@@ -1,0 +1,742 @@
+/* 1. LAYOUT YA JUMLA */
+.dashboard-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 2. HEADER YA JUU */
+.dashboard-header {
+    height: 60px;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 100;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.logo-text {
+    font-size: 22px;
+    font-weight: 800;
+    color: #ff6a00; /* Rangi ya Alibaba */
+    text-decoration: none;
+    letter-spacing: -0.5px;
+}
+
+.search-box {
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    padding: 6px 15px;
+    border-radius: 20px;
+    width: 280px;
+    color: #6b7280;
+}
+
+.search-box input {
+    background: transparent;
+    border: none;
+    outline: none;
+    margin-left: 10px;
+    font-size: 14px;
+    width: 100%;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.icon-btn {
+    color: #4b5563;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.icon-btn:hover {
+    color: #ff6a00;
+}
+
+/* 3. BODY (SIDEBAR + CONTENT) */
+.dashboard-main {
+    display: flex;
+    flex: 1;
+    overflow: hidden; /* Muhimu kuzuia kuscroll kote */
+}
+
+/* SIDEBAR YA ICONS */
+.dashboard-sidebar {
+    width: 65px;
+    background: #ffffff;
+    border-right: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+    gap: 15px;
+}
+
+.sidebar-link {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.sidebar-link:hover {
+    background: #f9fafb;
+    color: #ff6a00;
+}
+
+.sidebar-link.active {
+    background: #fff0e6;
+    color: #ff6a00;
+    position: relative;
+}
+
+/* Kiashiria kidogo pembeni ya icon iliyo active */
+.sidebar-link.active::before {
+    content: "";
+    position: absolute;
+    left: -11px;
+    height: 20px;
+    width: 4px;
+    background: #ff6a00;
+    border-radius: 0 4px 4px 0;
+}
+
+/* 4. SETTINGS CONTENT AREA */
+.settings-container {
+    flex: 1;
+    background-color: #f7f8fa; /* Rangi ya background ya Alibaba */
+    padding: 25px;
+    overflow-y: auto; /* Content pekee ndio inascroll */
+}
+
+.settings-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* CARDS ZA SETTINGS */
+.settings-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* PROFILE HEADER CARD */
+.profile-header-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.profile-info-main {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.avatar-circle {
+    width: 70px;
+    height: 70px;
+    background: #ff6a00;
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.user-full-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 4px;
+}
+
+.user-email-sub, .member-id {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.header-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+.btn-edit-profile {
+    padding: 8px 16px;
+    border: 1px solid #d1d5db;
+    background: white;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-signout-text {
+    color: #ef4444;
+    font-size: 14px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* GRID SYSTEM */
+.settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #374151;
+}
+
+.settings-links-list {
+    list-style: none;
+    padding: 0;
+}
+
+.link-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 14px;
+    color: #4b5563;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.link-item:hover {
+    color: #ff6a00;
+}
+
+.sub-text {
+    color: #9ca3af;
+}
+
+.delete-acc {
+    color: #ef4444;
+}
+
+.full-width {
+    grid-column: span 2;
+}
+/* --- MABORESHO YA PROFILE HEADER --- */
+
+.avatar-circle {
+  width: 80px;
+  height: 80px;
+  background-color: #f3f4f6; /* Rangi ya nyuma kama picha haipo */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: bold;
+  color: #4f46e5; /* Rangi ya herufi */
+  border: 3px solid #ffffff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  overflow: hidden; /* Muhimu ili picha isivuje nje ya duara */
+  flex-shrink: 0;
+}
+
+/* CSS Mpya kwa ajili ya Picha ya Mtumiaji (Real Avatar) */
+.avatar-img-real {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Inahakikisha picha haijivuti (no distortion) */
+  display: block;
+}
+
+.profile-info-main {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.user-full-name {
+  margin: 0;
+  font-size: 22px;
+  color: #111827;
+  text-transform: capitalize; /* Inafanya jina lianze na herufi kubwa */
+}
+
+.user-email-sub {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.member-id {
+  font-size: 12px;
+  color: #9ca3af;
+  font-family: monospace; /* Inafanya ID ionekane kama kodi */
+}
+
+/* --- MABORESHO YA ACCOUNT SECURITY SECTION --- */
+
+.link-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 15px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+  cursor: pointer;
+}
+
+.link-item:hover {
+  background-color: #f9fafb;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+.sub-text {
+  font-size: 13px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.delete-acc {
+  color: #ef4444; /* Rangi nyekundu kwa ajili ya kufuta account */
+}
+
+.delete-acc:hover {
+  background-color: #fef2f2;
+}
+
+/* --- BUTTONS --- */
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.btn-edit-profile {
+  padding: 8px 16px;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-edit-profile:hover {
+  opacity: 0.9;
+}
+
+.btn-signout-text {
+  background: none;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-signout-text:hover {
+  background-color: #f3f4f6;
+}
+/* Hakikisha sidebar-link iko relative */
+.sidebar-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Inatengeneza tooltip (maelezo) */
+.sidebar-link::after {
+  content: attr(data-tooltip); /* Inachukua neno kutoka kwenye data-tooltip */
+  position: absolute;
+  left: 110%; /* Inakaa upande wa kulia wa icon */
+  background-color: #333;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0; /* Haionekani mwanzo */
+  pointer-events: none;
+  transition: all 0.2s ease;
+  transform: translateX(-10px);
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Inatengeneza mshale mdogo (arrow) wa tooltip */
+.sidebar-link::before {
+  content: '';
+  position: absolute;
+  left: 100%;
+  border: 5px solid transparent;
+  border-right-color: #333;
+  opacity: 0;
+  transition: all 0.2s ease;
+  transform: translateX(-10px);
+}
+
+/* Inatokea unapopitisha mouse (Hover) */
+.sidebar-link:hover::after,
+.sidebar-link:hover::before {
+  opacity: 1;
+  transform: translateX(0);
+}
+/* ============================================ */
+/* RESPONSIVE DESIGN - ACCOUNT SETTINGS */
+/* ============================================ */
+
+/* Kwa simu na tablets ndogo (max-width: 768px) */
+@media (max-width: 768px) {
+  
+  /* Grid ya settings - iwe safu moja */
+  .settings-grid {
+    grid-template-columns: 1fr !important;
+    gap: 15px;
+  }
+  
+  /* Profile header - ipangane chini kwa chini */
+  .profile-header-card {
+    flex-direction: column !important;
+    text-align: center;
+    padding: 20px !important;
+  }
+  
+  .profile-info-main {
+    flex-direction: column !important;
+    text-align: center;
+    gap: 12px !important;
+  }
+  
+  /* Avatar iwe ndogo kidogo kwenye simu */
+  .avatar-circle {
+    width: 60px !important;
+    height: 60px !important;
+    font-size: 22px !important;
+  }
+  
+  /* Jina la mtumiaji liwe kubwa kidogo */
+  .user-full-name {
+    font-size: 18px !important;
+  }
+  
+  /* Button za edit profile - ziwe chini ya kila kitu */
+  .btn-edit-profile {
+    width: 100%;
+    justify-content: center;
+    margin-top: 10px;
+  }
+  
+  /* Header - punguza padding na gap */
+  .dashboard-header {
+    padding: 0 12px !important;
+  }
+  
+  .header-left {
+    gap: 12px !important;
+  }
+  
+  /* Ficha search box kwenye simu (au ifanye ndogo) */
+  .search-box {
+    display: none !important;
+  }
+  
+  /* Logo iwe ndogo kidogo */
+  .logo-text {
+    font-size: 16px !important;
+  }
+  
+  /* Sidebar kwenye simu - ifichwe kabisa au iwe floating */
+  .dashboard-main aside {
+    position: fixed !important;
+    left: 0;
+    top: 60px;
+    bottom: 0;
+    z-index: 200 !important;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  }
+  
+  /* Settings container - ongeza padding */
+  .settings-container {
+    padding: 15px !important;
+  }
+  
+  /* Cards - punguza padding */
+  .settings-card {
+    padding: 16px !important;
+  }
+  
+  /* Section titles ziwe ndogo */
+  .section-title {
+    font-size: 14px !important;
+  }
+  
+  /* Link items - punguza padding */
+  .link-item {
+    padding: 10px 12px !important;
+  }
+  
+  /* Badilisha font size za maandishi */
+  .user-email-sub, .member-id {
+    font-size: 12px !important;
+  }
+}
+
+/* Kwa simu ndogo sana (max-width: 480px) */
+@media (max-width: 480px) {
+  
+  /* Sidebar iwe nyembamba zaidi */
+  .dashboard-main aside {
+    width: 60px !important;
+  }
+  
+  /* Sidebar ikiwa imepanuliwa, iwe na upana mzuri */
+  .dashboard-main aside[style*="width: 240px"] {
+    width: 200px !important;
+  }
+  
+  /* Header right icons - punguza gap */
+  .header-right {
+    gap: 12px !important;
+  }
+  
+  /* Settings grid gap iwe ndogo */
+  .settings-grid {
+    gap: 12px !important;
+  }
+  
+  /* Buttons kwenye modal ziwe stacked */
+  .edit-profile-modal .modal-buttons {
+    flex-direction: column !important;
+  }
+}
+
+/* Kwa desktop kubwa (min-width: 1400px) */
+@media (min-width: 1400px) {
+  .settings-wrapper {
+    max-width: 1200px !important;
+  }
+  
+  .settings-grid {
+    gap: 30px !important;
+  }
+}
+
+/* ============================================ */
+/* SIDEBAR TOOLTIP IMPROVEMENTS */
+/* ============================================ */
+
+/* Hakikisha tooltip haivunjiki kwenye simu */
+@media (max-width: 768px) {
+  .sidebar-link::after,
+  .sidebar-link::before {
+    display: none !important;
+  }
+}
+
+/* Tooltip iwe na animation nzuri */
+.sidebar-link::after {
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  backdrop-filter: blur(10px);
+  background-color: rgba(0, 0, 0, 0.85);
+}
+
+/* ============================================ */
+/* MODAL RESPONSIVENESS */
+/* ============================================ */
+
+/* Edit profile modal kwenye simu */
+@media (max-width: 768px) {
+  /* Modal container */
+  div[style*="position: fixed"] > div {
+    width: 95% !important;
+    margin: 10px auto !important;
+    max-height: 85vh !important;
+    border-radius: 20px !important;
+  }
+  
+  /* Modal header */
+  div[style*="position: fixed"] > div > div:first-child {
+    padding: 15px !important;
+  }
+  
+  /* Modal body */
+  div[style*="position: fixed"] > div > div:last-child {
+    padding: 15px !important;
+  }
+  
+  /* Avatar kwenye modal iwe ndogo */
+  div[style*="position: fixed"] .avatar-upload-container {
+    width: 80px !important;
+    height: 80px !important;
+  }
+  
+  /* Buttons kwenye modal - ziwe stacked */
+  div[style*="position: fixed"] div[style*="display: flex; gap: 10px; justify-content: flex-end"] {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  
+  div[style*="position: fixed"] button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* ============================================ */
+/* IMPROVED SCROLLBAR */
+/* ============================================ */
+
+/* Custom scrollbar kwa settings container */
+.settings-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.settings-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.settings-container::-webkit-scrollbar-thumb {
+  background: #ff6a00;
+  border-radius: 10px;
+}
+
+.settings-container::-webkit-scrollbar-thumb:hover {
+  background: #e55a00;
+}
+
+/* ============================================ */
+/* ANIMATIONS & TRANSITIONS */
+/* ============================================ */
+
+/* Smooth transition kwa cards */
+.settings-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.settings-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Button hover effects */
+.btn-edit-profile, 
+button[style*="background-color: #ff6a00"] {
+  transition: all 0.2s ease !important;
+}
+
+.btn-edit-profile:hover,
+button[style*="background-color: #ff6a00"]:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+/* Link items - underline effect on hover */
+.link-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.link-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #ff6a00;
+  transition: width 0.2s ease;
+}
+
+.link-item:hover::after {
+  width: 100%;
+}
+
+/* ============================================ */
+/* DARK MODE SUPPORT (Optional) */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  /* Kama unataka ku-support dark mode */
+  /* Unaweza kuongeza baadaye */
+}
+
+/* ============================================ */
+/* FIX FOR MOBILE BOTTOM NAVIGATION */
+/* ============================================ */
+
+/* Hakikisha content ina nafasi chini kwa bottom nav */
+@media (max-width: 768px) {
+  .settings-container {
+    padding-bottom: 80px !important;
+  }
+}
+
+/* ============================================ */
+/* PRINT STYLES (Kama mtumiaji atachapisha) */
+/* ============================================ */
+
+@media print {
+  .dashboard-header,
+  .dashboard-main aside,
+  .btn-edit-profile,
+  .header-right {
+    display: none !important;
+  }
+  
+  .settings-container {
+    padding: 0 !important;
+    background: white !important;
+  }
+  
+  .settings-card {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
+}

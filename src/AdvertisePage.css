@@ -1,0 +1,802 @@
+/* --- ADVERTISE PAGE WRAPPER --- */
+.advertise-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    font-family: 'Inter', sans-serif;
+}
+
+.advertise-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.advertise-header h2 {
+    font-size: 2.2rem;
+    color: #1a1a1a;
+    margin-bottom: 10px;
+}
+
+.advertise-header p {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+/* --- FORM STYLING --- */
+.ad-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+.ad-form .full-width {
+    grid-column: span 2;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-group label {
+    font-weight: 600;
+    color: #444;
+    font-size: 0.95rem;
+}
+
+.input-group input, 
+.input-group select, 
+.input-group textarea {
+    padding: 14px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.input-group input:focus, 
+.input-group textarea:focus {
+    border-color: #ff6600;
+    box-shadow: 0 0 0 4px rgba(255, 102, 0, 0.1);
+}
+
+/* --- FILE UPLOAD BOX --- */
+.file-upload-zone {
+    grid-column: span 2;
+    border: 2px dashed #ff6600;
+    background-color: #fff9f5;
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.file-upload-zone:hover {
+    background-color: #fff0e6;
+}
+
+.file-upload-zone .icon-box {
+    color: #ff6600;
+    background: white;
+    padding: 15px;
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(255, 102, 0, 0.2);
+}
+
+.file-upload-zone span {
+    font-weight: 500;
+    color: #ff6600;
+}
+
+/* --- SUBMIT BUTTON --- */
+.submit-ad-btn {
+    grid-column: span 2;
+    background: linear-gradient(135deg, #ff8800, #ff6600);
+    color: white;
+    padding: 18px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+    margin-top: 10px;
+}
+
+.submit-ad-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 102, 0, 0.3);
+}
+
+/* --- STATUS MESSAGES --- */
+.status-success {
+    background-color: #dcfce7;
+    color: #166534;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .ad-form {
+        grid-template-columns: 1fr;
+    }
+    .ad-form .full-width {
+        grid-column: span 1;
+    }
+    .advertise-container {
+        margin: 10px;
+        padding: 20px;
+    }
+}
+.status-alert {
+    grid-column: span 2;
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.status-alert.success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+.status-alert.error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+.status-alert.info { background: #e0f2fe; color: #075985; border: 1px solid #bae6fd; }
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+/* ============================================ */
+/* RESPONSIVE DESIGN - ADVERTISE PAGE */
+/* ============================================ */
+
+/* Container kuu */
+.advertise-container {
+    max-width: 900px !important;
+    margin: 40px auto !important;
+    padding: 30px !important;
+    background-color: #ffffff !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+/* Header section */
+.advertise-header {
+    text-align: center !important;
+    margin-bottom: 40px !important;
+}
+
+.advertise-header h2 {
+    font-size: 2rem !important;
+    color: #1a1a1a !important;
+    margin-bottom: 10px !important;
+}
+
+.advertise-header p {
+    color: #666 !important;
+    font-size: 1rem !important;
+}
+
+/* ============================================ */
+/* FORM STYLING - RESPONSIVE */
+/* ============================================ */
+
+.ad-form {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 25px !important;
+}
+
+.ad-form .full-width {
+    grid-column: span 2 !important;
+}
+
+.input-group {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+}
+
+.input-group label {
+    font-weight: 600 !important;
+    color: #444 !important;
+    font-size: 0.9rem !important;
+}
+
+.input-group input, 
+.input-group select, 
+.input-group textarea {
+    padding: 12px 14px !important;
+    border: 1.5px solid #e0e0e0 !important;
+    border-radius: 10px !important;
+    font-size: 0.95rem !important;
+    transition: all 0.3s ease !important;
+    outline: none !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.input-group input:focus, 
+.input-group textarea:focus {
+    border-color: #ff6600 !important;
+    box-shadow: 0 0 0 4px rgba(255, 102, 0, 0.1) !important;
+}
+
+/* Readonly input */
+.readonly-input {
+    background-color: #f5f5f5 !important;
+    cursor: not-allowed !important;
+    color: #666 !important;
+}
+
+/* Form hint */
+.form-hint {
+    font-size: 11px !important;
+    color: #888 !important;
+    margin-top: 4px !important;
+}
+
+/* ============================================ */
+/* STORE SELECTION DROPDOWN - RESPONSIVE */
+/* ============================================ */
+
+.store-select-wrapper {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.store-icon {
+    position: absolute !important;
+    left: 12px !important;
+    color: #ff6600 !important;
+    z-index: 1 !important;
+}
+
+.store-select {
+    width: 100% !important;
+    padding: 12px 14px 12px 38px !important;
+    border: 1.5px solid #e0e0e0 !important;
+    border-radius: 10px !important;
+    font-size: 0.95rem !important;
+    background-color: white !important;
+    appearance: none !important;
+    cursor: pointer !important;
+}
+
+.dropdown-icon {
+    position: absolute !important;
+    right: 12px !important;
+    color: #888 !important;
+    pointer-events: none !important;
+}
+
+/* ============================================ */
+/* FILE UPLOAD ZONE - RESPONSIVE */
+/* ============================================ */
+
+.file-upload-zone {
+    grid-column: span 2 !important;
+    border: 2px dashed #ff6600 !important;
+    background-color: #fff9f5 !important;
+    padding: 40px 20px !important;
+    border-radius: 15px !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    transition: background 0.3s ease !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+.file-upload-zone:hover {
+    background-color: #fff0e6 !important;
+}
+
+.file-upload-zone .icon-box {
+    color: #ff6600 !important;
+    background: white !important;
+    padding: 12px !important;
+    border-radius: 50% !important;
+    box-shadow: 0 4px 10px rgba(255, 102, 0, 0.2) !important;
+}
+
+.file-upload-zone p {
+    font-weight: 600 !important;
+    color: #333 !important;
+    margin: 0 !important;
+}
+
+.file-upload-zone span {
+    font-weight: 500 !important;
+    color: #ff6600 !important;
+    font-size: 0.85rem !important;
+}
+
+.file-types {
+    font-size: 0.75rem !important;
+    color: #999 !important;
+}
+
+/* ============================================ */
+/* MEDIA PREVIEW - RESPONSIVE */
+/* ============================================ */
+
+.media-preview-container {
+    grid-column: span 2 !important;
+}
+
+.preview-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 15px !important;
+    padding: 20px !important;
+    background: #f8fafc !important;
+    border-radius: 12px !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+.media-preview-item {
+    max-width: 100% !important;
+    max-height: 250px !important;
+    border-radius: 10px !important;
+    object-fit: contain !important;
+}
+
+.preview-actions {
+    display: flex !important;
+    gap: 10px !important;
+}
+
+.change-file-btn {
+    background: none !important;
+    border: 1px solid #ff6600 !important;
+    color: #ff6600 !important;
+    padding: 8px 20px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+}
+
+.change-file-btn:hover {
+    background: #fff0e6 !important;
+}
+
+/* ============================================ */
+/* SUBMIT BUTTON - RESPONSIVE */
+/* ============================================ */
+
+.submit-ad-btn {
+    grid-column: span 2 !important;
+    background: linear-gradient(135deg, #ff8800, #ff6600) !important;
+    color: white !important;
+    padding: 16px !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-size: 1rem !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 12px !important;
+    transition: transform 0.2s ease, box-shadow 0.3s ease !important;
+    margin-top: 10px !important;
+}
+
+.submit-ad-btn:hover:not(:disabled) {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 20px rgba(255, 102, 0, 0.3) !important;
+}
+
+.submit-ad-btn:disabled {
+    opacity: 0.7 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+/* ============================================ */
+/* STATUS ALERTS - RESPONSIVE */
+/* ============================================ */
+
+.status-alert {
+    grid-column: span 2 !important;
+    padding: 15px !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-bottom: 20px !important;
+    font-weight: 500 !important;
+}
+
+.status-alert.success { 
+    background: #dcfce7 !important; 
+    color: #166534 !important; 
+    border: 1px solid #bbf7d0 !important; 
+}
+.status-alert.error { 
+    background: #fee2e2 !important; 
+    color: #991b1b !important; 
+    border: 1px solid #fecaca !important; 
+}
+.status-alert.info { 
+    background: #e0f2fe !important; 
+    color: #075985 !important; 
+    border: 1px solid #bae6fd !important; 
+}
+
+/* ============================================ */
+/* INFO BOX - RESPONSIVE */
+/* ============================================ */
+
+.ad-info-box {
+    margin-top: 30px !important;
+    padding: 20px !important;
+    background: #f8fafc !important;
+    border-radius: 12px !important;
+    border-left: 4px solid #ff6600 !important;
+}
+
+.ad-info-box h4 {
+    margin: 0 0 12px 0 !important;
+    color: #333 !important;
+    font-size: 1rem !important;
+}
+
+.ad-info-box ul {
+    margin: 0 !important;
+    padding-left: 20px !important;
+}
+
+.ad-info-box li {
+    margin-bottom: 8px !important;
+    color: #666 !important;
+    font-size: 0.85rem !important;
+}
+
+/* ============================================ */
+/* LOADING STATE - RESPONSIVE */
+/* ============================================ */
+
+.advertise-container > div[style*="textAlign: 'center'"] {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 300px !important;
+}
+
+/* ============================================ */
+/* RESPONSIVE BREAKPOINTS */
+/* ============================================ */
+
+/* Tablets and smaller (≤900px) */
+@media (max-width: 900px) {
+    .advertise-container {
+        margin: 20px !important;
+        padding: 25px !important;
+    }
+    
+    .advertise-header h2 {
+        font-size: 1.8rem !important;
+    }
+}
+
+/* Simu (≤768px) */
+@media (max-width: 768px) {
+    .advertise-container {
+        margin: 15px !important;
+        padding: 20px !important;
+        border-radius: 16px !important;
+    }
+    
+    .advertise-header {
+        margin-bottom: 25px !important;
+    }
+    
+    .advertise-header h2 {
+        font-size: 1.5rem !important;
+    }
+    
+    .advertise-header p {
+        font-size: 0.9rem !important;
+    }
+    
+    .ad-form {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+    }
+    
+    .ad-form .full-width,
+    .file-upload-zone,
+    .media-preview-container,
+    .submit-ad-btn,
+    .status-alert {
+        grid-column: span 1 !important;
+    }
+    
+    .input-group input, 
+    .input-group select, 
+    .input-group textarea {
+        padding: 10px 12px !important;
+        font-size: 0.9rem !important;
+    }
+    
+    .file-upload-zone {
+        padding: 30px 15px !important;
+    }
+    
+    .file-upload-zone p {
+        font-size: 0.9rem !important;
+    }
+    
+    .file-upload-zone span {
+        font-size: 0.8rem !important;
+    }
+    
+    .submit-ad-btn {
+        padding: 14px !important;
+        font-size: 0.95rem !important;
+    }
+    
+    .ad-info-box {
+        padding: 16px !important;
+    }
+    
+    .ad-info-box h4 {
+        font-size: 0.9rem !important;
+    }
+    
+    .ad-info-box li {
+        font-size: 0.8rem !important;
+    }
+}
+
+/* Simu ndogo (≤480px) */
+@media (max-width: 480px) {
+    .advertise-container {
+        margin: 10px !important;
+        padding: 16px !important;
+        border-radius: 12px !important;
+    }
+    
+    .advertise-header h2 {
+        font-size: 1.3rem !important;
+    }
+    
+    .advertise-header p {
+        font-size: 0.85rem !important;
+    }
+    
+    .input-group label {
+        font-size: 0.85rem !important;
+    }
+    
+    .store-select {
+        padding: 10px 14px 10px 35px !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .store-icon {
+        left: 10px !important;
+        width: 16px !important;
+        height: 16px !important;
+    }
+    
+    .file-upload-zone {
+        padding: 20px 12px !important;
+    }
+    
+    .file-upload-zone .icon-box svg {
+        width: 30px !important;
+        height: 30px !important;
+    }
+    
+    .media-preview-item {
+        max-height: 180px !important;
+    }
+    
+    .preview-wrapper {
+        padding: 12px !important;
+    }
+    
+    .change-file-btn {
+        padding: 6px 16px !important;
+        font-size: 0.8rem !important;
+    }
+    
+    .submit-ad-btn {
+        padding: 12px !important;
+        font-size: 0.9rem !important;
+    }
+    
+    .status-alert {
+        padding: 12px !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .ad-info-box {
+        padding: 12px !important;
+    }
+    
+    .ad-info-box ul {
+        padding-left: 16px !important;
+    }
+}
+
+/* ============================================ */
+/* TOUCH OPTIMIZATIONS */
+/* ============================================ */
+
+@media (hover: none) and (pointer: coarse) {
+    .submit-ad-btn,
+    .file-upload-zone,
+    .change-file-btn,
+    .store-select,
+    button {
+        cursor: pointer !important;
+        -webkit-tap-highlight-color: transparent !important;
+    }
+    
+    .submit-ad-btn:active,
+    .change-file-btn:active,
+    .file-upload-zone:active {
+        transform: scale(0.98) !important;
+        transition: transform 0.05s ease !important;
+    }
+    
+    /* Larger tap targets */
+    .submit-ad-btn {
+        min-height: 48px !important;
+    }
+    
+    .change-file-btn {
+        min-height: 40px !important;
+    }
+}
+
+/* ============================================ */
+/* PRINT STYLES */
+/* ============================================ */
+
+@media print {
+    .advertise-container {
+        margin: 0 !important;
+        padding: 20px !important;
+        box-shadow: none !important;
+    }
+    
+    .submit-ad-btn,
+    .file-upload-zone,
+    .change-file-btn,
+    .status-alert button {
+        display: none !important;
+    }
+    
+    .ad-info-box {
+        break-inside: avoid !important;
+    }
+}
+
+/* ============================================ */
+/* SAFE AREA FOR NOTCH DEVICES */
+/* ============================================ */
+
+@supports (padding: max(0px)) {
+    @media (max-width: 768px) {
+        .advertise-container {
+            padding-left: max(16px, env(safe-area-inset-left)) !important;
+            padding-right: max(16px, env(safe-area-inset-right)) !important;
+            padding-bottom: max(20px, env(safe-area-inset-bottom)) !important;
+        }
+    }
+}
+
+/* ============================================ */
+/* ANIMATIONS */
+/* ============================================ */
+
+.animate-spin {
+    animation: spin 1s linear infinite !important;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.status-alert {
+    animation: fadeIn 0.3s ease forwards !important;
+}
+
+/* ============================================ */
+/* DARK MODE SUPPORT (Optional) */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+    .advertise-container {
+        background-color: #1e293b !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    .advertise-header h2 {
+        color: #f1f5f9 !important;
+    }
+    
+    .advertise-header p {
+        color: #94a3b8 !important;
+    }
+    
+    .input-group label {
+        color: #cbd5e1 !important;
+    }
+    
+    .input-group input, 
+    .input-group select, 
+    .input-group textarea {
+        background-color: #0f172a !important;
+        border-color: #334155 !important;
+        color: #f1f5f9 !important;
+    }
+    
+    .readonly-input {
+        background-color: #334155 !important;
+        color: #94a3b8 !important;
+    }
+    
+    .file-upload-zone {
+        background-color: #0f172a !important;
+        border-color: #ff6600 !important;
+    }
+    
+    .file-upload-zone p {
+        color: #e2e8f0 !important;
+    }
+    
+    .ad-info-box {
+        background-color: #0f172a !important;
+    }
+    
+    .ad-info-box h4 {
+        color: #e2e8f0 !important;
+    }
+    
+    .ad-info-box li {
+        color: #94a3b8 !important;
+    }
+}

@@ -1,0 +1,762 @@
+/* 1. SMART VARIABLES - Badili rangi hapa, inabadilika kote */
+:root {
+  --primary-color: #ff4e00;
+  --primary-hover: #e64600;
+  --bg-body: #f4f7f9;
+  --card-bg: rgba(255, 255, 255, 0.95);
+  --text-main: #1a1a1a;
+  --text-muted: #6b7280;
+  --border-color: #e5e7eb;
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+  --radius-lg: 20px;
+  --radius-md: 12px;
+}
+
+/* 2. RESET & BASE */
+.up-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-body);
+  min-height: 100vh;
+}
+
+/* 3. SMART HEADER */
+.up-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  position: sticky;
+  top: 10px;
+  z-index: 100;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.up-header h2 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+}
+
+/* 4. SMART GRID LAYOUT */
+.up-content {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* 5. CARDS (Glassmorphism Lite) */
+.up-card {
+  background: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.3s ease;
+}
+
+.up-card h3 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* 6. IMAGE ENGINE (Smart Transitions) */
+.up-main-img {
+  position: relative;
+  aspect-ratio: 1/1;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #eee;
+  border: 2px solid var(--border-color);
+}
+
+.up-main-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.up-main-img:hover img {
+  transform: scale(1.08);
+}
+
+.up-edit-label {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  font-weight: 600;
+  font-size: 0.9rem;
+  gap: 8px;
+}
+
+.up-main-img:hover .up-edit-label {
+  opacity: 1;
+}
+
+/* 7. GALLERY GRID */
+.up-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.up-gallery-item {
+  position: relative;
+  aspect-ratio: 1/1;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.up-del-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.up-del-btn:hover {
+  transform: scale(1.1);
+  background: rgb(220, 38, 38);
+}
+
+/* 8. SMART FORM INPUTS */
+.up-form {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.up-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.up-input-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.up-input-group input, 
+.up-input-group textarea {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: #fff;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.up-input-group input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(255, 78, 0, 0.1);
+  outline: none;
+}
+
+/* 9. BUTTONS */
+.up-save-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(255, 78, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.up-save-btn:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 78, 0, 0.4);
+}
+
+/* 10. RESPONSIVE */
+@media (max-width: 900px) {
+  .up-content {
+    grid-template-columns: 1fr;
+  }
+  .up-container {
+    padding: 1rem;
+  }
+}
+/* ============================================ */
+/* RESPONSIVE DESIGN - UPDATE PRODUCT PAGE */
+/* ============================================ */
+
+/* Container kuu */
+.up-container {
+  max-width: 1400px !important;
+  margin: 0 auto !important;
+  padding: 20px !important;
+  min-height: 100vh !important;
+  background-color: #f8fafc !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+/* ============================================ */
+/* HEADER - RESPONSIVE */
+/* ============================================ */
+
+.up-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  background: white !important;
+  padding: 16px 24px !important;
+  border-radius: 16px !important;
+  margin-bottom: 24px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+}
+
+.up-back-btn {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: #f1f5f9 !important;
+  border: none !important;
+  padding: 8px 16px !important;
+  border-radius: 10px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  color: #475569 !important;
+}
+
+.up-back-btn:hover {
+  background: #e2e8f0 !important;
+  transform: translateX(-2px) !important;
+}
+
+.up-save-btn {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: #22c55e !important;
+  color: white !important;
+  border: none !important;
+  padding: 8px 20px !important;
+  border-radius: 10px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.up-save-btn:hover:not(:disabled) {
+  background: #16a34a !important;
+  transform: translateY(-2px) !important;
+}
+
+.up-save-btn:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+.up-header .text-center h2 {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  margin: 0 !important;
+}
+
+.up-header .text-center p {
+  font-size: 10px !important;
+  color: #94a3b8 !important;
+}
+
+@media (max-width: 640px) {
+  .up-header {
+    padding: 12px 16px !important;
+  }
+  
+  .up-back-btn {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+  }
+  
+  .up-save-btn {
+    padding: 6px 16px !important;
+    font-size: 12px !important;
+  }
+  
+  .up-header .text-center h2 {
+    font-size: 14px !important;
+  }
+}
+
+/* ============================================ */
+/* MAIN CONTENT - RESPONSIVE GRID */
+/* ============================================ */
+
+.up-content {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 24px !important;
+  align-items: start !important;
+}
+
+/* Simu (≤768px) - Grid inakuwa safu moja */
+@media (max-width: 768px) {
+  .up-content {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+}
+
+/* ============================================ */
+/* CARDS - RESPONSIVE */
+/* ============================================ */
+
+.up-card {
+  background: white !important;
+  border-radius: 20px !important;
+  padding: 24px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid #eef2f6 !important;
+}
+
+.up-card h3 {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  margin-bottom: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+@media (max-width: 480px) {
+  .up-card {
+    padding: 16px !important;
+    border-radius: 16px !important;
+  }
+  
+  .up-card h3 {
+    font-size: 14px !important;
+    margin-bottom: 14px !important;
+  }
+}
+
+/* ============================================ */
+/* MAIN IMAGE (COVER) - RESPONSIVE */
+/* ============================================ */
+
+.up-main-img {
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 16px !important;
+  border: 2px dashed #e2e8f0 !important;
+  background: #f8fafc !important;
+}
+
+.up-main-img img {
+  width: 100% !important;
+  height: 280px !important;
+  object-fit: cover !important;
+}
+
+.up-edit-label {
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: white !important;
+  opacity: 0 !important;
+  transition: opacity 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+.up-main-img:hover .up-edit-label {
+  opacity: 1 !important;
+}
+
+@media (max-width: 768px) {
+  .up-main-img img {
+    height: 220px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .up-main-img img {
+    height: 180px !important;
+  }
+}
+
+/* ============================================ */
+/* GALLERY GRID - RESPONSIVE */
+/* ============================================ */
+
+.up-gallery-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 12px !important;
+}
+
+.up-gallery-item {
+  position: relative !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  border: 1px solid #eef2f6 !important;
+  aspect-ratio: 1 / 1 !important;
+}
+
+.up-gallery-item img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+.up-del-btn {
+  position: absolute !important;
+  top: 6px !important;
+  right: 6px !important;
+  background: #ef4444 !important;
+  color: white !important;
+  border: none !important;
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  opacity: 0 !important;
+  transition: opacity 0.2s ease !important;
+}
+
+.up-gallery-item:hover .up-del-btn {
+  opacity: 1 !important;
+}
+
+.up-add-box {
+  border: 2px dashed #cbd5e1 !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  aspect-ratio: 1 / 1 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  background: #f8fafc !important;
+}
+
+.up-add-box:hover {
+  border-color: #ff6a00 !important;
+  background: #fff5ed !important;
+}
+
+@media (max-width: 768px) {
+  .up-gallery-grid {
+    gap: 10px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .up-gallery-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+  }
+}
+
+/* ============================================ */
+/* FORM - RESPONSIVE */
+/* ============================================ */
+
+.up-form {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 20px !important;
+}
+
+.up-input-group {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+}
+
+.up-input-group label {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: #475569 !important;
+}
+
+.up-input-group input,
+.up-input-group textarea {
+  width: 100% !important;
+  padding: 12px 14px !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  font-size: 14px !important;
+  transition: all 0.2s ease !important;
+  background: #fff !important;
+}
+
+.up-input-group input:focus,
+.up-input-group textarea:focus {
+  outline: none !important;
+  border-color: #ff6a00 !important;
+  box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.1) !important;
+}
+
+.up-input-group textarea {
+  resize: vertical !important;
+  min-height: 120px !important;
+}
+
+/* Form grid for 2 columns */
+.up-form .grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 16px !important;
+}
+
+@media (max-width: 640px) {
+  .up-form .grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  
+  .up-input-group input,
+  .up-input-group textarea {
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+  }
+}
+
+/* ============================================ */
+/* LOADING STATE - RESPONSIVE */
+/* ============================================ */
+
+.up-loading {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 400px !important;
+  gap: 16px !important;
+}
+
+.up-loading svg {
+  color: #ff6a00 !important;
+}
+
+.up-loading p {
+  color: #64748b !important;
+  font-size: 14px !important;
+}
+
+/* ============================================ */
+/* ANIMATIONS */
+/* ============================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation: fadeIn 0.3s ease forwards !important;
+}
+
+/* ============================================ */
+/* RESPONSIVE UTILITIES */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .space-y-6 > * + * {
+    margin-top: 16px !important;
+  }
+  
+  .space-y-4 > * + * {
+    margin-top: 14px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .space-y-6 > * + * {
+    margin-top: 12px !important;
+  }
+  
+  .space-y-4 > * + * {
+    margin-top: 10px !important;
+  }
+}
+
+/* ============================================ */
+/* TOUCH OPTIMIZATIONS */
+/* ============================================ */
+
+@media (hover: none) and (pointer: coarse) {
+  .up-back-btn,
+  .up-save-btn,
+  .up-add-box,
+  .up-del-btn {
+    cursor: pointer !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+  
+  .up-back-btn:active,
+  .up-save-btn:active {
+    transform: scale(0.97) !important;
+    transition: transform 0.05s ease !important;
+  }
+  
+  .up-add-box:active {
+    transform: scale(0.98) !important;
+  }
+  
+  /* Always show delete button on touch devices */
+  .up-del-btn {
+    opacity: 0.8 !important;
+  }
+}
+
+/* ============================================ */
+/* PRINT STYLES */
+/* ============================================ */
+
+@media print {
+  .up-container {
+    background: white !important;
+    padding: 0 !important;
+  }
+  
+  .up-header,
+  .up-edit-label,
+  .up-del-btn,
+  .up-add-box,
+  .up-save-btn {
+    display: none !important;
+  }
+  
+  .up-card {
+    break-inside: avoid !important;
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
+  
+  .up-main-img img {
+    height: 200px !important;
+  }
+}
+
+/* ============================================ */
+/* SAFE AREA FOR NOTCH DEVICES */
+/* ============================================ */
+
+@supports (padding: max(0px)) {
+  @media (max-width: 768px) {
+    .up-container {
+      padding-left: max(16px, env(safe-area-inset-left)) !important;
+      padding-right: max(16px, env(safe-area-inset-right)) !important;
+      padding-bottom: max(20px, env(safe-area-inset-bottom)) !important;
+    }
+  }
+}
+
+/* ============================================ */
+/* DARK MODE SUPPORT (Optional) */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .up-container {
+    background-color: #0f172a !important;
+  }
+  
+  .up-card,
+  .up-header {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+  }
+  
+  .up-card h3,
+  .up-header .text-center h2 {
+    color: #f1f5f9 !important;
+  }
+  
+  .up-input-group label {
+    color: #94a3b8 !important;
+  }
+  
+  .up-input-group input,
+  .up-input-group textarea {
+    background: #0f172a !important;
+    border-color: #475569 !important;
+    color: #e2e8f0 !important;
+  }
+  
+  .up-input-group input:focus,
+  .up-input-group textarea:focus {
+    border-color: #ff6a00 !important;
+  }
+  
+  .up-back-btn {
+    background: #334155 !important;
+    color: #e2e8f0 !important;
+  }
+  
+  .up-back-btn:hover {
+    background: #475569 !important;
+  }
+  
+  .up-add-box {
+    background: #1e293b !important;
+    border-color: #475569 !important;
+  }
+  
+  .up-add-box:hover {
+    background: #334155 !important;
+    border-color: #ff6a00 !important;
+  }
+}

@@ -1,0 +1,1286 @@
+/* CreateStore.css - Professional Edition */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+
+.create-store-page {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    background: #f8fafc;
+    padding: 120px 20px 60px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+}
+
+/* Background Decorations */
+.bg-decoration .circle {
+    position: absolute;
+    filter: blur(80px);
+    z-index: 0;
+    border-radius: 50%;
+}
+.circle-1 { width: 400px; height: 400px; background: rgba(255, 106, 0, 0.08); top: -100px; left: -100px; }
+.circle-2 { width: 300px; height: 300px; background: rgba(0, 123, 255, 0.08); bottom: -50px; right: -50px; }
+
+.main-container {
+    width: 100%;
+    max-width: 1000px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Hero Section */
+.hero-title { font-size: 2.8rem; font-weight: 800; color: #0f172a; letter-spacing: -1px; margin-bottom: 10px; }
+.hero-subtitle { color: #64748b; font-size: 1.1rem; }
+
+/* Selection Cards */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.choice-card-premium {
+    background: white;
+    padding: 50px 30px;
+    border-radius: 24px;
+    border: 1px solid #e2e8f0;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.choice-card-premium:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+    border-color: #ff6a00;
+}
+
+.icon-wrapper {
+    font-size: 4rem;
+    background: #f8fafc;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    margin-bottom: 25px;
+}
+
+.choice-card-premium h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 15px; color: #1e293b; }
+.choice-card-premium p { color: #64748b; line-height: 1.6; margin-bottom: 30px; font-size: 0.95rem; }
+
+.select-btn {
+    padding: 12px 30px;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    font-weight: 600;
+    color: #1e293b;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.choice-card-premium:hover .select-btn {
+    background: #ff6a00;
+    color: white;
+    border-color: #ff6a00;
+}
+
+.badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #f1f5f9;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #475569;
+}
+
+/* Form Wrapper Premium */
+.form-wrapper-premium {
+    display: flex;
+    background: white;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.15);
+    min-height: 600px;
+}
+
+.form-sidebar {
+    width: 35%;
+    background: #111;
+    padding: 50px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.back-link {
+    background: none; border: none; color: #94a3b8; cursor: pointer;
+    font-weight: 600; margin-bottom: 100px; transition: 0.3s;
+}
+.back-link:hover { color: #ff6a00; }
+
+.sidebar-content h2 { font-size: 2rem; font-weight: 800; margin-bottom: 15px; }
+.sidebar-content p { color: #94a3b8; line-height: 1.6; }
+.step-count { color: #ff6a00; font-weight: 800; font-size: 0.8rem; letter-spacing: 2px; }
+
+.form-content { width: 65%; padding: 60px; }
+
+/* Premium Input Groups */
+.premium-group { margin-bottom: 25px;
+margin-left: 2px; }
+.premium-group label { display: block; font-weight: 700; margin-bottom: 8px; color: #1e293b; font-size: 0.9rem; }
+.premium-group input, .premium-group select {
+    width: 100%; padding: 14px 18px; border: 2px solid #f1f5f9; background: #f8fafc;
+    border-radius: 14px; font-size: 1rem; transition: 0.3s;
+}
+.premium-group input:focus { border-color: #ff6a00; background: white; outline: none; box-shadow: 0 0 0 4px rgba(255, 106, 0, 0.1); }
+.premium-group small { color: #94a3b8; font-size: 0.8rem; margin-top: 5px; display: block; }
+
+.form-row {
+  display: flex;       /* Inakaa mstari mmoja */
+  gap: 20px;          /* Hii ndio itatengeneza nafasi kati ya box la kwanza na la pili */
+  width: 100%;
+  margin-bottom: 15px; /* Nafasi ya chini kuelekea row nyingine */
+}
+
+/* Hakikisha kila group linachukua nafasi sawa */
+.form-row .premium-group {
+  flex: 1; 
+  display: flex;
+  flex-direction: column;
+}
+
+/* Kwa simu (Mobile Responsive) */
+@media (max-width: 600px) {
+  .form-row {
+    flex-direction: column; /* Kwenye simu yakae juu na chini badala ya pembeni */
+    gap: 15px;
+  }
+}
+/* Submit Button */
+.premium-submit-btn {
+    width: 100%; background: #ff6a00; color: white; border: none; padding: 18px;
+    border-radius: 16px; font-size: 1.1rem; font-weight: 700; cursor: pointer;
+    box-shadow: 0 10px 25px -5px rgba(255, 106, 0, 0.4); transition: 0.3s; margin-top: 20px;
+}
+.premium-submit-btn:hover { background: #e65f00; transform: translateY(-2px); }
+
+/* Success Card */
+.premium-success-card {
+    background: white; padding: 60px; border-radius: 30px; text-align: center;
+    box-shadow: 0 40px 100px -20px rgba(0,0,0,0.1); max-width: 500px;
+}
+.gradient-text { background: linear-gradient(90deg, #ff6a00, #ffb800);  -webkit-text-fill-color: transparent; font-weight: 800; }
+.progress-bar-container { background: #f1f5f9; height: 8px; border-radius: 10px; margin-top: 30px; overflow: hidden; }
+.progress-fill { height: 100%; background: #ff6a00; width: 0%; animation: fill 2.5s forwards; }
+
+@keyframes fill { to { width: 100%; } }
+.animate-slide-up { animation: slideUp 0.6s ease-out; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Mobile Responsive */
+@media (max-width: 900px) {
+    .form-wrapper-premium { flex-direction: column; }
+    .form-sidebar, .form-content { width: 100%; padding: 40px 30px; }
+    .form-sidebar { min-height: auto; }
+    .back-link { margin-bottom: 30px; }
+    .form-row { grid-template-columns: 1fr; }
+    .hero-title { font-size: 2rem; }
+}
+/* Container ya Gridi ya Picha */
+.image-upload-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin: 20px 0;
+}
+
+/* Box la Kupakia Picha */
+.upload-box {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: #f8fafc;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+.upload-box:hover {
+  border-color: #6366f1;
+  background-color: #f1f5f9;
+}
+
+.upload-box span {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 500;
+  text-align: center;
+  padding: 5px;
+}
+
+/* Style ya picha ikishaingia */
+.upload-box.has-img {
+  border-style: solid;
+  border-color: #6366f1;
+}
+
+.upload-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.upload-box:hover img {
+  transform: scale(1.1);
+}
+
+/* Label kuu ya sehemu ya picha */
+.section-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+/* Animation kwa hatua (Steps) */
+.step-fade {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+  .image-upload-grid {
+    gap: 8px;
+  }
+  .upload-box span {
+    font-size: 0.7rem;
+  }
+}
+.premium-group select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  background-color: white;
+  font-size: 0.95rem;
+  color: #334155;
+  outline: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  appearance: none; /* Inatoa muonekano wa zamani wa browser */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 18px;
+}
+
+.premium-group select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.premium-group optgroup {
+  font-weight: 700;
+  color: #1e293b;
+  background: #f1f5f9;
+}
+
+.premium-group option {
+  padding: 10px;
+  font-weight: 400;
+  color: #475569;
+  background: white;
+}
+
+.loader {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #FFF;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.premium-submit-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+/* Container ya Sub-categories */
+.subcat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+/* Item moja (Label + Checkbox) */
+.subcat-item {
+  display: flex;
+  align-items: center; /* Hii inanyoosha checkbox na maandishi kwenye mstari mmoja */
+  gap: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.subcat-item:hover .subcat-name {
+  color: #ff6600; /* Rangi ya Skyfall ukigusa */
+}
+
+.subcat-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #ff6600; /* Rangi ya checkbox ikitiwa tiki */
+}
+
+.subcat-name {
+  font-size: 14px;
+  color: #ccc;
+}
+
+/* Specialist Tags Styles */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.specialist-tag {
+  background: #ff6600;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeIn 0.3s ease;
+}
+
+.tag-remove-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.group-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #fff;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.subcat-descriptions-container {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px dashed rgba(255, 102, 0, 0.2);
+  animation: fadeIn 0.4s ease-in;
+}
+
+.subcat-desc-item {
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  line-height: 1.4;
+}
+
+.subcat-desc-item:last-child {
+  border-bottom: none;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-pulse-subtle {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Inafanya maandishi ya description yasibanane na vitu vingine */
+.premium-group {
+  margin-bottom: 24px !important;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.animate-shake {
+  animation: shake 0.3s ease-in-out;
+}
+/* 1. Muonekano wa Group la Operation Details */
+.operation-section {
+  background: rgba(255, 255, 255, 0.02);
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 24px;
+}
+
+/* 2. Styling ya Quick Select Chips (MOQ Options) */
+.moq-chip {
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: #9ca3af;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.moq-chip:hover {
+  border-color: #f97316; /* Orange color */
+  color: #f97316;
+  background: rgba(249, 115, 22, 0.05);
+  transform: translateY(-1px);
+}
+
+.moq-chip.active {
+  background: #f97316;
+  color: #000;
+  border-color: #f97316;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
+}
+
+/* 3. Animation kwa ajili ya Error Message (Shake Effect) */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+/* 4. Glow Effect kwa ajili ya Pinned Fields */
+.premium-group-pinned {
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-group-pinned::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #f97316, transparent);
+  opacity: 0.5;
+}
+
+/* 5. Custom Styling kwa ajili ya Select Inputs */
+.premium-input {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  border-radius: 8px;
+  padding: 10px 12px;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.premium-input:focus {
+  border-color: #f97316 !important;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.1);
+}
+
+/* 6. Badge ya "LAZIMA" */
+.badge-required {
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #f97316;
+  color: black;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+/* Styling ya Textarea */
+.premium-group textarea {
+  width: 100%;
+  background: rgba(22, 22, 22, 0.25); /* Giza la ndani */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 14px;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: none; /* Inazuia mtumiaji kuivuta na kuharibu UI */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Inapoguswa (Focus) */
+.premium-group textarea:focus {
+  outline: none;
+  border-color: rgba(249, 115, 22, 0.5); /* Orange border */
+  background: rgba(249, 115, 22, 0.02); /* Glow ndogo ya ndani */
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.05), 
+              inset 0 0 10px rgba(249, 115, 22, 0.02);
+}
+
+/* Placeholder styling */
+.premium-group textarea::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+  font-style: italic;
+  font-size: 13px;
+}
+
+/* Scrollbar kwa ajili ya maelezo marefu */
+.premium-group textarea::-webkit-scrollbar {
+  width: 5px;
+}
+
+.premium-group textarea::-webkit-scrollbar-thumb {
+  background: rgba(249, 115, 22, 0.2);
+  border-radius: 10px;
+}
+
+/* Label styling maalum kwa Description */
+.premium-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #060e1b;
+  margin-bottom: 8px;
+}
+/* Hakikisha class hii ndiyo inayotumika kwenye textarea */
+.premium-textarea-input {
+  width: 100%;
+  /* Tunatumia giza nene kidogo (0.4) ili background ionekane */
+  background-color: rgba(15, 15, 15, 0.6) !important; 
+  border: 1px solid rgba(249, 115, 22, 0.2); /* Border ya orange hafifu */
+  border-radius: 12px;
+  padding: 16px;
+  color: #ffffff;
+  font-size: 15px;
+  min-height: 120px;
+  outline: none;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px); /* Inaleta muonekano wa kioo (glassmorphism) */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Inapoguswa (Focus) */
+.premium-textarea-input:focus {
+  border-color: #f97316; /* Orange inakolea */
+  background-color: rgba(15, 15, 15, 0.8) !important;
+  box-shadow: 0 0 15px rgba(249, 115, 22, 0.1), 
+              inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Kurekebisha muonekano wa Placeholder */
+.premium-textarea-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+/* 1. Punguza ukubwa wa picha ya preview isichukue nafasi kubwa */
+.verification-section img, 
+.upload-box img {
+    max-height: 150px; /* Inazuia picha kuwa ndefu sana */
+    width: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+/* 2. Fanya gridi ya maelezo iwe ndogo zaidi (Compact) */
+.verification-section, .location-verification {
+    padding: 1rem !important; /* Punguza nafasi ya ndani */
+    margin-bottom: 1rem !important;
+}
+
+/* 3. Punguza nafasi kati ya label na input */
+.premium-group {
+    margin-bottom: 0.8rem;
+}
+
+.premium-group label {
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    display: block;
+}
+
+/* 4. Rekebisha muonekano wa file input uwe nadhifu */
+input[type="file"] {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 5px;
+    border-radius: 5px;
+    width: 100%;
+}
+/* 1. Jenga chombo cha file input ionekane kama button safi */
+.custom-file-upload {
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.05); /* Giza nene la ndani */
+    border: 1px dashed rgba(255, 255, 255, 0.15); /* Mipaka iliyokatika */
+    border-radius: 12px;
+    padding: 10px 18px;
+    color: #9ca3af;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    text-align: center;
+}
+
+.custom-file-upload:hover {
+    border-color: rgba(249, 115, 22, 0.5); /* Orange ikiguswa */
+    color: #fff;
+    background-color: rgba(249, 115, 22, 0.02);
+}
+
+/* 2. Chombo cha kushikilia picha na kitufe cha kufuta */
+.preview-container {
+    display: inline-block;
+    position: relative;
+    margin-top: 12px;
+}
+
+/* 3. Punguza ukubwa wa picha isichukue nafasi kubwa sana */
+.compact-preview {
+    max-height: 100px; /* Hii inazuia picha kuwa kubwa mno */
+    width: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 1px solid rgba(249, 115, 22, 0.3); /* Orange hafifu */
+}
+
+/* 4. Kitufe kidogo cha kufuta picha (×) */
+.delete-photo-btn {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background-color: #ef4444; /* Red */
+    color: #fff;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
+}
+
+.delete-photo-btn:hover {
+    background-color: #dc2626;
+    transform: scale(1.1);
+}
+/* ============================================ */
+/* RESPONSIVE DESIGN - CREATE STORE PAGE */
+/* ============================================ */
+
+/* Container kuu */
+.create-store-page {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    min-height: 100vh !important;
+    background: #f8fafc !important;
+    padding: 100px 20px 60px !important;
+    position: relative !important;
+    overflow-x: hidden !important;
+    display: flex !important;
+    justify-content: center !important;
+}
+
+/* Main container */
+.main-container {
+    width: 100% !important;
+    max-width: 1000px !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* ============================================ */
+/* HERO SECTION - RESPONSIVE */
+/* ============================================ */
+
+.hero-title {
+    font-size: 2.8rem !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    letter-spacing: -1px !important;
+    margin-bottom: 10px !important;
+    text-align: center !important;
+}
+
+.hero-subtitle {
+    color: #64748b !important;
+    font-size: 1.1rem !important;
+    text-align: center !important;
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2rem !important;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.95rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 1.6rem !important;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.85rem !important;
+    }
+}
+
+/* ============================================ */
+/* SELECTION CARDS - RESPONSIVE */
+/* ============================================ */
+
+.card-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+    gap: 30px !important;
+    margin-top: 50px !important;
+}
+
+.choice-card-premium {
+    background: white !important;
+    padding: 40px 25px !important;
+    border-radius: 24px !important;
+    border: 1px solid #e2e8f0 !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+@media (max-width: 768px) {
+    .card-grid {
+        gap: 20px !important;
+        margin-top: 30px !important;
+    }
+    
+    .choice-card-premium {
+        padding: 30px 20px !important;
+    }
+    
+    .choice-card-premium h3 {
+        font-size: 1.3rem !important;
+    }
+    
+    .choice-card-premium p {
+        font-size: 0.85rem !important;
+        margin-bottom: 20px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+    
+    .icon-wrapper {
+        width: 70px !important;
+        height: 70px !important;
+        font-size: 2.5rem !important;
+        margin-bottom: 15px !important;
+    }
+}
+
+/* ============================================ */
+/* FORM WRAPPER - RESPONSIVE */
+/* ============================================ */
+
+.form-wrapper-premium {
+    display: flex !important;
+    background: white !important;
+    border-radius: 30px !important;
+    overflow: hidden !important;
+    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.15) !important;
+    min-height: 600px !important;
+}
+
+.form-sidebar {
+    width: 35% !important;
+    background: #111 !important;
+    padding: 50px 30px !important;
+    color: white !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.form-content {
+    width: 65% !important;
+    padding: 50px 40px !important;
+}
+
+@media (max-width: 900px) {
+    .form-wrapper-premium {
+        flex-direction: column !important;
+        border-radius: 20px !important;
+    }
+    
+    .form-sidebar {
+        width: 100% !important;
+        padding: 30px 25px !important;
+        text-align: center !important;
+    }
+    
+    .form-content {
+        width: 100% !important;
+        padding: 30px 25px !important;
+    }
+    
+    .sidebar-content h2 {
+        font-size: 1.5rem !important;
+    }
+    
+    .back-link {
+        margin-bottom: 30px !important;
+        text-align: left !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .form-content {
+        padding: 25px 20px !important;
+    }
+    
+    .form-sidebar {
+        padding: 25px 20px !important;
+    }
+    
+    .sidebar-content h2 {
+        font-size: 1.3rem !important;
+    }
+    
+    .sidebar-content p {
+        font-size: 0.85rem !important;
+    }
+}
+
+/* ============================================ */
+/* FORM ROWS - RESPONSIVE */
+/* ============================================ */
+
+.form-row {
+    display: flex !important;
+    gap: 20px !important;
+    width: 100% !important;
+    margin-bottom: 15px !important;
+}
+
+.form-row .premium-group {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+@media (max-width: 600px) {
+    .form-row {
+        flex-direction: column !important;
+        gap: 12px !important;
+    }
+}
+
+/* ============================================ */
+/* INPUT GROUPS - RESPONSIVE */
+/* ============================================ */
+
+.premium-group {
+    margin-bottom: 20px !important;
+}
+
+.premium-group label {
+    display: block !important;
+    font-weight: 700 !important;
+    margin-bottom: 8px !important;
+    color: #1e293b !important;
+    font-size: 0.9rem !important;
+}
+
+.premium-group input,
+.premium-group select,
+.premium-group textarea {
+    width: 100% !important;
+    padding: 12px 16px !important;
+    border: 2px solid #f1f5f9 !important;
+    background: #f8fafc !important;
+    border-radius: 14px !important;
+    font-size: 0.95rem !important;
+    transition: 0.3s !important;
+    box-sizing: border-box !important;
+}
+
+@media (max-width: 600px) {
+    .premium-group input,
+    .premium-group select,
+    .premium-group textarea {
+        padding: 10px 14px !important;
+        font-size: 0.9rem !important;
+    }
+    
+    .premium-group label {
+        font-size: 0.85rem !important;
+    }
+}
+
+/* ============================================ */
+/* SUBMIT BUTTON - RESPONSIVE */
+/* ============================================ */
+
+.premium-submit-btn {
+    width: 100% !important;
+    background: #ff6a00 !important;
+    color: white !important;
+    border: none !important;
+    padding: 16px !important;
+    border-radius: 16px !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    box-shadow: 0 10px 25px -5px rgba(255, 106, 0, 0.4) !important;
+    transition: 0.3s !important;
+    margin-top: 20px !important;
+}
+
+@media (max-width: 600px) {
+    .premium-submit-btn {
+        padding: 14px !important;
+        font-size: 0.95rem !important;
+        border-radius: 14px !important;
+    }
+}
+
+/* ============================================ */
+/* IMAGE UPLOAD GRID - RESPONSIVE */
+/* ============================================ */
+
+.image-upload-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 15px !important;
+    margin: 20px 0 !important;
+}
+
+.upload-box {
+    width: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    border: 2px dashed #cbd5e1 !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    background-color: #f8fafc !important;
+    transition: all 0.3s ease !important;
+    overflow: hidden !important;
+    position: relative !important;
+}
+
+@media (max-width: 600px) {
+    .image-upload-grid {
+        gap: 10px !important;
+    }
+    
+    .upload-box span {
+        font-size: 0.7rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .image-upload-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+    }
+}
+
+/* ============================================ */
+/* SUBCATEGORY GRID - RESPONSIVE */
+/* ============================================ */
+
+.subcat-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
+    gap: 12px !important;
+    margin-top: 10px !important;
+    max-height: 200px !important;
+    overflow-y: auto !important;
+    padding: 12px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+}
+
+@media (max-width: 600px) {
+    .subcat-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+        gap: 10px !important;
+        padding: 10px !important;
+    }
+    
+    .subcat-name {
+        font-size: 12px !important;
+    }
+}
+
+/* ============================================ */
+/* SUCCESS CARD - RESPONSIVE */
+/* ============================================ */
+
+.premium-success-card {
+    background: white !important;
+    padding: 50px 30px !important;
+    border-radius: 30px !important;
+    text-align: center !important;
+    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.1) !important;
+    max-width: 500px !important;
+    margin: 0 auto !important;
+}
+
+@media (max-width: 600px) {
+    .premium-success-card {
+        padding: 40px 20px !important;
+        border-radius: 20px !important;
+        margin: 20px !important;
+    }
+    
+    .gradient-text {
+        font-size: 1.5rem !important;
+    }
+}
+
+/* ============================================ */
+/* TAGS CONTAINER - RESPONSIVE */
+/* ============================================ */
+
+.tags-container {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    margin-bottom: 10px !important;
+}
+
+.specialist-tag {
+    background: #ff6600 !important;
+    color: white !important;
+    padding: 4px 12px !important;
+    border-radius: 20px !important;
+    font-size: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+@media (max-width: 600px) {
+    .specialist-tag {
+        font-size: 11px !important;
+        padding: 3px 10px !important;
+    }
+}
+
+/* ============================================ */
+/* MOQ CHIPS - RESPONSIVE */
+/* ============================================ */
+
+.moq-chip {
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    color: #9ca3af !important;
+    padding: 4px 12px !important;
+    border-radius: 9999px !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+}
+
+@media (max-width: 600px) {
+    .moq-chip {
+        font-size: 10px !important;
+        padding: 3px 10px !important;
+    }
+}
+
+/* ============================================ */
+/* TOUCH OPTIMIZATIONS */
+/* ============================================ */
+
+@media (hover: none) and (pointer: coarse) {
+    .choice-card-premium,
+    .premium-submit-btn,
+    .upload-box,
+    .moq-chip,
+    .back-link {
+        cursor: pointer !important;
+        -webkit-tap-highlight-color: transparent !important;
+    }
+    
+    .choice-card-premium:active,
+    .premium-submit-btn:active,
+    .upload-box:active,
+    .moq-chip:active {
+        transform: scale(0.98) !important;
+        transition: transform 0.05s ease !important;
+    }
+}
+
+/* ============================================ */
+/* PRINT STYLES */
+/* ============================================ */
+
+@media print {
+    .create-store-page {
+        background: white !important;
+        padding: 20px !important;
+    }
+    
+    .bg-decoration,
+    .back-link,
+    .premium-submit-btn {
+        display: none !important;
+    }
+    
+    .form-wrapper-premium {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+    }
+}
+
+/* ============================================ */
+/* SAFE AREA FOR NOTCH DEVICES */
+/* ============================================ */
+
+@supports (padding: max(0px)) {
+    @media (max-width: 768px) {
+        .create-store-page {
+            padding-left: max(20px, env(safe-area-inset-left)) !important;
+            padding-right: max(20px, env(safe-area-inset-right)) !important;
+            padding-bottom: max(40px, env(safe-area-inset-bottom)) !important;
+        }
+    }
+}
+
+/* ============================================ */
+/* SCROLLBAR STYLING */
+/* ============================================ */
+
+.create-store-page::-webkit-scrollbar {
+    width: 6px !important;
+}
+
+.create-store-page::-webkit-scrollbar-track {
+    background: #f1f1f1 !important;
+    border-radius: 10px !important;
+}
+
+.create-store-page::-webkit-scrollbar-thumb {
+    background: #ff6a00 !important;
+    border-radius: 10px !important;
+}
+
+/* ============================================ */
+/* DARK MODE SUPPORT (Optional) */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+    .create-store-page {
+        background: #0f172a !important;
+    }
+    
+    .choice-card-premium {
+        background: #1e293b !important;
+        border-color: #334155 !important;
+    }
+    
+    .choice-card-premium h3 {
+        color: #f1f5f9 !important;
+    }
+    
+    .choice-card-premium p {
+        color: #94a3b8 !important;
+    }
+    
+    .hero-title {
+        color: #f1f5f9 !important;
+    }
+    
+    .hero-subtitle {
+        color: #94a3b8 !important;
+    }
+}
+
+/* ============================================ */
+/* ANIMATIONS - RESPONSIVE KEEP */
+/* ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .choice-card-premium,
+    .premium-submit-btn,
+    .upload-box {
+        transition: none !important;
+    }
+    
+    @keyframes fill {
+        to { width: 100%; }
+    }
+}

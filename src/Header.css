@@ -1,0 +1,264 @@
+/* =========================================
+   1. MAIN HEADER & CONTAINER
+   ========================================= */
+.main-header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    background: #fff;
+    border-bottom: 1px solid #f3f4f6; /* Line nyembamba chini */
+}
+
+.main-header.relative-mode {
+    position: relative !important;
+    z-index: 100;
+}
+
+.header-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 4px 24px; /* Imepunguzwa kwa ajili ya usafi */
+    overflow: visible !important;
+}
+
+/* =========================================
+   2. TOP BAR (Height Compacted)
+   ========================================= */
+.header-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    height: 52px; /* Fixed height ili isiongezeke urefu */
+}
+
+.logo-wrapper {
+    min-width: 140px;
+}
+
+/* SEARCH BAR - Slim Design */
+.search-bar-container {
+    display: flex;
+    align-items: center;
+    flex: 1; /* Inachukua nafasi yote iliyobaki */
+    max-width: 900px; /* Upana ulioongezwa */
+    height: 40px;
+    background-color: #fff;
+    border: 2px solid #ddd;
+    border-radius: 50px;
+    padding: 1px 1px 1px 15px;
+    transition: 0.3s;
+    margin: 0 40px; /* Nafasi kati ya search bar na vitu vya pembeni */
+    position: relative; /* Muhimu kwa suggestions dropdown */
+    overflow: hidden;
+}
+
+.search-bar-container:hover { 
+    border-color: #FF6600; 
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    width: 100%;
+    padding: 0 10px;
+}
+
+.search-tools {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* Nafasi kati ya camera na search button */
+    padding-right: 5px;
+}
+
+.camera-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 5px;
+    transition: transform 0.2s;
+}
+
+.camera-button:hover {
+    transform: scale(1.1);
+}
+
+.search-submit-btn {
+    background-color: #FF6600;
+    color: white;
+    border: none;
+    height: 32px;
+    padding: 0 20px;
+    border-radius: 40px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* =========================================
+   3. NAVIGATION ROW (Punguza Nafasi)
+   ========================================= */
+.header-navigation-row {
+    margin-top: 0;
+    position: relative;
+    border-top: 1px solid #f3f4f6;
+}
+
+.nav-links-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 34px;
+    font-size: 13px;
+}
+
+.nav-group-left, .nav-group-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.category-toggle {
+    cursor: pointer !important;
+    font-weight: 700;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.nav-sell-link {
+    font-weight: 700;
+    border-left: 1px solid #eee;
+    padding-left: 12px;
+    color: #333;
+    text-decoration: none;
+}
+
+/* =========================================
+   4. USER TOOLS
+   ========================================= */
+.user-tools-group {
+    display: flex;
+    gap: 1.2rem;
+    align-items: center;
+}
+
+.tool-item {
+    font-size: 12px;
+    color: #333;
+    text-decoration: none;
+}
+
+/* =========================================
+   5. SUGGESTIONS DROPDOWN
+   ========================================= */
+.suggestions-dropdown {
+    position: absolute;
+    top: 100%; /* Chini ya search bar */
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 9999;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.suggestion-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.suggestion-item:hover {
+    background-color: #f9f9f9;
+}
+
+.suggestion-img {
+    width: 35px;
+    height: 35px;
+    border-radius: 4px;
+    margin-right: 12px;
+    object-fit: cover;
+}
+
+.suggestion-name {
+    font-size: 14px;
+    color: #333;
+}
+
+/* --- MUONEKANO MPYA WA SIMU (ALIBABA STYLE) --- */
+@media (max-width: 768px) {
+  /* 1. Header iwe fupi na safi */
+  .main-header {
+    position: fixed !important;
+    top: 0;
+    width: 100%;
+    height: auto !important;
+    z-index: 1100;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    padding-bottom: 0 !important;
+  }
+
+  .header-container {
+    padding: 4px 10px !important; /* Inapunguza nafasi ya juu na chini */
+  }
+
+  /* 2. Top Bar - Logo na Search Bar zikae mstari mmoja */
+  .header-top-bar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    height: 50px !important; /* Urefu uliopunguzwa */
+    gap: 8px !important;
+  }
+
+  /* 3. Logo iwe ndogo pembeni */
+  .logo-wrapper {
+    min-width: unset !important;
+    width: 75px !important; /* Imepunguzwa zaidi */
+    flex-shrink: 0 !important;
+  }
+
+  /* 4. Search Bar ichukue nafasi yote iliyobaki katikati */
+  .search-bar-container {
+    flex-grow: 1 !important;
+    margin: 0 !important; /* Muhimu: Inaondoa gap ya 40px uliyoweka PC */
+    height: 36px !important;
+    border-radius: 18px !important;
+    background-color: #f5f5f5 !important;
+    border: none !important;
+    padding-left: 12px !important;
+  }
+
+  .search-input {
+    font-size: 14px !important;
+    background: transparent !important;
+  }
+
+  /* 5. Ficha vitu visivyotakiwa kwenye simu kabisa */
+  .user-tools-group,
+  .header-navigation-row,
+  .camera-button,
+  .search-submit-btn span { 
+    display: none !important; 
+  }
+
+  /* Kama button yako ina icon pekee, ifanye iwe ndogo */
+  .search-submit-btn {
+    height: 30px !important;
+    padding: 0 12px !important;
+  }
+}

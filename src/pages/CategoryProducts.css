@@ -1,0 +1,747 @@
+.category-page-container {
+    background: #f7f8fa;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+}
+
+.header-spacer {
+    height: 100px;
+}
+
+.category-main-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Breadcrumbs */
+.breadcrumb-nav {
+    margin-bottom: 24px;
+}
+
+.breadcrumb-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 12px;
+}
+
+.breadcrumb-item.clickable:hover {
+    color: #ff6600;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.breadcrumb-item.active {
+    color: #222;
+    font-weight: 700;
+}
+
+.category-title {
+    font-size: 28px;
+    font-weight: 900;
+    color: #1a1a1a;
+    letter-spacing: -0.8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.item-count {
+    font-weight: 400;
+    color: #aaa;
+    font-size: 16px;
+}
+
+/* Layout */
+.content-layout {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+/* Sidebar */
+.sidebar-filters {
+    width: 280px;
+    flex-shrink: 0;
+}
+
+.sidebar-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    position: sticky;
+    top: 100px;
+    border: 1px solid #eaeaea;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+
+.filter-header {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-label {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 12px;
+    color: #444;
+}
+
+.category-badge {
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #fff5ed 0%, #ffefdb 100%);
+    color: #ff6600;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 800;
+    border: 1px solid #ffe0c2;
+}
+
+.status-filter-section {
+    border-top: 1px solid #f0f0f0;
+    padding-top: 20px;
+    margin-top: 25px;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #666;
+}
+
+.custom-checkbox {
+    accent-color: #ff6600;
+    width: 18px;
+    height: 18px;
+}
+
+/* Products Section */
+.products-display-area {
+    flex: 1;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 150px 0;
+    color: #999;
+    font-weight: 500;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    width: 100%;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 120px 20px;
+    background: #fff;
+    border-radius: 24px;
+    border: 1px solid #eee;
+}
+
+.empty-icon {
+    margin-bottom: 20px;
+}
+
+.go-back-btn {
+    margin-top: 30px;
+    background: linear-gradient(to right, #ff6600, #ff4400);
+    color: #fff;
+    border: none;
+    padding: 14px 40px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 15px;
+}
+
+.go-back-btn:hover {
+    opacity: 0.9;
+}
+
+/* Animations */
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+/* ============================================ */
+/* RESPONSIVE DESIGN - CATEGORY PRODUCTS PAGE */
+/* ============================================ */
+
+/* Container kuu */
+.category-page-container {
+    background: #f7f8fa !important;
+    min-height: 100vh !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+/* Header spacer */
+.header-spacer {
+    height: 100px !important;
+}
+
+/* Main content */
+.category-main-content {
+    max-width: 1400px !important;
+    margin: 0 auto !important;
+    padding: 20px !important;
+}
+
+/* ============================================ */
+/* BREADCRUMB NAVIGATION */
+/* ============================================ */
+
+.breadcrumb-nav {
+    margin-bottom: 24px !important;
+}
+
+.breadcrumb-links {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    font-size: 13px !important;
+    color: #888 !important;
+    margin-bottom: 12px !important;
+}
+
+.breadcrumb-item {
+    display: inline-block !important;
+}
+
+.breadcrumb-item.clickable {
+    cursor: pointer !important;
+    transition: color 0.2s ease !important;
+}
+
+.breadcrumb-item.clickable:hover {
+    color: #ff6600 !important;
+}
+
+.breadcrumb-item.active {
+    color: #222 !important;
+    font-weight: 700 !important;
+}
+
+/* Category title */
+.category-title {
+    font-size: 28px !important;
+    font-weight: 900 !important;
+    color: #1a1a1a !important;
+    letter-spacing: -0.8px !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    margin-bottom: 20px !important;
+}
+
+.item-count {
+    font-weight: 400 !important;
+    color: #aaa !important;
+    font-size: 16px !important;
+}
+
+/* ============================================ */
+/* CONTENT LAYOUT */
+/* ============================================ */
+
+.content-layout {
+    display: flex !important;
+    gap: 30px !important;
+    align-items: flex-start !important;
+}
+
+/* Sidebar filters */
+.sidebar-filters {
+    width: 280px !important;
+    flex-shrink: 0 !important;
+}
+
+.sidebar-card {
+    background: #fff !important;
+    border-radius: 16px !important;
+    padding: 24px !important;
+    position: sticky !important;
+    top: 100px !important;
+    border: 1px solid #eaeaea !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+}
+
+.filter-header {
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    margin-bottom: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+.filter-label {
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    margin-bottom: 12px !important;
+    color: #444 !important;
+}
+
+.category-badge {
+    padding: 12px 16px !important;
+    background: linear-gradient(135deg, #fff5ed 0%, #ffefdb 100%) !important;
+    color: #ff6600 !important;
+    border-radius: 10px !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    border: 1px solid #ffe0c2 !important;
+}
+
+.status-filter-section {
+    border-top: 1px solid #f0f0f0 !important;
+    padding-top: 20px !important;
+    margin-top: 25px !important;
+}
+
+.checkbox-group {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+}
+
+.checkbox-label {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    font-size: 14px !important;
+    cursor: pointer !important;
+    color: #666 !important;
+}
+
+.custom-checkbox {
+    accent-color: #ff6600 !important;
+    width: 18px !important;
+    height: 18px !important;
+    cursor: pointer !important;
+}
+
+/* ============================================ */
+/* PRODUCTS DISPLAY AREA */
+/* ============================================ */
+
+.products-display-area {
+    flex: 1 !important;
+}
+
+/* Products grid - RESPONSIVE */
+.products-grid {
+    display: grid !important;
+    gap: 20px !important;
+    width: 100% !important;
+}
+
+/* Default: Kadi 4 kwa mstari kwenye desktop kubwa */
+.products-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+}
+
+/* Kwa desktop (≥1200px) - Kadi 5 kwa mstari */
+@media (min-width: 1400px) {
+    .products-grid {
+        grid-template-columns: repeat(5, 1fr) !important;
+        gap: 24px !important;
+    }
+}
+
+/* Kwa laptop (992px - 1199px) - Kadi 4 kwa mstari */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .products-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 18px !important;
+    }
+}
+
+/* Kwa tablets (768px - 991px) - Kadi 3 kwa mstari */
+@media (min-width: 768px) and (max-width: 991px) {
+    .products-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 16px !important;
+    }
+    
+    .sidebar-filters {
+        width: 240px !important;
+    }
+    
+    .sidebar-card {
+        padding: 18px !important;
+    }
+}
+
+/* Kwa simu (≤767px) - Kadi 2 kwa mstari */
+@media (max-width: 767px) {
+    .category-main-content {
+        padding: 12px !important;
+    }
+    
+    .breadcrumb-links {
+        font-size: 11px !important;
+        gap: 6px !important;
+    }
+    
+    .breadcrumb-links svg {
+        width: 12px !important;
+        height: 12px !important;
+    }
+    
+    .category-title {
+        font-size: 22px !important;
+    }
+    
+    .content-layout {
+        flex-direction: column !important;
+        gap: 20px !important;
+    }
+    
+    .sidebar-filters {
+        width: 100% !important;
+    }
+    
+    .sidebar-card {
+        position: relative !important;
+        top: 0 !important;
+        padding: 16px !important;
+    }
+    
+    .filter-header {
+        font-size: 16px !important;
+        margin-bottom: 15px !important;
+    }
+    
+    .checkbox-group {
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        gap: 20px !important;
+    }
+    
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+}
+
+/* Kwa simu ndogo (≤480px) */
+@media (max-width: 480px) {
+    .category-main-content {
+        padding: 10px !important;
+    }
+    
+    .breadcrumb-links {
+        font-size: 10px !important;
+    }
+    
+    .category-title {
+        font-size: 18px !important;
+    }
+    
+    .item-count {
+        font-size: 13px !important;
+    }
+    
+    .products-grid {
+        gap: 10px !important;
+    }
+    
+    .checkbox-label {
+        font-size: 12px !important;
+        gap: 8px !important;
+    }
+    
+    .custom-checkbox {
+        width: 16px !important;
+        height: 16px !important;
+    }
+}
+
+/* Kwa simu ndogo sana (≤380px) - Kadi 1 kwa mstari */
+@media (max-width: 380px) {
+    .products-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+}
+
+/* ============================================ */
+/* LOADING STATE */
+/* ============================================ */
+
+.loading-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 100px 20px !important;
+    background: #fff !important;
+    border-radius: 16px !important;
+    min-height: 300px !important;
+}
+
+.loading-container p {
+    margin-top: 16px !important;
+    color: #999 !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite !important;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================ */
+/* EMPTY STATE */
+/* ============================================ */
+
+.empty-state {
+    text-align: center !important;
+    padding: 80px 20px !important;
+    background: #fff !important;
+    border-radius: 24px !important;
+    border: 1px solid #eee !important;
+}
+
+.empty-icon {
+    margin-bottom: 20px !important;
+    opacity: 0.6 !important;
+}
+
+.empty-state h2 {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    color: #333 !important;
+    margin-bottom: 10px !important;
+}
+
+.empty-state p {
+    font-size: 14px !important;
+    color: #888 !important;
+    margin-bottom: 20px !important;
+}
+
+.go-back-btn {
+    margin-top: 20px !important;
+    background: linear-gradient(135deg, #ff6600, #ff4400) !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 12px 32px !important;
+    border-radius: 50px !important;
+    cursor: pointer !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    transition: all 0.2s ease !important;
+}
+
+.go-back-btn:hover {
+    opacity: 0.9 !important;
+    transform: translateY(-2px) !important;
+}
+
+@media (max-width: 480px) {
+    .empty-state {
+        padding: 60px 16px !important;
+    }
+    
+    .empty-state h2 {
+        font-size: 18px !important;
+    }
+    
+    .empty-state p {
+        font-size: 12px !important;
+    }
+    
+    .go-back-btn {
+        padding: 10px 24px !important;
+        font-size: 13px !important;
+    }
+}
+
+/* ============================================ */
+/* CARD HOVER EFFECTS (CategoryCard) */
+/* ============================================ */
+
+/* Target CategoryCard component styles */
+.products-grid > * {
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.products-grid > *:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ============================================ */
+/* TOUCH OPTIMIZATIONS */
+/* ============================================ */
+
+@media (hover: none) and (pointer: coarse) {
+    .checkbox-label,
+    .breadcrumb-item.clickable,
+    .go-back-btn {
+        cursor: pointer !important;
+        -webkit-tap-highlight-color: transparent !important;
+    }
+    
+    .checkbox-label:active,
+    .breadcrumb-item.clickable:active,
+    .go-back-btn:active {
+        opacity: 0.7 !important;
+    }
+    
+    .products-grid > *:active {
+        transform: scale(0.98) !important;
+        transition: transform 0.05s ease !important;
+    }
+    
+    /* Larger tap targets */
+    .checkbox-label {
+        min-height: 32px !important;
+    }
+    
+    .breadcrumb-item.clickable {
+        padding: 4px 0 !important;
+    }
+}
+
+/* ============================================ */
+/* PRINT STYLES */
+/* ============================================ */
+
+@media print {
+    .category-page-container {
+        background: white !important;
+    }
+    
+    .header-spacer,
+    .sidebar-filters,
+    .breadcrumb-nav,
+    .go-back-btn {
+        display: none !important;
+    }
+    
+    .products-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+    
+    .products-grid > * {
+        break-inside: avoid !important;
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+    }
+}
+
+/* ============================================ */
+/* SAFE AREA FOR NOTCH DEVICES */
+/* ============================================ */
+
+@supports (padding: max(0px)) {
+    @media (max-width: 767px) {
+        .category-main-content {
+            padding-left: max(12px, env(safe-area-inset-left)) !important;
+            padding-right: max(12px, env(safe-area-inset-right)) !important;
+        }
+    }
+}
+
+/* ============================================ */
+/* SKELETON LOADING (Optional) */
+/* ============================================ */
+
+.skeleton-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 20px !important;
+}
+
+.skeleton-card {
+    background: #f0f0f0 !important;
+    border-radius: 12px !important;
+    height: 280px !important;
+    animation: pulse 1.5s ease-in-out infinite !important;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@media (max-width: 991px) {
+    .skeleton-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .skeleton-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+}
+
+@media (max-width: 380px) {
+    .skeleton-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ============================================ */
+/* SCROLLBAR STYLING */
+/* ============================================ */
+
+.products-display-area::-webkit-scrollbar {
+    width: 6px !important;
+}
+
+.products-display-area::-webkit-scrollbar-track {
+    background: #f1f1f1 !important;
+    border-radius: 10px !important;
+}
+
+.products-display-area::-webkit-scrollbar-thumb {
+    background: #ff6600 !important;
+    border-radius: 10px !important;
+}
+
+.products-display-area::-webkit-scrollbar-thumb:hover {
+    background: #e55a00 !important;
+}

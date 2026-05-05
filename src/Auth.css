@@ -1,0 +1,133 @@
+/* Auth.css - Muonekano wa Login na Register */
+
+/* 1. Kontena Kuu - Inaweka fomu katikati ya screen */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #c8c9ca 0%, #c3cfe2 100%);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    padding: 20px;
+}
+
+/* 2. Box la Fomu */
+.auth-box {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    transition: transform 0.3s ease;
+}
+
+/* 3. Sehemu ya Juu (Header) */
+.auth-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-header h2 {
+    color: #333;
+    font-size: 26px;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.auth-header p {
+    color: #666;
+    font-size: 14px;
+}
+
+/* 4. Mpangilio wa Input */
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #444;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box; /* Muhimu ili input isivimbe nje */
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #ff6a00; /* Rangi ya Alibaba Orange */
+    box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.1);
+}
+
+/* 5. Button ya Login/Register */
+.login-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #ff6a00;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s ease, transform 0.1s ease;
+}
+
+.login-btn:hover {
+    background-color: #e65f00;
+}
+
+.login-btn:active {
+    transform: scale(0.98);
+}
+
+.login-btn:disabled {
+    background-color: #ffb580;
+    cursor: not-allowed;
+}
+
+/* 6. Sehemu ya Chini (Footer) */
+.auth-footer {
+    margin-top: 25px;
+    text-align: center;
+    font-size: 14px;
+    color: #555;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+.auth-footer span {
+    color: #ff6a00;
+    font-weight: 700;
+    cursor: pointer;
+    margin-left: 5px;
+    transition: color 0.2s;
+}
+
+.auth-footer span:hover {
+    color: #cc5500;
+    text-decoration: underline;
+}
+
+/* 7. Responsive kwa Simu */
+@media (max-width: 480px) {
+    .auth-box {
+        padding: 25px;
+    }
+    
+    .auth-header h2 {
+        font-size: 22px;
+    }
+}

@@ -1,0 +1,683 @@
+/* ============================================ */
+/* NEW ARRIVALS - HORIZONTAL SCROLL WITH ARROWS */
+/* Desktop & Mobile - Full Responsive */
+/* ============================================ */
+
+/* Container kuu */
+.new-arrivals-section {
+  background: #fff;
+  margin: 20px 0;
+  padding: 20px 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* ============================================ */
+/* SECTION HEADER - RESPONSIVE (PC & MOBILE) */
+/* ============================================ */
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24px;
+  padding: 0 40px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.header-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.header-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Title - New Arrivals */
+.arrivals-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.arrivals-title::before {
+  content: "✨";
+  font-size: 1.5rem;
+}
+
+/* Subtitle */
+.arrivals-subtitle {
+  font-size: 0.9rem;
+  color: #059669;
+  font-weight: 500;
+  margin: 0;
+  max-width: 400px;
+}
+
+/* View More Button */
+.see-all-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  color: #1a1a1a;
+  border: 1px solid #e2e8f0;
+  padding: 8px 20px;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.see-all-link:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.see-all-link:active {
+  transform: scale(0.97);
+}
+
+/* ============================================ */
+/* WRAPPER WITH ARROWS (PC & MOBILE) */
+/* ============================================ */
+
+.arrivals-scroll-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 20px;
+}
+
+/* Horizontal scroll container */
+.arrivals-horizontal-scroll {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 12px;
+  padding: 15px 0 25px 0;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+/* Custom scrollbar styling */
+.arrivals-horizontal-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.arrivals-horizontal-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.arrivals-horizontal-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.arrivals-horizontal-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Scroll Arrow Buttons */
+.scroll-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.scroll-arrow:hover {
+  background: #ffffff;
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  border-color: #cbd5e1;
+}
+
+.scroll-arrow:active {
+  transform: translateY(-50%) scale(0.98);
+}
+
+.scroll-arrow-left {
+  left: 0;
+}
+
+.scroll-arrow-right {
+  right: 0;
+}
+
+/* ============================================ */
+/* PRODUCT CARDS - Horizontal Items */
+/* ============================================ */
+
+.arrivals-horizontal-item {
+  flex: 0 0 auto;
+  width: 240px;
+  scroll-snap-align: start;
+  transition: transform 0.2s ease;
+}
+
+.arrivals-horizontal-item:hover {
+  transform: translateY(-5px);
+}
+
+/* Make cards fill the horizontal item */
+.arrivals-horizontal-item .product-card-item {
+  width: 100%;
+  margin: 0;
+  height: 100%;
+}
+
+/* Card image styling */
+.arrivals-horizontal-item img,
+.product-card-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px 12px 0 0;
+}
+
+/* New badge */
+.new-badge,
+.new-arrival-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: linear-gradient(135deg, #00c6a7, #00a88f);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Price styling */
+.price-main {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.price-currency {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+}
+
+.price-amount {
+  font-size: 18px;
+  font-weight: 800;
+  color: #ff6600;
+}
+
+/* ============================================ */
+/* TABLET RESPONSIVE (768px - 1024px) */
+/* ============================================ */
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .section-header {
+    padding: 0 30px;
+  }
+  
+  .arrivals-title {
+    font-size: 1.5rem;
+  }
+  
+  .arrivals-subtitle {
+    font-size: 0.8rem;
+  }
+  
+  .see-all-link {
+    padding: 6px 16px;
+    font-size: 0.85rem;
+  }
+  
+  .arrivals-horizontal-scroll {
+    gap: 16px;
+    padding: 15px 0 20px 0;
+  }
+  
+  .arrivals-horizontal-item {
+    width: 210px;
+  }
+  
+  .arrivals-horizontal-item img,
+  .product-card-img {
+    height: 180px;
+  }
+  
+  .scroll-arrow {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* ============================================ */
+/* MOBILE RESPONSIVE (≤768px) */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .new-arrivals-section {
+    margin: 15px 0;
+    padding: 15px 0;
+  }
+
+  .section-header {
+    padding: 0 15px;
+    margin-bottom: 15px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .header-main {
+    flex: 1;
+  }
+
+  .header-text-group {
+    gap: 4px;
+  }
+
+  /* Title New Arrivals - Mobile */
+  .arrivals-title {
+    font-size: 1.2rem;
+    gap: 5px;
+  }
+
+  .arrivals-title::before {
+    font-size: 1rem;
+  }
+
+  /* Subtitle - Hide on very small mobile or keep short */
+  .arrivals-subtitle {
+    font-size: 0.65rem;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* View More Button - Mobile */
+  .see-all-link {
+    padding: 5px 12px;
+    font-size: 0.7rem;
+    gap: 4px;
+    white-space: nowrap;
+  }
+
+  /* Scroll wrapper - Mobile */
+  .arrivals-scroll-wrapper {
+    padding: 0 10px;
+  }
+
+  /* Horizontal scroll - Mobile */
+  .arrivals-horizontal-scroll {
+    gap: 12px;
+    padding: 10px 0 20px 0;
+  }
+
+  /* Product items - Mobile */
+  .arrivals-horizontal-item {
+    width: 160px;
+  }
+
+  /* Card images - Mobile */
+  .arrivals-horizontal-item img,
+  .product-card-img {
+    height: 140px !important;
+  }
+
+  /* Card info - Mobile */
+  .arrivals-horizontal-item .product-card-info {
+    padding: 8px 6px !important;
+  }
+
+  .arrivals-horizontal-item .product-card-title {
+    font-size: 11px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Price - Mobile */
+  .price-amount {
+    font-size: 14px !important;
+  }
+
+  .price-currency {
+    font-size: 10px !important;
+  }
+
+  /* New badge - Mobile */
+  .new-badge,
+  .new-arrival-badge {
+    font-size: 9px;
+    padding: 3px 8px;
+    top: 6px;
+    left: 6px;
+  }
+
+  /* Arrows - Mobile smaller */
+  .scroll-arrow {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .scroll-arrow-left {
+    left: -5px;
+  }
+  
+  .scroll-arrow-right {
+    right: -5px;
+  }
+}
+
+/* ============================================ */
+/* VERY SMALL MOBILE (≤480px) */
+/* ============================================ */
+
+@media (max-width: 480px) {
+  .new-arrivals-section {
+    margin: 10px 0;
+    padding: 10px 0;
+  }
+
+  .section-header {
+    padding: 0 12px;
+    margin-bottom: 12px;
+  }
+
+  .arrivals-title {
+    font-size: 1rem;
+  }
+
+  .arrivals-title::before {
+    font-size: 0.9rem;
+  }
+
+  .arrivals-subtitle {
+    display: none; /* Hide subtitle on very small phones */
+  }
+
+  .see-all-link {
+    padding: 4px 10px;
+    font-size: 0.65rem;
+  }
+
+  .arrivals-horizontal-item {
+    width: 140px;
+  }
+
+  .arrivals-horizontal-item img,
+  .product-card-img {
+    height: 120px !important;
+  }
+
+  .scroll-arrow {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .scroll-arrow-left {
+    left: -8px;
+  }
+  
+  .scroll-arrow-right {
+    right: -8px;
+  }
+}
+
+/* ============================================ */
+/* LARGE DESKTOP (≥1400px) */
+/* ============================================ */
+
+@media (min-width: 1400px) {
+  .new-arrivals-section {
+    max-width: 1400px;
+    margin: 30px auto;
+  }
+  
+  .section-header {
+    padding: 0 20px;
+  }
+  
+  .arrivals-horizontal-item {
+    width: 270px;
+  }
+  
+  .arrivals-horizontal-item img,
+  .product-card-img {
+    height: 220px;
+  }
+  
+  .arrivals-title {
+    font-size: 2rem;
+  }
+}
+
+/* ============================================ */
+/* DARK MODE SUPPORT */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .new-arrivals-section {
+    background: #0f172a;
+  }
+
+  .arrivals-title {
+    color: #f1f5f9;
+  }
+
+  .arrivals-subtitle {
+    color: #10b981;
+  }
+
+  .see-all-link {
+    background: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+  }
+
+  .see-all-link:hover {
+    background: #334155;
+    border-color: #475569;
+  }
+
+  .scroll-arrow {
+    background: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+  }
+
+  .scroll-arrow:hover {
+    background: #334155;
+  }
+
+  .arrivals-horizontal-scroll::-webkit-scrollbar-track {
+    background: #1e293b;
+  }
+
+  .arrivals-horizontal-scroll::-webkit-scrollbar-thumb {
+    background: #475569;
+  }
+}
+
+/* ============================================ */
+/* LOADING SKELETON */
+/* ============================================ */
+
+.arrivals-skeleton {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-size: 1rem;
+}
+
+/* ============================================ */
+/* TOUCH DEVICE OPTIMIZATIONS */
+/* ============================================ */
+
+@media (hover: none) and (pointer: coarse) {
+  .scroll-arrow {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .arrivals-horizontal-item:hover {
+    transform: none;
+  }
+  
+  .see-all-link:active {
+    transform: scale(0.96);
+  }
+}
+/* ============================================ */
+/* ZOOM EFFECT - ONLY ON IMAGES */
+/* ============================================ */
+
+/* Image container - to hold the image with overflow hidden */
+.arrivals-horizontal-item {
+  flex: 0 0 auto;
+  width: 240px;
+  scroll-snap-align: start;
+  /* Remove the hover transform from item */
+  transition: none;
+}
+
+.arrivals-horizontal-item:hover {
+  transform: none; /* No zoom on the whole card */
+}
+
+/* Image wrapper - add this if you don't have one */
+.arrivals-horizontal-item .product-card-img-container,
+.product-card-img-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px 12px 0 0;
+}
+
+/* Image zoom effect on hover */
+.arrivals-horizontal-item img,
+.product-card-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px 12px 0 0;
+  transition: transform 0.3s ease; /* Smooth zoom transition */
+}
+
+/* Zoom only the image when hovering over the item */
+.arrivals-horizontal-item:hover img,
+.arrivals-horizontal-item:hover .product-card-img {
+  transform: scale(1.05); /* Zooms image by 5% */
+}
+
+/* ============================================ */
+/* MOBILE - Disable zoom on touch devices */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .arrivals-horizontal-item:hover img,
+  .arrivals-horizontal-item:hover .product-card-img {
+    transform: none; /* No zoom on mobile */
+  }
+}
+/* Horizontal scroll container - NO SCROLLBAR VISIBLE */
+.arrivals-horizontal-scroll {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 0px;
+  padding: 15px 0 25px 0;
+  flex: 1;
+  
+  /* Hide scrollbar - keeps functionality */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.arrivals-horizontal-scroll::-webkit-scrollbar {
+  display: none;
+}
+/* ============================================ */
+/* FIX LARGE GAP BETWEEN CARDS */
+/* ============================================ */
+
+/* Horizontal scroll container - reduce gap */
+.arrivals-horizontal-scroll {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 12px;  /* ← Badilisha kutoka 20px hadi 12px or 16px */
+  padding: 15px 0 25px 0;
+  flex: 1;
+  
+  /* Hide scrollbar */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Card items - adjust width */
+.arrivals-horizontal-item {
+  flex: 0 0 auto;
+  width: 200px;  /* ← Punguza kutoka 240px hadi 200px or 180px */
+  scroll-snap-align: start;
+}
+
+/* Mobile - even smaller gap */
+@media (max-width: 768px) {
+  .arrivals-horizontal-scroll {
+    gap: 10px;  /* ← Gap ndogo kwa simu */
+  }
+  
+  .arrivals-horizontal-item {
+    width: 160px;  /* ← Punguza width kwa simu */
+  }
+}
+
+/* Very small mobile */
+@media (max-width: 480px) {
+  .arrivals-horizontal-scroll {
+    gap: 8px;
+  }
+  
+  .arrivals-horizontal-item {
+    width: 140px;
+  }
+}

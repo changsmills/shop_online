@@ -1,0 +1,1041 @@
+.product-page-root {
+    background-color: #f5f5f7;
+    min-height: 100vh;
+    padding-top: 25px;
+    display: flex;
+    flex-direction: column;
+}
+.container-wrapper {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 20px 20px 20px;
+}
+
+/* BREADCRUMB */
+.breadcrumb-nav {
+    padding: 15px 0;
+    font-size: 14px;
+    color: #666;
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb-nav .sep {
+    margin: 0 8px;
+    color: #ccc;
+}
+
+.breadcrumb-nav .active-path {
+    color: #222;
+    font-weight: 500;
+}
+
+/* MAIN GRID SYSTEM */
+.product-main-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.product-hero-section {
+    display: grid;
+    /* Ratio ya 1.8 kwa 1.2 (Picha kubwa, Maelezo madogo) */
+    grid-template-columns: 1.8fr 1.2fr;
+    gap: 30px;
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    align-items: start;
+}
+
+.gallery-column {
+    width: 100%;
+}
+
+.info-column {
+    width: 100%;
+    /* MUHIMU: Hii 'top' iwe kubwa kuliko Header ili isijifiche unapo-scroll */
+    position: sticky;
+    top: 100px; 
+}
+
+/* BOTTOM SECTION (SCROLLABLE & HIDDEN BAR) */
+.product-bottom-details {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    margin-top: 10px;
+}
+
+.details-header h2 {
+    font-size: 20px;
+    margin-bottom: 25px;
+    border-left: 5px solid #ff6a00;
+    padding-left: 15px;
+}
+
+.store-verification-banner {
+    background: #fdf2e9;
+    padding: 15px 25px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.verified-badge {
+    color: #ff6a00;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* LOADER STYLES */
+.loader-container {
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #ff6a00;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 1100px) {
+    .product-page-root {
+        /* Ongeza nafasi zaidi kwenye simu kama Header inabadilika */
+        padding-top: 110px; 
+    }
+
+    .product-hero-section {
+        grid-template-columns: 1fr;
+        padding: 15px;
+    }
+    
+    .info-column {
+        position: static;
+    }
+    
+    .container-wrapper {
+        padding: 10px;
+    }
+}
+
+.lightbox-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.lightbox-content {
+    position: relative;
+    width: 90%;
+    max-width: 900px;
+    height: 80vh;
+    background: #000;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal-zoom-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    cursor: crosshair;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-base-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transition: opacity 0.3s ease;
+}
+
+.modal-zoom-lens {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    pointer-events: none; /* Muhimu ili mousemove isikwame */
+    z-index: 10;
+}
+
+.modal-help-text {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
+}
+/* Layout ya chini */
+.details-content-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 20px 0;
+}
+
+/* Kadi inayoshikilia picha */
+.verification-hero-card {
+  width: 100%;
+  height: auto; /* Badala ya 400px, tumia auto ili isikatike */
+  border-radius: 15px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  background: #f9f9f9;
+}
+
+/* Picha yenyewe */
+.verification-img-full {
+  width: 100%;
+  height: auto; /* Inahakikisha urefu unajirekebisha kulingana na upana */
+  display: block;
+  object-fit: contain; /* 'contain' inaonyesha picha nzima bila kuikata */
+}
+
+.verified-location-overlay {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(0, 123, 255, 0.9);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-weight: bold;
+}
+
+/* Ramani strip */
+.maps-verification-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f0f7ff;
+  padding: 15px;
+  border-radius: 10px;
+  border-left: 5px solid #007bff;
+}
+
+/* Sehemu ya Maelezo Chini */
+.store-full-details-card {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.contact-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 25px;
+}
+
+.contact-item {
+  display: flex;
+  flex-direction: column;
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.contact-item .label { font-size: 0.8rem; color: #888; margin-bottom: 5px; }
+.contact-item .value { font-weight: 600; color: #333; }
+
+/* Action Buttons */
+.action-row {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.btn-social-large {
+  flex: 1;
+  padding: 15px;
+  text-align: center;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: bold;
+  color: white;
+}
+
+.wa { background: #25D366; }
+.ig { background: #E1306C; }
+/* Inafanya kichwa cha habari kionekane kama kadi ya kipekee */
+.verification-header-box {
+  background: #f8faff;
+  padding: 20px;
+  border-radius: 12px;
+  border-left: 5px solid #007bff;
+  margin-bottom: 25px;
+}
+
+.verification-header-box h2 {
+  font-size: 1.6rem;
+  margin: 5px 0;
+  color: #111;
+}
+
+/* Punguza ukubwa wa box la picha */
+.verification-hero-card {
+  width: 100%;
+  max-width: 700px; /* Hapa ndipo unapopunguza ukubwa wa picha */
+  margin: 0 auto 25px auto; /* Inaiweka picha katikati */
+  height: auto;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  background: #fff;
+}
+
+/* Inahakikisha picha inajaa kwenye box bila kukatika */
+.verification-img-full {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain; 
+}
+
+/* BADILISHA HII KWENYE CSS YAKO */
+.verified-location-overlay {
+  position: absolute;
+  top: 15px; /* Inakaa juu */
+  left: 15px; /* Inakaa kushoto */
+  background: rgba(37, 211, 102, 0.9); /* Rangi ya kijani ya WhatsApp/Verified */
+  color: white;
+  padding: 6px 14px;
+  border-radius: 50px; /* Inakuwa kama kidonge (pill) */
+  font-size: 0.75rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  width: auto; /* MUHIMU: Inahakikisha haitandi picha nzima */
+}
+
+
+/* 1. Kadi kuu ya upande wa kushoto (Picha na Store Details) */
+.left-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Hii ndio itatengeneza muonekano wa Kadi (CardView) */
+.product-hero-section, 
+.product-bottom-details,
+.store-full-details-card {
+    background: #ffffff;
+    border-radius: 16px; /* Kona zilizopinda vizuri */
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* Kivuli laini kinachozunguka kadi */
+    border: 1px solid #f0f0f0; /* Mstari mweupe hafifu sana pembeni */
+    margin-bottom: 20px;
+}
+
+/* 2. Sidebar ya Kulia (ProductInfo) */
+.right-sidebar {
+    min-width: 0;
+}
+
+/* Hapa tunatengeneza kadi kwa ajili ya ProductInfo */
+.sticky-info-wrapper {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 10px; /* Nafasi ya ndani kabla ya kufikia ProductInfo */
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1); /* Kivuli kinene kidogo ionekane imenyanyuka */
+    border: 1px solid #eef0f2;
+    position: sticky;
+    top: 100px;
+    z-index: 10;
+}
+
+/* 3. Verification Header iwe kama kadi ndogo ndani ya kubwa */
+.verification-header-box {
+    background: #f8faff;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #dce7ff;
+    margin-bottom: 25px;
+}
+/* Inafanya scrollbar ya upande wa kulia iwe nyembamba sana */
+.sticky-info-wrapper::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sticky-info-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sticky-info-wrapper::-webkit-scrollbar-thumb {
+  background: #d1d5db; /* Rangi ya kijivu hafifu */
+  border-radius: 10px;
+}
+
+.sticky-info-wrapper:hover::-webkit-scrollbar-thumb {
+  background: #ea580c; /* Inabadilika kuwa rangi ya duka lako ukigusa */
+}
+/* ============================================ */
+/* RESPONSIVE DESIGN - PRODUCT DETAILS PAGE */
+/* ============================================ */
+
+/* Kwa tablets na simu kubwa (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .product-main-layout .main-grid-container {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+  
+  .right-sidebar {
+    margin-top: 20px;
+  }
+  
+  .sticky-info-wrapper {
+    position: relative !important;
+    top: 0 !important;
+    max-height: none !important;
+    overflow-y: visible !important;
+  }
+}
+
+/* Kwa simu (max-width: 768px) */
+@media (max-width: 768px) {
+  .product-page-root {
+    padding-top: 120px !important;
+  }
+  
+  .container-wrapper {
+    padding: 0 12px 20px 12px !important;
+  }
+  
+  /* Breadcrumb navigation */
+  .breadcrumb-nav {
+    padding: 10px 0 !important;
+    font-size: 11px !important;
+    flex-wrap: wrap !important;
+  }
+  
+  .breadcrumb-nav .sep {
+    margin: 0 4px !important;
+  }
+  
+  /* Main grid container */
+  .main-grid-container {
+    padding: 0 !important;
+  }
+  
+  /* Hero section (Gallery) */
+  .product-hero-section {
+    padding: 12px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  /* Bottom details section */
+  .product-bottom-details {
+    padding: 12px !important;
+    margin-top: 0 !important;
+  }
+  
+  /* Verification header box */
+  .verification-header-box {
+    padding: 12px !important;
+    margin-bottom: 15px !important;
+  }
+  
+  .verification-header-box h2 {
+    font-size: 16px !important;
+  }
+  
+  .verification-header-box p {
+    font-size: 12px !important;
+  }
+  
+  /* Store full details card */
+  .store-full-details-card {
+    padding: 16px !important;
+  }
+  
+  .store-full-details-card > div:first-child {
+    flex-direction: column !important;
+    gap: 15px !important;
+  }
+  
+  .store-full-details-card h3 {
+    font-size: 18px !important;
+  }
+  
+  /* Store visuals section */
+  .store-visuals-section img {
+    height: 200px !important;
+    object-fit: cover !important;
+  }
+  
+  .verified-location-overlay {
+    top: 10px !important;
+    left: 10px !important;
+    padding: 4px 10px !important;
+    font-size: 10px !important;
+  }
+  
+  /* Metrics grid (MOQ, Lead Time, etc) */
+  .store-full-details-card div[style*="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr))"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+  
+  .store-full-details-card div[style*="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr))"] > div {
+    padding: 10px !important;
+  }
+  
+  /* Contact & Address footer */
+  .store-full-details-card > div:last-child {
+    grid-template-columns: 1fr !important;
+    gap: 15px !important;
+  }
+  
+  /* Button ya "Tembelea Duka" */
+  .store-full-details-card a[href*="/store/"] {
+    width: 100% !important;
+    text-align: center !important;
+    padding: 10px !important;
+  }
+  
+  /* Horizontal scroll products */
+  .showroom-horizontal-scroll .no-scrollbar {
+    gap: 12px !important;
+  }
+  
+  .showroom-horizontal-scroll a {
+    flex: 0 0 110px !important;
+  }
+  
+  .showroom-horizontal-scroll a > div {
+    width: 110px !important;
+    height: 110px !important;
+  }
+  
+  .showroom-horizontal-scroll p {
+    font-size: 10px !important;
+  }
+  
+  /* TIN certificate image */
+  .store-full-details-card img[alt*="TIN"] {
+    max-height: 150px !important;
+  }
+  
+  /* Social media buttons */
+  .store-full-details-card > div div[style*="display: flex; flex-wrap: wrap; gap: 10px"] {
+    gap: 8px !important;
+  }
+  
+  .store-full-details-card a[href*="instagram"],
+  .store-full-details-card a[href*="tiktok"],
+  .store-full-details-card a[href*="google"] {
+    padding: 8px 12px !important;
+    font-size: 11px !important;
+  }
+  
+  /* ProductInfo sidebar kwenye simu */
+  .right-sidebar .sticky-info-wrapper {
+    padding: 8px !important;
+  }
+  
+  /* Footer spacing */
+  .product-page-root {
+    padding-bottom: 70px !important;
+  }
+}
+
+/* Kwa simu ndogo sana (max-width: 480px) */
+@media (max-width: 480px) {
+  .product-page-root {
+    padding-top: 100px !important;
+  }
+  
+  /* Metrics grid iwe safu moja */
+  .store-full-details-card div[style*="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr))"] {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Home/Products breadcrumb ifiche kidogo */
+  .breadcrumb-nav span:not(.active-path) {
+    display: none !important;
+  }
+  
+  .breadcrumb-nav .sep {
+    display: none !important;
+  }
+  
+  /* Gallery thumbnails ziwe ndogo */
+  .product-hero-section .gallery-column {
+    gap: 8px !important;
+  }
+  
+  /* Buttons ziwe full width */
+  .store-full-details-card .action-row {
+    flex-direction: column !important;
+  }
+  
+  .store-full-details-card .btn-social-large {
+    width: 100% !important;
+  }
+  
+  /* Verification overlay */
+  .verified-location-overlay {
+    font-size: 8px !important;
+    padding: 3px 8px !important;
+  }
+  
+  /* Store name font size */
+  .store-full-details-card h3 {
+    font-size: 16px !important;
+  }
+  
+  /* TIN and office images */
+  .store-visuals-section img,
+  .store-full-details-card img[alt*="TIN"] {
+    border-radius: 12px !important;
+  }
+}
+
+/* Kwa iPad na tablets (landscape mode) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .product-page-root {
+    padding-top: 100px !important;
+  }
+  
+  .main-grid-container {
+    grid-template-columns: 1fr 320px !important;
+    gap: 20px !important;
+  }
+  
+  .store-full-details-card div[style*="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr))"] {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+/* Kwa desktop kubwa (min-width: 1600px) */
+@media (min-width: 1600px) {
+  .container-wrapper {
+    max-width: 1600px !important;
+  }
+  
+  .main-grid-container {
+    max-width: 1400px !important;
+  }
+  
+  .product-hero-section {
+    padding: 32px !important;
+  }
+  
+  .store-full-details-card {
+    padding: 32px !important;
+  }
+}
+
+/* ============================================ */
+/* IMPROVED SCROLLBAR FOR HORIZONTAL SCROLL */
+/* ============================================ */
+
+.no-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #ea580c #f1f1f1;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  height: 4px;
+}
+
+.no-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.no-scrollbar::-webkit-scrollbar-thumb {
+  background: #ea580c;
+  border-radius: 10px;
+}
+
+/* ============================================ */
+/* FIX FOR MOBILE BOTTOM NAVIGATION */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .product-page-root {
+    padding-bottom: 80px !important;
+  }
+  
+  .container-wrapper {
+    margin-bottom: 20px;
+  }
+}
+
+/* ============================================ */
+/* ANIMATION FOR STICKY SIDEBAR */
+/* ============================================ */
+
+.sticky-info-wrapper {
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.sticky-info-wrapper:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================ */
+/* IMAGE GALLERY RESPONSIVE FIXES */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  /* ProductGallery component images */
+  .product-hero-section .main-image-container {
+    height: 300px !important;
+  }
+  
+  .product-hero-section .thumbnail-list {
+    gap: 8px !important;
+  }
+  
+  .product-hero-section .thumbnail-item {
+    width: 60px !important;
+    height: 60px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-hero-section .main-image-container {
+    height: 250px !important;
+  }
+  
+  .product-hero-section .thumbnail-item {
+    width: 50px !important;
+    height: 50px !important;
+  }
+}
+
+/* ============================================ */
+/* LIGHTBOX RESPONSIVE */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .lightbox-content {
+    width: 95% !important;
+    height: 70vh !important;
+  }
+  
+  .modal-help-text {
+    font-size: 10px !important;
+    padding: 6px !important;
+  }
+}
+
+/* ============================================ */
+/* PRINT STYLES */
+/* ============================================ */
+
+@media print {
+  .product-page-root {
+    padding-top: 0 !important;
+    background: white !important;
+  }
+  
+  .main-header,
+  .footer-container,
+  .right-sidebar,
+  .breadcrumb-nav,
+  .btn-social-large,
+  .action-row,
+  .showroom-horizontal-scroll {
+    display: none !important;
+  }
+  
+  .main-grid-container {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .product-hero-section,
+  .product-bottom-details {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
+}
+
+/* ============================================ */
+/* DARK MODE SUPPORT (Optional) */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  /* Kama unataka ku-support dark mode */
+  /* Unaweza kuongeza baadaye */
+}
+/* ============================================ */
+/* PRODUCT DETAILS - MOBILE STACK LAYOUT */
+/* ============================================ */
+
+/* Reset for all screen sizes - proper stacking */
+@media (max-width: 768px) {
+  /* 1. Override main grid container */
+  .product-main-layout .main-grid-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+    padding: 0 !important;
+  }
+  
+  /* 2. Left content (Gallery) - first */
+  .product-main-layout .left-content {
+    width: 100% !important;
+    order: 1 !important;
+    margin-bottom: 0 !important;
+  }
+  
+  /* 3. Right sidebar (ProductInfo) - second (chini ya gallery) */
+  .product-main-layout .right-sidebar {
+    width: 100% !important;
+    order: 2 !important;
+    margin-top: 0 !important;
+    position: relative !important;
+  }
+  
+  /* 4. Remove sticky behavior on mobile */
+  .product-main-layout .sticky-info-wrapper {
+    position: relative !important;
+    top: 0 !important;
+    max-height: none !important;
+    overflow-y: visible !important;
+    padding: 12px !important;
+    background: #fff !important;
+    border-radius: 16px !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
+  }
+  
+  /* 5. Product info component styling */
+  .product-main-layout .sticky-info-wrapper > div {
+    background: transparent !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+  
+  /* 6. Ensure proper spacing between elements */
+  .product-main-layout .product-hero-section {
+    margin-bottom: 0 !important;
+  }
+  
+  /* 7. Add bottom padding for mobile navigation */
+  .product-page-root {
+    padding-bottom: 80px !important;
+  }
+  
+  /* 8. Breadcrumb adjustment */
+  .container-wrapper .breadcrumb-nav {
+    margin-bottom: 10px !important;
+  }
+}
+
+/* Desktop: Keep original layout */
+@media (min-width: 769px) {
+  .product-main-layout .main-grid-container {
+    display: grid !important;
+    grid-template-columns: 1.5fr 1fr !important;
+    gap: 30px !important;
+  }
+  
+  .product-main-layout .right-sidebar {
+    width: auto !important;
+  }
+  
+  .product-main-layout .sticky-info-wrapper {
+    position: sticky !important;
+    top: 100px !important;
+    max-height: calc(100vh - 120px) !important;
+    overflow-y: auto !important;
+  }
+}
+
+/* ============================================ */
+/* PRODUCT DETAILS - MOBILE STACK LAYOUT */
+/* ============================================ */
+
+/* Reset for all screen sizes - proper stacking */
+@media (max-width: 768px) {
+  /* 1. Override main grid container */
+  .product-main-layout .main-grid-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+    padding: 0 !important;
+  }
+  
+  /* 2. Left content (Gallery) - first */
+  .product-main-layout .left-content {
+    width: 100% !important;
+    order: 1 !important;
+    margin-bottom: 0 !important;
+  }
+  
+  /* 3. Right sidebar (ProductInfo) - second (chini ya gallery) */
+  .product-main-layout .right-sidebar {
+    width: 100% !important;
+    order: 2 !important;
+    margin-top: 0 !important;
+    position: relative !important;
+  }
+  
+  /* 4. Remove sticky behavior on mobile */
+  .product-main-layout .sticky-info-wrapper {
+    position: relative !important;
+    top: 0 !important;
+    max-height: none !important;
+    overflow-y: visible !important;
+    padding: 12px !important;
+    background: #fff !important;
+    border-radius: 16px !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
+  }
+  
+  /* 5. Product info component styling */
+  .product-main-layout .sticky-info-wrapper > div {
+    background: transparent !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+  
+  /* 6. Ensure proper spacing between elements */
+  .product-main-layout .product-hero-section {
+    margin-bottom: 0 !important;
+  }
+  
+  /* 7. Add bottom padding for mobile navigation */
+  .product-page-root {
+    padding-bottom: 80px !important;
+  }
+  
+  /* 8. Breadcrumb adjustment */
+  .container-wrapper .breadcrumb-nav {
+    margin-bottom: 10px !important;
+  }
+}
+
+/* Desktop: Keep original layout */
+@media (min-width: 769px) {
+  .product-main-layout .main-grid-container {
+    display: grid !important;
+    grid-template-columns: 1.5fr 1fr !important;
+    gap: 30px !important;
+  }
+  
+  .product-main-layout .right-sidebar {
+    width: auto !important;
+  }
+  
+  .product-main-layout .sticky-info-wrapper {
+    position: sticky !important;
+    top: 100px !important;
+    max-height: calc(100vh - 120px) !important;
+    overflow-y: auto !important;
+  }
+}
+/* Sticky Sidebar - Kama Alibaba */
+.right-sidebar {
+  position: relative;
+  height: 100%;
+}
+
+.sticky-info-wrapper {
+  position: sticky;
+  top: 20px;
+  align-self: start;
+}
+
+/* Kwa ajili ya layout kuwa na align-items start */
+.main-grid-container {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 2rem;
+  align-items: start; /* Muhimu kwa sticky */
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Responsive kwa tablet */
+@media (max-width: 1024px) {
+  .main-grid-container {
+    grid-template-columns: 1fr 320px;
+    gap: 1.5rem;
+  }
+}
+
+/* Responsive kwa mobile - sidebar inakuwa normal */
+@media (max-width: 768px) {
+  .main-grid-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .sticky-info-wrapper {
+    position: static;
+  }
+}
+/* Hakikisha hakuna overflow hidden kwenye containers */
+.main-grid-container {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 2rem;
+  align-items: start;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  overflow: visible !important; /* Muhimu */
+}
+
+.product-main-layout {
+  overflow: visible !important; /* Muhimu */
+}
+
+/* Hakikisha hakuna overflow hidden kwenye body au html */
+body, html {
+  overflow-x: visible;
+  overflow-y: auto;
+}
+
+/* Important - Ondoa overflow hidden kutoka kwa containers zote */
+.left-content,
+.right-sidebar,
+.product-hero-section {
+  overflow: visible !important;
+}

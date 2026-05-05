@@ -1,0 +1,423 @@
+/* =========================================
+   1. MAIN CONTAINER LAYOUT
+   ========================================= */
+.messages-container {
+    display: flex;
+    flex: 1;
+    height: 100%; /* Inajaza nafasi yote chini ya header */
+    background-color: #ffffff;
+    overflow: hidden; /* Muhimu kuzuia scrollbar ya nje */
+}
+
+/* =========================================
+   2. LEFT SIDEBAR (INBOX LIST)
+   ========================================= */
+.messages-sidebar {
+    width: 320px;
+    border-right: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+}
+
+.sidebar-header-chat {
+    padding: 16px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.sidebar-header-chat h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #111827;
+}
+
+.search-bar-chat {
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 8px;
+    gap: 8px;
+}
+
+.search-icon-chat {
+    color: #9ca3af;
+}
+
+.search-bar-chat input {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    width: 100%;
+}
+
+/* Chat List Items */
+.chat-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.chat-item {
+    display: flex;
+    padding: 12px 16px;
+    gap: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-bottom: 1px solid #f9fafb;
+}
+
+.chat-item:hover {
+    background-color: #f9fafb;
+}
+
+.chat-item.active {
+    background-color: #fff0e6; /* Rangi hafifu ya Alibaba */
+    border-left: 3px solid #ff6a00;
+}
+
+.chat-avatar {
+    width: 45px;
+    height: 45px;
+    background: #e5e7eb;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #4b5563;
+    flex-shrink: 0;
+}
+
+.chat-info {
+    flex: 1;
+    min-width: 0; /* Muhimu kwa text-overflow */
+}
+
+.chat-info-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 4px;
+}
+
+.chat-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #111827;
+}
+
+.chat-date {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+.chat-preview {
+    font-size: 13px;
+    color: #6b7280;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* =========================================
+   3. RIGHT SIDE - CHAT WINDOW
+   ========================================= */
+.chat-window {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #f7f8fa; /* Background ya kijivu */
+}
+
+/* Empty State */
+.chat-empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    padding: 40px;
+}
+
+.empty-chat-img {
+    width: 200px;
+    margin-bottom: 24px;
+    opacity: 0.8;
+}
+
+.empty-state-content h2 {
+    font-size: 18px;
+    color: #374151;
+    max-width: 400px;
+    margin: 0 auto 24px;
+    line-height: 1.5;
+}
+
+.learn-more-btn {
+    padding: 10px 24px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.learn-more-btn:hover {
+    background: #f9fafb;
+    border-color: #ff6a00;
+    color: #ff6a00;
+}
+
+/* Active Chat Content */
+.active-chat-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.chat-header-active {
+    padding: 16px 24px;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.chat-header-active h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.messages-display {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+/* Input Area */
+.message-input-area {
+    padding: 16px 24px;
+    background: #fff;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.message-input-area input {
+    flex: 1;
+    padding: 12px 16px;
+    background: #f3f4f6;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.message-input-area input:focus {
+    border-color: #ff6a00;
+    background: #fff;
+}
+
+.send-btn {
+    background: #ff6a00; /* Rangi ya Alibaba */
+    color: #fff;
+    border: none;
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.send-btn:hover {
+    opacity: 0.9;
+}
+
+/* Eneo la kuonyesha meseji zote */
+.messages-display {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: #f0f2f5; /* Rangi ya nyuma kama WhatsApp */
+}
+
+/* Base style kwa bubble zote */
+.message-bubble {
+  max-width: 70%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Meseji unazotuma (Zinakaa kulia) */
+.message-bubble.sent {
+  align-self: flex-end;
+}
+
+.message-bubble.sent .bubble-content {
+  background-color: #dcf8c6; /* Kijani hafifu */
+  color: #303030;
+  border-radius: 15px 15px 0 15px; /* Pembe ya kulia chini inakuwa kali */
+  padding: 10px 15px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Meseji unazopokea (Zinakaa kushoto) */
+.message-bubble.received {
+  align-self: flex-start;
+}
+
+.message-bubble.received .bubble-content {
+  background-color: #ffffff; /* Nyeupe */
+  color: #303030;
+  border-radius: 15px 15px 15px 0; /* Pembe ya kushoto chini inakuwa kali */
+  padding: 10px 15px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Mpangilio wa maandishi ndani ya bubble */
+.bubble-content p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Muda wa meseji */
+.msg-timestamp {
+  font-size: 10px;
+  color: #888;
+  margin-top: 4px;
+  align-self: flex-end;
+  display: block;
+}
+
+/* Inatengeneza scrollbar nzuri */
+.messages-display::-webkit-scrollbar {
+  width: 6px;
+}
+.messages-display::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 10px;
+}
+/* ============================================ */
+/* MOBILE RESPONSIVE - MESSAGES PAGE */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  /* Hide desktop sidebar */
+  .dashboard-layout > .dashboard-main > aside {
+    display: none !important;
+  }
+  
+  /* Messages container full width */
+  .messages-container {
+    width: 100% !important;
+  }
+  
+  /* Messages sidebar full width when chat not open */
+  .messages-sidebar {
+    width: 100% !important;
+    border-right: none !important;
+  }
+  
+  /* Chat window takes full width when open */
+  .chat-window {
+    width: 100% !important;
+  }
+  
+  /* Chat header adjustments */
+  .chat-header-active {
+    padding: 10px 16px !important;
+  }
+  
+  /* Message bubbles smaller on mobile */
+  .message-bubble .bubble-content {
+    max-width: 85% !important;
+    font-size: 13px !important;
+  }
+  
+  .messages-display {
+    padding: 16px !important;
+  }
+  
+  /* Message input area */
+  .message-input-area {
+    padding: 12px 16px !important;
+  }
+  
+  .message-input-area input {
+    padding: 10px !important;
+    font-size: 13px !important;
+  }
+  
+  .message-input-area button {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  
+  /* Chat list items */
+  .chat-item {
+    padding: 12px !important;
+  }
+  
+  .chat-avatar {
+    width: 45px !important;
+    height: 45px !important;
+  }
+  
+  .chat-name {
+    font-size: 14px !important;
+  }
+  
+  .chat-preview {
+    font-size: 12px !important;
+  }
+  
+  .chat-date {
+    font-size: 10px !important;
+  }
+  
+  /* Empty state */
+  .chat-empty-state .empty-state-content h2 {
+    font-size: 16px !important;
+    padding: 0 16px !important;
+  }
+  
+  .empty-chat-img {
+    width: 200px !important;
+  }
+  
+  /* Search bar in chat sidebar */
+  .search-bar-chat input {
+    font-size: 13px !important;
+    padding: 8px 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .message-bubble .bubble-content {
+    max-width: 95% !important;
+  }
+  
+  .chat-item {
+    padding: 10px !important;
+  }
+  
+  .chat-avatar {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  
+  .messages-display {
+    padding: 12px !important;
+  }
+}

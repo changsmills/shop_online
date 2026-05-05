@@ -1,0 +1,1852 @@
+:root {
+  --primary-color: #ff6a00;
+  --bg-light: #f8f9fa;
+  --border-color: #eee;
+  --text-dark: #333;
+}
+
+.gallery-main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #fff;
+}
+
+/* --- WRAPPER YA JUU --- */
+.gallery-wrapper {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 40px;
+  align-items: flex-start;
+}
+
+/* 1. THUMBNAILS (Kushoto) */
+.thumbnails-container {
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.thumbnails-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.thumb-item {
+  width: 70px;
+  height: 70px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fff;
+}
+
+.thumb-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Hii inazuia picha isikatwe */
+  padding: 2px;
+}
+
+.thumb-item:hover, 
+.thumb-item.active {
+  border: 2px solid var(--primary-color);
+  transform: translateX(3px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* 2. MAIN STAGE (Katikati) */
+.main-stage {
+  flex: 1;
+  position: relative;
+  background: #fff;
+  border-radius: 12px;
+  height: 550px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #f0f0f0;
+}
+
+.main-display {
+  width: 100%;
+  height: 100%;
+  cursor: zoom-in;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.base-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Muhimu ili picha isionekane vibaya */
+}
+
+/* ZOOM EFFECT (Dirisha dogo la zoom) */
+.zoom-result {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-size: 250%; /* Kiasi cha zoom */
+  pointer-events: none;
+  z-index: 10;
+  background-color: #fff;
+}
+
+.action-icons-overlay {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 5;
+}
+
+.icon-btn {
+  background: #fff;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+}
+
+.icon-btn:hover {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+/* --- SEHEMU YA CHINI (DETAILS) --- */
+.business-scroll-section {
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 1px solid var(--border-color);
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 25px;
+  color: var(--text-dark);
+}
+
+.trust-block {
+  margin-bottom: 30px;
+}
+
+.image-grid-single {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.detail-img-full {
+  width: 100%;
+  border-radius: 8px;
+  background: var(--bg-light);
+}
+
+/* --- OFFICE CARD --- */
+.business-info-card {
+  background: var(--bg-light);
+  padding: 25px;
+  border-radius: 12px;
+  display: flex;
+  gap: 30px;
+}
+
+.office-images {
+  display: flex;
+  gap: 15px;
+}
+
+.store-img-wrapper {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  color: #777;
+}
+
+.store-img-wrapper img {
+  width: 140px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-top: 5px;
+}
+
+.staff-intro {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* --- LIGHTBOX MODAL --- */
+.lightbox-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.9);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+}
+
+.lightbox-content {
+  width: 95%;
+  max-width: 1100px;
+  height: 85vh;
+  background: #fff;
+  border-radius: 15px;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+.lightbox-main-view {
+  flex: 2;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.modal-base-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.modal-zoom-lens {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-size: 300%;
+  background-position: var(--x, 50%) var(--y, 50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.lightbox-main-view:hover .modal-zoom-lens { opacity: 1; }
+.lightbox-main-view:hover .modal-base-img { opacity: 0.2; }
+
+.lightbox-sidebar {
+  flex: 0.8;
+  padding: 25px;
+  border-left: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.mini-thumbs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.mini-thumbs img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.mini-thumbs img.active-mini {
+  border-color: var(--primary-color);
+}
+
+.close-lightbox {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: #fff;
+  border: none;
+  font-size: 28px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .gallery-wrapper { flex-direction: column-reverse; }
+  .thumbnails-list { flex-direction: row; overflow-x: auto; width: 100%; }
+  .main-stage { height: 350px; }
+  .lightbox-content { flex-direction: column; }
+  .lightbox-sidebar { flex: 1; border-left: none; }
+}
+/* Container inayobeba picha na vimshale */
+.main-stage-container {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Nafasi kati ya mshale na picha */
+    flex: 1;
+}
+
+/* Style ya Vimshale vya Nje */
+.nav-arrow {
+    background: #fff;
+    border: 1px solid #eee;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    color: #333;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    z-index: 5;
+}
+
+.nav-arrow:hover {
+    background: #ff6a00;
+    color: #fff;
+    border-color: #ff6a00;
+    transform: scale(1.1);
+}
+
+/* Vimshale ndani ya Modal */
+.modal-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 30px;
+    padding: 20px 10px;
+    cursor: pointer;
+    z-index: 100;
+    transition: 0.3s;
+}
+
+.modal-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.modal-prev { left: 10px; }
+.modal-next { right: 10px; }
+
+/* Inahakikisha picha haisogei wakati vimshale vinatokea */
+.main-stage {
+    flex: 1;
+    height: 500px;
+    position: relative;
+}
+/* Overlay - Inajaza kioo chote na rangi nyeusi */
+.lightbox-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(4px);
+}
+
+/* Box la Modal */
+.lightbox-content {
+    display: flex;
+    width: 90%;
+    max-width: 1200px;
+    height: 85vh;
+    background: #000; /* Background Nyeusi kama picha yako */
+    border-radius: 12px;
+    border: 1px solid #333;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Sidebar ya Kushoto */
+.lightbox-sidebar {
+    width: 280px;
+    background: #111; /* Nyeusi iliyofifia kidogo */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #222;
+    color: #fff;
+}
+
+.modal-header-info h4 {
+    margin: 0;
+    font-size: 18px;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.modal-header-info p {
+    color: #888;
+    font-size: 14px;
+    margin: 5px 0 20px 0;
+}
+
+/* Thumbnails ndani ya modal */
+.mini-thumbs {
+    display: flex;
+    flex-direction: column; /* Wima (Vertical) kama picha yako */
+    gap: 12px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* Scrollbar kwa ajili ya picha nyingi */
+.mini-thumbs::-webkit-scrollbar {
+    width: 4px;
+}
+.mini-thumbs::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 10px;
+}
+
+.mini-thumbs img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    opacity: 0.6;
+    transition: 0.3s;
+}
+
+.mini-thumbs img.active-mini {
+    border-color: #ff6a00;
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.modal-footer-hint {
+    margin-top: auto;
+    font-size: 12px;
+    color: #666;
+    padding-top: 10px;
+}
+
+/* Sehemu ya Picha Kuu */
+.lightbox-main-view {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+}
+
+.modal-base-img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+}
+
+/* Vimshale ndani ya modal - Vyeupe na vya duara */
+.modal-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #fff;
+    color: #000;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    z-index: 10;
+    transition: 0.3s;
+}
+
+.modal-nav-btn:hover {
+    background: #ff6a00;
+    color: #fff;
+}
+
+.modal-prev { left: 20px; }
+.modal-next { right: 20px; }
+
+/* X button ya kufunga */
+.close-lightbox {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #fff;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Zoom lens kwa ajili ya modal */
+.modal-zoom-lens {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-size: 250%; /* Zoom level */
+    background-position: var(--x, 50%) var(--y, 50%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+.lightbox-main-view:hover .modal-zoom-lens {
+    opacity: 1;
+}
+.lightbox-main-view:hover .modal-base-img {
+    opacity: 0.4;
+}
+/* Hakikisha main view inachukua nafasi yote iliyobaki */
+.lightbox-main-view {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    overflow: hidden; /* Muhimu kwa ajili ya zoom */
+}
+
+/* Container ya picha kuzuia isipotee */
+.modal-image-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 5; /* Inakaa juu ya background nyeusi */
+}
+
+.modal-base-img {
+    max-width: 95%; /* Inaacha nafasi kidogo pembeni */
+    max-height: 90%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block; /* Inazuia inline-block issues */
+    transition: opacity 0.3s ease;
+}
+
+/* Zoom Lens - Hakikisha background size ni kubwa */
+.modal-zoom-lens {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-size: 250% !important; /* Lazima iwe kubwa kuliko picha yenyewe */
+    background-position: var(--x, 50%) var(--y, 50%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+    cursor: zoom-in;
+}
+
+/* Wakati wa ku-hover, picha ya chini ififie, ya zoom ionekane */
+.modal-image-container:hover .modal-zoom-lens {
+    opacity: 1;
+}
+.modal-image-container:hover .modal-base-img {
+    opacity: 0.2; /* Hii inasaidia kuona zoom vizuri */
+}
+
+/* Vimshale vya kusogea - Hakikisha viko juu kabisa */
+.modal-nav-btn {
+    position: absolute;
+    z-index: 20;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+    transition: 0.2s;
+}
+
+.modal-nav-btn:hover {
+    background: #ff6a00;
+    border-color: #ff6a00;
+}
+
+.business-verification-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Inagawa mara mbili */
+    gap: 30px;
+    background: #ffffff;
+    border: 1px solid #eee;
+    padding: 25px;
+    border-radius: 15px;
+}
+
+.large-office-img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.mini-visuals-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.map-placeholder {
+    background: #f0f4f8;
+    height: 100px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.staff-mini-card img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.verification-details {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.info-item {
+    padding: 10px 0;
+    border-bottom: 1px dashed #eee;
+    display: flex;
+    flex-direction: column;
+}
+
+.social-btn {
+    padding: 8px 15px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    margin-right: 10px;
+    background: #eee;
+    color: #333;
+}
+
+.social-btn.wa { background: #25D366; color: white; }
+.social-btn.ig { background: #E1306C; color: white; }
+
+@media (max-width: 768px) {
+    .business-verification-grid { grid-template-columns: 1fr; }
+}
+/* Container inayobeba kila kitu (Picha + Mishale) */
+.main-stage-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px; /* Huu ndio umbali wa mshale kutoka kwenye picha */
+    flex: 1;
+    position: relative;
+}
+
+/* Hakikisha main-stage haichukui upana wote ili mishale ipate nafasi pembeni */
+.main-stage {
+    flex: 0 0 500px; /* Badilisha 500px kulingana na upana unaotaka picha iwe */
+    height: 500px;
+    position: relative;
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid #f0f0f0;
+    overflow: hidden;
+}
+
+/* Style ya Vimshale (Tayari unayo, nimeiongezea shadow tu) */
+.nav-arrow {
+    background: #fff;
+    border: 1px solid #eee;
+    width: 48px; /* Kidogo kubwa zaidi kwa urahisi wa kubonyeza */
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    color: #333;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Inafanya mshale uonekane umeinuka */
+    z-index: 5;
+    flex-shrink: 0; /* Inazuia mshale usinywele */
+}
+
+.nav-arrow:hover {
+    background: #ff6a00;
+    color: #fff;
+    border-color: #ff6a00;
+    transform: scale(1.1);
+}
+
+/* RESPONSIVE: Kwenye simu, mishale irudi ndani ya picha ili isipotee nje ya kioo */
+@media (max-width: 768px) {
+    .main-stage-container {
+        gap: 0;
+        position: relative;
+    }
+    .nav-arrow {
+        position: absolute;
+        width: 35px;
+        height: 35px;
+        background: rgba(255, 255, 255, 0.7); /* Inafifia ili isizibe picha sana */
+    }
+    .prev-arrow { left: 10px; }
+    .next-arrow { right: 10px; }
+    .main-stage { flex: 1; height: 350px; }
+}
+
+.zoom-result {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-size: 250% !important; 
+  pointer-events: none; /* Inaruhusu mouse kugusa picha ya chini bila kuzuiliwa */
+  z-index: 10;
+  background-color: #fff; /* Inazuia kuona picha ya chini wakati inapakia */
+  border: 1px solid #ddd;
+}
+/* Badge ya video kwenye thumbnail */
+.video-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  z-index: 2;
+}
+
+/* Video kuu ikae vizuri kwenye box */
+.main-video-element {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Inazuia video isikatwe (crop) */
+  background: #000;
+  border-radius: 8px;
+}
+
+/* Hakikisha thumb-item ina position relative kwa ajili ya badge */
+.thumb-item {
+  position: relative;
+  /* ... styles zako zingine ... */
+}
+
+/* Container kuu ya Store Verification */
+.store-verification-stack {
+  display: flex;
+  flex-direction: column; /* Inalazimisha picha ziwe juu na data chini */
+  gap: 30px;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid #eee;
+}
+
+/* Sehemu ya Picha */
+.main-office-hero {
+  position: relative;
+  width: 100%;
+  height: 350px; /* Ukubwa sawa na picha za bidhaa */
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.office-img-large {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.office-thumbs-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.thumb-item img {
+  width: 100%;
+  height: 85px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Sehemu ya Maelezo */
+.office-about-card {
+  background: #f8fbff;
+  padding: 20px;
+  border-radius: 12px;
+  border-left: 6px solid #007bff;
+  margin: 20px 0;
+}
+
+.store-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.contact-card {
+  display: flex;
+  flex-direction: column;
+  background: #fafafa;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.contact-card .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.contact-card .value {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+/* Buttons */
+.social-button-row {
+  display: flex;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.social-btn {
+  flex: 1;
+  padding: 16px;
+  text-align: center;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: bold;
+  color: white;
+}
+
+.whatsapp { background: #25D366; }
+.instagram { background: #E1306C; }
+
+
+/* Container inayoweka picha moja juu ya nyingine */
+.store-visuals-vertical-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Nafasi kati ya picha moja na nyingine */
+    width: 100%;
+}
+
+/* Kadi ya kila picha */
+.office-hero-item {
+    position: relative;
+    width: 100%;
+    height: 380px; /* Unaweza kuongeza au kupunguza kulingana na muonekano */
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f5f5f5;
+}
+
+/* Picha yenyewe */
+.office-img-full-width {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Muhimu: Inazuia picha isipoteze umbo (distortion) */
+    display: block;
+}
+
+/* Lebo inayokaa juu ya picha ya kwanza */
+.verified-location-tag {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+}
+
+/* Kadi ya Ramani chini ya picha */
+.full-width-map-card {
+    width: 100%;
+    padding: 25px;
+    background: #f0f7ff;
+    border-radius: 12px;
+    border: 1.5px dashed #007bff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #007bff;
+    font-weight: bold;
+}
+.full-img-responsive {
+  width: 100%;
+  height: auto; /* Inafuata urefu wa picha, haikati! */
+  max-width: 800px;
+  display: block;
+  margin: 20px auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.full-view-item {
+  padding: 10px;
+  text-align: center;
+}
+.full-view-gallery-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Picha zinajipanga zenyewe */
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.full-view-item {
+  background: #f9f9f9;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.full-view-item:hover {
+  transform: scale(1.02); /* Inapanuka kidogo mteja akisogeza mouse */
+}
+
+.full-img-responsive {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+/* 1. Background kuu ya Modal */
+.lightbox-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.95); /* Weusi mzito */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Inakaa juu ya kila kitu */
+  animation: fadeIn 0.3s ease;
+}
+
+/* 2. Wrapper ya picha na vishale */
+.lightbox-content-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 90%;
+  max-width: 1200px;
+}
+
+/* Container ya picha ndani ya Modal */
+.modal-zoom-wrapper {
+  position: relative;
+  width: 100%;
+  height: 80vh; /* Inachukua 80% ya urefu wa screen */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  cursor: zoom-in;
+}
+
+.modal-base-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Hii ndio picha ya Zoom inayozunguka */
+.modal-zoom-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  z-index: 10;
+  background-color: #000; /* Inasaidia picha ionekane vizuri */
+  pointer-events: none; /* Inaruhusu mouse iendelee kusoma coordinates */
+  transition: background-position 0.1s ease-out; /* Inafanya zoom iwe laini */
+}
+
+/* Footer ya Modal */
+.modal-footer-caption {
+  position: absolute;
+  bottom: 20px;
+  color: white;
+  text-align: center;
+  width: 100%;
+  font-family: sans-serif;
+}
+/* Style ya Button za Modal (Prev/Next) */
+.modal-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.1); /* Background hafifu */
+  color: white;
+  border: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%; /* Duara kamili */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 100;
+  backdrop-filter: blur(4px); /* Inalainisha background ya button */
+}
+/* Mshale wa kushoto */
+.modal-nav-btn.prev {
+    left: 10px !important;
+    right: auto !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Mshale wa kulia */
+.modal-nav-btn.next {
+    right: 10px !important;
+    left: auto !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Wakati mouse inapopita juu ya button (Hover) */
+.modal-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-50%) scale(1.1); /* Inajivuta kidogo kuelekea mbele */
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Inazuia picha isifichwe na vishale kwenye screen ndogo */
+@media (max-width: 768px) {
+  .modal-nav-btn {
+    width: 45px;
+    height: 45px;
+    background: rgba(0, 0, 0, 0.5); /* Kwenye simu iwe nyeusi zaidi ili ionekane */
+  }
+  .modal-nav-btn.prev { left: 10px; }
+  .modal-nav-btn.next { right: 10px; }
+}
+/* Hakikisha container kuu haina nafasi ya ziada */
+.full-view-gallery-list {
+  display: block !important;
+  line-height: 0 !important; /* Huondoa nafasi ya asili ya picha (inline gap) */
+  width: 100%;
+}
+
+/* Inabana kila item ya picha/video */
+.full-view-item {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  display: block !important;
+  line-height: 0 !important;
+}
+
+/* Inafanya picha na video zijaze upana na kutoacha mwanya chini */
+.full-img-responsive {
+  width: 100%;
+  height: auto;
+  display: block !important; /* Muhimu: Inaondoa 'descender space' ya picha */
+  margin: 0 !important;
+}
+
+/* Inaficha maandishi ya caption kabisa */
+.image-caption {
+  display: none !important;
+}
+
+/* Container kuu inayoshikilia picha zote kuelekea chini */
+.kbc-full-view-list {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  max-width: 100% !important; /* Inachukua upana wote wa screen */
+  margin: 20px 0 !important;
+  padding: 0 !important;
+  background-color: #ffffff;
+}
+
+/* Box la kila picha */
+.kbc-full-view-item {
+  width: 100% !important;
+  display: block !important;
+  line-height: 0 !important; /* Muhimu: Inaondoa weupe kati ya picha */
+  margin: 0 !important;
+  padding: 0 !important;
+  border-bottom: 1px solid #dcdcdc; /* Mstari mwembamba kama wa Alibaba */
+}
+
+/* Picha au Video yenyewe */
+.kbc-full-view-media {
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  object-fit: contain !important;
+  /* Hii inahakikisha picha haivutwi vibaya */
+}
+
+/* Marekebisho kwa ajili ya Simu */
+@media (max-width: 768px) {
+  .kbc-full-view-list {
+    margin: 10px 0 !important;
+  }
+}
+/* Hakikisha hii ipo kwenye CSS yako */
+.modal-nav-btn {
+    position: fixed !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 10000 !important;
+    background: rgb(15, 13, 13) !important;
+    border: none !important;
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+
+.modal-nav-btn.prev {
+    left: 20px !important;
+    right: auto !important;
+}
+
+.modal-nav-btn.next {
+    right: 20px !important;
+    left: auto !important;
+}
+
+.modal-nav-btn:hover {
+    background: #f1ece9 !important;
+    color: rgb(228, 214, 214) !important;
+}
+.video-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.5); /* Inasaidia icon kuonekana */
+  border-radius: 50%;
+  padding: 5px;
+  pointer-events: none; /* Inahakikisha hover bado inafanya kazi kwenye img */
+}
+.nav-btn {
+  /* Tengeneza duara */
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  
+  /* Ondoa default borders za button */
+  border: 1px solid #e0e0e0;
+  background-color: rgb(241, 233, 233);
+  
+  /* Weka alama (arrow) katikati */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Mapambo ya ziada */
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  font-weight: bold;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Inapoguswa na mouse (Hover) */
+.nav-btn:hover {
+  background-color: #e0c00a;
+  box-shadow: 0 4px 8px rgba(184, 175, 175, 0.15);
+  transform: scale(1.05);
+}
+
+/* Inapobonyezwa (Active) */
+.nav-btn:active {
+  transform: scale(0.95);
+}
+
+/* Kugeuza mshale wa chini ufungue kuelekea chini */
+.nav-btn.next {
+  transform: rotate(180deg);
+}
+
+.nav-btn.next:hover {
+  transform: rotate(180deg) scale(1.05);
+}
+/* ============================================ */
+/* RESPONSIVE DESIGN - PRODUCT GALLERY */
+/* ============================================ */
+
+/* Kwa tablets (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .gallery-main-container {
+    padding: 15px !important;
+  }
+  
+  .main-stage {
+    flex: 0 0 400px !important;
+    height: 400px !important;
+  }
+  
+  .thumbnails-container {
+    width: 70px !important;
+  }
+  
+  .thumb-item {
+    width: 60px !important;
+    height: 60px !important;
+  }
+  
+  .nav-arrow {
+    width: 40px !important;
+    height: 40px !important;
+  }
+}
+
+/* Kwa simu (max-width: 768px) */
+@media (max-width: 768px) {
+  .gallery-main-container {
+    padding: 10px !important;
+  }
+  
+  /* Gallery wrapper - stack vertically */
+  .gallery-wrapper {
+    flex-direction: column !important;
+    gap: 15px !important;
+    margin-bottom: 20px !important;
+  }
+  
+  /* Thumbnails - horizontal scroll */
+  .thumbnails-container {
+    width: 100% !important;
+    order: 2 !important;
+  }
+  
+  .thumbnails-list {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    gap: 8px !important;
+    padding-bottom: 8px !important;
+  }
+  
+  .thumb-item {
+    flex-shrink: 0 !important;
+    width: 55px !important;
+    height: 55px !important;
+  }
+  
+  /* Hide vertical nav buttons on mobile */
+  .thumbnails-container .nav-btn {
+    display: none !important;
+  }
+  
+  /* Main stage container */
+  .main-stage-container {
+    gap: 8px !important;
+  }
+  
+  .main-stage {
+    flex: 1 !important;
+    height: 320px !important;
+  }
+  
+  .main-display {
+    height: 100% !important;
+  }
+  
+  /* Navigation arrows - floating on image */
+  .main-stage-container .nav-arrow {
+    position: absolute !important;
+    width: 36px !important;
+    height: 36px !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    z-index: 10 !important;
+  }
+  
+  .main-stage-container .prev-arrow {
+    left: 10px !important;
+    right: auto !important;
+  }
+  
+  .main-stage-container .next-arrow {
+    right: 10px !important;
+    left: auto !important;
+  }
+  
+  /* Zoom container */
+  .zoom-container {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  
+  .base-image {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+  }
+  
+  /* Action icons overlay */
+  .action-icons-overlay {
+    top: 10px !important;
+    right: 10px !important;
+  }
+  
+  .icon-btn {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  
+  .icon-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+}
+
+/* Kwa simu ndogo (max-width: 480px) */
+@media (max-width: 480px) {
+  .main-stage {
+    height: 250px !important;
+  }
+  
+  .thumb-item {
+    width: 50px !important;
+    height: 50px !important;
+  }
+  
+  .thumb-item img {
+    object-fit: cover !important;
+  }
+  
+  .main-stage-container .nav-arrow {
+    width: 30px !important;
+    height: 30px !important;
+  }
+  
+  .video-badge {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 10px !important;
+  }
+}
+
+/* ============================================ */
+/* LIGHTBOX / MODAL RESPONSIVE */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .lightbox-overlay {
+    padding: 10px !important;
+  }
+  
+  .lightbox-content-wrapper {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  
+  .modal-zoom-wrapper {
+    height: 70vh !important;
+  }
+  
+  /* Modal navigation buttons */
+  .modal-nav-btn {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  
+  .modal-nav-btn.prev {
+    left: 5px !important;
+  }
+  
+  .modal-nav-btn.next {
+    right: 5px !important;
+  }
+  
+  .modal-nav-btn svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  
+  /* Close button */
+  .close-lightbox {
+    top: 10px !important;
+    right: 10px !important;
+    width: 30px !important;
+    height: 30px !important;
+  }
+  
+  .close-lightbox svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  
+  /* Modal footer */
+  .modal-footer-caption {
+    bottom: 10px !important;
+    font-size: 12px !important;
+  }
+}
+
+/* Kwa simu ndogo sana */
+@media (max-width: 480px) {
+  .modal-zoom-wrapper {
+    height: 60vh !important;
+  }
+  
+  .modal-nav-btn {
+    width: 35px !important;
+    height: 35px !important;
+  }
+  
+  .modal-base-img {
+    max-width: 95% !important;
+    max-height: 95% !important;
+  }
+}
+
+/* ============================================ */
+/* KBC FULL VIEW LIST (Alibaba Style) */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .kbc-full-view-list {
+    margin: 15px 0 !important;
+  }
+  
+  .kbc-full-view-item {
+    border-bottom: 1px solid #e5e5e5 !important;
+  }
+  
+  .kbc-full-view-media {
+    width: 100% !important;
+    height: auto !important;
+  }
+}
+
+/* ============================================ */
+/* STORE VERIFICATION SECTION RESPONSIVE */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .store-verification-stack {
+    padding: 15px !important;
+    gap: 20px !important;
+  }
+  
+  .main-office-hero {
+    height: 200px !important;
+  }
+  
+  .office-thumbs-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 8px !important;
+  }
+  
+  .office-thumbs-grid .thumb-item img {
+    height: 60px !important;
+  }
+  
+  .office-about-card {
+    padding: 15px !important;
+  }
+  
+  .store-contact-grid {
+    grid-template-columns: 1fr !important;
+    gap: 15px !important;
+  }
+  
+  .social-button-row {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  
+  .social-btn {
+    padding: 12px !important;
+  }
+  
+  /* Store visuals vertical stack */
+  .store-visuals-vertical-stack {
+    gap: 15px !important;
+  }
+  
+  .office-hero-item {
+    height: 220px !important;
+  }
+  
+  .verified-location-tag {
+    font-size: 10px !important;
+    padding: 4px 10px !important;
+    bottom: 10px !important;
+    left: 10px !important;
+  }
+}
+
+/* ============================================ */
+/* BUSINESS VERIFICATION GRID RESPONSIVE */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .business-verification-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+    padding: 15px !important;
+  }
+  
+  .large-office-img {
+    height: 180px !important;
+  }
+  
+  .mini-visuals-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  
+  .staff-mini-card img {
+    height: 80px !important;
+  }
+  
+  .map-placeholder {
+    height: 80px !important;
+  }
+}
+
+/* ============================================ */
+/* ZOOM RESULT RESPONSIVE */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .zoom-result {
+    display: none !important; /* Hide zoom on mobile - too small */
+  }
+  
+  .modal-zoom-overlay {
+    display: none !important; /* Hide modal zoom on mobile */
+  }
+}
+
+/* ============================================ */
+/* TOUCH DEVICE OPTIMIZATIONS */
+/* ============================================ */
+
+@media (hover: none) and (pointer: coarse) {
+  /* For touch devices */
+  .zoom-container {
+    cursor: pointer !important;
+  }
+  
+  .zoom-result {
+    display: none !important;
+  }
+  
+  .main-stage-container .nav-arrow {
+    background: rgba(255, 255, 255, 0.85) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  }
+  
+  .thumb-item {
+    cursor: pointer !important;
+  }
+}
+
+/* ============================================ */
+/* LANDSCAPE MODE FOR MOBILE */
+/* ============================================ */
+
+@media (max-width: 896px) and (orientation: landscape) {
+  .product-page-root {
+    padding-top: 100px !important;
+  }
+  
+  .main-stage {
+    height: 280px !important;
+  }
+  
+  .modal-zoom-wrapper {
+    height: 70vh !important;
+  }
+  
+  .gallery-wrapper {
+    flex-direction: row !important;
+  }
+  
+  .thumbnails-container {
+    width: 60px !important;
+  }
+  
+  .thumb-item {
+    width: 50px !important;
+    height: 50px !important;
+  }
+}
+
+/* ============================================ */
+/* SMOOTH TRANSITIONS */
+/* ============================================ */
+
+.gallery-wrapper,
+.main-stage,
+.thumb-item,
+.modal-nav-btn {
+  transition: all 0.3s ease;
+}
+
+/* ============================================ */
+/* FIX FOR STICKY HEADER OVERLAP */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .gallery-main-container {
+    scroll-margin-top: 100px;
+  }
+}
+
+/* ============================================ */
+/* PRINT STYLES */
+/* ============================================ */
+
+@media print {
+  .gallery-main-container {
+    padding: 0 !important;
+  }
+  
+  .thumbnails-container,
+  .action-icons-overlay,
+  .nav-arrow,
+  .modal-nav-btn,
+  .close-lightbox {
+    display: none !important;
+  }
+  
+  .main-stage {
+    height: auto !important;
+  }
+  
+  .base-image {
+    max-width: 100% !important;
+  }
+  
+  .kbc-full-view-list {
+    display: none !important;
+  }
+}
+/* ============================================ */
+/* MOBILE GALLERY - SIMPLIFIED VIEW */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  /* Hide desktop gallery elements on mobile */
+  .gallery-main-container .gallery-wrapper,
+  .gallery-main-container .kbc-full-view-list {
+    display: none !important;
+  }
+
+  /* Mobile gallery container */
+  .gallery-mobile-simple {
+    width: 100%;
+    position: relative;
+    background: #f5f5f5;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .mobile-main-display {
+    position: relative;
+    width: 100%;
+    background: #000;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobile-image,
+  .mobile-video {
+    width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+  }
+
+  /* Hide desktop thumbnails container */
+  .thumbnails-container {
+    display: none !important;
+  }
+}
+
+/* For tablets (optional) */
+@media (min-width: 769px) {
+  .gallery-mobile-simple {
+    display: none !important;
+  }
+}
+/* ============================================ */
+/* MOBILE VIDEO/PHOTO TOGGLE BUTTONS */
+/* ============================================ */
+
+.mobile-toggle-buttons {
+    display: flex !important;
+    gap: 12px !important;
+    margin-bottom: 12px !important;
+    justify-content: center !important;
+}
+
+.mobile-toggle-buttons button {
+    padding: 8px 20px !important;
+    border-radius: 30px !important;
+    border: none !important;
+    font-weight: bold !important;
+    font-size: 14px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.mobile-toggle-buttons button:active {
+    transform: scale(0.96) !important;
+}
+
+/* Video controls styling */
+.video-controls-overlay {
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent) !important;
+    padding: 12px !important;
+}
+
+/* Progress bar styling */
+input[type="range"] {
+    -webkit-appearance: none !important;
+    height: 3px !important;
+    border-radius: 3px !important;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none !important;
+    width: 12px !important;
+    height: 12px !important;
+    border-radius: 50% !important;
+    background: #ff6600 !important;
+    cursor: pointer !important;
+}
+/* ============================================ */
+/* MOBILE FULL LIST VIEW - NEW */
+/* ============================================ */
+
+.mobile-full-list-view {
+    margin-top: 16px;
+    border-top: 1px solid #eee;
+    padding-top: 16px;
+}
+
+.mobile-full-list-scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+}
+
+.mobile-full-list-scroll::-webkit-scrollbar {
+    height: 3px;
+}
+
+.mobile-full-list-scroll::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.mobile-full-list-scroll::-webkit-scrollbar-thumb {
+    background: #ff6600;
+    border-radius: 10px;
+}

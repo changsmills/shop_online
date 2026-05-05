@@ -1,0 +1,491 @@
+.topbar-container {
+    width: 100%;
+    position: relative;
+    /* Inahakikisha kila kitu ndani ya TopBar kinaweza kubonyezwa */
+    pointer-events: auto !important;
+}
+
+.topbar-row-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 40px;
+    font-size: 13px;
+    color: #4b5563;
+    border-top: 1px solid #f3f4f6;
+    padding-top: 5px;
+}
+
+.menu-wrapper {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    /* Muhimu: Inahakikisha eneo hili linapokea clicks */
+    z-index: 100001; 
+}
+
+.all-categories-btn {
+    font-weight: bold;
+    color: #000;
+    cursor: pointer !important; /* Inalazimisha alama ya mkono */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    pointer-events: auto !important;
+}
+
+.megamenu-dropdown {
+    position: absolute;
+    top: 100%; /* Inakaa chini ya neno */
+    left: 0;
+    z-index: 100002; /* Inakaa juu ya Header */
+    padding-top: 10px; /* Gap ndogo ili mouse isipotee */
+}
+
+/* Kuzuia matatizo ya hover */
+.bottom-left-links, .bottom-right-links {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.nav-link {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.nav-link:hover {
+    color: #ff6a00;
+}
+.menu-wrapper {
+    position: relative;
+    z-index: 10000; /* Inahakikisha inakaa juu ya content */
+    pointer-events: auto !important;
+}
+
+.megamenu-dropdown {
+    position: absolute;
+    top: 100%; /* Inashuka moja kwa moja chini ya link */
+    left: 0;
+    min-width: 800px; /* Ipe upana ili ionekane kama banner */
+    background: white;
+    box-shadow: 0px 10px 30px rgba(0,0,0,0.1);
+    z-index: 99999;
+}
+/* ============================================ */
+/* RESPONSIVE DESIGN - TOP BAR */
+/* ============================================ */
+
+/* Container kuu */
+.topbar-container {
+    width: 100% !important;
+    position: relative !important;
+    pointer-events: auto !important;
+    background: #fff !important;
+    border-bottom: 1px solid #f3f4f6 !important;
+}
+
+/* Bottom row */
+.topbar-row-bottom {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    min-height: 40px !important;
+    font-size: 13px !important;
+    color: #4b5563 !important;
+    padding: 8px 24px !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+}
+
+/* Left and right links containers */
+.bottom-left-links,
+.bottom-right-links {
+    display: flex !important;
+    align-items: center !important;
+    gap: 24px !important;
+    flex-wrap: wrap !important;
+}
+
+/* Menu wrapper */
+.menu-wrapper {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    z-index: 100001 !important;
+    pointer-events: auto !important;
+}
+
+/* All categories button */
+.all-categories-btn {
+    font-weight: bold !important;
+    color: #000 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 6px 0 !important;
+    pointer-events: auto !important;
+    transition: color 0.2s ease !important;
+}
+
+.all-categories-btn:hover {
+    color: #ff6a00 !important;
+}
+
+.hamburger-icon {
+    font-size: 18px !important;
+}
+
+/* Nav links */
+.nav-link {
+    cursor: pointer !important;
+    transition: color 0.2s ease !important;
+    white-space: nowrap !important;
+}
+
+.nav-link:hover {
+    color: #ff6a00 !important;
+}
+
+/* Sell link */
+.sell-link {
+    color: #ff6a00 !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    transition: opacity 0.2s ease !important;
+}
+
+.sell-link:hover {
+    opacity: 0.8 !important;
+}
+
+/* ============================================ */
+/* MEGAMENU DROPDOWN - RESPONSIVE */
+/* ============================================ */
+
+.megamenu-dropdown {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    min-width: 800px !important;
+    background: white !important;
+    box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.15) !important;
+    z-index: 99999 !important;
+    border-radius: 12px !important;
+    margin-top: 8px !important;
+    overflow: hidden !important;
+}
+
+/* Arrow on top of megamenu */
+.megamenu-dropdown::before {
+    content: '' !important;
+    position: absolute !important;
+    top: -8px !important;
+    left: 30px !important;
+    width: 0 !important;
+    height: 0 !important;
+    border-left: 8px solid transparent !important;
+    border-right: 8px solid transparent !important;
+    border-bottom: 8px solid white !important;
+}
+
+/* ============================================ */
+/* RESPONSIVE BREAKPOINTS */
+/* ============================================ */
+
+/* Tablets (≤1024px) */
+@media (max-width: 1024px) {
+    .megamenu-dropdown {
+        min-width: 600px !important;
+        left: -50px !important;
+    }
+    
+    .megamenu-dropdown::before {
+        left: 80px !important;
+    }
+}
+
+/* Simu (≤768px) */
+@media (max-width: 768px) {
+    .topbar-row-bottom {
+        padding: 8px 16px !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+    }
+    
+    .bottom-left-links,
+    .bottom-right-links {
+        width: 100% !important;
+        justify-content: space-between !important;
+        gap: 12px !important;
+        flex-wrap: wrap !important;
+    }
+    
+    .nav-link {
+        font-size: 11px !important;
+        white-space: nowrap !important;
+    }
+    
+    .all-categories-btn {
+        font-size: 12px !important;
+    }
+    
+    .hamburger-icon {
+        font-size: 16px !important;
+    }
+    
+    .megamenu-dropdown {
+        position: fixed !important;
+        top: auto !important;
+        left: 0 !important;
+        right: 0 !important;
+        min-width: 100% !important;
+        max-height: 80vh !important;
+        overflow-y: auto !important;
+        border-radius: 16px 16px 0 0 !important;
+        margin-top: 0 !important;
+        bottom: 0 !important;
+        box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    .megamenu-dropdown::before {
+        display: none !important;
+    }
+    
+    /* Close button for mobile megamenu */
+    .megamenu-dropdown .close-megamenu {
+        display: flex !important;
+        justify-content: flex-end !important;
+        padding: 16px !important;
+        border-bottom: 1px solid #eee !important;
+    }
+}
+
+/* Simu ndogo (≤480px) */
+@media (max-width: 480px) {
+    .topbar-row-bottom {
+        padding: 6px 12px !important;
+    }
+    
+    .bottom-left-links,
+    .bottom-right-links {
+        gap: 10px !important;
+    }
+    
+    .nav-link {
+        font-size: 10px !important;
+    }
+    
+    .all-categories-btn {
+        font-size: 11px !important;
+        gap: 5px !important;
+    }
+    
+    .hamburger-icon {
+        font-size: 14px !important;
+    }
+    
+    .sell-link {
+        font-size: 11px !important;
+    }
+    
+    /* Hide "Order protections" on very small screens */
+    .bottom-left-links .nav-link:last-child {
+        display: none !important;
+    }
+}
+
+/* Simu ndogo sana (≤360px) */
+@media (max-width: 360px) {
+    .bottom-left-links,
+    .bottom-right-links {
+        gap: 8px !important;
+    }
+    
+    .nav-link {
+        font-size: 9px !important;
+    }
+    
+    /* Hide "App & extension" on very small screens */
+    .bottom-right-links .nav-link:nth-child(2) {
+        display: none !important;
+    }
+}
+
+/* ============================================ */
+/* TOUCH OPTIMIZATIONS */
+/* ============================================ */
+
+@media (hover: none) and (pointer: coarse) {
+    .all-categories-btn,
+    .nav-link,
+    .sell-link {
+        cursor: pointer !important;
+        -webkit-tap-highlight-color: transparent !important;
+    }
+    
+    .all-categories-btn:active,
+    .nav-link:active,
+    .sell-link:active {
+        opacity: 0.7 !important;
+    }
+    
+    /* Larger tap targets */
+    .all-categories-btn,
+    .nav-link,
+    .sell-link {
+        min-height: 32px !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+}
+
+/* ============================================ */
+/* PRINT STYLES */
+/* ============================================ */
+
+@media print {
+    .topbar-container {
+        display: none !important;
+    }
+}
+
+/* ============================================ */
+/* SAFE AREA FOR NOTCH DEVICES */
+/* ============================================ */
+
+@supports (padding: max(0px)) {
+    @media (max-width: 768px) {
+        .topbar-row-bottom {
+            padding-left: max(16px, env(safe-area-inset-left)) !important;
+            padding-right: max(16px, env(safe-area-inset-right)) !important;
+        }
+    }
+}
+
+/* ============================================ */
+/* DARK MODE SUPPORT (Optional) */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+    .topbar-container {
+        background: #1e293b !important;
+        border-bottom-color: #334155 !important;
+    }
+    
+    .topbar-row-bottom {
+        color: #94a3b8 !important;
+    }
+    
+    .all-categories-btn {
+        color: #f1f5f9 !important;
+    }
+    
+    .nav-link {
+        color: #94a3b8 !important;
+    }
+    
+    .nav-link:hover {
+        color: #ff6a00 !important;
+    }
+    
+    .megamenu-dropdown {
+        background: #1e293b !important;
+        box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    .megamenu-dropdown::before {
+        border-bottom-color: #1e293b !important;
+    }
+}
+
+/* ============================================ */
+/* ANIMATIONS */
+/* ============================================ */
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.megamenu-dropdown {
+    animation: fadeInDown 0.2s ease forwards !important;
+}
+
+/* ============================================ */
+/* HOVER DELAY FOR MEGAMENU */
+/* ============================================ */
+
+.menu-wrapper {
+    transition: all 0.3s ease !important;
+}
+
+.menu-wrapper:hover .megamenu-dropdown {
+    display: block !important;
+}
+
+/* Prevent megamenu from closing immediately */
+.megamenu-dropdown {
+    transition: visibility 0.2s, opacity 0.2s !important;
+}
+
+/* ============================================ */
+/* RESPONSIVE MEGAMENU CONTENT */
+/* ============================================ */
+
+@media (max-width: 1024px) {
+    .megamenu-dropdown {
+        min-width: 500px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .megamenu-dropdown {
+        position: fixed !important;
+        top: auto !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        min-width: 100% !important;
+        max-height: 70vh !important;
+        border-radius: 20px 20px 0 0 !important;
+    }
+    
+    /* Add overlay when megamenu is open on mobile */
+    .megamenu-open-overlay {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        background: rgba(0, 0, 0, 0.5) !important;
+        z-index: 99998 !important;
+    }
+}
+
+/* ============================================ */
+/* FIX FOR DROPDOWN CLIPPING */
+/* ============================================ */
+
+.topbar-container {
+    overflow: visible !important;
+}
+
+.topbar-row-bottom {
+    overflow: visible !important;
+}
+
+/* Ensure megamenu doesn't get cut off */
+.menu-wrapper {
+    overflow: visible !important;
+}

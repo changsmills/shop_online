@@ -1,0 +1,617 @@
+/* TopDeals Section - Compact Version */
+.top-deals-container {
+  padding: 16px;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #eef2f6;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eef2f6;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-left h2 {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+  color: #1e293b;
+}
+
+.live-icon {
+  color: #ef4444;
+  font-size: 10px;
+  animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Grid ya Deals - Compact */
+.deals-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Custom Scrollbar */
+.deals-grid::-webkit-scrollbar {
+  width: 4px;
+}
+
+.deals-grid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.deals-grid::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+/* Deal Card - Compact */
+.deal-card {
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #eef2f6;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+}
+
+.deal-card:hover {
+  transform: translateX(4px);
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Image Wrapper - Smaller */
+.image-wrapper {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #e2e8f0;
+}
+
+.image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.discount-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: #ef4444;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 8px;
+}
+
+/* Deal Details - Compact */
+.deal-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.product-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pricing-box {
+  margin-bottom: 6px;
+}
+
+.original-price-tag {
+  font-size: 11px;
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+.current-price {
+  font-size: 13px;
+  font-weight: 700;
+  color: #10b981;
+}
+
+/* Offer Input Group - Compact */
+.offer-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.offer-input-group label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.percentage-input {
+  width: 55px;
+  padding: 5px 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 12px;
+  text-align: center;
+  background: white;
+}
+
+.percentage-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.apply-btn {
+  padding: 5px 12px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.apply-btn:hover {
+  background: #2563eb;
+}
+
+.apply-btn:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* Empty State */
+.empty-deals {
+  text-align: center;
+  padding: 30px 20px;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .top-deals-container {
+    padding: 12px;
+  }
+  
+  .deal-card {
+    padding: 8px;
+    gap: 10px;
+  }
+  
+  .image-wrapper {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .product-title {
+    font-size: 12px;
+  }
+  
+  .percentage-input {
+    width: 50px;
+    padding: 4px 6px;
+  }
+  
+  .apply-btn {
+    padding: 4px 10px;
+    font-size: 10px;
+  }
+}
+/* ============================================ */
+/* RESPONSIVE ADDITIONS - TOP DEALS SECTION */
+/* HIZI ZINAONGEZWA TU, HAZIBADILISHI UMBO LA SASI */
+/* ============================================ */
+
+/* Container kuu - Inahakikisha haivuji layout */
+.top-deals-container {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
+}
+
+/* ============================================ */
+/* DEALS GRID - RESPONSIVE (HAIATHIRI PC) */
+/* ============================================ */
+
+.deals-grid {
+  display: grid !important;
+  gap: 20px !important;
+  width: 100% !important;
+}
+
+/* Default (PC) - Kadi 1 kwa mstari (kama ilivyo sasa) */
+.deals-grid {
+  grid-template-columns: 1fr !important;
+}
+
+/* Tablet (≥768px) - Bado safu moja, inaongeza nafasi kidogo */
+@media (min-width: 768px) {
+  .deals-grid {
+    gap: 24px !important;
+  }
+}
+
+/* Simu (≤768px) - Inapunguza gap na padding */
+@media (max-width: 768px) {
+  .top-deals-container {
+    padding: 0 !important;
+  }
+  
+  .deals-grid {
+    gap: 16px !important;
+  }
+}
+
+/* Simu ndogo (≤480px) - Inapunguza zaidi */
+@media (max-width: 480px) {
+  .deals-grid {
+    gap: 12px !important;
+  }
+}
+
+/* ============================================ */
+/* DEAL CARD - RESPONSIVE (HAIATHIRI PC) */
+/* ============================================ */
+
+/* Card base - Muonekano umebaki sawa */
+.deal-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+/* Hover effect ya PC haibadiliki */
+.deal-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Kwenye simu, card inachukua upana kamili */
+@media (max-width: 768px) {
+  .deal-card {
+    border-radius: 14px !important;
+  }
+}
+
+/* ============================================ */
+/* CARD LAYOUT - DESKTOP (HAIBADILIKI) */
+/* Simu tu ndio inarekebishwa */
+/* ============================================ */
+
+/* Desktop - Layout kama ilivyo sasa (horizontal) */
+/* Hakuna mabadiliko kwa PC */
+
+/* Simu - Card inakuwa vertical (picha juu, maelezo chini) */
+@media (max-width: 768px) {
+  .deal-card {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  .image-wrapper {
+    width: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+  }
+  
+  .deal-details {
+    padding: 14px !important;
+  }
+}
+
+/* ============================================ */
+/* SECTION HEADER - RESPONSIVE */
+/* ============================================ */
+
+.section-header {
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+}
+
+.header-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+}
+
+.header-left h2 {
+  font-size: 18px !important;
+  margin: 0 !important;
+}
+
+.live-icon {
+  font-size: 10px !important;
+  animation: pulse 1.5s infinite !important;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@media (max-width: 768px) {
+  .header-left h2 {
+    font-size: 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-left h2 {
+    font-size: 14px !important;
+  }
+  
+  .live-icon {
+    font-size: 8px !important;
+  }
+}
+
+/* ============================================ */
+/* PRODUCT TITLE - RESPONSIVE */
+/* ============================================ */
+
+.product-title {
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+@media (max-width: 768px) {
+  .product-title {
+    font-size: 13px !important;
+  }
+}
+
+/* ============================================ */
+/* PRICING BOX - RESPONSIVE */
+/* ============================================ */
+
+.pricing-box {
+  padding: 10px !important;
+}
+
+.original-price-tag {
+  font-size: 14px !important;
+  color: #64748b !important;
+  text-decoration: line-through !important;
+}
+
+.current-price {
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  color: #ff6a00 !important;
+}
+
+@media (max-width: 768px) {
+  .original-price-tag {
+    font-size: 13px !important;
+  }
+  
+  .current-price {
+    font-size: 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .original-price-tag {
+    font-size: 12px !important;
+  }
+  
+  .current-price {
+    font-size: 15px !important;
+  }
+}
+
+/* ============================================ */
+/* OFFER INPUT GROUP - RESPONSIVE */
+/* ============================================ */
+
+.offer-input-group {
+  margin-top: 12px !important;
+}
+
+.flex {
+  display: flex !important;
+  gap: 10px !important;
+  align-items: center !important;
+}
+
+.percentage-input {
+  flex: 1 !important;
+  padding: 8px 12px !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  font-size: 13px !important;
+  transition: all 0.2s ease !important;
+}
+
+.percentage-input:focus {
+  outline: none !important;
+  border-color: #ff6a00 !important;
+  box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.1) !important;
+}
+
+.apply-btn {
+  padding: 8px 20px !important;
+  background: #ff6a00 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  white-space: nowrap !important;
+}
+
+.apply-btn:hover:not(:disabled) {
+  background: #e55a00 !important;
+  transform: translateY(-1px) !important;
+}
+
+.apply-btn:disabled {
+  background: #94a3b8 !important;
+  cursor: not-allowed !important;
+}
+
+@media (max-width: 480px) {
+  .percentage-input {
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+  }
+  
+  .apply-btn {
+    padding: 6px 16px !important;
+    font-size: 12px !important;
+  }
+  
+  .flex {
+    gap: 8px !important;
+  }
+}
+
+/* ============================================ */
+/* DISCOUNT BADGE - RESPONSIVE */
+/* ============================================ */
+
+.discount-badge {
+  position: absolute !important;
+  top: 10px !important;
+  left: 10px !important;
+  background: #ff4d4f !important;
+  color: white !important;
+  padding: 4px 8px !important;
+  border-radius: 20px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  z-index: 1 !important;
+}
+
+@media (max-width: 480px) {
+  .discount-badge {
+    font-size: 9px !important;
+    padding: 3px 6px !important;
+    top: 8px !important;
+    left: 8px !important;
+  }
+}
+
+/* ============================================ */
+/* WARNING MESSAGE - RESPONSIVE */
+/* ============================================ */
+
+.offer-input-group p {
+  font-size: 10px !important;
+  color: #64748b !important;
+  margin-top: 8px !important;
+  line-height: 1.4 !important;
+}
+
+@media (max-width: 480px) {
+  .offer-input-group p {
+    font-size: 9px !important;
+  }
+}
+
+/* ============================================ */
+/* TOUCH OPTIMIZATIONS - SIMU TU */
+/* ============================================ */
+
+@media (hover: none) and (pointer: coarse) {
+  .apply-btn:active {
+    transform: scale(0.97) !important;
+    transition: transform 0.05s ease !important;
+  }
+  
+  .deal-card:active {
+    transform: scale(0.99) !important;
+  }
+}
+
+/* ============================================ */
+/* DARK MODE SUPPORT (Optional) */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .top-deals-container {
+    background: #1e293b !important;
+  }
+  
+  .deal-card {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+  }
+  
+  .product-title {
+    color: #e2e8f0 !important;
+  }
+  
+  .pricing-box {
+    background: #1e293b !important;
+  }
+  
+  .original-price-tag {
+    color: #94a3b8 !important;
+  }
+  
+  .percentage-input {
+    background: #1e293b !important;
+    border-color: #475569 !important;
+    color: #f1f5f9 !important;
+  }
+  
+  .percentage-input:disabled {
+    background: #334155 !important;
+  }
+  
+  .offer-input-group p {
+    color: #94a3b8 !important;
+  }
+  
+  .header-left h2 {
+    color: #f1f5f9 !important;
+  }
+}

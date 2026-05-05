@@ -1,0 +1,980 @@
+/* =========================================
+   1. CONTAINER KUU (LAYOUT YA ICONS)
+   ========================================= */
+.user-tools-container {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 15px;
+    justify-content: flex-end;
+    padding-right: 20px;
+}
+
+.dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.user-trigger-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #333;
+    padding: 0 10px;
+    text-decoration: none;
+}
+
+.user-icon {
+    font-size: 20px;
+}
+
+.user-label {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* =========================================
+   2. MENU YA DROPDOWN (ALIBABA STYLE)
+   ========================================= */
+.alibaba-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 240px;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    padding: 15px 0;
+    z-index: 9999;
+}
+
+/* Header na Sign In Button */
+.dropdown-header {
+    padding: 0 15px 15px;
+    text-align: center;
+}
+
+.welcome-text {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.btn-signin-main {
+    display: block;
+    background-color: #ff6a00;
+    color: white !important;
+    text-align: center;
+    padding: 10px 0;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    width: 100%;
+    transition: background 0.2s;
+}
+
+.btn-signin-main:hover {
+    background-color: #e65f00;
+}
+
+.user-info-box {
+    padding: 5px 0;
+}
+
+.user-email-display {
+    font-size: 12px;
+    color: #333;
+    font-weight: 600;
+    word-break: break-all;
+}
+
+/* =========================================
+   3. NAV LINKS NA LOGOUT (KUNDI MOJA)
+   ========================================= */
+.dropdown-divider {
+    height: 1px;
+    background-color: #eee;
+    margin: 8px 0;
+}
+
+.dropdown-nav-links {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Link za kawaida na Kitufe cha Logout zote zitumie hii */
+.nav-item {
+    display: block !important;
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #444;
+    text-decoration: none;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.nav-item:hover {
+    background-color: #f5f5f5;
+    color: #ff6a00;
+}
+
+/* Logout Maalum - Inatokea chini ya Analytics */
+.logout-item-link {
+    color: #ff471a !important; /* Nyekundu */
+    border-top: 1px solid #f5f5f5 !important;
+    margin-top: 5px;
+    font-weight: 600 !important;
+    display: block !important;
+}
+
+.logout-item-link:hover {
+    background-color: #fff5f5 !important;
+}
+
+/* =========================================
+   4. CART BADGE NA EKRAO YA KIKAPU
+   ========================================= */
+.cart-icon-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #ff6a00;
+    color: white;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 50%;
+    font-weight: bold;
+    border: 2px solid white;
+}
+
+.empty-cart-state {
+    padding: 15px;
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 30px;
+    display: block;
+    margin-bottom: 5px;
+    opacity: 0.5;
+}
+
+.outline-btn {
+    background-color: transparent !important;
+    color: #333 !important;
+    border: 1px solid #ddd !important;
+    margin-top: 10px;
+}
+/* Hakikisha neno Logout linaonekana kwa rangi nyekundu chini ya Analytics */
+.logout-item-link {
+    display: block !important;
+    width: 100% !important;
+    padding: 12px 20px !important;
+    text-align: left !important;
+    color: #ff471a !important; /* Rangi nyekundu ya Alibaba */
+    border-top: 1px solid #f0f0f0 !important; /* Mstari wa kutenganisha */
+    margin-top: 5px !important;
+    font-weight: 600 !important;
+    background: none;
+    cursor: pointer;
+}
+
+.logout-item-link:hover {
+    background-color: #fff1f0 !important; /* Mrejesho mwekundu mteja akigusa */
+}
+/* Header pindi mteja akiwa logged in */
+.user-logged-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px 0;
+    gap: 5px;
+}
+
+/* Email ionekane kwa ufinyu (subtle) */
+.user-email-display {
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 10px;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* KITUFE CHA SIGNOUT CHA KISASA */
+.btn-signout-modern {
+    width: 90%;
+    background-color: #fff;
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 8px 0;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-signout-modern:hover {
+    background-color: #f5f5f5;
+    border-color: #ff471a;
+    color: #ff471a;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Divider iwe nyepesi */
+.dropdown-divider {
+    height: 1px;
+    background-color: #f0f0f0;
+    margin: 10px 0;
+}
+
+/* Sign In Button (ile ya awali ibaki vile vile) */
+.btn-signin-main {
+    display: block;
+    background-color: #ff6a00;
+    color: white !important;
+    text-align: center;
+    padding: 10px 0;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: bold;
+    width: 100%;
+}
+/* Sehemu ya Alert Boxes */
+.seller-alerts-box {
+  padding-bottom: 8px;
+}
+
+/* Alerts Container */
+.alerts-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section-label {
+  font-size: 10px;
+  font-weight: bold;
+  color: #9ca3af;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.section-label.border-top {
+  border-top: 1px solid #f3f4f6;
+  padding-top: 8px;
+}
+
+/* Items */
+.notification-item {
+  display: block;
+  padding: 8px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  text-decoration: none;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+
+.seller-item {
+  background-color: #fffaf0; /* bg-orange-50 */
+  border-left-color: #fb923c; /* border-orange-400 */
+}
+
+.buyer-item {
+  background-color: #eff6ff; /* bg-blue-50 */
+  border-left-color: #60a5fa; /* border-blue-400 */
+}
+
+.item-main-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.order-no, .order-name {
+  font-size: 11px;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.order-total {
+  font-size: 9px;
+  font-weight: bold;
+  color: #ea580c;
+}
+
+.item-sub-text {
+  font-size: 10px;
+  color: #4b5563;
+}
+
+/* Badges */
+.status-badge {
+  font-size: 9px;
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.status-approved {
+  background-color: #bbf7d0;
+  color: #15803d;
+}
+
+.status-pending {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* Dot Logic */
+.notify-dot {
+  background-color: #ef4444 !important;
+  min-width: 8px !important;
+  height: 8px !important;
+  padding: 0 !important;
+}
+
+/* Login Prompt */
+.login-prompt {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.prompt-text {
+  font-size: 12px;
+  color: #6b7280;
+}
+.alibaba-dropdown-menu {
+  background-color: #ffffff !important; /* Inazuia kuona vya nyuma */
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 280px;
+  z-index: 9999 !important; /* Inakaa juu ya kila kitu */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.empty-state {
+  padding: 10px;
+  background-color: white;
+}
+/* ============================================ */
+/* RESPONSIVE DESIGN - USER TOOLS */
+/* ============================================ */
+
+/* Container kuu */
+.user-tools-container {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  position: relative !important;
+}
+
+/* ============================================ */
+/* TRIGGER BUTTONS - RESPONSIVE */
+/* ============================================ */
+
+.user-trigger-btn {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  gap: 4px !important;
+  padding: 4px 8px !important;
+  transition: all 0.2s ease !important;
+  border-radius: 8px !important;
+}
+
+.user-trigger-btn:hover {
+  background: #f5f5f5 !important;
+}
+
+.user-icon-svg {
+  color: #333 !important;
+  transition: color 0.2s ease !important;
+}
+
+.user-trigger-btn:hover .user-icon-svg {
+  color: #ff6a00 !important;
+}
+
+.user-label {
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  color: #666 !important;
+  white-space: nowrap !important;
+}
+
+/* ============================================ */
+/* DROPDOWN MENUS - RESPONSIVE */
+/* ============================================ */
+
+.alibaba-dropdown-menu {
+  position: absolute !important;
+  top: 100% !important;
+  right: 0 !important;
+  min-width: 280px !important;
+  background: white !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  margin-top: 8px !important;
+  z-index: 10000 !important;
+  overflow: hidden !important;
+  animation: dropdownFadeIn 0.2s ease !important;
+}
+
+/* Arrow on dropdown */
+.alibaba-dropdown-menu::before {
+  content: '' !important;
+  position: absolute !important;
+  top: -8px !important;
+  right: 20px !important;
+  width: 0 !important;
+  height: 0 !important;
+  border-left: 8px solid transparent !important;
+  border-right: 8px solid transparent !important;
+  border-bottom: 8px solid white !important;
+}
+
+/* Dropdown header */
+.dropdown-header {
+  padding: 16px !important;
+}
+
+.welcome-text {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  margin: 0 0 8px 0 !important;
+}
+
+.dropdown-divider {
+  height: 1px !important;
+  background: #f0f0f0 !important;
+  margin: 12px 0 !important;
+}
+
+/* Dropdown nav links */
+.dropdown-nav-links {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.nav-item {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 10px 0 !important;
+  text-decoration: none !important;
+  color: #333 !important;
+  font-size: 14px !important;
+  transition: color 0.2s ease !important;
+}
+
+.nav-item:hover {
+  color: #ff6a00 !important;
+}
+
+/* Cart icon wrapper */
+.cart-icon-wrapper {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.cart-badge {
+  position: absolute !important;
+  top: -8px !important;
+  right: -10px !important;
+  background: #ff4d4f !important;
+  color: white !important;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  padding: 2px 5px !important;
+  border-radius: 10px !important;
+  min-width: 16px !important;
+  text-align: center !important;
+}
+
+/* Notify dot */
+.notify-dot {
+  width: 8px !important;
+  height: 8px !important;
+  background: #ff4d4f !important;
+  border-radius: 50% !important;
+  position: absolute !important;
+  top: -4px !important;
+  right: -4px !important;
+  padding: 0 !important;
+  min-width: 8px !important;
+}
+
+/* Sign in button */
+.btn-signin-main {
+  display: block !important;
+  width: 100% !important;
+  text-align: center !important;
+  background: #ff6a00 !important;
+  color: white !important;
+  padding: 10px !important;
+  border-radius: 8px !important;
+  text-decoration: none !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  transition: background 0.2s ease !important;
+}
+
+.btn-signin-main:hover {
+  background: #e55a00 !important;
+}
+
+.btn-signout-modern {
+  width: 100% !important;
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+  border: none !important;
+  padding: 10px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  margin-top: 12px !important;
+}
+
+.btn-signout-modern:hover {
+  background: #e2e8f0 !important;
+}
+
+.user-email-display {
+  font-size: 11px !important;
+  color: #64748b !important;
+  margin: 4px 0 8px 0 !important;
+  word-break: break-all !important;
+}
+
+/* ============================================ */
+/* RESPONSIVE BREAKPOINTS */
+/* ============================================ */
+
+/* Tablets and smaller (≤1024px) */
+@media (max-width: 1024px) {
+  .user-tools-container {
+    gap: 8px !important;
+  }
+  
+  .user-trigger-btn {
+    padding: 4px 6px !important;
+  }
+  
+  .alibaba-dropdown-menu {
+    min-width: 260px !important;
+  }
+}
+
+/* Simu (≤768px) */
+@media (max-width: 768px) {
+  .user-tools-container {
+    gap: 4px !important;
+  }
+  
+  .user-trigger-btn {
+    padding: 4px 5px !important;
+  }
+  
+  .user-icon-svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  
+  .user-label {
+    font-size: 9px !important;
+  }
+  
+  .alibaba-dropdown-menu {
+    position: fixed !important;
+    top: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    min-width: 100% !important;
+    border-radius: 20px 20px 0 0 !important;
+    margin-top: 0 !important;
+    max-height: 80vh !important;
+    overflow-y: auto !important;
+  }
+  
+  .alibaba-dropdown-menu::before {
+    display: none !important;
+  }
+  
+  .dropdown-header {
+    padding: 20px 16px !important;
+  }
+  
+  .welcome-text {
+    font-size: 16px !important;
+  }
+  
+  .nav-item {
+    padding: 12px 0 !important;
+    font-size: 15px !important;
+  }
+  
+  .btn-signin-main,
+  .btn-signout-modern {
+    padding: 12px !important;
+    font-size: 15px !important;
+  }
+  
+  .cart-badge {
+    top: -10px !important;
+    right: -12px !important;
+    font-size: 10px !important;
+    padding: 2px 6px !important;
+  }
+}
+
+/* Simu ndogo (≤480px) */
+@media (max-width: 480px) {
+  .user-tools-container {
+    gap: 2px !important;
+  }
+  
+  .user-trigger-btn {
+    padding: 4px 4px !important;
+  }
+  
+  .user-icon-svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  
+  .user-label {
+    font-size: 8px !important;
+  }
+  
+  /* Ficha labels kwenye simu ndogo, baki na icons tu */
+  .user-label {
+    display: none !important;
+  }
+  
+  .alibaba-dropdown-menu {
+    max-height: 85vh !important;
+  }
+  
+  .dropdown-header {
+    padding: 16px !important;
+  }
+  
+  .cart-badge {
+    top: -8px !important;
+    right: -10px !important;
+    font-size: 8px !important;
+    padding: 2px 4px !important;
+    min-width: 14px !important;
+  }
+}
+
+/* ============================================ */
+/* ANIMATIONS */
+/* ============================================ */
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* For mobile bottom sheet */
+@media (max-width: 768px) {
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .alibaba-dropdown-menu {
+    animation: slideUp 0.3s ease !important;
+  }
+}
+
+/* ============================================ */
+/* ALERTS & NOTIFICATIONS - RESPONSIVE */
+/* ============================================ */
+
+.alerts-container {
+  max-height: 400px !important;
+  overflow-y: auto !important;
+}
+
+.seller-alerts-box,
+.buyer-alerts-box {
+  margin-bottom: 16px !important;
+}
+
+.section-label {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+  text-transform: uppercase !important;
+  margin-bottom: 8px !important;
+}
+
+.notification-item {
+  display: block !important;
+  padding: 10px !important;
+  border-radius: 8px !important;
+  margin-bottom: 8px !important;
+  text-decoration: none !important;
+  background: #f8fafc !important;
+  transition: background 0.2s ease !important;
+}
+
+.notification-item:hover {
+  background: #fff5ed !important;
+}
+
+.item-main-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+
+.order-no,
+.order-name {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  margin: 0 !important;
+}
+
+.order-total {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: #ff6a00 !important;
+}
+
+.item-sub-text {
+  font-size: 11px !important;
+  color: #64748b !important;
+  margin: 4px 0 0 0 !important;
+}
+
+.status-badge {
+  font-size: 10px !important;
+  padding: 2px 8px !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+}
+
+.status-approved {
+  background: #dcfce7 !important;
+  color: #166534 !important;
+}
+
+.status-pending {
+  background: #fef3c7 !important;
+  color: #92400e !important;
+}
+
+.empty-text {
+  font-size: 12px !important;
+  color: #94a3b8 !important;
+  text-align: center !important;
+  padding: 16px !important;
+}
+
+@media (max-width: 480px) {
+  .order-no,
+  .order-name {
+    font-size: 12px !important;
+  }
+  
+  .order-total {
+    font-size: 11px !important;
+  }
+  
+  .item-sub-text {
+    font-size: 10px !important;
+  }
+  
+  .notification-item {
+    padding: 12px !important;
+  }
+}
+
+/* ============================================ */
+/* EMPTY CART STATE - RESPONSIVE */
+/* ============================================ */
+
+.empty-cart-state {
+  text-align: center !important;
+  padding: 16px !important;
+}
+
+.empty-cart-state svg {
+  width: 48px !important;
+  height: 48px !important;
+  margin-bottom: 12px !important;
+}
+
+@media (max-width: 480px) {
+  .empty-cart-state svg {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  
+  .empty-cart-state p {
+    font-size: 13px !important;
+  }
+}
+
+/* ============================================ */
+/* LOGIN PROMPT - RESPONSIVE */
+/* ============================================ */
+
+.login-prompt {
+  text-align: center !important;
+  padding: 16px !important;
+}
+
+.prompt-text {
+  font-size: 13px !important;
+  color: #64748b !important;
+  margin-bottom: 12px !important;
+}
+
+@media (max-width: 480px) {
+  .prompt-text {
+    font-size: 12px !important;
+  }
+}
+
+/* ============================================ */
+/* TOUCH OPTIMIZATIONS */
+/* ============================================ */
+
+@media (hover: none) and (pointer: coarse) {
+  .user-trigger-btn {
+    min-height: 44px !important;
+    justify-content: center !important;
+  }
+  
+  .user-trigger-btn:active {
+    background: #f5f5f5 !important;
+    transform: scale(0.96) !important;
+  }
+  
+  .nav-item:active,
+  .btn-signin-main:active,
+  .btn-signout-modern:active,
+  .notification-item:active {
+    opacity: 0.7 !important;
+  }
+}
+
+/* ============================================ */
+/* PRINT STYLES */
+/* ============================================ */
+
+@media print {
+  .user-tools-container {
+    display: none !important;
+  }
+}
+
+/* ============================================ */
+/* DARK MODE SUPPORT */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .alibaba-dropdown-menu {
+    background: #1e293b !important;
+  }
+  
+  .alibaba-dropdown-menu::before {
+    border-bottom-color: #1e293b !important;
+  }
+  
+  .dropdown-header {
+    background: #1e293b !important;
+  }
+  
+  .welcome-text,
+  .order-no,
+  .order-name {
+    color: #f1f5f9 !important;
+  }
+  
+  .user-email-display,
+  .item-sub-text {
+    color: #94a3b8 !important;
+  }
+  
+  .nav-item {
+    color: #e2e8f0 !important;
+  }
+  
+  .dropdown-divider {
+    background: #334155 !important;
+  }
+  
+  .notification-item {
+    background: #0f172a !important;
+  }
+  
+  .notification-item:hover {
+    background: #334155 !important;
+  }
+  
+  .btn-signout-modern {
+    background: #334155 !important;
+    color: #e2e8f0 !important;
+  }
+  
+  .btn-signout-modern:hover {
+    background: #475569 !important;
+  }
+  
+  .empty-text,
+  .prompt-text {
+    color: #94a3b8 !important;
+  }
+}

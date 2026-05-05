@@ -1,0 +1,1081 @@
+/* =========================================
+   1. CONTAINER & WRAPPER (Zilizorekebishwa)
+   ========================================= */
+.orders-page-container {
+    flex: 1;
+    background-color: #f7f8fa; /* Rangi ya Alibaba */
+    padding: 24px; /* Imepunguzwa kutoka 40px kwa ajili ya usafi */
+    overflow-y: auto; /* Inaruhusu content pekee kuscroll */
+    height: 100%;
+}
+
+.orders-content-wrapper {
+    max-width: 1000px; /* Ilingane na Account Settings kwa muonekano bora */
+    margin: 0 auto;
+}
+
+.orders-main-title {
+    font-size: 24px; /* Imepunguzwa kidogo kutoka 28px ili iwe compact */
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* =========================================
+   2. EMPTY STATE CARD (Compact Alibaba Style)
+   ========================================= */
+.empty-orders-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 60px 30px; /* Imepunguzwa kutoka 80px/40px */
+    text-align: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.empty-orders-icon-circle {
+    background-color: #fff9f5;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.empty-orders-emoji {
+    font-size: 40px;
+}
+
+.empty-orders-heading {
+    font-size: 18px;
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.empty-orders-text {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+
+/* =========================================
+   3. BUTTONS & BADGES
+   ========================================= */
+.start-sourcing-btn {
+    display: inline-block;
+    padding: 10px 32px;
+    border: 1.5px solid #333;
+    border-radius: 30px;
+    color: #333;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.start-sourcing-btn:hover {
+    background-color: #333;
+    color: #ffffff;
+}
+
+/* Orodha ya Oda */
+.orders-list-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.order-item-card {
+    background: #fff;
+    padding: 16px 20px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #e5e7eb;
+}
+
+.order-amount-display {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111;
+}
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 4px; /* Alibaba mara nyingi hutumia square-ish badges */
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.status-badge.pending { background: #fff7ed; color: #ea580c; }
+.status-badge.delivered { background: #f0fdf4; color: #16a34a; }
+
+.orders-loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    color: #ff6a00;
+    font-weight: 600;
+}
+.confirm-arrival-btn {
+  margin-top: 10px;
+  background-color: #ff4e00;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 13px;
+  transition: 0.3s;
+}
+
+.confirm-arrival-btn:hover {
+  background-color: #e64600;
+}
+
+.received-text {
+  color: #28a745;
+  font-size: 13px;
+  font-weight: bold;
+  margin-top: 10px;
+  display: block;
+}
+
+/* Kadi nzima ya oda */
+.order-item-card {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+  border: 1px solid #eee;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* Mpangilio wa ndani wa kadi */
+.order-card-content {
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+}
+
+/* HAPA NDIPO TUNAPUNGUZA PICHA */
+.order-item-img {
+  width: 80px;      /* Upana wa picha */
+  height: 80px;     /* Urefu wa picha */
+  object-fit: cover; /* Inahakikisha picha haipotezi shape */
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+  flex-shrink: 0;   /* Inazuia picha isinywezwe na maandishi */
+}
+
+/* Maelezo ya oda upande wa kulia wa picha */
+.order-info-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.order-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.product-name-order {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+
+
+
+/* Container inayoshikilia kadi zote */
+.orders-list-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 800px; /* Hii inazuia bar kuwa ndefu sana upande wa kulia */
+  margin: 0 auto;   /* Inaweka kadi katikati */
+  padding: 20px 10px;
+}
+
+/* Kadi ya oda moja */
+.order-item-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.order-item-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* Picha iliyopunguzwa vizuri */
+.order-item-img {
+  width: 70px;      /* Upana mdogo zaidi */
+  height: 70px;     /* Urefu sawa na upana */
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+/* Mpangilio wa ndani wa kadi */
+.order-card-content {
+  display: flex;
+  gap: 16px;
+  align-items: center; /* Inaweka kila kitu katikati mstari mmoja */
+}
+
+.order-info-main {
+  flex: 1;
+}
+
+.order-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 4px;
+}
+
+.product-name-order {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+/* Muonekano wa status badges */
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-badge.received { background: #fee2e2; color: #991b1b; }
+.status-badge.delivered { background: #d1fae5; color: #065f46; }
+
+/* Kitufe cha Confirm */
+.confirm-arrival-btn {
+  background-color: #ff4e00;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+/* Punguza upana wa kadi nzima */
+.order-item-card {
+  max-width: 700px; /* Hapa ndipo unadhibiti upana usizidi */
+  margin: 0 auto 20px auto; /* Inaweka katikati */
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  padding: 15px;
+}
+
+/* Sehemu ya feedback */
+.order-feedback-section {
+  margin-top: 15px;
+}
+
+.feedback-divider {
+  border: 0;
+  border-top: 1px solid #f0f0f0;
+  margin-bottom: 12px;
+}
+
+.feedback-title {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.feedback-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  resize: vertical; /* Inaruhusu kuvuta chini tu */
+}
+
+.feedback-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.rating-stars {
+  font-size: 12px;
+  color: #777;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  font-size: 16px;
+}
+
+.submit-feedback-btn {
+  background-color: #000; /* Rangi nyeusi ya kishua */
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submit-feedback-btn:hover {
+  background-color: #333;
+}
+.star-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  filter: grayscale(100%); /* Inakuwa rangi ya kijivu */
+  transition: transform 0.2s;
+}
+
+.star-btn.active {
+  filter: grayscale(0%); /* Inakuwa rangi ya dhahabu/njano */
+  transform: scale(1.2);
+}
+
+.submit-feedback-btn {
+  background: #ff4e00; /* Rangi ya Changsmills */
+  color: white;
+  padding: 8px 15px;
+  border-radius: 6px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+.report-issue-btn {
+  background: transparent;
+  color: #666;
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.report-issue-btn:hover {
+  background: #f8f8f8;
+  border-color: #ff4e00;
+  color: #ff4e00;
+}
+/* ============================================ */
+/* RESPONSIVE DESIGN - MY ORDERS PAGE */
+/* ============================================ */
+
+/* Container kuu */
+.dashboard-layout {
+  background-color: #f7f8fa !important;
+  min-height: 100vh !important;
+}
+
+/* ============================================ */
+/* HEADER - RESPONSIVE */
+/* ============================================ */
+
+.dashboard-header {
+  padding: 10px 24px !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
+  background: #fff !important;
+  border-bottom: 1px solid #eee !important;
+}
+
+/* ============================================ */
+/* MAIN CONTENT - RESPONSIVE */
+/* ============================================ */
+
+main {
+  padding: 24px !important;
+  overflow-y: auto !important;
+  flex: 1 !important;
+}
+
+.orders-content-wrapper {
+  max-width: 1100px !important;
+  margin: 0 auto !important;
+}
+
+.orders-main-title {
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  margin-bottom: 20px !important;
+  color: #1e293b !important;
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    padding: 8px 12px !important;
+  }
+  
+  .header-left {
+    gap: 10px !important;
+  }
+  
+  .header-left a {
+    font-size: 16px !important;
+  }
+  
+  .header-left > div:last-child {
+    display: none !important; /* Hide search on mobile */
+  }
+  
+  .header-right {
+    gap: 10px !important;
+  }
+  
+  main {
+    padding: 16px !important;
+  }
+  
+  .orders-main-title {
+    font-size: 20px !important;
+    margin-bottom: 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  main {
+    padding: 12px !important;
+  }
+  
+  .orders-main-title {
+    font-size: 18px !important;
+  }
+}
+
+/* ============================================ */
+/* SIDEBAR - RESPONSIVE */
+/* ============================================ */
+
+/* Sidebar adjustments for mobile */
+@media (max-width: 768px) {
+  aside {
+    position: fixed !important;
+    left: 0 !important;
+    top: 60px !important;
+    bottom: 0 !important;
+    z-index: 200 !important;
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1) !important;
+    width: 70px !important;
+  }
+  
+  aside:hover {
+    width: 200px !important;
+  }
+}
+
+/* ============================================ */
+/* ORDERS LIST - RESPONSIVE */
+/* ============================================ */
+
+.orders-list-grid {
+  display: grid !important;
+  gap: 24px !important;
+}
+
+@media (max-width: 768px) {
+  .orders-list-grid {
+    gap: 16px !important;
+  }
+}
+
+/* ============================================ */
+/* ORDER CARD - RESPONSIVE */
+/* ============================================ */
+
+.order-card {
+  background: #fff !important;
+  border-radius: 16px !important;
+  border: 1px solid #eee !important;
+  overflow: hidden !important;
+  transition: box-shadow 0.2s ease !important;
+}
+
+.order-card:hover {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Order Header */
+.order-header {
+  padding: 20px !important;
+  border-bottom: 1px solid #eee !important;
+  background: #fafafa !important;
+}
+
+.order-header-top {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+}
+
+.order-number {
+  font-size: 12px !important;
+  color: #888 !important;
+}
+
+.order-date {
+  margin: 5px 0 0 !important;
+  font-size: 13px !important;
+  color: #666 !important;
+}
+
+/* Status Badge */
+.status-badge {
+  padding: 6px 12px !important;
+  border-radius: 20px !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+}
+
+.status-delivered {
+  background: #e8f5e9 !important;
+  color: #2e7d32 !important;
+}
+
+.status-pending {
+  background: #fff3e0 !important;
+  color: #ef6c00 !important;
+}
+
+.status-cancelled {
+  background: #ffebee !important;
+  color: #c62828 !important;
+}
+
+/* Toggle Button */
+.toggle-btn {
+  background: none !important;
+  border: 1px solid #ddd !important;
+  border-radius: 8px !important;
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  transition: all 0.2s ease !important;
+}
+
+.toggle-btn:hover {
+  background: #f5f5f5 !important;
+}
+
+/* Order Total */
+.order-total {
+  margin-top: 12px !important;
+  text-align: right !important;
+}
+
+.order-total-label {
+  font-size: 14px !important;
+  color: #666 !important;
+}
+
+.order-total-amount {
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  color: #ff6a00 !important;
+}
+
+@media (max-width: 600px) {
+  .order-header {
+    padding: 16px !important;
+  }
+  
+  .order-header-top {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  
+  .order-total {
+    text-align: left !important;
+    margin-top: 10px !important;
+  }
+  
+  .order-total-amount {
+    font-size: 18px !important;
+  }
+}
+
+/* ============================================ */
+/* ORDER ITEMS - RESPONSIVE */
+/* ============================================ */
+
+.order-items-container {
+  padding: 20px !important;
+}
+
+.order-item {
+  display: flex !important;
+  gap: 15px !important;
+  align-items: center !important;
+  padding-bottom: 15px !important;
+  margin-bottom: 15px !important;
+  border-bottom: 1px solid #f0f0f0 !important;
+}
+
+.order-item:last-child {
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+  border-bottom: none !important;
+}
+
+.order-item-image {
+  width: 70px !important;
+  height: 70px !important;
+  border-radius: 10px !important;
+  object-fit: cover !important;
+  background: #f9f9f9 !important;
+  flex-shrink: 0 !important;
+}
+
+.order-item-details {
+  flex: 1 !important;
+}
+
+.order-item-title {
+  margin: 0 !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #333 !important;
+}
+
+.order-item-specs {
+  margin: 5px 0 !important;
+  font-size: 13px !important;
+  color: #666 !important;
+}
+
+.order-item-price {
+  margin: 0 !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #ff6a00 !important;
+}
+
+@media (max-width: 600px) {
+  .order-items-container {
+    padding: 16px !important;
+  }
+  
+  .order-item {
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 10px !important;
+  }
+  
+  .order-item-image {
+    width: 100px !important;
+    height: 100px !important;
+  }
+  
+  .order-item-title {
+    font-size: 14px !important;
+  }
+  
+  .order-item-specs {
+    font-size: 12px !important;
+  }
+}
+
+/* ============================================ */
+/* BUTTONS - RESPONSIVE */
+/* ============================================ */
+
+.order-actions {
+  margin-top: 20px !important;
+  padding-top: 15px !important;
+  border-top: 1px solid #f5f5f5 !important;
+  display: flex !important;
+  gap: 12px !important;
+  flex-wrap: wrap !important;
+}
+
+.confirm-btn {
+  padding: 8px 20px !important;
+  border-radius: 8px !important;
+  border: none !important;
+  background: #4caf50 !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  font-size: 13px !important;
+  transition: all 0.2s ease !important;
+}
+
+.confirm-btn:hover {
+  background: #43a047 !important;
+  transform: translateY(-1px) !important;
+}
+
+.report-btn {
+  padding: 8px 20px !important;
+  border-radius: 8px !important;
+  border: 1px solid #ddd !important;
+  background: #fff !important;
+  color: #666 !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  font-size: 13px !important;
+  transition: all 0.2s ease !important;
+}
+
+.report-btn:hover {
+  background: #f5f5f5 !important;
+  border-color: #ccc !important;
+}
+
+@media (max-width: 480px) {
+  .order-actions {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  
+  .confirm-btn,
+  .report-btn {
+    width: 100% !important;
+    padding: 10px !important;
+  }
+}
+
+/* ============================================ */
+/* EMPTY STATE - RESPONSIVE */
+/* ============================================ */
+
+.empty-orders {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 80px 20px !important;
+  text-align: center !important;
+  background: #fff !important;
+  border-radius: 16px !important;
+  border: 1px solid #eee !important;
+  margin-top: 20px !important;
+}
+
+.empty-orders img {
+  width: 280px !important;
+  max-width: 80% !important;
+  margin-bottom: 24px !important;
+}
+
+.empty-orders h2 {
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  color: #1a1a1a !important;
+  margin-bottom: 12px !important;
+}
+
+.empty-orders p {
+  color: #666 !important;
+  max-width: 400px !important;
+  margin-bottom: 32px !important;
+  font-size: 15px !important;
+}
+
+.empty-orders button {
+  background: #ff6a00 !important;
+  color: white !important;
+  padding: 14px 40px !important;
+  border-radius: 30px !important;
+  border: none !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.empty-orders button:hover {
+  background: #e55a00 !important;
+  transform: translateY(-2px) !important;
+}
+
+@media (max-width: 600px) {
+  .empty-orders {
+    padding: 60px 16px !important;
+  }
+  
+  .empty-orders h2 {
+    font-size: 20px !important;
+  }
+  
+  .empty-orders p {
+    font-size: 13px !important;
+  }
+  
+  .empty-orders button {
+    padding: 12px 30px !important;
+    font-size: 14px !important;
+  }
+}
+
+/* ============================================ */
+/* LOADING STATE - RESPONSIVE */
+/* ============================================ */
+
+.orders-loader {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  min-height: 400px !important;
+  font-size: 16px !important;
+  color: #666 !important;
+}
+
+@media (max-width: 480px) {
+  .orders-loader {
+    font-size: 14px !important;
+    min-height: 300px !important;
+  }
+}
+
+/* ============================================ */
+/* FEEDBACK SECTION - RESPONSIVE */
+/* ============================================ */
+
+.feedback-section {
+  margin-top: 15px !important;
+  padding-top: 15px !important;
+  border-top: 1px solid #f0f0f0 !important;
+}
+
+.feedback-textarea {
+  width: 100% !important;
+  padding: 10px !important;
+  border: 1px solid #ddd !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  resize: vertical !important;
+  margin-bottom: 10px !important;
+}
+
+.feedback-textarea:focus {
+  outline: none !important;
+  border-color: #ff6a00 !important;
+}
+
+.rating-stars {
+  display: flex !important;
+  gap: 5px !important;
+  margin-bottom: 10px !important;
+  flex-wrap: wrap !important;
+}
+
+.star-btn {
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  font-size: 20px !important;
+  color: #ddd !important;
+  transition: color 0.2s ease !important;
+}
+
+.star-btn.active {
+  color: #ffc107 !important;
+}
+
+.submit-feedback-btn {
+  padding: 8px 16px !important;
+  background: #ff6a00 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+}
+
+@media (max-width: 480px) {
+  .star-btn {
+    font-size: 18px !important;
+  }
+  
+  .submit-feedback-btn {
+    width: 100% !important;
+    padding: 10px !important;
+  }
+}
+
+/* ============================================ */
+/* TOUCH OPTIMIZATIONS */
+/* ============================================ */
+
+@media (hover: none) and (pointer: coarse) {
+  button,
+  .toggle-btn,
+  .confirm-btn,
+  .report-btn,
+  .empty-orders button {
+    cursor: pointer !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+  
+  button:active,
+  .toggle-btn:active,
+  .confirm-btn:active,
+  .report-btn:active {
+    transform: scale(0.97) !important;
+    transition: transform 0.05s ease !important;
+  }
+}
+
+/* ============================================ */
+/* PRINT STYLES */
+/* ============================================ */
+
+@media print {
+  .dashboard-header,
+  aside,
+  .order-actions,
+  .toggle-btn {
+    display: none !important;
+  }
+  
+  .order-card {
+    break-inside: avoid !important;
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+  }
+  
+  main {
+    padding: 0 !important;
+  }
+}
+
+/* ============================================ */
+/* SAFE AREA FOR NOTCH DEVICES */
+/* ============================================ */
+
+@supports (padding: max(0px)) {
+  @media (max-width: 768px) {
+    main {
+      padding-left: max(16px, env(safe-area-inset-left)) !important;
+      padding-right: max(16px, env(safe-area-inset-right)) !important;
+      padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+    }
+  }
+}
+
+/* ============================================ */
+/* SCROLLBAR STYLING */
+/* ============================================ */
+
+main::-webkit-scrollbar {
+  width: 6px !important;
+}
+
+main::-webkit-scrollbar-track {
+  background: #f1f1f1 !important;
+  border-radius: 10px !important;
+}
+
+main::-webkit-scrollbar-thumb {
+  background: #ff6a00 !important;
+  border-radius: 10px !important;
+}
+
+/* ============================================ */
+/* DARK MODE SUPPORT (Optional) */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .dashboard-layout {
+    background-color: #0f172a !important;
+  }
+  
+  .dashboard-header {
+    background: #1e293b !important;
+    border-bottom-color: #334155 !important;
+  }
+  
+  .order-card,
+  .empty-orders {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+  }
+  
+  .order-header {
+    background: #0f172a !important;
+    border-bottom-color: #334155 !important;
+  }
+  
+  .order-number,
+  .order-date,
+  .order-total-label {
+    color: #94a3b8 !important;
+  }
+  
+  .order-item-title {
+    color: #e2e8f0 !important;
+  }
+  
+  .order-item-specs {
+    color: #94a3b8 !important;
+  }
+  
+  .empty-orders h2 {
+    color: #e2e8f0 !important;
+  }
+  
+  .empty-orders p {
+    color: #94a3b8 !important;
+  }
+  
+  .report-btn {
+    background: #334155 !important;
+    border-color: #475569 !important;
+    color: #e2e8f0 !important;
+  }
+  
+  .report-btn:hover {
+    background: #475569 !important;
+  }
+}

@@ -1,0 +1,908 @@
+/* ProductCreationFlow.css */
+
+:root {
+  --primary-orange: #ff6b00;
+  --primary-light: #fff5ed;
+  --success-green: #22c55e;
+  --text-main: #1f2937;
+  --text-muted: #6b7280;
+  --bg-light: #f9fafb;
+  --white: #ffffff;
+  --border-gray: #f3f4f6;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+  --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.1);
+}
+
+.product-creation-flow {
+  width: 100%;             /* Inachukua upana wote uliopo */
+  max-width: 100vw;        /* Inahakikisha haizidi upana wa kioo */
+  margin: 0;               /* Inaondoa nafasi za juu na pembeni */
+  padding: 1rem;           /* Inatoa nafasi kidogo tu ndani isiguse kuta za kioo */
+  box-sizing: border-box;  /* Inazuia padding isiongeze upana wa nje */
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--text-main);
+  min-height: 100vh;       /* Inahakikisha inajaa hadi chini ya kioo */
+}
+
+/* Hii itahakikisha form yako ya ndani pia inatanuka */
+.form-container {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* --- HEADER STEPS --- */
+.flow-steps-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-light);
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  border: 1px solid var(--border-gray);
+  margin-bottom: 2.5rem;
+}
+
+.step-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.step-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 2px solid var(--border-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: all 0.4s ease;
+}
+
+.step-item.active .step-circle {
+  background: var(--primary-orange);
+  color: white;
+  border-color: var(--primary-orange);
+  box-shadow: 0 0 15px rgba(255, 107, 0, 0.3);
+}
+
+.step-circle.completed {
+  background: var(--success-green);
+  border-color: var(--success-green);
+  color: white;
+}
+
+.step-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-top: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.step-item.active .step-label {
+  color: var(--primary-orange);
+}
+
+.step-line {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: var(--border-gray);
+  z-index: -1;
+}
+
+.step-line.filled {
+  background: var(--primary-orange);
+}
+
+/* --- TITLES --- */
+.step-title-area {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.main-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin-bottom: 0.5rem;
+}
+
+.sub-title {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+/* --- CATEGORY GRID --- */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1.5rem;
+}
+
+.category-card {
+  background: var(--white);
+  padding: 1.5rem;
+  border-radius: 2rem;
+  border: 2px solid transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-light);
+}
+
+.category-card.selected {
+  border-color: var(--primary-orange);
+  background: var(--primary-light);
+}
+
+.category-image-container {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  border: 4px solid var(--white);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.category-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.category-name {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-main);
+}
+
+/* --- MEDIA STEP --- */
+.step-navigation {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.back-button {
+  background: var(--bg-light);
+  border: none;
+  padding: 0.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.main-media-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.upload-area {
+  height: 200px;
+  border: 2px dashed var(--border-gray);
+  border-radius: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: var(--bg-light);
+  overflow: hidden;
+  position: relative;
+  transition: border 0.3s ease;
+}
+
+.upload-area:hover {
+  border-color: var(--primary-orange);
+}
+
+.upload-area.has-content {
+  border-style: solid;
+}
+
+.preview-image, .preview-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholder {
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.placeholder span {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-top: 0.5rem;
+}
+
+.gallery-upload-section {
+  margin-top: 1.5rem;
+  background: var(--bg-light);
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+}
+
+.gallery-flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.gallery-add-button {
+  width: 64px;
+  height: 64px;
+  border: 2px dashed var(--text-muted);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.gallery-item {
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+
+.gallery-preview {
+  width: 100%;
+  height: 100%;
+  border-radius: 1rem;
+  object-fit: cover;
+}
+
+.remove-button {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: var(--white);
+  color: #ef4444;
+  border-radius: 50%;
+  padding: 2px;
+  box-shadow: var(--shadow-sm);
+  border: none;
+  cursor: pointer;
+}
+
+/* --- BUTTONS --- */
+.step-primary-button {
+  width: 100%;
+  margin-top: 2rem;
+  padding: 1.25rem;
+  background: var(--primary-orange);
+  color: white;
+  border: none;
+  border-radius: 1.25rem;
+  font-weight: 900;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(255, 107, 0, 0.2);
+}
+
+.add-to-queue-button {
+  width: 100%;
+  padding: 1rem;
+  background: var(--primary-light);
+  color: var(--primary-orange);
+  border: 2px dashed #ffccaa;
+  border-radius: 1.25rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+/* --- QUEUE SECTION --- */
+.queue-section {
+  margin-top: 3rem;
+  border-top: 2px dashed var(--border-gray);
+  padding-top: 2rem;
+}
+
+.queue-title {
+  font-size: 0.875rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.queue-card {
+  background: var(--white);
+  border: 1px solid var(--border-gray);
+  padding: 1rem;
+  border-radius: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.queue-card-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.queue-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 0.75rem;
+  object-fit: cover;
+}
+
+.queue-product-name {
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.publish-all-button {
+  width: 100%;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: var(--success-green);
+  color: white;
+  border: none;
+  border-radius: 1.5rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(34, 197, 94, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .main-media-grid {
+    grid-template-columns: 1fr;
+  }
+  .category-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+/* ============================================ */
+/* RESPONSIVE DESIGN - PRODUCT CREATION FLOW */
+/* ============================================ */
+
+/* Kwa tablets (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .product-creation-flow {
+    padding: 0.75rem !important;
+  }
+  
+  .flow-steps-header {
+    padding: 1rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+  
+  .step-circle {
+    width: 35px !important;
+    height: 35px !important;
+    font-size: 14px !important;
+  }
+  
+  .step-label {
+    font-size: 10px !important;
+  }
+  
+  .category-grid {
+    gap: 1rem !important;
+  }
+  
+  .category-card {
+    padding: 1rem !important;
+  }
+  
+  .category-image-container {
+    width: 70px !important;
+    height: 70px !important;
+  }
+}
+
+/* Kwa simu (max-width: 768px) */
+@media (max-width: 768px) {
+  .product-creation-flow {
+    padding: 0.5rem !important;
+  }
+  
+  /* Step indicators - horizontal scroll kwa simu */
+  .flow-steps-header {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 0.5rem !important;
+    padding: 1rem 0.75rem !important;
+    scroll-snap-type: x mandatory !important;
+  }
+  
+  .step-item {
+    min-width: 80px !important;
+    scroll-snap-align: center !important;
+  }
+  
+  .step-line {
+    display: none !important;
+  }
+  
+  .step-circle {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 12px !important;
+  }
+  
+  .step-label {
+    font-size: 9px !important;
+    margin-top: 0.5rem !important;
+  }
+  
+  /* Category grid - 2 columns kwa simu */
+  .category-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+  
+  .category-card {
+    padding: 0.75rem !important;
+    border-radius: 1.5rem !important;
+  }
+  
+  .category-image-container {
+    width: 60px !important;
+    height: 60px !important;
+  }
+  
+  .category-name {
+    font-size: 0.7rem !important;
+  }
+  
+  /* Step titles */
+  .step-title-area {
+    margin-bottom: 1rem !important;
+  }
+  
+  .main-title {
+    font-size: 1.25rem !important;
+  }
+  
+  .sub-title {
+    font-size: 0.75rem !important;
+  }
+  
+  /* Media upload section */
+  .main-media-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+  
+  .upload-area {
+    height: 180px !important;
+  }
+  
+  .placeholder svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  
+  .placeholder span {
+    font-size: 0.7rem !important;
+  }
+  
+  /* Gallery section */
+  .gallery-upload-section {
+    padding: 1rem !important;
+    margin-top: 1rem !important;
+  }
+  
+  .section-title {
+    font-size: 0.875rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+  
+  .gallery-flex {
+    gap: 0.5rem !important;
+  }
+  
+  .gallery-add-button {
+    width: 55px !important;
+    height: 55px !important;
+  }
+  
+  .gallery-add-button svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  
+  .gallery-item {
+    width: 55px !important;
+    height: 55px !important;
+  }
+  
+  /* Navigation buttons */
+  .step-navigation {
+    margin-bottom: 1rem !important;
+  }
+  
+  .back-button {
+    padding: 0.4rem !important;
+  }
+  
+  .step-heading {
+    font-size: 1rem !important;
+  }
+  
+  /* Primary button */
+  .step-primary-button {
+    padding: 1rem !important;
+    margin-top: 1.5rem !important;
+    font-size: 0.875rem !important;
+  }
+  
+  /* Add to queue button */
+  .add-to-queue-button {
+    padding: 0.875rem !important;
+    font-size: 0.75rem !important;
+  }
+  
+  /* Queue section */
+  .queue-section {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+  
+  .queue-title {
+    font-size: 0.75rem !important;
+  }
+  
+  .queue-card {
+    padding: 0.75rem !important;
+  }
+  
+  .queue-thumb {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  
+  .queue-product-name {
+    font-size: 0.75rem !important;
+  }
+  
+  .queue-remove-button {
+    padding: 0.25rem !important;
+  }
+  
+  .publish-all-button {
+    padding: 1rem !important;
+    font-size: 0.875rem !important;
+    margin-top: 1rem !important;
+  }
+  
+  .publish-all-button svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+}
+
+/* Kwa simu ndogo (max-width: 480px) */
+@media (max-width: 480px) {
+  .product-creation-flow {
+    padding: 0.25rem !important;
+  }
+  
+  /* Category grid bado 2 columns */
+  .category-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+  
+  .category-card {
+    padding: 0.5rem !important;
+  }
+  
+  .category-image-container {
+    width: 50px !important;
+    height: 50px !important;
+  }
+  
+  .category-name {
+    font-size: 0.65rem !important;
+  }
+  
+  .step-circle {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 10px !important;
+  }
+  
+  .step-label {
+    font-size: 8px !important;
+  }
+  
+  .main-title {
+    font-size: 1.1rem !important;
+  }
+  
+  .upload-area {
+    height: 150px !important;
+  }
+  
+  /* Gallery items smaller */
+  .gallery-add-button {
+    width: 50px !important;
+    height: 50px !important;
+  }
+  
+  .gallery-item {
+    width: 50px !important;
+    height: 50px !important;
+  }
+  
+  /* Queue cards stacked */
+  .queue-card-info {
+    gap: 0.5rem !important;
+  }
+  
+  .queue-thumb {
+    width: 35px !important;
+    height: 35px !important;
+  }
+}
+
+/* Kwa simu kubwa (landscape mode) */
+@media (max-width: 896px) and (orientation: landscape) {
+  .product-creation-flow {
+    min-height: auto !important;
+  }
+  
+  .upload-area {
+    height: 140px !important;
+  }
+  
+  .category-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+  
+  .category-card {
+    padding: 0.5rem !important;
+  }
+  
+  .category-image-container {
+    width: 50px !important;
+    height: 50px !important;
+  }
+}
+
+/* ============================================ */
+/* PRODUCT ATTRIBUTES RESPONSIVE */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  /* ProductAttributes component inline styles */
+  .pd-attr-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  
+  .pd-full-width {
+    grid-column: span 1 !important;
+  }
+  
+  .pd-attr-container {
+    padding: 15px !important;
+  }
+  
+  .pd-attr-title {
+    font-size: 16px !important;
+  }
+  
+  /* Color picker section */
+  .color-picker-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+  
+  /* Size matrix table */
+  .size-matrix-table {
+    overflow-x: auto !important;
+  }
+  
+  .size-matrix-table table {
+    min-width: 500px !important;
+  }
+  
+  /* Price tiers */
+  .price-tier-item {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  
+  .price-tier-item input {
+    width: 100% !important;
+  }
+  
+  .remove-tier-btn {
+    align-self: flex-end !important;
+  }
+  
+  /* Wholesale section */
+  .wholesale-section {
+    padding: 15px !important;
+  }
+  
+  .wholesale-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+}
+
+/* ============================================ */
+/* FORM ACTIONS SECTION */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .form-actions {
+    margin-top: 1.5rem !important;
+  }
+  
+  .form-actions button {
+    width: 100% !important;
+  }
+}
+
+/* ============================================ */
+/* LOADING STATES */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .publish-all-button:disabled {
+    opacity: 0.7 !important;
+  }
+}
+
+/* ============================================ */
+/* TOUCH OPTIMIZATIONS */
+/* ============================================ */
+
+@media (hover: none) and (pointer: coarse) {
+  .category-card,
+  .upload-area,
+  .gallery-add-button,
+  .step-primary-button,
+  .add-to-queue-button,
+  .publish-all-button,
+  .back-button {
+    cursor: pointer !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+  
+  .category-card:active {
+    transform: scale(0.98) !important;
+    background-color: var(--primary-light) !important;
+  }
+  
+  .step-primary-button:active,
+  .add-to-queue-button:active,
+  .publish-all-button:active {
+    transform: scale(0.98) !important;
+  }
+  
+  /* Larger tap targets for mobile */
+  .back-button {
+    min-width: 40px !important;
+    min-height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  .remove-button {
+    min-width: 20px !important;
+    min-height: 20px !important;
+  }
+  
+  .queue-remove-button {
+    min-width: 32px !important;
+    min-height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+/* ============================================ */
+/* PRINT STYLES */
+/* ============================================ */
+
+@media print {
+  .product-creation-flow {
+    padding: 0 !important;
+  }
+  
+  .flow-steps-header,
+  .step-navigation .back-button,
+  .gallery-add-button,
+  .remove-button,
+  .queue-remove-button,
+  .step-primary-button,
+  .add-to-queue-button,
+  .publish-all-button {
+    display: none !important;
+  }
+  
+  .category-card {
+    break-inside: avoid !important;
+  }
+  
+  .upload-area {
+    border: 1px solid #ddd !important;
+    background: white !important;
+  }
+}
+
+/* ============================================ */
+/* SAFE AREA FOR NOTCH DEVICES */
+/* ============================================ */
+
+@supports (padding: max(0px)) {
+  @media (max-width: 768px) {
+    .product-creation-flow {
+      padding-left: max(0.5rem, env(safe-area-inset-left)) !important;
+      padding-right: max(0.5rem, env(safe-area-inset-right)) !important;
+    }
+    
+    .queue-section {
+      padding-bottom: max(1.5rem, env(safe-area-inset-bottom)) !important;
+    }
+  }
+}
+
+/* ============================================ */
+/* SMOOTH SCROLLING FOR MOBILE */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .flow-steps-header {
+    scrollbar-width: thin !important;
+    scrollbar-color: var(--primary-orange) var(--border-gray) !important;
+  }
+  
+  .flow-steps-header::-webkit-scrollbar {
+    height: 3px !important;
+  }
+  
+  .flow-steps-header::-webkit-scrollbar-track {
+    background: var(--border-gray) !important;
+    border-radius: 10px !important;
+  }
+  
+  .flow-steps-header::-webkit-scrollbar-thumb {
+    background: var(--primary-orange) !important;
+    border-radius: 10px !important;
+  }
+}

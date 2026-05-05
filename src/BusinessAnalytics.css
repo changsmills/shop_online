@@ -1,0 +1,204 @@
+/* BusinessAnalytics.css */
+
+.analytics-container {
+    padding: 20px 0;
+    width: 100%;
+}
+
+.analytics-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+    padding-left: 5px;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.stat-card {
+    background: #ffffff;
+    border: 1px solid #f0f0f0;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.stat-icon-wrapper {
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Rangi za Icon Box */
+.icon-blue { background-color: #eef2ff; color: #4f46e5; }
+.icon-green { background-color: #f0fdf4; color: #16a34a; }
+.icon-purple { background-color: #faf5ff; color: #9333ea; }
+.icon-orange { background-color: #fff7ed; color: #ea580c; }
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-number {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.product-name-stat {
+    font-size: 14px;
+    color: #4f46e5;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #666;
+    margin: 4px 0 0 0;
+    font-weight: 500;
+}
+
+/* Spinner Animation */
+.spinner-icon {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive kwa simu ndogo sana */
+@media (max-width: 480px) {
+    .analytics-grid {
+        grid-template-columns: 1fr 1fr; /* Zinaingia mbili mbili */
+    }
+    
+    .stat-card {
+        padding: 15px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .stat-number {
+        font-size: 18px;
+    }
+}
+.analytics-container {
+    margin-bottom: 25px;
+}
+
+.analytics-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 15px;
+}
+
+.analytics-grid {
+    display: grid;
+    /* PC: Kadi 4 mstari mmoja */
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 15px;
+}
+
+.stat-card {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #f0f0f0;
+    transition: transform 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+.stat-icon-wrapper {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Rangi za Icons */
+.icon-blue { background: #e0f2fe; color: #0ea5e9; }
+.icon-green { background: #dcfce7; color: #22c55e; }
+.icon-purple { background: #f3e8ff; color: #a855f7; }
+.icon-orange { background: #ffedd5; color: #f97316; }
+
+.stat-number {
+    font-size: 18px;
+    font-weight: 800;
+    margin: 0;
+    color: #111827;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: #6b7280;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.spinner-icon {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* --- MOBILE OPTIMIZATION --- */
+@media (max-width: 768px) {
+    .analytics-grid {
+        /* Simu: Kadi 2 kwa kila mstari (2x2 Grid) */
+        grid-template-columns: 1fr 1fr; 
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 12px;
+        flex-direction: column; /* Icon juu, Maandishi chini kwa simu */
+        text-align: center;
+        gap: 8px;
+    }
+
+    .stat-icon-wrapper {
+        width: 35px;
+        height: 35px;
+    }
+
+    .stat-number {
+        font-size: 16px;
+    }
+
+    .stat-label {
+        font-size: 10px;
+    }
+}

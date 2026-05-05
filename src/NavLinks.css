@@ -1,0 +1,936 @@
+/* LAYOUT KUU */
+.nav-links-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1250px; 
+  margin: 0 auto;
+  padding: 0 20px;
+  position: static; 
+  height: 48px;
+  border-bottom: 1px solid #eee;
+}
+
+.nav-group-left, .nav-group-right {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+/* MAANDISHI YA POINTS (BOLD) */
+.nav-item, .category-toggle {
+  font-size: 15px;
+  color: #222;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-item:hover, .category-toggle:hover {
+  color: #ff6a00;
+}
+
+/* MEGA MENU FULL WIDTH */
+.mega-menu-container {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100vw;
+  background: white;
+  display: flex;
+  justify-content: center;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+  z-index: 10000;
+  height: 520px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.mega-menu-inner {
+  display: flex;
+  width: 100%;
+  max-width: 1250px;
+}
+
+/* SIDEBAR NA HOVER EFFECT */
+.mega-menu-sidebar {
+  width: 280px;
+  background: #fff;
+  border-right: 1px solid #f5f5f5;
+  padding: 15px 0;
+  overflow-y: auto;
+}
+
+.sidebar-item {
+  padding: 12px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s; /* Transition laini */
+}
+
+/* HII NDIO HOVER ULIOOMBA */
+.sidebar-item:hover, .sidebar-item.active {
+  background: #f7f8fa; /* Rangi ya kijivu hafifu uki-hover */
+}
+
+.sidebar-text {
+  font-size: 14px;
+  color: #333;
+  font-weight: 600;
+}
+
+.sidebar-item:hover .sidebar-text, 
+.sidebar-item.active .sidebar-text {
+  color: #ff6a00; /* Maandishi yanakuwa machungwa */
+  font-weight: 800;
+}
+
+.arrow {
+  font-weight: 800;
+  color: #ccc;
+  font-size: 18px;
+  transition: transform 0.2s;
+}
+
+.sidebar-item:hover .arrow {
+  color: #ff6a00;
+  transform: translateX(3px); /* Mshale unacheza kidogo */
+}
+
+/* CONTENT GRID */
+.mega-menu-content {
+  flex: 1;
+  padding: 30px 45px;
+  background: #fff;
+  overflow-y: auto;
+}
+
+.content-header h3 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #111;
+  margin-bottom: 15px;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 25px;
+}
+
+.grid-item p {
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  margin-top: 12px;
+}
+
+.image-circle {
+  width: 95px;
+  height: 95px;
+  background: #f8f8f8;
+  border-radius: 50%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid transparent;
+  transition: 0.3s;
+}
+
+.grid-item:hover .image-circle {
+  border-color: #ff6a00;
+  box-shadow: 0 5px 15px rgba(255,106,0,0.15);
+}
+
+.image-circle img {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+}
+
+/* SELL ON LINK */
+.nav-sell-link {
+  font-weight: 900;
+  color: #222;
+  text-decoration: none;
+  border-left: 2px solid #eee;
+  padding-left: 20px;
+}
+
+/* Container inayoshikilia picha */
+.image-circle {
+  width: 80px;           /* Unaweza kuongeza au kupunguza ukubwa hapa */
+  height: 80px;
+  border-radius: 50%;    /* Hii ndio inatengeneza duara */
+  overflow: hidden;      /* Hii inakata sehemu za picha zinazozidi duara */
+  margin: 0 auto 10px;   /* Inakaa katikati na kutoa nafasi chini */
+  border: 2px solid #f0f0f0; /* Hiari: inaongeza mstari mwembamba pembeni */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+}
+/* Hii ndio 'outer' inayotengeneza duara */
+.image-circle {
+  width: 90px;           /* Ukubwa wa duara (unaweza kuongeza hapa) */
+  height: 90px;
+  border-radius: 50%;    /* Inatengeneza duara kamili */
+  overflow: hidden;      /* Inakata kona za square za picha */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5; 
+  border: 1px solid #e0e0e0; /* Mstari mwembamba wa kijivu pembeni */
+  margin-bottom: 10px;
+}
+
+/* Hii ndio picha yenyewe (image grid) ndani ya duara */
+.image-circle img {
+  width: 100%;           /* Inajaza upana wote wa duara */
+  height: 100%;          /* Inajaza urefu wote wa duara */
+  object-fit: cover;     /* MUHIMU: Inakata picha iwe duara bila kujivuta */
+  object-position: center; /* Inahakikisha katikati ya picha ndio inaonekana */
+  display: block;
+}
+
+/* Mpangilio wa maandishi chini ya picha */
+.grid-item p {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  text-align: center;
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Inaweka dots (...) kama jina ni refu sana */
+}
+
+.grid-item:hover .image-circle {
+  border-color: #ff6600; /* Rangi ya machungwa ukigusa */
+  transform: scale(1.05); /* Inajivuta kidogo kwa mbele */
+  transition: all 0.3s ease;
+}
+/* Hakikisha mzazi wa Nav hauzuii vitu (Kama hautumii Portal) */
+.nav-links-container {
+    position: relative;
+    z-index: 50; /* Nav yenyewe iwe juu kidogo */
+}
+
+/* Kama unatumia Portal, hakikisha container ina muonekano huu */
+.mega-menu-container {
+    width: 100%;
+    border-top: 1px solid #eee;
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+
+/* Inafanya grid iwe na mpangilio mzuri */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  padding: 10px;
+}
+
+/* Inatengeneza muundo wa Alibaba kwenye sub-categories */
+.sub-category-bg {
+  background-color: #ffffff !important;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Button ya Back to Featured */
+.back-to-featured {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #f3f4f6;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: 0.3s;
+}
+
+.back-to-featured:hover {
+  background-color: #e5e7eb;
+}
+
+/* Container ya Sidebar */
+.mega-menu-sidebar {
+    width: 250px;
+    background-color: #fff;
+    border-right: 1px solid #f0f0f0;
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* Kichwa cha Kategoria (Agriculture & Food nk) */
+.sidebar-back-header {
+    padding: 15px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #222;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.sidebar-back-header:hover {
+    color: #ff6a00;
+}
+
+/* Item moja ya Sub-category kwenye sidebar */
+.sidebar-sub-item {
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #444;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.sidebar-sub-item:hover, .sidebar-sub-item.active {
+    background-color: #fff8f3;
+    color: #ff6a00;
+    font-weight: 600;
+    border-left: 3px solid #ff6a00;
+}
+/* Main content area */
+.mega-menu-content {
+    flex: 1;
+    padding: 20px 30px;
+    background-color: #fff;
+    overflow-y: auto;
+}
+
+/* Grid layout ya duara */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+/* Item ya duara (Kama ulivyoona kwenye Alibaba) */
+.grid-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+}
+
+.grid-item:hover {
+    transform: translateY(-5px);
+}
+
+/* Duara lenyewe la picha */
+.image-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #fff;
+    border: 1px solid #ebebeb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    margin-bottom: 10px;
+}
+
+.image-circle img {
+    width: 80%; /* Alibaba hutumia picha ndogo katikati ya duara */
+    height: 80%;
+    object-fit: contain;
+}
+
+/* Maandishi chini ya picha */
+.grid-item p, .sub-text-name {
+    font-size: 13px;
+    color: #333;
+    text-align: center;
+    line-height: 1.2;
+    max-width: 110px;
+    font-weight: 500;
+}
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.back-to-featured {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background-color: #f5f5f5;
+    border: none;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.back-to-featured:hover {
+    background-color: #e0e0e0;
+    color: #222;
+}
+/* Container ya duara */
+.image-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%; /* Hii lazima iwe hapa */
+    background-color: #fff;
+    border: 1px solid #ebebeb; /* Alibaba Style */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* HATUA YA MUHIMU SANA: Hii inazuia picha isitoke nje ya duara */
+    overflow: hidden; 
+    
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    margin-bottom: 10px;
+}
+
+/* Ili kuzuia picha kuwa box tena */
+.image-circle {
+    width: 110px;
+    height: 110px;
+    border-radius: 50% !important;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #eee;
+}
+
+.image-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+/* Inazuia maneno yasikatike kabisa */
+.whitespace-nowrap {
+  white-space: nowrap;
+}
+
+/* Inahakikisha group la kulia linajipanga vizuri */
+.nav-group-right {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Punguza gap kutoka 25px hadi 15px ili kutoshea */
+  flex-shrink: 0; /* Inazuia group zima lisinywele */
+}
+
+.nav-sell-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: background 0.2s;
+  background-color: #f9f9f9; /* Inampa muonekano wa button kidogo */
+}
+
+.nav-sell-link:hover {
+  background-color: #fff0e5;
+  color: #ff6a00;
+}
+
+/* Kama kioo ni kidogo sana, punguza font kidogo badala ya kukata neno */
+@media (max-width: 1200px) {
+  .nav-item, .nav-sell-link {
+    font-size: 13px;
+    gap: 4px;
+  }
+  .nav-group-right {
+    gap: 10px;
+  }
+}
+/* ============================================ */
+/* RESPONSIVE DESIGN - NAV LINKS */
+/* ============================================ */
+
+/* Container kuu */
+.nav-links-container {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  height: 40px !important;
+  font-size: 13px !important;
+  color: #111 !important;
+  width: 100% !important;
+}
+
+.nav-group-left,
+.nav-group-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 20px !important;
+  flex-wrap: wrap !important;
+}
+
+/* Nav wrapper */
+.nav-wrapper {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 8px 0 !important;
+}
+
+.nav-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  color: #111 !important;
+  transition: color 0.2s ease !important;
+}
+
+.nav-item:hover {
+  color: #ff6a00 !important;
+}
+
+.category-toggle {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+}
+
+/* Nav Sell Link */
+.nav-sell-link {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  padding: 6px 12px !important;
+  border: 1px solid #eee !important;
+  border-radius: 6px !important;
+  text-decoration: none !important;
+  color: inherit !important;
+  transition: all 0.2s ease !important;
+}
+
+.nav-sell-link:hover {
+  border-color: #ff6a00 !important;
+  background: #fff5ed !important;
+}
+
+/* ============================================ */
+/* RESPONSIVE BREAKPOINTS */
+/* ============================================ */
+
+/* Tablets (≤1024px) */
+@media (max-width: 1024px) {
+  .nav-group-left,
+  .nav-group-right {
+    gap: 15px !important;
+  }
+  
+  .nav-item span,
+  .category-toggle span {
+    font-size: 12px !important;
+  }
+}
+
+/* Simu (≤768px) */
+@media (max-width: 768px) {
+  .nav-links-container {
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    padding: 0 12px !important;
+  }
+  
+  .nav-links-container::-webkit-scrollbar {
+    display: none !important;
+  }
+  
+  .nav-group-left,
+  .nav-group-right {
+    flex: 1 !important;
+    gap: 20px !important;
+  }
+  
+  .nav-item span,
+  .category-toggle span {
+    font-size: 11px !important;
+  }
+  
+  .nav-sell-link {
+    padding: 4px 10px !important;
+    font-size: 11px !important;
+  }
+  
+  .nav-sell-link svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
+
+/* ============================================ */
+/* MEGA MENU - RESPONSIVE */
+/* ============================================ */
+
+.mega-menu-container {
+  position: fixed !important;
+  top: 100px !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 520px !important;
+  z-index: 9999 !important;
+  background-color: white !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.3s ease !important;
+}
+
+.mega-menu-inner {
+  display: flex !important;
+  height: 100% !important;
+}
+
+.mega-menu-sidebar {
+  width: 280px !important;
+  border-right: 1px solid #eee !important;
+  overflow-y: auto !important;
+}
+
+.mega-menu-content {
+  flex: 1 !important;
+  padding: 20px !important;
+  overflow-y: auto !important;
+}
+
+/* Tablet responsive for megamenu */
+@media (max-width: 1024px) {
+  .mega-menu-sidebar {
+    width: 240px !important;
+  }
+  
+  .category-grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)) !important;
+    gap: 15px !important;
+  }
+  
+  .image-circle {
+    width: 70px !important;
+    height: 70px !important;
+  }
+  
+  .grid-text {
+    font-size: 11px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .mega-menu-container {
+    top: 80px !important;
+    height: auto !important;
+    max-height: 80vh !important;
+    bottom: 0 !important;
+    border-radius: 20px 20px 0 0 !important;
+  }
+  
+  .mega-menu-inner {
+    flex-direction: column !important;
+  }
+  
+  .mega-menu-sidebar {
+    width: 100% !important;
+    max-height: 200px !important;
+    border-right: none !important;
+    border-bottom: 1px solid #eee !important;
+  }
+  
+  .category-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
+    gap: 12px !important;
+  }
+  
+  .image-circle {
+    width: 60px !important;
+    height: 60px !important;
+  }
+  
+  .sidebar-item {
+    padding: 10px 16px !important;
+    font-size: 13px !important;
+  }
+}
+
+/* ============================================ */
+/* DROPDOWN MENUS (Expose Store, Protections, etc) */
+/* ============================================ */
+
+/* Generic dropdown styles */
+@media (max-width: 1024px) {
+  div[style*="position: fixed"][style*="gridTemplateColumns"] {
+    gap: 25px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  div[style*="position: fixed"][style*="gridTemplateColumns"] {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+    position: fixed !important;
+    left: 10px !important;
+    right: 10px !important;
+    max-height: 80vh !important;
+    overflow-y: auto !important;
+    padding: 20px !important;
+  }
+  
+  /* Remove border-left on mobile */
+  div[style*="position: fixed"][style*="borderLeft"] {
+    border-left: none !important;
+    padding-left: 0 !important;
+    margin-top: 15px !important;
+    border-top: 1px solid #eee !important;
+    padding-top: 15px !important;
+  }
+}
+
+/* ============================================ */
+/* EXPOSE STORE DROPDOWN SPECIFIC */
+/* ============================================ */
+
+@media (max-width: 1024px) {
+  div[style*="gridTemplateColumns: '1.2fr 1fr 1fr'"] {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 30px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  div[style*="gridTemplateColumns: '1.2fr 1fr 1fr'"] {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+    padding: 25px !important;
+  }
+  
+  div[style*="backgroundColor: '#fff7f2'"] {
+    padding: 20px !important;
+  }
+  
+  div[style*="backgroundColor: '#fff7f2'"] h4 {
+    font-size: 18px !important;
+  }
+}
+
+/* ============================================ */
+/* TOUCH OPTIMIZATIONS */
+/* ============================================ */
+
+@media (hover: none) and (pointer: coarse) {
+  .nav-item,
+  .category-toggle,
+  .nav-sell-link,
+  .sidebar-item,
+  .grid-item {
+    cursor: pointer !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+  
+  .nav-item:active,
+  .category-toggle:active,
+  .nav-sell-link:active {
+    opacity: 0.7 !important;
+  }
+  
+  .grid-item:active {
+    transform: scale(0.97) !important;
+    transition: transform 0.05s ease !important;
+  }
+  
+  /* Larger tap targets */
+  .nav-item,
+  .category-toggle {
+    min-height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+}
+
+/* ============================================ */
+/* PRINT STYLES */
+/* ============================================ */
+
+@media print {
+  .nav-links-container {
+    display: none !important;
+  }
+}
+
+/* ============================================ */
+/* SCROLLBAR FOR MEGA MENU CONTENT */
+/* ============================================ */
+
+.mega-menu-content::-webkit-scrollbar {
+  width: 5px !important;
+}
+
+.mega-menu-content::-webkit-scrollbar-track {
+  background: #f1f1f1 !important;
+  border-radius: 10px !important;
+}
+
+.mega-menu-content::-webkit-scrollbar-thumb {
+  background: #ff6a00 !important;
+  border-radius: 10px !important;
+}
+
+.mega-menu-sidebar::-webkit-scrollbar {
+  width: 3px !important;
+}
+
+.mega-menu-sidebar::-webkit-scrollbar-track {
+  background: #f1f1f1 !important;
+}
+
+.mega-menu-sidebar::-webkit-scrollbar-thumb {
+  background: #cbd5e1 !important;
+  border-radius: 10px !important;
+}
+
+/* ============================================ */
+/* ANIMATIONS */
+/* ============================================ */
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mega-menu-container,
+div[style*="position: fixed"][style*="boxShadow: '0 15px 35px rgba(0,0,0,0.2)'"] {
+  animation: fadeInDown 0.2s ease forwards !important;
+}
+
+/* ============================================ */
+/* HOVER EFFECTS */
+/* ============================================ */
+
+.sidebar-item {
+  transition: background-color 0.2s ease, color 0.2s ease !important;
+}
+
+.sidebar-item:hover {
+  background-color: #fff5ed !important;
+  color: #ff6a00 !important;
+}
+
+.sidebar-item.active {
+  background-color: #fff5ed !important;
+  color: #ff6a00 !important;
+  border-right: 3px solid #ff6a00 !important;
+}
+
+.grid-item {
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.grid-item:hover {
+  transform: translateY(-3px) !important;
+}
+
+.see-all-circle {
+  transition: all 0.3s ease !important;
+}
+
+.see-all-card:hover .see-all-circle {
+  transform: scale(1.05) !important;
+  background-color: #fff5ed !important;
+}
+
+/* ============================================ */
+/* DARK MODE SUPPORT (Optional) */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .mega-menu-container,
+  div[style*="position: fixed"][style*="backgroundColor: 'white'"] {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+  }
+  
+  .mega-menu-sidebar {
+    border-right-color: #334155 !important;
+  }
+  
+  .sidebar-item {
+    color: #e2e8f0 !important;
+  }
+  
+  .sidebar-item:hover,
+  .sidebar-item.active {
+    background-color: #334155 !important;
+  }
+  
+  .grid-text {
+    color: #94a3b8 !important;
+  }
+  
+  .nav-item,
+  .category-toggle span,
+  .nav-sell-link {
+    color: #e2e8f0 !important;
+  }
+  
+  div[style*="backgroundColor: '#fff7f2'"] {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+  }
+  
+  div[style*="backgroundColor: '#fff7f2'"] h4 {
+    color: #f1f5f9 !important;
+  }
+  
+  div[style*="backgroundColor: '#fff7f2'"] p {
+    color: #94a3b8 !important;
+  }
+  
+  .grid-item .image-circle {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+  }
+}

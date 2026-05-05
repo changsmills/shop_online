@@ -1,0 +1,502 @@
+/* src/components/ProductCard.css */
+
+/* ========== MAIN CARD CONTAINER ========== */
+.product-card {
+  width: 100%;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin: 0;
+  transition: none;
+}
+
+.product-card:hover {
+  transform: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Priority card (featured product) */
+.product-card.priority-card {
+  border: 2px solid #fbbf24;
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
+}
+
+/* ========== IMAGE SECTION - FORCE SQUARE ========== */
+.image-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1 !important; /* Force square */
+  overflow: hidden;
+  background-color: #f3f4f6;
+}
+
+/* Fallback for older browsers */
+@supports not (aspect-ratio: 1 / 1) {
+  .image-container {
+    padding-bottom: 100% !important;
+    height: 0 !important;
+  }
+}
+
+.image-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.3s ease-out;
+}
+
+/* ZOOM EFFECT - Picha TU inazoom, card haibadiliki */
+.product-card:hover .product-image {
+  transform: scale(1.08);
+}
+
+/* ========== BADGES ========== */
+.lowest-price-tag {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background-color: #10b981;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  z-index: 2;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hot-sale-tag {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background-color: #ef4444;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  z-index: 2;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.8; }
+  100% { opacity: 1; }
+}
+
+.moq-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: white;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+  z-index: 2;
+  backdrop-filter: blur(2px);
+}
+
+/* ========== INFO CONTAINER ========== */
+.info-container {
+  padding: 12px;
+}
+
+/* Product name - 2 lines max */
+.product-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 40px;
+}
+
+/* Lowest price banner */
+.lowest-price-banner {
+  background-color: #ecfdf5;
+  color: #047857;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.banner-icon {
+  font-size: 11px;
+}
+
+/* ========== PRICE SECTION ========== */
+.price-section {
+  margin-bottom: 8px;
+}
+
+.price-single {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.currency {
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.price-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #dc2626;
+  line-height: 1;
+}
+
+.old-price {
+  font-size: 12px;
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+
+.discount-badge {
+  background-color: #fee2e2;
+  color: #dc2626;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+}
+
+/* ========== STATS ROW ========== */
+.stats-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 8px;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.stat-label {
+  color: #9ca3af;
+}
+
+.stat-value {
+  color: #4b5563;
+  font-weight: 500;
+}
+
+.stat-divider {
+  color: #d1d5db;
+  font-size: 8px;
+}
+
+.location-stat {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.location-stat svg {
+  width: 10px;
+  height: 10px;
+  color: #6b7280;
+}
+
+.country-code {
+  font-weight: 500;
+  color: #6b7280;
+}
+
+/* ========== TRUST ROW ========== */
+.trust-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 10px;
+}
+
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background-color: #f0fdf4;
+  color: #15803d;
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.verified-icon {
+  font-size: 9px;
+  background-color: #15803d;
+  color: white;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.years-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: #6b7280;
+  background-color: #f3f4f6;
+  padding: 2px 6px;
+  border-radius: 12px;
+}
+
+.years-badge svg {
+  width: 10px;
+  height: 10px;
+  color: #fbbf24;
+  fill: #fbbf24;
+}
+
+.country-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: #9ca3af;
+}
+
+.country-badge svg {
+  width: 10px;
+  height: 10px;
+  color: #9ca3af;
+}
+
+/* ========== RESPONSIVE DESIGN - MOBILE FIRST ========== */
+
+/* Mobile phones (max-width: 768px) */
+@media (max-width: 768px) {
+  /* Card styling */
+  .product-card {
+    border-radius: 8px;
+  }
+  
+  /* Force square images on mobile */
+  .image-container {
+    aspect-ratio: 1 / 1 !important;
+  }
+  
+  /* Smaller padding on mobile */
+  .info-container {
+    padding: 8px;
+  }
+  
+  /* Smaller text */
+  .product-name {
+    font-size: 12px;
+    min-height: 32px;
+    margin-bottom: 4px;
+  }
+  
+  .price-value {
+    font-size: 14px;
+  }
+  
+  .currency {
+    font-size: 10px;
+  }
+  
+  .old-price {
+    font-size: 9px;
+  }
+  
+  .stats-row {
+    font-size: 9px;
+    gap: 3px;
+    margin-bottom: 4px;
+  }
+  
+  .trust-row {
+    font-size: 8px;
+    gap: 4px;
+  }
+  
+  /* Smaller badges */
+  .lowest-price-tag,
+  .hot-sale-tag,
+  .moq-badge {
+    font-size: 8px;
+    padding: 3px 6px;
+  }
+  
+  /* Smaller icons */
+  .location-stat svg,
+  .years-badge svg,
+  .country-badge svg {
+    width: 8px;
+    height: 8px;
+  }
+  
+  /* Lowest price banner mobile */
+  .lowest-price-banner {
+    font-size: 8px;
+    padding: 3px 6px;
+    margin-bottom: 6px;
+  }
+  
+  .banner-icon {
+    font-size: 9px;
+  }
+  
+  /* Verified badge mobile */
+  .verified-badge {
+    padding: 1px 4px;
+    font-size: 8px;
+  }
+  
+  .verified-icon {
+    width: 10px;
+    height: 10px;
+    font-size: 7px;
+  }
+  
+  /* Years badge mobile */
+  .years-badge {
+    padding: 1px 4px;
+  }
+  
+  /* Priority card mobile */
+  .priority-card {
+    border-width: 1.5px;
+  }
+}
+
+/* Tablets (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .product-name {
+    font-size: 13px;
+  }
+  
+  .price-value {
+    font-size: 16px;
+  }
+  
+  .info-container {
+    padding: 10px;
+  }
+}
+
+/* Desktop (min-width: 1025px) */
+@media (min-width: 1025px) {
+  .product-card {
+    border-radius: 12px;
+  }
+}
+
+/* ========== ZOOM ONLY - NO OTHER EFFECTS ========== */
+.product-card {
+  transition: none;
+}
+
+.product-card:hover {
+  transform: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.product-image {
+  transition: transform 0.3s ease-out;
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.08);
+}
+
+/* ========== MOBILE-SPECIFIC CLASSES (from JSX) ========== */
+@media (max-width: 768px) {
+  /* Mobile card */
+  .product-card.mobile-card {
+    border-radius: 8px;
+  }
+  
+  /* Mobile name */
+  .product-name.mobile-name {
+    font-size: 12px;
+    line-height: 1.3;
+    min-height: 30px;
+  }
+  
+  /* Mobile info container */
+  .info-container.mobile-info {
+    padding: 6px;
+    gap: 4px;
+  }
+  
+  /* Mobile price */
+  .price-value.mobile-price {
+    font-size: 13px;
+  }
+  
+  .currency.mobile-currency {
+    font-size: 9px;
+  }
+  
+  .old-price.mobile-old-price {
+    font-size: 8px;
+  }
+  
+  /* Mobile stats row */
+  .stats-row.mobile-stats {
+    font-size: 8px;
+    gap: 2px;
+  }
+  
+  /* Mobile trust row */
+  .trust-row.mobile-trust {
+    font-size: 7px;
+    gap: 3px;
+  }
+  
+  /* Mobile badges */
+  .lowest-price-tag.mobile-tag,
+  .hot-sale-tag.mobile-tag,
+  .moq-badge.mobile-tag {
+    padding: 2px 5px;
+    font-size: 7px;
+  }
+  
+  /* Mobile banner */
+  .lowest-price-banner.mobile-banner {
+    font-size: 7px;
+    padding: 2px 5px;
+  }
+}
