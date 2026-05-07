@@ -33,7 +33,7 @@ const Register = () => {
   };
 
   // FUNCTION MPYA YA KUUNDA PROFILE (ILIYOREKEBISHWA)
-  const createUserProfile = async (userId, email) => {
+const createUserProfile = async (userId, email) => {
     try {
       const defaultName = generateDefaultNameFromEmail(email);
       const baseUsername = defaultName.toLowerCase().replace(/\s/g, '');
@@ -41,44 +41,39 @@ const Register = () => {
       
       console.log("Creating profile for user:", userId);
       
-      // FIRST CHECK IF PROFILE ALREADY EXISTS
+      // 1. ANGALIA KAMA PROFILE IPO
       const { data: existingProfile } = await supabase
         .from('profiles')
         .select('id')
         .eq('id', userId)
-        .maybeSingle(); // Use maybeSingle to avoid errors
+        .maybeSingle();
       
       if (existingProfile) {
         console.log("Profile already exists, skipping creation");
         return true;
       }
       
-      // INSERT PROFILE
+      // 2. INGIZA DATA (Email imeondolewa hapa kwa sababu haipo kwenye table yako)
       const { error } = await supabase
         .from('profiles')
         .insert({
           id: userId,
-          email: email,
+          // email: email, <--- ONDOA HII LINE, HAIPO KWENYE DATABASE YAKO
           full_name: defaultName,
           username: username,
           avatar_url: null,
           bio: `Hi! I'm ${defaultName} on Skyfall`,
-          created_at: new Date().toISOString(),
+          // created_at haipo kwenye list yako, kama database haina iondoe pia
           updated_at: new Date().toISOString()
         });
       
       if (error) {
         console.error("Profile creation error details:", error);
         
-        // Kama error ni duplicate, hiyo ni sawa
-        if (error.code === '23505') { // Unique violation
-          console.log("Profile already exists (duplicate key)");
-          return true;
-        }
+        if (error.code === '23505') return true; // Duplicate
         
-        // Kama error ni RLS policy
         if (error.message.includes('row-level security policy')) {
-          toast.error("Tatizo la usalama. Tafadhali wasiliana na msimamizi.");
+          toast.error("Tatizo la usalama wa database (RLS).");
           return false;
         }
         
