@@ -71,19 +71,24 @@ export default function DashboardCard({
   </div>
 )}
         
-        {/* ✅ IMAGE - Now uses container's aspect ratio */}
-        <img 
-          src={image || 'https://via.placeholder.com/200'} 
-          alt={title} 
-          className="product-card-img"
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center',
-          }}
-          onError={(e) => { e.target.src = 'https://via.placeholder.com/200'; }}
-        />
+       <img 
+  src={image || 'https://via.placeholder.com/200'} 
+  alt={title} 
+  className="product-card-img"
+  style={{
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    objectPosition: 'center',
+    transition: 'transform 0.3s ease-out',
+    transform: 'scale(1)',
+  }}
+  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
+  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+  onTouchStart={(e) => e.currentTarget.style.transform = 'scale(1.15)'}
+  onTouchEnd={(e) => e.currentTarget.style.transform = 'scale(1)'}
+  onError={(e) => { e.target.src = 'https://via.placeholder.com/200'; }}
+/>
 
         {overlay && (
           <div className="product-card-location">

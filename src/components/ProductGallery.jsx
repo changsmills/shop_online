@@ -48,16 +48,20 @@ const ProductGallery = ({ product, isMobile = false }) => {
 
   const nextImage = (e) => {
     e?.stopPropagation();
-    if (mediaType === 'photos') {
-      if (photoItems.length === 0) return;
+    // Badilisha currentIndex badala ya photoIndex ili iathiri Modal na Desktop
+    setCurrentIndex((prev) => (prev + 1) % mediaList.length);
+    
+    // Kama unataka kuendelea kutumia photoIndex kwenye mobile view:
+    if (mediaType === 'photos' && photoItems.length > 0) {
       setPhotoIndex((prev) => (prev + 1) % photoItems.length);
     }
   };
 
   const prevImage = (e) => {
     e?.stopPropagation();
-    if (mediaType === 'photos') {
-      if (photoItems.length === 0) return;
+    setCurrentIndex((prev) => (prev - 1 + mediaList.length) % mediaList.length);
+    
+    if (mediaType === 'photos' && photoItems.length > 0) {
       setPhotoIndex((prev) => (prev - 1 + photoItems.length) % photoItems.length);
     }
   };
@@ -505,7 +509,7 @@ if (isMobile) {
                   onMouseEnter={() => setIsZooming(true)} onMouseLeave={() => setIsZooming(false)}
                   style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
                   <img key={currentMedia?.url} src={currentMedia?.url} alt="View" className="modal-base-img"
-                    style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', transform: 'scale(1.05)' }} />
+                  style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', transform: 'scale(1.05)' }} />
                   {isZooming && (
                     <div className="modal-zoom-overlay" style={{
                       position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
