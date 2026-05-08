@@ -224,7 +224,7 @@ export default function TopDeals({ navigate, selectedCategory, isMobile }) {
               >
                 <DashboardCard
                   image={product.cover_image}
-                 // title={product.name}
+                  title={product.name}
                   price={product.original_price} 
                   originalPrice={product.price}  
                   moq={product.moq}
@@ -308,7 +308,7 @@ export default function TopDeals({ navigate, selectedCategory, isMobile }) {
                 >
                   <DashboardCard
   image={product.cover_image}
- // title={product.name}
+  title={product.name}
   price={product.original_price} 
   originalPrice={product.price}  
   moq={product.moq}

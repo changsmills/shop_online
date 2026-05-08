@@ -220,7 +220,7 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
       >
         <DashboardCard
           image={product.cover_image}
-          //title={product.name}
+          title={product.name}
           price={product.price}
           originalPrice={product.original_price}
           views={product.views}
@@ -299,7 +299,7 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
               >
               <DashboardCard
   image={product.cover_image}
- // title={product.name}
+  title={product.name}
   price={product.price}
   originalPrice={product.original_price}
   views={product.views}
