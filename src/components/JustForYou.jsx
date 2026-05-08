@@ -82,9 +82,14 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
     <section 
       className="just-for-you-container"
       style={{
+          padding: isMobile ? '4px 0' : '0px',
+        position: 'relative',
         width: '100%',
-        margin: 0,
-        padding: isMobile ? '0 0 40px 0' : 0,  // ← Add padding-bottom on mobile (70px for BottomNav)
+        // ✅ 2. Rangi ya background ya kijivu (Light Gray kama Alibaba)
+        backgroundColor: '#eceef1', 
+        // ✅ 3. Pembe za duara kidogo kwa kontena zima
+        borderRadius: isMobile ? '8px' : '16px',
+        margin: isMobile ? '2px 0' : '10px 0'
 
       }}
     >
@@ -128,7 +133,7 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
     </div>
   </div>
   
-  {filteredProducts.length > 6 && (
+  {filteredProducts.length > 3 && (
     <button 
       className="view-all-just" 
       onClick={() => navigate("/products", { 
@@ -144,7 +149,7 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
         border: 'none',
         borderRadius: isMobile ? '16px' : '0',
         padding: isMobile ? '4px 10px' : '0',
-        color: '#ff6600',
+        color: '#7a380c',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
@@ -175,12 +180,17 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
             filteredProducts.map((item) => (
               <DashboardCard 
                 key={item.id}
-                image={item.cover_image}
-                title={item.name}
-                price={item.price}
-                originalPrice={item.original_price}
-                views={item.views}
-                isMobile={isMobile}
+    image={item.cover_image}
+    title={item.name}
+    price={item.price}
+    originalPrice={item.original_price}
+    isMobile={isMobile}
+    // --- HAPA NDIYO PANAPOKOSEKANA ---
+    moq={item.moq}                   // Inatoka kwenye database column 'moq'
+    subtitle={item.store_address}    // Au column yoyote ya eneo (Location)
+    categoryName={item.category_name} // Jina la kundi la bidhaa
+    isTopDeal={true}                 // Lazima iwe true ili bei ionekane kama isStore ipo
+    views={item.views}
                 onClick={() => navigate('/products', { 
                   state: { 
                     priorityId: item.id, 
@@ -211,13 +221,18 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
           {filteredProducts.length > 0 ? (
             filteredProducts.map((item) => (
               <DashboardCard 
-  key={item.id}
-  image={item.cover_image}
-  title={item.name}
-  price={item.price}
-  originalPrice={item.original_price}
-  views={item.views}
-  isMobile={isMobile}
+key={item.id}
+    image={item.cover_image}
+    title={item.name}
+    price={item.price}
+    originalPrice={item.original_price}
+    isMobile={isMobile}
+    // --- HAPA NDIYO PANAPOKOSEKANA ---
+    moq={item.moq}                   // Inatoka kwenye database column 'moq'
+    subtitle={item.store_address}    // Au column yoyote ya eneo (Location)
+    categoryName={item.category_name} // Jina la kundi la bidhaa
+    isTopDeal={true}                 // Lazima iwe true ili bei ionekane kama isStore ipo
+    views={item.views}
   onClick={() => {
     // 1. Maandalizi ya data
     const priorityId = item.id;

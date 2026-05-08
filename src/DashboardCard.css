@@ -1,12 +1,12 @@
 /* CONTAINER KUU - Imeboreshwa kufuata muundo wa ProductCard */
 .product-card-item {
-  background: #ffffff;
+  background: #050505;
   border-radius: 8px; /* Radius ndogo kidogo kama Alibaba */
   overflow: hidden;
   display: flex;
   flex-direction: column;
   cursor: pointer;
-  border: 1px solid #f0f0f0;
+  border: 1px solid #ece6e6;
   width: 100%; 
   position: relative;
   transition: box-shadow 0.2s;
@@ -21,7 +21,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  background: #f7f7f7;
+  background: #e0d7d7;
   overflow: hidden;
 }
 
@@ -70,7 +70,7 @@
   position: absolute;
   bottom: 6px;
   left: 6px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(240, 239, 239, 0.9);
   padding: 2px 5px;
   border-radius: 4px;
   font-size: 9px;
@@ -163,7 +163,7 @@
 /* 5. Inahakikisha maandishi hayatikisiki wakati picha inazoom */
 .product-card-info {
   padding: 10px;
-  background: white;
+  background: rgb(110, 15, 15);
   z-index: 2; /* Inakaa juu ya picha kuzuia overlapping */
   position: relative;
 }
@@ -664,7 +664,7 @@
 
 /* Remove any conflicting styles */
 .product-card-info {
-  background: white;
+  background: rgb(151, 11, 11);
   position: relative;
   z-index: 2;
 }
@@ -686,6 +686,6 @@
 }
 
 .product-card-stats svg {
-  color: #ffffff;  /* White eye icon */
+  color: #d6d5d5;  /* White eye icon */
   opacity: 0.8;
 }

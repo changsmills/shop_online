@@ -4,7 +4,6 @@
 
 /* Container kuu */
 .just-for-you-container {
-  background: #fff;
   margin: 20px 0;
   padding: 20px 0;
   width: 100%;
@@ -43,7 +42,7 @@
 .just-title {
   font-size: 1.6rem;
   font-weight: 800;
-  color: #000000;
+  color: #f3ebeb;
   margin: 0;
   letter-spacing: -0.6px;
   display: flex;
@@ -60,7 +59,7 @@
 .stores-subtitle,
 .just-subtitle {
   font-size: 0.88rem;
-  color: #64748b;
+  color: #072957;
   font-weight: 500;
   margin: 0;
   max-width: 450px;

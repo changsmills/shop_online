@@ -13,7 +13,9 @@ export default function DashboardCard({
   rank, 
   overlay, 
   subtitle,
+  categoryName,
   isStore, 
+  isTopDeal,
   isLocation, 
   isMobile,
   onClick 
@@ -27,7 +29,20 @@ export default function DashboardCard({
     : title;
 
   return (
-    <div className="product-card-item" onClick={onClick} data-is-store={isStore}>
+   //<div className="product-card-item" onClick={onClick} data-is-store={isStore}>
+   // Badilisha hapa:
+<div 
+  className="product-card-item" 
+  onClick={onClick} 
+  data-is-store={isStore}
+  style={{
+    backgroundColor: 'transparent', // ✅ Inafanya background iwe wazi
+    border: 'none',                 // ✅ Inatoa border yoyote nyeupe
+    boxShadow: 'none',              // ✅ Inatoa kivuli kinachoweza kuleta weupe
+    padding: 0,                     // ✅ Inahakikisha kadi haina nafasi ya ndani
+    margin: 0                       // ✅ Inahakikisha kadi haina nafasi ya nje
+  }}
+>
       {/* IMAGE CONTAINER - Different for mobile vs desktop */}
       <div 
         className="product-card-media"
@@ -35,10 +50,11 @@ export default function DashboardCard({
           position: 'relative',
           width: '100%',
           // ✅ MOBILE: Square (1:1), DESKTOP: Rectangle (3:4 or as you want)
-          aspectRatio: isMobile ? '1 / 1' : '3 / 4',
-          backgroundColor: '#f8f8f8',
+          aspectRatio: isMobile ? '1 / 1' : '1 / 1',
+          backgroundColor: '#ece7e7',
           overflow: 'hidden',
-          borderRadius: '8px 8px 0 0',
+          //borderRadius: '8px 8px 0 0',
+          borderRadius: '8px',
         }}
       >
         {rank && Number(rank) > 0 ? (
@@ -48,11 +64,12 @@ export default function DashboardCard({
           </div>
         ) : null}
         
-        {!isStore && numOriginal > 0 && hasValidPrice && numPrice < numOriginal && (
-          <div className="discount-badge-mini">
-            -{Math.round(((numOriginal - numPrice) / numOriginal) * 100)}%
-          </div>
-        )}
+       {/* ✅ Badilisha hapa ili isTopDeal iweze kuonyesha beji ya punguzo pia */}
+{(!isStore || isTopDeal) && numOriginal > 0 && hasValidPrice && numPrice < numOriginal && (
+  <div className="discount-badge-mini">
+    -{Math.round(((numOriginal - numPrice) / numOriginal) * 100)}%
+  </div>
+)}
         
         {/* ✅ IMAGE - Now uses container's aspect ratio */}
         <img 
@@ -82,10 +99,13 @@ export default function DashboardCard({
       <div 
         className="product-card-info"
         style={{
-          padding: isMobile ? '6px' : '10px',
+          padding: isMobile ? '2px 6px 6px 6px' : '0px 5px 5px 4px', // Hapa '2px' ni ya juu, imepunguzwa sana
+         // padding: isMobile ? '4px 6px' : '1px 2px',
           display: 'flex',
           flexDirection: 'column',
-          gap: isMobile ? '3px' : '5px',
+          marginTop: isMobile ? '-2px' : '-4px', // Hii inavuta info section juu kidogo iguse picha
+            gap: isMobile ? '1px' : '0px',
+          backgroundColor: 'transparent',
         }}
       >
         <h4 
@@ -105,7 +125,8 @@ export default function DashboardCard({
           {displayTitle || title}
         </h4>
         
-        {!isStore && !isLocation && hasValidPrice && (
+       {/* ✅ Ikiwemo isTopDeal hapa, bei itatokea hata kama isStore ni true */}
+        {(!isStore || isTopDeal) && !isLocation && hasValidPrice && (
           <div 
             className="product-card-price-row"
             style={{
@@ -119,9 +140,9 @@ export default function DashboardCard({
               <span 
                 className="price-currency"
                 style={{
-                  fontSize: isMobile ? '9px' : '11px',
+                  fontSize: isMobile ? '9px' : '19px',
                   fontWeight: '700',
-                  color: '#f97316',
+                  color: '#ca290d',
                 }}
               >
                 TSh
@@ -129,9 +150,9 @@ export default function DashboardCard({
               <span 
                 className="price-amount"
                 style={{
-                  fontSize: isMobile ? '13px' : '16px',
+                  fontSize: isMobile ? '13px' : '19px',
                   fontWeight: '700',
-                  color: '#f97316',
+                  color: '#ca290d',
                 }}
               >
                 {numPrice.toLocaleString()}
@@ -153,30 +174,76 @@ export default function DashboardCard({
           </div>
         )}
 
-        {isStore && (
-          <div className="store-moq-info">
-            <span className="moq-label">Minimum Order:</span>
-            <span className="moq-value">
-              {(moq && moq !== "0" && moq !== 0) ? moq : '1'}
-            </span>
-          </div>
-        )}
+{/* ✅ Ikiwa ni Store AU ni TopDeal, onyesha MOQ kwenye mstari mmoja nadhifu */}
+{(isStore || isTopDeal) && (
+  <div style={{ 
+    display: 'flex', 
+    alignItems: 'center', 
+    gap: '4px', 
+    marginTop: '1px',
+    marginBottom:'1px',
+    lineHeight: '1' 
+  }}>
+    <span style={{ 
+      fontSize: isMobile ? '10px' : '15px', 
+      color: '#666',
+      fontWeight: '500'
+    }}>
+      MOQ:
+    </span>
+    <span style={{ 
+      fontSize: isMobile ? '10px' : '15px', 
+      fontWeight: '700',
+      color: '#333'
+    }}>
+      {(moq && moq !== "0" && moq !== 0) ? moq : '1'}
+    </span>
+  </div>
+)}
 
-        {subtitle && (
-          <p 
-            className="product-card-subtitle"
-            style={{
-              fontSize: isMobile ? '9px' : '10px',
-              color: '#888',
-              margin: 0,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {subtitle}
-          </p>
-        )}
+
+{/* ✅ Sehemu ya Category Name - Mstari wake wenyewe */}
+{categoryName && (
+  <p style={{
+    fontSize: isMobile ? '9px' : '11px',
+    fontWeight: '700',
+    color: '#f97316', 
+    margin: '4px 0 0 0', // Nafasi kidogo juu
+    textTransform: 'uppercase',
+    letterSpacing: '0.4px',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
+  }}>
+    {categoryName}
+  </p>
+)}
+
+{/* ✅ Subtitle (Location) - Chini ya Category na Ikoni */}
+{subtitle && (
+  <div style={{ 
+    display: 'flex', 
+    alignItems: 'center', 
+    gap: '3px', 
+    marginTop: '2px' 
+  }}>
+    <MapPin size={isMobile ? 8 : 10} color="#888" />
+    <span 
+      className="product-card-subtitle"
+      style={{
+        fontSize: isMobile ? '9px' : '10px',
+        color: '#888',
+        margin: 0,
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+      }}
+    >
+      {subtitle}
+    </span>
+  </div>
+)}
+       
       </div>
     </div>
   );

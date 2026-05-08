@@ -106,9 +106,14 @@ export default function TopDeals({ navigate, selectedCategory, isMobile }) {
     <div 
       className="top-deals-main-wrapper" 
       style={{ 
-        padding: isMobile ? '4px 0' : '20px',
+        padding: isMobile ? '4px 0' : '0px',
         position: 'relative',
         width: '100%',
+        // ✅ 2. Rangi ya background ya kijivu (Light Gray kama Alibaba)
+        backgroundColor: '#eceef1', 
+        // ✅ 3. Pembe za duara kidogo kwa kontena zima
+        borderRadius: isMobile ? '8px' : '16px',
+        margin: isMobile ? '2px 0' : '10px 0'
       }}
     >
       {/* Header Section - Same as NewArrivals */}
@@ -116,9 +121,9 @@ export default function TopDeals({ navigate, selectedCategory, isMobile }) {
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'center', 
-        marginBottom: isMobile ? '12px' : '20px',
+        marginBottom: isMobile ? '2px' : '2px',
         flexWrap: 'wrap',
-        gap: isMobile ? '6px' : '10px',
+        gap: isMobile ? '3px' : '5px',
         padding: isMobile ? '0 8px' : '0',
       }}>
         <div>
@@ -126,7 +131,7 @@ export default function TopDeals({ navigate, selectedCategory, isMobile }) {
             display: 'flex', 
             alignItems: 'center', 
             gap: isMobile ? '4px' : '8px', 
-            marginBottom: isMobile ? '2px' : '8px' 
+            marginBottom: isMobile ? '1px' : '1px' 
           }}>
             <Flame size={isMobile ? 12 : 24} style={{ color: '#f97316' }} />
             <h2 style={{ 
@@ -219,9 +224,10 @@ export default function TopDeals({ navigate, selectedCategory, isMobile }) {
               >
                 <DashboardCard
                   image={product.cover_image}
-                  title={product.name}
+                 // title={product.name}
                   price={product.original_price} 
                   originalPrice={product.price}  
+                  moq={product.moq}
                   discountBadge={discountPercent > 0 ? `-${discountPercent}%` : null}
                   showProgress={true}
                   isMobile={isMobile}
@@ -302,9 +308,11 @@ export default function TopDeals({ navigate, selectedCategory, isMobile }) {
                 >
                   <DashboardCard
   image={product.cover_image}
-  title={product.name}
+ // title={product.name}
   price={product.original_price} 
   originalPrice={product.price}  
+  moq={product.moq}
+  isTopDeal={true}
   discountBadge={discountPercent > 0 ? `-${discountPercent}%` : null}
   showProgress={true}
   isMobile={isMobile}

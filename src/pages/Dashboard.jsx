@@ -90,6 +90,8 @@ export default function Dashboard() {
   const isMobile = useIsMobile();
   const [selectedCategoryForComponents, setSelectedCategoryForComponents] = useState(null);
   const [mobileBanner, setMobileBanner] = useState(null);  // Banner maalum kwa simu
+  // Ongeza hii karibu na state zingine (around line 70-80)
+const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 
 
@@ -826,13 +828,12 @@ const fetchData = async () => {
         </div>
       </div>
 
-          {isMobile && <BottomNav session={session} />}
-
+{isMobile && <BottomNav session={session} onOpenCategories={() => setMobileMenuOpen(true)} />}
 
       {/* ============================================ */}
       {/* PORTAL: MEGA MENU (Kwa NavLinks style) */}
       {/* ============================================ */}
-      {activeMenu === 'categories' && selectedCategory && ReactDOM.createPortal(
+      {!isMobile && activeMenu === 'categories' && selectedCategory && ReactDOM.createPortal(
         <div 
           className="mega-menu-container" 
           onMouseEnter={() => handleMouseEnter('categories')} 
@@ -990,6 +991,146 @@ const fetchData = async () => {
         </div>,
         document.body
       )}
+
+
+      {/* ============================================ */}
+{/* PORTAL YA MOBILE - BOTTOM SHEET (MPYA) */}
+{/* ============================================ */}
+{isMobile && mobileMenuOpen && selectedCategory && ReactDOM.createPortal(
+  <div 
+    style={{ 
+      position: 'fixed', 
+      top: 0, 
+      left: 0, 
+      right: 0, 
+      bottom: 0, 
+      backgroundColor: 'rgba(0,0,0,0.5)', 
+      zIndex: 10000,
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'flex-end',
+      animation: 'fadeIn 0.2s ease-out'
+    }}
+    onClick={() => setMobileMenuOpen(false)}
+  >
+    <div 
+      style={{ 
+        backgroundColor: 'white', 
+        height: '75vh', 
+        borderTopLeftRadius: '20px', 
+        borderTopRightRadius: '20px', 
+        display: 'flex', 
+        flexDirection: 'column',
+        overflow: 'hidden',
+        animation: 'slideUp 0.3s ease-out'
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {/* Handle - indicator ya kuteleza */}
+      <div style={{ 
+        width: '40px', 
+        height: '5px', 
+        background: '#ccc', 
+        borderRadius: '10px', 
+        margin: '12px auto',
+        cursor: 'pointer'
+      }} />
+      
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        {/* Sidebar ya Kategoria (Kushoto) */}
+        <aside style={{ 
+          width: '100px', 
+          borderRight: '1px solid #eee', 
+          overflowY: 'auto', 
+          backgroundColor: '#f9f9f9' 
+        }}>
+          {categories.map((cat) => (
+            <div 
+              key={cat.id} 
+              onClick={() => {
+                setSelectedCategory(cat);
+                fetchFeaturedLeafs(cat.id);
+                fetchSubCategories(cat.id);
+              }}
+              style={{ 
+                padding: '15px 5px', 
+                textAlign: 'center', 
+                backgroundColor: selectedCategory?.id === cat.id ? 'white' : 'transparent',
+                borderLeft: selectedCategory?.id === cat.id ? '4px solid #ff6a00' : 'none',
+                cursor: 'pointer'
+              }}
+            >
+              <div style={{ color: selectedCategory?.id === cat.id ? '#ff6a00' : '#666' }}>
+                {getIcon(cat.icon_name)}
+              </div>
+              <div style={{ 
+                fontSize: '10px', 
+                marginTop: '5px', 
+                fontWeight: selectedCategory?.id === cat.id ? 'bold' : 'normal' 
+              }}>
+                {cat.name}
+              </div>
+            </div>
+          ))}
+        </aside>
+
+        {/* Content ya Bidhaa (Kulia) */}
+        <main style={{ flex: 1, padding: '15px', overflowY: 'auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px', alignItems: 'center' }}>
+            <h4 style={{ fontSize: '14px', margin: 0, fontWeight: 'bold' }}>
+              {selectedCategory?.name}
+            </h4>
+            <button 
+              onClick={() => setMobileMenuOpen(false)} 
+              style={{ 
+                border: 'none', 
+                background: 'none', 
+                fontWeight: 'bold',
+                fontSize: '18px',
+                cursor: 'pointer'
+              }}
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Grid ya bidhaa (columns 2 kwenye simu) */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '15px' }}>
+            {featuredProducts.map((leaf) => (
+              <div 
+                key={leaf.id} 
+                onClick={() => {
+                  handleLeafClick(leaf.leaf_category_id);
+                  setMobileMenuOpen(false);
+                }}
+                style={{ textAlign: 'center', cursor: 'pointer' }}
+              >
+                <div style={{ 
+                  width: '100%', 
+                  aspectRatio: '1/1', 
+                  borderRadius: '12px', 
+                  backgroundColor: '#f5f5f5', 
+                  marginBottom: '8px', 
+                  overflow: 'hidden' 
+                }}>
+                  <img 
+                    src={leaf.cover_image || placeholderImg} 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                    alt={leaf.leaf_categories?.name}
+                  />
+                </div>
+                <p style={{ fontSize: '11px', margin: 0, color: '#333' }}>
+                  {leaf.leaf_categories?.name}
+                </p>
+              </div>
+            ))}
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>,
+  document.body
+)}
       
     </div>
   );

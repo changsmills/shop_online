@@ -81,9 +81,14 @@ export default function TrendingNow({ navigate, selectedCategory, isMobile }) {
     <div 
       className="trending-main-wrapper" 
       style={{ 
-        padding: isMobile ? '4px 0' : '20px',
+        padding: isMobile ? '4px 0' : '0px',
         position: 'relative',
         width: '100%',
+        // ✅ 2. Rangi ya background ya kijivu (Light Gray kama Alibaba)
+        backgroundColor: '#eceef1', 
+        // ✅ 3. Pembe za duara kidogo kwa kontena zima
+        borderRadius: isMobile ? '8px' : '16px',
+        margin: isMobile ? '2px 0' : '10px 0'
       }}
     >
       {/* Header Section - Same as TopDeals */}
@@ -101,7 +106,7 @@ export default function TrendingNow({ navigate, selectedCategory, isMobile }) {
             display: 'flex', 
             alignItems: 'center', 
             gap: isMobile ? '4px' : '8px', 
-            marginBottom: isMobile ? '2px' : '8px' 
+            marginBottom: isMobile ? '2px' : '3px' 
           }}>
             <TrendingUp size={isMobile ? 12 : 24} style={{ color: '#8b5cf6' }} />
             <h2 style={{ 
@@ -190,7 +195,7 @@ export default function TrendingNow({ navigate, selectedCategory, isMobile }) {
             >
                <DashboardCard
                 image={item.cover_image}
-                title={item.name}
+               // title={item.name}
                 price={item.price}
                 views={item.views}
                 rank={index + 1}
@@ -270,7 +275,7 @@ export default function TrendingNow({ navigate, selectedCategory, isMobile }) {
               >
                 <DashboardCard
                   image={item.cover_image}
-                  title={item.name}
+                  // //title={item.name}
                   price={item.price}
                   views={item.views}
                   rank={index + 1}

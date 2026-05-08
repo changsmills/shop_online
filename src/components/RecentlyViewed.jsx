@@ -80,9 +80,14 @@ export default function RecentlyViewed({ navigate, isMobile }) {
     <div 
       className="recently-viewed-main-wrapper" 
       style={{ 
-        padding: isMobile ? '16px 0' : '20px',
+         padding: isMobile ? '4px 0' : '0px',
         position: 'relative',
         width: '100%',
+        // ✅ 2. Rangi ya background ya kijivu (Light Gray kama Alibaba)
+        backgroundColor: '#eceef1', 
+        // ✅ 3. Pembe za duara kidogo kwa kontena zima
+        borderRadius: isMobile ? '8px' : '16px',
+        margin: isMobile ? '2px 0' : '10px 0'
       }}
     >
       {/* Header Section - Same as NewArrivals */}
@@ -92,7 +97,7 @@ export default function RecentlyViewed({ navigate, isMobile }) {
         alignItems: 'center', 
         marginBottom: isMobile ? '12px' : '20px',
         flexWrap: 'wrap',
-        gap: isMobile ? '6px' : '10px',
+        gap: isMobile ? '2px' : '3px',
         padding: isMobile ? '0 8px' : '0',
       }}>
         <div>
@@ -190,7 +195,7 @@ export default function RecentlyViewed({ navigate, isMobile }) {
             >
               <DashboardCard
                 image={product.cover_image}
-                title={product.name}
+                //title={product.name}
                 price={product.price}
                 originalPrice={product.original_price}
                 views={product.views}
@@ -267,7 +272,7 @@ export default function RecentlyViewed({ navigate, isMobile }) {
               >
                <DashboardCard
           image={product.cover_image}
-          title={product.name}
+          //title={product.name}
           price={product.price}
           originalPrice={product.original_price}
           views={product.views}

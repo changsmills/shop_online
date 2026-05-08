@@ -102,9 +102,14 @@ export default function LocationFilter({ navigate, isMobile }) {
     <div 
       className="location-main-wrapper" 
       style={{ 
-        padding: isMobile ? '4px 0' : '20px',
+         padding: isMobile ? '4px 0' : '0px',
         position: 'relative',
         width: '100%',
+        // ✅ 2. Rangi ya background ya kijivu (Light Gray kama Alibaba)
+        backgroundColor: '#eceef1', 
+        // ✅ 3. Pembe za duara kidogo kwa kontena zima
+        borderRadius: isMobile ? '8px' : '16px',
+        margin: isMobile ? '2px 0' : '10px 0'
       }}
     >
       {/* Header Section - Same as TopDeals */}

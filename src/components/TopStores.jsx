@@ -12,26 +12,35 @@ export default function TopStores({ navigate, isMobile }) {
   const [showRightArrow, setShowRightArrow] = useState(false);
 
   useEffect(() => {
-    const fetchTopStores = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from("stores_engine") 
-          .select("*")
-          .eq("status", "active") 
-          .limit(10); 
+  const fetchTopStores = async () => {
+    try {
+      setLoading(true);
+      
+      // ✅ Tumebadilisha .select("*") na kuweka uhusiano wa categories
+      const { data, error } = await supabase
+        .from("stores_engine") 
+        .select(`
+          *,
+          categories:category_id (
+            name
+          )
+        `) 
+        .eq("status", "active") 
+        .limit(10); 
 
-        if (error) throw error;
-        setStores(data || []);
-      } catch (error) {
-        console.error("Error fetching stores:", error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+      if (error) throw error;
+      
+      // Supabase itarudisha data ikiwa na object ya 'categories' ndani
+      setStores(data || []);
+    } catch (error) {
+      console.error("Error fetching stores:", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchTopStores();
-  }, []);
+  fetchTopStores();
+}, []);
 
   const checkScrollPosition = () => {
     if (scrollContainerRef.current) {
@@ -70,81 +79,80 @@ export default function TopStores({ navigate, isMobile }) {
     <div 
       className="top-stores-main-wrapper" 
       style={{ 
-        padding: isMobile ? '4px 0' : '20px',
+        padding: isMobile ? '4px 0' : '1px',
         position: 'relative',
         width: '100%',
+       backgroundColor: 'white', 
+          borderRadius: isMobile ? '8px' : '16px',
+        margin: isMobile ? '2px 0' : '10px 0'
+
+
+
       }}
     >
-      {/* Header Section - Same as RecentlyViewed */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        marginBottom: isMobile ? '12px' : '20px',
-        flexWrap: 'wrap',
-        gap: isMobile ? '6px' : '10px',
-        padding: isMobile ? '0 8px' : '0',
+    {/* Header Section - Fixed Version */}
+<div style={{ 
+  display: 'flex', 
+  justifyContent: 'space-between', 
+  alignItems: 'center', 
+  marginBottom: isMobile ? '8px' : '15px',
+  // ✅ Badilisha wrap iwe nowrap ili button isishuke chini
+  flexWrap: 'nowrap', 
+  gap: isMobile ? '4px' : '10px',
+  padding: isMobile ? '0 10px' : '0', 
+  width: '100%',
+}}>
+  <div style={{ flexShrink: 1, minWidth: 0 }}>
+    <div style={{ 
+      display: 'flex', 
+      alignItems: 'center', 
+      gap: isMobile ? '4px' : '8px' 
+    }}>
+      <Factory size={isMobile ? 14 : 24} style={{ color: '#f97316', flexShrink: 0 }} />
+      <h2 style={{ 
+        fontSize: isMobile ? '14px' : '24px', 
+        fontWeight: 'bold', 
+        margin: 0,
+        whiteSpace: 'nowrap'
       }}>
-        <div>
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: isMobile ? '4px' : '8px', 
-            marginBottom: isMobile ? '2px' : '8px' 
-          }}>
-            <Factory size={isMobile ? 12 : 24} style={{ color: '#f97316' }} />
-            <h2 style={{ 
-              fontSize: isMobile ? '13px' : '24px', 
-              fontWeight: 'bold', 
-              margin: 0,
-              lineHeight: isMobile ? '1.3' : '1.4'
-            }}>
-              Elite Suppliers
-            </h2>
-          </div>
-          <p style={{ 
-            margin: 0, 
-            color: '#888',
-            fontSize: isMobile ? '9px' : '16px',
-            lineHeight: isMobile ? '1.2' : '1.5'
-          }}>
-            Maduka ya jumla yaliyohakikiwa
-          </p>
-        </div>
-        
-        {stores.length > 6 && (
-          <button 
-            onClick={() => navigate('/products', { state: { filterType: 'Wholesaler' } })}
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: isMobile ? '4px' : '8px', 
-              padding: isMobile ? '4px 10px' : '8px 20px',
-              background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
-              color: 'white',
-              border: 'none',
-              borderRadius: isMobile ? '20px' : '10px',
-              cursor: 'pointer',
-              fontWeight: '500',
-              fontSize: isMobile ? '9px' : '16px',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 2px 8px rgba(249, 115, 22, 0.3)',
-              whiteSpace: 'nowrap'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(249, 115, 22, 0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(249, 115, 22, 0.3)';
-            }}
-          >
-            <span>Ona Yote</span>
-            <ChevronRight size={isMobile ? 10 : 16} />
-          </button>
-        )}
-      </div>
+        Elite Suppliers
+      </h2>
+    </div>
+    <p style={{ 
+      margin: 0, 
+      color: '#888',
+      fontSize: isMobile ? '9px' : '14px',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis'
+    }}>
+      Maduka ya jumla yaliyohakikiwa
+    </p>
+  </div>
+  
+  {/* ✅ Ondoa sharti la stores.length > 6 ili ionekane muda wote */}
+  <button 
+    onClick={() => navigate('/products', { state: { filterType: 'Wholesaler' } })}
+    style={{ 
+      display: 'flex', 
+      alignItems: 'center', 
+      gap: '2px', 
+      background: 'transparent', // ✅ Ondoa gradient, weka transparent
+      color: '#f97316', 
+      border: 'none',
+      cursor: 'pointer',
+      fontWeight: '600',
+      fontSize: isMobile ? '11px' : '16px',
+      whiteSpace: 'nowrap',
+      flexShrink: 0, // ✅ Inazuia button isinywee
+      padding: '4px 0'
+    }}
+  >
+    {/* ✅ Badilisha "Ona Yote" kuwa "View more" */}
+    <span>View more</span>
+    <ChevronRight size={isMobile ? 12 : 16} />
+  </button>
+</div>
       
       {/* ========== MOBILE VIEW: Horizontal Scroll ========== */}
       {isMobile ? (
@@ -187,7 +195,11 @@ export default function TopStores({ navigate, isMobile }) {
                   image={officeImg}
                   logo={store.store_logo}
                   title={store.store_name}
-                  subtitle={`${store.city} - ${store.physical_address?.split(',')[0]}`}
+                  subtitle={
+  store.categories?.name 
+  ? `${store.categories.name.toUpperCase()} • ${store.city}` 
+  : `${store.business_type} • ${store.city}`
+}
                   isVerified={store.is_verified}
                   businessType={store.business_type}
                   moq={store.moq}
@@ -292,7 +304,11 @@ export default function TopStores({ navigate, isMobile }) {
           image={officeImg}
           logo={store.store_logo}
           title={store.store_name}
-          subtitle={`${store.city || ''} - ${store.physical_address?.split(',')[0] || ''}`}
+          subtitle={
+    store.categories?.name 
+    ? `${store.categories.name.toUpperCase()} • ${store.city}` 
+    : `${store.business_type} • ${store.city}`
+  }
           isVerified={store.is_verified}
           businessType={store.business_type}
           moq={store.moq}
@@ -327,7 +343,7 @@ export default function TopStores({ navigate, isMobile }) {
                 right: '-15px',
                 zIndex: 10,
                 backgroundColor: 'white',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #f8fafc',
                 borderRadius: '50%',
                 width: '40px',
                 height: '40px',

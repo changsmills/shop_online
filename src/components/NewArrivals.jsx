@@ -104,9 +104,14 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
     <div 
       className="new-arrivals-main-wrapper" 
       style={{ 
-        padding: isMobile ? '4px 0' : '20px',
+         padding: isMobile ? '4px 0' : '0px',
         position: 'relative',
         width: '100%',
+        // ✅ 2. Rangi ya background ya kijivu (Light Gray kama Alibaba)
+        backgroundColor: 'white', 
+        // ✅ 3. Pembe za duara kidogo kwa kontena zima
+        borderRadius: isMobile ? '8px' : '16px',
+        margin: isMobile ? '2px 0' : '10px 0'
       }}
     >
      {/* Header Section */}
@@ -215,7 +220,7 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
       >
         <DashboardCard
           image={product.cover_image}
-          title={product.name}
+          //title={product.name}
           price={product.price}
           originalPrice={product.original_price}
           views={product.views}
@@ -294,7 +299,7 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
               >
               <DashboardCard
   image={product.cover_image}
-  title={product.name}
+ // title={product.name}
   price={product.price}
   originalPrice={product.original_price}
   views={product.views}
