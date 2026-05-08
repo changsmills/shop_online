@@ -3,7 +3,7 @@ import { Home, LayoutGrid, ShoppingCart, Bell, User } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../BottomNav.css";
 
-const BottomNav = ({ activeMenu, onOpenCategories }) => {
+const BottomNav = ({ activeMenu, onOpenCategories, session }) => {
   const navigate = useNavigate();
   const location = useLocation();
 

@@ -828,7 +828,11 @@ const fetchData = async () => {
         </div>
       </div>
 
-{isMobile && <BottomNav session={session} onOpenCategories={() => setMobileMenuOpen(true)} />}
+{isMobile && <BottomNav 
+  session={session} 
+  activeMenu={activeMenu}
+  onOpenCategories={() => setMobileMenuOpen(true)} 
+/>}
 
       {/* ============================================ */}
       {/* PORTAL: MEGA MENU (Kwa NavLinks style) */}

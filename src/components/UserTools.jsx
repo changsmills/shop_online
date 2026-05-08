@@ -135,18 +135,20 @@ useEffect(() => {
       return;
     }
 
-    // 4. Tafuta Store ID
+   // 4. Tafuta Store ID (Imeboreshwa kusupport maduka mengi)
     try {
-      const { data: store, error } = await supabase
+      const { data: stores, error } = await supabase
         .from("stores_engine")
         .select("id")
         .eq("owner_id", currentSession.user.id)
-        .maybeSingle();
+        .order('created_at', { ascending: false }) // Inaleta duka la mwisho kutengenezwa kwanza
+        .limit(1); // Inahakikisha tunapata duka moja tu bila kuleta error
 
       if (error) throw error;
 
       if (isMounted) {
-        setUserStoreId(store ? store.id : null);
+        // Tunacheki kama array ina data, kisha tunachukua ID ya duka la kwanza [0]
+        setUserStoreId(stores && stores.length > 0 ? stores[0].id : null);
       }
     } catch (error) {
       console.error("Store Fetch Error:", error.message);

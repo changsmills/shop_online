@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import { createPortal } from "react-dom";
 import * as LucideIcons from "lucide-react"; 
+import { Link, useNavigate } from "react-router-dom"; // Ongeza useNavigate
 import "../NavLinks.css";
 
 export default function NavLinks() {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -41,6 +42,8 @@ const [helpMenuPos, setHelpMenuPos] = useState({ top: 0, left: 0 });
 const [exposeMenuPos, setExposeMenuPos] = useState({ top: 0, left: 0 });
 const [protectionsMenuPos, setProtectionsMenuPos] = useState({ top: 0, left: 0 });
 const [activeNav, setActiveNav] = useState(null);
+const [hasStore, setHasStore] = useState(false);
+const [checkingStore, setCheckingStore] = useState(true);
 
 
 
@@ -60,6 +63,45 @@ useEffect(() => {
   return () => subscription.unsubscribe();
 }, []);
 
+useEffect(() => {
+  const checkUserStore = async () => {
+    if (!user) {
+      console.log("❌ No user, checkingStore = false");
+      setCheckingStore(false);
+      return;
+    }
+    
+    console.log("🔍 User ID:", user.id);
+    
+    try {
+      // Badilisha kutoka .maybeSingle() hadi .then() au .select() tu
+      const { data, error } = await supabase
+        .from('stores_engine')
+        .select('id, store_name, owner_id')
+        .eq('owner_id', user.id);
+      
+      console.log("📦 Query result:", { data, error });
+      
+      if (error) throw error;
+      
+      // Angalia kama kuna data (inaweza kuwa multiple rows)
+      if (data && data.length > 0) {
+        setHasStore(true);
+        console.log("✅ Store found! Number of stores:", data.length);
+      } else {
+        setHasStore(false);
+        console.log("❌ No store found for this user");
+      }
+    } catch (err) {
+      console.error("❌ Error checking store:", err.message);
+      setHasStore(false);
+    } finally {
+      setCheckingStore(false);
+    }
+  };
+  
+  checkUserStore();
+}, [user]);
 
   useEffect(() => {
     async function fetchCategories() {
@@ -293,6 +335,22 @@ const activeIndicatorStyle = (isActive) => ({
     width: isActive ? '100%' : '0%'
   }
 });
+
+const handleSellNavigation = () => {
+  if (!user) {
+    navigate('/dashboard/login', { 
+      state: { message: "Tafadhali ingia ili uweze kuanza kuuza bidhaa zako!" }
+    });
+    return;
+  }
+  
+  // User ameingia, angalia kama ana store
+  if (hasStore) {
+    navigate('/dashboard/physical/123'); // Au store ID yoyote
+  } else {
+    navigate('/create-store');
+  }
+};
 
 // Ongeza kwenye style constants zako
 const protectionIconStyle = {
@@ -1032,47 +1090,55 @@ const updatePosition = (ref) => {
     document.body
   )}
 
-  {/* SELL ON SKYFALL - LOGIN/SELL BUTTON */}
-  <Link 
-    to={user ? "/home" : "/dashboard/login"} 
-    state={{ message: "Tafadhali ingia ili uweze kuanza kuuza bidhaa zako!" }}
-    className="nav-sell-link" 
-    onMouseEnter={() => setActiveNav('sell')}
-    onMouseLeave={() => setActiveNav(null)}
-    style={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-      gap: '8px', 
-      whiteSpace: 'nowrap', 
-      flexShrink: 0,
-      padding: '8px 12px',
-      border: '1px solid #eee',
-      borderRadius: '4px',
-      textDecoration: 'none',
-      color: 'inherit',
-      backgroundColor: user ? 'transparent' : '#fff7f2',
-      position: 'relative'
-    }}
-  >
-    <LucideIcons.Store size={18} color={user ? "currentColor" : "#ff6a00"} />
+{/* SELL ON SKYFALL - LOGIN/SELL BUTTON */}
+<div 
+  onClick={handleSellNavigation}
+  className="nav-sell-link" 
+  onMouseEnter={() => setActiveNav('sell')}
+  onMouseLeave={() => setActiveNav(null)}
+  style={{ 
+    display: 'flex', 
+    alignItems: 'center', 
+    gap: '8px', 
+    whiteSpace: 'nowrap', 
+    flexShrink: 0,
+    padding: '8px 12px',
+    border: '1px solid #eee',
+    borderRadius: '4px',
+    textDecoration: 'none',
+    color: 'inherit',
+    backgroundColor: user ? 'transparent' : '#fff7f2',
+    position: 'relative',
+    cursor: 'pointer'
+  }}
+>
+  <LucideIcons.Store size={18} color={user ? "currentColor" : "#ff6a00"} />
+  
+  {/* Loading state wakati tunacheck store */}
+  {user && checkingStore ? (
+    <LucideIcons.Loader2 size={14} className="animate-spin" style={{ marginLeft: '4px' }} />
+  ) : (
     <span style={{ fontWeight: '500' }}>
-      {user ? "Sell on skyfall" : "Login to sell"}
+      {!user && "Login to sell"}
+      {user && !hasStore && "Create Your Store"}
+      {user && hasStore && "My Store Dashboard"}
     </span>
-    
-    {/* Active Indicator - Bottom Line (kwa hover tu) */}
-    {activeNav === 'sell' && (
-      <div style={{
-        position: 'absolute',
-        bottom: '-8px',
-        left: '0',
-        right: '0',
-        height: '3px',
-        backgroundColor: '#ff6a00',
-        borderRadius: '2px',
-        transition: 'all 0.2s ease'
-      }} />
-    )}
-  </Link>
+  )}
+  
+  {/* Active Indicator - Bottom Line (kwa hover tu) */}
+  {activeNav === 'sell' && (
+    <div style={{
+      position: 'absolute',
+      bottom: '-8px',
+      left: '0',
+      right: '0',
+      height: '3px',
+      backgroundColor: '#ff6a00',
+      borderRadius: '2px',
+      transition: 'all 0.2s ease'
+    }} />
+  )}
+</div>
 
 </div>
     </nav>
