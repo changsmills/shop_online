@@ -305,17 +305,31 @@ if (storeId) {
     );
   }
 
-  // Empty state
+// ========== EMPTY STATE - CLEAN & MINIMALIST ==========
   if (!loading && products.length === 0 && !error) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-        <div className="text-5xl mb-4">📦</div>
-        <p className="text-gray-500 text-lg">Hakuna bidhaa zilizopatikana</p>
-        <p className="text-gray-400 text-sm mt-2">
-          {category !== "All" 
-            ? `Jaribu kuangalia kategoria nyingine badala ya "${category}"`
-            : "Jaribu tena baadaye au angalia kategoria nyingine"}
+      <div className="w-full flex flex-col items-center justify-center py-20 px-4">
+        {/* Icon ya Box kwa kutumia CSS */}
+        <div className="bg-gray-100 p-6 rounded-full mb-6">
+          <span className="text-5xl">📦</span>
+        </div>
+        
+        <h3 className="text-2xl font-bold text-gray-800 mb-2">
+          Bidhaa Hazijapatikana
+        </h3>
+        
+        <p className="text-gray-500 max-w-sm text-center mb-8">
+          Samahani, kwa sasa hatuna bidhaa kwenye kategoria ya 
+          <span className="font-semibold text-orange-600"> "{category}"</span>. 
+          Tunaongeza bidhaa mpya kila siku, tafadhali rudi baadaye!
         </p>
+
+        <button 
+          onClick={() => window.location.href = '/'}
+          className="flex items-center gap-2 px-8 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-black transition-all active:scale-95 shadow-lg"
+        >
+          <span>←</span> Rudi Kwenye Duka
+        </button>
       </div>
     );
   }

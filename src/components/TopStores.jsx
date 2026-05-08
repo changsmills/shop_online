@@ -155,76 +155,73 @@ export default function TopStores({ navigate, isMobile }) {
 </div>
       
       {/* ========== MOBILE VIEW: Horizontal Scroll ========== */}
-      {isMobile ? (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            flexWrap: 'nowrap',
-            gap: '12px',
-            overflowX: 'auto',
-            overflowY: 'hidden',
-            scrollBehavior: 'smooth',
-            WebkitOverflowScrolling: 'touch',
-            padding: '10px 0 20px 0',
-            width: '100%',
-            msOverflowStyle: 'none',
-            scrollbarWidth: 'none'
-          }}
-          className="hide-scrollbar-mobile"
-        >
-          {stores.map((store) => {
-            let officeImg = 'https://via.placeholder.com/300x150?text=Verified+Store';
-            try {
-              if (store.office_images) {
-                const images = typeof store.office_images === 'string' ? JSON.parse(store.office_images) : store.office_images;
-                officeImg = Array.isArray(images) ? images.find(img => img !== null) : officeImg;
-              }
-            } catch (e) { officeImg = officeImg; }
+{isMobile ? (
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'row',
+      flexWrap: 'nowrap',
+      gap: '12px',
+      overflowX: 'auto',
+      overflowY: 'hidden',
+      scrollBehavior: 'smooth',
+      WebkitOverflowScrolling: 'touch',
+      padding: '10px 0 20px 0',
+      width: '100%',
+      msOverflowStyle: 'none',
+      scrollbarWidth: 'none'
+    }}
+    className="hide-scrollbar-mobile"
+  >
+    {stores.map((store) => {
+      let officeImg = 'https://via.placeholder.com/300x150?text=Verified+Store';
+      try {
+        if (store.office_images) {
+          const images = typeof store.office_images === 'string' ? JSON.parse(store.office_images) : store.office_images;
+          officeImg = Array.isArray(images) ? images.find(img => img !== null) : officeImg;
+        }
+      } catch (e) { officeImg = officeImg; }
 
-            return (
-              <div
-                key={store.id}
-                style={{
-                  flex: '0 0 auto',
-                  width: '140px',
-                  minWidth: '140px'
-                }}
-              >
-                 <DashboardCard 
-                  image={officeImg}
-                  logo={store.store_logo}
-                  title={store.store_name}
-                  subtitle={
-  store.categories?.name 
-  ? `${store.categories.name.toUpperCase()} • ${store.city}` 
-  : `${store.business_type} • ${store.city}`
-}
-                  isVerified={store.is_verified}
-                  businessType={store.business_type}
-                  moq={store.moq}
-                  rating={store.average_rating}
-                  isStore={true}
-                  isMobile={isMobile}
-                  onClick={() => {
-  // 1. Maandalizi ya kichwa cha habari (Header)
-  const sectionTitle = `Products from ${store.store_name}`;
-  
-  // 2. Navigate kwenda /products badala ya /store
-  navigate('/products', {
-    state: {
-      storeId: store.id,          // Inachuja bidhaa za duka hili
-      categoryId: store.category_id,
-      sectionName: sectionTitle   // Inatuma jina la duka lionekane juu
-    }
-  });
-}}
-                />
-              </div>
-            );
-          })}
+      return (
+        <div
+          key={store.id}
+          style={{
+            flex: '0 0 auto',
+            width: '140px',
+            minWidth: '140px'
+          }}
+        >
+          <DashboardCard 
+            image={officeImg}
+            logo={store.store_logo}
+            title={store.store_name}
+            subtitle={
+              store.categories?.name 
+              ? `${store.categories.name.toUpperCase()} • ${store.city}` 
+              : `${store.business_type} • ${store.city}`
+            }
+            isVerified={store.is_verified}
+            businessType={store.business_type}
+            moq={store.moq}
+            rating={store.average_rating}
+            isStore={true}
+            isMobile={isMobile}
+            onClick={() => {
+              // Navigate directly to StorePage
+              navigate(`/stores/${store.id}`, {
+                state: {
+                  storeId: store.id,
+                  categoryId: store.category_id,
+                  storeName: store.store_name
+                }
+              });
+            }}
+          />
         </div>
-      ) : (
+      );
+    })}
+  </div>
+) : (
         /* ========== DESKTOP VIEW: Horizontal Scroll with Arrows ========== */
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
           {showLeftArrow && (
@@ -315,18 +312,20 @@ export default function TopStores({ navigate, isMobile }) {
           rating={store.average_rating}
           isStore={true}
           isMobile={isMobile}
-         onClick={() => {
-  // 1. Tengeneza URL Params (Hakikisha unapitisha storeId hapa pia)
-  const params = new URLSearchParams({
-    categoryId: store.category_id, // <--- Tunapitisha category_id sasa
-    storeId: store.id, // Hii ni muhimu ili ukurasa wa products ujue ni duka gani
-    name: store.store_name || '',
-    city: store.city || '',
-    type: store.business_type || ''
-  }).toString();
-
-  // 2. Fungua ukurasa wa Products badala ya Store
-  window.open(`/products?${params}`, '_blank');
+ onClick={() => {
+  // Fungua ukurasa wa Store na pitisha data kama state
+  const storeData = {
+    id: store.id,
+    name: store.store_name,
+    categoryId: store.category_id,
+    city: store.city,
+    type: store.business_type
+  };
+  
+  // Store data kwenye localStorage kwa muda (option)
+  sessionStorage.setItem('selectedStore', JSON.stringify(storeData));
+  
+  window.open(`/stores/${store.id}`, '_blank');
 }}
         />
       </div>

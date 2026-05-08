@@ -48,11 +48,21 @@ import Quotes from './pages/Quotes';
 import Verification from './pages/Verification';
 import AdRequest from './pages/AdRequest';
 import StorePage from "./pages/StorePage";
+import AllStores from './pages/AllStores';
+
 
 
 // ========== COMPONENT MPYA YA KUDHIBITI BOTTOM NAV ==========
 function AppContent({ session }) {
   const location = useLocation();
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   
   // ORODHA YA KURASA ZINAZOONESHA BOTTOM NAV (DASHBOARD PEKEE)
   const showBottomNavPaths = [
@@ -162,6 +172,9 @@ function AppContent({ session }) {
         {/* AUTHENTICATION */}
         <Route path="/dashboard/login" element={<Login />} />
         <Route path="/dashboard/register" element={<Register />} />
+
+        <Route path="/stores/:storeId" element={<AllStores session={session} />} />
+
 
         {/* DASHBOARD SUB-PAGES */}
         <Route path="/dashboard/analytics" element={<Analytics session={session} />} />
