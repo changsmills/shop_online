@@ -60,57 +60,78 @@ const FlashSaleCard = ({ product, onUpdate }) => {
   const [percentage, setPercentage] = useState(0);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const beiKuu = Number(product.price) || 0;
+  // 1. Pata bei kutoka kwenye table yako
+  const beiKuu = Number(product.price) || 0; 
+  
+  // 2. Hesabu bei mpya itakayokuwa "original_price" (Offer Price)
   const kiasiChaPunguzo = (percentage / 100) * beiKuu;
   const beiMpyaYaOfa = beiKuu - kiasiChaPunguzo;
 
-  const isLocked = product.offer_started_at && 
-    (new Date().getTime() - new Date(product.offer_started_at).getTime()) < (24 * 60 * 60 * 1000);
+  // 3. LOGIC YA KUFUNGA (LOCKED):
+  // Lazima 'is_flash_sale' iwe true ndipo tufunge. 
+  // Kama ni false, hata kama kuna tarehe, isifunge.
+  const mwanzoWaOfa = product.offer_started_at ? new Date(product.offer_started_at).getTime() : 0;
+  const sasa = new Date().getTime();
+  const masaa24 = 24 * 60 * 60 * 1000;
 
-  const masaaYaliyobaki = isLocked ? 
-    Math.ceil(( (24 * 60 * 60 * 1000) - (new Date().getTime() - new Date(product.offer_started_at).getTime()) ) / (1000 * 60 * 60)) 
+  const isLocked = product.is_flash_sale === true && (sasa - mwanzoWaOfa) < masaa24;
+
+  const masaaYaliyobaki = isLocked 
+    ? Math.ceil((masaa24 - (sasa - mwanzoWaOfa)) / (1000 * 60 * 60)) 
     : 0;
 
   const handleApplyOffer = async () => {
-    if (percentage <= 0 || percentage > 90) {
-      alert("Weka asilimia sahihi (1% mpaka 90%)");
+  // 1. Validations za asilimia
+  if (percentage <= 0 || percentage > 90) {
+    alert("Weka asilimia sahihi (1% mpaka 90%)");
+    return;
+  }
+
+  // 2. Kagua kama ofa imefungwa (Lock Logic)
+  // Tunafunga TU kama is_flash_sale ni true NA muda haujapita masaa 24
+  if (product.is_flash_sale && product.offer_started_at) {
+    const sasa = new Date().getTime();
+    const mwanzo = new Date(product.offer_started_at).getTime();
+    const masaa24 = 24 * 60 * 60 * 1000;
+
+    if ((sasa - mwanzo) < masaa24) {
+      alert("🔒 Ofa hii bado imefungwa. Huwezi kubadilisha mpaka masaa 24 yaishe.");
       return;
     }
+  }
 
-    // ... (Logic yako ya handleApplyOffer ibaki vile vile kama mwanzo)
-    if (product.offer_started_at) {
-      const sasa = new Date().getTime();
-      const mwanzo = new Date(product.offer_started_at).getTime();
-      if ((sasa - mwanzo) < (24 * 60 * 60 * 1000)) {
-        alert("🔒 Ofa imefungwa kwa sasa.");
-        return;
-      }
-    }
+  // 3. Thibitisha kwa mtumiaji
+  const beiYaOfa = Math.round(beiMpyaYaOfa).toLocaleString();
+  const confirmAction = window.confirm(
+    `ZINGATIA: Bei mpya itakuwa ${beiYaOfa} TZS na itajifunga kwa masaa 24. Je, unaendelea?`
+  );
+  if (!confirmAction) return;
 
-    const confirmAction = window.confirm("ZINGATIA: Ofa itafungwa kwa masaa 24. Je, unaendelea?");
-    if (!confirmAction) return;
+  setIsUpdating(true);
+  try {
+    const { error } = await supabase
+      .from("products_engines")
+      .update({
+        // Kwenye table yako 'price' ni bei kuu, 'original_price' tunaitumia kwa bei ya ofa
+        original_price: beiMpyaYaOfa, 
+        offer_started_at: new Date().toISOString(),
+        is_flash_sale: true, // Hii inawasha mfumo wa ofa na kufuli
+        sale_end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+      })
+      .eq("id", product.id);
 
-    setIsUpdating(true);
-    try {
-      const { error } = await supabase
-        .from("products_engines")
-        .update({
-          original_price: beiMpyaYaOfa,
-          offer_started_at: new Date().toISOString(),
-          is_flash_sale: true,
-          sale_end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-        })
-        .eq("id", product.id);
+    if (error) throw error;
 
-      if (error) throw error;
-      alert(`✅ Ofa imewekwa!`);
-      if (onUpdate) onUpdate(); 
-    } catch (err) {
-      alert("Error: " + err.message);
-    } finally {
-      setIsUpdating(false);
-    }
-  };
+    alert(`✅ Ofa ya ${percentage}% imewekwa kikamilifu!`);
+    if (onUpdate) onUpdate(); 
+    setPercentage(0); // Safisha input baada ya kukamilisha
+    
+  } catch (err) {
+    alert("Imefeli: " + err.message);
+  } finally {
+    setIsUpdating(false);
+  }
+};
 
   return (
     <div className="bg-gray-50 rounded-xl border border-gray-100 overflow-hidden transition-all hover:bg-white hover:border-gray-200 hover:shadow-sm">

@@ -273,8 +273,7 @@ const prevStep = () => setStep(step - 1);
       {/* FOMU YENYEWE */}
       <div className="form-content">
         <form onSubmit={handleSubmitInternal} className="premium-form">
-
-          {/* STEP 1: Basic Info */}
+{/* STEP 1: Basic Info */}
           {/* STEP 1: Basic Info & Business Identity */}
 {step === 1 && (
   <div className="step-fade space-y-4">
@@ -448,30 +447,70 @@ const prevStep = () => setStep(step - 1);
     <div className="location-section">
       <h3 className="text-orange-500 font-bold border-b border-orange-500/20 pb-2 mb-4 uppercase text-xs tracking-widest">
       </h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="premium-group">
-          <label>Mji</label>
-          <input 
-            type="text" 
-            name="city" 
-            value={formData.city} 
-            onChange={handleChange} 
-            placeholder="Dar es Salaam" 
-            required 
-          />
-        </div>
-        <div className="premium-group">
-          <label>Anwani (Mtaa/Jengo)</label>
-          <input 
-            type="text" 
-            name="location" 
-            value={formData.location} 
-            onChange={handleChange} 
-            placeholder="Msimbazi, Kariakoo" 
-            required 
-          />
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6" style={{ display: 'grid', gap: '1.5rem' }}>
+  
+  {/* MJI SELECTION */}
+  <div className="flex flex-col gap-2" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider" style={{ color: '#9ca3af', fontSize: '0.75rem', fontWeight: 'bold' }}>
+      Mji
+    </label>
+    <div className="relative" style={{ position: 'relative' }}>
+      <select 
+        name="city" 
+        value={formData.city} 
+        onChange={handleChange} 
+        required 
+        className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl p-3 text-white focus:border-orange-500 outline-none appearance-none cursor-pointer"
+        style={{
+          width: '100%',
+          backgroundColor: '#1a1a1a',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: '12px',
+          padding: '12px',
+          color: 'white',
+          outline: 'none',
+          WebkitAppearance: 'none'
+        }}
+      >
+        <option value="">Chagua Mji...</option>
+        <option value="Dar es Salaam">Dar es Salaam</option>
+        <option value="Arusha">Arusha</option>
+        <option value="Mwanza">Mwanza</option>
+        <option value="Dodoma">Dodoma</option>
+        <option value="Kahama">Kahama</option>
+      </select>
+      {/* Ka-arrow kadogo */}
+      <div style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#666' }}>
+        ▼
       </div>
+    </div>
+  </div>
+
+  {/* ANWANI SELECTION */}
+  <div className="flex flex-col gap-2" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider" style={{ color: '#9ca3af', fontSize: '0.75rem', fontWeight: 'bold' }}>
+      Anwani (Mtaa/Jengo)
+    </label>
+    <input 
+      type="text" 
+      name="location" 
+      value={formData.location} 
+      onChange={handleChange} 
+      placeholder="Msimbazi, Kariakoo" 
+      required 
+      className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl p-3 text-white focus:border-orange-500 outline-none"
+      style={{
+        width: '100%',
+        backgroundColor: '#1a1a1a',
+        border: '1px solid rgba(255,255,255,0.1)',
+        borderRadius: '12px',
+        padding: '12px',
+        color: 'white',
+        outline: 'none'
+      }}
+    />
+  </div>
+</div>
     </div>
 
     {/* 2. SEHEMU YA UENDESHAJI (OPERATION DETAILS) - MPYA */}

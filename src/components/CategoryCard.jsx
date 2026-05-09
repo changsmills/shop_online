@@ -8,34 +8,47 @@ export default function CategoryCard({ item }) {
 
 // Badilisha mstari huu
 const placeholder = "https://placehold.co/400x400?text=Picha+Haipo";
-
 // --- WEKA KODI HAPA (MAHALI PAKE NI HAPA) ---
-// 1. Chuchua kila kitu na hakikisha tunachukua .media_url
+
+// --- 1. PICHA NA GALLERY LOGIC ---
+
+// 1. Chuchua picha zote za gallery na hakikisha tunapata .media_url pekee
 const galleryImages = item.product_media
-    ?.map((m) => m.media_url) // Hapa ndipo tulikuwa tunakosea, lazima tupate url yenyewe
-    ?.filter((url) => url && !url.startsWith('blob:')) 
+    ?.map((m) => m.media_url)
+    ?.filter((url) => url && typeof url === 'string' && !url.startsWith('blob:')) 
     || [];
 
-// 2. Unganisha na cover_image ikiwa ipo (kama backup)
-let finalImages = [...galleryImages];
-if (item.cover_image && !finalImages.includes(item.cover_image)) {
-    finalImages.unshift(item.cover_image);
+// 2. Tumia "Set" ili kuondoa marudio (Duplicates) kiotomatiki
+// Hii itahakikisha hata kama cover_image ipo ndani ya gallery, itachukuliwa mara moja tu.
+const uniqueImages = new Set();
+
+// Ongeza cover_image kwanza (kama ipo na ni halali)
+if (item.cover_image && typeof item.cover_image === 'string') {
+    uniqueImages.add(item.cover_image);
 }
 
-// 3. Ikiwa bado ni tupu kabisa, tumia placeholder
+// Ongeza picha za gallery
+galleryImages.forEach(img => uniqueImages.add(img));
+
+// Badilisha Set kuwa Array tena
+const finalImages = Array.from(uniqueImages);
+
+// 3. Ikiwa hakuna picha yoyote, tumia placeholder
 const imagesToDisplay = finalImages.length > 0 ? finalImages : [placeholder];
 
 // --- 2. NAVIGATION FUNCTIONS ---
+
+// Tumia 'imagesToDisplay' badala ya 'finalImages' hapa ili logic iende sawa na dots
 const nextSlide = (e) => {
     e.stopPropagation();
-    if (finalImages.length <= 1) return;
-    setCurrentImgIndex((prev) => (prev + 1) % finalImages.length);
+    if (imagesToDisplay.length <= 1) return;
+    setCurrentImgIndex((prev) => (prev + 1) % imagesToDisplay.length);
 };
 
 const prevSlide = (e) => {
     e.stopPropagation();
-    if (finalImages.length <= 1) return;
-    setCurrentImgIndex((prev) => (prev - 1 + finalImages.length) % finalImages.length);
+    if (imagesToDisplay.length <= 1) return;
+    setCurrentImgIndex((prev) => (prev - 1 + imagesToDisplay.length) % imagesToDisplay.length);
 };
 
 return (
@@ -49,8 +62,11 @@ return (
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
+            aspectRatio: '1 / 1',
+
         transition: 'box-shadow 0.3s ease', 
         position: 'relative'
+
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.boxShadow = '0 6px 15px rgba(0,0,0,0.1)';
@@ -64,6 +80,8 @@ return (
           position: 'relative', 
           height: '220px', 
           overflow: 'hidden', 
+   width: '100%',         // Inachukua upana wote wa kadi
+    aspectRatio: '1 / 1',
           background: '#f9f9f9' 
         }}
         onMouseEnter={(e) => {
@@ -89,6 +107,9 @@ return (
             height: '100%', 
             objectFit: 'cover',
             transition: 'transform 0.5s ease-in-out'
+                          
+
+
           }}
           onError={(e) => {
             if (e.target.src !== placeholder) {
