@@ -1683,3 +1683,80 @@ body {
     margin-right: 0 !important;
     max-width: none !important; /* Hii itazuia kuzuiliwa katikati */
 }
+
+/* ============================================
+   REPLACE ENTIRE CONTENT CONTAINER SECTION
+   ============================================ */
+
+/* Desktop default */
+.content-container-simple {
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* MOBILE - NO PADDING AT ALL */
+@media only screen and (max-width: 768px) {
+  .content-container-simple {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+  
+  /* Remove all padding from ALL containers inside */
+  .content-container-simple > * {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  
+  /* Category slider - full width */
+  .mobile-category-slider-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+  
+  .mobile-category-slider {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  
+  /* Banner - full width with no gaps */
+  .hero-banners-container {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .hot-picks-banner {
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+  
+  /* Grid products - just a little padding for breathing */
+  .alibaba-grid,
+  .just-for-you-grid,
+  .summary-grid,
+  .universal-grid-layout {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    gap: 8px !important;
+  }
+  
+  /* Remove section header padding */
+  .section-header {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    margin: 8px 0 !important;
+  }
+  
+  /* Make just-for-you items full width */
+  .just-for-you-container {
+    width: 100% !important;
+    padding: 0 !important;
+  }
+}
