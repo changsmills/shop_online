@@ -475,7 +475,11 @@ const fetchData = async () => {
 />
     </div>
   )}
-          <div className="content-container-simple" style={{ paddingTop: 0 }}>
+          <div className="content-container-simple" style={{ paddingTop: 0,
+  paddingLeft: isMobile ? 0 : '20px',  // 0 kwenye simu
+  paddingRight: isMobile ? 0 : '20px', // 0 kwenye simu
+  width: '100%',
+  margin: '0 auto'}}>
 
           {search && (
             <div style={{ padding: '15px' }}>
