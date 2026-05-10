@@ -58,6 +58,7 @@ export default function ProductCard({ product, isMobile = false, isPriority = fa
       <div 
         className="product-card-item" 
         onClick={() => navigate(`/product/${id}`)}
+        onContextMenu={(e) => e.preventDefault()} // <---
         style={{
           backgroundColor: 'transparent',
           border: 'none',
@@ -65,6 +66,10 @@ export default function ProductCard({ product, isMobile = false, isPriority = fa
           padding: 0,
           margin: 0,
           cursor: 'pointer',
+          // 2. Inazuia rangi ya kijani/bluu (highlight) unapogusa
+          WebkitTapHighlightColor: 'transparent', // <---
+          WebkitUserSelect: 'none',               // <---
+          userSelect: 'none'
         }}
       >
         {/* IMAGE CONTAINER - Square kama DashboardCard */}
@@ -76,6 +81,7 @@ export default function ProductCard({ product, isMobile = false, isPriority = fa
             backgroundColor: '#ece7e7',
             overflow: 'hidden',
             borderRadius: '8px',
+            WebkitTouchCallout: 'none' // <---
           }}
         >
           {/* Hot Sale Badge */}
@@ -134,6 +140,9 @@ export default function ProductCard({ product, isMobile = false, isPriority = fa
        <img 
   src={finalImage} 
   alt={name} 
+  // 4. Inazuia picha isivutike (drag) na menu ya picha isitokee
+            draggable="false"                          // <---
+            onContextMenu={(e) => e.preventDefault()} // <---
   style={{
     width: '100%',
     height: '100%',

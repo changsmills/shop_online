@@ -433,6 +433,8 @@ const fetchData = async () => {
       
       <div className="main-content" style={{ 
         paddingTop: isMobile ? 0 : '115px',  /* Nafasi kwa desktop tu */ 
+        width: '100%', // Hakikisha ni 100%
+    margin: 0  ,    // Hakikisha margin ni 0
   marginTop: 0,
   position: 'relative'
 }}>
@@ -444,7 +446,12 @@ const fetchData = async () => {
       top: '60px', /* Adjust based on your header height */
       zIndex: 99,
       backgroundColor: 'white',
-      width: '100%'
+      width: '100vw',  // Badilisha hapa kuwa 100vw
+    padding: 0, 
+    margin: 0,
+    marginLeft: 'calc(-50vw + 50%)', // Hii ni "hack" ya CSS kuvuta content nje ya container
+    marginRight: 'calc(-50vw + 50%)',
+    display: 'block',
     }}>
       <MobileCategorySlider 
   categories={categories}

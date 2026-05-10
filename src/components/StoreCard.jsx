@@ -35,6 +35,7 @@ export default function StoreCard({ store, isMobile, onClick }) {
     return (
       <div 
         onClick={onClick}
+        onContextMenu={(e) => e.preventDefault()}
         style={{
           backgroundColor: 'transparent',
           border: 'none',
@@ -42,6 +43,10 @@ export default function StoreCard({ store, isMobile, onClick }) {
           padding: 0,
           margin: 0,
           cursor: 'pointer',
+          // 2. ONDOA RANGI YA KIJANI/BLUU UNAPOGUSA
+        WebkitTapHighlightColor: 'transparent',
+        WebkitUserSelect: 'none',
+        userSelect: 'none'
         }}
       >
         {/* IMAGE CONTAINER */}
@@ -53,6 +58,8 @@ export default function StoreCard({ store, isMobile, onClick }) {
             backgroundColor: '#ece7e7',
             overflow: 'hidden',
             borderRadius: '8px',
+            // 3. ZUIA MENU YA PICHA KWENYE iOS
+          WebkitTouchCallout: 'none'
           }}
         >
           {/* Verification Badge */}
@@ -80,6 +87,9 @@ export default function StoreCard({ store, isMobile, onClick }) {
           <img 
             src={storeImage} 
             alt={store_name}
+            // 4. ZUIA PICHA ISIVUTWE NA ISIFUNGUE MENU
+            draggable="false"
+            onContextMenu={(e) => e.preventDefault()}
             style={{
               width: '100%',
               height: '100%',

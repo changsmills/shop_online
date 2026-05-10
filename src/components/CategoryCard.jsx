@@ -54,6 +54,7 @@ const prevSlide = (e) => {
 return (
     <div 
       onClick={() => navigate(`/product/${item.id}`)}
+      onContextMenu={(e) => e.preventDefault()}
       style={{
         background: '#fff',
         borderRadius: '16px',
@@ -65,7 +66,12 @@ return (
             aspectRatio: '1 / 1',
 
         transition: 'box-shadow 0.3s ease', 
-        position: 'relative'
+        position: 'relative',
+        // --- ONGEZA HIZI ---
+        WebkitTapHighlightColor: 'transparent',
+        WebkitUserSelect: 'none',
+        userSelect: 'none',
+        touchAction: 'manipulation'
 
       }}
       onMouseEnter={(e) => {
@@ -82,7 +88,8 @@ return (
           overflow: 'hidden', 
    width: '100%',         // Inachukua upana wote wa kadi
     aspectRatio: '1 / 1',
-          background: '#f9f9f9' 
+          background: '#f9f9f9' ,
+          WebkitTouchCallout: 'none'
         }}
         onMouseEnter={(e) => {
           // 1. Zoom picha
@@ -102,6 +109,9 @@ return (
         <img 
           src={imagesToDisplay[currentImgIndex]} 
           alt={item.name}
+          // 2. ZUIA PICHA ISIVUTWE NA ISIFUNGUE MENU
+          draggable="false"
+          onContextMenu={(e) => e.preventDefault()}
           style={{ 
             width: '100%', 
             height: '100%', 

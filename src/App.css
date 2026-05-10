@@ -1673,3 +1673,13 @@ body {
   margin-top: 0 !important;
   padding-top: 0 !important;
 }
+
+/* Kwenye App.css au faili lako la CSS */
+.content-container-simple {
+    width: 100%;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    max-width: none !important; /* Hii itazuia kuzuiliwa katikati */
+}
