@@ -1027,10 +1027,10 @@ const fetchData = async () => {
       )}
 
 
-      {/* ============================================ */}
-{/* PORTAL YA MOBILE - BOTTOM SHEET (MPYA) */}
+  {/* ============================================ */}
+{/* PORTAL YA MOBILE - BOTTOM SHEET (MPYA) - ILIYOSAHIHISHWA */}
 {/* ============================================ */}
-{isMobile && mobileMenuOpen && selectedCategory && ReactDOM.createPortal(
+{isMobile && mobileMenuOpen && ReactDOM.createPortal(
   <div 
     style={{ 
       position: 'fixed', 
@@ -1050,7 +1050,7 @@ const fetchData = async () => {
     <div 
       style={{ 
         backgroundColor: 'white', 
-        height: '75vh', 
+        height: '85vh',  // Ilikuwa 75vh, sasa 85vh kwa nafasi zaidi
         borderTopLeftRadius: '20px', 
         borderTopRightRadius: '20px', 
         display: 'flex', 
@@ -1070,97 +1070,109 @@ const fetchData = async () => {
         cursor: 'pointer'
       }} />
       
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        {/* Sidebar ya Kategoria (Kushoto) */}
-        <aside style={{ 
-          width: '100px', 
-          borderRight: '1px solid #eee', 
-          overflowY: 'auto', 
-          backgroundColor: '#f9f9f9' 
-        }}>
-          {categories.map((cat) => (
-            <div 
-              key={cat.id} 
-              onClick={() => {
-                setSelectedCategory(cat);
-                fetchFeaturedLeafs(cat.id);
-                fetchSubCategories(cat.id);
-              }}
-              style={{ 
-                padding: '15px 5px', 
-                textAlign: 'center', 
-                backgroundColor: selectedCategory?.id === cat.id ? 'white' : 'transparent',
-                borderLeft: selectedCategory?.id === cat.id ? '4px solid #ff6a00' : 'none',
-                cursor: 'pointer'
-              }}
-            >
-              <div style={{ color: selectedCategory?.id === cat.id ? '#ff6a00' : '#666' }}>
-                {getIcon(cat.icon_name)}
-              </div>
-              <div style={{ 
-                fontSize: '10px', 
-                marginTop: '5px', 
-                fontWeight: selectedCategory?.id === cat.id ? 'bold' : 'normal' 
-              }}>
-                {cat.name}
-              </div>
-            </div>
-          ))}
-        </aside>
-
-        {/* Content ya Bidhaa (Kulia) */}
-        <main style={{ flex: 1, padding: '15px', overflowY: 'auto' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px', alignItems: 'center' }}>
-            <h4 style={{ fontSize: '14px', margin: 0, fontWeight: 'bold' }}>
-              {selectedCategory?.name}
-            </h4>
-            <button 
-              onClick={() => setMobileMenuOpen(false)} 
-              style={{ 
-                border: 'none', 
-                background: 'none', 
-                fontWeight: 'bold',
-                fontSize: '18px',
-                cursor: 'pointer'
-              }}
-            >
-              ✕
-            </button>
-          </div>
-
-          {/* Grid ya bidhaa (columns 2 kwenye simu) */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '15px' }}>
-            {featuredProducts.map((leaf) => (
+      {categories.length === 0 ? (
+        <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
+          Loading categories...
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+          {/* Sidebar ya Kategoria (Kushoto) */}
+          <aside style={{ 
+            width: '100px', 
+            borderRight: '1px solid #eee', 
+            overflowY: 'auto', 
+            backgroundColor: '#f9f9f9' 
+          }}>
+            {categories.map((cat) => (
               <div 
-                key={leaf.id} 
+                key={cat.id} 
                 onClick={() => {
-                  handleLeafClick(leaf.leaf_category_id);
-                  setMobileMenuOpen(false);
+                  setSelectedCategory(cat);
+                  fetchFeaturedLeafs(cat.id);
+                  fetchSubCategories(cat.id);
                 }}
-                style={{ textAlign: 'center', cursor: 'pointer' }}
+                style={{ 
+                  padding: '15px 5px', 
+                  textAlign: 'center', 
+                  backgroundColor: selectedCategory?.id === cat.id ? 'white' : 'transparent',
+                  borderLeft: selectedCategory?.id === cat.id ? '4px solid #ff6a00' : 'none',
+                  cursor: 'pointer'
+                }}
               >
-                <div style={{ 
-                  width: '100%', 
-                  aspectRatio: '1/1', 
-                  borderRadius: '12px', 
-                  backgroundColor: '#f5f5f5', 
-                  marginBottom: '8px', 
-                  overflow: 'hidden' 
-                }}>
-                  <img 
-                    src={leaf.cover_image || placeholderImg} 
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                    alt={leaf.leaf_categories?.name}
-                  />
+                <div style={{ color: selectedCategory?.id === cat.id ? '#ff6a00' : '#666' }}>
+                  {getIcon(cat.icon_name)}
                 </div>
-                <p style={{ fontSize: '11px', margin: 0, color: '#333' }}>
-                  {leaf.leaf_categories?.name}
-                </p>
+                <div style={{ 
+                  fontSize: '10px', 
+                  marginTop: '5px', 
+                  fontWeight: selectedCategory?.id === cat.id ? 'bold' : 'normal' 
+                }}>
+                  {cat.name}
+                </div>
               </div>
             ))}
-          </div>
-        </main>
-      </div>
+          </aside>
+
+          {/* Content ya Bidhaa (Kulia) */}
+          <main style={{ flex: 1, padding: '15px', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px', alignItems: 'center' }}>
+              <h4 style={{ fontSize: '14px', margin: 0, fontWeight: 'bold' }}>
+                {selectedCategory?.name || "Select Category"}
+              </h4>
+              <button 
+                onClick={() => setMobileMenuOpen(false)} 
+                style={{ 
+                  border: 'none', 
+                  background: 'none', 
+                  fontWeight: 'bold',
+                  fontSize: '18px',
+                  cursor: 'pointer'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Grid ya bidhaa (columns 2 kwenye simu) */}
+            {featuredProducts.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+                No products available
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '15px' }}>
+                {featuredProducts.map((leaf) => (
+                  <div 
+                    key={leaf.id} 
+                    onClick={() => {
+                      handleLeafClick(leaf.leaf_category_id);
+                      setMobileMenuOpen(false);
+                    }}
+                    style={{ textAlign: 'center', cursor: 'pointer' }}
+                  >
+                    <div style={{ 
+                      width: '100%', 
+                      aspectRatio: '1/1', 
+                      borderRadius: '12px', 
+                      backgroundColor: '#f5f5f5', 
+                      marginBottom: '8px', 
+                      overflow: 'hidden' 
+                    }}>
+                      <img 
+                        src={leaf.cover_image || placeholderImg} 
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                        alt={leaf.leaf_categories?.name}
+                      />
+                    </div>
+                    <p style={{ fontSize: '11px', margin: 0, color: '#333' }}>
+                      {leaf.leaf_categories?.name}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </main>
+        </div>
+      )}
     </div>
   </div>,
   document.body
