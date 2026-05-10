@@ -6,10 +6,9 @@ export default function MobileCategorySlider({ categories, selectedCategory, onS
   const scrollRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
-  
-  // Create "All" category
-  const allCategory = { id: null, name: "All" };
-  const allCategories = [allCategory, ...categories];
+
+  // MABADILIKO: Tumeondoa 'allCategories' hapa kwa sababu 'categories' 
+  // tayari inakuja na "All" kutoka kwenye Dashboard.js
 
   const checkScroll = () => {
     if (scrollRef.current) {
@@ -30,9 +29,9 @@ export default function MobileCategorySlider({ categories, selectedCategory, onS
     checkScroll();
     window.addEventListener('resize', checkScroll);
     return () => window.removeEventListener('resize', checkScroll);
-  }, [allCategories]);
+  }, [categories]); // Tumeweka 'categories' kama dependency
 
-  if (!categories.length) return null;
+  if (!categories || !categories.length) return null;
 
   return (
     <div className="mobile-category-slider-container">
@@ -43,9 +42,11 @@ export default function MobileCategorySlider({ categories, selectedCategory, onS
       )}
       
       <div className="mobile-category-slider" ref={scrollRef} onScroll={checkScroll}>
-        {allCategories.map((cat) => (
+        {/* Tunatumia 'categories' moja kwa moja hapa */}
+        {categories.map((cat, index) => (
           <div
-            key={cat.id === null ? 'all' : cat.id}
+            // Tunatumia index pamoja na id kuhakikisha key ni unique
+            key={cat.id === null ? `all-${index}` : cat.id}
             className={`mobile-cat-item ${selectedCategory?.id === cat.id ? 'active' : ''}`}
             onClick={() => onSelectCategory(cat)}
           >
