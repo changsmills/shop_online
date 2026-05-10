@@ -35,6 +35,7 @@ export default function DashboardCard({
   className="product-card-item" 
   onClick={onClick} 
   data-is-store={isStore}
+  onContextMenu={(e) => e.preventDefault()}
   style={{
     backgroundColor: 'transparent', // ✅ Inafanya background iwe wazi
     border: 'none',                 // ✅ Inatoa border yoyote nyeupe
@@ -53,6 +54,7 @@ export default function DashboardCard({
           aspectRatio: isMobile ? '1 / 1' : '1 / 1',
           backgroundColor: '#ece7e7',
           overflow: 'hidden',
+          WebkitTouchCallout: 'none',
           //borderRadius: '8px 8px 0 0',
           borderRadius: '8px',
         }}
@@ -75,6 +77,8 @@ export default function DashboardCard({
   src={image || 'https://via.placeholder.com/200'} 
   alt={title} 
   className="product-card-img"
+  draggable="false"
+  onContextMenu={(e) => e.preventDefault()}
   style={{
     width: '100%',
     height: '100%',

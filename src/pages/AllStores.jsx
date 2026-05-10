@@ -77,7 +77,8 @@ export default function AllStores({ session }) {
       <div style={{ 
         maxWidth: '1200px', 
         margin: '0 auto', 
-        padding: isMobile ? '16px' : '6px' 
+        padding: isMobile ? '16px' : '3px' ,
+        paddingTop: isMobile ?'16px' : '59px'
       }}>
         {/* Header */}
         <div style={{ 
@@ -132,7 +133,7 @@ export default function AllStores({ session }) {
         )}
       </div>
       
-      <Footer />
+      {!isMobile && <Footer />}
     </div>
   );
 }

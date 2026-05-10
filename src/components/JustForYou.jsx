@@ -89,7 +89,8 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
         backgroundColor: '#eceef1', 
         // ✅ 3. Pembe za duara kidogo kwa kontena zima
         borderRadius: isMobile ? '8px' : '16px',
-        margin: isMobile ? '2px 0' : '10px 0'
+        margin: isMobile ? '2px 0' : '10px 0',
+        paddingBottom: isMobile ? '8px' : '16px'
 
       }}
     >
@@ -114,6 +115,7 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
           fontWeight: 'bold',
           margin: 0,
           lineHeight: isMobile ? '1.3' : '1.4',
+          color:  'black',
         }}
       >
         Just For You {selectedCategory && `in ${selectedCategory.name}`}
@@ -123,7 +125,7 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
         style={{
           fontSize: isMobile ? '9px' : '14px',
           margin: isMobile ? '2px 0 0 0' : '4px 0 0 0',
-          color: '#888',
+          color: '#312c2c',
           lineHeight: isMobile ? '1.2' : '1.4',
         }}
       >
