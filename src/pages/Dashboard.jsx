@@ -500,8 +500,8 @@ const fetchData = async () => {
   <>
 {isMobile ? (
   <div style={{ 
-    width: '100%', 
-    padding: 0, 
+    //width: '100%', 
+   // padding: 0, 
     margin: 0,
     display: 'block',
     lineHeight: 0,
@@ -510,6 +510,15 @@ const fetchData = async () => {
     position: 'relative',
     top: 0,
     marginTop: 25,  // ← Zero margin top
+    width: '100vw',           // Inatumia upana wote wa kioo
+    marginLeft: 'calc(-50vw + 50%)', // Inavuta banner kuelekea kushoto kabisa
+    marginRight: 'calc(-50vw + 50%)', // Inavuta banner kuelekea kulia kabisa
+    padding: 0, 
+    display: 'block',
+    lineHeight: 0,
+    backgroundColor: '#f7f8fa',
+    position: 'relative',
+    overflow: 'hidden'
   }}>
     {mobileBanner ? (
       <div style={{ 
