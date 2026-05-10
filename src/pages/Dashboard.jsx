@@ -99,15 +99,25 @@ const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   // 3. FETCH DATA FUNCTIONS (Kwa NavLinks style)
   // ============================================
 
-  // Fetch categories
+// Fetch categories
   const fetchCategories = async () => {
     const { data, error } = await supabase
       .from('categories')
       .select('*')
       .order('name', { ascending: true });
+
     if (!error && data) {
-      setCategories(data);
-      if (data.length > 0) setSelectedCategory(data[0]);
+      // 1. Tunatengeneza 'All' category manually
+      const allCategory = { id: null, name: 'All' };
+
+      // 2. Tunaiweka 'All' iwe ya kwanza, kisha zinafuata zingine kutoka DB
+      const categoriesWithAll = [allCategory, ...data];
+
+      setCategories(categoriesWithAll);
+
+      // 3. Tuna-set 'All' iwe ndio chaguo la kwanza (Default Selected)
+      setSelectedCategory(allCategory);
+      setSelectedCategoryForComponents(allCategory);
     }
   };
 
