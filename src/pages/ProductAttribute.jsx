@@ -79,6 +79,25 @@ useEffect(() => {
 const handleLeafChange = (e) => {
   const leafId = e.target.value;
   const leaf = leafCategories.find(l => l.id === leafId);
+  
+  // 🔥 FIX: Hakikisha condition_options ni array
+  let conditionOptions = [];
+  if (leaf && leaf.condition_options) {
+    if (Array.isArray(leaf.condition_options)) {
+      conditionOptions = leaf.condition_options;
+    } else if (typeof leaf.condition_options === 'string') {
+      try {
+        const parsed = JSON.parse(leaf.condition_options);
+        conditionOptions = Array.isArray(parsed) ? parsed : [leaf.condition_options];
+      } catch(e) {
+        // Kama ni string plain, iweke kwenye array
+        conditionOptions = [leaf.condition_options];
+      }
+    } else {
+      conditionOptions = [leaf.condition_options];
+    }
+  }
+  
   setSelectedLeaf(leaf);
   
   // Reset size mode
@@ -91,15 +110,16 @@ const handleLeafChange = (e) => {
   console.log("size_format:", leaf?.size_format);
   console.log("color_required:", leaf?.color_required);
   console.log("warranty_required:", leaf?.warranty_required);
+  console.log("condition_options:", conditionOptions); // 🔥 Angalia hii sasa
 
   setAttributes({ 
     ...attributes, 
     leaf_category_id: leafId, 
     specifications: {},
 
-      // Color images storage (moja kwa rangi)
-  color_images: {},  // 🔥 Map: color -> image URL
-  color_image_files: {},  // 🔥 Map: color -> File object
+    // Color images storage (moja kwa rangi)
+    color_images: {},  // 🔥 Map: color -> image URL
+    color_image_files: {},  // 🔥 Map: color -> File object
     
     // ========== ENABLE FLAGS (FALSE kwa default) ==========
     has_colors: false,  // 🔥 Kwa default, bidhaa haina rangi tofauti
@@ -110,20 +130,19 @@ const handleLeafChange = (e) => {
     enable_weight: false,
     enable_dimensions: false,
     enable_variations: false,
-      size_stock: {},  // 🔥 Ongeza hii
+    size_stock: {},  // 🔥 Ongeza hii
 
-
-      // Shipping defaults
-  shipping_method: "fixed",
-  shipping_cost: "",
-  shipping_rate_per_km: "",
-  shipping_base_fee: "",
-  shipping_default_distance: "",
-  shipping_dar_cost: "",
-  shipping_outside_dar_cost: "",
-  shipping_remote_cost: "",
-  enable_pickup: false,
-  store_address: "",
+    // Shipping defaults
+    shipping_method: "fixed",
+    shipping_cost: "",
+    shipping_rate_per_km: "",
+    shipping_base_fee: "",
+    shipping_default_distance: "",
+    shipping_dar_cost: "",
+    shipping_outside_dar_cost: "",
+    shipping_remote_cost: "",
+    enable_pickup: false,
+    store_address: "",
     
     // ========== EMPTY ARRAYS/VALUES ==========
     colors: [],
@@ -134,7 +153,7 @@ const handleLeafChange = (e) => {
     weight: '',
     dimensions: { length: '', width: '', height: '' },
     marketplace_listings: [],  // 🔥 Hii MOJA tu! Futa nyingine
-    condition: leaf?.condition_options?.[0] || 'new',
+    condition: conditionOptions.length > 0 ? conditionOptions[0] : 'new', // 🔥 FIXED!
     custom_fields_values: {}
   });
 };
@@ -614,7 +633,7 @@ const handleTierChange = (index, field, value) => {
       </div>
 
       {/* ========== SECTION 3: DYNAMIC SPECS FROM LEAF CATEGORY ========== */}
-      {selectedLeaf && selectedLeaf.specs && selectedLeaf.specs.length > 0 && (
+     {/*} {selectedLeaf && selectedLeaf.specs && selectedLeaf.specs.length > 0 && (
         <>
           <div className="form-section-header">
             {getCategoryIcon()}
@@ -674,7 +693,87 @@ const handleTierChange = (index, field, value) => {
             </div>
           </div>
         </>
-      )}
+      )} *}
+
+
+
+        {/* ========== SECTION 3: DYNAMIC SPECS FROM LEAF CATEGORY ========== */}
+{selectedLeaf && selectedLeaf.specs && (
+  <>
+    <div className="form-section-header">
+      {getCategoryIcon()}
+      <h3>Sifa za {selectedLeaf.name}</h3>
+    </div>
+    <div className="dynamic-specs-container">
+      <div className="specs-grid">
+        {(() => {
+          // 1. Hakikisha specs ni Array. Kama ni string, i-convert.
+          let specsArray = [];
+          try {
+            specsArray = typeof selectedLeaf.specs === 'string' 
+              ? JSON.parse(selectedLeaf.specs) 
+              : selectedLeaf.specs;
+          } catch (e) {
+            console.error("Specs format is invalid", e);
+          }
+
+          // 2. Kama bado siyo array baada ya parse, usionyeshe chochote
+          if (!Array.isArray(specsArray)) return null;
+
+          return specsArray.map((specName, idx) => {
+            const cleanKey = specName.split("(")[0].trim();
+            const hasOptions = specName.includes("(") && specName.includes(")");
+            let label = specName;
+            let options = [];
+
+            if (hasOptions) {
+              label = specName.split("(")[0].trim();
+              const rawOptions = specName.match(/\(([^)]+)\)/)[1];
+              options = rawOptions.split("/").map((opt) => opt.trim());
+            }
+
+            // Skip size specs kama zinashughulikiwa kwingine
+            if (label.toLowerCase().includes("size") || label.toLowerCase().includes("ukubwa")) {
+              return null;
+            }
+
+            return (
+              <div key={idx} className="spec-item">
+                <label className="spec-label">{label}</label>
+                {hasOptions ? (
+                  <select
+                    className="select-input"
+                    value={attributes.specifications?.[cleanKey] || ""}
+                    onChange={(e) => setAttributes({
+                      ...attributes,
+                      specifications: { ...attributes.specifications, [cleanKey]: e.target.value }
+                    })}
+                  >
+                    <option value="">-- Chagua --</option>
+                    {options.map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    className="text-input"
+                    type="text"
+                    placeholder={`Weka ${label}...`}
+                    value={attributes.specifications?.[cleanKey] || ""}
+                    onChange={(e) => setAttributes({
+                      ...attributes,
+                      specifications: { ...attributes.specifications, [cleanKey]: e.target.value }
+                    })}
+                  />
+                )}
+              </div>
+            );
+          });
+        })()}
+      </div>
+    </div>
+  </>
+)}
 
 
 {/* ========== SECTION: CUSTOMIZATION CONTROLS ========== */}
@@ -856,36 +955,37 @@ const handleTierChange = (index, field, value) => {
   </>
 )}
 
-
-      {/* ========== SECTION 4: PRODUCT CONDITION ========== */}
-      {selectedLeaf && selectedLeaf.condition_options && selectedLeaf.condition_options.length > 1 && (
-        <>
-          <div className="form-section-header">
-            <Tag size={20} />
-            <h3>Hali ya Bidhaa</h3>
+{/* ========== SECTION 4: PRODUCT CONDITION ========== */}
+{selectedLeaf && selectedLeaf.condition_options && 
+ Array.isArray(selectedLeaf.condition_options) && 
+ selectedLeaf.condition_options.length > 1 && (
+  <>
+    <div className="form-section-header">
+      <Tag size={20} />
+      <h3>Hali ya Bidhaa</h3>
+    </div>
+    <div className="dynamic-specs-container">
+      <div className="specs-grid" style={{ padding: "15px" }}>
+        <div className="spec-full-width">
+          <div className="spec-buttons-group">
+            {selectedLeaf.condition_options.map(cond => (
+              <button
+                key={cond}
+                type="button"
+                className={`spec-pill-button ${attributes.condition === cond ? "selected" : ""}`}
+                onClick={() => setAttributes({ ...attributes, condition: cond })}
+              >
+                {cond === 'new' && '🆕 Mpya'}
+                {cond === 'used' && '📦 Iliyotumika'}
+                {cond === 'refurbished' && '🔧 Refurbished'}
+              </button>
+            ))}
           </div>
-          <div className="dynamic-specs-container">
-            <div className="specs-grid" style={{ padding: "15px" }}>
-              <div className="spec-full-width">
-                <div className="spec-buttons-group">
-                  {selectedLeaf.condition_options.map(cond => (
-                    <button
-                      key={cond}
-                      type="button"
-                      className={`spec-pill-button ${attributes.condition === cond ? "selected" : ""}`}
-                      onClick={() => setAttributes({ ...attributes, condition: cond })}
-                    >
-                      {cond === 'new' && '🆕 Mpya'}
-                      {cond === 'used' && '📦 Iliyotumika'}
-                      {cond === 'refurbished' && '🔧 Refurbished'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
+        </div>
+      </div>
+    </div>
+  </>
+)}
 
       {/* ========== SECTION 5: WARRANTY ========== */}
       {selectedLeaf && attributes.enable_warranty && (
