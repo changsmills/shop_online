@@ -126,18 +126,19 @@ const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Fetch featured leaf categories (kwa viewMode='products')
   const fetchFeaturedLeafs = async (categoryId) => {
-    if (!categoryId) return;
-    
-    const { data, error } = await supabase
-      .from('products_engines')
-      .select(`
-        leaf_category_id,
-        cover_image,
-        leaf_categories!inner (
-          id,
-          name
-        )
-      `)
+  if (!categoryId) return;
+  
+  const { data, error } = await supabase
+    .from('products_engines')
+    .select(`
+      leaf_category_id,
+      cover_image,
+      leaf_categories!inner (
+        id,
+        name,
+        name_sw
+      )
+    `)
       .eq('parent_category_id', categoryId)
       .not('cover_image', 'is', null)
       .limit(50);
@@ -182,39 +183,41 @@ const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   };
 
   // Fetch leaf categories kwa sub-category iliyochaguliwa
-  const fetchLeafsForSub = async (subCategoryId) => {
-    const { data, error } = await supabase
-      .from('products_engines')
-      .select(`
-        leaf_category_id,
-        cover_image,
-        leaf_categories!inner (
-          id,
-          name
-        )
-      `)
-      .eq('category_id', subCategoryId)
-      .not('cover_image', 'is', null);
+const fetchLeafsForSub = async (subCategoryId) => {
+  const { data, error } = await supabase
+    .from('products_engines')
+    .select(`
+      leaf_category_id,
+      cover_image,
+      leaf_categories!inner (
+        id,
+        name,
+        name_sw
+      )
+    `)
+    .eq('category_id', subCategoryId)
+    .not('cover_image', 'is', null);
 
-    if (!error && data) {
-      const uniqueLeafs = [];
-      const seenLeafIds = new Set();
+  if (!error && data) {
+    const uniqueLeafs = [];
+    const seenLeafIds = new Set();
 
-      data.forEach(item => {
-        if (!seenLeafIds.has(item.leaf_category_id)) {
-          seenLeafIds.add(item.leaf_category_id);
-          uniqueLeafs.push({
-            id: item.leaf_category_id,
-            name: item.leaf_categories.name,
-            cover_image: item.cover_image
-          });
-        }
-      });
-      setLeafsForSub(uniqueLeafs);
-    } else {
-      setLeafsForSub([]);
-    }
-  };
+    data.forEach(item => {
+      if (!seenLeafIds.has(item.leaf_category_id)) {
+        seenLeafIds.add(item.leaf_category_id);
+        uniqueLeafs.push({
+          id: item.leaf_category_id,
+          name: item.leaf_categories.name,
+          name_sw: item.leaf_categories.name_sw,  // ← LINE MPYA
+          cover_image: item.cover_image
+        });
+      }
+    });
+    setLeafsForSub(uniqueLeafs);
+  } else {
+    setLeafsForSub([]);
+  }
+};
 
   // Fetch data zote
 // Fetch data zote (Badilisha hii)
@@ -510,6 +513,7 @@ const getCategoryDisplayName = (category) => {
       fetchSubCategories(cat.id);
     }
   }}
+  getDisplayName={getCategoryDisplayName}  // ← ADD THIS
   getIcon={getIcon}
 />
     </div>
@@ -1022,8 +1026,10 @@ const getCategoryDisplayName = (category) => {
                           />
                         </div>
                         <p className="grid-text" style={{ fontSize: '12px', margin: 0 }}>
-                          {leaf.leaf_categories?.name || "Kategoria"}
-                        </p>
+  {i18n.language === 'sw' 
+    ? (leaf.leaf_categories?.name_sw || leaf.leaf_categories?.name || "Kategoria")
+    : (leaf.leaf_categories?.name || "Kategoria")}
+</p>
                       </div>
                     ))}
 
@@ -1055,7 +1061,9 @@ const getCategoryDisplayName = (category) => {
                           style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                         />
                       </div>
-                      <p className="grid-text" style={{ fontSize: '12px', margin: 0 }}>{leaf.name}</p>
+                      <p className="grid-text" style={{ fontSize: '12px', margin: 0 }}>
+  {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
+</p>
                     </div>
                   ))
                 )}
@@ -1204,8 +1212,10 @@ const getCategoryDisplayName = (category) => {
                       />
                     </div>
                     <p style={{ fontSize: '11px', margin: 0, color: '#333' }}>
-                      {leaf.leaf_categories?.name}
-                    </p>
+  {i18n.language === 'sw' 
+    ? (leaf.leaf_categories?.name_sw || leaf.leaf_categories?.name)
+    : leaf.leaf_categories?.name}
+</p>
                   </div>
                 ))}
               </div>
