@@ -14,10 +14,9 @@ html, body {
 }
 
 body {
-  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Roboto', Helvetica, Arial, sans-serif;
   background-color: #f7f8fa;
 }
-
 /* ============================================
    2. HEADER - STICKY ON TOP
    ============================================ */
@@ -43,7 +42,8 @@ body {
 .content-container-simple {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 20px 30px 20px;
+ /* padding: 0 20px 30px 20px;*/
+   padding: 0;  /* ← Weka sifuri */
   padding-top: 85px;
 }
 

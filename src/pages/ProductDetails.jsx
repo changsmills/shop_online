@@ -439,7 +439,7 @@ useEffect(() => {
 
       {/* ================= SEHEMU YA DESKTOP ================= */}
       {!isMobile && (
-        <section className="product-bottom-details" style={{ marginTop: '40px' }}>
+        <section className="product-bottom-details" style={{ marginTop: '30px'}}>
           <div className="verification-header-box">
             <div className="header-text">
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#16a34a', marginBottom: '8px' }}>

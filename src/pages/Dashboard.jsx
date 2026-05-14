@@ -436,7 +436,11 @@ const fetchData = async () => {
         width: '100%', // Hakikisha ni 100%
     margin: 0  ,    // Hakikisha margin ni 0
   marginTop: 0,
-  position: 'relative'
+  position: 'relative',
+   /* Weka namba zinazofanana pande zote mbili */
+    paddingLeft: isMobile ? '1px' : '20px', 
+    paddingRight: isMobile ? '1px' : '20px', 
+    overflowX: 'hidden'
 }}>
 
   {/* ========== MOBILE CATEGORY SLIDER ========== */}
@@ -478,7 +482,8 @@ const fetchData = async () => {
      <div className="content-container-simple" style={{ 
   padding: 0,
   margin: 0,
-  width: '100%'
+  width: '100%',
+  paddingLeft: isMobile ? 0 : 0,
 }}>
 
           {search && (
