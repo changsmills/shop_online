@@ -17,6 +17,7 @@ import { useIsMobile } from "../hooks/useIsMobile";
 import BottomNav from "../components/BottomNav";
 import MobileCategorySlider from "../components/MobileCategorySlider";
 // Karibu na state zingine (line 70-80)
+import { useTranslation } from 'react-i18next';
 
 
 import { 
@@ -66,6 +67,8 @@ const withTimeout = (promise, timeoutMs = 5000, errorMessage = "Operation timed 
 // ============================================
 
 export default function Dashboard() {
+  const { t, i18n } = useTranslation();  // ← Ongeza hii
+  const [language, setLanguage] = useState('en'); // ← Ongeza hii
   const [categories, setCategories] = useState([]);
   const [trendingProducts, setTrendingProducts] = useState([]);
   const [ads, setAds] = useState([]);
@@ -100,26 +103,26 @@ const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   // ============================================
 
 // Fetch categories
-  const fetchCategories = async () => {
-    const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .order('name', { ascending: true });
+ const fetchCategories = async () => {
+  const { data, error } = await supabase
+    .from('categories')
+    .select('*')
+    .order('name', { ascending: true });
 
-    if (!error && data) {
-      // 1. Tunatengeneza 'All' category manually
-      const allCategory = { id: null, name: 'All' };
+  if (!error && data) {
+    // 1. Tunatengeneza 'All' category manually - Ongeza name_sw
+    const allCategory = { id: null, name: 'All', name_sw: 'Zote' };
 
-      // 2. Tunaiweka 'All' iwe ya kwanza, kisha zinafuata zingine kutoka DB
-      const categoriesWithAll = [allCategory, ...data];
+    // 2. Tunaiweka 'All' iwe ya kwanza, kisha zinafuata zingine kutoka DB
+    const categoriesWithAll = [allCategory, ...data];
 
-      setCategories(categoriesWithAll);
+    setCategories(categoriesWithAll);
 
-      // 3. Tuna-set 'All' iwe ndio chaguo la kwanza (Default Selected)
-      setSelectedCategory(allCategory);
-      setSelectedCategoryForComponents(allCategory);
-    }
-  };
+    // 3. Tuna-set 'All' iwe ndio chaguo la kwanza (Default Selected)
+    setSelectedCategory(allCategory);
+    setSelectedCategoryForComponents(allCategory);
+  }
+};
 
   // Fetch featured leaf categories (kwa viewMode='products')
   const fetchFeaturedLeafs = async (categoryId) => {
@@ -297,6 +300,13 @@ const fetchData = async () => {
     else navigate("/products", { state: { priorityId: id, sectionName: sectionName } });
   };
 
+  // Function ya kupata jina la category kulingana na lugha
+const getCategoryDisplayName = (category) => {
+  if (!category) return '';
+  if (category.id === null) return i18n.language === 'sw' ? 'Zote' : 'All';
+  return i18n.language === 'sw' ? (category.name_sw || category.name) : category.name;
+};
+
   const getIcon = (iconName) => {
     const icons = { 
         Shirt, Headphones, Dribbble, Sparkles, Gem, Home, Bike, 
@@ -412,7 +422,7 @@ const fetchData = async () => {
               <div className="dot" style={{ animationDelay: '0.2s' }}></div>
               <div className="dot" style={{ animationDelay: '0.4s' }}></div>
             </div>
-            <h3 style={{ marginLeft: '12px', color: '#666' }}>Loading...</h3>
+            <h3 style={{ marginLeft: '12px', color: '#666' }}>{t('loading')}</h3>
           </div>
         </div>
       </div>
@@ -427,6 +437,31 @@ const fetchData = async () => {
 
   return (
     <div style={{ backgroundColor: '#f7f8fa', minHeight: '100vh' }}>
+
+
+        {/* Kitufe cha kubadilisha lugha - Weka mahali popote unapotaka */}
+    <div style={{ position: 'fixed', top: '70px', right: '10px', zIndex: 1001 }}>
+      <button 
+        onClick={() => {
+          const newLang = i18n.language === 'en' ? 'sw' : 'en';
+          i18n.changeLanguage(newLang);
+          setLanguage(newLang);
+        }}
+        style={{
+          background: '#ff6600',
+          color: 'white',
+          border: 'none',
+          padding: '6px 12px',
+          borderRadius: '20px',
+          cursor: 'pointer',
+          fontSize: '12px',
+          fontWeight: 'bold'
+        }}
+      >
+        {i18n.language === 'en' ? 'Kiswahili' : 'English'}
+      </button>
+    </div>
+
       <div className="sticky-header">
         <Header search={search} setSearch={setSearch} />
       </div>
@@ -488,7 +523,7 @@ const fetchData = async () => {
 
           {search && (
             <div style={{ padding: '15px' }}>
-              <h3 style={{ marginBottom: '15px' }}>Looking for: {search}</h3>
+              <h3 style={{ marginBottom: '15px' }}>{t('looking_for')}: {search}</h3>
               <div className="alibaba-grid"> 
                 {trendingProducts
                   .filter(p => p.name?.toLowerCase().includes(search.toLowerCase()))
@@ -579,7 +614,7 @@ const fetchData = async () => {
             display: 'inline-block',
             marginBottom: '8px',
             fontWeight: '600'
-          }}>📱 Mobile Deal</span>
+          }}>📱 {t('mobile_deal')}</span>
           <h2 className="banner-title mobile-title" style={{ 
             margin: '4px 0',
             fontSize: '18px',
@@ -603,7 +638,7 @@ const fetchData = async () => {
             fontSize: '12px',
             fontWeight: '600',
             pointerEvents: 'auto'
-          }}>Shop Now →</button>
+          }}>{t('shop_now')} →</button>
         </div>
       </div>
     ) : (
@@ -655,7 +690,7 @@ const fetchData = async () => {
             display: 'inline-block',
             marginBottom: '8px',
             fontWeight: '600'
-          }}>📱 Deal</span>
+          }}>📱 {t('mobile_deal')}</span>
           <h2 className="banner-title mobile-title" style={{ 
             margin: '4px 0',
             fontSize: '18px',
@@ -679,7 +714,7 @@ const fetchData = async () => {
             fontSize: '12px',
             fontWeight: '600',
             pointerEvents: 'auto'
-          }}>Shop Now →</button>
+          }}>{t('shop_now')} →</button>
         </div>
       </div>
     )}
@@ -710,7 +745,7 @@ const fetchData = async () => {
             alignItems: 'center',
             gap: '8px'
           }}>
-            <Star size={18} /> <span>Categories</span>
+            <Star size={18} /> <span>{t('categories')}</span>
           </div>
           <ul className="categories-list" style={{
             listStyle: 'none',
@@ -731,7 +766,7 @@ const fetchData = async () => {
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
                 <span className="cat-icon" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   {getIcon(cat.icon_name)}
-                  <span className="cat-name">{cat.name}</span>
+                  <span className="cat-name">{getCategoryDisplayName(cat)}</span>
                 </span>
                 <ChevronRight size={14} className="arrow" />
               </li>
@@ -784,7 +819,7 @@ const fetchData = async () => {
                 fontSize: '12px',
                 width: 'fit-content',
                 marginBottom: '15px'
-              }}>Sponsored</span>
+              }}>{t('sponsored')}</span>
               <h2 className="banner-title" style={{
                 fontSize: '28px',
                 margin: '0 0 10px 0',
@@ -804,7 +839,7 @@ const fetchData = async () => {
                 cursor: 'pointer',
                 width: 'fit-content',
                 fontWeight: 'bold'
-              }}>Source Now →</button>
+              }}>{t('source_now')} →</button>
             </div>
           </div>
         </div>
@@ -903,7 +938,7 @@ const fetchData = async () => {
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       {getIcon(cat.icon_name)}
-                      <span>{cat.name}</span>
+                      <span>{getCategoryDisplayName(cat)}</span>
                     </div>
                     <ChevronRight size={16} />
                   </div>
@@ -925,18 +960,18 @@ const fetchData = async () => {
                       gap: '8px' 
                     }}
                   >
-                    <ChevronLeft size={18} /> Back to {selectedCategory?.name}
+                    <ChevronLeft size={18} /> {t('back_to')} {getCategoryDisplayName(selectedCategory)}
                   </div>
                   {subCategories.map((sub) => (
-                    <div 
-                      key={sub.id} 
-                      onMouseEnter={() => handleSubCategoryHover(sub)} 
-                      className={`sidebar-item ${selectedSubCategory?.id === sub.id ? 'active' : ''}`} 
-                      style={{ padding: '12px 25px', cursor: 'pointer', fontSize: '14px', backgroundColor: selectedSubCategory?.id === sub.id ? '#f5f5f5' : 'transparent' }}
-                    >
-                      {sub.name}
-                    </div>
-                  ))}
+  <div 
+    key={sub.id} 
+    onMouseEnter={() => handleSubCategoryHover(sub)} 
+    className={`sidebar-item ${selectedSubCategory?.id === sub.id ? 'active' : ''}`} 
+    style={{ padding: '12px 25px', cursor: 'pointer', fontSize: '14px', backgroundColor: selectedSubCategory?.id === sub.id ? '#f5f5f5' : 'transparent' }}
+  >
+    {i18n.language === 'sw' ? (sub.name_sw || sub.name) : sub.name}
+  </div>
+))}
                 </>
               )}
             </aside>
@@ -945,10 +980,10 @@ const fetchData = async () => {
             <main className="mega-menu-content" style={{ flex: 1, padding: '20px', overflowY: 'auto' }}>
               <div className="content-header" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
                 <h3 style={{ fontSize: '18px', fontWeight: '600', margin: 0 }}>
-                  {viewMode === 'products' 
-                    ? `Top Categories: ${selectedCategory?.name}` 
-                    : selectedSubCategory?.name}
-                </h3>
+  {viewMode === 'products' 
+    ? `${t('top_categories')}: ${getCategoryDisplayName(selectedCategory)}` 
+        : (i18n.language === 'sw' ? (selectedSubCategory?.name_sw || selectedSubCategory?.name) : selectedSubCategory?.name)}
+</h3>
                 {viewMode === 'products' && (
                   <button 
                     onClick={handleViewAll} 
@@ -963,7 +998,7 @@ const fetchData = async () => {
                       alignItems: 'center' 
                     }}
                   >
-                    View all <ChevronRight size={14} />
+                    {t('view_all')} <ChevronRight size={14} />
                   </button>
                 )}
               </div>
@@ -1001,7 +1036,7 @@ const fetchData = async () => {
                       <div className="image-circle see-all-circle" style={{ width: '90px', height: '90px', borderRadius: '50%', border: '2px dashed #ff6a00', margin: '0 auto 10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Plus size={30} color="#ff6a00" />
                       </div>
-                      <p style={{ color: '#ff6a00', fontWeight: 'bold', fontSize: '12px' }}>See all</p>
+                      <p style={{ color: '#ff6a00', fontWeight: 'bold', fontSize: '12px' }}>{t('see_all')}</p>
                     </div>
                   </>
                 ) : (
@@ -1077,7 +1112,7 @@ const fetchData = async () => {
       
       {categories.length === 0 ? (
         <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
-          Loading categories...
+          {t('loading')}
         </div>
       ) : (
         <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
@@ -1112,7 +1147,7 @@ const fetchData = async () => {
                   marginTop: '5px', 
                   fontWeight: selectedCategory?.id === cat.id ? 'bold' : 'normal' 
                 }}>
-                  {cat.name}
+                  {getCategoryDisplayName(cat)}
                 </div>
               </div>
             ))}
@@ -1122,7 +1157,7 @@ const fetchData = async () => {
           <main style={{ flex: 1, padding: '15px', overflowY: 'auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px', alignItems: 'center' }}>
               <h4 style={{ fontSize: '14px', margin: 0, fontWeight: 'bold' }}>
-                {selectedCategory?.name || "Select Category"}
+                {getCategoryDisplayName(selectedCategory) || t('select_category')}
               </h4>
               <button 
                 onClick={() => setMobileMenuOpen(false)} 
@@ -1141,7 +1176,7 @@ const fetchData = async () => {
             {/* Grid ya bidhaa (columns 2 kwenye simu) */}
             {featuredProducts.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-                No products available
+                 {t('no_products')}
               </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '15px' }}>
