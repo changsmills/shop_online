@@ -4,6 +4,8 @@ import { supabase } from "./supabaseClient";
 import { CartProvider } from "./context/CartContext"; 
 import BottomNav from "./components/BottomNav";
 import { Toaster, toast } from 'react-hot-toast';
+import { LanguageProvider } from './context/LanguageContext.jsx'; // Ongeza import
+
 
 // Import Pages
 import Home from "./pages/Home"; 
@@ -226,6 +228,7 @@ function App() {
   );
 
   return (
+   <LanguageProvider>  {/* Ongeza hii - IWE NJE YA CartProvider au ndani */}
     <CartProvider>
       <Toaster 
         position="top-right" 
@@ -240,6 +243,8 @@ function App() {
         <AppContent session={session} />
       </BrowserRouter>
     </CartProvider>
+     </LanguageProvider>
+
   );
 }
 

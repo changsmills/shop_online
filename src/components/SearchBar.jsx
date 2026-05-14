@@ -3,8 +3,10 @@ import { supabase } from "../supabaseClient";
 import { useNavigate } from "react-router-dom";
 import "../SearchBar.css"; 
 import { createPortal } from 'react-dom'; 
+import { useTranslation } from 'react-i18next';
 
 export default function SearchBar({ search = "", setSearch }) {
+  const { t } = useTranslation();
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
   const [placeholders, setPlaceholders] = useState(["Tafuta kategoria..."]);

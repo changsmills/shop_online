@@ -68,7 +68,7 @@ const withTimeout = (promise, timeoutMs = 5000, errorMessage = "Operation timed 
 
 export default function Dashboard() {
   const { t, i18n } = useTranslation();  // ← Ongeza hii
-  const [language, setLanguage] = useState('en'); // ← Ongeza hii
+  //const [language, setLanguage] = useState('en'); // ← Ongeza hii
   const [categories, setCategories] = useState([]);
   const [trendingProducts, setTrendingProducts] = useState([]);
   const [ads, setAds] = useState([]);
@@ -439,11 +439,11 @@ const getCategoryDisplayName = (category) => {
   };
 
   return (
-    <div style={{ backgroundColor: '#f7f8fa', minHeight: '100vh' }}>
+  <div key={i18n.language} style={{ backgroundColor: '#f7f8fa', minHeight: '100vh' }}>
 
 
-        {/* Kitufe cha kubadilisha lugha - Weka mahali popote unapotaka */}
-    <div style={{ position: 'fixed', top: '70px', right: '10px', zIndex: 1001 }}>
+    {/*   {/* Kitufe cha kubadilisha lugha - Weka mahali popote unapotaka */}
+    {/*<div style={{ position: 'fixed', top: '70px', right: '10px', zIndex: 1001 }}>
       <button 
         onClick={() => {
           const newLang = i18n.language === 'en' ? 'sw' : 'en';
@@ -463,7 +463,7 @@ const getCategoryDisplayName = (category) => {
       >
         {i18n.language === 'en' ? 'Kiswahili' : 'English'}
       </button>
-    </div>
+    </div> */}
 
       <div className="sticky-header">
         <Header search={search} setSearch={setSearch} />

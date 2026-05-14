@@ -4,8 +4,14 @@ import { createPortal } from "react-dom";
 import * as LucideIcons from "lucide-react"; 
 import { Link, useNavigate } from "react-router-dom"; // Ongeza useNavigate
 import "../NavLinks.css";
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../context/LanguageContext.jsx';
+
 
 export default function NavLinks() {
+  const { t, i18n } = useTranslation();
+   const { language } = useLanguage(); // Ongeza hii
+  const [forceUpdate, setForceUpdate] = useState(0); // Ongeza hii
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
@@ -44,6 +50,17 @@ const [protectionsMenuPos, setProtectionsMenuPos] = useState({ top: 0, left: 0 }
 const [activeNav, setActiveNav] = useState(null);
 const [hasStore, setHasStore] = useState(false);
 const [checkingStore, setCheckingStore] = useState(true);
+
+ // Badilisha hii
+useEffect(() => {
+  setForceUpdate(prev => prev + 1);
+}, [language]);
+
+// Iwe hivi (iongeze i18n.language pia)
+useEffect(() => {
+  setForceUpdate(prev => prev + 1);
+  console.log("Language changed to:", language, i18n.language);
+}, [language, i18n.language]);
 
 
 
@@ -103,19 +120,20 @@ useEffect(() => {
   checkUserStore();
 }, [user]);
 
-  useEffect(() => {
-    async function fetchCategories() {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name', { ascending: true });
-      if (!error && data) {
-        setCategories(data);
-        if (data.length > 0) setSelectedParent(data[0]);
-      }
+ useEffect(() => {
+  async function fetchCategories() {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')  // '*' inachukua name, name_sw, icon_name, na columns zingine zote
+      .order('name', { ascending: true });
+    if (!error && data) {
+      setCategories(data);
+      if (data.length > 0) setSelectedParent(data[0]);
     }
-    fetchCategories();
-  }, []);
+  }
+  fetchCategories();
+}, []);
+
 
   useEffect(() => {
     if (selectedParent) {
@@ -145,7 +163,8 @@ async function fetchFeaturedLeafs(parentId) {
       leaf_category_id,
       cover_image,
       leaf_categories!inner (
-        name
+         name,
+       name_sw
       )
     `)
     .eq('parent_category_id', parentId) // TUNATUMIA COLUMN MPYA HAPA
@@ -186,7 +205,8 @@ useEffect(() => {
           leaf_category_id,
           cover_image,
           leaf_categories!inner (
-            name
+            name,
+            name_sw
           )
         `)
         .eq('category_id', selectedSubForLeaf.id) // Hii inachuja bidhaa za sub-category husika
@@ -202,6 +222,7 @@ useEffect(() => {
             uniqueLeafs.push({
               id: item.leaf_category_id,
               name: item.leaf_categories.name,
+              name_sw: item.leaf_categories.name_sw,  // Ongeza hii line
               image_url: item.cover_image
             });
           }
@@ -214,6 +235,14 @@ useEffect(() => {
   }
   fetchLeafsBySub();
 }, [selectedSubForLeaf, viewMode]);
+
+
+const getDisplayName = (item) => {
+  if (!item) return '';
+  const result = i18n.language === 'sw' ? (item.name_sw || item.name) : item.name;
+  console.log("getDisplayName called - language:", i18n.language, "item:", item.name, "result:", result);
+  return result;
+};
 
 const handleMouseEnter = (menuName, e) => {
   if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -339,7 +368,7 @@ const activeIndicatorStyle = (isActive) => ({
 const handleSellNavigation = () => {
   if (!user) {
     navigate('/dashboard/login', { 
-      state: { message: "Tafadhali ingia ili uweze kuanza kuuza bidhaa zako!" }
+      state: { message: t('please_login') }
     });
     return;
   }
@@ -375,6 +404,16 @@ const updatePosition = (ref) => {
   return { top: 0, left: 0, width: 0 };
 };
 
+useEffect(() => {
+  console.log("=== NAVLINKS MOUNTED/RE-RENDERED ===");
+  console.log("Current language:", i18n.language);
+  console.log("Categories count:", categories.length);
+  if (categories.length > 0) {
+    console.log("First category name:", categories[0].name);
+    console.log("First category name_sw:", categories[0].name_sw);
+  }
+}, [i18n.language, categories]);
+
   return (
     <nav className="nav-links-container">
       <div className="nav-group-left">
@@ -386,7 +425,7 @@ const updatePosition = (ref) => {
   style={{ position: 'relative', paddingBottom: '8px' }}
 >
   <span className="category-toggle" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-    <LucideIcons.Menu size={20} strokeWidth={2.5} /> All categories
+    <LucideIcons.Menu size={20} strokeWidth={2.5} /> {t('all_categories')}
   </span>
   
   {/* Active Indicator - Bottom Line */}
@@ -432,7 +471,7 @@ const updatePosition = (ref) => {
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <DynamicIcon name={cat.icon_name} />
-                  <span>{cat.name}</span>
+                  <span>{getDisplayName(cat)}</span>
                 </div>
                 <LucideIcons.ChevronRight size={16} />
               </div>
@@ -453,7 +492,7 @@ const updatePosition = (ref) => {
                   gap: '8px' 
                 }}
               >
-                <LucideIcons.ChevronLeft size={18} /> Back
+                <LucideIcons.ChevronLeft size={18} /> {t('back')}
               </div>
               {subCategories.map((sub) => (
                 <div 
@@ -462,7 +501,7 @@ const updatePosition = (ref) => {
                   className={`sidebar-item ${selectedSubForLeaf?.id === sub.id ? 'active' : ''}`} 
                   style={{ padding: '12px 25px', cursor: 'pointer', fontSize: '14px' }}
                 >
-                  {sub.name}
+                  {getDisplayName(sub)}
                 </div>
               ))}
             </>
@@ -472,7 +511,7 @@ const updatePosition = (ref) => {
         <main className="mega-menu-content" style={{ flex: 1, padding: '20px', overflowY: 'auto' }}>
           <div className="content-header" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
             <h3 style={{ fontSize: '18px', fontWeight: '600', margin: 0 }}>
-              {viewMode === 'products' ? `Top Categories: ${selectedParent?.name}` : selectedSubForLeaf?.name}
+              {viewMode === 'products' ? `Top Categories: ${getDisplayName(selectedParent)}` : getDisplayName(selectedSubForLeaf)}
             </h3>
             {viewMode === 'products' && (
               <button 
@@ -488,7 +527,7 @@ const updatePosition = (ref) => {
                   alignItems: 'center' 
                 }}
               >
-                View all <LucideIcons.ChevronRight size={14} />
+                {t('view_all')} <LucideIcons.ChevronRight size={14} />
               </button>
             )}
           </div>
@@ -506,13 +545,13 @@ const updatePosition = (ref) => {
                     <div className="image-circle" style={{ width: '90px', height: '90px', borderRadius: '50%', backgroundColor: '#f5f5f5', margin: '0 auto 10px', overflow: 'hidden', border: '1px solid #eee' }}>
                       <img 
                         src={leaf.cover_image || placeholderImg} 
-                        alt={leaf.leaf_categories?.name}
+                        alt={getDisplayName(leaf.leaf_categories)}
                         onError={(e) => { e.target.src = placeholderImg; }} 
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                       />
                     </div>
                     <p className="grid-text" style={{ fontSize: '12px', margin: 0 }}>
-                      {leaf.leaf_categories?.name || "Kategoria"}
+                      {getDisplayName(leaf.leaf_categories) || "Kategoria"}
                     </p>
                   </Link>
                 ))}
@@ -525,7 +564,7 @@ const updatePosition = (ref) => {
                   <div className="image-circle see-all-circle" style={{ width: '90px', height: '90px', borderRadius: '50%', border: '2px dashed #ff6a00', margin: '0 auto 10px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.3s ease' }}>
                     <LucideIcons.Plus size={30} color="#ff6a00" />
                   </div>
-                  <p style={{ color: '#ff6a00', fontWeight: 'bold', fontSize: '12px' }}>See all</p>
+                  <p style={{ color: '#ff6a00', fontWeight: 'bold', fontSize: '12px' }}>{t('see_all')}</p>
                 </div>
               </>
             ) : (
@@ -539,12 +578,12 @@ const updatePosition = (ref) => {
                   <div className="image-circle" style={{ width: '90px', height: '90px', borderRadius: '50%', backgroundColor: '#f9f9f9', margin: '0 auto 10px', overflow: 'hidden', border: '1px solid #eee' }}>
                     <img 
                       src={leaf.image_url || placeholderImg} 
-                      alt={leaf.name}
+                      alt={getDisplayName(leaf)}
                       onError={(e) => { e.target.src = placeholderImg; }}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                     />
                   </div>
-                  <p className="grid-text" style={{ fontSize: '12px', margin: 0 }}>{leaf.name}</p>
+                  <p className="grid-text" style={{ fontSize: '12px', margin: 0 }}>{getDisplayName(leaf)}</p>
                 </Link>
               ))
             )}
@@ -584,7 +623,7 @@ const updatePosition = (ref) => {
       whiteSpace: 'nowrap',
       lineHeight: 'normal'
     }}>
-      Skyfall Ads
+      {t('skyfall_ads')}
     </span>
   </Link>
 
@@ -745,7 +784,7 @@ const updatePosition = (ref) => {
     }}
   >
     <LucideIcons.ShieldCheck size={18} style={{ color: '#0071dc' }} /> 
-    <span>Order protections</span>
+    <span>{t('order_protections')}</span>
   </Link>
 
   {/* Active Indicator - Bottom Line */}
@@ -867,7 +906,7 @@ const updatePosition = (ref) => {
     }}
   >
     <LucideIcons.Users size={18} /> 
-    <span>Buyer Central</span>
+    <span>{t('buyer_central')}</span>
     <LucideIcons.ChevronDown size={14} />
 
     {/* Active Indicator - Bottom Line */}
@@ -994,7 +1033,7 @@ const updatePosition = (ref) => {
     }}
   >
     <LucideIcons.Headset size={18} /> 
-    <span>Help Center</span>
+    <span>{t('help_center')}</span>
     <LucideIcons.ChevronDown size={14} />
 
     {/* Active Indicator - Bottom Line */}
@@ -1119,10 +1158,10 @@ const updatePosition = (ref) => {
     <LucideIcons.Loader2 size={14} className="animate-spin" style={{ marginLeft: '4px' }} />
   ) : (
     <span style={{ fontWeight: '500' }}>
-      {!user && "Login to sell"}
-      {user && !hasStore && "Create Your Store"}
-      {user && hasStore && "My Store Dashboard"}
-    </span>
+  {!user && t('login_to_sell')}
+  {user && !hasStore && t('create_your_store')}
+  {user && hasStore && t('my_store_dashboard')}
+</span>
   )}
   
   {/* Active Indicator - Bottom Line (kwa hover tu) */}
