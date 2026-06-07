@@ -353,7 +353,7 @@ if (!session) {
   if (drawerAction === 'cart') {
     itemsToProcess.forEach(item => addToCart(item));
     toast.success(`${itemsToProcess.length} bidhaa zimeongezwa kwenye kikapu!`, {
-  duration: 2000, // Itatoweka baada ya sekunde 2
+  duration: 1000, // Itatoweka baada ya sekunde 2
 });
     setIsSelectionOpen(false);
     navigate('/cart');

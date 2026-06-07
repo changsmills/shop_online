@@ -156,7 +156,7 @@ const handleCheckout = () => {
           padding: isMobile ? '16px' : '24px', 
           backgroundColor: '#f7f8fa', 
           overflowY: 'auto',
-          paddingBottom: isMobile && cartItems.length > 0 ? '290px' : '24px'
+          paddingBottom: isMobile && cartItems.length > 0 ? '590px' : '24px'
         }}>
           <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
             

@@ -231,14 +231,27 @@ function App() {
    <LanguageProvider>  {/* Ongeza hii - IWE NJE YA CartProvider au ndani */}
     <CartProvider>
       <Toaster 
-        position="top-right" 
-        reverseOrder={false} 
-        toastOptions={{
-          style: {
-            zIndex: 9999,
-          },
-        }}
-      />
+  position="top-right" 
+  reverseOrder={false} 
+  gutter={8} // Hii inaongeza nafasi kati ya toast ili zisigandane
+  toastOptions={{
+    style: {
+      zIndex: 9999,
+      borderRadius: '8px',
+      background: '#333',
+      color: '#fff',
+    },
+    // Hii itahakikisha kila toast inatoweka baada ya sekunde 3 (3000ms)
+    duration: 2000, 
+    // Hii inazuia toast nyingi sana kuonekana kwa wakati mmoja
+    success: {
+      duration: 2000,
+    },
+    error: {
+      duration: 3000,
+    },
+  }}
+/>
       <BrowserRouter>
         <AppContent session={session} />
       </BrowserRouter>
