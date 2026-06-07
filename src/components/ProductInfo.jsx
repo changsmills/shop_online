@@ -352,7 +352,9 @@ if (!session) {
 
   if (drawerAction === 'cart') {
     itemsToProcess.forEach(item => addToCart(item));
-    toast.success(`${itemsToProcess.length} bidhaa zimeongezwa kwenye kikapu!`);
+    toast.success(`${itemsToProcess.length} bidhaa zimeongezwa kwenye kikapu!`, {
+  duration: 2000, // Itatoweka baada ya sekunde 2
+});
     setIsSelectionOpen(false);
     navigate('/cart');
   } else {
@@ -365,6 +367,7 @@ if (!session) {
     navigate('/checkout', { state: { orderItems: itemsToProcess } });
     setIsSelectionOpen(false);
 }
+
 };
 
 const handleWhatsAppOrder = async () => {

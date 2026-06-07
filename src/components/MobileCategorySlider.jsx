@@ -54,7 +54,6 @@ export default function MobileCategorySlider({ categories, selectedCategory, onS
           </div>
         ))}
       </div>
-
       {showRightArrow && (
         <button className="slider-arrow right" onClick={() => scroll('right')}>
           <ChevronRight size={20} />

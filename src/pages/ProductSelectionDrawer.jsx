@@ -318,7 +318,10 @@ useEffect(() => {
             });
             localStorage.setItem('alibaba_cart', JSON.stringify(existingCart));
             window.dispatchEvent(new CustomEvent('cartUpdated', { detail: existingCart }));
-            toast.success(`${itemsToCart.length} item(s) added to cart!`);
+// Au kwa sekunde 2 (2000 milliseconds)
+toast.success(`Bidhaa ${itemsToCart.length} zimeongezwa kwenye kikapu!`, {
+  duration: 2000,
+});
             onClose();
             navigate('/cart');
         } else {

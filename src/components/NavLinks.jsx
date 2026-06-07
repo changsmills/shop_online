@@ -1034,7 +1034,7 @@ useEffect(() => {
   >
     <LucideIcons.Headset size={18} /> 
     <span>{t('help_center')}</span>
-    <LucideIcons.ChevronDown size={14} />
+    <LucideIcons.ChevronDown size={18} />
 
     {/* Active Indicator - Bottom Line */}
     {activeMenu === 'helpCenter' && (
