@@ -595,176 +595,25 @@ useEffect(() => {
   )}
 </div>
 
-<div 
-  ref={exposeRef} 
-  className="nav-wrapper" 
-  onMouseEnter={(e) => handleMouseEnter('exposeStore', e)} 
-  onMouseLeave={handleMouseLeave}
-  style={{ position: 'relative', paddingBottom: '8px' }}
+<Link
+  className="nav-item" 
+  style={{ 
+    display: 'flex', 
+    alignItems: 'center', 
+    textDecoration: 'none', 
+    color: '#111',
+    padding: '0 10px'
+  }}
 >
-  <Link
-    className="nav-item" 
-    style={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-      gap: '7px',
-      textDecoration: 'none', 
-      color: '#111',
-      padding: '0 10px'
-    }}
-  >
-    <LucideIcons.Zap 
-      size={20}
-      style={{ color: '#ff6a00', flexShrink: 0 }} 
-    /> 
-    <span style={{ 
-      fontSize: '15px',
-      fontWeight: '600',
-      whiteSpace: 'nowrap',
-      lineHeight: 'normal'
-    }}>
-      {t('skyfall_ads')}
-    </span>
-  </Link>
-
-  {/* Active Indicator - Bottom Line */}
-  {activeMenu === 'exposeStore' && (
-    <div style={{ 
-      position: 'fixed', 
-      top: `${exposeMenuPos.top + 8}px`, // Ongeza kapengo kidogo toka juu
-      left: `${exposeMenuPos.left}px`,   // Itakaa kuanzia pale neno lilipo
-      width: '850px',                    // Weka upana ule unaoutaka
-      backgroundColor: 'white', 
-      boxShadow: '0 20px 40px rgba(0,0,0,0.12)', 
-      borderRadius: '12px', 
-      padding: '40px', 
-      zIndex: 100000,
-      border: '1px solid #e5e7eb',
-      display: 'grid',
-      gridTemplateColumns: '1.2fr 1fr 1fr', 
-      gap: '40px'
-    }} />
-  )}
-
-  {activeMenu === 'exposeStore' && createPortal(
-    <div 
-      onMouseEnter={() => handleMouseEnter('exposeStore')} 
-      onMouseLeave={handleMouseLeave}
-      style={{ 
-        position: 'fixed', 
-        top: `${exposeMenuPos.top}px`, 
-        left: '20px', 
-        right: '20px', 
-        backgroundColor: 'white', 
-        boxShadow: '0 20px 40px rgba(0,0,0,0.12)', 
-        borderRadius: '0 0 12px 12px', 
-        padding: '40px', 
-        zIndex: 100000,
-        border: '1px solid #e5e7eb',
-        borderTop: 'none',
-        display: 'grid',
-        gridTemplateColumns: '1.2fr 1fr 1fr', 
-        gap: '50px'
-      }}
-    >
-      {/* SEHEMU YA 1: BANNER YA KUVUTIA */}
-      <div style={{ 
-        backgroundColor: '#fff7f2', 
-        padding: '30px', 
-        borderRadius: '12px', 
-        border: '1px solid #ffe8d9',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center'
-      }}>
-        <h4 style={{ 
-          fontSize: '20px', 
-          fontWeight: '700', 
-          color: '#ff6a00', 
-          marginBottom: '15px',
-          lineHeight: '1.2'
-        }}>
-          Ongeza Mauzo na <br/> Skyfall Advertising
-        </h4>
-        <p style={{ fontSize: '14px', color: '#555', lineHeight: '1.7', marginBottom: '25px' }}>
-          Usisubiri wateja wakutafute. Huduma ya matangazo inakuweka mstari wa mbele mbele ya maelfu ya wanunuzi wa jumla kila siku nchi nzima.
-        </p>
-        <Link to="/ad-request" style={{ 
-          backgroundColor: '#ff6a00', 
-          color: 'white', 
-          padding: '12px 24px', 
-          borderRadius: '6px', 
-          textDecoration: 'none', 
-          fontWeight: '600',
-          display: 'inline-block',
-          textAlign: 'center',
-          fontSize: '14px',
-          width: 'fit-content',
-          transition: 'background 0.3s'
-        }}>
-          Anza Kutangaza Sasa
-        </Link>
-      </div>
-
-      {/* SEHEMU YA 2: FAIDA ZA KUTANGAZA */}
-      <div>
-        <h4 style={{ fontSize: '16px', fontWeight: '700', color: '#111', marginBottom: '20px' }}>
-          Kwanini Utangaze?
-        </h4>
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          <li style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
-            <div style={{ color: '#27ae60', marginTop: '2px' }}><LucideIcons.TrendingUp size={20} /></div>
-            <div>
-              <div style={{ fontWeight: '600', fontSize: '14px', color: '#333' }}>Ongeza Watazamaji</div>
-              <div style={{ fontSize: '13px', color: '#666' }}>Bidhaa zako huonekana mara 5 zaidi ya duka la kawaida.</div>
-            </div>
-          </li>
-          <li style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
-            <div style={{ color: '#0071dc', marginTop: '2px' }}><LucideIcons.Target size={20} /></div>
-            <div>
-              <div style={{ fontWeight: '600', fontSize: '14px', color: '#333' }}>Wateja Walengwa</div>
-              <div style={{ fontSize: '13px', color: '#666' }}>Tangaza moja kwa moja kwa watu wanaotafuta unachouza.</div>
-            </div>
-          </li>
-          <li style={{ display: 'flex', gap: '15px' }}>
-            <div style={{ color: '#f1c40f', marginTop: '2px' }}><LucideIcons.ShieldCheck size={20} /></div>
-            <div>
-              <div style={{ fontWeight: '600', fontSize: '14px', color: '#333' }}>Jenga Uaminifu</div>
-              <div style={{ fontSize: '13px', color: '#666' }}>Maduka yanayotangaza huonekana kuwa thabiti na serious.</div>
-            </div>
-          </li>
-        </ul>
-      </div>
-
-      {/* SEHEMU YA 3: VIFURUSHI */}
-      <div>
-        <h4 style={{ fontSize: '16px', fontWeight: '700', color: '#111', marginBottom: '20px' }}>
-          Vifurushi vya Matangazo
-        </h4>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <Link to="/ads/keyword" style={{ textDecoration: 'none', color: '#555', fontSize: '14px', padding: '8px 0', borderBottom: '1px solid #f0f0f0' }}>Keyword Advertising</Link>
-          <Link to="/ads/banner" style={{ textDecoration: 'none', color: '#555', fontSize: '14px', padding: '8px 0', borderBottom: '1px solid #f0f0f0' }}>Banner Ads (Home Page)</Link>
-          <Link to="/ads/top-ranking" style={{ textDecoration: 'none', color: '#555', fontSize: '14px', padding: '8px 0', borderBottom: '1px solid #f0f0f0' }}>Top Ranking Products</Link>
-          <Link to="/ads/analytics" style={{ textDecoration: 'none', color: '#555', fontSize: '14px', padding: '8px 0' }}>Ripoti ya Matangazo</Link>
-        </div>
-        
-        <div style={{ 
-          marginTop: '30px', 
-          padding: '15px', 
-          backgroundColor: '#f9fafb', 
-          borderRadius: '8px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px'
-        }}>
-          <LucideIcons.PhoneCall size={18} color="#666" />
-          <span style={{ fontSize: '13px', color: '#666' }}>Msaada: <b>07XX XXX XXX</b></span>
-        </div>
-      </div>
-    </div>,
-    document.body
-  )}
-</div>
+  <span style={{ 
+    fontSize: '15px',
+    fontWeight: '600',
+    whiteSpace: 'nowrap',
+    lineHeight: 'normal'
+  }}>
+    {t('skyfall_ads')}
+  </span>
+</Link>
 
         <div 
          ref={protectionsRef}
@@ -773,19 +622,17 @@ useEffect(() => {
   onMouseLeave={handleMouseLeave}
   style={{ position: 'relative', paddingBottom: '8px' }}
 >
-  <Link
-    className="nav-item" 
-    style={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-      gap: '5px',
-      textDecoration: 'none',
-      color: '#111'
-    }}
-  >
-    <LucideIcons.ShieldCheck size={18} style={{ color: '#0071dc' }} /> 
-    <span>{t('order_protections')}</span>
-  </Link>
+<Link
+  className="nav-item" 
+  style={{ 
+    display: 'flex', 
+    alignItems: 'center', 
+    textDecoration: 'none',
+    color: '#111'
+  }}
+>
+  <span style={{ fontSize: '15px' }}>{t('order_protections')}</span>
+</Link>
 
   {/* Active Indicator - Bottom Line */}
   {activeMenu === 'protections' && (
@@ -889,40 +736,36 @@ useEffect(() => {
 {/* RIGHT SIDE LINKS */}
 <div className="nav-group-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
 
-  {/* BUYER CENTRAL */}
-  <span 
+ <span 
   ref={buyerRef}
-    className="nav-item" 
-    onMouseEnter={(e) => handleMouseEnter('buyerCentral', e)}
-    onMouseLeave={handleMouseLeave}
-    style={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-      gap: '5px', 
-      whiteSpace: 'nowrap', 
-      cursor: 'pointer',
-      position: 'relative',
-      paddingBottom: '8px'
-    }}
-  >
-    <LucideIcons.Users size={18} /> 
-    <span>{t('buyer_central')}</span>
-    <LucideIcons.ChevronDown size={14} />
+  className="nav-item" 
+  onMouseEnter={(e) => handleMouseEnter('buyerCentral', e)}
+  onMouseLeave={handleMouseLeave}
+  style={{ 
+    display: 'flex', 
+    alignItems: 'center', 
+    whiteSpace: 'nowrap', 
+    cursor: 'pointer',
+    position: 'relative',
+    paddingBottom: '8px'
+  }}
+>
+  <span style={{ fontSize: '15px' }}>{t('buyer_central')}</span>
 
-    {/* Active Indicator - Bottom Line */}
-    {activeMenu === 'buyerCentral' && (
-      <div style={{
-        position: 'absolute',
-        bottom: '-8px',
-        left: '0',
-        right: '0',
-        height: '3px',
-        backgroundColor: '#ff6a00',
-        borderRadius: '2px',
-        transition: 'all 0.2s ease'
-      }} />
-    )}
-  </span>
+  {/* Active Indicator - Bottom Line */}
+  {activeMenu === 'buyerCentral' && (
+    <div style={{
+      position: 'absolute',
+      bottom: '-8px',
+      left: '0',
+      right: '0',
+      height: '3px',
+      backgroundColor: '#ff6a00',
+      borderRadius: '2px',
+      transition: 'all 0.2s ease'
+    }} />
+  )}
+</span>
 
   {activeMenu === 'buyerCentral' && createPortal(
     <div 
@@ -1016,40 +859,37 @@ useEffect(() => {
     document.body
   )}
   
-  {/* HELP CENTER */}
-  <span 
+{/* HELP CENTER */}
+<span 
   ref={helpRef}
-    className="nav-item" 
-    onMouseEnter={(e) => handleMouseEnter('helpCenter', e)}
-    onMouseLeave={handleMouseLeave}
-    style={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-      gap: '5px', 
-      whiteSpace: 'nowrap', 
-      cursor: 'pointer',
-      position: 'relative',
-      paddingBottom: '8px'
-    }}
-  >
-    <LucideIcons.Headset size={18} /> 
-    <span>{t('help_center')}</span>
-    <LucideIcons.ChevronDown size={18} />
+  className="nav-item" 
+  onMouseEnter={(e) => handleMouseEnter('helpCenter', e)}
+  onMouseLeave={handleMouseLeave}
+  style={{ 
+    display: 'flex', 
+    alignItems: 'center', 
+    whiteSpace: 'nowrap', 
+    cursor: 'pointer',
+    position: 'relative',
+    paddingBottom: '8px'
+  }}
+>
+  <span style={{ fontSize: '15px' }}>{t('help_center')}</span>
 
-    {/* Active Indicator - Bottom Line */}
-    {activeMenu === 'helpCenter' && (
-      <div style={{
-        position: 'absolute',
-        bottom: '-8px',
-        left: '0',
-        right: '0',
-        height: '3px',
-        backgroundColor: '#ff6a00',
-        borderRadius: '2px',
-        transition: 'all 0.2s ease'
-      }} />
-    )}
-  </span>
+  {/* Active Indicator - Bottom Line */}
+  {activeMenu === 'helpCenter' && (
+    <div style={{
+      position: 'absolute',
+      bottom: '-8px',
+      left: '0',
+      right: '0',
+      height: '3px',
+      backgroundColor: '#ff6a00',
+      borderRadius: '2px',
+      transition: 'all 0.2s ease'
+    }} />
+  )}
+</span>
 
   {activeMenu === 'helpCenter' && createPortal(
     <div 
