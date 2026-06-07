@@ -2,6 +2,7 @@
 import React from 'react';
 import { Eye, Trophy, MapPin } from "lucide-react";
 import "../DashboardCard.css";
+import { useTranslation } from 'react-i18next';
 
 export default function DashboardCard({ 
   image, 
@@ -21,6 +22,7 @@ export default function DashboardCard({
   onClick 
 }) {
   const numPrice = Number(price);
+  const { t } = useTranslation();
   const numOriginal = Number(originalPrice);
   const hasValidPrice = price !== undefined && price !== null && !isNaN(numPrice);
 
@@ -147,15 +149,15 @@ export default function DashboardCard({
           >
             <div className="price-main">
               <span 
-                className="price-currency"
-                style={{
-                  fontSize: isMobile ? '9px' : '19px',
-                  fontWeight: '700',
-                  color: '#ca290d',
-                }}
-              >
-                TSh
-              </span>
+  className="price-currency"
+  style={{
+    fontSize: isMobile ? '9px' : '19px',
+    fontWeight: '700',
+    color: '#ca290d',
+  }}
+>
+  {t('currency')}
+</span>
               <span 
                 className="price-amount"
                 style={{
@@ -198,7 +200,7 @@ export default function DashboardCard({
       color: '#666',
       fontWeight: '500'
     }}>
-      MOQ:
+      {t('moq')}:
     </span>
     <span style={{ 
       fontSize: isMobile ? '10px' : '15px', 

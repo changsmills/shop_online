@@ -48,8 +48,8 @@ const Login = () => {
       <Toaster position="top-center" reverseOrder={false} /> 
       <div className="auth-box">
         <div className="auth-header">
-          <h2>Ingia (Login)</h2>
-          <p>Karibu tena kwenye Duka AI</p>
+          <h2>Login</h2>
+          <p>Karibu tena kwenye Duka </p>
         </div>
         
         <form onSubmit={handleLogin}>

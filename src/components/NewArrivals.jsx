@@ -3,8 +3,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, Sparkles } from "lucide-react";
 import { supabase } from "../supabaseClient";
 import DashboardCard from "./DashboardCard";
+import { useTranslation } from 'react-i18next';
 
 export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
+  const { t, i18n } = useTranslation();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const scrollContainerRef = useRef(null);
@@ -38,6 +40,13 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
 
     fetchNewArrivals();
   }, [selectedCategory]);
+
+
+  const getCategoryDisplayName = (category) => {
+  if (!category) return '';
+  return i18n.language === 'sw' ? (category.name_sw || category.name) : category.name;
+};
+
 
   const checkScrollPosition = () => {
     if (scrollContainerRef.current) {
@@ -132,30 +141,30 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
       marginBottom: isMobile ? '2px' : '8px' 
     }}>
       <Sparkles size={isMobile ? 12 : 24} style={{ color: '#eab308' }} />
-      <h2 style={{ 
-        fontSize: isMobile ? '13px' : '24px', 
-        fontWeight: 'bold', 
-        margin: 0,
-        lineHeight: isMobile ? '1.3' : '1.4'
-      }}>
-        New Arrivals {selectedCategory && `in ${selectedCategory.name}`}
-      </h2>
+     <h2 style={{ 
+  fontSize: isMobile ? '13px' : '24px', 
+  fontWeight: 'bold', 
+  margin: 0,
+  lineHeight: isMobile ? '1.3' : '1.4'
+}}>
+  {t('new_arrivals')} {selectedCategory && `${t('in')} ${getCategoryDisplayName(selectedCategory)}`}
+</h2>
     </div>
     <p style={{ 
-      margin: 0, 
-      color: '#888',
-      fontSize: isMobile ? '9px' : '16px',
-      lineHeight: isMobile ? '1.2' : '1.5'
-    }}>
-      Discover the latest arrivals on Skyfall.com
-      {selectedCategory && ` in ${selectedCategory.name}`}
-    </p>
+  margin: 0, 
+  color: '#888',
+  fontSize: isMobile ? '9px' : '16px',
+  lineHeight: isMobile ? '1.2' : '1.5'
+}}>
+  {t('discover_latest_arrivals')}
+  {selectedCategory && ` ${t('in')} ${getCategoryDisplayName(selectedCategory)}`}
+</p>
   </div>
   
   <button 
     onClick={() => navigate('/products', { 
       state: { 
-        sectionName: `New Arrivals ${selectedCategory ? `in ${selectedCategory.name}` : ''}`,
+        sectionName: `${t('new_arrivals')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`,
         categoryId: selectedCategory?.id,
         categoryName: selectedCategory?.name
       } 
@@ -185,7 +194,7 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
       e.currentTarget.style.boxShadow = '0 2px 8px rgba(59, 130, 246, 0.3)';
     }}
   >
-    <span>View more</span>
+    <span>{t('view_more')}</span>
     <ChevronRight size={isMobile ? 10 : 16} />
   </button>
 </div>

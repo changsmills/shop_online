@@ -3,8 +3,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, Flame } from "lucide-react";
 import { supabase } from "../supabaseClient";
 import DashboardCard from "./DashboardCard";
+import { useTranslation } from 'react-i18next';
 
 export default function TopDeals({ navigate, selectedCategory, isMobile }) {
+  const { t } = useTranslation();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const scrollContainerRef = useRef(null);
@@ -134,24 +136,24 @@ export default function TopDeals({ navigate, selectedCategory, isMobile }) {
             marginBottom: isMobile ? '1px' : '1px' 
           }}>
             <Flame size={isMobile ? 12 : 24} style={{ color: '#f97316' }} />
-            <h2 style={{ 
-              fontSize: isMobile ? '13px' : '24px', 
-              fontWeight: 'bold', 
-              margin: 0,
-              lineHeight: isMobile ? '1.3' : '1.4'
-            }}>
-              Top Deals {selectedCategory && `in ${selectedCategory.name}`}
-            </h2>
+           <h2 style={{ 
+  fontSize: isMobile ? '13px' : '24px', 
+  fontWeight: 'bold', 
+  margin: 0,
+  lineHeight: isMobile ? '1.3' : '1.4'
+}}>
+  {t('top_deals')} {selectedCategory && `${t('in')} ${getCategoryDisplayName(selectedCategory)}`}
+</h2>
           </div>
           <p style={{ 
-            margin: 0, 
-            color: '#888',
-            fontSize: isMobile ? '9px' : '16px',
-            lineHeight: isMobile ? '1.2' : '1.5'
-          }}>
-            Score the lowest price on Skyfall.com
-            {selectedCategory && ` in ${selectedCategory.name}`}
-          </p>
+  margin: 0, 
+  color: '#888',
+  fontSize: isMobile ? '9px' : '16px',
+  lineHeight: isMobile ? '1.2' : '1.5'
+}}>
+  {t('score_lowest_price')}
+  {selectedCategory && ` ${t('in')} ${getCategoryDisplayName(selectedCategory)}`}
+</p>
         </div>
         
         <button 
