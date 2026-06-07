@@ -34,6 +34,23 @@ export default function CartPage({ session }) {
     { icon: <Settings size={20} />, path: '/dashboard/settings', label: 'Settings' },
   ];
 
+  // Function ya kurahisisha Checkout
+const handleCheckout = () => {
+  if (cartItems.length === 0) {
+    alert("Kikapu chako kiko tupu!");
+    return;
+  }
+  
+  // HAPA: Unaweza kuongeza sharti la session (kama unataka lazima wawe wame-login)
+  if (!session) {
+    navigate('/login'); // Au redirect kwenye page ya kuingia
+    return;
+  }
+
+  // Kama kila kitu kiko sawa, nenda checkout
+  navigate('/checkout');
+};
+
   return (
     <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#fff' }}>
       
@@ -139,7 +156,7 @@ export default function CartPage({ session }) {
           padding: isMobile ? '16px' : '24px', 
           backgroundColor: '#f7f8fa', 
           overflowY: 'auto',
-          paddingBottom: isMobile && cartItems.length > 0 ? '90px' : '24px'
+          paddingBottom: isMobile && cartItems.length > 0 ? '190px' : '24px'
         }}>
           <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
             
@@ -289,7 +306,8 @@ export default function CartPage({ session }) {
                         <span style={{ fontWeight: '900', fontSize: '20px', color: '#ff6a00' }}>TSH {totalAmount.toLocaleString()}</span>
                       </div>
                       <button 
-                        onClick={() => navigate('/checkout')}
+                        onClick={handleCheckout}
+
                         style={{ width: '100%', padding: '14px', backgroundColor: '#ff6a00', color: '#fff', border: 'none', borderRadius: '30px', fontWeight: '800', fontSize: '16px', cursor: 'pointer', boxShadow: '0 4px 12px rgba(255,106,0,0.2)' }}
                       >
                         Checkout ({totalItems})
@@ -330,7 +348,7 @@ export default function CartPage({ session }) {
             <div style={{ fontSize: '11px', color: '#999' }}>{totalItems} item(s)</div>
           </div>
           <button 
-            onClick={() => navigate('/checkout')}
+            onClick={handleCheckout}
             style={{
               backgroundColor: '#ff6a00',
               color: 'white',
