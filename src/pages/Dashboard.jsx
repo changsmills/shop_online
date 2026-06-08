@@ -483,7 +483,7 @@ const getCategoryDisplayName = (category) => {
 
  {/* ========== MOBILE CATEGORY SLIDER (FIXED) ========== */}
 {isMobile && !search && categories.length > 0 && (
-  
+
   <div style={{
     position: 'sticky', // Tumia sticky ili isipotee unaposogeza screen
     top: '60px',        // Rekebisha kulingana na urefu wa Header yako
@@ -1078,9 +1078,6 @@ const getCategoryDisplayName = (category) => {
       )}
 
 
-  {/* ============================================ */}
-{/* PORTAL YA MOBILE - BOTTOM SHEET (MPYA) - ILIYOSAHIHISHWA */}
-{/* ============================================ */}
 {isMobile && mobileMenuOpen && ReactDOM.createPortal(
   <div 
     style={{ 
@@ -1089,50 +1086,62 @@ const getCategoryDisplayName = (category) => {
       left: 0, 
       right: 0, 
       bottom: 0, 
-      backgroundColor: 'rgba(0,0,0,0.5)', 
+      backgroundColor: 'rgba(0,0,0,0.6)', 
       zIndex: 10000,
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'flex-end',
-      animation: 'fadeIn 0.2s ease-out'
+      animation: 'fadeIn 0.2s ease-out',
+      backdropFilter: 'blur(2px)'
     }}
     onClick={() => setMobileMenuOpen(false)}
   >
     <div 
       style={{ 
         backgroundColor: 'white', 
-        height: '85vh',  // Ilikuwa 75vh, sasa 85vh kwa nafasi zaidi
-        borderTopLeftRadius: '20px', 
-        borderTopRightRadius: '20px', 
+        height: '90vh',           // Tumia 90vh kwa nafasi zaidi
+        maxHeight: 'calc(100% - 60px)', // Usizidi ukubwa wa screen
+        borderTopLeftRadius: '24px', 
+        borderTopRightRadius: '24px', 
         display: 'flex', 
         flexDirection: 'column',
         overflow: 'hidden',
-        animation: 'slideUp 0.3s ease-out'
+        animation: 'slideUp 0.3s ease-out',
+        boxShadow: '0 -2px 20px rgba(0,0,0,0.1)'
       }}
       onClick={(e) => e.stopPropagation()}
     >
-      {/* Handle - indicator ya kuteleza */}
-      <div style={{ 
-        width: '40px', 
-        height: '5px', 
-        background: '#ccc', 
-        borderRadius: '10px', 
-        margin: '12px auto',
-        cursor: 'pointer'
-      }} />
+      {/* Handle - indicator ya kuteleza (inaweza kubofya kufunga) */}
+      <div 
+        onClick={() => setMobileMenuOpen(false)}
+        style={{ 
+          width: '50px', 
+          height: '5px', 
+          background: '#ddd', 
+          borderRadius: '20px', 
+          margin: '12px auto',
+          cursor: 'pointer',
+          transition: 'background 0.2s'
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.background = '#bbb'}
+        onMouseLeave={(e) => e.currentTarget.style.background = '#ddd'}
+      />
       
       {categories.length === 0 ? (
         <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
           {t('loading')}
         </div>
       ) : (
-        <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-          {/* Sidebar ya Kategoria (Kushoto) */}
+        <div style={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>
+          {/* Sidebar ya Kategoria (Kushoto) - inayoweza kusongeshwa */}
           <aside style={{ 
-            width: '100px', 
-            borderRight: '1px solid #eee', 
+            width: '30%',           // Badala ya 100px, tumia percentage
+            maxWidth: '110px',
+            minWidth: '80px',
+            borderRight: '1px solid #f0f0f0', 
             overflowY: 'auto', 
-            backgroundColor: '#f9f9f9' 
+            backgroundColor: '#fafafa',
+            flexShrink: 0
           }}>
             {categories.map((cat) => (
               <div 
@@ -1143,20 +1152,22 @@ const getCategoryDisplayName = (category) => {
                   fetchSubCategories(cat.id);
                 }}
                 style={{ 
-                  padding: '15px 5px', 
+                  padding: '12px 5px', 
                   textAlign: 'center', 
                   backgroundColor: selectedCategory?.id === cat.id ? 'white' : 'transparent',
                   borderLeft: selectedCategory?.id === cat.id ? '4px solid #ff6a00' : 'none',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
                 }}
               >
-                <div style={{ color: selectedCategory?.id === cat.id ? '#ff6a00' : '#666' }}>
+                <div style={{ color: selectedCategory?.id === cat.id ? '#ff6a00' : '#555' }}>
                   {getIcon(cat.icon_name)}
                 </div>
                 <div style={{ 
-                  fontSize: '10px', 
-                  marginTop: '5px', 
-                  fontWeight: selectedCategory?.id === cat.id ? 'bold' : 'normal' 
+                  fontSize: '11px', 
+                  marginTop: '6px', 
+                  fontWeight: selectedCategory?.id === cat.id ? '600' : '400',
+                  wordBreak: 'break-word'
                 }}>
                   {getCategoryDisplayName(cat)}
                 </div>
@@ -1164,17 +1175,38 @@ const getCategoryDisplayName = (category) => {
             ))}
           </aside>
 
-          {/* Content ya Bidhaa (Kulia) */}
-          <main style={{ flex: 1, padding: '15px', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px', alignItems: 'center' }}>
-              <h4 style={{ fontSize: '14px', margin: 0, fontWeight: 'bold' }}>
+          {/* Content ya Bidhaa (Kulia) - inayoweza kusongeshwa kwa uhuru */}
+          <main style={{ 
+            flex: 1, 
+            padding: '12px', 
+            overflowY: 'auto', 
+            WebkitOverflowScrolling: 'touch'
+          }}>
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              marginBottom: '12px', 
+              alignItems: 'center',
+              position: 'sticky',
+              top: 0,
+              backgroundColor: 'white',
+              zIndex: 5,
+              paddingBottom: '8px'
+            }}>
+              <h4 style={{ fontSize: '15px', margin: 0, fontWeight: 'bold' }}>
                 {getCategoryDisplayName(selectedCategory) || t('select_category')}
               </h4>
               <button 
                 onClick={() => setMobileMenuOpen(false)} 
                 style={{ 
                   border: 'none', 
-                  background: 'none', 
+                  background: 'rgba(0,0,0,0.05)',
+                  borderRadius: '20px',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   fontWeight: 'bold',
                   fontSize: '18px',
                   cursor: 'pointer'
@@ -1184,13 +1216,17 @@ const getCategoryDisplayName = (category) => {
               </button>
             </div>
 
-            {/* Grid ya bidhaa (columns 2 kwenye simu) */}
+            {/* Grid ya bidhaa - responsive automatically */}
             {featuredProducts.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-                 {t('no_products')}
+              <div style={{ textAlign: 'center', padding: '30px 20px', color: '#999' }}>
+                {t('no_products')}
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '15px' }}>
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', 
+                gap: '12px' 
+              }}>
                 {featuredProducts.map((leaf) => (
                   <div 
                     key={leaf.id} 
@@ -1203,22 +1239,30 @@ const getCategoryDisplayName = (category) => {
                     <div style={{ 
                       width: '100%', 
                       aspectRatio: '1/1', 
-                      borderRadius: '12px', 
-                      backgroundColor: '#f5f5f5', 
+                      borderRadius: '16px', 
+                      backgroundColor: '#f8f8f8', 
                       marginBottom: '8px', 
-                      overflow: 'hidden' 
+                      overflow: 'hidden',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
                     }}>
                       <img 
                         src={leaf.cover_image || placeholderImg} 
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                         alt={leaf.leaf_categories?.name}
+                        loading="lazy"
                       />
                     </div>
-                    <p style={{ fontSize: '11px', margin: 0, color: '#333' }}>
-  {i18n.language === 'sw' 
-    ? (leaf.leaf_categories?.name_sw || leaf.leaf_categories?.name)
-    : leaf.leaf_categories?.name}
-</p>
+                    <p style={{ 
+                      fontSize: '12px', 
+                      margin: 0, 
+                      color: '#333',
+                      fontWeight: '500',
+                      lineHeight: '1.3'
+                    }}>
+                      {i18n.language === 'sw' 
+                        ? (leaf.leaf_categories?.name_sw || leaf.leaf_categories?.name)
+                        : leaf.leaf_categories?.name}
+                    </p>
                   </div>
                 ))}
               </div>
