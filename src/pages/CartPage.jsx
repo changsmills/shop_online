@@ -153,7 +153,7 @@ const handleCheckout = () => {
         {/* MAIN CONTENT */}
         <main style={{ 
           flex: 1, 
-          padding: isMobile ? '16px' : '24px', 
+          padding: isMobile ? '46px' : '24px', 
           backgroundColor: '#f7f8fa', 
           overflowY: 'auto',
           paddingBottom: isMobile && cartItems.length > 0 ? '590px' : '24px'

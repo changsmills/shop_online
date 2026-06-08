@@ -21,7 +21,7 @@ const Messages = ({ session }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [showMobileChat, setShowMobileChat] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-const [searchResults, setSearchResults] = useState([]); // Matokeo ya maduka mapya
+const [searchResults, setSearchResults] = useState([]);
 const [isSearching, setIsSearching] = useState(false);
   const location = useLocation();
   const messagesEndRef = useRef(null);
