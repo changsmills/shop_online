@@ -1165,65 +1165,69 @@ const getCategoryDisplayName = (category) => {
           </aside>
 
           {/* Content ya Bidhaa (Kulia) */}
-          <main style={{ flex: 1, padding: '15px', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px', alignItems: 'center' }}>
-              <h4 style={{ fontSize: '14px', margin: 0, fontWeight: 'bold' }}>
-                {getCategoryDisplayName(selectedCategory) || t('select_category')}
-              </h4>
-              <button 
-                onClick={() => setMobileMenuOpen(false)} 
-                style={{ 
-                  border: 'none', 
-                  background: 'none', 
-                  fontWeight: 'bold',
-                  fontSize: '18px',
-                  cursor: 'pointer'
-                }}
-              >
-                ✕
-              </button>
-            </div>
+<main style={{ flex: 1, padding: '15px', overflowY: 'auto' }}>
+  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px', alignItems: 'center' }}>
+    <h4 style={{ fontSize: '14px', margin: 0, fontWeight: 'bold' }}>
+      {getCategoryDisplayName(selectedCategory) || t('select_category')}
+    </h4>
+  </div>
 
-            {/* Grid ya bidhaa (columns 2 kwenye simu) */}
-            {featuredProducts.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-                 {t('no_products')}
-              </div>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '15px' }}>
-                {featuredProducts.map((leaf) => (
-                  <div 
-                    key={leaf.id} 
-                    onClick={() => {
-                      handleLeafClick(leaf.leaf_category_id);
-                      setMobileMenuOpen(false);
-                    }}
-                    style={{ textAlign: 'center', cursor: 'pointer' }}
-                  >
-                    <div style={{ 
-                      width: '100%', 
-                      aspectRatio: '1/1', 
-                      borderRadius: '12px', 
-                      backgroundColor: '#f5f5f5', 
-                      marginBottom: '8px', 
-                      overflow: 'hidden' 
-                    }}>
-                      <img 
-                        src={leaf.cover_image || placeholderImg} 
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                        alt={leaf.leaf_categories?.name}
-                      />
-                    </div>
-                    <p style={{ fontSize: '11px', margin: 0, color: '#333' }}>
-  {i18n.language === 'sw' 
-    ? (leaf.leaf_categories?.name_sw || leaf.leaf_categories?.name)
-    : leaf.leaf_categories?.name}
-</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </main>
+  {/* Grid ya bidhaa - Hapa ndipo tunapofanya muonekano wa duara */}
+  {featuredProducts.length === 0 ? (
+    <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+      {t('no_products')}
+    </div>
+  ) : (
+    <div style={{ 
+      display: 'grid', 
+      gridTemplateColumns: 'repeat(3, 1fr)', // Ongeza columns kuwa 3 ili ziwe ndogo zaidi
+      gap: '15px' 
+    }}>
+      {featuredProducts.map((leaf) => (
+        <div 
+          key={leaf.id} 
+          onClick={() => {
+            handleLeafClick(leaf.leaf_category_id);
+            setMobileMenuOpen(false);
+          }}
+          style={{ textAlign: 'center', cursor: 'pointer' }}
+        >
+          {/* Hapa ndipo tunafanya umbo la duara */}
+          <div style={{ 
+            width: '100%', 
+            aspectRatio: '1/1', 
+            borderRadius: '50%', // Hii ndio inafanya duara kamili
+            backgroundColor: '#f5f5f5', 
+            marginBottom: '8px', 
+            overflow: 'hidden',
+            border: '1px solid #eee', // Border nyepesi kuongeza muonekano
+            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+          }}>
+            <img 
+              src={leaf.cover_image || placeholderImg} 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+              alt={leaf.leaf_categories?.name}
+            />
+          </div>
+          <p style={{ 
+            fontSize: '10px', 
+            margin: 0, 
+            color: '#333', 
+            fontWeight: '500',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis' // Kuzuia maandishi marefu kuharibu layout
+          }}>
+            {i18n.language === 'sw' 
+              ? (leaf.leaf_categories?.name_sw || leaf.leaf_categories?.name)
+              : leaf.leaf_categories?.name}
+          </p>
+        </div>
+      ))}
+    </div>
+  )}
+</main>
+
         </div>
       )}
     </div>
