@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast, Toaster } from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import { supabase } from '../supabaseClient';
 import ProductSelectionDrawer from '../pages/ProductSelectionDrawer';
 import { MessageSquare, Star, ChevronRight, ShoppingCart, Zap } from 'lucide-react';
@@ -272,102 +272,74 @@ const handleQtyChange = (variant, delta = 1) => {
   }
 };
 
- const handleDrawerConfirm = async () => {
-
+const handleDrawerConfirm = async () => {
   // 1. Zuia double submission
   if (loading) return; 
   setLoading(true);
 
   const finalQty = Object.values(selectedItems).reduce((sum, qty) => sum + qty, 0);
+  
   if (finalQty === 0) {
     toast.error("Tafadhali chagua angalau bidhaa moja");
+    setLoading(false); // ✅ LAZIMA UZIME LOADING HAPA
     return;
   }
 
-  // ✅ KIZUIZI CHA LOGIN KIPO HAPA
-  // Kama ana-order (anataka kulipia), tunakagua kama ameingia (login)
+  // 2. Kagua Session (Kama ni Order)
   if (drawerAction === 'order') {
     const { data: { session } } = await supabase.auth.getSession();
-   // Badala ya ku-navigate mara moja, tunatumia setTimeout
-if (!session) {
-  toast.error("Tafadhali ingia kwanza ili kukamilisha oda!", {
-    duration: 2000, // Toast itatoweka baada ya sekunde 2
-  });
-  
-  // Nimeongeza delay ya sekunde 1 ili toast ieleweke kwanza 
-  // kabla ya kuhamisha page
-  setTimeout(() => {
-    navigate("/dashboard/login");
-  }, 1000); 
-  
-  return;
-}
+    if (!session) {
+      toast.dismiss(); // ✅ Futa toast zote zilizoganda
+      toast.error("Tafadhali ingia kwanza!");
+      setLoading(false); // ✅ LAZIMA UZIME LOADING
+      navigate("/dashboard/login");
+      return;
+    }
   }
 
+  // 3. Andaa vitu vya ku-process
   const itemsToProcess = [];
   Object.entries(selectedItems).forEach(([itemKey, qty]) => {
     if (qty <= 0) return;
     
-    let variantIdFromKey = itemKey;
-    let selectedSizeFromKey = null;
-    if (itemKey.includes('::')) {
-      const parts = itemKey.split('::');
-      variantIdFromKey = parts[0];
-      selectedSizeFromKey = parts[1];
-    }
+    let variantIdFromKey = itemKey.split('::')[0];
+    let selectedSizeFromKey = itemKey.includes('::') ? itemKey.split('::')[1] : null;
     
     let variant = productVariations.find(v => String(v.id) === String(variantIdFromKey));
     if (!variant) return;
 
-    let unitPrice = Number(variant.price) || Number(product?.price) || 0;
-    let productImageUrl = variant.color_image || product?.cover_image || "https://via.placeholder.com/150";
-    const uniqueCartId = `${variant.id}_${selectedSizeFromKey || 'nosize'}_${variant.color_name || 'nocolor'}`;
-    
-    const baseItem = {
+    itemsToProcess.push({
       id: product.id,
-      productId: product.id,
       variant_id: variant.id,
       name: product.name,
-      product_name: product.name,
-      selected_color: variant.color_name || selectedColor || 'Standard',
+      selected_color: variant.color_name || 'Standard',
       selected_size: selectedSizeFromKey || 'Free Size',
       quantity: qty,
-      price: unitPrice,
-      image: productImageUrl,
-      store_id: product.store_id,
-      sku: variant.sku || product.sku || ''
-    };
-
-    if (drawerAction === 'cart') {
-      itemsToProcess.push({ ...baseItem, uniqueCartId });
-    } else {
-      itemsToProcess.push(baseItem);
-    }
+      price: Number(variant.price) || Number(product?.price) || 0,
+      image: variant.color_image || product?.cover_image,
+      store_id: product.store_id
+    });
   });
 
   if (itemsToProcess.length === 0) {
     toast.error("Hakuna bidhaa zilizochaguliwa");
+    setLoading(false); // ✅ LAZIMA UZIME LOADING
     return;
   }
 
+  // 4. Mwisho: Safisha na Navigate
+  setIsSelectionOpen(false); // Funga drawer
+  setSelectedItems({});      // Futa selection
+  setPurchaseQty(1);         // Rudisha idadi 1
+  setLoading(false);         // Zima loading
+
   if (drawerAction === 'cart') {
     itemsToProcess.forEach(item => addToCart(item));
-    toast.success(`${itemsToProcess.length} bidhaa zimeongezwa kwenye kikapu!`, {
-  duration: 1000, // Itatoweka baada ya sekunde 2
-});
-    setIsSelectionOpen(false);
+    toast.success("Imeongezwa kwenye kikapu!");
     navigate('/cart');
   } else {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      toast.error("Session imeisha, tafadhali ingia tena.");
-      navigate("/dashboard/login");
-      return;
-    }
     navigate('/checkout', { state: { orderItems: itemsToProcess } });
-    setIsSelectionOpen(false);
-}
-
+  }
 };
 
 const handleWhatsAppOrder = async () => {
@@ -446,7 +418,7 @@ useEffect(() => {
 
   return (
     <div className="info-main-container" style={{ height: 'auto', minHeight: '100%' }}>
-      <Toaster position="top-center" />
+      {/* //<Toaster position="top-center" /> */}
 
       <ProductSelectionDrawer
         isOpen={isSelectionOpen}
