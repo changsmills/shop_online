@@ -481,43 +481,44 @@ const getCategoryDisplayName = (category) => {
     overflowX: 'hidden'
 }}>
 
-  {/* ========== MOBILE CATEGORY SLIDER ========== */}
-  {isMobile && !search && categories.length > 0 && (
-    <div style={{
-      position: 'sticky',
-  top: '60px',
-  zIndex: 99,
-  backgroundColor: 'white',
-  width: '100vw',
-  marginLeft: 'calc(-50vw + 50%)',
-  marginRight: 'calc(-50vw + 50%)',
-  padding: '0 12px',
-  boxSizing: 'border-box',
-    display: 'block',
-    }}>
-      <MobileCategorySlider 
-  categories={categories}
-  selectedCategory={selectedCategoryForComponents}
-  onSelectCategory={(cat) => {
-    setSelectedCategoryForComponents(cat);
-    setSelectedCategory(cat);
-    // If "All" category is selected (id === null), fetch all products
-    if (cat.id === null) {
-      // You might want to reset or clear the category filter
-      setSelectedCategoryForComponents(null);
-      setSelectedCategory(null);
-    } else {
-      setSelectedCategoryForComponents(cat);
-      setSelectedCategory(cat);
-      fetchFeaturedLeafs(cat.id);
-      fetchSubCategories(cat.id);
-    }
-  }}
-  getDisplayName={getCategoryDisplayName}  // ← ADD THIS
-  getIcon={getIcon}
-/>
-    </div>
-  )}
+ {/* ========== MOBILE CATEGORY SLIDER (FIXED) ========== */}
+{isMobile && !search && categories.length > 0 && (
+  <div style={{
+    position: 'relative',
+    backgroundColor: 'white',
+    width: '100%',
+    padding: '8px 0 4px 0',
+    margin: 0,
+    boxSizing: 'border-box',
+    borderBottom: '1px solid #eee',
+    zIndex: 50
+  }}>
+    <MobileCategorySlider 
+      categories={categories}
+      selectedCategory={selectedCategoryForComponents}
+      onSelectCategory={(cat) => {
+        // Update both states
+        setSelectedCategoryForComponents(cat);
+        setSelectedCategory(cat);
+        
+        // Kama ni "All" (id === null), reset filters
+        if (cat.id === null) {
+          setSelectedCategoryForComponents(null);
+          setSelectedCategory(null);
+          // Chukua hatua nyingine kama unahitaji kuonyesha products zote
+          // Kwa mfano: fetchAllProducts() ikiwa ipo
+        } else {
+          setSelectedCategoryForComponents(cat);
+          setSelectedCategory(cat);
+          fetchFeaturedLeafs(cat.id);
+          fetchSubCategories(cat.id);
+        }
+      }}
+      getDisplayName={getCategoryDisplayName}
+      getIcon={getIcon}
+    />
+  </div>
+)}
      <div className="content-container-simple" style={{ 
   padding: 0,
   margin: 0,

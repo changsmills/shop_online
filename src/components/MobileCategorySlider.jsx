@@ -1,4 +1,4 @@
-// src/components/MobileCategorySlider.jsx
+// src/components/MobileCategorySlider.jsx (FIXED)
 import React, { useRef, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -33,11 +33,17 @@ export default function MobileCategorySlider({
     return () => window.removeEventListener('resize', checkScroll);
   }, [categories]);
 
-  if (!categories || !categories.length) return null;
+  if (!categories || categories.length === 0) return null;
 
   return (
-    <div style={{ position: 'relative', display: 'flex', alignItems: 'center', width: '100%' }}>
-      {/* Left Arrow */}
+    <div style={{ 
+      position: 'relative', 
+      display: 'flex', 
+      alignItems: 'center', 
+      width: '100%',
+      padding: '0 4px'
+    }}>
+      {/* Left Arrow - sio absolute tena, na background gradient */}
       {showLeftArrow && (
         <button
           onClick={() => scroll('left')}
@@ -45,40 +51,41 @@ export default function MobileCategorySlider({
             position: 'absolute',
             left: 0,
             zIndex: 10,
-            background: 'white',
+            background: 'linear-gradient(90deg, white 60%, transparent)',
             border: 'none',
-            borderRadius: '50%',
-            width: '28px',
-            height: '28px',
+            borderRadius: '0 20px 20px 0',
+            width: '32px',
+            height: '40px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+            justifyContent: 'flex-start',
+            paddingLeft: '6px',
             cursor: 'pointer',
-            marginLeft: '4px'
+            boxShadow: 'none'
           }}
         >
-          <ChevronLeft size={18} />
+          <ChevronLeft size={20} strokeWidth={2} />
         </button>
       )}
 
-      {/* Scrollable Categories Container */}
+      {/* Scrollable Container */}
       <div
         ref={scrollRef}
         onScroll={checkScroll}
         style={{
           display: 'flex',
           overflowX: 'auto',
-          scrollbarWidth: 'none', // Firefox
-          msOverflowStyle: 'none', // IE/Edge
-          padding: '10px 0',
-          gap: '12px',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          padding: '8px 0',
+          gap: '10px',
           flex: 1,
-          scrollBehavior: 'smooth'
+          scrollBehavior: 'smooth',
+          WebkitOverflowScrolling: 'touch'
         }}
       >
         {categories.map((cat, index) => {
-          const displayName = getDisplayName ? getDisplayName(cat) : cat.name;
+          const displayName = getDisplayName ? getDisplayName(cat) : (cat.name || cat.name_sw);
           const isActive = selectedCategory?.id === cat.id;
           return (
             <div
@@ -87,15 +94,16 @@ export default function MobileCategorySlider({
               style={{
                 whiteSpace: 'nowrap',
                 flexShrink: 0,
-                padding: '8px 16px',
-                borderRadius: '30px',
+                padding: '6px 16px',
+                borderRadius: '40px',
                 backgroundColor: isActive ? '#000000' : '#f0f0f0',
-                color: isActive ? '#ffffff' : '#000000',
+                color: isActive ? '#ffffff' : '#333333',
                 cursor: 'pointer',
                 fontSize: '14px',
-                fontWeight: '500',
+                fontWeight: isActive ? '600' : '500',
                 transition: 'all 0.2s ease',
-                userSelect: 'none'
+                userSelect: 'none',
+                boxShadow: isActive ? '0 2px 6px rgba(0,0,0,0.1)' : 'none'
               }}
             >
               {displayName}
@@ -112,20 +120,20 @@ export default function MobileCategorySlider({
             position: 'absolute',
             right: 0,
             zIndex: 10,
-            background: 'white',
+            background: 'linear-gradient(270deg, white 60%, transparent)',
             border: 'none',
-            borderRadius: '50%',
-            width: '28px',
-            height: '28px',
+            borderRadius: '20px 0 0 20px',
+            width: '32px',
+            height: '40px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+            justifyContent: 'flex-end',
+            paddingRight: '6px',
             cursor: 'pointer',
-            marginRight: '4px'
+            boxShadow: 'none'
           }}
         >
-          <ChevronRight size={18} />
+          <ChevronRight size={20} strokeWidth={2} />
         </button>
       )}
     </div>
