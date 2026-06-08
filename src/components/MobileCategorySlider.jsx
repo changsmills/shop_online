@@ -2,13 +2,15 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-export default function MobileCategorySlider({ categories, selectedCategory, onSelectCategory }) {
+export default function MobileCategorySlider({ 
+  categories, 
+  selectedCategory, 
+  onSelectCategory,
+  getDisplayName   // ← prop mpya kwa lugha
+}) {
   const scrollRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
-
-  // MABADILIKO: Tumeondoa 'allCategories' hapa kwa sababu 'categories' 
-  // tayari inakuja na "All" kutoka kwenye Dashboard.js
 
   const checkScroll = () => {
     if (scrollRef.current) {
@@ -29,7 +31,7 @@ export default function MobileCategorySlider({ categories, selectedCategory, onS
     checkScroll();
     window.addEventListener('resize', checkScroll);
     return () => window.removeEventListener('resize', checkScroll);
-  }, [categories]); // Tumeweka 'categories' kama dependency
+  }, [categories]);
 
   if (!categories || !categories.length) return null;
 
@@ -42,18 +44,21 @@ export default function MobileCategorySlider({ categories, selectedCategory, onS
       )}
       
       <div className="mobile-category-slider" ref={scrollRef} onScroll={checkScroll}>
-        {/* Tunatumia 'categories' moja kwa moja hapa */}
-        {categories.map((cat, index) => (
-          <div
-            // Tunatumia index pamoja na id kuhakikisha key ni unique
-            key={cat.id === null ? `all-${index}` : cat.id}
-            className={`mobile-cat-item ${selectedCategory?.id === cat.id ? 'active' : ''}`}
-            onClick={() => onSelectCategory(cat)}
-          >
-            <span>{cat.name}</span>
-          </div>
-        ))}
+        {categories.map((cat, index) => {
+          // Kama getDisplayName ipo, itumie, vinginevyo tumia cat.name
+          const displayName = getDisplayName ? getDisplayName(cat) : cat.name;
+          return (
+            <div
+              key={cat.id === null ? `all-${index}` : cat.id}
+              className={`mobile-cat-item ${selectedCategory?.id === cat.id ? 'active' : ''}`}
+              onClick={() => onSelectCategory(cat)}
+            >
+              <span>{displayName}</span>
+            </div>
+          );
+        })}
       </div>
+      
       {showRightArrow && (
         <button className="slider-arrow right" onClick={() => scroll('right')}>
           <ChevronRight size={20} />

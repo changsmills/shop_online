@@ -7,36 +7,44 @@
   cursor: pointer;
 }
 
-/* Box la kukatia picha (ili ibaki icon tu) */
+/* Box la logo - Tumebadilisha kuwa duara */
 .icon-crop {
-  overflow: hidden;
-  width: 45px;
-  height: 30px;
+  width: 40px;  
+  height: 40px; 
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
+  
+  /* Hizi ndizo zinazounda duara */
+  border-radius: 50%; 
+  overflow: hidden; 
+  
+  /* Hiari: Ongeza border kama unataka nembo iwe na mzunguko wa rangi */
+  border: 1px solid rgba(255, 255, 255, 0.1); 
+  background-color: #0B132B; /* Iwe na rangi ya background ya logo yako */
 }
 
-/* Style ya picha yenyewe */
+/* Style ya SVG yenyewe */
 .logo-img {
-  height: 30px;
-  object-fit: contain;
-  filter: brightness(0); /* Inafanya icon iwe nyeusi */
+  width: 120%; /* Nimeiongeza kidogo ili ijaze vizuri ndani ya duara */
+  height: 120%;
+  object-fit: cover; /* Inahakikisha picha inajaza eneo bila kupoteza umbo */
 }
 
-/* Maandishi ya Changsmills */
+/* Maandishi ya Skyfall */
 .logo-text {
   display: flex;
   flex-direction: column;
-  margin-left: -10px; /* Inasogeza maandishi karibu na icon */
-  color: rgb(241, 63, 19) !important;
-  font-weight: bold;
-  font-size: 24px;
+  /* margin-left: -10px; Hii unaweza kuiondoa kama unataka nafasi ya kawaida */
+  color: #ff4e00 !important; /* Rangi uliyotumia kwenye checkout button yako */
+  font-weight: 700;
+  font-size: 22px;
   line-height: 1;
-  font-family: sans-serif;
+  font-family: 'Inter', sans-serif, Arial;
 }
 
 /* Rangi ya .com pekee */
 .dot-com {
   color: #e45a0a;
+  font-size: 16px; /* .com huwa ndogo kidogo kuliko neno kuu */
 }
