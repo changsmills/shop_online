@@ -485,16 +485,14 @@ const getCategoryDisplayName = (category) => {
   {isMobile && !search && categories.length > 0 && (
     <div style={{
       position: 'sticky',
-      top: '60px', /* Adjust based on your header height */
-      zIndex: 99,
-      backgroundColor: 'white',
-      //width: '100vw',  // Badilisha hapa kuwa 100vw
-          width: '100%',           // ← badilisha kutoka 100vw
-    //padding: 0, 
-        padding: '0 12px',       // ← ongeza padding ya kutosha pande
-    margin: 0,
-    marginLeft: 'calc(-50vw + 50%)', // Hii ni "hack" ya CSS kuvuta content nje ya container
-    marginRight: 'calc(-50vw + 50%)',
+  top: '60px',
+  zIndex: 99,
+  backgroundColor: 'white',
+  width: '100vw',
+  marginLeft: 'calc(-50vw + 50%)',
+  marginRight: 'calc(-50vw + 50%)',
+  padding: '0 12px',
+  boxSizing: 'border-box',
     display: 'block',
     }}>
       <MobileCategorySlider 
