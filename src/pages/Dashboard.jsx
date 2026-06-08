@@ -483,16 +483,18 @@ const getCategoryDisplayName = (category) => {
 
  {/* ========== MOBILE CATEGORY SLIDER (FIXED) ========== */}
 {isMobile && !search && categories.length > 0 && (
+  
   <div style={{
-    position: 'relative',
-    backgroundColor: 'white',
+    position: 'sticky', // Tumia sticky ili isipotee unaposogeza screen
+    top: '60px',        // Rekebisha kulingana na urefu wa Header yako
+    left: 0,
     width: '100%',
-    padding: '8px 0 4px 0',
-    margin: 0,
-    boxSizing: 'border-box',
-    borderBottom: '1px solid #eee',
-    zIndex: 50
+    backgroundColor: 'white',
+    zIndex: 999,        // Iwe juu kabisa
+    padding: '10px 0',
+    borderBottom: '1px solid #eee'
   }}>
+
     <MobileCategorySlider 
       categories={categories}
       selectedCategory={selectedCategoryForComponents}
