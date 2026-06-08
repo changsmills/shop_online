@@ -194,7 +194,7 @@ function AppContent({ session }) {
       </Routes>
 
       {/* BOTTOM NAV - INAONEKANA KWA MASHARTI TU */}
-      {shouldShowBottomNav() && <BottomNav />}
+     {/*{shouldShowBottomNav() && <BottomNav />}*/}
     </div>
   );
 }
