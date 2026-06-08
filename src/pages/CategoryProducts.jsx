@@ -3,9 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { CheckCircle, Star, Filter, ChevronRight, ChevronLeft, Loader2, PackageOpen } from "lucide-react";
-import CategoryCard from "../components/CategoryCard";
-import "./CategoryProducts.css"; // Hakikisha umeunda hii file
+import { ChevronRight, Loader2, PackageOpen } from "lucide-react";
+import "./CategoryProducts.css";
 
 export default function CategoryProducts() {
   const { leafId } = useParams();
@@ -13,6 +12,15 @@ export default function CategoryProducts() {
   const [hierarchy, setHierarchy] = useState({ category: "Marketplace", sub: "General", leaf: "Products" });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  
+  // Detect mobile screen
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     async function fetchPageData() {
@@ -84,46 +92,111 @@ export default function CategoryProducts() {
       <div className="header-spacer"></div> 
 
       <main className="category-main-content">
-        <nav className="breadcrumb-nav">
-          <div className="breadcrumb-links">
-            <span className="breadcrumb-item clickable" onClick={() => navigate('/')}>Home</span> 
-            <ChevronRight size={14} />
-            <span className="breadcrumb-item">{hierarchy.category}</span> 
-            <ChevronRight size={14} />
-            <span className="breadcrumb-item">{hierarchy.sub}</span> 
-            <ChevronRight size={14} />
-            <span className="breadcrumb-item active">{hierarchy.leaf}</span>
-          </div>
-        </nav>
+        {/* Breadcrumb - Inaonekana desktop tu */}
+        {!isMobile && (
+          <nav className="breadcrumb-nav">
+            <div className="breadcrumb-links">
+              <span className="breadcrumb-item clickable" onClick={() => navigate('/')}>Home</span> 
+              <ChevronRight size={14} />
+              <span className="breadcrumb-item">{hierarchy.category}</span> 
+              <ChevronRight size={14} />
+              <span className="breadcrumb-item">{hierarchy.sub}</span> 
+              <ChevronRight size={14} />
+              <span className="breadcrumb-item active">{hierarchy.leaf}</span>
+            </div>
+          </nav>
+        )}
+
+        {/* Kichwa cha ukurasa - muhimu kwa UX */}
+        <div style={{ 
+          padding: isMobile ? '10px 20px 0' : '20px', 
+          fontSize: isMobile ? '18px' : '24px', 
+          fontWeight: 'bold' 
+        }}>
+          {hierarchy.leaf}
+        </div>
 
         <div className="content-layout">
-
-          <section className="products-display-area">
+          <section className="products-display-area" style={{ 
+            padding: isMobile ? '10px' : '20px',
+            minHeight: '60vh'
+          }}>
             {loading ? (
-              <div className="loading-container">
-                <Loader2 className="animate-spin" size={50} color="#ff6600" strokeWidth={3} />
-                <p>Fetching products...</p>
+              <div className="loading-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '50px' }}>
+                <Loader2 className="animate-spin" size={40} color="#ff6600" strokeWidth={2.5} />
+                <p style={{ color: '#666', marginTop: '10px' }}>Inapakia bidhaa...</p>
               </div>
             ) : products.length > 0 ? (
-              <div className="products-grid">
+              <div className="products-grid" style={{ 
+                display: 'grid', 
+                gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(auto-fill, minmax(150px, 1fr))',
+                gap: isMobile ? '15px' : '20px'
+              }}>
                 {products.map((item) => (
-                  <CategoryCard key={item.id} item={item} />
+                  <div key={item.id} className="product-wrapper" style={{ textAlign: 'center' }}>
+                    <div style={{ 
+                      width: '100%', 
+                      aspectRatio: '1/1', 
+                      borderRadius: '50%', 
+                      overflow: 'hidden',
+                      backgroundColor: '#f5f5f5',
+                      marginBottom: '8px',
+                      border: '1px solid #eee',
+                      cursor: 'pointer'
+                    }} onClick={() => navigate(`/product/${item.id}`)}>
+                      <img 
+                        src={item.product_media?.[0]?.media_url || '/placeholder.jpg'} 
+                        alt={item.name}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    </div>
+                    <p style={{ 
+                      fontSize: isMobile ? '10px' : '12px', 
+                      margin: '0 0 4px 0', 
+                      fontWeight: '500',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}>
+                      {item.name}
+                    </p>
+                    {/* 👇 ONGEZA BEI IKIWA UNAITAKA (hiari) */}
+                    {item.price && (
+                      <p style={{ 
+                        fontSize: isMobile ? '10px' : '12px', 
+                        margin: 0, 
+                        color: '#ff6600', 
+                        fontWeight: 'bold' 
+                      }}>
+                        TSh {Number(item.price).toLocaleString()}
+                      </p>
+                    )}
+                  </div>
                 ))}
               </div>
             ) : (
-              <div className="empty-state">
-                <PackageOpen size={80} color="#ddd" className="empty-icon" />
-                <h2>No products found!</h2>
-                <p>Samahani, kategoria ya "{hierarchy.leaf}" haina bidhaa kwa sasa.</p>
-                <button className="go-back-btn" onClick={() => navigate(-1)}>
-                  Go Back
+              <div className="empty-state" style={{ textAlign: 'center', padding: '50px 20px' }}>
+                <PackageOpen size={60} color="#ddd" style={{ marginBottom: '15px' }} />
+                <h2 style={{ fontSize: '18px', color: '#333' }}>Hakuna bidhaa!</h2>
+                <p style={{ color: '#999', fontSize: '14px', marginBottom: '20px' }}>
+                  Samahani, kategoria ya "{hierarchy.leaf}" haina bidhaa kwa sasa.
+                </p>
+                <button className="go-back-btn" onClick={() => navigate(-1)} style={{ 
+                  padding: '10px 25px', 
+                  borderRadius: '20px', 
+                  border: 'none', 
+                  background: '#ff6600', 
+                  color: 'white',
+                  cursor: 'pointer' 
+                }}>
+                  Rudi Nyuma
                 </button>
               </div>
             )}
           </section>
         </div>
       </main>
-      <Footer />
+       {!isMobile && <Footer />}
     </div>
   );
 }

@@ -745,3 +745,40 @@
 .products-display-area::-webkit-scrollbar-thumb:hover {
     background: #e55a00 !important;
 }
+/* CategoryProducts.css */
+.category-page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.header-spacer {
+  height: 70px; /* au urefu wa header yako */
+}
+.category-main-content {
+  flex: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+}
+.breadcrumb-nav {
+  padding: 1rem 2rem;
+  background: #f9f9f9;
+}
+.breadcrumb-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.breadcrumb-item {
+  color: #666;
+  font-size: 14px;
+}
+.breadcrumb-item.clickable {
+  cursor: pointer;
+  color: #333;
+}
+.breadcrumb-item.active {
+  color: #ff6600;
+  font-weight: 500;
+}
