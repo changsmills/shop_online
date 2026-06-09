@@ -1,17 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabaseClient';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, MessageSquare, ClipboardList, 
   Settings, BarChart3, Bell, Search, Send, Menu, 
-  ChevronLeft, Home, ShoppingCart, User
+  ChevronLeft, Home, ShoppingCart, User,
+  Plus, Megaphone   // ← HIZI
 } from 'lucide-react';
+
 import UserTools from '../components/UserTools';
 import '../Messages.css';
 import '../AccountSettings.css';
 import messageImage from "../images/messageSent.svg"; 
 
 const Messages = ({ session }) => {
+  const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
   const [chats, setChats] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
@@ -309,7 +312,7 @@ const handleSelectStoreFromSearch = (store) => {
         </div>
       </header>
 
-      <div className="dashboard-main" style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div className="dashboard-main" style={{ display: 'flex', flex: 1, overflow: 'hidden',paddingBottom: isMobile ? '70px' : 0 }}>
         {/* SIDEBAR - Hide on mobile (use bottom nav instead) */}
         {!isMobile && (
           <aside 
@@ -752,6 +755,7 @@ const handleSelectStoreFromSearch = (store) => {
                   flex: 1, 
                   overflowY: 'auto', 
                   padding: '20px',
+                    paddingBottom: isMobile ? 'calc(20px + 70px)' : '20px',  // ← HAPA
                   backgroundColor: '#f5f5f7'
                 }}>
                   {messages.map((msg, index) => (
@@ -816,43 +820,126 @@ const handleSelectStoreFromSearch = (store) => {
         </div>
       </div>
 
-      {/* MOBILE BOTTOM NAVIGATION */}
-      {isMobile && (
-        <nav className="mobile-bottom-nav" style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: 'white',
-          display: 'flex',
-          justifyContent: 'space-around',
-          alignItems: 'center',
-          padding: '10px 0 20px',
-          borderTop: '1px solid #eee',
-          zIndex: 1000,
-          boxShadow: '0 -2px 10px rgba(0,0,0,0.05)'
-        }}>
-          <div className="nav-item" onClick={() => window.location.href = '/dashboard'} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
-            <Home size={22} color={location.pathname === '/dashboard' ? '#ff6600' : '#666'} />
-            <span style={{ fontSize: '11px', color: location.pathname === '/dashboard' ? '#ff6600' : '#666' }}>Home</span>
-          </div>
-          <div className="nav-item" onClick={() => window.location.href = '/dashboard/messages'} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
-            <MessageSquare size={22} color={location.pathname === '/dashboard/messages' ? '#ff6600' : '#666'} />
-            <span style={{ fontSize: '11px', color: location.pathname === '/dashboard/messages' ? '#ff6600' : '#666' }}>Messages</span>
-          </div>
-          <div className="nav-item" onClick={() => window.location.href = '/cart'} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
-            <ShoppingCart size={22} color="#666" />
-            <span style={{ fontSize: '11px', color: '#666' }}>Cart</span>
-          </div>
-          <div className="nav-item" onClick={() => window.location.href = '/profile'} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
-            <User size={22} color="#666" />
-            <span style={{ fontSize: '11px', color: '#666' }}>Account</span>
-          </div>
-        </nav>
-      )}
+{/* MOBILE BOTTOM NAVIGATION - SAHIHI */}
+{isMobile && (
+  <nav 
+    className="mobile-bottom-nav"
+    style={{
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      background: 'white',
+      display: 'flex',
+      justifyContent: 'space-around',
+      alignItems: 'center',
+      padding: '10px 0 calc(20px + env(safe-area-inset-bottom, 0px))',
+      borderTop: '1px solid #eee',
+      zIndex: 1000,
+      boxShadow: '0 -2px 10px rgba(0,0,0,0.05)'
+    }}
+  >
+    {/* Home */}
+    <button 
+      onClick={() => navigate('/dashboard')} 
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '4px',
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        flex: 1,
+        padding: '4px 0'
+      }}
+    >
+      <Home size={22} color={location.pathname === '/dashboard' ? '#ff6600' : '#666'} />
+      <span style={{ fontSize: '10px', color: location.pathname === '/dashboard' ? '#ff6600' : '#666' }}>Home</span>
+    </button>
+
+    {/* My Orders */}
+    <button 
+      onClick={() => navigate('/dashboard/orders')} 
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '4px',
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        flex: 1,
+        padding: '4px 0'
+      }}
+    >
+      <ClipboardList size={22} color={location.pathname === '/dashboard/orders' ? '#ff6600' : '#666'} />
+      <span style={{ fontSize: '10px', color: location.pathname === '/dashboard/orders' ? '#ff6600' : '#666' }}>Orders</span>
+    </button>
+
+    {/* Create Store (kitufe cha katikati) */}
+    <button 
+      onClick={() => navigate('/create-store')} 
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '4px',
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        flex: 1,
+        padding: '4px 0'
+      }}
+    >
+      <div style={{ background: '#ff6600', padding: '8px', borderRadius: '50%', marginBottom: '4px' }}>
+        <Plus size={24} color="white" />
+      </div>
+      <span style={{ fontSize: '10px', color: '#ff6600', fontWeight: 'bold' }}>Store</span>
+    </button>
+
+    {/* Advertise */}
+    <button 
+      onClick={() => navigate('/advertise')} 
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '4px',
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        flex: 1,
+        padding: '4px 0'
+      }}
+    >
+      <Megaphone size={22} color={location.pathname === '/advertise' ? '#ff6600' : '#666'} />
+      <span style={{ fontSize: '10px', color: location.pathname === '/advertise' ? '#ff6600' : '#666' }}>Ads</span>
+    </button>
+
+    {/* Notifications */}
+    <button 
+      onClick={() => navigate('/dashboard/notifications')} 
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '4px',
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        flex: 1,
+        padding: '4px 0'
+      }}
+    >
+      <Bell size={22} color={location.pathname === '/dashboard/notifications' ? '#ff6600' : '#666'} />
+      <span style={{ fontSize: '10px', color: location.pathname === '/dashboard/notifications' ? '#ff6600' : '#666' }}>Alerts</span>
+    </button>
+  </nav>
+)}
 
       {/* Add padding bottom for mobile to avoid content hiding under bottom nav */}
-      {isMobile && <div style={{ height: '70px' }} />}
+    {/*   {isMobile && <div style={{ height: '70px' }} />}*/}
     </div>
   );
 };
