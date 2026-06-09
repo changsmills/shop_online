@@ -127,11 +127,7 @@ export default function CategoryProducts() {
                 <p style={{ color: '#666', marginTop: '10px' }}>Inapakia bidhaa...</p>
               </div>
             ) : products.length > 0 ? (
-              <div className="products-grid" style={{ 
-                display: 'grid', 
-                gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(auto-fill, minmax(150px, 1fr))',
-                gap: isMobile ? '15px' : '20px'
-              }}>
+              <div className="products-grid">
                 {products.map((item) => (
                   <div key={item.id} className="product-wrapper" style={{ textAlign: 'center' }}>
                     <div style={{ 
