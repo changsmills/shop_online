@@ -141,9 +141,9 @@ export default function CategoryProducts() {
                       cursor: 'pointer'
                     }} onClick={() => navigate(`/product/${item.id}`)}>
                       <img 
-                        src={item.product_media?.[0]?.media_url || '/placeholder.jpg'} 
+                        src={item.product_media?.find(m => m.media_type === 'image')?.media_url || '/placeholder.jpg'} 
                         alt={item.name}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                       />
                     </div>
                     <p style={{ 
@@ -156,7 +156,6 @@ export default function CategoryProducts() {
                     }}>
                       {item.name}
                     </p>
-                    {/* 👇 ONGEZA BEI IKIWA UNAITAKA (hiari) */}
                     {item.price && (
                       <p style={{ 
                         fontSize: isMobile ? '10px' : '12px', 
@@ -192,7 +191,7 @@ export default function CategoryProducts() {
           </section>
         </div>
       </main>
-       {!isMobile && <Footer />}
+      {!isMobile && <Footer />}
     </div>
   );
 }
