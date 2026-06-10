@@ -5,7 +5,7 @@ import {
   LayoutDashboard, MessageSquare, ClipboardList, 
   Settings, BarChart3, Bell, Search, Send, Menu, 
   ChevronLeft, Home, ShoppingCart, User,
-  Plus, Megaphone   // ← HIZI
+  Plus, Megaphone, Loader2 // ← Ongeza Loader2 hapa
 } from 'lucide-react';
 
 import UserTools from '../components/UserTools';
@@ -287,18 +287,55 @@ const handleSelectStoreFromSearch = (store) => {
     return msg.sender?.full_name || "User";
   };
 
+  const handleStoreNavigation = async () => {
+  // 1. Onyesha loading kwanza (hiari)
+  setLoading(true); 
+
+  try {
+    // 2. Angalia kama user ana duka kwenye table ya 'stores_engine'
+    const { data: store, error } = await supabase
+      .from('stores_engine')
+      .select('id')
+      .eq('owner_id', session.user.id)
+      .maybeSingle(); // Inarudisha data au null kama hana duka
+
+    if (error) throw error;
+
+    if (store) {
+      // Kama duka lipo, mpeleke kwenye dashboard ya duka
+      navigate('/physical-dashboard'); 
+    } else {
+      // Kama hana duka, mpeleke kwenye ukurasa wa kutengeneza duka
+      navigate('/create-store');
+    }
+  } catch (err) {
+    console.error("Error checking store status:", err);
+    // Kama kuna error, labda mpeleke create-store au show notification
+    navigate('/create-store');
+  } finally {
+    setLoading(false);
+  }
+};
+
   return (
+
     <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       {/* HEADER */}
       <header className="dashboard-header" style={{ position: 'sticky', top: 0, zIndex: 100 }}>
         <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          {!isMobile && (
           <Menu 
             size={22} 
             className="menu-toggle" 
             style={{ cursor: 'pointer', color: '#666' }} 
             onClick={() => setIsExpanded(!isExpanded)} 
           />
-          <Link to="/dashboard" className="logo-text">skyfall.com</Link>
+          )}
+
+          <Link to="/dashboard" style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: '800', color: '#ff6a00', textDecoration: 'none' }}>
+            Skyfall.com
+          </Link>
+
           {!isMobile && (
             <div className="search-box">
               <Search size={16} />
@@ -306,10 +343,18 @@ const handleSelectStoreFromSearch = (store) => {
             </div>
           )}
         </div>
-        <div className="header-right">
-          <Bell size={20} className="icon-btn" />
-          <UserTools session={session} />
+
+
+       {/* HAPA NDIPO ULIPOTAKIWA KUWEKA SHARTI LA !isMobile */}
+        <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          {!isMobile && (
+            <>
+              <Bell size={20} style={{ cursor: 'pointer', color: '#666' }} />
+              <UserTools session={session} />
+            </>
+          )}
         </div>
+
       </header>
 
       <div className="dashboard-main" style={{ display: 'flex', flex: 1, overflow: 'hidden',paddingBottom: isMobile ? '70px' : 0 }}>
@@ -380,6 +425,7 @@ const handleSelectStoreFromSearch = (store) => {
               flexShrink: 0,
               borderRight: '1px solid #eee'
             }}>
+
 <div className="sidebar-header-chat">
   <h3>Inbox</h3>
   <div className="search-bar-chat" style={{ position: 'relative' }}>
@@ -540,7 +586,6 @@ const handleSelectStoreFromSearch = (store) => {
     ))
   )}
 </div>
-
 
 {/* SEARCH MODAL - ONLY ON MOBILE */}
 {isMobile && showSearchModal && (
@@ -877,26 +922,33 @@ const handleSelectStoreFromSearch = (store) => {
       <span style={{ fontSize: '10px', color: location.pathname === '/dashboard/orders' ? '#ff6600' : '#666' }}>Orders</span>
     </button>
 
-    {/* Create Store (kitufe cha katikati) */}
     <button 
-      onClick={() => navigate('/create-store')} 
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '4px',
-        background: 'none',
-        border: 'none',
-        cursor: 'pointer',
-        flex: 1,
-        padding: '4px 0'
-      }}
-    >
-      <div style={{ background: '#ff6600', padding: '8px', borderRadius: '50%', marginBottom: '4px' }}>
-        <Plus size={24} color="white" />
-      </div>
-      <span style={{ fontSize: '10px', color: '#ff6600', fontWeight: 'bold' }}>Store</span>
-    </button>
+  onClick={handleStoreNavigation} // ← Ibadilishe iwe hivi
+  disabled={loading} // ← Inazuia kubonyeza mara nyingi wakati inacheki
+  style={{
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '4px',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    flex: 1,
+    padding: '4px 0',
+    opacity: loading ? 0.6 : 1 // Inapunguza mwanga wakati inaload
+  }}
+>
+  <div style={{ background: '#ff6600', padding: '8px', borderRadius: '50%', marginBottom: '4px' }}>
+    {loading ? (
+      <Loader2 size={24} color="white" className="animate-spin" /> // Ongeza icon ya loading ikiwa unayo
+    ) : (
+      <Plus size={24} color="white" />
+    )}
+  </div>
+  <span style={{ fontSize: '10px', color: '#ff6600', fontWeight: 'bold' }}>
+    {loading ? "Inacheki..." : "Store"}
+  </span>
+</button>
 
     {/* Advertise */}
     <button 

@@ -44,11 +44,10 @@ export default function SearchBar({ search = "", setSearch }) {
     return () => clearInterval(timer);
   }, [placeholders]);
 
-  // 2. LOGIC YA KUTAFUTA KATEGORIA (ZINGATIA ULINZI HAPA)
   useEffect(() => {
-    const getCategorySuggestions = async () => {
-      // Ulinzi: Hakikisha search ipo na ni string kuzuia kosa la .trim()
-      if (!search || typeof search !== "string") {
+    const getCombinedSuggestions = async () => {
+      // 1. Ulinzi wa awali
+      if (!search || typeof search !== "string" || search.trim().length < 2) {
         setSuggestions([]);
         setShowSuggestions(false);
         return;
@@ -56,40 +55,37 @@ export default function SearchBar({ search = "", setSearch }) {
 
       const query = search.trim();
       
-      if (query.length > 0) {
-        try {
-          const { data, error } = await supabase
-            .from("leaf_categories")
-            .select("id, name") 
-            .ilike("name", `%${query}%`)
-            .limit(8);
+      try {
+        // 2. Tunafanya queries mbili kwa wakati mmoja (Parallel Fetching)
+        const [catData, prodData] = await Promise.all([
+          supabase.from("leaf_categories").select("id, name").ilike("name", `%${query}%`).limit(4),
+          supabase.from("products_engines").select("id, name").ilike("name", `%${query}%`).limit(4)
+        ]);
 
-          if (error) {
-            console.error("Supabase Error Details:", error);
-            // alert("Supabase Error: " + error.message); // Ondoa alert ikishafanya kazi
-            setSuggestions([]);
-            setShowSuggestions(false);
-            return;
-          }
+        // 3. Kuchanganya matokeo (Combined Array)
+        const combined = [
+          ...(catData.data || []).map(item => ({ ...item, type: 'category' })),
+          ...(prodData.data || []).map(item => ({ ...item, type: 'product' }))
+        ];
 
-          if (data) {
-            console.log("Data imepatikana:", data);
-            setSuggestions(data);
-            setShowSuggestions(true);
-          }
-
-        } catch (err) {
-          console.error("Network/JS Error:", err);
+        // 4. Sasisha state
+        if (combined.length > 0) {
+          setSuggestions(combined);
+          setShowSuggestions(true);
+        } else {
           setSuggestions([]);
           setShowSuggestions(false);
         }
-      } else {
+
+      } catch (err) {
+        console.error("Search Error:", err);
         setSuggestions([]);
         setShowSuggestions(false);
       }
     };
 
-    const timeoutId = setTimeout(getCategorySuggestions, 200);
+    // 5. Debounce ili kupunguza mizigo kwenye database kila mtumiaji anapochapa
+    const timeoutId = setTimeout(getCombinedSuggestions, 300);
     return () => clearTimeout(timeoutId);
   }, [search]);
 
@@ -131,42 +127,54 @@ export default function SearchBar({ search = "", setSearch }) {
         </div>
       </div>
 
-{/* PORTAL LOGIC - ILIYOREKEBISHWA KWA POSITIONING */}
 {showSuggestions && suggestions.length > 0 && createPortal(
   <div 
     className="suggestions-dropdown portal-layout"
     style={{
       position: 'fixed',
-      top: '80px', // Ongeza hii inline style (rekebisha kulingana na header yako)
+      top: '80px',
       left: 'auto',
       right: 'auto',
       width: '400px',
-      maxWidth: 'calc(100vw - 40px)'
+      maxWidth: 'calc(100vw - 40px)',
+      zIndex: 9999
     }}
   >
-    <div className="suggestion-header">Kategoria Zinazofanana</div>
+    <div className="suggestion-header">
+      {search.trim().length > 0 ? "Matokeo yaliyopatikana" : "Mapendekezo"}
+    </div>
     
     <div className="suggestion-scroll-area">
       {suggestions.map((item) => (
         <div 
-          key={item.id} 
-          className="suggestion-item category-item"
+          // Tunatumia type + id kuhakikisha key ni unique
+          key={`${item.type}-${item.id}`} 
+          className="suggestion-item"
           onMouseDown={() => {
             if (typeof setSearch === "function") setSearch(item.name);
-            navigate(`/search?q=${item.name}`);
+            
+            // Logic ya navigation
+            if (item.type === 'product') {
+              navigate(`/product/${item.id}`);
+            } else {
+              navigate(`/search?q=${item.name}`);
+            }
             setShowSuggestions(false);
           }}
         >
           <div className="category-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
+            {/* Tunabadilisha icon kulingana na kama ni bidhaa au kategoria */}
+            {item.type === 'product' ? '📦' : '🔍'}
           </div>
-          <span className="suggestion-name">{item.name}</span>
+          
+          <div className="suggestion-info">
+            <span className="suggestion-name">{item.name}</span>
+            <span className="suggestion-type-badge">
+              {item.type === 'product' ? 'Bidhaa' : 'Kategoria'}
+            </span>
+          </div>
         </div>
       ))}
-      
     </div>
   </div>,
   document.body

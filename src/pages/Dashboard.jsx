@@ -634,18 +634,24 @@ const getCategoryDisplayName = (category) => {
             maxWidth: '70%',
             lineHeight: '1.4'
           }}>{mobileBanner.description}</p>
-          <button className="view-more-banner mobile-btn" style={{
-            background: '#ff6a00',
-            color: 'white',
-            border: 'none',
-            padding: '8px 20px',
-            borderRadius: '25px',
-            cursor: 'pointer',
-            marginTop: '8px',
-            fontSize: '12px',
-            fontWeight: '600',
-            pointerEvents: 'auto'
-          }}>{t('shop_now')} →</button>
+          <button 
+  className="view-more-banner mobile-btn" 
+  onClick={() => navigate(`/store/${mobileBanner.store_id}`)} // Hapa ndipo uchawi ulipo
+  style={{
+    background: '#ff6a00',
+    color: 'white',
+    border: 'none',
+    padding: '8px 20px',
+    borderRadius: '25px',
+    cursor: 'pointer',
+    marginTop: '8px',
+    fontSize: '12px',
+    fontWeight: '600',
+    pointerEvents: 'auto'
+  }}
+>
+  {t('shop_now')} →
+</button>
         </div>
       </div>
     ) : (

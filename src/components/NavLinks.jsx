@@ -596,6 +596,7 @@ useEffect(() => {
 </div>
 
 <Link
+  to="/advertise" // Hii ndiyo inayofanya navigation itokee
   className="nav-item" 
   style={{ 
     display: 'flex', 
