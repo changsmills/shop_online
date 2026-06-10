@@ -287,30 +287,26 @@ const handleSelectStoreFromSearch = (store) => {
     return msg.sender?.full_name || "User";
   };
 
-  const handleStoreNavigation = async () => {
-  // 1. Onyesha loading kwanza (hiari)
+ const handleStoreNavigation = async () => {
   setLoading(true); 
 
   try {
-    // 2. Angalia kama user ana duka kwenye table ya 'stores_engine'
     const { data: store, error } = await supabase
       .from('stores_engine')
-      .select('id')
+      .select('id') // Hakikisha unachukua ID ya duka (au owner_id)
       .eq('owner_id', session.user.id)
-      .maybeSingle(); // Inarudisha data au null kama hana duka
+      .maybeSingle();
 
     if (error) throw error;
 
     if (store) {
-      // Kama duka lipo, mpeleke kwenye dashboard ya duka
-      navigate('/physical-dashboard'); 
+      // HAPA: Ongeza ID ya duka kwenye URL ili ilingane na Route yako
+      navigate(`/dashboard/physical/${store.id}`); 
     } else {
-      // Kama hana duka, mpeleke kwenye ukurasa wa kutengeneza duka
       navigate('/create-store');
     }
   } catch (err) {
-    console.error("Error checking store status:", err);
-    // Kama kuna error, labda mpeleke create-store au show notification
+    console.error("Error:", err);
     navigate('/create-store');
   } finally {
     setLoading(false);
