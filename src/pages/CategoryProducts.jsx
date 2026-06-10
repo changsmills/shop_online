@@ -11,6 +11,7 @@ export default function CategoryProducts() {
   const [products, setProducts] = useState([]);
   const [hierarchy, setHierarchy] = useState({ category: "Marketplace", sub: "General", leaf: "Products" });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
   
   // Detect mobile screen
@@ -24,10 +25,16 @@ export default function CategoryProducts() {
 
   useEffect(() => {
     async function fetchPageData() {
-      if (!leafId) return;
+      if (!leafId) {
+        setError("Leaf ID haipo");
+        setLoading(false);
+        return;
+      }
       setLoading(true);
+      setError(null);
       
       try {
+        console.log("Fetching leaf category with ID:", leafId);
         const { data: leaf, error: leafErr } = await supabase
           .from('leaf_categories')
           .select('name, sub_category_id')
@@ -60,6 +67,7 @@ export default function CategoryProducts() {
           });
         }
 
+        console.log("Fetching products for leaf ID:", leafId);
         const { data: prodData, error: prodError } = await supabase
           .from('products_engines')
           .select(`
@@ -74,10 +82,12 @@ export default function CategoryProducts() {
           .order('created_at', { ascending: false });
 
         if (prodError) throw prodError;
+        console.log(`Products found: ${prodData?.length || 0}`);
         setProducts(prodData || []);
 
       } catch (err) {
         console.error("Full Error Debug:", err);
+        setError(err.message || "Kuna tatizo la kupakia data");
       } finally {
         setLoading(false);
       }
@@ -85,6 +95,12 @@ export default function CategoryProducts() {
     
     fetchPageData();
   }, [leafId]);
+
+  // Helper function to get first image URL
+  const getProductImage = (item) => {
+    const imageMedia = item.product_media?.find(m => m.media_type === 'image');
+    return imageMedia?.media_url || '/placeholder.jpg';
+  };
 
   return (
     <div className="category-page-container">
@@ -107,83 +123,51 @@ export default function CategoryProducts() {
           </nav>
         )}
 
-        {/* Kichwa cha ukurasa - muhimu kwa UX */}
-        <div style={{ 
-          padding: isMobile ? '10px 20px 0' : '20px', 
-          fontSize: isMobile ? '18px' : '24px', 
-          fontWeight: 'bold' 
-        }}>
-          {hierarchy.leaf}
+        {/* Kichwa cha ukurasa */}
+        <div className="category-header">
+          <h1>{hierarchy.leaf}</h1>
         </div>
 
         <div className="content-layout">
-          <section className="products-display-area" style={{ 
-            padding: isMobile ? '10px' : '20px',
-            minHeight: '60vh'
-          }}>
+          <section className="products-display-area">
             {loading ? (
-              <div className="loading-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '50px' }}>
+              <div className="loading-container">
                 <Loader2 className="animate-spin" size={40} color="#ff6600" strokeWidth={2.5} />
-                <p style={{ color: '#666', marginTop: '10px' }}>Inapakia bidhaa...</p>
+                <p>Inapakia bidhaa...</p>
+              </div>
+            ) : error ? (
+              <div className="error-state">
+                <p>{error}</p>
+                <button onClick={() => window.location.reload()}>Jaribu tena</button>
               </div>
             ) : products.length > 0 ? (
               <div className="products-grid">
                 {products.map((item) => (
-                  <div key={item.id} className="product-wrapper" style={{ textAlign: 'center' }}>
-                    <div style={{ 
-                      width: '100%', 
-                      aspectRatio: '1/1', 
-                      borderRadius: '50%', 
-                      overflow: 'hidden',
-                      backgroundColor: '#f5f5f5',
-                      marginBottom: '8px',
-                      border: '1px solid #eee',
-                      cursor: 'pointer'
-                    }} onClick={() => navigate(`/product/${item.id}`)}>
+                  <div key={item.id} className="product-wrapper" onClick={() => navigate(`/product/${item.id}`)}>
+                    <div className="product-image-container">
                       <img 
-                        src={item.product_media?.find(m => m.media_type === 'image')?.media_url || '/placeholder.jpg'} 
+                        src={getProductImage(item)} 
                         alt={item.name}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                        loading="lazy"
                       />
                     </div>
-                    <p style={{ 
-                      fontSize: isMobile ? '10px' : '12px', 
-                      margin: '0 0 4px 0', 
-                      fontWeight: '500',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis'
-                    }}>
-                      {item.name}
-                    </p>
-                    {item.price && (
-                      <p style={{ 
-                        fontSize: isMobile ? '10px' : '12px', 
-                        margin: 0, 
-                        color: '#ff6600', 
-                        fontWeight: 'bold' 
-                      }}>
-                        TSh {Number(item.price).toLocaleString()}
-                      </p>
-                    )}
+                    <div className="product-info">
+                      <p className="product-name">{item.name}</p>
+                      {item.price && (
+                        <p className="product-price">
+                          TSh {Number(item.price).toLocaleString()}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="empty-state" style={{ textAlign: 'center', padding: '50px 20px' }}>
-                <PackageOpen size={60} color="#ddd" style={{ marginBottom: '15px' }} />
-                <h2 style={{ fontSize: '18px', color: '#333' }}>Hakuna bidhaa!</h2>
-                <p style={{ color: '#999', fontSize: '14px', marginBottom: '20px' }}>
-                  Samahani, kategoria ya "{hierarchy.leaf}" haina bidhaa kwa sasa.
-                </p>
-                <button className="go-back-btn" onClick={() => navigate(-1)} style={{ 
-                  padding: '10px 25px', 
-                  borderRadius: '20px', 
-                  border: 'none', 
-                  background: '#ff6600', 
-                  color: 'white',
-                  cursor: 'pointer' 
-                }}>
+              <div className="empty-state">
+                <PackageOpen size={60} color="#ddd" />
+                <h2>Hakuna bidhaa!</h2>
+                <p>Samahani, kategoria ya "{hierarchy.leaf}" haina bidhaa kwa sasa.</p>
+                <button className="go-back-btn" onClick={() => navigate(-1)}>
                   Rudi Nyuma
                 </button>
               </div>
