@@ -123,57 +123,61 @@ export default function CategoryProducts() {
           </nav>
         )}
 
-        {/* Kichwa cha ukurasa */}
-        <div className="category-header">
-          <h1>{hierarchy.leaf}</h1>
-        </div>
-
-        <div className="content-layout">
-          <section className="products-display-area">
-            {loading ? (
-              <div className="loading-container">
-                <Loader2 className="animate-spin" size={40} color="#ff6600" strokeWidth={2.5} />
-                <p>Inapakia bidhaa...</p>
-              </div>
-            ) : error ? (
-              <div className="error-state">
-                <p>{error}</p>
-                <button onClick={() => window.location.reload()}>Jaribu tena</button>
-              </div>
-            ) : products.length > 0 ? (
-              <div className="products-grid">
-                {products.map((item) => (
-                  <div key={item.id} className="product-wrapper" onClick={() => navigate(`/product/${item.id}`)}>
-                    <div className="product-image-container">
-                      <img 
-                        src={getProductImage(item)} 
-                        alt={item.name}
-                        loading="lazy"
-                      />
-                    </div>
-                    <div className="product-info">
-                      <p className="product-name">{item.name}</p>
-                      {item.price && (
-                        <p className="product-price">
-                          TSh {Number(item.price).toLocaleString()}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="empty-state">
-                <PackageOpen size={60} color="#ddd" />
-                <h2>Hakuna bidhaa!</h2>
-                <p>Samahani, kategoria ya "{hierarchy.leaf}" haina bidhaa kwa sasa.</p>
-                <button className="go-back-btn" onClick={() => navigate(-1)}>
-                  Rudi Nyuma
-                </button>
-              </div>
-            )}
-          </section>
-        </div>
+        <div className="products-grid" style={{
+  display: 'grid',
+  gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+  gap: '15px',
+  padding: '10px'
+}}>
+  {products.map((item) => (
+    <div key={item.id} className="product-wrapper" onClick={() => navigate(`/product/${item.id}`)} style={{
+      textAlign: 'center',
+      cursor: 'pointer'
+    }}>
+      {/* Container ya Picha */}
+      <div className="product-image-container" style={{
+        width: '100%',
+        aspectRatio: '1 / 1', // Hii inafanya picha iwe mraba kila wakati
+        borderRadius: '50%',
+        overflow: 'hidden',
+        border: '1px solid #eee',
+        backgroundColor: '#f5f5f5',
+        marginBottom: '8px'
+      }}>
+        <img 
+          src={getProductImage(item)} 
+          alt={item.name}
+          loading="lazy"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover', // Hii inazuia picha kunyooka (stretching)
+            display: 'block'
+          }}
+        />
+      </div>
+      
+      {/* Maelezo ya Bidhaa */}
+      <div className="product-info">
+        <p className="product-name" style={{
+          fontSize: isMobile ? '12px' : '14px',
+          fontWeight: '500',
+          margin: '0 0 4px 0'
+        }}>{item.name}</p>
+        {item.price && (
+          <p className="product-price" style={{
+            fontSize: isMobile ? '12px' : '14px',
+            color: '#ff6600',
+            fontWeight: 'bold',
+            margin: 0
+          }}>
+            TSh {Number(item.price).toLocaleString()}
+          </p>
+        )}
+      </div>
+    </div>
+  ))}
+</div>
       </main>
       {!isMobile && <Footer />}
     </div>
