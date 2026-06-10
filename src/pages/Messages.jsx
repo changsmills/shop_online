@@ -213,28 +213,48 @@ const handleSelectStoreFromSearch = (store) => {
   setSearchResults([]);
 };
 
-  // Send message
-  const handleSendMessage = async (e) => {
-    e.preventDefault();
-    if (!newMessage.trim() || !activeChat) return;
+const handleSendMessage = async (e) => {
+  e.preventDefault();
+  if (!newMessage.trim() || !activeChat) return;
 
-    const { error } = await supabase
-      .from('messages')
-      .insert([
-        {
-          sender_id: session.user.id,
-          receiver_id: activeChat.id,
-          content: newMessage,
-        }
-      ]);
-
-    if (!error) {
-      setNewMessage("");
-      await fetchMessages(activeChat.id);
-      await fetchInbox();
-      scrollToBottom();
-    }
+  // 1. Tunatengeneza 'Temporary Message' ya kuonyesha kwenye UI
+  const tempMsg = {
+    id: Date.now(), // ID ya muda
+    sender_id: session.user.id,
+    receiver_id: activeChat.id,
+    content: newMessage,
+    created_at: new Date().toISOString(),
+    isPending: true // Hii inatusaidia kujua meseji bado haijafika server
   };
+
+  // 2. Tunaongeza meseji kwenye state KABLA hatujaituma (Optimistic)
+  setMessages(prev => [...prev, tempMsg]);
+  const originalMessage = newMessage; // Tunahifadhi meseji
+  setNewMessage(""); // Tunafuta input
+  scrollToBottom();
+
+  // 3. Tunatuma kwenye Supabase
+  const { error } = await supabase
+    .from('messages')
+    .insert([
+      {
+        sender_id: session.user.id,
+        receiver_id: activeChat.id,
+        content: originalMessage,
+      }
+    ]);
+
+  if (error) {
+    console.error("Error sending:", error);
+    // Kama kuna error, tunatoa ile meseji ya muda
+    setMessages(prev => prev.filter(msg => msg.id !== tempMsg.id));
+    setNewMessage(originalMessage); // Tunairudisha kwenye input ili mtumiaji ajue haikutumika
+  } else {
+    // 4. Meseji ikifanikiwa, tunaita fetchMessages ili kupata data rasmi kutoka Supabase (na ID sahihi)
+    // TUNAONDOA fetchInbox HAPA ili kuzuia screen kuruka-ruka (kama unataka update, fanya kwenye background)
+    fetchMessages(activeChat.id); 
+  }
+};
 
   // Handle chat selection (mobile friendly)
   const handleChatSelect = async (chat) => {
