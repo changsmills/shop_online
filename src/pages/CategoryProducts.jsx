@@ -96,12 +96,23 @@ export default function CategoryProducts() {
     fetchPageData();
   }, [leafId]);
 
-  const getProductImage = (item) => {
+ const getProductImage = (item) => {
+  // Kwanza angalia product_media (kama ilivyo)
   const imageMedia = item.product_media?.find(m => m.media_type === 'image');
   if (imageMedia?.media_url) return imageMedia.media_url;
-  // Tumia placeholder ya nje inayofanya kazi (hakikisha inapatikana kwenye simu pia)
+  // Kama hakuna, tumia cover_image kutoka products_engines
+  if (item.cover_image) return item.cover_image;
+  // Mwisho, placeholder
   return "https://placehold.co/400x400?text=No+Image";
 };
+
+useEffect(() => {
+  console.log("Products loaded:", products.length);
+  if (products.length > 0) {
+    console.log("Sample cover_image:", products[0].cover_image);
+    console.log("Sample product_media:", products[0].product_media);
+  }
+}, [products]);
 
   return (
     <div className="category-page-container">
