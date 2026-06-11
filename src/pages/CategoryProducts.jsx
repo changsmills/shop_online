@@ -134,7 +134,8 @@ export default function CategoryProducts() {
     {products.map((item) => (
       <div key={item.id} className="product-wrapper" onClick={() => navigate(`/product/${item.id}`)} style={{ textAlign: 'center', cursor: 'pointer' }}>
         <div className="product-image-container" style={{
-          width: '100%',
+          width: '150px',       // Badala ya 100%
+          height: '150px',
           aspectRatio: '1 / 1',
           borderRadius: '12px',
           overflow: 'hidden',
