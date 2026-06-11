@@ -4,7 +4,6 @@ import { supabase } from "../supabaseClient";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { ChevronRight, Loader2, PackageOpen } from "lucide-react";
-import "./CategoryProducts.css";
 
 export default function CategoryProducts() {
   const { leafId } = useParams();
@@ -14,7 +13,6 @@ export default function CategoryProducts() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   
-  // Detect mobile screen
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
@@ -34,13 +32,11 @@ export default function CategoryProducts() {
       setError(null);
       
       try {
-        console.log("Fetching leaf category with ID:", leafId);
         const { data: leaf, error: leafErr } = await supabase
           .from('leaf_categories')
           .select('name, sub_category_id')
           .eq('id', leafId)
           .single();
-
         if (leafErr) throw leafErr;
 
         if (leaf) {
@@ -67,109 +63,156 @@ export default function CategoryProducts() {
           });
         }
 
-        console.log("Fetching products for leaf ID:", leafId);
         const { data: prodData, error: prodError } = await supabase
           .from('products_engines')
           .select(`
             *,
-            product_media (
-              media_url,
-              media_type,
-              product_id
-            )
+            product_media ( media_url, media_type, product_id )
           `)
           .eq('leaf_category_id', leafId)
           .order('created_at', { ascending: false });
 
         if (prodError) throw prodError;
-        console.log(`Products found: ${prodData?.length || 0}`);
         setProducts(prodData || []);
-
       } catch (err) {
-        console.error("Full Error Debug:", err);
+        console.error(err);
         setError(err.message || "Kuna tatizo la kupakia data");
       } finally {
         setLoading(false);
       }
     }
-    
     fetchPageData();
   }, [leafId]);
 
- const getProductImage = (item) => {
-  // Kwanza angalia product_media (kama ilivyo)
-  const imageMedia = item.product_media?.find(m => m.media_type === 'image');
-  if (imageMedia?.media_url) return imageMedia.media_url;
-  // Kama hakuna, tumia cover_image kutoka products_engines
-  if (item.cover_image) return item.cover_image;
-  // Mwisho, placeholder
-  return "https://placehold.co/400x400?text=No+Image";
-};
+  const getProductImage = (item) => {
+    const imageMedia = item.product_media?.find(m => m.media_type === 'image');
+    if (imageMedia?.media_url) return imageMedia.media_url;
+    if (item.cover_image) return item.cover_image;
+    return "https://placehold.co/400x400?text=No+Image";
+  };
 
-useEffect(() => {
-  console.log("Products loaded:", products.length);
-  if (products.length > 0) {
-    console.log("Sample cover_image:", products[0].cover_image);
-    console.log("Sample product_media:", products[0].product_media);
-  }
-}, [products]);
+  useEffect(() => {
+    console.log("Products loaded:", products.length);
+    if (products.length > 0) {
+      console.log("Sample cover_image:", products[0].cover_image);
+    }
+  }, [products]);
 
-  return (
-    <div className="category-page-container">
-      <Header />
-      <div className="header-spacer"></div> 
-
-      <main className="category-main-content">
-  <nav className="breadcrumb-nav">
-    <div className="breadcrumb-links" style={{
-      fontSize: isMobile ? '10px' : '13px',
-      gap: isMobile ? '4px' : '8px',
-      flexWrap: 'wrap'
-    }}>
-      <span className="breadcrumb-item clickable" onClick={() => navigate('/')}>Home</span> 
-      <ChevronRight size={isMobile ? 10 : 14} />
-      <span className="breadcrumb-item">{hierarchy.category}</span> 
-      <ChevronRight size={isMobile ? 10 : 14} />
-      <span className="breadcrumb-item">{hierarchy.sub}</span> 
-      <ChevronRight size={isMobile ? 10 : 14} />
-      <span className="breadcrumb-item active">{hierarchy.leaf}</span>
-    </div>
-  </nav>
-
-  <div className="products-grid" style={{
-    display: 'grid',
-    gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-    gap: '15px',
-    padding: '10px'
-  }}>
-    {products.map((item) => (
-      <div key={item.id} className="product-wrapper" onClick={() => navigate(`/product/${item.id}`)} style={{ textAlign: 'center', cursor: 'pointer' }}>
-        <div className="product-image-container" style={{
-          width: '150px',       // Badala ya 100%
-          height: '150px',
-          aspectRatio: '1 / 1',
-          borderRadius: '12px',
-          overflow: 'hidden',
-          border: '1px solid #eee',
-          backgroundColor: '#f5f5f5',
-          marginBottom: '8px'
-        }}>
-          <img 
-            src={getProductImage(item)} 
-            alt={item.name}
-            loading="lazy"
-            onError={(e) => { e.target.src = "https://placehold.co/400x400?text=No+Image"; }}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
-          />
-        </div>
-        <div className="product-info">
-          <p className="product-name" style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '500', margin: '0 0 4px 0' }}>{item.name}</p>
-          {item.price && <p className="product-price" style={{ fontSize: isMobile ? '12px' : '14px', color: '#ff6600', fontWeight: 'bold', margin: 0 }}>TSh {Number(item.price).toLocaleString()}</p>}
+  if (loading) {
+    return (
+      <div style={{ backgroundColor: '#f7f8fa', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <Header search="" setSearch={() => {}} />
+        <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+            <Loader2 className="animate-spin" size={40} color="#ff6600" />
+            <p style={{ marginLeft: '12px', color: '#666' }}>Inapakia...</p>
+          </div>
         </div>
       </div>
-    ))}
-  </div>
-</main>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ backgroundColor: '#f7f8fa', minHeight: '100vh' }}>
+        <Header search="" setSearch={() => {}} />
+        <div style={{ textAlign: 'center', padding: '80px 20px' }}>
+          <p style={{ color: '#dc2626' }}>{error}</p>
+          <button onClick={() => window.location.reload()} style={{ marginTop: '16px', padding: '8px 20px', background: '#ff6600', color: 'white', border: 'none', borderRadius: '8px' }}>Jaribu tena</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ background: '#f7f8fa', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <Header search="" setSearch={() => {}} />
+      <div style={{ height: '100px' }}></div> {/* header-spacer */}
+
+      <main style={{ flex: 1, maxWidth: '1400px', margin: '0 auto', width: '100%', padding: '0 20px' }}>
+        {/* Breadcrumb */}
+        <nav style={{ marginBottom: '16px' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: isMobile ? '4px' : '8px',
+            fontSize: isMobile ? '10px' : '13px'
+          }}>
+            <span style={{ cursor: 'pointer', color: '#333' }} onClick={() => navigate('/')}>Home</span>
+            <ChevronRight size={isMobile ? 10 : 14} />
+            <span style={{ color: '#666' }}>{hierarchy.category}</span>
+            <ChevronRight size={isMobile ? 10 : 14} />
+            <span style={{ color: '#666' }}>{hierarchy.sub}</span>
+            <ChevronRight size={isMobile ? 10 : 14} />
+            <span style={{ color: '#ff6600', fontWeight: 'bold' }}>{hierarchy.leaf}</span>
+          </div>
+        </nav>
+
+        {/* Products Grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+          gap: isMobile ? '10px' : '15px',
+          padding: isMobile ? '8px' : '10px'
+        }}>
+          {products.map((item) => (
+            <div
+              key={item.id}
+              onClick={() => navigate(`/product/${item.id}`)}
+              style={{ textAlign: 'center', cursor: 'pointer' }}
+            >
+              {/* Image Container - RESPONSIVE: 100% width, aspect-ratio 1:1, no fixed px */}
+              <div style={{
+                width: '100%',
+                aspectRatio: '1 / 1',
+                borderRadius: isMobile ? '10px' : '12px',
+                overflow: 'hidden',
+                border: '1px solid #eee',
+                backgroundColor: '#f5f5f5',
+                marginBottom: '8px'
+              }}>
+                <img
+                  src={getProductImage(item)}
+                  alt={item.name}
+                  loading="lazy"
+                  onError={(e) => { e.target.src = "https://placehold.co/400x400?text=No+Image"; }}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'center',
+                    display: 'block'
+                  }}
+                />
+              </div>
+
+              {/* Product Info */}
+              <div>
+                <p style={{
+                  fontSize: isMobile ? '12px' : '14px',
+                  fontWeight: '500',
+                  margin: '0 0 4px 0',
+                  color: '#333',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}>{item.name}</p>
+                {item.price && (
+                  <p style={{
+                    fontSize: isMobile ? '11px' : '13px',
+                    color: '#ff6600',
+                    fontWeight: 'bold',
+                    margin: 0
+                  }}>
+                    TSh {Number(item.price).toLocaleString()}
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </main>
 
       {!isMobile && <Footer />}
     </div>
