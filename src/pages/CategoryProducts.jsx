@@ -96,11 +96,12 @@ export default function CategoryProducts() {
     fetchPageData();
   }, [leafId]);
 
-  // Helper function to get first image URL
   const getProductImage = (item) => {
-    const imageMedia = item.product_media?.find(m => m.media_type === 'image');
-    return imageMedia?.media_url || '/placeholder.jpg';
-  };
+  const imageMedia = item.product_media?.find(m => m.media_type === 'image');
+  if (imageMedia?.media_url) return imageMedia.media_url;
+  // Tumia placeholder ya nje inayofanya kazi (hakikisha inapatikana kwenye simu pia)
+  return "https://placehold.co/400x400?text=No+Image";
+};
 
   return (
     <div className="category-page-container">
@@ -108,77 +109,56 @@ export default function CategoryProducts() {
       <div className="header-spacer"></div> 
 
       <main className="category-main-content">
-        {/* Breadcrumb - Inaonekana desktop tu */}
-        {!isMobile && (
-          <nav className="breadcrumb-nav">
-            <div className="breadcrumb-links">
-              <span className="breadcrumb-item clickable" onClick={() => navigate('/')}>Home</span> 
-              <ChevronRight size={14} />
-              <span className="breadcrumb-item">{hierarchy.category}</span> 
-              <ChevronRight size={14} />
-              <span className="breadcrumb-item">{hierarchy.sub}</span> 
-              <ChevronRight size={14} />
-              <span className="breadcrumb-item active">{hierarchy.leaf}</span>
-            </div>
-          </nav>
-        )}
-
-        <div className="products-grid" style={{
-  display: 'grid',
-  gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-  gap: '15px',
-  padding: '10px'
-}}>
-  {products.map((item) => (
-    <div key={item.id} className="product-wrapper" onClick={() => navigate(`/product/${item.id}`)} style={{
-      textAlign: 'center',
-      cursor: 'pointer'
+  <nav className="breadcrumb-nav">
+    <div className="breadcrumb-links" style={{
+      fontSize: isMobile ? '10px' : '13px',
+      gap: isMobile ? '4px' : '8px',
+      flexWrap: 'wrap'
     }}>
-      {/* Container ya Picha */}
-      <div className="product-image-container" style={{
-        width: '100%',
-        aspectRatio: '1 / 1', // Hii inafanya picha iwe mraba kila wakati
-        borderRadius: '50%',
-        overflow: 'hidden',
-        border: '1px solid #eee',
-        backgroundColor: '#f5f5f5',
-        marginBottom: '8px'
-      }}>
-        <img 
-          src={getProductImage(item)} 
-          alt={item.name}
-          loading="lazy"
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover', // Hii inazuia picha kunyooka (stretching)
-            display: 'block'
-          }}
-        />
-      </div>
-      
-      {/* Maelezo ya Bidhaa */}
-      <div className="product-info">
-        <p className="product-name" style={{
-          fontSize: isMobile ? '12px' : '14px',
-          fontWeight: '500',
-          margin: '0 0 4px 0'
-        }}>{item.name}</p>
-        {item.price && (
-          <p className="product-price" style={{
-            fontSize: isMobile ? '12px' : '14px',
-            color: '#ff6600',
-            fontWeight: 'bold',
-            margin: 0
-          }}>
-            TSh {Number(item.price).toLocaleString()}
-          </p>
-        )}
-      </div>
+      <span className="breadcrumb-item clickable" onClick={() => navigate('/')}>Home</span> 
+      <ChevronRight size={isMobile ? 10 : 14} />
+      <span className="breadcrumb-item">{hierarchy.category}</span> 
+      <ChevronRight size={isMobile ? 10 : 14} />
+      <span className="breadcrumb-item">{hierarchy.sub}</span> 
+      <ChevronRight size={isMobile ? 10 : 14} />
+      <span className="breadcrumb-item active">{hierarchy.leaf}</span>
     </div>
-  ))}
-</div>
-      </main>
+  </nav>
+
+  <div className="products-grid" style={{
+    display: 'grid',
+    gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+    gap: '15px',
+    padding: '10px'
+  }}>
+    {products.map((item) => (
+      <div key={item.id} className="product-wrapper" onClick={() => navigate(`/product/${item.id}`)} style={{ textAlign: 'center', cursor: 'pointer' }}>
+        <div className="product-image-container" style={{
+          width: '100%',
+          aspectRatio: '1 / 1',
+          borderRadius: '12px',
+          overflow: 'hidden',
+          border: '1px solid #eee',
+          backgroundColor: '#f5f5f5',
+          marginBottom: '8px'
+        }}>
+          <img 
+            src={getProductImage(item)} 
+            alt={item.name}
+            loading="lazy"
+            onError={(e) => { e.target.src = "https://placehold.co/400x400?text=No+Image"; }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
+          />
+        </div>
+        <div className="product-info">
+          <p className="product-name" style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '500', margin: '0 0 4px 0' }}>{item.name}</p>
+          {item.price && <p className="product-price" style={{ fontSize: isMobile ? '12px' : '14px', color: '#ff6600', fontWeight: 'bold', margin: 0 }}>TSh {Number(item.price).toLocaleString()}</p>}
+        </div>
+      </div>
+    ))}
+  </div>
+</main>
+
       {!isMobile && <Footer />}
     </div>
   );
