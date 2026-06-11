@@ -52,7 +52,10 @@ const handleCheckout = () => {
 };
 
   return (
-    <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#fff' }}>
+    <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', 
+    //height: '100vh', 
+    minHeight: '100vh', // Badala ya height: 100vh
+    backgroundColor: '#fff' }}>
       
      {/* HEADER */}
 <header className="dashboard-header" style={{ 
@@ -156,7 +159,7 @@ const handleCheckout = () => {
           padding: isMobile ? '46px' : '24px', 
           backgroundColor: '#f7f8fa', 
           overflowY: 'auto',
-          paddingBottom: isMobile && cartItems.length > 0 ? '120px' : '24px'
+          paddingBottom: isMobile && cartItems.length > 0 ? '150px' : '24px'
         }}>
           <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
             
