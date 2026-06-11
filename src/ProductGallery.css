@@ -1850,3 +1850,10 @@ input[type="range"]::-webkit-slider-thumb {
     background: #ff6600;
     border-radius: 10px;
 }
+
+@media (max-width: 768px) {
+  .gallery-main-container {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}

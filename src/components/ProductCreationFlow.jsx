@@ -561,7 +561,7 @@ const newEntry = {
     // ========== MUUNDO MPYA (SAHIHI) ==========
     
     // Basic info
-    name: attributes.name,
+    name: attributes.name.trim().toLowerCase(),
     description: attributes.description,
     price: attributes.price,
     stock: attributes.stock,

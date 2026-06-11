@@ -99,14 +99,15 @@ useEffect(() => {
   if (!partnerId) return;
   
   const { data, error } = await supabase
-    .from('messages')
-    .select(`
-      *,
-      sender:profiles!fk_messages_sender_id(id, full_name, avatar_url),
-      receiver:profiles!fk_messages_receiver_id(id, full_name, avatar_url)
-    `)
-    .or(`and(sender_id.eq.${session.user.id},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${session.user.id})`)
-    .order('created_at', { ascending: true });
+  .from('messages')
+  .select(`
+    *,
+    sender:sender_id(id, full_name, avatar_url),
+    receiver:receiver_id(id, full_name, avatar_url)
+  `)
+  .or(`and(sender_id.eq.${session.user.id},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${session.user.id})`)
+  .order('created_at', { ascending: true });
+
 
   if (!error && data) {
     setMessages(data);
@@ -120,15 +121,16 @@ useEffect(() => {
     if (!session?.user) return;
     setLoading(true);
 
-    const { data, error } = await supabase
+  const { data, error } = await supabase
   .from('messages')
   .select(`
     *,
-    sender:profiles!fk_messages_sender_id(id, full_name, avatar_url),
-    receiver:profiles!fk_messages_receiver_id(id, full_name, avatar_url)
+    sender:sender_id(id, full_name, avatar_url),
+    receiver:receiver_id(id, full_name, avatar_url)
   `)
   .or(`sender_id.eq.${session.user.id},receiver_id.eq.${session.user.id}`)
   .order('created_at', { ascending: false });
+
 
     if (error) {
       console.error("Error fetching inbox:", error);
@@ -292,6 +294,24 @@ const handleSendMessage = async (e) => {
       supabase.removeChannel(channel);
     };
   }, [session, activeChat]);
+
+  // Hifadhi activeChat kwenye localStorage kila inapobadilika
+useEffect(() => {
+  if (activeChat?.id) {
+    localStorage.setItem('lastActiveChatId', activeChat.id);
+  }
+}, [activeChat]);
+
+// Wakati chats zikipakiwa, jaribu kurejesha chat ya mwisho
+useEffect(() => {
+  const lastChatId = localStorage.getItem('lastActiveChatId');
+  if (lastChatId && chats.length > 0 && !activeChat) {
+    const lastChat = chats.find(c => c.id === lastChatId);
+    if (lastChat) {
+      handleChatSelect(lastChat);
+    }
+  }
+}, [chats, activeChat]);
 
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} />, path: '/dashboard', label: 'Dashboard' },

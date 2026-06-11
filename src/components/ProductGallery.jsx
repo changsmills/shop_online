@@ -144,7 +144,7 @@ const ProductGallery = ({ product, isMobile = false }) => {
 if (isMobile) {
   return (
     <div className="gallery-mobile-simple">
-
+      
       {/* Main Display */}
       <div className="mobile-main-display" style={{ position: 'relative', background: '#000', borderRadius: '12px', overflow: 'hidden' }}>
         

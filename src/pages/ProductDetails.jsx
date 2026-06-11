@@ -193,8 +193,19 @@ useEffect(() => {
           <span className="active-path">{product.name}</span>
         </nav>
 
-        <main className="product-main-layout">
-  <div className="main-grid-container">
+       {/*} <main className="product-main-layout">*/}
+
+       <main className="product-main-layout" style={{ padding: isMobile ? '0' : '0' }}>
+
+  {/*<div className="main-grid-container">*/}
+
+  <div className="main-grid-container" style={{
+  display: 'grid',
+  gridTemplateColumns: isMobile ? '1fr' : '1fr 380px',
+  gap: isMobile ? '0' : '24px',
+  padding: isMobile ? '0' : '0 20px',   // ← Hapa: padding zero kwa simu
+  margin: isMobile ? '0' : '0 auto'
+}}>
     
     {/* ================= UPANDE WA KUSHOTO ================= */}
     <div className="left-content">
