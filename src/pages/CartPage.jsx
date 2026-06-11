@@ -159,7 +159,7 @@ const handleCheckout = () => {
           padding: isMobile ? '46px' : '24px', 
           backgroundColor: '#f7f8fa', 
           overflowY: 'auto',
-          paddingBottom: isMobile && cartItems.length > 0 ? '150px' : '24px'
+          //paddingBottom: isMobile && cartItems.length > 0 ? '150px' : '24px'
         }}>
           <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
             
@@ -328,49 +328,53 @@ const handleCheckout = () => {
         </main>
       </div>
 
-      {/* MOBILE BOTTOM CHECKOUT BAR - ONLY THIS, NO BOTTOM NAVIGATION */}
-      {isMobile && cartItems.length > 0 && (
-        <div className="mobile-checkout-bar" style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: 'white',
-          padding: '12px 20px',
-          paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
-          borderTop: '1px solid #eee',
-          boxShadow: '0 -2px 15px rgba(0,0,0,0.08)',
-          zIndex: 1000,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <div>
-            <div style={{ fontSize: '12px', color: '#666' }}>Total</div>
-            <div style={{ fontSize: '20px', fontWeight: '800', color: '#ff6a00' }}>TSH {totalAmount.toLocaleString()}</div>
-            <div style={{ fontSize: '11px', color: '#999' }}>{totalItems} item(s)</div>
-          </div>
-          <button 
-            onClick={handleCheckout}
-            style={{
-              backgroundColor: '#ff6a00',
-              color: 'white',
-              border: 'none',
-              padding: '12px 28px',
-              borderRadius: '40px',
-              fontWeight: '700',
-              fontSize: '16px',
-              cursor: 'pointer',
-              boxShadow: '0 4px 15px rgba(255,106,0,0.3)',
-              transition: 'transform 0.2s ease'
-            }}
-            onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.97)'}
-            onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
-          >
-            Checkout →
-          </button>
-        </div>
-      )}
+     {/* MOBILE BOTTOM CHECKOUT BAR - Toleo Jipya Lenye Urefu Mdogo */}
+{isMobile && cartItems.length > 0 && (
+  <div className="mobile-checkout-bar" style={{
+    position: 'fixed',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    background: 'white',
+    padding: '8px 16px',                         // ← imepunguzwa kutoka 12px 20px
+    paddingBottom: 'calc(8px + env(safe-area-inset-bottom, 0px))', // ← imepunguzwa
+    borderTop: '1px solid #eee',
+    boxShadow: '0 -2px 10px rgba(0,0,0,0.05)',
+    zIndex: 1000,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  }}>
+    <div>
+      <div style={{ fontSize: '10px', color: '#666' }}>Total</div>               {/* ← ilikuwa 12px */}
+      <div style={{ fontSize: '16px', fontWeight: '800', color: '#ff6a00' }}>    {/* ← ilikuwa 20px */}
+        TSH {totalAmount.toLocaleString()}
+      </div>
+      <div style={{ fontSize: '10px', color: '#999' }}>                          {/* ← ilikuwa 11px */}
+        {totalItems} item(s)
+      </div>
+    </div>
+    <button 
+      onClick={handleCheckout}
+      style={{
+        backgroundColor: '#ff6a00',
+        color: 'white',
+        border: 'none',
+        padding: '8px 20px',                     // ← ilikuwa 12px 28px
+        borderRadius: '30px',
+        fontWeight: '700',
+        fontSize: '14px',                        // ← ilikuwa 16px
+        cursor: 'pointer',
+        boxShadow: '0 2px 8px rgba(255,106,0,0.25)',
+        transition: 'transform 0.1s ease'
+      }}
+      onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.97)'}
+      onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+    >
+      Checkout →
+    </button>
+  </div>
+)}
     </div>
   );
 }
