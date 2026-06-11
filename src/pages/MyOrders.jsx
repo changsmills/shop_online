@@ -58,43 +58,69 @@ const MyOrders = ({ session }) => {
     }
   };
 
-  const handleReportIssue = async (orderId, storeId) => {
-    if (!orderId || !storeId) {
-      toast.error("Taarifa za duka hazijapatikana.");
-      return;
-    }
+  const handleReportIssue = async (orderId, storeId, orderItems) => {
+  if (!orderId || !storeId) {
+    toast.error("Taarifa za duka hazijapatikana.");
+    return;
+  }
 
-    const messageText = `Habari, nina tatizo na oda #${orderId.slice(0, 8)}. Haijanifikia bado.`;
+  // Chukua bidhaa ya kwanza kwa ajili ya maelezo
+  const firstItem = orderItems?.[0];
+  const productName = firstItem?.product_name || "Bidhaa isiyojulikana";
+  const productId = firstItem?.product_id || "";
 
-    try {
-      const { data: store, error: storeErr } = await supabase
-        .from('stores_engine')
-        .select('owner_id, whatsapp_number')
-        .eq('id', storeId)
-        .single();
+  const messageText = `Habari, nina tatizo na oda #${orderId.slice(0, 8)}: Bidhaa "${productName}" haijafika kama ilivyotarajiwa. Tafadhali nisaidie.`;
 
-      if (storeErr || !store) throw new Error("Duka halikupatikana");
+  try {
+    // 1. Tafuta maelezo ya duka (whatsapp na owner_id)
+    const { data: store, error: storeErr } = await supabase
+      .from('stores_engine')
+      .select('owner_id, whatsapp_number')
+      .eq('id', storeId)
+      .single();
 
-      const { error: msgError } = await supabase
-        .from('messages')
-        .insert([{
-          sender_id: session.user.id,
-          receiver_id: store.owner_id,
-          order_id: orderId,
-          content: messageText,
-        }]);
+    if (storeErr || !store) throw new Error("Duka halikupatikana");
 
-      if (msgError) throw msgError;
+    // 2. Fungua WhatsApp (kwa muuzaji)
+    const whatsapp = store.whatsapp_number.replace(/\s+/g, '');
+    window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(messageText)}`, '_blank');
 
-      const whatsapp = store.whatsapp_number.replace(/\s+/g, '');
-      window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(messageText)}`, '_blank');
-      
-      toast.success("Ujumbe umeripotiwa!");
-      navigate('/dashboard/messages');
-    } catch (err) {
-      toast.error("Kuna tatizo: " + err.message);
-    }
-  };
+    // 3. Weka dispute kwenye database (table `disputes`)
+    const { error: disputeError } = await supabase
+      .from('disputes')
+      .insert([{
+        order_id: orderId,
+        store_id: storeId,
+        customer_id: session.user.id,
+        product_name: productName,
+        product_id: productId,
+        reason: 'Bidhaa haijafika',  // Unaweza kubadilisha sababu baadaye
+        description: messageText,
+        status: 'open'
+      }]);
+
+    if (disputeError) throw disputeError;
+
+    // 4. Tuma ujumbe kwenye mfumo wa messages (kama ulivyokuwa)
+    const { error: msgError } = await supabase
+      .from('messages')
+      .insert([{
+        sender_id: session.user.id,
+        receiver_id: store.owner_id,
+        order_id: orderId,
+        content: messageText,
+      }]);
+
+    if (msgError) console.error("Message insert error:", msgError);
+
+    toast.success("Ripoti imetumwa kwa muuzaji na kurekodiwa kwenye mfumo!");
+    navigate('/dashboard/messages'); // au uwaachie wabaki kwenye ukurasa wa orders
+
+  } catch (err) {
+    toast.error("Kuna tatizo: " + err.message);
+    console.error(err);
+  }
+};
 
   useEffect(() => {
     fetchOrders();
@@ -380,11 +406,11 @@ const MyOrders = ({ session }) => {
                             </button>
                           )}
                           <button 
-                            onClick={() => handleReportIssue(order.id, order.store_id)}
-                            style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #ddd', backgroundColor: '#fff', color: '#666', fontWeight: '600', cursor: 'pointer', fontSize: '13px' }}
-                          >
-                            ⚠️ Ripoti Tatizo
-                          </button>
+  onClick={() => handleReportIssue(order.id, order.store_id, orderItems)}
+  style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #ddd', backgroundColor: '#fff', color: '#666', fontWeight: '600', cursor: 'pointer', fontSize: '13px' }}
+>
+  ⚠️ Ripoti Tatizo
+</button>
                         </div>
                       </div>
                     </div>

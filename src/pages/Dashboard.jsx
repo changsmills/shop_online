@@ -1031,8 +1031,8 @@ const getCategoryDisplayName = (category) => {
 
 
 {/* ============================================ */}
-{/* PORTAL YA MOBILE - BOTTOM SHEET (MPYA) - ILIYOSAHIHISHWA */}
-{/* ============================================ */}
+/* PORTAL YA MOBILE - BOTTOM SHEET (ILIYOFANANA NA DESKTOP) */
+
 {isMobile && mobileMenuOpen && ReactDOM.createPortal(
   <div 
     style={{ 
@@ -1048,12 +1048,16 @@ const getCategoryDisplayName = (category) => {
       justifyContent: 'flex-end',
       animation: 'fadeIn 0.2s ease-out'
     }}
-    onClick={() => setMobileMenuOpen(false)}
+    onClick={() => {
+  setMobileMenuOpen(false);
+  setViewMode('products');          // Rudisha kwenye kategoria kuu
+  setSelectedSubCategory(null);     // Futa subcategory iliyochaguliwa
+}}
   >
     <div 
       style={{ 
         backgroundColor: 'white', 
-        height: '85vh',  // Ilikuwa 75vh, sasa 85vh kwa nafasi zaidi
+        height: '85vh', 
         borderTopLeftRadius: '20px', 
         borderTopRightRadius: '20px', 
         display: 'flex', 
@@ -1072,114 +1076,258 @@ const getCategoryDisplayName = (category) => {
         margin: '12px auto',
         cursor: 'pointer'
       }} />
-      
+
       {categories.length === 0 ? (
         <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
           {t('loading')}
         </div>
       ) : (
         <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-          {/* Sidebar ya Kategoria (Kushoto) */}
+          
+          {/* SIDEBAR - Categories au Sub-categories */}
           <aside style={{ 
-            width: '100px', 
+            width: '110px', 
             borderRight: '1px solid #eee', 
             overflowY: 'auto', 
-            backgroundColor: '#f9f9f9' 
+            backgroundColor: '#fafafa',
+            flexShrink: 0
           }}>
-            {categories.map((cat) => (
-              <div 
-                key={cat.id} 
-                onClick={() => {
-                  setSelectedCategory(cat);
-                  fetchFeaturedLeafs(cat.id);
-                  fetchSubCategories(cat.id);
-                }}
-                style={{ 
-                  padding: '15px 5px', 
-                  textAlign: 'center', 
-                  backgroundColor: selectedCategory?.id === cat.id ? 'white' : 'transparent',
-                  borderLeft: selectedCategory?.id === cat.id ? '4px solid #ff6a00' : 'none',
-                  cursor: 'pointer'
-                }}
-              >
-                <div style={{ color: selectedCategory?.id === cat.id ? '#ff6a00' : '#666' }}>
-                  {getIcon(cat.icon_name)}
+            {viewMode === 'products' ? (
+              /* MODE PRODUCTS: Onyesha kategoria zote */
+              categories.map((cat) => (
+                <div 
+                  key={cat.id} 
+                  onClick={() => {
+                    setSelectedCategory(cat);
+                    fetchFeaturedLeafs(cat.id);
+                    fetchSubCategories(cat.id);
+                    // Weka viewMode kwenye products (ikiwa ilikuwa subcategories, rudisha)
+                    if (viewMode !== 'products') setViewMode('products');
+                  }}
+                  style={{ 
+                    padding: '12px 8px', 
+                    textAlign: 'center', 
+                    backgroundColor: selectedCategory?.id === cat.id ? 'white' : 'transparent',
+                    borderLeft: selectedCategory?.id === cat.id ? '3px solid #ff6a00' : 'none',
+                    cursor: 'pointer',
+                    borderBottom: '1px solid #f0f0f0'
+                  }}
+                >
+                  <div style={{ color: selectedCategory?.id === cat.id ? '#ff6a00' : '#666' }}>
+                    {getIcon(cat.icon_name)}
+                  </div>
+                  <div style={{ 
+                    fontSize: '10px', 
+                    marginTop: '6px', 
+                    fontWeight: selectedCategory?.id === cat.id ? 'bold' : 'normal',
+                    whiteSpace: 'normal',
+                    wordBreak: 'break-word'
+                  }}>
+                    {getCategoryDisplayName(cat)}
+                  </div>
                 </div>
-                <div style={{ 
-                  fontSize: '10px', 
-                  marginTop: '5px', 
-                  fontWeight: selectedCategory?.id === cat.id ? 'bold' : 'normal' 
-                }}>
-                  {getCategoryDisplayName(cat)}
+              ))
+            ) : (
+              /* MODE SUBCATEGORIES: Onyesha subkategoria + back button */
+              <>
+                <div 
+                  onClick={() => {
+                    setViewMode('products');
+                    // Rudisha selectedSubCategory kuwa null
+                    setSelectedSubCategory(null);
+                  }}
+                  style={{ 
+                    padding: '12px 8px', 
+                    textAlign: 'center', 
+                    cursor: 'pointer', 
+                    borderBottom: '1px solid #eee',
+                    backgroundColor: '#fff5ed',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <ChevronLeft size={14} color="#ff6a00" />
+                  <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#ff6a00' }}>Nyuma</span>
                 </div>
-              </div>
-            ))}
+                {subCategories.map((sub) => (
+                  <div 
+                    key={sub.id} 
+                    onClick={() => {
+                      setSelectedSubCategory(sub);
+                      fetchLeafsForSub(sub.id);
+                    }}
+                    style={{ 
+                      padding: '12px 8px', 
+                      textAlign: 'center', 
+                      backgroundColor: selectedSubCategory?.id === sub.id ? 'white' : 'transparent',
+                      borderLeft: selectedSubCategory?.id === sub.id ? '3px solid #ff6a00' : 'none',
+                      cursor: 'pointer',
+                      borderBottom: '1px solid #f0f0f0',
+                      fontSize: '11px',
+                      fontWeight: selectedSubCategory?.id === sub.id ? 'bold' : 'normal',
+                      color: selectedSubCategory?.id === sub.id ? '#ff6a00' : '#444'
+                    }}
+                  >
+                    {i18n.language === 'sw' ? (sub.name_sw || sub.name) : sub.name}
+                  </div>
+                ))}
+              </>
+            )}
           </aside>
 
-          {/* Content ya Bidhaa (Kulia) */}
-<main style={{ flex: 1, padding: '15px', overflowY: 'auto' }}>
-  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px', alignItems: 'center' }}>
-    <h4 style={{ fontSize: '14px', margin: 0, fontWeight: 'bold' }}>
-      {getCategoryDisplayName(selectedCategory) || t('select_category')}
-    </h4>
-  </div>
+          {/* CONTENT - Featured Products au Leaf Categories */}
+          <main style={{ flex: 1, padding: '15px', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <h4 style={{ fontSize: '14px', margin: 0, fontWeight: 'bold' }}>
+                {viewMode === 'products' 
+                  ? getCategoryDisplayName(selectedCategory) || t('select_category')
+                  : (selectedSubCategory ? (i18n.language === 'sw' ? (selectedSubCategory.name_sw || selectedSubCategory.name) : selectedSubCategory.name) : '')
+                }
+              </h4>
+              {viewMode === 'products' && (
+                <button 
+                  onClick={() => setViewMode('subcategories')}
+                  style={{ 
+                    color: '#ff6a00', 
+                    background: 'none', 
+                    border: 'none', 
+                    fontSize: '12px', 
+                    fontWeight: 'bold',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {t('view_all')} <ChevronRight size={12} />
+                </button>
+              )}
+            </div>
 
-  {/* Grid ya bidhaa - Hapa ndipo tunapofanya muonekano wa duara */}
-  {featuredProducts.length === 0 ? (
-    <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-      {t('no_products')}
-    </div>
-  ) : (
-    <div style={{ 
-      display: 'grid', 
-      gridTemplateColumns: 'repeat(3, 1fr)', // Ongeza columns kuwa 3 ili ziwe ndogo zaidi
-      gap: '15px' 
-    }}>
-      {featuredProducts.map((leaf) => (
-        <div 
-          key={leaf.id} 
-          onClick={() => {
-            handleLeafClick(leaf.leaf_category_id);
-            setMobileMenuOpen(false);
-          }}
-          style={{ textAlign: 'center', cursor: 'pointer' }}
-        >
-          {/* Hapa ndipo tunafanya umbo la duara */}
-          <div style={{ 
-            width: '100%', 
-            aspectRatio: '1/1', 
-            borderRadius: '50%', // Hii ndio inafanya duara kamili
-            backgroundColor: '#f5f5f5', 
-            marginBottom: '8px', 
-            overflow: 'hidden',
-            border: '1px solid #eee', // Border nyepesi kuongeza muonekano
-            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-          }}>
-            <img 
-              src={leaf.cover_image || placeholderImg} 
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-              alt={leaf.leaf_categories?.name}
-            />
-          </div>
-          <p style={{ 
-            fontSize: '10px', 
-            margin: 0, 
-            color: '#333', 
-            fontWeight: '500',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis' // Kuzuia maandishi marefu kuharibu layout
-          }}>
-            {i18n.language === 'sw' 
-              ? (leaf.leaf_categories?.name_sw || leaf.leaf_categories?.name)
-              : leaf.leaf_categories?.name}
-          </p>
-        </div>
-      ))}
-    </div>
-  )}
-</main>
-
+            {viewMode === 'products' ? (
+              /* FEATURED PRODUCTS (leaf categories) */
+              featuredProducts.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+                  {t('no_products')}
+                </div>
+              ) : (
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(3, 1fr)', 
+                  gap: '15px' 
+                }}>
+                  {featuredProducts.map((leaf) => (
+                    <div 
+                      key={leaf.id} 
+                      onClick={() => {
+                        handleLeafClick(leaf.leaf_category_id);
+                        setMobileMenuOpen(false);
+                      }}
+                      style={{ textAlign: 'center', cursor: 'pointer' }}
+                    >
+                      <div style={{ 
+                        width: '100%', 
+                        aspectRatio: '1/1', 
+                        borderRadius: '50%', 
+                        backgroundColor: '#f5f5f5', 
+                        marginBottom: '8px', 
+                        overflow: 'hidden',
+                        border: '1px solid #eee',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                      }}>
+                        <img 
+                          src={leaf.cover_image || placeholderImg} 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                          alt={leaf.leaf_categories?.name}
+                        />
+                      </div>
+                      <p style={{ 
+                        fontSize: '10px', 
+                        margin: 0, 
+                        color: '#333', 
+                        fontWeight: '500',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}>
+                        {i18n.language === 'sw' 
+                          ? (leaf.leaf_categories?.name_sw || leaf.leaf_categories?.name)
+                          : leaf.leaf_categories?.name}
+                      </p>
+                    </div>
+                  ))}
+                  
+                  {/* "View All" Card (sawa na desktop) */}
+                  <div 
+                    onClick={() => setViewMode('subcategories')}
+                    style={{ textAlign: 'center', cursor: 'pointer' }}
+                  >
+                    <div style={{ 
+                      width: '100%', 
+                      aspectRatio: '1/1', 
+                      borderRadius: '50%', 
+                      border: '2px dashed #ff6a00', 
+                      backgroundColor: '#fff', 
+                      marginBottom: '8px', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center'
+                    }}>
+                      <Plus size={28} color="#ff6a00" />
+                    </div>
+                    <p style={{ color: '#ff6a00', fontWeight: 'bold', fontSize: '10px' }}>
+                      {t('see_all')}
+                    </p>
+                  </div>
+                </div>
+              )
+            ) : (
+              /* SUBCATEGORIES VIEW: Onyesha leafs za subcategory iliyochaguliwa */
+              leafsForSub.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+                  Hakuna bidhaa katika kategoria hii
+                </div>
+              ) : (
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(3, 1fr)', 
+                  gap: '15px' 
+                }}>
+                  {leafsForSub.map((leaf) => (
+                    <div 
+                      key={leaf.id} 
+                      onClick={() => {
+                        handleLeafClick(leaf.id);
+                        setMobileMenuOpen(false);
+                      }}
+                      style={{ textAlign: 'center', cursor: 'pointer' }}
+                    >
+                      <div style={{ 
+                        width: '100%', 
+                        aspectRatio: '1/1', 
+                        borderRadius: '50%', 
+                        backgroundColor: '#f5f5f5', 
+                        marginBottom: '8px', 
+                        overflow: 'hidden',
+                        border: '1px solid #eee'
+                      }}>
+                        <img 
+                          src={leaf.cover_image || placeholderImg} 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                          alt={leaf.name}
+                        />
+                      </div>
+                      <p style={{ fontSize: '10px', margin: 0, fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )
+            )}
+          </main>
         </div>
       )}
     </div>
