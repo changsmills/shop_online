@@ -127,7 +127,7 @@ export default function CategoryProducts() {
   return (
     <div style={{ background: '#f7f8fa', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Header search="" setSearch={() => {}} />
-      <div style={{ height: isMobile ? '40px' : '100px' }}></div>
+      <div style={{ height: isMobile ? '80px' : '100px' }}></div>
 
       <main style={{ flex: 1, maxWidth: '1400px', margin: '0 auto', width: '100%', padding: '0 20px' }}>
         {/* Breadcrumb */}
