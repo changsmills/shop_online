@@ -92,17 +92,17 @@ export default function SearchBar({ search = "", setSearch }) {
     }
   };
 
-  // Helper: navigate to products page with search query
-  const navigateToProducts = (query) => {
+  // 🔥 Changed: navigate to /search instead of /products
+  const navigateToSearchResults = (query) => {
     if (!query || query.trim() === "") return;
-    navigate(`/products?search=${encodeURIComponent(query.trim())}`);
+    navigate(`/search?q=${encodeURIComponent(query.trim())}`);
     setShowSuggestions(false);
   };
 
   // Submit search from button or Enter key
   const handleSearchSubmit = () => {
     if (search.trim()) {
-      navigateToProducts(search);
+      navigateToSearchResults(search);
     }
   };
 
@@ -163,8 +163,8 @@ export default function SearchBar({ search = "", setSearch }) {
                 className="suggestion-item"
                 onMouseDown={() => {
                   if (typeof setSearch === "function") setSearch(item.name);
-                  // Navigate to products page with search query (same for both product and category)
-                  navigateToProducts(item.name);
+                  // 🔥 Navigate to search results page
+                  navigateToSearchResults(item.name);
                 }}
               >
                 <div className="category-icon">
