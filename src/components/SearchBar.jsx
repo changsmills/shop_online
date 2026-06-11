@@ -15,7 +15,7 @@ export default function SearchBar({ search = "", setSearch }) {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  // 1. Fetch Placeholders
+  // Fetch placeholders
   useEffect(() => {
     const fetchLeafCategoryNames = async () => {
       try {
@@ -31,22 +31,20 @@ export default function SearchBar({ search = "", setSearch }) {
     fetchLeafCategoryNames();
   }, []);
 
-  // 1.5 Logic ya kubadilisha placeholder kila baada ya sekunde 3
+  // Rotate placeholder every 3 seconds
   useEffect(() => {
     if (placeholders.length <= 1) return;
-
     const timer = setInterval(() => {
       setPlaceholderIndex((prevIndex) => 
         prevIndex === placeholders.length - 1 ? 0 : prevIndex + 1
       );
     }, 3000);
-
     return () => clearInterval(timer);
   }, [placeholders]);
 
+  // Fetch suggestions (categories + products) with debounce
   useEffect(() => {
     const getCombinedSuggestions = async () => {
-      // 1. Ulinzi wa awali
       if (!search || typeof search !== "string" || search.trim().length < 2) {
         setSuggestions([]);
         setShowSuggestions(false);
@@ -56,19 +54,16 @@ export default function SearchBar({ search = "", setSearch }) {
       const query = search.trim();
       
       try {
-        // 2. Tunafanya queries mbili kwa wakati mmoja (Parallel Fetching)
         const [catData, prodData] = await Promise.all([
           supabase.from("leaf_categories").select("id, name").ilike("name", `%${query}%`).limit(4),
           supabase.from("products_engines").select("id, name").ilike("name", `%${query}%`).limit(4)
         ]);
 
-        // 3. Kuchanganya matokeo (Combined Array)
         const combined = [
           ...(catData.data || []).map(item => ({ ...item, type: 'category' })),
           ...(prodData.data || []).map(item => ({ ...item, type: 'product' }))
         ];
 
-        // 4. Sasisha state
         if (combined.length > 0) {
           setSuggestions(combined);
           setShowSuggestions(true);
@@ -84,18 +79,30 @@ export default function SearchBar({ search = "", setSearch }) {
       }
     };
 
-    // 5. Debounce ili kupunguza mizigo kwenye database kila mtumiaji anapochapa
     const timeoutId = setTimeout(getCombinedSuggestions, 300);
     return () => clearTimeout(timeoutId);
   }, [search]);
 
-  // Handle input change safely
   const handleInputChange = (e) => {
     const val = e.target.value;
     if (typeof setSearch === "function") {
       setSearch(val);
     } else {
-      console.warn("setSearch is not a function. Check your props.");
+      console.warn("setSearch is not a function.");
+    }
+  };
+
+  // Helper: navigate to products page with search query
+  const navigateToProducts = (query) => {
+    if (!query || query.trim() === "") return;
+    navigate(`/products?search=${encodeURIComponent(query.trim())}`);
+    setShowSuggestions(false);
+  };
+
+  // Submit search from button or Enter key
+  const handleSearchSubmit = () => {
+    if (search.trim()) {
+      navigateToProducts(search);
     }
   };
 
@@ -112,6 +119,11 @@ export default function SearchBar({ search = "", setSearch }) {
             if (suggestions.length > 0) setShowSuggestions(true);
           }}
           onBlur={() => setTimeout(() => setShowSuggestions(false), 300)}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              handleSearchSubmit();
+            }
+          }}
         />
 
         <div className="search-tools">
@@ -120,65 +132,57 @@ export default function SearchBar({ search = "", setSearch }) {
           </button>
           <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" />
           
-          <button className="search-submit-btn" onClick={() => navigate(`/search?q=${search}`)}>
+          <button className="search-submit-btn" onClick={handleSearchSubmit}>
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <span>Search</span>
           </button>
         </div>
       </div>
 
-{showSuggestions && suggestions.length > 0 && createPortal(
-  <div 
-    className="suggestions-dropdown portal-layout"
-    style={{
-      position: 'fixed',
-      top: '80px',
-      left: 'auto',
-      right: 'auto',
-      width: '400px',
-      maxWidth: 'calc(100vw - 40px)',
-      zIndex: 9999
-    }}
-  >
-    <div className="suggestion-header">
-      {search.trim().length > 0 ? "Matokeo yaliyopatikana" : "Mapendekezo"}
-    </div>
-    
-    <div className="suggestion-scroll-area">
-      {suggestions.map((item) => (
+      {showSuggestions && suggestions.length > 0 && createPortal(
         <div 
-          // Tunatumia type + id kuhakikisha key ni unique
-          key={`${item.type}-${item.id}`} 
-          className="suggestion-item"
-          onMouseDown={() => {
-            if (typeof setSearch === "function") setSearch(item.name);
-            
-            // Logic ya navigation
-            if (item.type === 'product') {
-              navigate(`/product/${item.id}`);
-            } else {
-              navigate(`/search?q=${item.name}`);
-            }
-            setShowSuggestions(false);
+          className="suggestions-dropdown portal-layout"
+          style={{
+            position: 'fixed',
+            top: '80px',
+            left: 'auto',
+            right: 'auto',
+            width: '400px',
+            maxWidth: 'calc(100vw - 40px)',
+            zIndex: 9999
           }}
         >
-          <div className="category-icon">
-            {/* Tunabadilisha icon kulingana na kama ni bidhaa au kategoria */}
-            {item.type === 'product' ? '📦' : '🔍'}
+          <div className="suggestion-header">
+            {search.trim().length > 0 ? "Matokeo yaliyopatikana" : "Mapendekezo"}
           </div>
           
-          <div className="suggestion-info">
-            <span className="suggestion-name">{item.name}</span>
-            <span className="suggestion-type-badge">
-              {item.type === 'product' ? 'Bidhaa' : 'Kategoria'}
-            </span>
+          <div className="suggestion-scroll-area">
+            {suggestions.map((item) => (
+              <div 
+                key={`${item.type}-${item.id}`} 
+                className="suggestion-item"
+                onMouseDown={() => {
+                  if (typeof setSearch === "function") setSearch(item.name);
+                  // Navigate to products page with search query (same for both product and category)
+                  navigateToProducts(item.name);
+                }}
+              >
+                <div className="category-icon">
+                  {item.type === 'product' ? '📦' : '🔍'}
+                </div>
+                
+                <div className="suggestion-info">
+                  <span className="suggestion-name">{item.name}</span>
+                  <span className="suggestion-type-badge">
+                    {item.type === 'product' ? 'Bidhaa' : 'Kategoria'}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
-      ))}
-    </div>
-  </div>,
-  document.body
-)}
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
