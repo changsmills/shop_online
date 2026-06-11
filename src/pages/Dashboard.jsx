@@ -92,7 +92,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [selectedCategoryForComponents, setSelectedCategoryForComponents] = useState(null);
-  const [mobileBanner, setMobileBanner] = useState(null);  // Banner maalum kwa simu
+  //const [mobileBanner, setMobileBanner] = useState(null);  // Banner maalum kwa simu
   // Ongeza hii karibu na state zingine (around line 70-80)
 const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -219,28 +219,26 @@ const fetchLeafsForSub = async (subCategoryId) => {
   }
 };
 
-  // Fetch data zote
-// Fetch data zote (Badilisha hii)
 const fetchData = async () => {
   setLoading(true);
   try {
     await fetchCategories();
     
-    const [trendRes, adRes, mobileAdRes] = await Promise.all([
+    const [trendRes, adRes] = await Promise.all([
       supabase.from('products_engines').select('*').order('views', { ascending: false }).limit(8),
-      supabase.from('advertisements').select('*').eq('status', 'active').eq('ad_type', 'banner'),
-      supabase.from('advertisements').select('*').eq('status', 'active').eq('ad_type', 'mobile_banner').limit(1)  // ← Mobile banner specific
+      supabase.from('advertisements').select('*').eq('status', 'active')   // Hakuna filter ya ad_type
     ]);
 
     setTrendingProducts(trendRes.data || []);
     setAds(adRes.data || []);
-    
-    // Set mobile banner (kama ipo, vinginevyo tumia banner ya kawaida)
-    if (mobileAdRes.data && mobileAdRes.data.length > 0) {
-      setMobileBanner(mobileAdRes.data[0]);
-    } else if (adRes.data && adRes.data.length > 0) {
-      setMobileBanner(adRes.data[0]);  // Fallback to regular banner
-    }
+
+    // Futa kabisa block hii yote (haina maana tena):
+    // if (mobileAdRes.data && mobileAdRes.data.length > 0) {
+    //   setMobileBanner(mobileAdRes.data[0]);
+    // } else if (adRes.data && adRes.data.length > 0) {
+    //   setMobileBanner(adRes.data[0]);
+    // }
+
   } catch (err) {
     console.error("Fetch Error:", err.message);
   } finally {
@@ -393,15 +391,34 @@ const getCategoryDisplayName = (category) => {
     }
   }, [selectedCategory?.id, activeMenu]);
 
-  // Ads slider
   useEffect(() => {
-    if (ads.length > 1) {
-      const interval = setInterval(() => {
-        setCurrentAdIndex((prev) => (prev + 1) % ads.length);
-      }, 6000);
-      return () => clearInterval(interval);
-    }
-  }, [ads]);
+  if (ads.length === 0) return;
+
+  let timeoutId;
+
+  const getDurationForAd = (ad) => {
+    return ad?.media_type === 'video' ? 10000 : 5000;
+  };
+
+  const rotateAd = () => {
+    setCurrentAdIndex((prev) => (prev + 1) % ads.length);
+  };
+
+  const scheduleNext = () => {
+  if (timeoutId) clearTimeout(timeoutId);
+  const activeAd = ads[currentAdIndex];
+  if (!activeAd) return;
+  const duration = getDurationForAd(activeAd);
+  timeoutId = setTimeout(() => { rotateAd(); }, duration);
+};
+
+  scheduleNext();
+
+  // Cleanup
+  return () => {
+    if (timeoutId) clearTimeout(timeoutId);
+  };
+}, [ads, currentAdIndex]); 
 
   // Cleanup timeout
   useEffect(() => {
@@ -442,30 +459,6 @@ const getCategoryDisplayName = (category) => {
 
   return (
   <div key={i18n.language} style={{ backgroundColor: '#f7f8fa', minHeight: '100vh' }}>
-
-
-    {/*   {/* Kitufe cha kubadilisha lugha - Weka mahali popote unapotaka */}
-    {/*<div style={{ position: 'fixed', top: '70px', right: '10px', zIndex: 1001 }}>
-      <button 
-        onClick={() => {
-          const newLang = i18n.language === 'en' ? 'sw' : 'en';
-          i18n.changeLanguage(newLang);
-          setLanguage(newLang);
-        }}
-        style={{
-          background: '#ff6600',
-          color: 'white',
-          border: 'none',
-          padding: '6px 12px',
-          borderRadius: '20px',
-          cursor: 'pointer',
-          fontSize: '12px',
-          fontWeight: 'bold'
-        }}
-      >
-        {i18n.language === 'en' ? 'Kiswahili' : 'English'}
-      </button>
-    </div> */}
 
       <div className="sticky-header">
         <Header search={search} setSearch={setSearch} />
@@ -548,7 +541,7 @@ const getCategoryDisplayName = (category) => {
               </div>
             </div>
           )}
-          
+
 {!search && (
   <>
     {isMobile ? (
@@ -567,45 +560,41 @@ const getCategoryDisplayName = (category) => {
         padding: 0,
         overflow: 'hidden'
       }}>
-        {(mobileBanner || activeAd) ? (
+        {activeAd ? (
           <div style={{ margin: 0, padding: 0, position: 'relative', width: '100%' }}>
-            {/* Video au Picha kulingana na media_type */}
-            {(() => {
-              const adToShow = mobileBanner || activeAd;
-              const isVideo = isVideoAd(adToShow);
-              return isVideo ? (
-                <video
-                  src={adToShow.media_url}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                    maxHeight: '200px',
-                    objectFit: 'cover',
-                    display: 'block'
-                  }}
-                />
-              ) : (
-                <img
-                  src={adToShow.media_url}
-                  alt="promo"
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                    maxHeight: '200px',
-                    objectFit: 'cover',
-                    display: 'block',
-                    margin: 0,
-                    padding: 0,
-                    border: 'none'
-                  }}
-                />
-              );
-            })()}
-            {/* Overlay text (haibadiliki) */}
+            {isVideoAd(activeAd) ? (
+              <video
+                src={activeAd.media_url}
+                autoPlay
+                muted
+                playsInline
+                onEnded={() => {
+                  if (ads.length) setCurrentAdIndex((prev) => (prev + 1) % ads.length);
+                }}
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  maxHeight: '200px',
+                  objectFit: 'cover',
+                  display: 'block'
+                }}
+              />
+            ) : (
+              <img
+                src={activeAd.media_url}
+                alt="promo"
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  maxHeight: '200px',
+                  objectFit: 'cover',
+                  display: 'block',
+                  margin: 0,
+                  padding: 0,
+                  border: 'none'
+                }}
+              />
+            )}
             <div className="banner-overlay-text mobile-overlay" style={{
               position: 'absolute',
               top: 0,
@@ -637,16 +626,16 @@ const getCategoryDisplayName = (category) => {
                 fontSize: '18px',
                 fontWeight: 'bold',
                 lineHeight: '1.3'
-              }}>{(mobileBanner || activeAd).business_name}</h2>
+              }}>{activeAd.business_name}</h2>
               <p className="banner-desc mobile-desc" style={{ 
                 margin: '4px 0',
                 fontSize: '12px',
                 maxWidth: '70%',
                 lineHeight: '1.4'
-              }}>{(mobileBanner || activeAd).description}</p>
+              }}>{activeAd.description}</p>
               <button 
                 className="view-more-banner mobile-btn" 
-                onClick={() => navigate(`/store/${(mobileBanner || activeAd).store_id}`)}
+                onClick={() => navigate(`/store/${activeAd.store_id}`)}
                 style={{
                   background: '#ff6a00',
                   color: 'white',
@@ -664,7 +653,9 @@ const getCategoryDisplayName = (category) => {
               </button>
             </div>
           </div>
-        ) : null}
+        ) : (
+          <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>Hakuna matangazo kwa sasa</div>
+        )}
       </div>
     ) : (
       /* DESKTOP VERSION */
@@ -727,13 +718,15 @@ const getCategoryDisplayName = (category) => {
             padding: 0,
             lineHeight: 0
           }}>
-            {isVideoAd(activeAd) ? (
+            {activeAd && isVideoAd(activeAd) ? (
               <video
                 src={activeAd.media_url}
                 autoPlay
                 muted
-                loop
                 playsInline
+                onEnded={() => {
+                  if (ads.length) setCurrentAdIndex((prev) => (prev + 1) % ads.length);
+                }}
                 style={{
                   width: '100%',
                   height: 'auto',
@@ -742,60 +735,64 @@ const getCategoryDisplayName = (category) => {
                 }}
               />
             ) : (
-              <img
-                src={activeAd.media_url}
-                className="banner-video-bg"
-                alt="promo"
-                style={{
-                  width: '100%',
-                  height: 'auto',
-                  display: 'block'
-                }}
-              />
+              activeAd && (
+                <img
+                  src={activeAd.media_url}
+                  className="banner-video-bg"
+                  alt="promo"
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    display: 'block'
+                  }}
+                />
+              )
             )}
-            <div className="banner-overlay-text" style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              padding: '40px',
-              color: 'white',
-              background: 'linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%)'
-            }}>
-              <span className="ad-tag" style={{
-                background: '#ff6a00',
-                display: 'inline-block',
-                padding: '4px 12px',
-                borderRadius: '20px',
-                fontSize: '12px',
-                width: 'fit-content',
-                marginBottom: '15px'
-              }}>{t('sponsored')}</span>
-              <h2 className="banner-title" style={{
-                fontSize: '28px',
-                margin: '0 0 10px 0',
-                fontWeight: 'bold'
-              }}>{activeAd.business_name}</h2>
-              <p className="banner-desc" style={{
-                fontSize: '16px',
-                margin: '0 0 20px 0',
-                maxWidth: '60%'
-              }}>{activeAd.description}</p>
-              <button className="view-more-banner" style={{
-                background: '#ff6a00',
+            {activeAd && (
+              <div className="banner-overlay-text" style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                padding: '40px',
                 color: 'white',
-                border: 'none',
-                padding: '12px 24px',
-                borderRadius: '30px',
-                cursor: 'pointer',
-                width: 'fit-content',
-                fontWeight: 'bold'
-              }}>{t('source_now')} →</button>
-            </div>
+                background: 'linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%)'
+              }}>
+                <span className="ad-tag" style={{
+                  background: '#ff6a00',
+                  display: 'inline-block',
+                  padding: '4px 12px',
+                  borderRadius: '20px',
+                  fontSize: '12px',
+                  width: 'fit-content',
+                  marginBottom: '15px'
+                }}>{t('sponsored')}</span>
+                <h2 className="banner-title" style={{
+                  fontSize: '28px',
+                  margin: '0 0 10px 0',
+                  fontWeight: 'bold'
+                }}>{activeAd.business_name}</h2>
+                <p className="banner-desc" style={{
+                  fontSize: '16px',
+                  margin: '0 0 20px 0',
+                  maxWidth: '60%'
+                }}>{activeAd.description}</p>
+                <button className="view-more-banner" style={{
+                  background: '#ff6a00',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '30px',
+                  cursor: 'pointer',
+                  width: 'fit-content',
+                  fontWeight: 'bold'
+                }}>{t('source_now')} →</button>
+              </div>
+            )}
           </div>
         </div>
       </div>
