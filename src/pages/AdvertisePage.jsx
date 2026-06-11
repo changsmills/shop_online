@@ -17,6 +17,7 @@ export default function AdvertisePage({ session }) {
   const [preview, setPreview] = useState(null);
   const [stores, setStores] = useState([]);
   const [selectedStore, setSelectedStore] = useState(null);
+
   
   const [formData, setFormData] = useState({
     store_id: "",
@@ -140,6 +141,7 @@ export default function AdvertisePage({ session }) {
     try {
       // 1. Upload Media to Storage
       const fileExt = file.name.split('.').pop();
+      const mediaType = file.type.startsWith('video') ? 'video' : 'image';
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
       const filePath = `ads/${formData.store_id}/${fileName}`;
 
@@ -168,6 +170,7 @@ export default function AdvertisePage({ session }) {
             ad_type: formData.ad_type,
             description: formData.description,
             media_url: publicUrl,
+            media_type: mediaType,   // ← ONGEZA HAPA
             status: 'pending',
             created_at: new Date().toISOString()
           }

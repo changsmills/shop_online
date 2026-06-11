@@ -438,6 +438,8 @@ const getCategoryDisplayName = (category) => {
     description: "Pata bidhaa bora kutoka kwa wauzaji waliohakikiwa nchi nzima."
   };
 
+  const isVideoAd = (ad) => ad?.media_type === 'video';
+
   return (
   <div key={i18n.language} style={{ backgroundColor: '#f7f8fa', minHeight: '100vh' }}>
 
@@ -549,199 +551,129 @@ const getCategoryDisplayName = (category) => {
           
 {!search && (
   <>
-{isMobile ? (
-  <div style={{ 
-    //width: '100%', 
-   // padding: 0, 
-    margin: 0,
-    display: 'block',
-    lineHeight: 0,
-    fontSize: 0,
-    backgroundColor: '#f7f8fa',
-    position: 'relative',
-    top: 0,
-    marginTop: 25,  // ← Zero margin top
-    width: '100vw',           // Inatumia upana wote wa kioo
-    marginLeft: 'calc(-50vw + 50%)', // Inavuta banner kuelekea kushoto kabisa
-    marginRight: 'calc(-50vw + 50%)', // Inavuta banner kuelekea kulia kabisa
-    padding: 0, 
-    display: 'block',
-    lineHeight: 0,
-    backgroundColor: '#f7f8fa',
-    position: 'relative',
-    overflow: 'hidden'
-  }}>
-    {mobileBanner ? (
+    {isMobile ? (
       <div style={{ 
-        margin: 0, 
-        padding: 0,
+        margin: 0,
         display: 'block',
-        position: 'relative',
         lineHeight: 0,
-        width: '100%',
+        fontSize: 0,
+        backgroundColor: '#f7f8fa',
+        position: 'relative',
+        top: 0,
+        marginTop: 25,
+        width: '100vw',
+        marginLeft: 'calc(-50vw + 50%)',
+        marginRight: 'calc(-50vw + 50%)',
+        padding: 0,
+        overflow: 'hidden'
       }}>
-        <img 
-          src={mobileBanner.media_url} 
-          alt="promo" 
-          style={{
-            width: '100%',
-            height: 'auto',  // ← Auto height, si fixed
-            maxHeight: '200px',  // ← Max height limit
-            objectFit: 'cover',
-            objectPosition: 'center',
-            display: 'block',
-            margin: 0,
-            padding: 0,
-            border: 'none'
-          }}
-        />
-        {/* Overlay text - positioned absolutely within the banner */}
-        <div className="banner-overlay-text mobile-overlay" style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',  // ← Center vertically
-          alignItems: 'flex-start',  // ← Align left (pembeni)
-          textAlign: 'left',  // ← Left alignment
-          color: 'white',
-          background: 'linear-gradient(90deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%)',
-          margin: 0,
-          padding: '20px',  // ← Padding inside banner
-          pointerEvents: 'none'
-        }}>
-          <span className="ad-tag" style={{ 
-            background: '#ff6a00', 
-            padding: '4px 12px',
-            borderRadius: '20px',
-            fontSize: '10px',
-            display: 'inline-block',
-            marginBottom: '8px',
-            fontWeight: '600'
-          }}>📱 {t('mobile_deal')}</span>
-          <h2 className="banner-title mobile-title" style={{ 
-            margin: '4px 0',
-            fontSize: '18px',
-            fontWeight: 'bold',
-            lineHeight: '1.3'
-          }}>{mobileBanner.business_name}</h2>
-          <p className="banner-desc mobile-desc" style={{ 
-            margin: '4px 0',
-            fontSize: '12px',
-            maxWidth: '70%',
-            lineHeight: '1.4'
-          }}>{mobileBanner.description}</p>
-          <button 
-  className="view-more-banner mobile-btn" 
-  onClick={() => navigate(`/store/${mobileBanner.store_id}`)} // Hapa ndipo uchawi ulipo
-  style={{
-    background: '#ff6a00',
-    color: 'white',
-    border: 'none',
-    padding: '8px 20px',
-    borderRadius: '25px',
-    cursor: 'pointer',
-    marginTop: '8px',
-    fontSize: '12px',
-    fontWeight: '600',
-    pointerEvents: 'auto'
-  }}
->
-  {t('shop_now')} →
-</button>
-        </div>
+        {(mobileBanner || activeAd) ? (
+          <div style={{ margin: 0, padding: 0, position: 'relative', width: '100%' }}>
+            {/* Video au Picha kulingana na media_type */}
+            {(() => {
+              const adToShow = mobileBanner || activeAd;
+              const isVideo = isVideoAd(adToShow);
+              return isVideo ? (
+                <video
+                  src={adToShow.media_url}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    maxHeight: '200px',
+                    objectFit: 'cover',
+                    display: 'block'
+                  }}
+                />
+              ) : (
+                <img
+                  src={adToShow.media_url}
+                  alt="promo"
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    maxHeight: '200px',
+                    objectFit: 'cover',
+                    display: 'block',
+                    margin: 0,
+                    padding: 0,
+                    border: 'none'
+                  }}
+                />
+              );
+            })()}
+            {/* Overlay text (haibadiliki) */}
+            <div className="banner-overlay-text mobile-overlay" style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+              textAlign: 'left',
+              color: 'white',
+              background: 'linear-gradient(90deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%)',
+              margin: 0,
+              padding: '20px',
+              pointerEvents: 'none'
+            }}>
+              <span className="ad-tag" style={{ 
+                background: '#ff6a00', 
+                padding: '4px 12px',
+                borderRadius: '20px',
+                fontSize: '10px',
+                display: 'inline-block',
+                marginBottom: '8px',
+                fontWeight: '600'
+              }}>📱 {t('mobile_deal')}</span>
+              <h2 className="banner-title mobile-title" style={{ 
+                margin: '4px 0',
+                fontSize: '18px',
+                fontWeight: 'bold',
+                lineHeight: '1.3'
+              }}>{(mobileBanner || activeAd).business_name}</h2>
+              <p className="banner-desc mobile-desc" style={{ 
+                margin: '4px 0',
+                fontSize: '12px',
+                maxWidth: '70%',
+                lineHeight: '1.4'
+              }}>{(mobileBanner || activeAd).description}</p>
+              <button 
+                className="view-more-banner mobile-btn" 
+                onClick={() => navigate(`/store/${(mobileBanner || activeAd).store_id}`)}
+                style={{
+                  background: '#ff6a00',
+                  color: 'white',
+                  border: 'none',
+                  padding: '8px 20px',
+                  borderRadius: '25px',
+                  cursor: 'pointer',
+                  marginTop: '8px',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  pointerEvents: 'auto'
+                }}
+              >
+                {t('shop_now')} →
+              </button>
+            </div>
+          </div>
+        ) : null}
       </div>
     ) : (
-      <div style={{ 
-        margin: 0, 
-        padding: 0,
-        display: 'block',
-        position: 'relative',
-        lineHeight: 0,
-        width: '100%',
-      }}>
-        <img 
-          src={activeAd.media_url} 
-          alt="promo" 
-          style={{
-            width: '100%',
-            height: 'auto',
-            maxHeight: '200px',
-            objectFit: 'cover',
-            objectPosition: 'center',
-            display: 'block',
-            margin: 0,
-            padding: 0,
-            border: 'none'
-          }}
-        />
-        <div className="banner-overlay-text mobile-overlay" style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'flex-start',  // ← Left alignment
-          textAlign: 'left',
-          color: 'white',
-          background: 'linear-gradient(90deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%)',
-          margin: 0,
-          padding: '20px',
-          pointerEvents: 'none'
-        }}>
-          <span className="ad-tag" style={{ 
-            background: '#ff6a00', 
-            padding: '4px 12px',
-            borderRadius: '20px',
-            fontSize: '10px',
-            display: 'inline-block',
-            marginBottom: '8px',
-            fontWeight: '600'
-          }}>📱 {t('mobile_deal')}</span>
-          <h2 className="banner-title mobile-title" style={{ 
-            margin: '4px 0',
-            fontSize: '18px',
-            fontWeight: 'bold',
-            lineHeight: '1.3'
-          }}>{activeAd.business_name}</h2>
-          <p className="banner-desc mobile-desc" style={{ 
-            margin: '4px 0',
-            fontSize: '12px',
-            maxWidth: '70%',
-            lineHeight: '1.4'
-          }}>{activeAd.description}</p>
-          <button className="view-more-banner mobile-btn" style={{
-            background: '#ff6a00',
-            color: 'white',
-            border: 'none',
-            padding: '8px 20px',
-            borderRadius: '25px',
-            cursor: 'pointer',
-            marginTop: '8px',
-            fontSize: '12px',
-            fontWeight: '600',
-            pointerEvents: 'auto'
-          }}>{t('shop_now')} →</button>
-        </div>
-      </div>
-    )}
-  </div>
-) : (
-      /* DESKTOP VERSION - Layout ya kawaida yenye sidebar */
+      /* DESKTOP VERSION */
       <div className="alibaba-top-layout" style={{ 
         display: 'flex', 
         gap: '20px', 
         marginBottom: 0,
         paddingBottom: 0
-
       }}>
-        {/* Sidebar Categories (Desktop Only) */}
         <aside className="side-categories" style={{
           width: '260px',
           flexShrink: 0,
@@ -772,8 +704,7 @@ const getCategoryDisplayName = (category) => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 cursor: 'pointer',
-                borderBottom: '1px solid #f0f0f0',
-                transition: 'background-color 0.2s'
+                borderBottom: '1px solid #f0f0f0'
               }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
@@ -787,12 +718,7 @@ const getCategoryDisplayName = (category) => {
           </ul>
         </aside>
 
-        {/* Banner Container Desktop */}
-        <div className="hero-banners-container" style={{ 
-          flex: 1,
-          margin: 0,
-          padding: 0
-        }}>
+        <div className="hero-banners-container" style={{ flex: 1, margin: 0, padding: 0 }}>
           <div className="hot-picks-banner" style={{
             position: 'relative',
             borderRadius: '12px',
@@ -801,16 +727,32 @@ const getCategoryDisplayName = (category) => {
             padding: 0,
             lineHeight: 0
           }}>
-            <img 
-              src={activeAd.media_url} 
-              className="banner-video-bg" 
-              alt="promo" 
-              style={{
-                width: '100%',
-                height: 'auto',
-                display: 'block'
-              }}
-            />
+            {isVideoAd(activeAd) ? (
+              <video
+                src={activeAd.media_url}
+                autoPlay
+                muted
+                loop
+                playsInline
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  display: 'block',
+                  borderRadius: '12px'
+                }}
+              />
+            ) : (
+              <img
+                src={activeAd.media_url}
+                className="banner-video-bg"
+                alt="promo"
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  display: 'block'
+                }}
+              />
+            )}
             <div className="banner-overlay-text" style={{
               position: 'absolute',
               top: 0,
