@@ -781,16 +781,23 @@ const getCategoryDisplayName = (category) => {
                   margin: '0 0 20px 0',
                   maxWidth: '60%'
                 }}>{activeAd.description}</p>
-                <button className="view-more-banner" style={{
-                  background: '#ff6a00',
-                  color: 'white',
-                  border: 'none',
-                  padding: '12px 24px',
-                  borderRadius: '30px',
-                  cursor: 'pointer',
-                  width: 'fit-content',
-                  fontWeight: 'bold'
-                }}>{t('source_now')} →</button>
+                <button 
+  className="view-more-banner" 
+  onClick={() => navigate(`/store/${activeAd.store_id}`)}
+  style={{
+    background: '#ff6a00',
+    color: 'white',
+    border: 'none',
+    padding: '12px 24px',
+    borderRadius: '30px',
+    cursor: 'pointer',
+    width: 'fit-content',
+    fontWeight: 'bold'
+  }}
+>
+  {t('source_now')} →
+</button>
+
               </div>
             )}
           </div>
