@@ -95,76 +95,67 @@ useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const fetchMessages = async (partnerId) => {
-  if (!partnerId) return;
-  
+const fetchMessages = async (partnerId) => {
+  if (!partnerId || !session?.user?.id) return;
+
   const { data, error } = await supabase
-  .from('messages')
-  .select(`
-    *,
-    sender:sender_id(id, full_name, avatar_url),
-    receiver:receiver_id(id, full_name, avatar_url)
-  `)
-  .or(`and(sender_id.eq.${session.user.id},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${session.user.id})`)
-  .order('created_at', { ascending: true });
+    .from('messages')
+    .select(`
+      *,
+      sender:sender_id ( id, full_name, avatar_url ),
+      receiver:receiver_id ( id, full_name, avatar_url )
+    `)
+    .or(`and(sender_id.eq.${session.user.id},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${session.user.id})`)
+    .order('created_at', { ascending: true });
 
-
-  if (!error && data) {
-    setMessages(data);
-  } else {
-    console.error("Error fetching messages:", error);
-  }
+  if (!error && data) setMessages(data);
+  else console.error("Error fetching messages:", error);
 };
 
-  // Fetch inbox
-  const fetchInbox = async () => {
-    if (!session?.user) return;
-    setLoading(true);
+const fetchInbox = async () => {
+  if (!session?.user) return;
+  setLoading(true);
 
   const { data, error } = await supabase
-  .from('messages')
-  .select(`
-    *,
-    sender:sender_id(id, full_name, avatar_url),
-    receiver:receiver_id(id, full_name, avatar_url)
-  `)
-  .or(`sender_id.eq.${session.user.id},receiver_id.eq.${session.user.id}`)
-  .order('created_at', { ascending: false });
+    .from('messages')
+    .select(`
+      *,
+      sender:sender_id ( id, full_name, avatar_url ),
+      receiver:receiver_id ( id, full_name, avatar_url )
+    `)
+    .or(`sender_id.eq.${session.user.id},receiver_id.eq.${session.user.id}`)
+    .order('created_at', { ascending: false });
 
-
-    if (error) {
-      console.error("Error fetching inbox:", error);
-      setLoading(false);
-      return;
-    }
-
-    if (data) {
-      const chatGroups = {};
-
-      data.forEach(msg => {
-        const isIUserSender = msg.sender_id === session.user.id;
-        const partnerId = isIUserSender ? msg.receiver_id : msg.sender_id;
-        const partnerData = isIUserSender ? msg.receiver : msg.sender;
-
-        if (partnerId && !chatGroups[partnerId]) {
-          chatGroups[partnerId] = {
-            id: partnerId,
-            name: partnerData?.full_name || `User ${partnerId.slice(0, 4)}`,
-            avatar: partnerData?.avatar_url || null,
-            lastMsg: msg.content,
-            date: new Date(msg.created_at).toLocaleDateString([], { 
-              day: '2-digit', 
-              month: 'short' 
-            }),
-            timestamp: new Date(msg.created_at).getTime()
-          };
-        }
-      });
-
-      setChats(Object.values(chatGroups).sort((a, b) => b.timestamp - a.timestamp));
-    }
+  if (error) {
+    console.error("Error fetching inbox:", error);
     setLoading(false);
-  };
+    return;
+  }
+
+  if (data) {
+    const chatGroups = {};
+
+    data.forEach(msg => {
+      const isISender = msg.sender_id === session.user.id;
+      const partnerId = isISender ? msg.receiver_id : msg.sender_id;
+      const partnerData = isISender ? msg.receiver : msg.sender;
+
+      if (partnerId && !chatGroups[partnerId]) {
+        chatGroups[partnerId] = {
+          id: partnerId,
+          name: partnerData?.full_name || `User ${partnerId.slice(0,4)}`,
+          avatar: partnerData?.avatar_url || null,
+          lastMsg: msg.content,
+          date: new Date(msg.created_at).toLocaleDateString(),
+          timestamp: new Date(msg.created_at).getTime()
+        };
+      }
+    });
+
+    setChats(Object.values(chatGroups).sort((a,b) => b.timestamp - a.timestamp));
+  }
+  setLoading(false);
+};
 
 const handleSearchStores = async (query) => {
   setSearchQuery(query);
