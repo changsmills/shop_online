@@ -429,3 +429,17 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+@media (max-width: 768px) {
+  /* KUHUSU BUBBLE YENYEWE */
+  .message-bubble {
+    max-width: 90% !important;   /* Inapanua sanduku hadi 90% ya skrini */
+    width: auto !important;
+  }
+
+  .bubble-content {
+    max-width: 100% !important;   /* Hairuhusu kuzidi mzazi */
+    word-break: break-word !important;
+    white-space: normal !important;
+  }
+}
