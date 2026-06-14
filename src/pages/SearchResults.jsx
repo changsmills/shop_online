@@ -23,6 +23,15 @@ export default function SearchResults({ session }) {
   const [categoryName, setCategoryName] = useState("");
   
   const navigate = useNavigate();
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+useEffect(() => {
+  const handleResize = () => setIsMobile(window.innerWidth < 768);
+  window.addEventListener('resize', handleResize);
+  return () => window.removeEventListener('resize', handleResize);
+}, []);
+
   const lastProductRef = useRef();
   
   const PRODUCTS_PER_PAGE = 50;
@@ -97,33 +106,37 @@ export default function SearchResults({ session }) {
 
   // STEP 3: Main search - inapobadilika initialQuery
   useEffect(() => {
-    const performSearch = async () => {
-      if (!initialQuery) {
-        setProducts([]);
-        setLoading(false);
-        setHasMore(false);
-        return;
-      }
-      
-      setLoading(true);
-      setPage(1);
-      setProducts([]);
-      
-      // Tafuta category ID kwanza
-      const foundCategoryId = await fetchCategoryId(initialQuery);
-      setCategoryId(foundCategoryId);
-      
-      if (foundCategoryId) {
-        // Kama category ipo, fetch products zake
-        const productsData = await fetchProductsByCategoryId(foundCategoryId, 1);
-        setProducts(productsData);
-      } else {
-        // Kama hakuna category inayofanana
-        setProducts([]);
-      }
-      
-      setLoading(false);
-    };
+    // Ndani ya useEffect ya 'performSearch' kwenye SearchResults.js:
+
+const performSearch = async () => {
+  if (!initialQuery) {
+    setProducts([]);
+    setLoading(false);
+    return;
+  }
+  
+  setLoading(true);
+  
+  // 1. Tafuta kategoria kwanza (ili uweke title nzuri)
+  const foundCategoryId = await fetchCategoryId(initialQuery);
+  setCategoryId(foundCategoryId);
+  
+  // 2. Query ya nguvu: Tafuta bidhaa zenye jina hilo AU bidhaa zilizo kwenye kategoria hiyo
+  const { data, error } = await supabase
+    .from("products_engines")
+    .select("id, name, price, cover_image, leaf_category_id")
+    .or(`name.ilike.%${initialQuery}%,leaf_category_id.eq.${foundCategoryId || '00000000-0000-0000-0000-000000000000'}`)
+    .range(0, PRODUCTS_PER_PAGE - 1)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error("Search Error:", error);
+  } else {
+    setProducts(data || []);
+  }
+  
+  setLoading(false);
+};
     
     performSearch();
   }, [initialQuery, fetchCategoryId, fetchProductsByCategoryId]);
@@ -188,29 +201,41 @@ export default function SearchResults({ session }) {
           </div>
 
           <div className="header-right-actions">
-            <div className="nav-action-item mini-lang hide-mobile">
-              <Globe size={14} />
-              <span className="mini-text">TZS</span>
-            </div>
-            
-            <div className="nav-action-item">
-              <UserTools session={session} />
-            </div>
-          </div>
+  {!isMobile && (
+    <div className="nav-action-item mini-lang">
+      <Globe size={14} />
+      <span className="mini-text">TZS</span>
+    </div>
+  )}
+  
+  {!isMobile && (
+    <div className="nav-action-item">
+      <UserTools session={session} />
+    </div>
+  )}
+</div>
+
         </div>
       </header>
 
       {/* MAIN CONTENT */}
       <main className="alibaba-main">
         <div className="results-info-bar">
-          <div className="deep-search-label">
-            <span className="sparkle">✦</span> 
-            {categoryName ? (
-              <>Bidhaa katika kategoria ya "{categoryName}"</>
-            ) : (
-              <>Matokeo ya utafutaji wa "{initialQuery}"</>
-            )}
-          </div>
+
+<div className="deep-search-label">
+  <span className="sparkle">✦</span> 
+  {products.length > 0 ? (
+    categoryName ? (
+      <>Bidhaa katika kategoria ya <strong>"{categoryName}"</strong></>
+    ) : (
+      <>Matokeo ya utafutaji wa <strong>"{initialQuery}"</strong></>
+    )
+  ) : (
+    <>Samahani, hatukupata bidhaa kwa "{initialQuery}"</>
+  )}
+</div>
+
+
           {products.length > 0 && (
             <div className="results-count">
               {products.length}+ products found
