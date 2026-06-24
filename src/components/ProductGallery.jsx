@@ -143,10 +143,12 @@ const ProductGallery = ({ product, isMobile = false }) => {
 {/* ========== MOBILE VIEW (VIDEO/PHOTO TOGGLE) ========== */}
 if (isMobile) {
   return (
-    <div className="gallery-mobile-simple">
+    /* 1. Ongeza padding na margin kuwa 0 hapa ili kuzuia CSS ya nje */
+    <div className="gallery-mobile-simple" style={{ width: '100%', padding: 0, margin: 0 }}>
       
       {/* Main Display */}
-      <div className="mobile-main-display" style={{ position: 'relative', background: '#000', borderRadius: '12px', overflow: 'hidden' }}>
+      {/* 2. Ongeza borderRadius: 0 ili iende mpaka kingo za kushoto na kulia bila pembe za mviringo */}
+      <div className="mobile-main-display" style={{ position: 'relative', background: '#000', borderRadius: 0, overflow: 'hidden', width: '100%', margin: 0, padding: 0 }}>
         
         {/* VIDEO MODE */}
         {mediaType === 'video' && videoItem && (
@@ -300,7 +302,9 @@ if (isMobile) {
           display: 'flex',
           gap: '12px',
           marginTop: '12px',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          marginLeft: 0,  /* Ongeza hili */
+          marginRight: 0  /* Ongeza hili */
         }}>
           <button
             onClick={() => setMediaType('video')}
@@ -339,9 +343,11 @@ if (isMobile) {
 <div className="product-long-description" style={{ 
   marginTop: '20px', 
   display: 'flex', 
-  flexDirection: 'column', // Inapanga picha mmoja baada ya mwingine kwenda chini
-  gap: '0px', // Inaondoa nafasi kati ya picha ili zigandane kama Alibaba
-  width: '100%' 
+  flexDirection: 'column', 
+  gap: '0px', 
+  width: '100%',
+  paddingLeft: 0,  /* Hii inazuia CSS ya nje kuweka padding */
+  paddingRight: 0 /* Hii inazuia CSS ya nje kuweka padding */
 }}>
   {mediaList.map((item, idx) => (
     <div 
@@ -350,14 +356,16 @@ if (isMobile) {
         width: '100%',
         backgroundColor: '#f5f5f5',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        margin: 0,        /* Ongeza hili */
+        padding: 0        /* Ongeza hili */
       }}
     >
       {item.type === 'video' ? (
         <div style={{ width: '100%', position: 'relative' }}>
           <video 
             src={item.url} 
-            controls // Kwenye full view ni vizuri mteja aweza ku-play
+            controls
             style={{ 
               width: '100%', 
               height: 'auto', 
@@ -371,9 +379,11 @@ if (isMobile) {
           alt={`Product detail ${idx}`} 
           style={{ 
             width: '100%', 
-            height: 'auto', // Inahakikisha picha haipotezi umbo lake (no distortion)
-            display: 'block', // Inaondoa lile pengo dogo la pixel chini ya picha
-            objectFit: 'contain'
+            height: 'auto', 
+            display: 'block', 
+            objectFit: 'contain',
+            margin: 0,
+            padding: 0
           }} 
         />
       )}

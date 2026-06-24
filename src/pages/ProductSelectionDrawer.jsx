@@ -697,18 +697,21 @@ toast.success(`Bidhaa ${itemsToCart.length} zimeongezwa kwenye kikapu!`, {
                     }}>
                         <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 600 }}>Select Options</h3>
                         <button onClick={onClose} style={{
-                            background: '#f5f5f5',
-                            border: 'none',
-                            fontSize: '18px',
-                            cursor: 'pointer',
-                            width: '32px',
-                            height: '32px',
-                            borderRadius: '50%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}>✕</button>
-                    </div>
+                                background: '#f5f5f5',       // Rangi ya kijivu nyepesi (inafanya ionekane kama kitufe)
+                               border: 'none',
+                               fontSize: '16px',
+                                   fontWeight: 500,
+                                    cursor: 'pointer',
+                                 minWidth: '50px',            // 🔥 Upana wa kutosha (si duara, bali umbo la mviringo)
+                                height: '32px',
+                                     borderRadius: '16px',        // 🔥 Pembe za mviringo kama "Pill" / Kidonge
+                                 display: 'flex',
+                               alignItems: 'center',
+                               justifyContent: 'center',
+                                 color: '#333',
+                                   transition: 'background 0.2s'
+                                     }}>✕</button>
+                                 </div>
 
                     {/* Scrollable Content */}
                     <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px' }}>
@@ -746,60 +749,89 @@ toast.success(`Bidhaa ${itemsToCart.length} zimeongezwa kwenye kikapu!`, {
                             </div>
                         )}
 
-                        {/* Size Selection */}
-                        {hasSizes && currentColorVar && (
-                            <div style={{ marginBottom: '20px' }}>
-                                <div style={{ fontWeight: 600, marginBottom: '12px', fontSize: '14px' }}>Size</div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                    {sizes.map(size => {
-                                        const stockQty = getStockForSize(currentColorVar, size);
-                                        const variantId = `${currentColorVar.id}::${size}`;
-                                        const qty = getQuantityForSize(size);
-                                        const isOutOfStock = stockQty === 0;
-                                        const unitPrice = currentColorVar.price || product?.price || 0;
-                                        return (
-                                            <div key={size} style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'space-between',
-                                                padding: '12px',
-                                                backgroundColor: '#fafafa',
-                                                borderRadius: '8px',
-                                                border: qty > 0 ? '1px solid #ff4e00' : '1px solid #eee'
-                                            }}>
-                                                <div style={{ flex: 1 }}>
-                                                    <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{size}</div>
-                                                    <div style={{ fontSize: '11px', color: '#666' }}>TSH {formatPrice(unitPrice)}</div>
-                                                    <small style={{ color: isOutOfStock ? '#ff4444' : '#4caf50' }}>
-                                                        {isOutOfStock ? 'Out of stock' : `${stockQty} available`}
-                                                    </small>
-                                                </div>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                    <button onClick={() => { if (qty > 0) handleQtyChange({ id: variantId, stock_quantity: stockQty }, -1); }}
-                                                        disabled={qty === 0 || isOutOfStock} style={{
-                                                            width: '28px', height: '28px', borderRadius: '6px', border: '1px solid #ddd',
-                                                            backgroundColor: '#fff', cursor: qty > 0 && !isOutOfStock ? 'pointer' : 'not-allowed',
-                                                            fontWeight: 'bold'
-                                                        }}>-</button>
-                                                    <input type="number" value={qty} onChange={(e) => {
-                                                        const val = e.target.value === '' ? 0 : parseInt(e.target.value);
-                                                        if (!isNaN(val) && val >= 0 && !isOutOfStock) {
-                                                            handleQtyChange({ id: variantId, stock_quantity: stockQty }, val - qty);
-                                                        }
-                                                    }} style={{ width: '45px', textAlign: 'center', border: '1px solid #ccc', borderRadius: '6px', padding: '6px' }} disabled={isOutOfStock} />
-                                                    <button onClick={() => { if (!isOutOfStock && qty < stockQty) handleQtyChange({ id: variantId, stock_quantity: stockQty }, 1); }}
-                                                        disabled={isOutOfStock || qty >= stockQty} style={{
-                                                            width: '28px', height: '28px', borderRadius: '6px', border: '1px solid #ddd',
-                                                            backgroundColor: '#fff', cursor: !isOutOfStock && qty < stockQty ? 'pointer' : 'not-allowed',
-                                                            fontWeight: 'bold'
-                                                        }}>+</button>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        )}
+                       {/* Size Selection */}
+                 {hasSizes && currentColorVar && (
+               <div style={{ marginBottom: '20px' }}>
+                     <div style={{ fontWeight: 600, marginBottom: '12px', fontSize: '14px' }}>Size</div>
+               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {sizes.map(size => {
+                const stockQty = getStockForSize(currentColorVar, size);
+                const variantId = `${currentColorVar.id}::${size}`;
+                const qty = getQuantityForSize(size);
+                const isOutOfStock = stockQty === 0;
+                const unitPrice = currentColorVar.price || product?.price || 0;
+                return (
+                    <div key={size} style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '12px',
+                        backgroundColor: '#fafafa',
+                        borderRadius: '8px',
+                        border: qty > 0 ? '1px solid #ff4e00' : '1px solid #eee'
+                    }}>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{size}</div>
+                            <div style={{ fontSize: '11px', color: '#666' }}>TSH {formatPrice(unitPrice)}</div>
+                            <small style={{ color: isOutOfStock ? '#ff4444' : '#4caf50' }}>
+                                {isOutOfStock ? 'Out of stock' : `${stockQty} available`}
+                            </small>
+                        </div>
+                        
+                        {/* 🔥 MAZISHI YALIYOSAHIHISHWA: VIFUNGO NA INPUT VIMEPANULIWA NA KUTENGENEZWA */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <button
+                                onClick={() => { if (qty > 0) handleQtyChange({ id: variantId, stock_quantity: stockQty }, -1); }}
+                                disabled={qty === 0 || isOutOfStock}
+                                style={{
+                                    width: '36px', height: '36px',
+                                    borderRadius: '8px', border: '1px solid #ddd',
+                                    backgroundColor: '#fff',
+                                    color: qty > 0 && !isOutOfStock ? '#333' : '#ccc',
+                                    cursor: qty > 0 && !isOutOfStock ? 'pointer' : 'not-allowed',
+                                    fontWeight: 'bold', fontSize: '16px',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    transition: 'background 0.2s'
+                                }}
+                            >−</button>
+                            <input
+                                type="number"
+                                value={qty}
+                                onChange={(e) => {
+                                    const val = e.target.value === '' ? 0 : parseInt(e.target.value);
+                                    if (!isNaN(val) && val >= 0 && !isOutOfStock) {
+                                        handleQtyChange({ id: variantId, stock_quantity: stockQty }, val - qty);
+                                    }
+                                }}
+                                disabled={isOutOfStock}
+                                style={{
+                                    width: '50px', height: '36px',
+                                    textAlign: 'center', border: '1px solid #ccc',
+                                    borderRadius: '8px', padding: '0 4px', fontSize: '15px',
+                                    backgroundColor: '#fff', outline: 'none'
+                                }}
+                            />
+                            <button
+                                onClick={() => { if (!isOutOfStock && qty < stockQty) handleQtyChange({ id: variantId, stock_quantity: stockQty }, 1); }}
+                                disabled={isOutOfStock || qty >= stockQty}
+                                style={{
+                                    width: '36px', height: '36px',
+                                    borderRadius: '8px', border: '1px solid #ddd',
+                                    backgroundColor: '#fff',
+                                    color: !isOutOfStock && qty < stockQty ? '#333' : '#ccc',
+                                    cursor: !isOutOfStock && qty < stockQty ? 'pointer' : 'not-allowed',
+                                    fontWeight: 'bold', fontSize: '16px',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    transition: 'background 0.2s'
+                                }}
+                            >+</button>
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+    </div>
+)}
 
                         {/* Free size */}
                         {!hasSizes && currentColorVar && (
