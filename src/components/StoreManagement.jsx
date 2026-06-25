@@ -327,20 +327,54 @@ const StoreManagement = ({
 
         {/* SEHEMU YA OFFICE IMAGES & STORE DETAILS (haijaguswa) */}
         <div className="mt-8 pt-6 border-t border-gray-100">
-          <div className="pd-image-upload-grid">
-            {officePreviews.map((url, index) => (
-              <div key={index} className="pd-image-box" onClick={() => officeInputRefs.current[index].click()}>
-                {url ? <img src={url} alt="Office" className="pd-office-img" /> : <div className="pd-placeholder">📸 Picha {index + 1}</div>}
-                <input type="file" hidden ref={(el) => (officeInputRefs.current[index] = el)} onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    const nF = [...officeFiles]; nF[index] = file; setOfficeFiles(nF);
-                    const nP = [...officePreviews]; nP[index] = URL.createObjectURL(file); setOfficePreviews(nP);
-                  }
-                }} />
-              </div>
-            ))}
-          </div>
+
+     <div className="pd-image-upload-grid">
+  {officePreviews.map((url, index) => (
+    <div 
+      key={`${index}-${url || index}`}  // 🔥 MABADILIKO MUHIMU!
+      className="pd-image-box" 
+      onClick={() => officeInputRefs.current[index]?.click()}
+    >
+      {url ? (
+        <img 
+          key={url} 
+          src={url} 
+          alt="Office" 
+          className="pd-office-img" 
+        />
+      ) : (
+        <div className="pd-placeholder">📸 Picha {index + 1}</div>
+      )}
+      <input 
+        type="file" 
+        hidden 
+        ref={(el) => (officeInputRefs.current[index] = el)} 
+        onChange={(e) => {
+  const file = e.target.files[0];
+  if (file) {
+    // Safisha picha ya zamani kwenye memory (hiari)
+    if (officePreviews[index]) {
+      URL.revokeObjectURL(officePreviews[index]);
+    }
+
+    // 🔥 MABADILIKO MUHIMU: Hakikisha officeFiles ni array kabla ya kutumia spread
+    const safeOfficeFiles = Array.isArray(officeFiles) ? officeFiles : [null, null, null];
+    const nF = [...safeOfficeFiles];
+    const nP = [...officePreviews];
+    
+    nF[index] = file; 
+    nP[index] = URL.createObjectURL(file);
+    setOfficeFiles(nF);
+    setOfficePreviews(nP);
+
+    // Safisha input ili iweze kuchagua picha tena
+    e.target.value = null; 
+  }
+}} 
+      />
+    </div>
+  ))}
+</div>
 
           <div className="pd-form-column">
             <div className={isMobile ? "flex flex-col gap-3" : "pd-input-row"}>

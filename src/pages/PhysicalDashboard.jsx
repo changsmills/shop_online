@@ -158,7 +158,7 @@ export default function PhysicalDashboard() {
     } catch (err) { alert("Imeshindikana: " + err.message); }
   };
 
-  const handleUpdateStoreDetails = async () => {
+   const handleUpdateStoreDetails = async () => {
     setIsUpdatingStore(true);
     try {
       let finalLogo = logoPreview;
