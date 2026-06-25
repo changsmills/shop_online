@@ -368,12 +368,19 @@ const handleWhatsAppOrder = async () => {
   setIsSelectionOpen(true);
 };
 
-  const handleChatWithSeller = () => {
+   const handleChatWithSeller = () => {
+    // 1. Angalia kama muuzaji yupo (Tumia owner_id sasa, siyo user_id)
+    if (!product?.stores?.owner_id) {
+      toast.error("Samahani, muuzaji huyu hajapatikana.");
+      return; 
+    }
+
+    // 2. Endelea kwa navigation kwa kutumia owner_id sahihi
     navigate('/dashboard/messages', {
       state: {
-        sellerId: product.stores?.user_id,
-        sellerName: product.stores?.store_name,
-        productContext: product.name,
+        sellerId: product.stores.owner_id,     // 🔥 SASA IMEBADILISHWA KUWA owner_id!
+        sellerName: product.stores.store_name || "Mmuuzaji",
+        productContext: product.name || "Bidhaa",
       },
     });
   };

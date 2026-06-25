@@ -41,43 +41,46 @@ const [isSearching, setIsSearching] = useState(false);
 
 
   // Sikiliza kama kuna mteja anakuja kuanza chat mpya kutoka kwenye bidhaa
-useEffect(() => {
-  const startNewChat = async () => {
-    if (location.state?.sellerId) {
-      const { sellerId, sellerName, productContext } = location.state;
+  useEffect(() => {
+    const startNewChat = async () => {
+      if (location.state?.sellerId) {
+        const { sellerId, sellerName, productContext } = location.state;
 
-      // 1. Angalia kama huyu seller tayari yupo kwenye list yako ya chats
-      const existingChat = chats.find(c => c.id === sellerId);
+        // 1. Angalia kama huyu seller tayari yupo kwenye list yako ya chats
+        const existingChat = chats.find(c => c.id === sellerId);
 
-      if (existingChat) {
-        // Kama yupo, mfungue tu
-        handleChatSelect(existingChat);
-      } else {
-        // Kama hayupo (ni mara ya kwanza), tengeneza "Temporary Chat" object
-        const temporaryChat = {
-          id: sellerId,
-          name: sellerName || "Seller",
-          avatar: null,
-          lastMsg: productContext ? `Ninaulizia: ${productContext}` : "",
-          date: "Now"
-        };
-        
-        setActiveChat(temporaryChat);
-        
-        // Kama unataka kutuma ujumbe wa kwanza automatic kuhusu bidhaa:
-        if (productContext) {
-           setNewMessage(`Habari, ninaulizia kuhusu bidhaa hii: ${productContext}`);
+        if (existingChat) {
+          // Kama yupo, mfungue tu
+          handleChatSelect(existingChat);
+        } else {
+          // Kama hayupo (ni mara ya kwanza), tengeneza "Temporary Chat" object
+          const temporaryChat = {
+            id: sellerId,
+            name: sellerName || "Seller",
+            avatar: null,
+            lastMsg: productContext ? `Ninaulizia: ${productContext}` : "",
+            date: "Now"
+          };
+          
+          setActiveChat(temporaryChat);
+          
+          // Kama unataka kutuma ujumbe wa kwanza automatic kuhusu bidhaa:
+          if (productContext) {
+             setNewMessage(`Habari, ninaulizia kuhusu bidhaa hii: ${productContext}`);
+          }
+
+          if (isMobile) setShowMobileChat(true);
         }
-
-        if (isMobile) setShowMobileChat(true);
       }
-    }
-  };
+    };
 
-  if (!loading) { // Hakikisha inbox imeshaload kwanza
-    startNewChat();
-  }
-}, [location.state, chats, loading]);
+    /* 🔥 MABADILIKO MUHIMU: 
+       TUMEONDOA 'if (!loading)'. 
+       Sasa chat itafunguliwa MARA MOJA bila kusubiri inbox ipakie. */
+    if (location.state?.sellerId) {
+      startNewChat();
+    }
+  }, [location.state, chats, isMobile]); // 🔥 Tumeondoa 'loading' kwenye dependencies!
 
   // Close mobile chat when screen becomes desktop
   useEffect(() => {
@@ -95,67 +98,92 @@ useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-const fetchMessages = async (partnerId) => {
-  if (!partnerId || !session?.user?.id) return;
+  const fetchMessages = async (partnerId) => {
+    if (!partnerId || !session?.user?.id) return;
 
-  const { data, error } = await supabase
-    .from('messages')
-    .select(`
-      *,
-      sender:sender_id ( id, full_name, avatar_url ),
-      receiver:receiver_id ( id, full_name, avatar_url )
-    `)
-    .or(`and(sender_id.eq.${session.user.id},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${session.user.id})`)
-    .order('created_at', { ascending: true });
+    // 🔥 Hakikisha umegeuza loading kuwa true kabla ya kuita function hii
+    // (Kama hauko kwenye loading state, unaweza kuacha hii, lakini ni vyema kuzima mwishoni)
 
-  if (!error && data) setMessages(data);
-  else console.error("Error fetching messages:", error);
-};
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .select(`
+          *,
+          sender:sender_id ( id, full_name, avatar_url ),
+          receiver:receiver_id ( id, full_name, avatar_url )
+        `)
+        .or(`and(sender_id.eq.${session.user.id},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${session.user.id})`)
+        .order('created_at', { ascending: true });
 
-const fetchInbox = async () => {
-  if (!session?.user) return;
-  setLoading(true);
-
-  const { data, error } = await supabase
-    .from('messages')
-    .select(`
-      *,
-      sender:sender_id ( id, full_name, avatar_url ),
-      receiver:receiver_id ( id, full_name, avatar_url )
-    `)
-    .or(`sender_id.eq.${session.user.id},receiver_id.eq.${session.user.id}`)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error("Error fetching inbox:", error);
-    setLoading(false);
-    return;
-  }
-
-  if (data) {
-    const chatGroups = {};
-
-    data.forEach(msg => {
-      const isISender = msg.sender_id === session.user.id;
-      const partnerId = isISender ? msg.receiver_id : msg.sender_id;
-      const partnerData = isISender ? msg.receiver : msg.sender;
-
-      if (partnerId && !chatGroups[partnerId]) {
-        chatGroups[partnerId] = {
-          id: partnerId,
-          name: partnerData?.full_name || `User ${partnerId.slice(0,4)}`,
-          avatar: partnerData?.avatar_url || null,
-          lastMsg: msg.content,
-          date: new Date(msg.created_at).toLocaleDateString(),
-          timestamp: new Date(msg.created_at).getTime()
-        };
+      if (!error && data) {
+        setMessages(data);
+      } else {
+        console.error("Error fetching messages:", error);
+        // 🔥 Ikiwa kuna error, tunaweza kuweka messages kuwa tupu ili UI isionyeshe data za zamani
+        setMessages([]); 
       }
-    });
+    } catch (err) {
+      // 🔥 Inakamata network error (kama mtandao umezima)
+      console.error("Network error while fetching messages:", err);
+      setMessages([]);
+    } finally {
+      // 🔥 Muhimu: Hii inazima 'loading' hata kama kuna error
+      // Kama unatumia state ya 'loading' kwa messages, zima hapa.
+      // setMessagesLoading(false); 
+    }
+  };
 
-    setChats(Object.values(chatGroups).sort((a,b) => b.timestamp - a.timestamp));
-  }
-  setLoading(false);
-};
+  const fetchInbox = async () => {
+    if (!session?.user) return;
+    
+    // 🔥 Anzisha loading mwanzoni
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .select(`
+          *,
+          sender:sender_id ( id, full_name, avatar_url ),
+          receiver:receiver_id ( id, full_name, avatar_url )
+        `)
+        .or(`sender_id.eq.${session.user.id},receiver_id.eq.${session.user.id}`)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error("Error fetching inbox:", error);
+        return;
+      }
+
+      if (data) {
+        const chatGroups = {};
+        data.forEach(msg => {
+          const isISender = msg.sender_id === session.user.id;
+          const partnerId = isISender ? msg.receiver_id : msg.sender_id;
+          const partnerData = isISender ? msg.receiver : msg.sender;
+
+          if (partnerId && !chatGroups[partnerId]) {
+            chatGroups[partnerId] = {
+              id: partnerId,
+              name: partnerData?.full_name || `User ${partnerId.slice(0,4)}`,
+              avatar: partnerData?.avatar_url || null,
+              lastMsg: msg.content,
+              date: new Date(msg.created_at).toLocaleDateString(),
+              timestamp: new Date(msg.created_at).getTime()
+            };
+          }
+        });
+
+        setChats(Object.values(chatGroups).sort((a,b) => b.timestamp - a.timestamp));
+      }
+    } catch (err) {
+      // 🔥 Hii inakamata kosa lolote la mtandao (network error)
+      console.error("Network error while fetching inbox:", err);
+    } finally {
+      // 🔥 HAPA NDIYO MUHIMU ZAIDI: inazima 'loading' hata kama mtandao umekatika!
+      setLoading(false);
+    }
+  };
 
 const handleSearchStores = async (query) => {
   setSearchQuery(query);
@@ -822,29 +850,51 @@ useEffect(() => {
                   </div>
                 </div>
                 
-                <div className="messages-display" style={{ 
+                               <div className="messages-display" style={{ 
                   flex: 1, 
                   overflowY: 'auto', 
                   padding: '20px',
-                    paddingBottom: isMobile ? 'calc(20px + 70px)' : '20px',  // ← HAPA
+                  paddingBottom: isMobile ? 'calc(20px + 70px)' : '20px', 
                   backgroundColor: '#f5f5f7'
                 }}>
-                  {messages.map((msg, index) => (
-                    <div 
-                      key={index} 
-                      className={`message-bubble ${msg.sender_id === session.user.id ? 'sent' : 'received'}`}
-                    >
-                      <div className="bubble-content">
-                        <div className="message-sender-name" style={{ fontSize: '12px', fontWeight: '600', marginBottom: '4px', color: '#ff6a00' }}>
-                          {getSenderName(msg)}
-                        </div>
-                        <p style={{ margin: 0, wordBreak: 'break-word' }}>{msg.content}</p>
-                        <span className="msg-timestamp" style={{ fontSize: '10px', color: '#999', marginTop: '4px', display: 'block' }}>
-                          {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
+                  
+                  {/* 🔥 MABADILIKO HAPA: Angalia kama kuna ujumbe */}
+                  {messages.length === 0 ? (
+                    <div style={{ 
+                      height: '100%', 
+                      display: 'flex', 
+                      flexDirection: 'column',
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      color: '#999', 
+                      fontSize: '14px',
+                      textAlign: 'center',
+                      padding: '20px'
+                    }}>
+                      <p style={{ margin: 0 }}>Hakuna ujumbe bado.</p>
+                      <p style={{ margin: '5px 0 0', fontSize: '12px', color: '#bbb' }}>
+                        Andika ujumbe ili kuanza mazungumzo na muuzaji!
+                      </p>
                     </div>
-                  ))}
+                  ) : (
+                    messages.map((msg, index) => (
+                      <div 
+                        key={index} 
+                        className={`message-bubble ${msg.sender_id === session.user.id ? 'sent' : 'received'}`}
+                      >
+                        <div className="bubble-content">
+                          <div className="message-sender-name" style={{ fontSize: '12px', fontWeight: '600', marginBottom: '4px', color: '#ff6a00' }}>
+                            {getSenderName(msg)}
+                          </div>
+                          <p style={{ margin: 0, wordBreak: 'break-word' }}>{msg.content}</p>
+                          <span className="msg-timestamp" style={{ fontSize: '10px', color: '#999', marginTop: '4px', display: 'block' }}>
+                            {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                  
                   <div ref={messagesEndRef} />
                 </div>
 
