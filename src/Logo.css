@@ -37,8 +37,8 @@
   flex-direction: column;
   /* margin-left: -10px; Hii unaweza kuiondoa kama unataka nafasi ya kawaida */
   color: #ff4e00 !important; /* Rangi uliyotumia kwenye checkout button yako */
-  font-weight: 700;
-  font-size: 22px;
+  font-weight: 200px;
+  font-size: 12px;
   line-height: 1;
   font-family: 'Inter', sans-serif, Arial;
 }
