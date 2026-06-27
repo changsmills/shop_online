@@ -5,12 +5,29 @@ import { CartProvider } from "./context/CartContext";
 import BottomNav from "./components/BottomNav";
 import { Toaster, toast } from 'react-hot-toast';
 import { LanguageProvider } from './context/LanguageContext.jsx'; // Ongeza import
+// Tafuta sehemu ya imports na ongeza hizi
+import ProductCreationFlow from './components/ProductCreationFlow';
+import QuickInventoryManager from './components/QuickInventoryManager';
+import BusinessAnalytics from './components/BusinessAnalytics';
+import TopDealsSection from './components/TopDealsSection';
+import StoreManagement from './components/StoreManagement';
 
 
 // Import Pages
 import Home from "./pages/Home"; 
+// Imports za Supplier Modular Dashboard (Hizi ndizo utakazoongeza)
+import SellerLayout from './components/SellerLayout';
+import SellerOverview from './pages/SellerOverview';
+import SellerProducts from './pages/SellerProducts';
+import SellerSettings from './pages/SellerSettings';
+// Ongeza hizi pia kama zipo kwenye sidebar yako:
+import SellerOrders from './pages/SellerOrders';
+import SellerAnalytics from './pages/SellerAnalytics';
+import SellerCustomers from './pages/SellerCustomers';
 import Login from "./pages/Login"; 
 import Register from "./pages/Register";
+import SellerDashboard from './pages/SellerDashboard'; 
+import SupplierAuth from './pages/SupplierAuth';
 import CreateStore from "./pages/CreateStore";
 import Dashboard from "./pages/Dashboard";
 import ProductManagement from "./pages/ProductManagement";
@@ -142,6 +159,7 @@ function AppContent({ session }) {
         <Route path="/how-to-buy" element={<HowToBuy />} />
         <Route path="/about-skyfall" element={<SkyfallBusiness session={session} />} />
         <Route path="/search" element={<SearchResults session={session} />} />
+
         
         <Route path="/dashboard/orders" element={session ? <MyOrders session={session} /> : <Navigate to="/dashboard/login" />} />
         <Route path="/update/:productId" element={session ? <UpdateProductPage /> : <Navigate to="/dashboard/login" />} />
@@ -174,8 +192,41 @@ function AppContent({ session }) {
         {/* AUTHENTICATION */}
         <Route path="/dashboard/login" element={<Login />} />
         <Route path="/dashboard/register" element={<Register />} />
+        <Route path="/dashboard/register-supplier" element={<SupplierAuth />} />
+
 
         <Route path="/stores/:storeId" element={<AllStores session={session} />} />
+
+        <Route path="/dashboard/seller" element={<SellerDashboard />} />
+
+<Route 
+  path="/dashboard/sellerboard" 
+  element={
+    <SellerLayout 
+      user={session?.user} 
+      // 🔥 ONGEZA HAPA: Pitisha dataProps tupu mwanzo, lakini itajazwa na PhysicalDashboard
+      dataProps={{ storeId: id, products: [], store: null }} 
+      handleLogout={() => supabase.auth.signOut()}
+    />
+  }
+>
+  <Route index element={<SellerOverview />} />
+  <Route path="overview" element={<SellerOverview />} />
+  <Route path="products" element={<SellerProducts />} />
+  <Route path="add-product" element={<ProductCreationFlow />} />
+  <Route path="inventory" element={<QuickInventoryManager />} />
+  <Route path="analytics" element={<BusinessAnalytics />} />
+  <Route path="top-deals" element={<TopDealsSection />} />
+  <Route path="customers" element={<SellerCustomers />} />
+  
+  <Route 
+    path="store-management" 
+    element={<StoreManagement />} 
+  />
+  
+  <Route path="settings" element={<SellerSettings />} />
+</Route>
+
 
 
         {/* DASHBOARD SUB-PAGES */}

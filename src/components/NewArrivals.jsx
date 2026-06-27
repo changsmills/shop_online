@@ -218,33 +218,57 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
     }}
     className="hide-scrollbar-mobile"
   >
-    {products.map((product) => (
-      <div
-        key={product.id}
-        style={{
-          flex: '0 0 auto',        // ← MUHIMU: Inazuia vipengele kukua au kusinyaa
-          width: '140px',
-          minWidth: '140px'
-        }}
-      >
-        <DashboardCard
-          image={product.cover_image}
-          title={product.name}
-          price={product.price}
-          originalPrice={product.original_price}
-          views={product.views}
-          isMobile={isMobile}
-          onClick={() => navigate('/products', {
-            state: {
-              priorityId: product.id,
-              sectionName: `New Arrivals ${selectedCategory ? `in ${selectedCategory.name}` : ''}`,
-              categoryId: selectedCategory?.id,
-              categoryName: selectedCategory?.name
-            }
-          })}
-        />
-      </div>
-    ))}
+
+  {products.map((product) => (
+  <div
+    key={product.id}
+    style={{
+      flex: '0 0 auto',
+      width: isMobile ? '140px' : '180px',
+      minWidth: isMobile ? '140px' : '180px',
+      /* 🔥 MUHIMU SANA: Hapa ndipo tunatengeneza Card inayoonekana! */
+      backgroundColor: '#ffffff',
+      borderRadius: '12px', /* Pembe za duara */
+      padding: isMobile ? '8px' : '10px', /* Punguza padding kidogo */
+      border: '1px solid #e5e7eb', /* 🔥 Hii ndio inayotengeneza mstari wa kijivu unaoonekana */
+      boxShadow: '0 2px 8px rgba(0,0,0,0.04)', /* 🔥 Kivuli kidogo sana kinacholeta 3D effect */
+      transition: 'all 0.2s ease',
+      cursor: 'pointer',
+      marginBottom: '8px'
+    }}
+    onMouseEnter={(e) => {
+      if (!isMobile) {
+        e.currentTarget.style.transform = 'translateY(-3px)';
+        e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.08)';
+        e.currentTarget.style.borderColor = '#ff6a00'; /* Inageuka orange ukikausha */
+      }
+    }}
+    onMouseLeave={(e) => {
+      if (!isMobile) {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
+        e.currentTarget.style.borderColor = '#e5e7eb';
+      }
+    }}
+  >
+    <DashboardCard
+      image={product.cover_image}
+      title={product.name}
+      price={product.price}
+      originalPrice={product.original_price}
+      views={product.views}
+      isMobile={isMobile}
+      onClick={() => navigate('/products', {
+        state: {
+          priorityId: product.id,
+          sectionName: `New Arrivals ${selectedCategory ? `in ${selectedCategory.name}` : ''}`,
+          categoryId: selectedCategory?.id,
+          categoryName: selectedCategory?.name
+        }
+      })}
+    />
+  </div>
+))}
   </div>
 ) : (
         /* ========== DESKTOP VIEW: Horizontal Scroll with Arrows ========== */

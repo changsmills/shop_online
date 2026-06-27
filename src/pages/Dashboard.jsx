@@ -1029,10 +1029,6 @@ const getCategoryDisplayName = (category) => {
         document.body
       )}
 
-
-{/* ============================================ */}
-/* PORTAL YA MOBILE - BOTTOM SHEET (ILIYOFANANA NA DESKTOP) */
-
 {isMobile && mobileMenuOpen && ReactDOM.createPortal(
   <div 
     style={{ 

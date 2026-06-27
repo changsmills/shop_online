@@ -20,13 +20,26 @@ export default function StorePage({ session }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [categories, setCategories] = useState([]);
-  const [isMobile, setIsMobile] = useState(false);
-  const [viewMode, setViewMode] = useState('grid'); // grid au list
+  
+  // =======================================================
+  // 🔥 SULUHISHO LA TATIZO LA FOOTER KUPOTEA
+  // =======================================================
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth <= 768;
+    }
+    return false;
+  });
 
-  // Detect mobile screen
+  // =======================================================
+  // 🔥 SULUHISHO LA TATIZO LA "viewMode is not defined"
+  // =======================================================
+  const [viewMode, setViewMode] = useState('grid'); 
+  // =======================================================
+
+  // Detect mobile screen resize
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-    checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
@@ -38,7 +51,6 @@ export default function StorePage({ session }) {
       
       setLoading(true);
       try {
-        // Fetch store details
         const { data: storeData, error: storeError } = await supabase
           .from('stores_engine')
           .select('*')
@@ -48,7 +60,6 @@ export default function StorePage({ session }) {
         if (storeError) throw storeError;
         setStore(storeData);
 
-        // Fetch products from this store
         const { data: productsData, error: productsError } = await supabase
           .from('products_engines')
           .select('*')
@@ -60,7 +71,6 @@ export default function StorePage({ session }) {
         setProducts(productsData || []);
         setFilteredProducts(productsData || []);
 
-        // Extract unique categories from products
         if (productsData && productsData.length > 0) {
           const uniqueCats = [...new Set(productsData.map(p => p.category_name).filter(Boolean))];
           setCategories(uniqueCats);
@@ -76,20 +86,17 @@ export default function StorePage({ session }) {
     fetchStoreData();
   }, [storeId]);
 
-  // Filter products based on search and category
+  // Filter products
   useEffect(() => {
     let filtered = [...products];
-
     if (searchTerm) {
       filtered = filtered.filter(p => 
         p.name?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-
     if (selectedCategory !== 'all') {
       filtered = filtered.filter(p => p.category_name === selectedCategory);
     }
-
     setFilteredProducts(filtered);
   }, [searchTerm, selectedCategory, products]);
 
@@ -132,7 +139,6 @@ export default function StorePage({ session }) {
       <Header />
       
       <div className="store-container">
-        
         {/* Back Button */}
         <div className="store-back-btn" onClick={() => navigate(-1)}>
           <ChevronLeft size={20} />
@@ -188,7 +194,6 @@ export default function StorePage({ session }) {
 
         {/* Store Info Cards */}
         <div className="store-info-grid">
-          {/* About Store */}
           <div className="info-card">
             <h3><Store size={18} /> About Store</h3>
             <p>{store.description || 'No description available'}</p>
@@ -208,7 +213,6 @@ export default function StorePage({ session }) {
             </div>
           </div>
 
-          {/* Contact & Location */}
           <div className="info-card">
             <h3><MapPin size={18} /> Contact & Location</h3>
             {store.physical_address && (
@@ -237,7 +241,6 @@ export default function StorePage({ session }) {
             )}
           </div>
 
-          {/* Social Media */}
           {(store.instagram_handle || store.tiktok_handle || store.facebook_handle) && (
             <div className="info-card">
               <h3><Globe size={18} /> Connect With Us</h3>
@@ -267,7 +270,6 @@ export default function StorePage({ session }) {
           <div className="products-header">
             <h2>All Products ({filteredProducts.length})</h2>
             
-            {/* Search & Filter */}
             <div className="products-controls">
               <div className="search-bar">
                 <Search size={18} />
@@ -292,15 +294,32 @@ export default function StorePage({ session }) {
                 </select>
               )}
 
-              <div className="view-toggle">
+              {/* 🔥 SEHEMU YA VIEW TOGGLE IMEBADILISHWA KUWA INLINE CSS ILI KUTATUA ERROR NA KUDUMISHA MUONEKANO */}
+              <div style={{ display: 'flex', gap: '5px' }}>
                 <button 
-                  className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                  style={{
+                    padding: '8px',
+                    borderRadius: '8px',
+                    border: viewMode === 'grid' ? '1px solid #ff6a00' : '1px solid #ddd',
+                    background: viewMode === 'grid' ? '#ff6a00' : 'white',
+                    color: viewMode === 'grid' ? 'white' : '#333',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
                   onClick={() => setViewMode('grid')}
                 >
                   <Grid3x3 size={18} />
                 </button>
                 <button 
-                  className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
+                  style={{
+                    padding: '8px',
+                    borderRadius: '8px',
+                    border: viewMode === 'list' ? '1px solid #ff6a00' : '1px solid #ddd',
+                    background: viewMode === 'list' ? '#ff6a00' : 'white',
+                    color: viewMode === 'list' ? 'white' : '#333',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
                   onClick={() => setViewMode('list')}
                 >
                   <List size={18} />
@@ -376,7 +395,8 @@ export default function StorePage({ session }) {
         </div>
       </div>
 
-       {!isMobile && <Footer />}
+      {/* Footer sasa haina 'flash' kwa sababu state inachekiwa kwa haraka */}
+      {!isMobile && <Footer />}
     </div>
   );
 }

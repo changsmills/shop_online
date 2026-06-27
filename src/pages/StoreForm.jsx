@@ -120,12 +120,10 @@ const prevStep = () => setStep(step - 1);
     }
   }, [formData.category_id, dbSubCategories]);
 
-
-
- const handleSubmitInternal = async (e) => {
+   const handleSubmitInternal = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError(null); // Hakikisha unayo state ya error: const [error, setError] = useState(null);
+    setError(null);
 
     try {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -137,25 +135,21 @@ const prevStep = () => setStep(step - 1);
       // --- HELPER FUNCTION YA UPLOAD ---
       const uploadImage = async (file, folder = "office_photos") => {
         if (!file || !(file instanceof File)) return null;
-
         const fileExt = file.name.split(".").pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
         const filePath = `${user.id}/${folder}/${fileName}`;
-
         const { error: uploadError } = await supabase.storage
           .from("picha_za_duka")
           .upload(filePath, file);
-
         if (uploadError) {
           console.error("Storage Error:", uploadError.message);
           return null;
         }
-
         const { data } = supabase.storage.from("picha_za_duka").getPublicUrl(filePath);
         return data.publicUrl;
       };
 
-      // 1. Uploading Images (Branding, Office, TIN)
+      // 1. Uploading Images
       const logoUrl = await uploadImage(formData.logo?.[0], "branding");
       const bannerUrl = await uploadImage(formData.banner?.[0], "branding");
       const tinImageUrl = await uploadImage(formData.tin_image?.[0], "verification");
@@ -177,24 +171,16 @@ const prevStep = () => setStep(step - 1);
             store_slug: createSlug(formData.name),
             business_type: formData.business_type,
             category_id: formData.category_id,
-            
-            // Arrays
             sub_category_ids: formData.sub_category_ids || [], 
             specialist_tags: formData.specialist_tags || [],
-
-            // Picha
             store_logo: logoUrl,
             store_banner: bannerUrl,
             office_images: imageUrls,
-
-            // Maelezo & Operations
             description: formData.description,
             moq: formData.moq, 
             lead_time: formData.lead_time,
             supply_capacity: formData.supply_capacity,
             packaging_type: formData.packaging_type,
-
-            // Mawasiliano (Tumeunganisha hapa)
             phone_number: formData.phone,
             email: formData.email || null,
             whatsapp_number: formData.whatsapp || formData.phone,
@@ -202,26 +188,22 @@ const prevStep = () => setStep(step - 1);
             tiktok_handle: formData.tiktok || null,
             twitter_handle: formData.twitter || null,
             youtube_link: formData.youtube || null,
-
-            // Mahali & Verification
             physical_address: formData.location,
             city: formData.city || "Dar es Salaam",
             tin_number: formData.tin_number,
             tin_image_url: tinImageUrl,
             google_maps_url: formData.maps_link,
-
             status: "active",
             is_verified: false,
           },
         ])
         .select();
 
-      // --- HAPA NDIPO TUNAKAGUA UNIQUE CONSTRAINT ---
       if (insertError) {
         if (insertError.code === "23505" || insertError.message.includes("unique constraint")) {
           setError("⚠️ Jina hili la duka tayari limeshatumika. Tafadhali tumia jina lingine la kipekee.");
-          setStep(1); // Mrudishe user hatua ya kwanza kubadili jina
-          return; // Acha kuendelea
+          setStep(1);
+          return;
         }
         throw insertError;
       }
@@ -230,6 +212,22 @@ const prevStep = () => setStep(step - 1);
       setIsSuccess(true);
       if (newStore && newStore.length > 0) {
         const storeId = newStore[0].id;
+
+        // ✅ HAPA NDIO UNAONGEZA MSIMBO WA KUBADILISHA ROLE!
+        console.log("⚡ Inabadilisha role ya user kuwa 'supplier'...");
+        const { error: roleError } = await supabase
+          .from('profiles')
+          .update({ role: 'supplier' })
+          .eq('id', user.id);
+
+        if (roleError) {
+          console.error("⚠️ Tatizo kubadilisha role:", roleError.message);
+        } else {
+          console.log("✅ Role imebadilishwa kuwa 'supplier'!");
+        }
+        // ----------------------------------------------------------------
+
+        // Sasa mpeleke kwenye physical dashboard yake
         setTimeout(() => navigate(`/dashboard/physical/${storeId}`), 2000);
       }
 

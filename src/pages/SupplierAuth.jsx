@@ -1,124 +1,81 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
-import { toast, Toaster } from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
-// Unaweza kuongeza icons hizi kama tayari umesakinisha lucide-react
-// import { Google, Facebook, Linkedin } from 'lucide-react'; 
+import { supabase } from '../supabaseClient'; // Hakikisha njia ni sahihi
+import { ChevronDown } from 'lucide-react';
 
-const Login = () => {
-  const { t } = useTranslation();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 900);
+const SupplierAuth = () => {
   const navigate = useNavigate();
-
+  const [isLogin, setIsLogin] = useState(false); // Badilisha true kuwa Sign In, false kuwa Sign Up
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [country, setCountry] = useState('TZ');
+  
+  // Responsive Logic
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth <= 900 : false);
+  
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 900);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({ 
-        email: email.trim(), 
-        password 
-      });
-      
-      if (error) throw error;
-
-      if (data.session) {
-        const user = data.session.user;
-
-        // 1. Pata role ya mteja kwenye table ya 'profiles'
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
-
-        if (profileError) {
-          // Kama hana profile bado (mgeni), mpeleke kwenye dashboard ya mteja
-          toast.success("Karibu kwenye Skyfall!");
-          navigate('/dashboard', { replace: true });
-          return;
-        }
-
-        const role = profileData?.role;
-
-        // 2. Amua anatakiwa aende wapi kulingana na role
-        if (role === 'supplier') {
-          toast.success("Karibu Muuzaji! Inaelekeza kwenye Dashboard yako...");
-          navigate('/dashboard/sellerboard', { replace: true });
-        } else {
-          // Akiwa 'customer' au 'null'
-          toast.success("Karibu Mteja!");
-          navigate('/dashboard', { replace: true });
-        }
-      }
-    } catch (err) {
-      toast.error("Kosa: " + err.message);
-    } finally {
-      setLoading(false);
+    // Hapa unaweza kuweka logic yako ya Supabase Auth
+    if (isLogin) {
+      console.log("Logging in with:", email);
+      // await supabase.auth.signInWithPassword({ email, password });
+    } else {
+      console.log("Signing up supplier with:", email);
+      // await supabase.auth.signUp({ email, password, options: { data: { role: 'supplier' } } });
     }
+    setLoading(false);
   };
 
-  // Social Login Helpers (Mfano tu - unaweza kuunganisha supabase OAuth hapa)
-  const handleSocialLogin = (provider) => {
-    toast(`Inaanza ${provider} login...`, { icon: '⏳' });
-    // Mfano: supabase.auth.signInWithOAuth({ provider: 'google' })
-  };
-
-  // Styles za Layout (Split Screen)
+  // Styles constants
   const styles = {
     container: {
       display: 'flex',
       minHeight: '100vh',
       backgroundColor: '#fff',
-      fontFamily: "'Inter', sans-serif",
+      fontFamily: "'Inter', -apple-system, sans-serif",
       flexDirection: isMobile ? 'column' : 'row',
     },
     leftPanel: {
       flex: 1,
-      backgroundImage: 'url("https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1000&auto=format&fit=crop")', // Badilisha URL kwa picha yako mwenyewe
+      backgroundImage: 'url("https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1000&auto=format&fit=crop")', // Unaweza kubadilisha link hii
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       position: 'relative',
-      height: isMobile ? '300px' : 'auto',
+      height: isMobile ? '350px' : 'auto',
     },
-    testimonialBox: {
+    overlayBox: {
       position: 'absolute',
       bottom: '40px',
       left: '40px',
       right: '40px',
-      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      backgroundColor: 'rgba(255, 255, 255, 0.85)',
       padding: '20px 30px',
       borderRadius: '12px',
       boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-      backdropFilter: 'blur(10px)',
     },
     rightPanel: {
       flex: 1,
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
-      padding: isMobile ? '30px 20px' : '40px 60px',
+      padding: isMobile ? '30px 20px' : '40px 80px',
       backgroundColor: '#fff',
     },
   };
 
   return (
     <div style={styles.container}>
-      <Toaster position="top-center" reverseOrder={false} />
-
+      
       {/* SEHEMU YA KUSHOTO: PICHA NA MAANDISHI */}
       <div style={styles.leftPanel}>
-        <div style={styles.testimonialBox}>
+        <div style={styles.overlayBox}>
           <p style={{ margin: '0 0 10px 0', fontSize: '16px', fontStyle: 'italic', fontWeight: '500', color: '#1a1a1a', lineHeight: '1.5' }}>
             “In just 1 year, LTA International generated 14 new customers with new sales growth totaling $1.5 million.”
           </p>
@@ -129,35 +86,42 @@ const Login = () => {
         </div>
       </div>
 
-      {/* SEHEMU YA KULIA: FOMU YA LOGIN */}
+      {/* SEHEMU YA KULIA: FOMU YA LOGIN / SIGNUP */}
       <div style={styles.rightPanel}>
+        <h2 style={{ fontSize: '32px', fontWeight: '700', color: '#1a1a1a', marginBottom: '8px' }}>
+          {isLogin ? 'Sign in as a supplier' : 'Sign up as a supplier'}
+        </h2>
         
-        {/* Kichwa cha Fomu */}
-        <div style={{ marginBottom: '30px' }}>
-          <h2 style={{ fontSize: '32px', fontWeight: '700', color: '#1a1a1a', marginBottom: '8px' }}>
-            Sign in to your account
-          </h2>
-          <p style={{ margin: 0, fontSize: '14px', color: '#666' }}>
-            Welcome back! Enter your details below.
-          </p>
+        {/* Location Dropdown */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '30px', color: '#555', fontSize: '14px' }}>
+          <span>Company location:</span>
+          <select 
+            value={country} 
+            onChange={(e) => setCountry(e.target.value)}
+            style={{
+              border: 'none', background: 'transparent', fontWeight: '600', color: '#1a1a1a', cursor: 'pointer', outline: 'none', fontSize: '14px'
+            }}
+          >
+            <option value="TZ">🇹🇿 Tanzania</option>
+            <option value="KE">🇰🇪 Kenya</option>
+            <option value="UG">🇺🇬 Uganda</option>
+            <option value="US">🇺🇸 United States</option>
+          </select>
         </div>
 
-        {/* Vifungo vya Social Login (Kama kwenye picha) */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '25px' }}>
+        {/* Social Buttons */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '30px' }}>
           <SocialButton 
-            onClick={() => handleSocialLogin('Google')}
             bg="#fff" border="1px solid #ddd" color="#333" 
             icon={<GoogleIcon />} 
             text="Continue with Google" 
           />
           <SocialButton 
-            onClick={() => handleSocialLogin('Facebook')}
             bg="#1877F2" border="none" color="#fff" 
             icon={<FacebookIcon />} 
             text="Continue with Facebook" 
           />
           <SocialButton 
-            onClick={() => handleSocialLogin('LinkedIn')}
             bg="#0077B5" border="none" color="#fff" 
             icon={<LinkedInIcon />} 
             text="Continue with LinkedIn" 
@@ -165,19 +129,19 @@ const Login = () => {
         </div>
 
         {/* Divider */}
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '25px', color: '#999', fontSize: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '30px', color: '#999', fontSize: '14px' }}>
           <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #e5e7eb' }} />
           <span style={{ padding: '0 15px' }}>Or</span>
           <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #e5e7eb' }} />
         </div>
 
-        {/* Fomu ya Email & Password */}
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        {/* Email Input & Form */}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#333' }}>Email</label>
             <input 
               type="email" 
-              required 
+              required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               style={{
@@ -188,46 +152,30 @@ const Login = () => {
               onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
             />
           </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#333' }}>Password</label>
-            <input 
-              type="password" 
-              required 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={{
-                width: '100%', padding: '14px 16px', borderRadius: '8px', border: '1px solid #d1d5db',
-                fontSize: '15px', outline: 'none', transition: '0.2s'
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#FF6600'}
-              onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-            />
-          </div>
-
+          
           <button 
             type="submit" 
             disabled={loading}
             style={{
               width: '100%', padding: '14px', backgroundColor: '#FF6600', color: 'white', border: 'none',
               borderRadius: '40px', fontSize: '16px', fontWeight: '700', cursor: 'pointer',
-              transition: '0.2s', marginTop: '10px'
+              opacity: loading ? 0.7 : 1, transition: '0.2s'
             }}
             onMouseOver={(e) => !loading && (e.target.style.backgroundColor = '#e55a00')}
             onMouseOut={(e) => !loading && (e.target.style.backgroundColor = '#FF6600')}
           >
-            {loading ? 'Inachakata...' : 'Sign in'}
+            {loading ? 'Processing...' : isLogin ? 'Sign in' : 'Create account'}
           </button>
         </form>
 
-        {/* Footer - Jisajili */}
+        {/* Toggle Footer */}
         <div style={{ textAlign: 'center', marginTop: '20px', fontSize: '15px', color: '#333' }}>
-          Don't have an account? 
+          {isLogin ? "Don't have an account? " : "Already have an account? "}
           <span 
-            onClick={() => navigate("/dashboard/register")}
-            style={{ fontWeight: '700', color: '#FF6600', cursor: 'pointer', textDecoration: 'underline', marginLeft: '4px' }}
+            onClick={() => setIsLogin(!isLogin)}
+            style={{ fontWeight: '700', color: '#FF6600', cursor: 'pointer', textDecoration: 'underline' }}
           >
-            Sign up here
+            {isLogin ? 'Sign up' : 'Sign in'}
           </span>
         </div>
       </div>
@@ -235,24 +183,24 @@ const Login = () => {
   );
 };
 
-// === Helper Components for Social Buttons ===
-const SocialButton = ({ bg, border, color, icon, text, onClick }) => (
-  <button 
-    type="button" 
-    onClick={onClick}
-    style={{
-      width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      gap: '12px', padding: '12px 16px', backgroundColor: bg, border: border || 'none',
-      borderRadius: '8px', color: color, fontSize: '15px', fontWeight: '500', cursor: 'pointer',
-      transition: '0.2s'
-    }}
-  >
+// ---------------------------------------------------------------
+// KUTUMIA HIVI SOCIAL BUTTONS (Vipande vidogo vilivyotengwa)
+// ---------------------------------------------------------------
+const SocialButton = ({ bg, border, color, icon, text }) => (
+  <button type="button" style={{
+    width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    gap: '12px', padding: '12px 16px', backgroundColor: bg, border: border || 'none',
+    borderRadius: '8px', color: color, fontSize: '15px', fontWeight: '500', cursor: 'pointer',
+    transition: '0.2s'
+  }}>
     {icon}
     {text}
   </button>
 );
 
-// === SVGs for social icons ===
+// ---------------------------------------------------------------
+// ICONS (SVGs Zilizoruhusiwa kwa Google, Facebook, LinkedIn)
+// ---------------------------------------------------------------
 const GoogleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -274,4 +222,4 @@ const LinkedInIcon = () => (
   </svg>
 );
 
-export default Login;
+export default SupplierAuth;

@@ -1,28 +1,65 @@
 import React from 'react';
-import '../Logo.css'; 
-// 1. Import file lako la SVG kutoka kwenye folder la assets
 import logoSvg from '../assets/logoz.svg'; 
 
-export default function Logo() {
+const Logo = () => {
+  // Hapa ndio msingi wa kutatua tatizo: Inakagua ukubwa wa screen mara moja!
+  // Haihitaji useEffect, haisubiri chochote. 
+  // Ukitumia SSR (Next.js), tumia: const isMobile = typeof window !== 'undefined' ? window.matchMedia('(max-width: 768px)').matches : false;
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+  const styles = {
+    wrapper: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: isMobile ? '4px' : '10px',
+      flexShrink: 0,
+      cursor: 'pointer',
+    },
+    iconBox: {
+      width: isMobile ? '28px' : '40px', // Imepunguzwa hadi 28px kwa mobile
+      height: isMobile ? '28px' : '40px',
+      borderRadius: '50%',
+      overflow: 'hidden',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#0B132B',
+      border: '2px solid #ff4e00',
+      boxShadow: '0 3px 6px rgba(255, 78, 0, 0.25)',
+    },
+    img: {
+      width: '120%',
+      height: '120%',
+      objectFit: 'cover',
+    },
+    text: {
+      color: '#ff4e00',
+      fontSize: isMobile ? '12px' : '20px', // Sasa maandishi yanapungua papo hapo
+      fontWeight: '800',
+      lineHeight: 1,
+      letterSpacing: '-0.3px',
+      fontFamily: "'Inter', -apple-system, sans-serif",
+      display: 'flex',
+      alignItems: 'baseline',
+    },
+    dotCom: {
+      color: '#e45a0a',
+      fontSize: isMobile ? '8px' : '14px',
+      fontWeight: '600',
+      marginLeft: '1px',
+    }
+  };
+
   return (
-    <div className="logo-wrapper">
-      
-      {/* 2. Badilisha <img> ya zamani na hii mpya */}
-      <div className="icon-crop">
-        <img 
-          src={logoSvg} 
-          alt="Skyfall Logo" 
-          className="logo-img" 
-        />
+    <div style={styles.wrapper}>
+      <div style={styles.iconBox}>
+        <img src={logoSvg} alt="Skyfall Logo" style={styles.img} />
       </div>
-      
-      {/* 3. Kama unataka maandishi yasomeke vizuri, unaweza kuyaacha 
-          au kuyaficha kama logo ya SVG ina maandishi tayari */}
-      <div className="logo-text">
-        <span>
-          Skyfall<span className="dot-com">.com</span>
-        </span>
+      <div style={styles.text}>
+        Skyfall<span style={styles.dotCom}>.com</span>
       </div>
     </div>
   );
-}
+};
+
+export default Logo;
