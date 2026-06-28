@@ -1,16 +1,17 @@
+// PhysicalDashboard.js (Full Inline Styles – No External CSS)
 import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
 import QuickInventoryManager from '../components/QuickInventoryManager';
-import BusinessAnalytics from '../components/BusinessAnalytics'; 
+import BusinessAnalytics from '../components/BusinessAnalytics';
 import TopDealsSection from "../components/TopDealsSection"
-import StoreHeader from '../components/StoreHeader'; 
+import StoreHeader from '../components/StoreHeader';
 import StoreManagement from '../components/StoreManagement';
 import ProductCreationFlow from '../components/ProductCreationFlow';
-import { Edit3, Rocket, X, CheckCircle, Plus } from 'lucide-react';
-import "../PhysicalDashboard.css";
+import {
+  Edit3, Rocket, X, CheckCircle, Plus,
+  LayoutDashboard, Package, Box, BarChart3, Store, Megaphone, Menu, Bell, User,TrendingUp
+} from 'lucide-react';
 import ReactDOM from 'react-dom';
 
 export default function PhysicalDashboard() {
@@ -20,10 +21,14 @@ export default function PhysicalDashboard() {
   // --- UI STATES ---
   const [isManageMode, setIsManageMode] = useState(false);
   const [showCategoryManager, setShowCategoryManager] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1); // Imerudishwa kwa ajili ya Flow
+  const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdatingStore, setIsUpdatingStore] = useState(false);
   const [search, setSearch] = useState("");
+
+  // --- Sidebar states ---
+  const [activeTab, setActiveTab] = useState('overview');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 768);
 
   // --- DATA STATES ---
   const [allSubCategories, setAllSubCategories] = useState([]);
@@ -68,18 +73,26 @@ export default function PhysicalDashboard() {
   const videoInputRef = useRef(null);
   const galleryInputRef = useRef(null);
 
+  // --- Hover States for Inline Pseudo-classes ---
+  const [hoveredSidebarItem, setHoveredSidebarItem] = useState(null);
+  const [hoveredProductId, setHoveredProductId] = useState(null);
+  const [hoveredSubCatId, setHoveredSubCatId] = useState(null);
+
+  // --- EFFECTS ---
   useEffect(() => {
     if (id) fetchDashboardData();
   }, [id]);
 
   useEffect(() => {
-  const handleResize = () => {
-    setIsMobile(window.innerWidth < 768);
-  };
-
-  window.addEventListener("resize", handleResize);
-  return () => window.removeEventListener("resize", handleResize);
-}, []);
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) setIsSidebarOpen(false);
+      else setIsSidebarOpen(true);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // --- RESET FORM ---
   const resetProductForm = () => {
@@ -94,6 +107,7 @@ export default function PhysicalDashboard() {
     setEditingProductId(null);
   };
 
+  // --- FETCH DATA ---
   const fetchDashboardData = async () => {
     try {
       const { data: bData } = await supabase.from("brands").select("*");
@@ -136,6 +150,7 @@ export default function PhysicalDashboard() {
     } catch (err) { console.error("Fetch Error:", err); }
   };
 
+  // --- UPLOAD FILE ---
   const uploadFile = async (file, folderPath, bucket = "picha_za_duka") => {
     if (!file) return null;
     const fileExt = file.name.split(".").pop();
@@ -147,7 +162,7 @@ export default function PhysicalDashboard() {
     return urlData.publicUrl;
   };
 
-  // --- CORE FUNCTIONS (Zilizohitajika na UI) ---
+  // --- CORE FUNCTIONS ---
   const handleRemoveCategoryFromStore = async (catId) => {
     if (!window.confirm("Je, una uhakika unataka kuondoa kategoria hii?")) return;
     try {
@@ -158,7 +173,7 @@ export default function PhysicalDashboard() {
     } catch (err) { alert("Imeshindikana: " + err.message); }
   };
 
-   const handleUpdateStoreDetails = async () => {
+  const handleUpdateStoreDetails = async () => {
     setIsUpdatingStore(true);
     try {
       let finalLogo = logoPreview;
@@ -201,112 +216,105 @@ export default function PhysicalDashboard() {
     resetProductForm();
     alert("Bidhaa imeongezwa kwenye list!");
   };
-const handleFinalPublishAll = async () => {
-  if (addedProducts.length === 0) return alert("Hakuna bidhaa ya kurusha!");
-  setIsLoading(true);
 
-  try {
-    // 1. Uhakiki wa User
-    const { data: authData } = await supabase.auth.getUser();
-    const user = authData?.user;
-    if (!user) throw new Error("Session imeisha. Tafadhali login tena.");
+  const handleFinalPublishAll = async () => {
+    if (addedProducts.length === 0) return alert("Hakuna bidhaa ya kurusha!");
+    setIsLoading(true);
 
-    // 2. Pata Parent Category ya Duka mara moja tu (nje ya loop)
-    const { data: stData } = await supabase.from('stores_engine')
-      .select('category_id')
-      .eq('id', id)
-      .single();
-    const storeParentCategoryId = stData?.category_id;
+    try {
+      const { data: authData } = await supabase.auth.getUser();
+      const user = authData?.user;
+      if (!user) throw new Error("Session imeisha. Tafadhali login tena.");
 
-    let successCount = 0;
-    
-    // Tunatumia nakala ya list ili tuweze ku-update UI bidhaa ikifanikiwa
-    let remainingProducts = [...addedProducts];
+      const { data: stData } = await supabase.from('stores_engine')
+        .select('category_id')
+        .eq('id', id)
+        .single();
+      const storeParentCategoryId = stData?.category_id;
 
-    for (const p of addedProducts) {
-      try {
-        const productPath = `${p.category_id}/${id}`;
+      let successCount = 0;
+      let remainingProducts = [...addedProducts];
 
-        // Upload Picha Kuu
-        let finalCoverUrl = await uploadFile(p.cover_file, productPath, "product-images");
+      for (const p of addedProducts) {
+        try {
+          const productPath = `${p.category_id}/${id}`;
 
-        // Upload Gallery
-        const finalGalleryUrls = [];
-        if (p.gallery && p.gallery.length > 0) {
-          for (const item of p.gallery) {
-            const url = await uploadFile(item, productPath, "product-images");
-            if (url) finalGalleryUrls.push(url);
+          // Upload Picha Kuu
+          let finalCoverUrl = await uploadFile(p.cover_file, productPath, "product-images");
+
+          // Upload Gallery
+          const finalGalleryUrls = [];
+          if (p.gallery && p.gallery.length > 0) {
+            for (const item of p.gallery) {
+              const url = await uploadFile(item, productPath, "product-images");
+              if (url) finalGalleryUrls.push(url);
+            }
           }
+
+          // Upload Video
+          let finalVideoUrl = p.video_file ? await uploadFile(p.video_file, productPath, "product-videos") : null;
+
+          // Insert kwenye products_engines
+          const { data: engineData, error: engineError } = await supabase.from('products_engines').insert([{
+            user_id: user.id,
+            store_id: id,
+            name: p.name,
+            sku: `${p.name.substring(0,3).toUpperCase()}-${Date.now().toString().slice(-6)}`,
+            price: parseFloat(p.price),
+            original_price: parseFloat(p.compare_at_price) || 0,
+            cover_image: finalCoverUrl || (finalGalleryUrls.length > 0 ? finalGalleryUrls[0] : null),
+            category_id: p.category_id,
+            parent_category_id: storeParentCategoryId,
+            brand_id: p.brand_id || null,
+            stock_quantity: parseInt(p.stock) || 0,
+            description: p.description,
+            specifications: p.specifications,
+            is_approved: false
+          }]).select('id').single();
+
+          if (engineError) throw engineError;
+
+          // Insert Media
+          const mediaPayload = [];
+          if (finalVideoUrl) {
+            mediaPayload.push({ product_id: engineData.id, media_type: 'video', media_url: finalVideoUrl, display_order: 0 });
+          }
+          finalGalleryUrls.forEach((url, i) => {
+            mediaPayload.push({ product_id: engineData.id, media_type: 'image', media_url: url, display_order: i + 1 });
+          });
+
+          if (mediaPayload.length > 0) {
+            await supabase.from('product_media').insert(mediaPayload);
+          }
+
+          successCount++;
+          remainingProducts = remainingProducts.filter(item => item.id !== p.id);
+          setAddedProducts([...remainingProducts]);
+
+        } catch (productError) {
+          console.error(`Error kwenye bidhaa ${p.name}:`, productError.message);
+          continue;
         }
-
-        // Upload Video
-        let finalVideoUrl = p.video_file ? await uploadFile(p.video_file, productPath, "product-videos") : null;
-
-        // 3. Insert kwenye products_engines
-        const { data: engineData, error: engineError } = await supabase.from('products_engines').insert([{
-          user_id: user.id,
-          store_id: id,
-          name: p.name,
-          sku: `${p.name.substring(0,3).toUpperCase()}-${Date.now().toString().slice(-6)}`,
-          price: parseFloat(p.price),
-          original_price: parseFloat(p.compare_at_price) || 0,
-          cover_image: finalCoverUrl || (finalGalleryUrls.length > 0 ? finalGalleryUrls[0] : null),
-          category_id: p.category_id,
-          parent_category_id: storeParentCategoryId,
-          brand_id: p.brand_id || null,
-          stock_quantity: parseInt(p.stock) || 0,
-          description: p.description,
-          specifications: p.specifications,
-          is_approved: false
-        }]).select('id').single();
-
-        if (engineError) throw engineError;
-
-        // 4. Insert Media (Picha za ziada na Video)
-        const mediaPayload = [];
-        if (finalVideoUrl) {
-          mediaPayload.push({ product_id: engineData.id, media_type: 'video', media_url: finalVideoUrl, display_order: 0 });
-        }
-        finalGalleryUrls.forEach((url, i) => {
-          mediaPayload.push({ product_id: engineData.id, media_type: 'image', media_url: url, display_order: i + 1 });
-        });
-
-        if (mediaPayload.length > 0) {
-          await supabase.from('product_media').insert(mediaPayload);
-        }
-
-        // KAMA KILA KITU KIMEENDA SAWA:
-        successCount++;
-        // Ondoa bidhaa hii kwenye list ya "addedProducts" ili isirudiwe ikitokea error mbeleni
-        remainingProducts = remainingProducts.filter(item => item.id !== p.id);
-        setAddedProducts([...remainingProducts]);
-
-      } catch (productError) {
-        console.error(`Error kwenye bidhaa ${p.name}:`, productError.message);
-        // Hapa hatu-stop loop, tunaendelea na bidhaa inayofuata
-        continue;
       }
-    }
 
-    if (successCount > 0) {
-      alert(`✅ Bidhaa ${successCount} zimehifadhiwa kikamilifu!`);
-      fetchDashboardData();
-      if (remainingProducts.length === 0) {
-        // Kama zote zimeisha, rudi step ya kwanza
-        if (typeof setCurrentStep === 'function') setCurrentStep(1);
+      if (successCount > 0) {
+        alert(`✅ Bidhaa ${successCount} zimehifadhiwa kikamilifu!`);
+        fetchDashboardData();
+        if (remainingProducts.length === 0) {
+          if (typeof setCurrentStep === 'function') setCurrentStep(1);
+        }
       }
-    }
 
-    if (remainingProducts.length > 0) {
-      alert(`⚠️ Bidhaa ${remainingProducts.length} zimefeli kurushwa. Tafadhali jaribu tena.`);
-    }
+      if (remainingProducts.length > 0) {
+        alert(`⚠️ Bidhaa ${remainingProducts.length} zimefeli kurushwa. Tafadhali jaribu tena.`);
+      }
 
-  } catch (err) {
-    alert("Hitilafu Kubwa: " + err.message);
-  } finally {
-    setIsLoading(false);
-  }
-};
+    } catch (err) {
+      alert("Hitilafu Kubwa: " + err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // --- UI Handlers ---
   const handleCoverChange = (e) => {
@@ -336,275 +344,415 @@ const handleFinalPublishAll = async () => {
   const selectedCategoryName = myStoreSubCats?.find(cat => cat.id === attributes.category_id)?.name || "Chagua Kategoria";
 
   const handleAddCategoryToStore = async (cat) => {
-  try {
-    // Pata ID za sasa, kama hakuna anza na array tupu
-    const currentIds = myStore.sub_category_ids || [];
-    
-    // Zuia kuongeza mara mbili
-    if (currentIds.includes(cat.id)) {
-      alert("Kategoria hii tayari ipo dukan kwako!");
-      return;
+    try {
+      const currentIds = myStore.sub_category_ids || [];
+      if (currentIds.includes(cat.id)) {
+        alert("Kategoria hii tayari ipo dukan kwako!");
+        return;
+      }
+      const updatedIds = [...currentIds, cat.id];
+      const { error } = await supabase.from("stores_engine").update({ sub_category_ids: updatedIds }).eq("id", id);
+      if (error) throw error;
+      await fetchDashboardData();
+      alert(`✅ ${cat.name} imeongezwa!`);
+    } catch (err) {
+      alert("Hitilafu: " + err.message);
     }
+  };
 
-    const updatedIds = [...currentIds, cat.id];
+  // --- SIDEBAR MENU ---
+  const menuItems = [
+    { id: 'overview', label: 'Duka Lako', icon: <LayoutDashboard size={20} /> },
+    { id: 'products', label: 'Bidhaa Zangu', icon: <Package size={20} /> },
+    { id: 'inventory', label: 'Inventory', icon: <Box size={20} /> },
+    { id: 'offers', label: 'Punguzo (Offers)', icon: <TrendingUp size={20} /> }, 
+    { id: 'analytics', label: 'Takwimu', icon: <BarChart3 size={20} /> },
+    { id: 'store-settings', label: 'Mipangilio ya Duka', icon: <Store size={20} /> },
+    { id: 'advertise', label: 'Matangazo', icon: <Megaphone size={20} /> },
+  ];
 
-    const { error } = await supabase
-      .from("stores_engine")
-      .update({ sub_category_ids: updatedIds })
-      .eq("id", id);
-
-    if (error) throw error;
-
-    // Refresh dashboard ili kategoria mpya ionekane
-    await fetchDashboardData();
-    alert(`✅ ${cat.name} imeongezwa!`);
-  } catch (err) {
-    alert("Hitilafu: " + err.message);
-  }
-};
-
-useEffect(() => {
-  const handleResize = () => setIsMobile(window.innerWidth < 768);
-  window.addEventListener('resize', handleResize);
-  return () => window.removeEventListener('resize', handleResize);
-}, []);
-
+  // ------------------------------------------------------------------------
+  // RENDER
+  // ------------------------------------------------------------------------
   return (
-    <div className="pd-dashboard-wrapper">
-      <Header search={search} setSearch={setSearch} />
-      <main className="pd-main-content">
-        <div className="pd-container">
-
-           <StoreHeader 
-            myStore={myStore}
-            bannerPreview={bannerPreview}
-            setBannerFile={setBannerFile}
-            setBannerPreview={setBannerPreview}
-            logoPreview={logoPreview}
-            setLogoFile={setLogoFile}
-            setLogoPreview={setLogoPreview}
-          />
-         
-
-          <section className="pd-section mt-4">
-            <BusinessAnalytics products={myProducts} sellerId={myStore?.id} />   
-            <div className="advertise-banner-mini mt-4" onClick={() => navigate('/advertise')} style={{ background: 'linear-gradient(135deg, #ff4e00 0%, #ec2f4b 100%)', borderRadius: '20px', padding: '20px', color: 'white', cursor: 'pointer', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Rocket size={20} /><b>ONGEZA MAUZO LEO!</b></div>
-                <p style={{ fontSize: '12px', opacity: 0.9 }}>Weka bidhaa zako mbele ya maelfu ya wateja sasa.</p>
-              </div>
-              <button style={{ backgroundColor: 'white', color: '#ff4e00', padding: '10px 20px', borderRadius: '12px', fontWeight: 'bold' }}>TANGAA SASA 🚀</button>
-            </div>
-          </section>
-
-        <StoreManagement 
-            isManageMode={isManageMode}
-            isMobile={isMobile}
-            setIsManageMode={setIsManageMode}
-            myStoreSubCats={myStoreSubCats}
-            attributes={attributes}
-            setAttributes={setAttributes}
-            handleRemoveCategoryFromStore={handleRemoveCategoryFromStore}
-            setShowCategoryManager={setShowCategoryManager}
-            officePreviews={officePreviews}
-            setOfficeFiles={setOfficeFiles}
-            setOfficePreviews={setOfficePreviews}
-            officeInputRefs={officeInputRefs}
-            storeMeta={storeMeta}
-            setStoreMeta={setStoreMeta}
-            isUpdatingStore={isUpdatingStore}
-            handleUpdateStoreDetails={handleUpdateStoreDetails}
-          />
-
-   <section className="pd-section mt-8">
-  
-  {/* ROW YA 1: ProductCreationFlow - IWE JUU KABISA */}
-  <div className="bg-white p-6 rounded-[35px] border border-gray-100 shadow-sm" style={{ marginBottom: '32px' }}>
-    <h2 className="text-xl font-black text-gray-800 mb-6">✨ Ongeza Bidhaa Mpya</h2>
-    <ProductCreationFlow 
-      storeId={id}
-      currentStep={currentStep} setCurrentStep={setCurrentStep}
-      myStoreSubCats={myStoreSubCats}
-      attributes={attributes} setAttributes={setAttributes}
-      selectedCategoryName={selectedCategoryName} 
-      coverPreview={coverPreview} coverInputRef={coverInputRef} handleCoverChange={handleCoverChange}
-      videoPreview={videoPreview} videoInputRef={videoInputRef} handleVideoChange={handleVideoChange}
-      galleryPreviews={galleryPreviews} galleryInputRef={galleryInputRef} handleGalleryChange={handleGalleryChange} removeGalleryImage={removeGalleryImage}
-      addedProducts={addedProducts} setAddedProducts={setAddedProducts}
-      addToQueue={addToQueue} resetProductForm={resetProductForm} handleFinalPublishAll={handleFinalPublishAll}
-      isLoading={isLoading} editingProductId={editingProductId}
-    />
-  </div>
-  
-<div className="grid grid-cols-2 gap-6">
-  <QuickInventoryManager products={myProducts} setProducts={setMyProducts} />
-  <TopDealsSection products={myProducts} />
-</div>
-
-  {/* ROW YA 3: Products Grid (Bidhaa zilizopo) */}
-  <div>
-    <div className="pd-products-grid">
-      {myProducts.map((p) => (
-        <div key={p.id} className="pd-product-card">
-          <img src={p.cover_image || "https://via.placeholder.com/150"} alt={p.name} className="pd-product-image" />
-          <div className="pd-product-info">
-            <span className="pd-product-name">{p.name}</span>
-            <span className="pd-product-price">TZS {Number(p.price).toLocaleString()}</span>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      
+      {/* HEADER MPYA YA SUPPLIER */}
+      <header style={{
+        height: '70px',
+        background: 'white',
+        borderBottom: '1px solid #e5e7eb',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 24px',
+        flexShrink: 0,
+        position: 'sticky',
+        top: 0,
+        zIndex: 100
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <button 
+            style={{ display: isMobile ? 'flex' : 'none', background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          >
+            <Menu size={24} />
+          </button>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <span style={{ fontWeight: 900, color: '#f97316', fontSize: '20px', letterSpacing: '-0.5px' }}>Skyfall</span>
+            <span style={{ background: '#f97316', color: 'white', fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '999px', marginLeft: '8px' }}>Supplier</span>
           </div>
-          <button onClick={() => navigate(`/update/${p.id}`)} className="pd-edit-btn">
-            <Edit3 size={14} /> Hariri
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button style={{ width: '36px', height: '36px', borderRadius: '50%', border: 'none', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4b5563', cursor: 'pointer' }}>
+            <Bell size={20} />
+          </button>
+          <button style={{ width: '36px', height: '36px', borderRadius: '50%', border: 'none', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4b5563', cursor: 'pointer' }}>
+            <User size={20} />
           </button>
         </div>
-      ))}
-    </div>
-  </div>
+      </header>
 
-</section>
-{!isMobile && <Footer />}
-        </div>
-      </main>
-{/* --- MODAL YA KATEGORIA INAYOTUMIA PORTAL --- */}
-{showCategoryManager && ReactDOM.createPortal(
-  <div style={{
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100vw',
-    height: '100vh',
-    zIndex: 9999,
-    display: 'flex',
-    alignItems: 'flex-end', // Kwenye simu inaanza chini kidogo (kama kadi za iPhone)
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    backdropFilter: 'blur(4px)',
-    WebkitBackdropFilter: 'blur(4px)'
-  }}>
-    {/* Background inayoweza kubonyeza kufunga */}
-    <div 
-      style={{ position: 'absolute', inset: 0 }}
-      onClick={() => setShowCategoryManager(false)} 
-    />
-    
-    {/* Dirisha la Modal */}
-    <div 
-      className="animate-in slide-in-from-bottom duration-300"
-      style={{
-        position: 'relative',
-        backgroundColor: 'white',
-        width: '100%',
-        maxWidth: '500px',
-        // Kwenye simu tunatoa round za juu tu, chini inagusa screen
-        borderRadius: isMobile ? '30px 30px 0 0' : '35px', 
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        maxHeight: isMobile ? '92vh' : '85vh', // Inachukua nafasi kubwa zaidi kwenye simu
-        boxShadow: '0 -10px 25px rgba(0,0,0,0.2)'
-      }}
-    >
-      
-      {/* Notch ya urembo kwa ajili ya Mobile (Optional) */}
-      {isMobile && (
-        <div style={{ width: '40px', height: '4px', backgroundColor: '#e5e7eb', borderRadius: '2px', margin: '12px auto 0' }} />
-      )}
-
-      {/* Header */}
-      <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-white" style={{ flexShrink: 0 }}>
-        <div>
-          <h3 className="font-black text-gray-800 italic uppercase tracking-tighter" style={{ margin: 0, fontSize: '1rem' }}>Soko la Kategoria</h3>
-          <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest" style={{ margin: 0 }}>
-            Chagua sub-kategoria ya kuongeza
-          </p>
-        </div>
-        <button 
-          onClick={() => setShowCategoryManager(false)}
-          className="w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 border-none"
-        >
-          <X size={18} />
-        </button>
-      </div>
-
-      {/* Sehemu ya Scroll (Kategoria) */}
-      <div 
-        style={{ 
-          flex: 1, 
-          overflowY: 'auto', 
-          padding: '15px',
-          WebkitOverflowScrolling: 'touch', // Muhimu kwa iPhone
-        }}
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {allSubCategories
-            .filter(cat => String(cat.category_id || "").trim() === String(myStore?.category_id || "").trim())
-            .map((cat) => {
-              const isAdded = myStoreSubCats.some(s => s.id === cat.id);
-              
+      {/* CONTAINER KUU */}
+      <div style={{ display: 'flex', flexDirection: 'row', height: 'calc(100vh - 70px)' }}>
+        
+        {/* SIDEBAR */}
+        <aside style={{
+          width: isMobile ? '280px' : '260px',
+          background: 'white',
+          borderRight: '1px solid #f3f4f6',
+          height: '100%',
+          overflowY: 'auto',
+          transition: 'all 0.3s ease',
+          flexShrink: 0,
+          padding: '20px 0',
+          transform: isSidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
+          ...(isMobile && {
+            position: 'fixed',
+            left: 0,
+            top: '70px',
+            height: 'calc(100vh - 70px)',
+            width: '280px',
+            zIndex: 999,
+            boxShadow: '2px 0 10px rgba(0,0,0,0.1)'
+          })
+        }}>
+          <div style={{ padding: '0 20px 20px 20px', borderBottom: '1px solid #f3f4f6' }}>
+            <h3 style={{ fontWeight: 900, color: '#f97316' }}>Supplier</h3>
+          </div>
+          <ul style={{ listStyle: 'none', padding: '10px 10px', margin: 0 }}>
+            {menuItems.map((item) => {
+              const isActive = activeTab === item.id;
+              const isHovered = hoveredSidebarItem === item.id;
               return (
-                <button
-                  key={cat.id}
-                  disabled={isAdded}
-                  onClick={() => handleAddCategoryToStore(cat)}
+                <li
+                  key={item.id}
+                  onClick={() => {
+                    setActiveTab(item.id);
+                    if (isMobile) setIsSidebarOpen(false);
+                  }}
+                  onMouseEnter={() => setHoveredSidebarItem(item.id)}
+                  onMouseLeave={() => setHoveredSidebarItem(null)}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '15px 20px',
-                    borderRadius: '18px',
-                    border: '1.5px solid',
-                    width: '100%',
-                    backgroundColor: isAdded ? '#f9fafb' : 'white',
-                    borderColor: isAdded ? '#f3f4f6' : '#f3f4f6',
-                    cursor: isAdded ? 'not-allowed' : 'pointer'
+                    padding: '12px 16px',
+                    borderRadius: '14px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    color: isActive ? '#ea580c' : (isHovered ? '#374151' : '#6b7280'),
+                    fontWeight: 600,
+                    fontSize: '14px',
+                    marginBottom: '4px',
+                    backgroundColor: isActive ? '#fff7ed' : (isHovered ? '#f9fafb' : 'transparent'),
+                    border: isActive ? '1px solid #ffedd5' : 'none'
                   }}
                 >
-                  <span style={{ 
-                    fontWeight: '700', 
-                    fontSize: '13px', 
-                    color: isAdded ? '#9ca3af' : '#374151' 
-                  }}>
-                    {cat.name}
-                  </span>
-                  
-                  {isAdded ? (
-                    <CheckCircle size={18} className="text-green-500" />
-                  ) : (
-                    <div style={{ color: '#f97316' }}><Plus size={18} /></div>
-                  )}
-                </button>
+                  {item.icon}
+                  <span style={{ marginLeft: '12px' }}>{item.label}</span>
+                </li>
               );
             })}
+          </ul>
+        </aside>
+
+        {/* MAIN CONTENT */}
+        <main style={{ flex: 1, padding: '20px', backgroundColor: '#f9fafb', overflowY: 'auto', marginTop: 0 }}>
+          <div style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '80px' }}>
             
-          {/* Kama hakuna kategoria */}
-          {allSubCategories.filter(cat => String(cat.category_id || "").trim() === String(myStore?.category_id || "").trim()).length === 0 && (
-            <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-              <p style={{ color: '#9ca3af', fontSize: '13px', fontWeight: '600' }}>Hakuna kategoria hapa.</p>
+            {/* --- TAB 1: OVERVIEW (Sasa ni Nadhifu) --- */}
+            <div style={{ display: activeTab === 'overview' ? 'block' : 'none' }}>
+              <StoreHeader
+                myStore={myStore}
+                bannerPreview={bannerPreview}
+                setBannerFile={setBannerFile}
+                setBannerPreview={setBannerPreview}
+                logoPreview={logoPreview}
+                setLogoFile={setLogoFile}
+                setLogoPreview={setLogoPreview}
+              />
+              <section style={{ marginBottom: '16px', marginTop: '16px' }}>
+                <BusinessAnalytics products={myProducts} sellerId={myStore?.id} />
+                <div
+                  onClick={() => navigate('/advertise')}
+                  style={{
+                    background: 'linear-gradient(135deg, #ff4e00 0%, #ec2f4b 100%)',
+                    borderRadius: '20px',
+                    padding: '20px',
+                    color: 'white',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginTop: '16px'
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Rocket size={20} />
+                      <b>ONGEZA MAUZO LEO!</b>
+                    </div>
+                    <p style={{ fontSize: '12px', opacity: 0.9, margin: '4px 0 0 0' }}>Weka bidhaa zako mbele ya maelfu ya wateja sasa.</p>
+                  </div>
+                  <button style={{ backgroundColor: 'white', color: '#ff4e00', padding: '10px 20px', borderRadius: '12px', fontWeight: 'bold', border: 'none' }}>TANGAA SASA 🚀</button>
+                </div>
+              </section>
             </div>
-          )}
+
+            {/* --- TAB 2: PRODUCTS --- */}
+            <div style={{ display: activeTab === 'products' ? 'block' : 'none' }}>
+              <div style={{ backgroundColor: 'white', padding: isMobile ? '16px' : '24px', borderRadius: '35px', border: '1px solid #f3f4f6', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', marginBottom: '32px' }}>
+                <h2 style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: 900, color: '#1f2937', margin: '0 0 24px 0' }}>✨ Ongeza Bidhaa Mpya</h2>
+                <ProductCreationFlow
+                  storeId={id}
+                  currentStep={currentStep} setCurrentStep={setCurrentStep}
+                  myStoreSubCats={myStoreSubCats}
+                  attributes={attributes} setAttributes={setAttributes}
+                  selectedCategoryName={selectedCategoryName}
+                  coverPreview={coverPreview} coverInputRef={coverInputRef} handleCoverChange={handleCoverChange}
+                  videoPreview={videoPreview} videoInputRef={videoInputRef} handleVideoChange={handleVideoChange}
+                  galleryPreviews={galleryPreviews} galleryInputRef={galleryInputRef} handleGalleryChange={handleGalleryChange} removeGalleryImage={removeGalleryImage}
+                  addedProducts={addedProducts} setAddedProducts={setAddedProducts}
+                  addToQueue={addToQueue} resetProductForm={resetProductForm} handleFinalPublishAll={handleFinalPublishAll}
+                  isLoading={isLoading} editingProductId={editingProductId}
+                />
+              </div>
+              <div style={{ marginTop: '32px' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1f2937', marginBottom: '16px' }}>Bidhaa Zilizopo</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(auto-fill, minmax(180px, 1fr))', gap: isMobile ? '10px' : '16px' }}>
+                  {myProducts.map((p) => {
+                    const isHovered = hoveredProductId === p.id;
+                    return (
+                      <div
+                        key={p.id}
+                        onMouseEnter={() => setHoveredProductId(p.id)}
+                        onMouseLeave={() => setHoveredProductId(null)}
+                        style={{
+                          background: 'white',
+                          borderRadius: '12px',
+                          overflow: 'hidden',
+                          boxShadow: isHovered ? '0 8px 15px rgba(0,0,0,0.06)' : '0 2px 8px rgba(0,0,0,0.05)',
+                          transition: 'all 0.2s ease-in-out',
+                          position: 'relative',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          transform: isHovered ? 'translateY(-3px)' : 'translateY(0)',
+                          border: isHovered ? '1px solid #bfdbfe' : '1px solid #e2e8f0'
+                        }}
+                      >
+                        <div style={{ width: '100%', height: isMobile ? '120px' : '160px', background: '#f1f5f9' }}>
+                          <img src={p.cover_image || "https://via.placeholder.com/150"} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </div>
+                        <div style={{ padding: '10px', flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                          <h4 style={{ fontSize: '13px', fontWeight: 600, color: '#334155', margin: '0 0 4px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</h4>
+                          <p style={{ fontWeight: 700, fontSize: '14px', color: '#2563eb', margin: 0 }}>TZS {Number(p.price).toLocaleString()}</p>
+                        </div>
+                        <button
+                          onClick={() => navigate(`/update/${p.id}`)}
+                          style={{
+                            position: 'absolute',
+                            top: isMobile ? '5px' : '10px',
+                            right: isMobile ? '5px' : '10px',
+                            background: 'rgba(37, 99, 235, 0.95)',
+                            color: 'white',
+                            padding: isMobile ? '5px 8px' : '6px 10px',
+                            borderRadius: '6px',
+                            fontSize: isMobile ? '10px' : '11px',
+                            fontWeight: 600,
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            zIndex: 10,
+                            opacity: isMobile ? 1 : (isHovered ? 1 : 0),
+                            transition: 'all 0.2s ease',
+                            backdropFilter: 'blur(2px)'
+                          }}
+                        >
+                          <Edit3 size={14} /> Hariri
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* --- TAB 3: INVENTORY (Sasa ni Inventory pekee) --- */}
+           <div style={{ display: activeTab === 'inventory' ? 'block' : 'none' }}>
+              <QuickInventoryManager products={myProducts} setProducts={setMyProducts} />
+           </div>
+
+            {/* --- TAB 4: OFFERS (MPYA) --- */}
+        <div style={{ display: activeTab === 'offers' ? 'block' : 'none' }}>
+          <div style={{ backgroundColor: 'white', padding: '24px', borderRadius: '35px', border: '1px solid #f3f4f6', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+            <TopDealsSection products={myProducts} />
+          </div>
         </div>
+
+            {/* --- TAB 4: ANALYTICS --- */}
+            <div style={{ display: activeTab === 'analytics' ? 'block' : 'none' }}>
+              <BusinessAnalytics products={myProducts} sellerId={myStore?.id} />
+            </div>
+
+            {/* --- TAB 5: STORE SETTINGS --- */}
+            <div style={{ display: activeTab === 'store-settings' ? 'block' : 'none' }}>
+              <StoreManagement
+                isManageMode={isManageMode}
+                isMobile={isMobile}
+                setIsManageMode={setIsManageMode}
+                myStoreSubCats={myStoreSubCats}
+                attributes={attributes}
+                setAttributes={setAttributes}
+                handleRemoveCategoryFromStore={handleRemoveCategoryFromStore}
+                setShowCategoryManager={setShowCategoryManager}
+                officePreviews={officePreviews}
+                setOfficeFiles={setOfficeFiles}
+                setOfficePreviews={setOfficePreviews}
+                officeInputRefs={officeInputRefs}
+                storeMeta={storeMeta}
+                setStoreMeta={setStoreMeta}
+                isUpdatingStore={isUpdatingStore}
+                handleUpdateStoreDetails={handleUpdateStoreDetails}
+              />
+            </div>
+
+            {/* --- TAB 6: ADVERTISE --- */}
+            <div style={{ display: activeTab === 'advertise' ? 'block' : 'none' }}>
+              <div style={{ backgroundColor: 'white', padding: '24px', borderRadius: '35px', border: '1px solid #f3f4f6', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', textAlign: 'center' }}>
+                <Megaphone size={48} style={{ margin: '0 auto 16px auto', color: '#f97316' }} />
+                <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#1f2937', marginBottom: '8px' }}>Tangaza Bidhaa Zako</h2>
+                <p style={{ color: '#6b7280', marginBottom: '24px' }}>Weka bidhaa zako mbele ya maelfu ya wateja.</p>
+                <button
+                  onClick={() => navigate('/advertise')}
+                  style={{ background: '#f97316', color: 'white', padding: '12px 24px', borderRadius: '12px', fontWeight: 700, border: 'none', cursor: 'pointer' }}
+                >
+                  Anza Kutangaza Sasa
+                </button>
+              </div>
+            </div>
+
+          </div>
+          
+        </main>
       </div>
-      
-      {/* Footer (Button ya chini) */}
-      <div className="p-4 bg-white border-t border-gray-50" style={{ flexShrink: 0, paddingBottom: isMobile ? '30px' : '20px' }}>
-        <button 
-          onClick={() => setShowCategoryManager(false)}
-          style={{ 
-            width: '100%', 
-            padding: '16px', 
-            backgroundColor: 'black', 
-            color: 'white', 
-            borderRadius: '16px', 
-            fontWeight: '900',
-            border: 'none',
-            fontSize: '14px'
-          }}
-        >
-          NIMEKAMILISHA
-        </button>
-      </div>
-    </div>
-  </div>,
-  document.body
-)}
+
+      {/* --- MODAL YA KATEGORIA --- */}
+      {showCategoryManager && ReactDOM.createPortal(
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          backdropFilter: 'blur(4px)',
+          WebkitBackdropFilter: 'blur(4px)'
+        }}>
+          <div style={{ position: 'absolute', inset: 0 }} onClick={() => setShowCategoryManager(false)} />
+          <div className="animate-in slide-in-from-bottom duration-300" style={{
+            position: 'relative',
+            backgroundColor: 'white',
+            width: '100%',
+            maxWidth: '500px',
+            borderRadius: isMobile ? '30px 30px 0 0' : '35px',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            maxHeight: isMobile ? '92vh' : '85vh',
+            boxShadow: '0 -10px 25px rgba(0,0,0,0.2)'
+          }}>
+            {isMobile && (
+              <div style={{ width: '40px', height: '4px', backgroundColor: '#e5e7eb', borderRadius: '2px', margin: '12px auto 0' }} />
+            )}
+            <div style={{ padding: '20px', borderBottom: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', flexShrink: 0 }}>
+              <div>
+                <h3 style={{ fontWeight: 900, color: '#1f2937', fontStyle: 'italic', textTransform: 'uppercase', letterSpacing: '-0.5px', margin: 0, fontSize: '16px' }}>Soko la Kategoria</h3>
+                <p style={{ fontSize: '9px', color: '#9ca3af', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', margin: 0 }}>Chagua sub-kategoria ya kuongeza</p>
+              </div>
+              <button onClick={() => setShowCategoryManager(false)} style={{ width: '32px', height: '32px', background: '#f9fafb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', border: 'none', cursor: 'pointer' }}>
+                <X size={18} />
+              </button>
+            </div>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '15px', WebkitOverflowScrolling: 'touch' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {allSubCategories
+                  .filter(cat => String(cat.category_id || "").trim() === String(myStore?.category_id || "").trim())
+                  .map((cat) => {
+                    const isAdded = myStoreSubCats.some(s => s.id === cat.id);
+                    return (
+                      <button
+                        key={cat.id}
+                        disabled={isAdded}
+                        onClick={() => handleAddCategoryToStore(cat)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '15px 20px',
+                          borderRadius: '18px',
+                          border: '1.5px solid',
+                          width: '100%',
+                          backgroundColor: isAdded ? '#f9fafb' : 'white',
+                          borderColor: isAdded ? '#f3f4f6' : '#f3f4f6',
+                          cursor: isAdded ? 'not-allowed' : 'pointer'
+                        }}
+                      >
+                        <span style={{ fontWeight: 700, fontSize: '13px', color: isAdded ? '#9ca3af' : '#374151' }}>
+                          {cat.name}
+                        </span>
+                        {isAdded ? (
+                          <CheckCircle size={18} style={{ color: '#10b981' }} />
+                        ) : (
+                          <div style={{ color: '#f97316' }}><Plus size={18} /></div>
+                        )}
+                      </button>
+                    );
+                  })}
+                {allSubCategories.filter(cat => String(cat.category_id || "").trim() === String(myStore?.category_id || "").trim()).length === 0 && (
+                  <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+                    <p style={{ color: '#9ca3af', fontSize: '13px', fontWeight: 600 }}>Hakuna kategoria hapa.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div style={{ padding: '16px', background: 'white', borderTop: '1px solid #f9fafb', flexShrink: 0, paddingBottom: isMobile ? '30px' : '20px' }}>
+              <button onClick={() => setShowCategoryManager(false)} style={{ width: '100%', padding: '16px', backgroundColor: 'black', color: 'white', borderRadius: '16px', fontWeight: 900, border: 'none', fontSize: '14px', cursor: 'pointer' }}>
+                NIMEKAMILISHA
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }

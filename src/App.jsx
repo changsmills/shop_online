@@ -15,15 +15,6 @@ import StoreManagement from './components/StoreManagement';
 
 // Import Pages
 import Home from "./pages/Home"; 
-// Imports za Supplier Modular Dashboard (Hizi ndizo utakazoongeza)
-import SellerLayout from './components/SellerLayout';
-import SellerOverview from './pages/SellerOverview';
-import SellerProducts from './pages/SellerProducts';
-import SellerSettings from './pages/SellerSettings';
-// Ongeza hizi pia kama zipo kwenye sidebar yako:
-import SellerOrders from './pages/SellerOrders';
-import SellerAnalytics from './pages/SellerAnalytics';
-import SellerCustomers from './pages/SellerCustomers';
 import Login from "./pages/Login"; 
 import Register from "./pages/Register";
 import SellerDashboard from './pages/SellerDashboard'; 
@@ -199,35 +190,8 @@ function AppContent({ session }) {
 
         <Route path="/dashboard/seller" element={<SellerDashboard />} />
 
-<Route 
-  path="/dashboard/sellerboard" 
-  element={
-    <SellerLayout 
-      user={session?.user} 
-      // 🔥 ONGEZA HAPA: Pitisha dataProps tupu mwanzo, lakini itajazwa na PhysicalDashboard
-      dataProps={{ storeId: id, products: [], store: null }} 
-      handleLogout={() => supabase.auth.signOut()}
-    />
-  }
->
-  <Route index element={<SellerOverview />} />
-  <Route path="overview" element={<SellerOverview />} />
-  <Route path="products" element={<SellerProducts />} />
-  <Route path="add-product" element={<ProductCreationFlow />} />
-  <Route path="inventory" element={<QuickInventoryManager />} />
-  <Route path="analytics" element={<BusinessAnalytics />} />
-  <Route path="top-deals" element={<TopDealsSection />} />
-  <Route path="customers" element={<SellerCustomers />} />
-  
-  <Route 
-    path="store-management" 
-    element={<StoreManagement />} 
-  />
-  
-  <Route path="settings" element={<SellerSettings />} />
-</Route>
 
-
+         <Route path="/dashboard/sellerboard/:id?" element={<PhysicalDashboard session={session} />} />
 
         {/* DASHBOARD SUB-PAGES */}
         <Route path="/dashboard/analytics" element={<Analytics session={session} />} />

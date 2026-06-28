@@ -310,7 +310,7 @@ export default function NavLinks({ isMobile }) {
 
           if (!storeError && storeData) {
             console.log("✅ 5. Store ID imepatikana:", storeData.id);
-            navigate(`/dashboard/sellerboard`);
+            navigate(`/dashboard/sellerboard/${storeData.id}`);
             return;
           } else {
             console.warn("⚠️ 6. Supplier lakini hana store iliyosajiliwa bado");
