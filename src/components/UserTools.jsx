@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import { useCart } from "../context/CartContext"; 
-import { Bell, Store, MessageSquare, ShoppingCart, User, LogOut, ChevronRight } from "lucide-react";
+import { Bell, MessageSquare, ShoppingCart, User, LogOut, ChevronRight } from "lucide-react";
 import "../UserTools.css"; 
 
 export default function UserTools({ session: propSession, isMobile }) {
@@ -69,7 +69,7 @@ export default function UserTools({ session: propSession, isMobile }) {
     <div className="user-tools-container" style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '6px' : '12px' }}>
       
       {/* ==========================================
-          1. CART (INAEONEKANA KWA WOTE!)
+          1. CART
          ========================================== */}
       <div 
         className="dropdown-wrapper" 
@@ -110,7 +110,7 @@ export default function UserTools({ session: propSession, isMobile }) {
 
 
       {/* ==========================================
-          2. MUONEKANO WA MGENI (Haijasajiliwa)
+          2. MGENI
          ========================================== */}
       {!session ? (
         <div className="flex items-center gap-4" style={{ display: 'flex', gap: isMobile ? '8px' : '12px', alignItems: 'center' }}>
@@ -141,30 +141,22 @@ export default function UserTools({ session: propSession, isMobile }) {
       ) : (
         
         /* ==========================================
-           3. MUONEKANO WA MTEJA AU MFANYA BIASHARA (Ameingia)
+           3. MTEJA / MFANYA BIASHARA
            ========================================== */
         <div className="flex items-center gap-4" style={{ display: 'flex', gap: isMobile ? '6px' : '12px', alignItems: 'center' }}>
           
-          {/* A. Store */}
-          {userStoreId && (
-            <Link 
-              to={`/dashboard/physical/${userStoreId}`}
-              className="flex flex-col items-center hover:opacity-80 transition"
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '10px', color: '#333', textDecoration: 'none' }}
-            >
-              <Store size={isMobile ? 22 : 20} />
-              {!isMobile && <span>Store</span>}
-            </Link>
-          )}
-
-          {/* B. Alerts */}
-          <div className="flex flex-col items-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '10px', color: '#333' }}>
+          {/* 🔥 B. ALERTS - SASA INA LINK (Inafanya kazi!) */}
+          <Link 
+            to="/dashboard/notifications"
+            className="flex flex-col items-center hover:opacity-80 transition"
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '10px', color: '#333', textDecoration: 'none' }}
+          >
             <div style={{ position: 'relative', display: 'flex' }}>
               <Bell size={isMobile ? 22 : 20} />
               {(unreadCount > 0) && <span style={{ position: 'absolute', top: '-4px', right: '-6px', background: '#ff4e00', color: 'white', borderRadius: '50%', width: '14px', height: '14px', fontSize: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>3</span>}
             </div>
             {!isMobile && <span>Alerts</span>}
-          </div>
+          </Link>
 
           {/* C. Messages */}
           <Link to="/dashboard/messages" className="flex flex-col items-center hover:opacity-80 transition" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '10px', color: '#333', textDecoration: 'none' }}>

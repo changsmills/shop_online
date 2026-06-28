@@ -11,13 +11,18 @@ import QuickInventoryManager from './components/QuickInventoryManager';
 import BusinessAnalytics from './components/BusinessAnalytics';
 import TopDealsSection from './components/TopDealsSection';
 import StoreManagement from './components/StoreManagement';
+import SupplierMessages from './pages/SupplierMessages'; // 🔥 Ongeza import
+import SupplierNotifications from './pages/SupplierNotifications'; // 🔥 Ongeza import
+import SupplierOrders from './pages/SupplierOrders';
+
+
+
 
 
 // Import Pages
 import Home from "./pages/Home"; 
 import Login from "./pages/Login"; 
 import Register from "./pages/Register";
-import SellerDashboard from './pages/SellerDashboard'; 
 import SupplierAuth from './pages/SupplierAuth';
 import CreateStore from "./pages/CreateStore";
 import Dashboard from "./pages/Dashboard";
@@ -59,6 +64,8 @@ import Verification from './pages/Verification';
 import AdRequest from './pages/AdRequest';
 import StorePage from "./pages/StorePage";
 import AllStores from './pages/AllStores';
+import SupplierAccountSettings from './pages/SupplierAccountSettings'; 
+
 
 
 
@@ -173,7 +180,10 @@ function AppContent({ session }) {
         <Route path="/verification" element={<Verification />} />
         <Route path="/ad-request" element={<AdRequest />} />
         <Route path="/store/:storeId" element={<StorePage session={session} />} />
+        <Route path="/dashboard/supplier-messages" element={<SupplierMessages session={session} />} />
 
+
+        <Route path="/dashboard/supplier-notifications" element={<SupplierNotifications session={session} />} />
         
         <Route path="/advertise" element={session ? <AdvertisePage session={session} /> : <Navigate to="/dashboard/login" />} />
         <Route path="/dashboard/settings" element={session ? <AccountSettings session={session} /> : <Navigate to="/dashboard/login" />} />
@@ -184,11 +194,12 @@ function AppContent({ session }) {
         <Route path="/dashboard/login" element={<Login />} />
         <Route path="/dashboard/register" element={<Register />} />
         <Route path="/dashboard/register-supplier" element={<SupplierAuth />} />
+        
+       <Route path="/dashboard/supplier-settings" element={<SupplierAccountSettings session={session} />} />
 
 
         <Route path="/stores/:storeId" element={<AllStores session={session} />} />
 
-        <Route path="/dashboard/seller" element={<SellerDashboard />} />
 
 
          <Route path="/dashboard/sellerboard/:id?" element={<PhysicalDashboard session={session} />} />
@@ -196,9 +207,10 @@ function AppContent({ session }) {
         {/* DASHBOARD SUB-PAGES */}
         <Route path="/dashboard/analytics" element={<Analytics session={session} />} />
         <Route path="/dashboard/virtual" element={<VirtualDashboard session={session} />} />
-        <Route path="/dashboard/physical/:id" element={<PhysicalDashboard session={session} />} />
         <Route path="/dashboard/products" element={<ProductManagement session={session} />} />
         <Route path="/create-store" element={<CreateStore session={session} />} />
+        <Route path="/dashboard/supplier-orders" element={<SupplierOrders session={session} />} />
+
 
         {/* Default Redirects */}
         <Route path="/" element={<Navigate replace to="/dashboard" />} />

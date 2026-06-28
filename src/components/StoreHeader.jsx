@@ -22,78 +22,66 @@ const StoreHeader = ({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
- const handleImageChange = async (e, type) => {
-  const file = e.target.files[0];
-  if (!file || !myStore?.id) return;
+  const handleImageChange = async (e, type) => {
+    const file = e.target.files[0];
+    if (!file || !myStore?.id) return;
 
-  // 1. Tengeneza jina la kipekee na path (kama yale ya Supabase uliyotuma)
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
-  const filePath = `${myStore.owner_id}/branding/${fileName}`;
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+    const filePath = `${myStore.owner_id}/branding/${fileName}`;
 
-  try {
-    // 2. Pandisha picha kwenye Supabase Bucket ya 'picha_za_duka'
-    const { error: uploadError } = await supabase.storage
-      .from('picha_za_duka')
-      .upload(filePath, file);
+    try {
+      const { error: uploadError } = await supabase.storage
+        .from('picha_za_duka')
+        .upload(filePath, file);
 
-    if (uploadError) throw uploadError;
+      if (uploadError) throw uploadError;
 
-    // 3. Pata Public URL ya hiyo picha
-    const { data: { publicUrl } } = supabase.storage
-      .from('picha_za_duka')
-      .getPublicUrl(filePath);
+      const { data: { publicUrl } } = supabase.storage
+        .from('picha_za_duka')
+        .getPublicUrl(filePath);
 
-    // 4. Update Table ya 'stores_engine' kulingana na Column husika
-    const updateColumn = type === 'banner' ? 'store_banner' : 'store_logo';
-    
-    const { error: updateError } = await supabase
-      .from('stores_engine')
-      .update({ [updateColumn]: publicUrl })
-      .eq('id', myStore.id); // Inatumia ID ya duka uliyotupa
+      const updateColumn = type === 'banner' ? 'store_banner' : 'store_logo';
+      
+      const { error: updateError } = await supabase
+        .from('stores_engine')
+        .update({ [updateColumn]: publicUrl })
+        .eq('id', myStore.id);
 
-    if (updateError) throw updateError;
+      if (updateError) throw updateError;
 
-    // 5. Update UI Preview
-    if (type === 'banner') setBannerPreview(publicUrl);
-    else setLogoPreview(publicUrl);
+      if (type === 'banner') setBannerPreview(publicUrl);
+      else setLogoPreview(publicUrl);
 
-    alert('Imefanikiwa kubadilishwa!');
-  } catch (error) {
-    console.error('Shida imetokea:', error.message);
-    alert('Imeshindikana kupakia picha.');
-  }
-};
+      alert('Imefanikiwa kubadilishwa!');
+    } catch (error) {
+      console.error('Shida imetokea:', error.message);
+      alert('Imeshindikana kupakia picha.');
+    }
+  };
   
   useEffect(() => {
-  if (myStore?.store_banner) setBannerPreview(myStore.store_banner);
-  if (myStore?.store_logo) setLogoPreview(myStore.store_logo);
-}, [myStore]);
+    if (myStore?.store_banner) setBannerPreview(myStore.store_banner);
+    if (myStore?.store_logo) setLogoPreview(myStore.store_logo);
+  }, [myStore]);
 
   return (
-    <header
-      className="pd-header-card-premium"
-      style={{
-  backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), 
-url(${bannerPreview || myStore?.store_banner || "https://via.placeholder.com/1200x400"})`,
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
-  position: 'relative',
-  
-  // 1. Ongeza urefu wa chini ili isijikunje (Stabilization)
-  minHeight: isMobile ? '240px' : '320px', 
-  
-  borderRadius: isMobile ? '16px' : '24px',
-  
-  // 2. Ongeza nafasi ya chini ili kutoa room kwa Logo inayochungulia nje
-  marginBottom: isMobile ? '45px' : '60px', 
-  
-  overflow: 'visible', // Badilisha kuwa visible ili Logo ionekane ikitokeza nje
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'space-between'
-}}
-    >
+    <header style={{
+      backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url(${bannerPreview || myStore?.store_banner || "https://via.placeholder.com/1200x400"})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      position: 'relative',
+      minHeight: isMobile ? '240px' : '320px', 
+      borderRadius: isMobile ? '16px' : '24px',
+      
+      // 🔥 ONDOA MARGINBOTTOM NA OVERFLOW HAPA
+      /* marginBottom: isMobile ? '45px' : '60px',  <-- IMEFUTWA */
+      /* overflow: 'visible', <-- IMEFUTWA */
+      
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between'
+    }}>
       {/* Inner container with padding */}
       <div style={{
         padding: isMobile ? '20px 16px' : '30px',
@@ -105,18 +93,18 @@ url(${bannerPreview || myStore?.store_banner || "https://via.placeholder.com/120
       }}>
         
         {/* 1. Maelezo ya Duka (Jina, Verification, ID) */}
-        <div className="pd-header-info" style={{
+        <div style={{
           flex: 1,
           color: 'white'
         }}>
-          <div className="pd-name-row" style={{
+          <div style={{
             display: 'flex',
             alignItems: 'center',
             flexWrap: 'wrap',
             gap: isMobile ? '8px' : '12px',
             marginBottom: isMobile ? '8px' : '12px'
           }}>
-            <h1 className="pd-store-name" style={{
+            <h1 style={{
               fontSize: isMobile ? '20px' : '28px',
               fontWeight: '800',
               margin: 0,
@@ -126,7 +114,7 @@ url(${bannerPreview || myStore?.store_banner || "https://via.placeholder.com/120
             </h1>
             
             {myStore?.is_verified ? (
-              <div className="pd-badge verified" style={{
+              <div style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '4px',
@@ -140,7 +128,7 @@ url(${bannerPreview || myStore?.store_banner || "https://via.placeholder.com/120
                 <span>Verified</span>
               </div>
             ) : (
-              <div className="pd-badge pending" style={{
+              <div style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '4px',
@@ -150,20 +138,20 @@ url(${bannerPreview || myStore?.store_banner || "https://via.placeholder.com/120
                 fontSize: isMobile ? '11px' : '12px',
                 fontWeight: '600'
               }}>
-                <Loader2 size={isMobile ? 12 : 14} className="pd-icon-spin" />
+                <Loader2 size={isMobile ? 12 : 14} style={{ animation: 'spin 1s linear infinite' }} />
                 <span>Reviewing</span>
               </div>
             )}
           </div>
 
-          <div className="pd-meta-row" style={{
+          <div style={{
             display: 'flex',
             alignItems: 'center',
             flexWrap: 'wrap',
             gap: isMobile ? '6px 12px' : '16px',
             marginTop: isMobile ? '4px' : '8px'
           }}>
-            <div className="pd-id-box" style={{
+            <div style={{
               display: 'flex',
               alignItems: 'center',
               gap: '4px',
@@ -176,13 +164,13 @@ url(${bannerPreview || myStore?.store_banner || "https://via.placeholder.com/120
               <span>ID: {myStore?.id?.substring(0, 8)}</span>
             </div>
 
-            <div className="pd-location" style={{
+            <div style={{
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
               fontSize: isMobile ? '11px' : '12px'
             }}>
-              <span className="pd-dot" style={{
+              <span style={{
                 width: '6px',
                 height: '6px',
                 backgroundColor: '#10b981',
@@ -193,18 +181,18 @@ url(${bannerPreview || myStore?.store_banner || "https://via.placeholder.com/120
             </div>
 
             {!isMobile && (
-              <div className="pd-stats-summary" style={{
+              <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
                 fontSize: '12px'
               }}>
-                <div className="pd-stat-item" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ opacity: 0.7 }}>Sales:</span>
                   <span style={{ fontWeight: '700' }}>{myStore?.total_sales || 0}</span>
                 </div>
-                <div className="pd-stat-divider" style={{ width: '1px', height: '12px', backgroundColor: 'rgba(255,255,255,0.3)' }}></div>
-                <div className="pd-stat-item" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <div style={{ width: '1px', height: '12px', backgroundColor: 'rgba(255,255,255,0.3)' }}></div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ opacity: 0.7 }}>Type:</span>
                   <span style={{ fontWeight: '700' }}>{myStore?.business_type || "Retailer"}</span>
                 </div>
@@ -214,7 +202,7 @@ url(${bannerPreview || myStore?.store_banner || "https://via.placeholder.com/120
           
           {/* Stats for mobile only */}
           {isMobile && (
-            <div className="pd-stats-mobile" style={{
+            <div style={{
               display: 'flex',
               alignItems: 'center',
               gap: '16px',
@@ -239,7 +227,7 @@ url(${bannerPreview || myStore?.store_banner || "https://via.placeholder.com/120
         </div>
 
         {/* 2. Kitufe cha kubadili Banner */}
-        <label className="pd-banner-edit" style={{
+        <label style={{
           display: 'flex',
           alignItems: 'center',
           gap: isMobile ? '6px' : '8px',
@@ -260,50 +248,7 @@ url(${bannerPreview || myStore?.store_banner || "https://via.placeholder.com/120
         </label>
       </div>
 
-      {/* 3. Sehemu ya Logo (Avatar) - Bottom Left */}
-      <div className="pd-profile-group" style={{
-        position: 'absolute',
-        bottom: isMobile ? '-25px' : '-30px',
-        left: isMobile ? '16px' : '30px',
-        zIndex: 10
-      }}>
-        <div className="pd-avatar-wrapper" style={{ position: 'relative' }}>
-          <img 
-            src={logoPreview || myStore?.store_logo || "https://via.placeholder.com/150"}
-            alt="Logo" 
-            style={{
-              width: isMobile ? '70px' : '100px',
-              height: isMobile ? '70px' : '100px',
-              borderRadius: '50%',
-              objectFit: 'cover',
-              border: isMobile ? '3px solid white' : '4px solid white',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-              backgroundColor: '#fff'
-            }} 
-          />
-          <label className="pd-logo-edit" style={{
-            position: 'absolute',
-            bottom: '5px',
-            right: '5px',
-            backgroundColor: '#ff4e00',
-            borderRadius: '50%',
-            width: isMobile ? '28px' : '32px',
-            height: isMobile ? '28px' : '32px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            border: '2px solid white',
-            transition: 'transform 0.2s'
-          }}>
-            <Camera size={isMobile ? 12 : 14} color="white" />
-            <input type="file" hidden onChange={(e) => handleImageChange(e, 'logo')} />
-          </label>
-        </div>
-      </div>
-
-      {/* Add padding bottom to account for absolute positioned logo */}
-      <div style={{ height: isMobile ? '45px' : '60px' }}></div>
+      {/* 🔥 ONDOA SEHEMU ZOTE ZILIZOBEKI (Logo na padding bottom) - HAZIPO TENA */}
     </header>
   );
 };

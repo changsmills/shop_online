@@ -20,11 +20,12 @@ const Login = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handleLogin = async (e) => {
+    const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      // 🔥 1. Jaribu kuingiza mtumiaji kwa email na password
       const { data, error } = await supabase.auth.signInWithPassword({ 
         email: email.trim(), 
         password 
@@ -34,8 +35,9 @@ const Login = () => {
 
       if (data.session) {
         const user = data.session.user;
+        console.log("✅ User logged in:", user.id);
 
-        // 1. Pata role ya mteja kwenye table ya 'profiles'
+        // 🔥 2. Pata role ya mtumiaji kwenye table ya 'profiles'
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('role')
@@ -50,18 +52,37 @@ const Login = () => {
         }
 
         const role = profileData?.role;
+        console.log("✅ Role found:", role);
 
-        // 2. Amua anatakiwa aende wapi kulingana na role
+        // 🔥 3. Kama ni Supplier, tafuta Store ID yake
         if (role === 'supplier') {
-          toast.success("Karibu Muuzaji! Inaelekeza kwenye Dashboard yako...");
-          navigate('/dashboard/sellerboard', { replace: true });
-        } else {
-          // Akiwa 'customer' au 'null'
+          console.log("⏳ Searching for supplier's store...");
+          const { data: storeData, error: storeError } = await supabase
+            .from('stores_engine')
+            .select('id')
+            .eq('owner_id', user.id)
+            .maybeSingle(); // 📌 Tumia maybeSingle ili usipate error kama hakuna store
+
+          // 🔥 4. Kama store ipo, peleka na ID; Kama haipo, peleka kuunda store
+          if (storeData && !storeError) {
+            console.log("✅ Store ID found:", storeData.id);
+            toast.success("Karibu Muuzaji! Inaelekeza kwenye Dashboard yako...");
+            navigate(`/dashboard/sellerboard/${storeData.id}`, { replace: true });
+          } else {
+            console.warn("⚠️ Supplier has no store yet. Redirecting to create store.");
+            toast.success("Karibu Muuzaji! Tafadhali unda duka lako kwanza.");
+            navigate('/create-store', { replace: true });
+          }
+        } 
+        // 🔥 5. Kama ni Customer, peleka kwenye dashboard ya kawaida
+        else {
+          console.log("✅ Customer detected. Redirecting to customer dashboard.");
           toast.success("Karibu Mteja!");
           navigate('/dashboard', { replace: true });
         }
       }
     } catch (err) {
+      console.error("❌ Login error:", err.message);
       toast.error("Kosa: " + err.message);
     } finally {
       setLoading(false);

@@ -5,7 +5,7 @@ import {
   LayoutDashboard, MessageSquare, ClipboardList, 
   Settings, BarChart3, Bell, Search, Send, Menu, 
   ChevronLeft, Home, ShoppingCart, User,
-  Plus, Megaphone, Loader2 // ← Ongeza Loader2 hapa
+  Plus, Megaphone, Loader2
 } from 'lucide-react';
 
 import UserTools from '../components/UserTools';
@@ -15,6 +15,9 @@ import messageImage from "../images/messageSent.svg";
 
 const Messages = ({ session }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const messagesEndRef = useRef(null);
+
   const [isExpanded, setIsExpanded] = useState(false);
   const [chats, setChats] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
@@ -24,12 +27,37 @@ const Messages = ({ session }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [showMobileChat, setShowMobileChat] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-const [searchResults, setSearchResults] = useState([]);
-const [isSearching, setIsSearching] = useState(false);
-  const location = useLocation();
-  const messagesEndRef = useRef(null);
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
 
+  // ==========================================
+  // 🔥 MPYA: LOGIC YA KUTAMBUA USER (SUPPLIER AU CUSTOMER)
+  // ==========================================
+  const [userRole, setUserRole] = useState('customer'); // 'customer' au 'supplier'
+
+  useEffect(() => {
+    const checkUserRole = async () => {
+      if (!session?.user) return;
+      
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .maybeSingle(); // Tumia maybeSingle ili usipate error
+
+      if (profile?.role === 'supplier') {
+        setUserRole('supplier');
+      } else {
+        setUserRole('customer');
+      }
+    };
+    checkUserRole();
+  }, [session]);
+
+  // ==========================================
+  // MWISHO WA LOGIC MPYA
+  // ==========================================
 
   // Detect mobile screen
   useEffect(() => {
@@ -39,21 +67,16 @@ const [isSearching, setIsSearching] = useState(false);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-
-  // Sikiliza kama kuna mteja anakuja kuanza chat mpya kutoka kwenye bidhaa
+  // Sikiliza kama kuna mteja anakuja kuanza chat mpya
   useEffect(() => {
     const startNewChat = async () => {
       if (location.state?.sellerId) {
         const { sellerId, sellerName, productContext } = location.state;
-
-        // 1. Angalia kama huyu seller tayari yupo kwenye list yako ya chats
         const existingChat = chats.find(c => c.id === sellerId);
 
         if (existingChat) {
-          // Kama yupo, mfungue tu
           handleChatSelect(existingChat);
         } else {
-          // Kama hayupo (ni mara ya kwanza), tengeneza "Temporary Chat" object
           const temporaryChat = {
             id: sellerId,
             name: sellerName || "Seller",
@@ -61,35 +84,26 @@ const [isSearching, setIsSearching] = useState(false);
             lastMsg: productContext ? `Ninaulizia: ${productContext}` : "",
             date: "Now"
           };
-          
           setActiveChat(temporaryChat);
-          
-          // Kama unataka kutuma ujumbe wa kwanza automatic kuhusu bidhaa:
           if (productContext) {
              setNewMessage(`Habari, ninaulizia kuhusu bidhaa hii: ${productContext}`);
           }
-
           if (isMobile) setShowMobileChat(true);
         }
       }
     };
 
-    /* 🔥 MABADILIKO MUHIMU: 
-       TUMEONDOA 'if (!loading)'. 
-       Sasa chat itafunguliwa MARA MOJA bila kusubiri inbox ipakie. */
     if (location.state?.sellerId) {
       startNewChat();
     }
-  }, [location.state, chats, isMobile]); // 🔥 Tumeondoa 'loading' kwenye dependencies!
+  }, [location.state, chats, isMobile]);
 
-  // Close mobile chat when screen becomes desktop
   useEffect(() => {
     if (!isMobile) {
       setShowMobileChat(false);
     }
   }, [isMobile]);
 
-  // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -100,10 +114,6 @@ const [isSearching, setIsSearching] = useState(false);
 
   const fetchMessages = async (partnerId) => {
     if (!partnerId || !session?.user?.id) return;
-
-    // 🔥 Hakikisha umegeuza loading kuwa true kabla ya kuita function hii
-    // (Kama hauko kwenye loading state, unaweza kuacha hii, lakini ni vyema kuzima mwishoni)
-
     try {
       const { data, error } = await supabase
         .from('messages')
@@ -119,24 +129,16 @@ const [isSearching, setIsSearching] = useState(false);
         setMessages(data);
       } else {
         console.error("Error fetching messages:", error);
-        // 🔥 Ikiwa kuna error, tunaweza kuweka messages kuwa tupu ili UI isionyeshe data za zamani
         setMessages([]); 
       }
     } catch (err) {
-      // 🔥 Inakamata network error (kama mtandao umezima)
       console.error("Network error while fetching messages:", err);
       setMessages([]);
-    } finally {
-      // 🔥 Muhimu: Hii inazima 'loading' hata kama kuna error
-      // Kama unatumia state ya 'loading' kwa messages, zima hapa.
-      // setMessagesLoading(false); 
     }
   };
 
   const fetchInbox = async () => {
     if (!session?.user) return;
-    
-    // 🔥 Anzisha loading mwanzoni
     setLoading(true);
 
     try {
@@ -177,106 +179,92 @@ const [isSearching, setIsSearching] = useState(false);
         setChats(Object.values(chatGroups).sort((a,b) => b.timestamp - a.timestamp));
       }
     } catch (err) {
-      // 🔥 Hii inakamata kosa lolote la mtandao (network error)
       console.error("Network error while fetching inbox:", err);
     } finally {
-      // 🔥 HAPA NDIYO MUHIMU ZAIDI: inazima 'loading' hata kama mtandao umekatika!
       setLoading(false);
     }
   };
 
-const handleSearchStores = async (query) => {
-  setSearchQuery(query);
-  if (query.trim().length < 2) {
-    setSearchResults([]);
-    return;
-  }
+  const handleSearchStores = async (query) => {
+    setSearchQuery(query);
+    if (query.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
 
-  setIsSearching(true);
-  const { data, error } = await supabase
-    .from('stores_engine')
-    .select('owner_id, store_name, store_logo')
-    .ilike('store_name', `%${query}%`)
-    .neq('owner_id', session.user.id)  // ← ONGEZA HII! Inachuja maduka yako
-    .limit(5);
+    setIsSearching(true);
+    const { data, error } = await supabase
+      .from('stores_engine')
+      .select('owner_id, store_name, store_logo')
+      .ilike('store_name', `%${query}%`)
+      .neq('owner_id', session.user.id)
+      .limit(5);
 
-  if (!error && data) {
-    setSearchResults(data);
-  }
-  setIsSearching(false);
-};
-
-const handleSelectStoreFromSearch = (store) => {
-  const existingChat = chats.find(c => c.id === store.owner_id);
-  
-  if (existingChat) {
-    handleChatSelect(existingChat);
-  } else {
-    const newChatPartner = {
-      id: store.owner_id, 
-      name: store.store_name,
-      avatar: store.store_logo || null,
-      lastMsg: "Anza mazungumzo mapya...",
-      date: "New"
-    };
-
-    // 1. Safisha meseji za nyuma kwanza
-    setMessages([]); 
-    
-    // 2. Fungua chat mpya
-    setActiveChat(newChatPartner);
-    
-    if (isMobile) setShowMobileChat(true);
-  }
-  
-  setSearchQuery("");
-  setSearchResults([]);
-};
-
-const handleSendMessage = async (e) => {
-  e.preventDefault();
-  if (!newMessage.trim() || !activeChat) return;
-
-  // 1. Tunatengeneza 'Temporary Message' ya kuonyesha kwenye UI
-  const tempMsg = {
-    id: Date.now(), // ID ya muda
-    sender_id: session.user.id,
-    receiver_id: activeChat.id,
-    content: newMessage,
-    created_at: new Date().toISOString(),
-    isPending: true // Hii inatusaidia kujua meseji bado haijafika server
+    if (!error && data) {
+      setSearchResults(data);
+    }
+    setIsSearching(false);
   };
 
-  // 2. Tunaongeza meseji kwenye state KABLA hatujaituma (Optimistic)
-  setMessages(prev => [...prev, tempMsg]);
-  const originalMessage = newMessage; // Tunahifadhi meseji
-  setNewMessage(""); // Tunafuta input
-  scrollToBottom();
+  const handleSelectStoreFromSearch = (store) => {
+    const existingChat = chats.find(c => c.id === store.owner_id);
+    
+    if (existingChat) {
+      handleChatSelect(existingChat);
+    } else {
+      const newChatPartner = {
+        id: store.owner_id, 
+        name: store.store_name,
+        avatar: store.store_logo || null,
+        lastMsg: "Anza mazungumzo mapya...",
+        date: "New"
+      };
+      setMessages([]); 
+      setActiveChat(newChatPartner);
+      if (isMobile) setShowMobileChat(true);
+    }
+    
+    setSearchQuery("");
+    setSearchResults([]);
+  };
 
-  // 3. Tunatuma kwenye Supabase
-  const { error } = await supabase
-    .from('messages')
-    .insert([
-      {
-        sender_id: session.user.id,
-        receiver_id: activeChat.id,
-        content: originalMessage,
-      }
-    ]);
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !activeChat) return;
 
-  if (error) {
-    console.error("Error sending:", error);
-    // Kama kuna error, tunatoa ile meseji ya muda
-    setMessages(prev => prev.filter(msg => msg.id !== tempMsg.id));
-    setNewMessage(originalMessage); // Tunairudisha kwenye input ili mtumiaji ajue haikutumika
-  } else {
-    // 4. Meseji ikifanikiwa, tunaita fetchMessages ili kupata data rasmi kutoka Supabase (na ID sahihi)
-    // TUNAONDOA fetchInbox HAPA ili kuzuia screen kuruka-ruka (kama unataka update, fanya kwenye background)
-    fetchMessages(activeChat.id); 
-  }
-};
+    const tempMsg = {
+      id: Date.now(),
+      sender_id: session.user.id,
+      receiver_id: activeChat.id,
+      content: newMessage,
+      created_at: new Date().toISOString(),
+      isPending: true
+    };
 
-  // Handle chat selection (mobile friendly)
+    setMessages(prev => [...prev, tempMsg]);
+    const originalMessage = newMessage;
+    setNewMessage("");
+    scrollToBottom();
+
+    const { error } = await supabase
+      .from('messages')
+      .insert([
+        {
+          sender_id: session.user.id,
+          receiver_id: activeChat.id,
+          content: originalMessage,
+        }
+      ]);
+
+    if (error) {
+      console.error("Error sending:", error);
+      setMessages(prev => prev.filter(msg => msg.id !== tempMsg.id));
+      setNewMessage(originalMessage);
+    } else {
+      fetchMessages(activeChat.id);
+    }
+  };
+
   const handleChatSelect = async (chat) => {
     setActiveChat(chat);
     await fetchMessages(chat.id);
@@ -286,7 +274,6 @@ const handleSendMessage = async (e) => {
     }
   };
 
-  // Handle back button on mobile
   const handleBackToChatList = () => {
     setShowMobileChat(false);
   };
@@ -314,25 +301,37 @@ const handleSendMessage = async (e) => {
     };
   }, [session, activeChat]);
 
-  // Hifadhi activeChat kwenye localStorage kila inapobadilika
-useEffect(() => {
-  if (activeChat?.id) {
-    localStorage.setItem('lastActiveChatId', activeChat.id);
-  }
-}, [activeChat]);
-
-// Wakati chats zikipakiwa, jaribu kurejesha chat ya mwisho
-useEffect(() => {
-  const lastChatId = localStorage.getItem('lastActiveChatId');
-  if (lastChatId && chats.length > 0 && !activeChat) {
-    const lastChat = chats.find(c => c.id === lastChatId);
-    if (lastChat) {
-      handleChatSelect(lastChat);
+  // Hifadhi activeChat kwenye localStorage
+  useEffect(() => {
+    if (activeChat?.id) {
+      localStorage.setItem('lastActiveChatId', activeChat.id);
     }
-  }
-}, [chats, activeChat]);
+  }, [activeChat]);
 
-  const sidebarItems = [
+  useEffect(() => {
+    const lastChatId = localStorage.getItem('lastActiveChatId');
+    if (lastChatId && chats.length > 0 && !activeChat) {
+      const lastChat = chats.find(c => c.id === lastChatId);
+      if (lastChat) {
+        handleChatSelect(lastChat);
+      }
+    }
+  }, [chats, activeChat]);
+
+  const getSenderName = (msg) => {
+    if (msg.sender_id === session.user.id) return "Me";
+    return msg.sender?.full_name || "User";
+  };
+
+  // 🔥 MABADILIKO HAPA: SIDEBAR INABADILIKA KULINGANA NA ROLE (Supplier/Customer)
+  const isSupplier = userRole === 'supplier';
+  
+  const sidebarItems = isSupplier ? [
+    { icon: <LayoutDashboard size={20} />, path: '/dashboard/sellerboard', label: 'Duka Lako' },
+    { icon: <MessageSquare size={20} />, path: '/dashboard/messages', label: 'Ujumbe' },
+    { icon: <ClipboardList size={20} />, path: '/dashboard/notifications', label: 'Arifa (Oda)' },
+    { icon: <Settings size={20} />, path: '/dashboard/sellerboard', label: 'Mipangilio' },
+  ] : [
     { icon: <LayoutDashboard size={20} />, path: '/dashboard', label: 'Dashboard' },
     { icon: <MessageSquare size={20} />, path: '/dashboard/messages', label: 'Messages' },
     { icon: <ClipboardList size={20} />, path: '/dashboard/orders', label: 'Orders' },
@@ -340,40 +339,13 @@ useEffect(() => {
     { icon: <Settings size={20} />, path: '/dashboard/settings', label: 'Settings' },
   ];
 
-  const getSenderName = (msg) => {
-    if (msg.sender_id === session.user.id) return "Me";
-    return msg.sender?.full_name || "User";
+  const handleSearchNavigation = () => {
+    setShowSearchModal(true);
   };
 
- const handleStoreNavigation = async () => {
-  setLoading(true); 
-
-  try {
-    const { data: store, error } = await supabase
-      .from('stores_engine')
-      .select('id') // Hakikisha unachukua ID ya duka (au owner_id)
-      .eq('owner_id', session.user.id)
-      .maybeSingle();
-
-    if (error) throw error;
-
-    if (store) {
-      // HAPA: Ongeza ID ya duka kwenye URL ili ilingane na Route yako
-      navigate(`/dashboard/physical/${store.id}`); 
-    } else {
-      navigate('/create-store');
-    }
-  } catch (err) {
-    console.error("Error:", err);
-    navigate('/create-store');
-  } finally {
-    setLoading(false);
-  }
-};
-
   return (
-
     <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+      
       {/* HEADER */}
       <header className="dashboard-header" style={{ position: 'sticky', top: 0, zIndex: 100 }}>
         <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
@@ -398,8 +370,6 @@ useEffect(() => {
           )}
         </div>
 
-
-       {/* HAPA NDIPO ULIPOTAKIWA KUWEKA SHARTI LA !isMobile */}
         <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
           {!isMobile && (
             <>
@@ -408,11 +378,11 @@ useEffect(() => {
             </>
           )}
         </div>
-
       </header>
 
-      <div className="dashboard-main" style={{ display: 'flex', flex: 1, overflow: 'hidden',paddingBottom: isMobile ? '70px' : 0 }}>
-        {/* SIDEBAR - Hide on mobile (use bottom nav instead) */}
+      <div className="dashboard-main" style={{ display: 'flex', flex: 1, overflow: 'hidden', paddingBottom: isMobile ? '70px' : 0 }}>
+        
+        {/* SIDEBAR */}
         {!isMobile && (
           <aside 
             onMouseEnter={() => setIsExpanded(true)}
@@ -430,370 +400,349 @@ useEffect(() => {
               zIndex: 10
             }}
           >
-            {sidebarItems.map((item) => (
-              <Link 
-                key={item.path} 
-                to={item.path} 
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  height: '48px',
-                  textDecoration: 'none',
-                  color: location.pathname === item.path ? '#ff6a00' : '#666',
-                  margin: '4px 10px',
-                  borderRadius: '8px',
-                  transition: 'background 0.2s',
-                  backgroundColor: location.pathname === item.path ? '#fff5ed' : 'transparent',
-                }}
-              >
-                <div style={{ 
-                  minWidth: '52px',
-                  display: 'flex', 
-                  justifyContent: 'center',
-                  alignItems: 'center' 
-                }}>
-                  {item.icon}
-                </div>
-                <span style={{ 
-                  fontSize: '14px', 
-                  fontWeight: '600',
-                  whiteSpace: 'nowrap',
-                  opacity: isExpanded ? 1 : 0,
-                  transition: 'opacity 0.2s ease',
-                  pointerEvents: isExpanded ? 'auto' : 'none'
-                }}>
-                  {item.label}
-                </span>
-              </Link>
-            ))}
+            {sidebarItems.map((item) => {
+              // 🔥 Logic ya kuangalia kama link ni active (Inafanya kazi kwa Supplier na Customer)
+              const isActive = isSupplier
+                ? (item.path === '/dashboard/sellerboard' && location.pathname.startsWith('/dashboard/sellerboard'))
+                : location.pathname === item.path;
+
+              return (
+                <Link 
+                  key={item.path} 
+                  to={item.path} 
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    height: '48px',
+                    textDecoration: 'none',
+                    color: isActive ? '#ff6a00' : '#666',
+                    margin: '4px 10px',
+                    borderRadius: '8px',
+                    transition: 'background 0.2s',
+                    backgroundColor: isActive ? '#fff5ed' : 'transparent',
+                  }}
+                >
+                  <div style={{ 
+                    minWidth: '52px',
+                    display: 'flex', 
+                    justifyContent: 'center',
+                    alignItems: 'center' 
+                  }}>
+                    {item.icon}
+                  </div>
+                  <span style={{ 
+                    fontSize: '14px', 
+                    fontWeight: '600',
+                    whiteSpace: 'nowrap',
+                    opacity: isExpanded ? 1 : 0,
+                    transition: 'opacity 0.2s ease',
+                    pointerEvents: isExpanded ? 'auto' : 'none'
+                  }}>
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
           </aside>
         )}
 
         {/* MESSAGES CONTAINER */}
         <div className="messages-container" style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
           
-          {/* CHAT LIST SIDEBAR - Hide on mobile when chat is open */}
+          {/* CHAT LIST SIDEBAR */}
           {(!isMobile || (isMobile && !showMobileChat)) && (
             <div className="messages-sidebar" style={{ 
               width: isMobile ? '100%' : '320px',
               flexShrink: 0,
               borderRight: '1px solid #eee'
             }}>
+              <div className="sidebar-header-chat">
+                <h3>Inbox</h3>
+                <div className="search-bar-chat" style={{ position: 'relative' }}>
+                  <Search size={14} className="search-icon-chat" />
+                  <input 
+                    type="text" 
+                    placeholder="Tafuta duka..." 
+                    value={searchQuery}
+                    onChange={(e) => handleSearchStores(e.target.value)}
+                    style={{
+                      fontSize: isMobile ? '14px' : '13px',
+                      padding: isMobile ? '10px 10px 10px 35px' : '8px 8px 8px 32px'
+                    }}
+                  />
+                  {searchResults.length > 0 && (
+                    <div className="search-results-dropdown" style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      right: 0,
+                      backgroundColor: '#fff',
+                      boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                      borderRadius: '8px',
+                      zIndex: 1000,
+                      marginTop: '8px',
+                      maxHeight: isMobile ? '200px' : '300px',
+                      overflowY: 'auto',
+                      border: '1px solid #eee'
+                    }}>
+                      {searchResults.map(store => (
+                        <div 
+                          key={store.owner_id}
+                          onClick={() => handleSelectStoreFromSearch(store)}
+                          style={{
+                            padding: isMobile ? '10px 12px' : '12px 15px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            borderBottom: '1px solid #f8f8f8',
+                            transition: 'background 0.2s'
+                          }}
+                        >
+                          <div style={{ 
+                            width: isMobile ? '30px' : '35px', 
+                            height: isMobile ? '30px' : '35px', 
+                            borderRadius: '50%', 
+                            backgroundColor: '#ff6a00', 
+                            color: '#fff',
+                            display: 'flex', 
+                            justifyContent: 'center', 
+                            alignItems: 'center', 
+                            fontSize: isMobile ? '12px' : '14px', 
+                            fontWeight: 'bold' 
+                          }}>
+                            {store.store_logo ? (
+                              <img src={store.store_logo} alt="" style={{width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover'}} />
+                            ) : (
+                              store.store_name[0].toUpperCase()
+                            )}
+                          </div>
+                          <div>
+                            <div style={{ fontSize: isMobile ? '13px' : '14px', fontWeight: '600', color: '#333' }}>{store.store_name}</div>
+                            <div style={{ fontSize: isMobile ? '10px' : '11px', color: '#ff6a00' }}>Anza mazungumzo sasa</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {isSearching && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      right: 0,
+                      backgroundColor: '#fff',
+                      padding: '10px',
+                      textAlign: 'center',
+                      fontSize: '12px',
+                      color: '#666',
+                      borderRadius: '8px',
+                      marginTop: '5px',
+                      zIndex: 1000
+                    }}>
+                      Inatafuta...
+                    </div>
+                  )}
+                </div>
+              </div>
 
-<div className="sidebar-header-chat">
-  <h3>Inbox</h3>
-  <div className="search-bar-chat" style={{ position: 'relative' }}>
-    <Search size={14} className="search-icon-chat" />
-    <input 
-      type="text" 
-      placeholder="Tafuta duka..." 
-      value={searchQuery}
-      onChange={(e) => handleSearchStores(e.target.value)}
-      style={{
-        // Ongeza hizi kwa mobile experience nzuri
-        fontSize: isMobile ? '14px' : '13px',
-        padding: isMobile ? '10px 10px 10px 35px' : '8px 8px 8px 32px'
-      }}
-    />
+              <div className="chat-list" style={{ overflowY: 'auto' }}>
+                {loading ? (
+                  <p style={{padding: '20px', textAlign: 'center'}}>Inapakia...</p>
+                ) : chats.length === 0 ? (
+                  <>
+                    {isMobile && (
+                      <div style={{ padding: '30px 20px', textAlign: 'center' }}>
+                        <p style={{ color: '#9ca3af', marginBottom: '20px' }}>Hakuna mazungumzo bado</p>
+                        <button 
+                          onClick={() => setShowSearchModal(true)}
+                          style={{
+                            background: '#ff6a00',
+                            border: 'none',
+                            borderRadius: '30px',
+                            padding: '12px 25px',
+                            color: 'white',
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                          }}
+                        >
+                          <Search size={18} />
+                          Tafuta Duka Kuanza Mazungumzo
+                        </button>
+                      </div>
+                    )}
+                    {!isMobile && (
+                      <p style={{padding: '20px', textAlign: 'center', color: '#9ca3af'}}>Hakuna mazungumzo bado</p>
+                    )}
+                  </>
+                ) : (
+                  chats.map(chat => (
+                    <div 
+                      key={chat.id} 
+                      className={`chat-item ${activeChat?.id === chat.id ? 'active' : ''}`}
+                      onClick={() => handleChatSelect(chat)}
+                    >
+                      <div className="chat-avatar">
+                        {chat.avatar ? (
+                          <img src={chat.avatar} alt={chat.name} style={{width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover'}} />
+                        ) : (
+                          <span style={{fontWeight: 'bold', fontSize: '16px'}}>{chat.name[0]?.toUpperCase() || '?'}</span>
+                        )}
+                      </div>
+                      <div className="chat-info">
+                        <div className="chat-info-top">
+                          <span className="chat-name">{chat.name}</span>
+                          <span className="chat-date">{chat.date}</span>
+                        </div>
+                        <p className="chat-preview">
+                          {chat.lastMsg?.length > 40 ? chat.lastMsg.substring(0, 40) + '...' : chat.lastMsg}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
 
-    {/* Dropdown ya matokeo - itafanya kazi kwenye mobile pia */}
-    {searchResults.length > 0 && (
-      <div className="search-results-dropdown" style={{
-        position: 'absolute',
-        top: '100%',
-        left: 0,
-        right: 0,
-        backgroundColor: '#fff',
-        boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-        borderRadius: '8px',
-        zIndex: 1000,
-        marginTop: '8px',
-        maxHeight: isMobile ? '200px' : '300px', // Mobile smaller height
-        overflowY: 'auto',
-        border: '1px solid #eee'
-      }}>
-        {searchResults.map(store => (
-          <div 
-            key={store.owner_id}
-            onClick={() => handleSelectStoreFromSearch(store)}
-            style={{
-              padding: isMobile ? '10px 12px' : '12px 15px', // Smaller padding for mobile
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              borderBottom: '1px solid #f8f8f8',
-              transition: 'background 0.2s'
-            }}
-          >
-            <div style={{ 
-              width: isMobile ? '30px' : '35px', 
-              height: isMobile ? '30px' : '35px', 
-              borderRadius: '50%', 
-              backgroundColor: '#ff6a00', 
-              color: '#fff',
-              display: 'flex', 
-              justifyContent: 'center', 
-              alignItems: 'center', 
-              fontSize: isMobile ? '12px' : '14px', 
-              fontWeight: 'bold' 
-            }}>
-              {store.store_logo ? (
-                <img src={store.store_logo} alt="" style={{width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover'}} />
-              ) : (
-                store.store_name[0].toUpperCase()
+              {/* MOBILE SEARCH MODAL */}
+              {isMobile && showSearchModal && (
+                <div 
+                  onClick={() => {
+                    setShowSearchModal(false);
+                    setSearchResults([]);
+                    setSearchQuery('');
+                  }}
+                  style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    zIndex: 2000,
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'center',
+                    padding: '20px'
+                  }}
+                >
+                  <div 
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      backgroundColor: '#fff',
+                      borderRadius: '16px',
+                      width: '100%',
+                      maxWidth: '400px',
+                      marginTop: '60px',
+                      padding: '20px'
+                    }}
+                  >
+                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px'}}>
+                      <h3 style={{margin: 0, fontSize: '18px'}}>Tafuta Duka</h3>
+                      <button 
+                        onClick={() => {
+                          setShowSearchModal(false);
+                          setSearchResults([]);
+                          setSearchQuery('');
+                        }} 
+                        style={{ border: 'none', background: 'none', fontSize: '24px', cursor: 'pointer', color: '#666' }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    
+                    <div className="search-bar-chat" style={{ position: 'relative' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #e0e0e0', borderRadius: '25px', padding: '8px 15px' }}>
+                        <Search size={18} color="#999" />
+                        <input 
+                          type="text" 
+                          placeholder="Andika jina la duka..."
+                          value={searchQuery}
+                          onChange={(e) => handleSearchStores(e.target.value)}
+                          autoFocus
+                          style={{ flex: 1, border: 'none', outline: 'none', padding: '8px 10px', fontSize: '14px', background: 'transparent' }}
+                        />
+                      </div>
+                      
+                      {searchResults.length > 0 && (
+                        <div style={{
+                          position: 'absolute',
+                          top: '100%',
+                          left: 0,
+                          right: 0,
+                          backgroundColor: '#fff',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                          borderRadius: '8px',
+                          zIndex: 100,
+                          marginTop: '8px',
+                          maxHeight: '300px',
+                          overflowY: 'auto',
+                          border: '1px solid #eee'
+                        }}>
+                          {searchResults.map(store => (
+                            <div 
+                              key={store.owner_id}
+                              onClick={() => {
+                                handleSelectStoreFromSearch(store);
+                                setShowSearchModal(false);
+                                setSearchQuery('');
+                                setSearchResults([]);
+                              }}
+                              style={{
+                                padding: '12px 15px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px',
+                                borderBottom: '1px solid #f5f5f5'
+                              }}
+                            >
+                              <div style={{ 
+                                width: '35px', height: '35px', borderRadius: '50%', 
+                                backgroundColor: '#ff6a00', color: '#fff',
+                                display: 'flex', justifyContent: 'center', alignItems: 'center',
+                                fontSize: '14px', fontWeight: 'bold'
+                              }}>
+                                {store.store_logo ? (
+                                  <img src={store.store_logo} alt="" style={{width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover'}} />
+                                ) : (
+                                  store.store_name[0].toUpperCase()
+                                )}
+                              </div>
+                              <div>
+                                <div style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>{store.store_name}</div>
+                                <div style={{ fontSize: '11px', color: '#ff6a00' }}>Bonyeza kuanza mazungumzo</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {isSearching && (
+                        <div style={{
+                          position: 'absolute',
+                          top: '100%',
+                          left: 0,
+                          right: 0,
+                          backgroundColor: '#fff',
+                          padding: '12px',
+                          textAlign: 'center',
+                          fontSize: '12px',
+                          color: '#666',
+                          borderRadius: '8px',
+                          marginTop: '5px',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                        }}>
+                          Inatafuta...
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
               )}
-            </div>
-            <div>
-              <div style={{ fontSize: isMobile ? '13px' : '14px', fontWeight: '600', color: '#333' }}>{store.store_name}</div>
-              <div style={{ fontSize: isMobile ? '10px' : '11px', color: '#ff6a00' }}>Anza mazungumzo sasa</div>
-            </div>
-          </div>
-        ))}
-      </div>
-    )}
-    
-    {/* Ongeza loading indicator kwa mobile */}
-    {isSearching && (
-      <div style={{
-        position: 'absolute',
-        top: '100%',
-        left: 0,
-        right: 0,
-        backgroundColor: '#fff',
-        padding: '10px',
-        textAlign: 'center',
-        fontSize: '12px',
-        color: '#666',
-        borderRadius: '8px',
-        marginTop: '5px',
-        zIndex: 1000
-      }}>
-        Inatafuta...
-      </div>
-    )}
-  </div>
-</div>
-             <div className="chat-list" style={{ overflowY: 'auto' }}>
-  {loading ? (
-    <p style={{padding: '20px', textAlign: 'center'}}>Inapakia...</p>
-  ) : chats.length === 0 ? (
-    <>
-      {/* Kwa mobile tu - onyesha button ya kutafuta duka */}
-      {isMobile && (
-        <div style={{
-          padding: '30px 20px',
-          textAlign: 'center'
-        }}>
-          <p style={{ color: '#9ca3af', marginBottom: '20px' }}>Hakuna mazungumzo bado</p>
-          <button 
-            onClick={() => setShowSearchModal(true)}
-            style={{
-              background: '#ff6a00',
-              border: 'none',
-              borderRadius: '30px',
-              padding: '12px 25px',
-              color: 'white',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}
-          >
-            <Search size={18} />
-            Tafuta Duka Kuanza Mazungumzo
-          </button>
-        </div>
-      )}
-      
-      {/* Kwa desktop - onyesha text tu */}
-      {!isMobile && (
-        <p style={{padding: '20px', textAlign: 'center', color: '#9ca3af'}}>Hakuna mazungumzo bado</p>
-      )}
-    </>
-  ) : (
-    chats.map(chat => (
-      <div 
-        key={chat.id} 
-        className={`chat-item ${activeChat?.id === chat.id ? 'active' : ''}`}
-        onClick={() => handleChatSelect(chat)}
-      >
-        <div className="chat-avatar">
-          {chat.avatar ? (
-            <img src={chat.avatar} alt={chat.name} style={{width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover'}} />
-          ) : (
-            <span style={{fontWeight: 'bold', fontSize: '16px'}}>{chat.name[0]?.toUpperCase() || '?'}</span>
-          )}
-        </div>
-        <div className="chat-info">
-          <div className="chat-info-top">
-            <span className="chat-name">{chat.name}</span>
-            <span className="chat-date">{chat.date}</span>
-          </div>
-          <p className="chat-preview">
-            {chat.lastMsg?.length > 40 ? chat.lastMsg.substring(0, 40) + '...' : chat.lastMsg}
-          </p>
-        </div>
-      </div>
-    ))
-  )}
-</div>
-
-{/* SEARCH MODAL - ONLY ON MOBILE */}
-{isMobile && showSearchModal && (
-  <div 
-    onClick={() => {
-      setShowSearchModal(false);
-      setSearchResults([]);
-      setSearchQuery('');
-    }}
-    style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      zIndex: 2000,
-      display: 'flex',
-      alignItems: 'flex-start',
-      justifyContent: 'center',
-      padding: '20px'
-    }}
-  >
-    <div 
-      onClick={(e) => e.stopPropagation()}  // Ongeza hii - inazuia modal isifunge unapobonyeza ndani
-      style={{
-        backgroundColor: '#fff',
-        borderRadius: '16px',
-        width: '100%',
-        maxWidth: '400px',
-        marginTop: '60px',
-        padding: '20px'
-      }}
-    >
-      {/* Rest of your modal content remains the same */}
-      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px'}}>
-        <h3 style={{margin: 0, fontSize: '18px'}}>Tafuta Duka</h3>
-        <button 
-          onClick={() => {
-            setShowSearchModal(false);
-            setSearchResults([]);
-            setSearchQuery('');
-          }} 
-          style={{
-            border: 'none', 
-            background: 'none', 
-            fontSize: '24px', 
-            cursor: 'pointer',
-            color: '#666'
-          }}
-        >
-          ✕
-        </button>
-      </div>
-      
-    {/* The rest of your search input and dropdown remains exactly the same */}
-<div className="search-bar-chat" style={{ position: 'relative' }}>
-  <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #e0e0e0', borderRadius: '25px', padding: '8px 15px' }}>
-    <Search size={18} color="#999" />
-    <input 
-      type="text" 
-      placeholder="Andika jina la duka..."
-      value={searchQuery}
-      onChange={(e) => handleSearchStores(e.target.value)}
-      autoFocus
-      style={{
-        flex: 1,
-        border: 'none',
-        outline: 'none',
-        padding: '8px 10px',
-        fontSize: '14px',
-        background: 'transparent'
-      }}
-    />
-  </div>
-  
-  {/* Dropdown results inside modal */}
-  {searchResults.length > 0 && (
-    <div style={{
-      position: 'absolute',
-      top: '100%',
-      left: 0,
-      right: 0,
-      backgroundColor: '#fff',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-      borderRadius: '8px',
-      zIndex: 100,
-      marginTop: '8px',
-      maxHeight: '300px',
-      overflowY: 'auto',
-      border: '1px solid #eee'
-    }}>
-      {searchResults.map(store => (
-        <div 
-          key={store.owner_id}
-          onClick={() => {
-            handleSelectStoreFromSearch(store);
-            setShowSearchModal(false);
-            setSearchQuery('');
-            setSearchResults([]);
-          }}
-          style={{
-            padding: '12px 15px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            borderBottom: '1px solid #f5f5f5'
-          }}
-        >
-          <div style={{ 
-            width: '35px', height: '35px', borderRadius: '50%', 
-            backgroundColor: '#ff6a00', color: '#fff',
-            display: 'flex', justifyContent: 'center', alignItems: 'center',
-            fontSize: '14px', fontWeight: 'bold'
-          }}>
-            {store.store_logo ? (
-              <img src={store.store_logo} alt="" style={{width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover'}} />
-            ) : (
-              store.store_name[0].toUpperCase()
-            )}
-          </div>
-          <div>
-            <div style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>{store.store_name}</div>
-            <div style={{ fontSize: '11px', color: '#ff6a00' }}>Bonyeza kuanza mazungumzo</div>
-          </div>
-        </div>
-      ))}
-    </div>
-  )}
-  
-  {isSearching && (
-    <div style={{
-      position: 'absolute',
-      top: '100%',
-      left: 0,
-      right: 0,
-      backgroundColor: '#fff',
-      padding: '12px',
-      textAlign: 'center',
-      fontSize: '12px',
-      color: '#666',
-      borderRadius: '8px',
-      marginTop: '5px',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-    }}>
-      Inatafuta...
-    </div>
-  )}
-</div>
-    </div>
-  </div>
-)}
-
             </div>
           )}
 
@@ -822,7 +771,6 @@ useEffect(() => {
                   backgroundColor: '#fff'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    {/* Back button for mobile */}
                     {isMobile && showMobileChat && (
                       <button 
                         onClick={handleBackToChatList}
@@ -850,15 +798,13 @@ useEffect(() => {
                   </div>
                 </div>
                 
-                               <div className="messages-display" style={{ 
+                <div className="messages-display" style={{ 
                   flex: 1, 
                   overflowY: 'auto', 
                   padding: '20px',
                   paddingBottom: isMobile ? 'calc(20px + 70px)' : '20px', 
                   backgroundColor: '#f5f5f7'
                 }}>
-                  
-                  {/* 🔥 MABADILIKO HAPA: Angalia kama kuna ujumbe */}
                   {messages.length === 0 ? (
                     <div style={{ 
                       height: '100%', 
@@ -894,7 +840,6 @@ useEffect(() => {
                       </div>
                     ))
                   )}
-                  
                   <div ref={messagesEndRef} />
                 </div>
 
@@ -941,133 +886,130 @@ useEffect(() => {
         </div>
       </div>
 
-{/* MOBILE BOTTOM NAVIGATION - SAHIHI */}
-{isMobile && (
-  <nav 
-    className="mobile-bottom-nav"
-    style={{
-      position: 'fixed',
-      bottom: 0,
-      left: 0,
-      right: 0,
-      background: 'white',
-      display: 'flex',
-      justifyContent: 'space-around',
-      alignItems: 'center',
-      padding: '10px 0 calc(20px + env(safe-area-inset-bottom, 0px))',
-      borderTop: '1px solid #eee',
-      zIndex: 1000,
-      boxShadow: '0 -2px 10px rgba(0,0,0,0.05)'
-    }}
-  >
-    {/* Home */}
-    <button 
-      onClick={() => navigate('/dashboard')} 
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '4px',
-        background: 'none',
-        border: 'none',
-        cursor: 'pointer',
-        flex: 1,
-        padding: '4px 0'
-      }}
-    >
-      <Home size={22} color={location.pathname === '/dashboard' ? '#ff6600' : '#666'} />
-      <span style={{ fontSize: '10px', color: location.pathname === '/dashboard' ? '#ff6600' : '#666' }}>Home</span>
-    </button>
+      {/* MOBILE BOTTOM NAVIGATION - IMEBADILISHWA KWA SUPPLIER NA CUSTOMER */}
+      {isMobile && (
+        <nav 
+          className="mobile-bottom-nav"
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            background: 'white',
+            display: 'flex',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+            padding: '10px 0 calc(20px + env(safe-area-inset-bottom, 0px))',
+            borderTop: '1px solid #eee',
+            zIndex: 1000,
+            boxShadow: '0 -2px 10px rgba(0,0,0,0.05)'
+          }}
+        >
+          {/* Home - Inabadilika kulingana na role */}
+          <button 
+            onClick={() => navigate(isSupplier ? '/dashboard/sellerboard' : '/dashboard')} 
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '4px',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              flex: 1,
+              padding: '4px 0'
+            }}
+          >
+            <Home size={22} color={location.pathname.startsWith(isSupplier ? '/dashboard/sellerboard' : '/dashboard') ? '#ff6600' : '#666'} />
+            <span style={{ fontSize: '10px', color: location.pathname.startsWith(isSupplier ? '/dashboard/sellerboard' : '/dashboard') ? '#ff6600' : '#666' }}>
+              {isSupplier ? 'Duka' : 'Home'}
+            </span>
+          </button>
 
-    {/* My Orders */}
-    <button 
-      onClick={() => navigate('/dashboard/orders')} 
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '4px',
-        background: 'none',
-        border: 'none',
-        cursor: 'pointer',
-        flex: 1,
-        padding: '4px 0'
-      }}
-    >
-      <ClipboardList size={22} color={location.pathname === '/dashboard/orders' ? '#ff6600' : '#666'} />
-      <span style={{ fontSize: '10px', color: location.pathname === '/dashboard/orders' ? '#ff6600' : '#666' }}>Orders</span>
-    </button>
+          {/* Orders - Supplier inaenda Notifications, Customer inaenda Orders */}
+          <button 
+            onClick={() => navigate(isSupplier ? '/dashboard/notifications' : '/dashboard/orders')} 
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '4px',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              flex: 1,
+              padding: '4px 0'
+            }}
+          >
+            <ClipboardList size={22} color={location.pathname === (isSupplier ? '/dashboard/notifications' : '/dashboard/orders') ? '#ff6600' : '#666'} />
+            <span style={{ fontSize: '10px', color: location.pathname === (isSupplier ? '/dashboard/notifications' : '/dashboard/orders') ? '#ff6600' : '#666' }}>
+              {isSupplier ? 'Oda' : 'Orders'}
+            </span>
+          </button>
 
-    <button 
-  onClick={handleStoreNavigation} // ← Ibadilishe iwe hivi
-  disabled={loading} // ← Inazuia kubonyeza mara nyingi wakati inacheki
-  style={{
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '4px',
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    flex: 1,
-    padding: '4px 0',
-    opacity: loading ? 0.6 : 1 // Inapunguza mwanga wakati inaload
-  }}
->
-  <div style={{ background: '#ff6600', padding: '8px', borderRadius: '50%', marginBottom: '4px' }}>
-    {loading ? (
-      <Loader2 size={24} color="white" className="animate-spin" /> // Ongeza icon ya loading ikiwa unayo
-    ) : (
-      <Plus size={24} color="white" />
-    )}
-  </div>
-  <span style={{ fontSize: '10px', color: '#ff6600', fontWeight: 'bold' }}>
-    {loading ? "Inacheki..." : "Store"}
-  </span>
-</button>
+          {/* Search - Inabaki sawa kwa wote */}
+          <button 
+            onClick={handleSearchNavigation}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '4px',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              flex: 1,
+              padding: '4px 0'
+            }}
+          >
+            <div style={{ background: '#ff6600', padding: '8px', borderRadius: '50%', marginBottom: '4px' }}>
+              <Search size={24} color="white" />
+            </div>
+            <span style={{ fontSize: '10px', color: '#ff6600', fontWeight: 'bold' }}>
+              Search
+            </span>
+          </button>
 
-    {/* Advertise */}
-    <button 
-      onClick={() => navigate('/advertise')} 
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '4px',
-        background: 'none',
-        border: 'none',
-        cursor: 'pointer',
-        flex: 1,
-        padding: '4px 0'
-      }}
-    >
-      <Megaphone size={22} color={location.pathname === '/advertise' ? '#ff6600' : '#666'} />
-      <span style={{ fontSize: '10px', color: location.pathname === '/advertise' ? '#ff6600' : '#666' }}>Ads</span>
-    </button>
+          {/* Advertise - Inabaki sawa kwa wote */}
+          <button 
+            onClick={() => navigate('/advertise')} 
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '4px',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              flex: 1,
+              padding: '4px 0'
+            }}
+          >
+            <Megaphone size={22} color={location.pathname === '/advertise' ? '#ff6600' : '#666'} />
+            <span style={{ fontSize: '10px', color: location.pathname === '/advertise' ? '#ff6600' : '#666' }}>Ads</span>
+          </button>
 
-    {/* Notifications */}
-    <button 
-      onClick={() => navigate('/dashboard/notifications')} 
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '4px',
-        background: 'none',
-        border: 'none',
-        cursor: 'pointer',
-        flex: 1,
-        padding: '4px 0'
-      }}
-    >
-      <Bell size={22} color={location.pathname === '/dashboard/notifications' ? '#ff6600' : '#666'} />
-      <span style={{ fontSize: '10px', color: location.pathname === '/dashboard/notifications' ? '#ff6600' : '#666' }}>Alerts</span>
-    </button>
-  </nav>
-)}
+          {/* Notifications - Inabaki sawa kwa wote (inaenda /dashboard/notifications) */}
+          <button 
+            onClick={() => navigate('/dashboard/notifications')} 
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '4px',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              flex: 1,
+              padding: '4px 0'
+            }}
+          >
+            <Bell size={22} color={location.pathname === '/dashboard/notifications' ? '#ff6600' : '#666'} />
+            <span style={{ fontSize: '10px', color: location.pathname === '/dashboard/notifications' ? '#ff6600' : '#666' }}>Alerts</span>
+          </button>
+        </nav>
+      )}
 
-      {/* Add padding bottom for mobile to avoid content hiding under bottom nav */}
-    {/*   {isMobile && <div style={{ height: '70px' }} />}*/}
     </div>
   );
 };

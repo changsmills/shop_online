@@ -3,14 +3,13 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { 
   LayoutDashboard, MessageSquare, ClipboardList, 
-  Settings, BarChart3, Bell, Search, User, LogOut, ChevronRight, Menu, X, Eye, EyeOff,
-  Camera, Upload, Save, HelpCircle, FileText, Shield, Phone, Mail, Globe, Truck, Store
+  Settings, Bell, Search, User, LogOut, ChevronRight, Menu, X, Eye, EyeOff,
+  Camera, Save, HelpCircle, FileText, Shield, Phone, Mail, Globe, Truck, Store, Home, Megaphone
 } from 'lucide-react';
-import UserTools from '../components/UserTools';
 import toast from 'react-hot-toast';
 import '../AccountSettings.css';
 
-const AccountSettings = ({ session }) => {
+const SupplierAccountSettings = ({ session }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const user = session?.user;
@@ -42,7 +41,6 @@ const AccountSettings = ({ session }) => {
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [emailLoading, setEmailLoading] = useState(false);
-  const [userStoreId, setUserStoreId] = useState(null);
 
   // --- STATE ZA PASSWORD UPDATE ---
   const [isEditingPassword, setIsEditingPassword] = useState(false);
@@ -80,32 +78,6 @@ const AccountSettings = ({ session }) => {
 
     fetchProfile();
   }, [user]);
-
-  // Check if user has a store
-useEffect(() => {
-  const checkUserStore = async () => {
-    if (!user) return;
-    
-    try {
-      const { data: store, error } = await supabase
-        .from('stores_engine')
-        .select('id')
-        .eq('owner_id', user.id)
-        .maybeSingle();
-      
-      if (!error && store) {
-        setUserStoreId(store.id);
-      } else {
-        setUserStoreId(null);
-      }
-    } catch (error) {
-      console.error('Error checking store:', error);
-      setUserStoreId(null);
-    }
-  };
-  
-  checkUserStore();
-}, [user]);
 
   // --- 2. HANDLE AVATAR FILE SELECTION ---
   const handleAvatarChange = (e) => {
@@ -334,15 +306,15 @@ useEffect(() => {
     }
   };
 
+  // ========== 🔥 SIDEBAR KWA MUUZAJI (Supplier) ==========
   const sidebarItems = [
-    { icon: <LayoutDashboard size={20} />, path: '/dashboard', label: 'Dashboard' },
-    { icon: <MessageSquare size={20} />, path: '/dashboard/messages', label: 'Messages' },
-    { icon: <ClipboardList size={20} />, path: '/dashboard/orders', label: 'Orders' },
-    { icon: <BarChart3 size={20} />, path: '/dashboard/analytics', label: 'Analytics' },
-    { icon: <Settings size={20} />, path: '/dashboard/settings', label: 'Settings' },
+    { icon: <LayoutDashboard size={20} />, path: '/dashboard/sellerboard', label: 'Duka Lako' },
+    { icon: <MessageSquare size={20} />, path: '/dashboard/supplier-messages', label: 'Ujumbe' },
+    { icon: <ClipboardList size={20} />, path: '/dashboard/supplier-notifications', label: 'Arifa (Oda)' },
+    { icon: <Settings size={20} />, path: '/dashboard/supplier-settings', label: 'Mipangilio' }, // Mipangilio iko kwenye sellerboard
   ];
 
-  // ========== HELPFUL LINKS (LIST YA VIUNGO KWA MAELEZO) ==========
+  // ========== HELPFUL LINKS (Inabaki sawa) ==========
   const helpfulLinks = [
     { icon: <HelpCircle size={18} />, title: 'Help Center', path: '/help-center' },
     { icon: <FileText size={18} />, title: 'Tutorials', path: '/tutorials' },
@@ -353,60 +325,56 @@ useEffect(() => {
     { icon: <Truck size={18} />, title: 'Shipping Info', path: '/shipping-info' },
     { icon: <FileText size={18} />, title: 'Refund Policy', path: '/refund-policy' },
     { icon: <Globe size={18} />, title: 'About Skyfall', path: '/about-skyfall' },
-    { icon: <FileText size={18} />, title: 'How to Buy', path: '/how-to-buy' },
-  
   ];
 
   return (
     <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       
-{/* HEADER */}
-<header className="dashboard-header" style={{ 
-  display: 'flex', 
-  justifyContent: 'space-between', 
-  alignItems: 'center',
-  padding: isMobile ? '10px 16px' : '10px 24px', 
-  borderBottom: '1px solid #eee', 
-  backgroundColor: '#fff',
-  zIndex: 100 
-}}>
-  <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '10px' : '15px' }}>
-    {/* Menu - Desktop TU, Mobile HAPANA */}
-    {!isMobile && (
-      <Menu 
-        size={22} 
-        style={{ cursor: 'pointer', color: '#666' }} 
-        onClick={() => setIsExpanded(!isExpanded)} 
-      />
-    )}
-    
-    <Link to="/dashboard" style={{ fontSize: isMobile ? '20px' : '20px', fontWeight: '800', color: '#ff6a00', textDecoration: 'none' }}>
-      Skyfall.com
-    </Link>
-    
-    {/* Search - Desktop TU, Mobile HAPANA */}
-    {!isMobile && (
-      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', backgroundColor: '#f4f4f4', padding: '6px 12px', borderRadius: '8px', marginLeft: '10px' }}>
-        <Search size={16} color="#999" />
-        <input type="text" placeholder="Search in cart..." style={{ border: 'none', background: 'none', outline: 'none', marginLeft: '8px', fontSize: '14px' }} />
-      </div>
-    )}
-  </div>
+      {/* HEADER (Imebadilishwa link ya nyumbani) */}
+      <header className="dashboard-header" style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        padding: isMobile ? '10px 16px' : '10px 24px', 
+        borderBottom: '1px solid #eee', 
+        backgroundColor: '#fff',
+        zIndex: 100 
+      }}>
+        <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '10px' : '15px' }}>
+          {!isMobile && (
+            <Menu 
+              size={22} 
+              style={{ cursor: 'pointer', color: '#666' }} 
+              onClick={() => setIsExpanded(!isExpanded)} 
+            />
+          )}
+          
+          <Link to="/dashboard/sellerboard" style={{ fontSize: isMobile ? '20px' : '20px', fontWeight: '800', color: '#ff6a00', textDecoration: 'none' }}>
+            Skyfall.com
+          </Link>
+          
+          {!isMobile && (
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', backgroundColor: '#f4f4f4', padding: '6px 12px', borderRadius: '8px', marginLeft: '10px' }}>
+              <Search size={16} color="#999" />
+              <input type="text" placeholder="Search..." style={{ border: 'none', background: 'none', outline: 'none', marginLeft: '8px', fontSize: '14px' }} />
+            </div>
+          )}
+        </div>
 
-  {/* Bell na UserTools - Desktop TU, Mobile HAPANA */}
-  <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-    {!isMobile && (
-      <>
-        <Bell size={20} style={{ cursor: 'pointer', color: '#666' }} />
-        <UserTools session={session} />
-      </>
-    )}
-  </div>
-</header>
+        {/* 🔥 MABADILIKO: Imeondoa UserTools hapa */}
+        <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          {!isMobile && (
+            <>
+              <Bell size={20} style={{ cursor: 'pointer', color: '#666' }} />
+              {/* UserTools imeondolewa kabisa! */}
+            </>
+          )}
+        </div>
+      </header>
 
       <div className="dashboard-main" style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         
-        {/* SIDEBAR - Hide on mobile */}
+        {/* SIDEBAR - Supplier Version */}
         {!isMobile && (
           <aside 
             onMouseEnter={() => setIsExpanded(true)} 
@@ -578,7 +546,38 @@ useEffect(() => {
               </div>
             </div>
 
-            {/* ========== SEHEMU YA HELPFUL LINKS (CHINI KABISA) ========== */}
+            {/* 🔥 STORE SECTION - INAELEKEZA KWENYE SELLERBOARD */}
+            <div className="store-section" style={{ marginTop: '32px' }}>
+              <div 
+                onClick={() => navigate('/dashboard/sellerboard')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '16px 20px',
+                  backgroundColor: '#fff5ed',
+                  borderRadius: '12px',
+                  border: '1px solid #ff6a00',
+                  cursor: 'pointer',
+                  marginBottom: '20px'
+                }}
+              >
+                <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#ff6a00', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+                  <Store size={20} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <span style={{ fontSize: '15px', fontWeight: '700', color: '#ff6a00' }}>
+                    Rudi kwenye Duka Lako
+                  </span>
+                  <p style={{ fontSize: '12px', color: '#666', margin: '4px 0 0' }}>
+                    Dhibiti bidhaa, oda na taarifa za duka lako
+                  </p>
+                </div>
+                <ChevronRight size={18} color="#ff6a00" />
+              </div>
+            </div>
+
+            {/* HELP & INFORMATION */}
             <div className="helpful-links-section" style={{ marginTop: '32px' }}>
               <h3 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '16px', color: '#333', paddingLeft: '4px' }}>
                 Help & Information
@@ -620,43 +619,44 @@ useEffect(() => {
                   </div>
                 ))}
               </div>
-              {/* ========== SIGN OUT BUTTON - WEKA HAPA CHINI YA STORE SECTION ========== */}
-<div style={{ marginTop: '24px' }}>
-  <button
-    onClick={async () => {
-      await supabase.auth.signOut();
-      navigate('/');
-      toast.success('Umefanikiwa kutoka!');
-    }}
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: '12px',
-       width: 'auto',
-      padding: '14px 20px',
-      backgroundColor: '#fff',
-      border: '1px solid #ff4d4f',
-      borderRadius: '12px',
-      color: '#ff4d4f',
-      fontWeight: '600',
-      fontSize: '14px',
-      cursor: 'pointer',
-      transition: 'all 0.2s ease'
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.backgroundColor = '#ff4d4f';
-      e.currentTarget.style.color = '#fff';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.backgroundColor = '#fff';
-      e.currentTarget.style.color = '#ff4d4f';
-    }}
-  >
-    <LogOut size={18} />
-    Sign Out
-  </button>
-</div>
+
+              {/* SIGN OUT BUTTON */}
+              <div style={{ marginTop: '24px' }}>
+                <button
+                  onClick={async () => {
+                    await supabase.auth.signOut();
+                    navigate('/');
+                    toast.success('Umefanikiwa kutoka!');
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '12px',
+                    width: 'auto',
+                    padding: '14px 20px',
+                    backgroundColor: '#fff',
+                    border: '1px solid #ff4d4f',
+                    borderRadius: '12px',
+                    color: '#ff4d4f',
+                    fontWeight: '600',
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#ff4d4f';
+                    e.currentTarget.style.color = '#fff';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#fff';
+                    e.currentTarget.style.color = '#ff4d4f';
+                  }}
+                >
+                  <LogOut size={18} />
+                  Sign Out
+                </button>
+              </div>
               
               {/* Simple footer */}
               <div style={{ textAlign: 'center', marginTop: '24px', padding: '16px' }}>
@@ -669,19 +669,38 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* EDIT PROFILE MODAL */}
+      {/* 🔥 MOBILE BOTTOM NAV - SUPPLIER VERSION (Imeongezwa hapa!) */}
+      {isMobile && (
+        <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'white', display: 'flex', justifyContent: 'space-around', alignItems: 'center', padding: '10px 0 20px', borderTop: '1px solid #eee', zIndex: 1000 }}>
+          <button onClick={() => navigate('/dashboard/sellerboard')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', flex: 1 }}>
+            <Home size={22} color={location.pathname.startsWith('/dashboard/sellerboard') ? '#ff6600' : '#666'} />
+            <span style={{ fontSize: '10px', color: location.pathname.startsWith('/dashboard/sellerboard') ? '#ff6600' : '#666' }}>Duka</span>
+          </button>
+          <button onClick={() => navigate('/dashboard/supplier-notifications')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', flex: 1 }}>
+            <ClipboardList size={22} color={location.pathname === '/dashboard/supplier-notifications' ? '#ff6600' : '#666'} />
+            <span style={{ fontSize: '10px', color: location.pathname === '/dashboard/supplier-notifications' ? '#ff6600' : '#666' }}>Oda</span>
+          </button>
+          <button onClick={() => navigate('/advertise')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', flex: 1 }}>
+            <Megaphone size={22} color={location.pathname === '/advertise' ? '#ff6600' : '#666'} />
+            <span style={{ fontSize: '10px', color: location.pathname === '/advertise' ? '#ff6600' : '#666' }}>Ads</span>
+          </button>
+          <button onClick={() => navigate('/dashboard/supplier-notifications')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', flex: 1 }}>
+            <Bell size={22} color={location.pathname === '/dashboard/supplier-notifications' ? '#ff6600' : '#666'} />
+            <span style={{ fontSize: '10px', color: location.pathname === '/dashboard/supplier-notifications' ? '#ff6600' : '#666' }}>Arifa</span>
+          </button>
+        </nav>
+      )}
+
+      {/* EDIT PROFILE MODAL (Inabaki sawa) */}
       {isEditingProfile && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ backgroundColor: '#fff', borderRadius: '16px', width: '90%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' }}>
-            
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px', borderBottom: '1px solid #eee' }}>
               <h3 style={{ margin: 0 }}>Edit Profile</h3>
               <button onClick={() => { setIsEditingProfile(false); setAvatarFile(null); if(avatarPreview) URL.revokeObjectURL(avatarPreview); }} 
                 style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
             </div>
-            
             <div style={{ padding: '20px' }}>
-              {/* AVATAR UPLOAD */}
               <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                 <div style={{ position: 'relative', display: 'inline-block' }}>
                   <div style={{ width: '100px', height: '100px', borderRadius: '50%', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
@@ -698,29 +717,21 @@ useEffect(() => {
                 </div>
                 <p style={{ fontSize: '12px', color: '#999', marginTop: '8px' }}>Bonyeza kamera kubadilisha picha</p>
               </div>
-              
-              {/* FULL NAME */}
               <div style={{ marginBottom: '15px' }}>
                 <label style={{ display: 'block', marginBottom: '5px', fontWeight: '600', fontSize: '14px' }}>Full Name *</label>
                 <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} 
                   style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd' }} />
               </div>
-              
-              {/* USERNAME */}
               <div style={{ marginBottom: '15px' }}>
                 <label style={{ display: 'block', marginBottom: '5px', fontWeight: '600', fontSize: '14px' }}>Username</label>
                 <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} 
                   style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd' }} />
               </div>
-              
-              {/* BIO */}
               <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', marginBottom: '5px', fontWeight: '600', fontSize: '14px' }}>Bio</label>
                 <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows="3"
                   style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', resize: 'vertical' }} />
               </div>
-              
-              {/* BUTTONS */}
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
                 <button onClick={() => { setIsEditingProfile(false); setAvatarFile(null); if(avatarPreview) URL.revokeObjectURL(avatarPreview); }} 
                   style={{ padding: '10px 20px', backgroundColor: '#f5f5f5', border: '1px solid #ddd', borderRadius: '8px', cursor: 'pointer' }}>Cancel</button>
@@ -737,4 +748,4 @@ useEffect(() => {
   );
 };
 
-export default AccountSettings;
+export default SupplierAccountSettings;

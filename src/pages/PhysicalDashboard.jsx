@@ -10,7 +10,7 @@ import StoreManagement from '../components/StoreManagement';
 import ProductCreationFlow from '../components/ProductCreationFlow';
 import {
   Edit3, Rocket, X, CheckCircle, Plus,
-  LayoutDashboard, Package, Box, BarChart3, Store, Megaphone, Menu, Bell, User,TrendingUp
+  LayoutDashboard, Package, Box, BarChart3, Store, Megaphone, Menu, Bell, User,TrendingUp,LogOut,MessageSquare, Settings, ClipboardList
 } from 'lucide-react';
 import ReactDOM from 'react-dom';
 
@@ -18,7 +18,6 @@ export default function PhysicalDashboard() {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  // --- UI STATES ---
   const [isManageMode, setIsManageMode] = useState(false);
   const [showCategoryManager, setShowCategoryManager] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
@@ -39,6 +38,9 @@ export default function PhysicalDashboard() {
   const [editingProductId, setEditingProductId] = useState(null);
   const [addedProducts, setAddedProducts] = useState([]);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    // --- HEADER STATES (MPYA) ---
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(0);
 
   // --- FORM STATES ---
   const [storeMeta, setStoreMeta] = useState({
@@ -93,6 +95,41 @@ export default function PhysicalDashboard() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+    // 🔥 HESABU UJUMBE AMBAO HAJASOMWA (Kutoka kwa wateja)
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchUnreadMessages = async () => {
+      const { data, error } = await supabase
+        .from('messages')
+        .select('id', { count: 'exact', head: true })
+        .eq('receiver_id', id)  // Ni ujumbe uliotumiwa kwa supplier huyu
+        .eq('is_read', false);   // Ambao bado hajasomwa
+
+      if (!error && data) {
+        setUnreadMessages(data.length);
+      }
+    };
+
+    fetchUnreadMessages();
+
+    // Sikiliza mabadiliko ya wakati halisi (Realtime)
+    const channel = supabase
+      .channel('supplier_messages')
+      .on('postgres_changes', 
+        { event: 'INSERT', schema: 'public', table: 'messages', filter: `receiver_id=eq.${id}` },
+        (payload) => {
+          // Kama ujumbe mpya umefika kwa supplier huyu, ongeza idadi
+          setUnreadMessages(prev => prev + 1);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [id]);
 
   // --- RESET FORM ---
   const resetProductForm = () => {
@@ -360,6 +397,14 @@ export default function PhysicalDashboard() {
     }
   };
 
+
+    const handleLogout = async () => {
+    if (window.confirm("Je, una uhakika unataka kutoka (Logout)?")) {
+      await supabase.auth.signOut();
+      navigate('/dashboard/login', { replace: true });
+    }
+  };
+
   // --- SIDEBAR MENU ---
   const menuItems = [
     { id: 'overview', label: 'Duka Lako', icon: <LayoutDashboard size={20} /> },
@@ -367,8 +412,10 @@ export default function PhysicalDashboard() {
     { id: 'inventory', label: 'Inventory', icon: <Box size={20} /> },
     { id: 'offers', label: 'Punguzo (Offers)', icon: <TrendingUp size={20} /> }, 
     { id: 'analytics', label: 'Takwimu', icon: <BarChart3 size={20} /> },
-    { id: 'store-settings', label: 'Mipangilio ya Duka', icon: <Store size={20} /> },
+    { id: 'settings', label: 'Mipangilio ya Akaunti', icon: <Settings size={20} /> },
     { id: 'advertise', label: 'Matangazo', icon: <Megaphone size={20} /> },
+    { id: 'logout', label: 'Toka (Logout)', icon: <LogOut size={20} /> },
+
   ];
 
   // ------------------------------------------------------------------------
@@ -376,8 +423,8 @@ export default function PhysicalDashboard() {
   // ------------------------------------------------------------------------
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      
-      {/* HEADER MPYA YA SUPPLIER */}
+
+             {/* HEADER MPYA YA SUPPLIER (ILIYOBORESHA) */}
       <header style={{
         height: '70px',
         background: 'white',
@@ -404,20 +451,165 @@ export default function PhysicalDashboard() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <button style={{ width: '36px', height: '36px', borderRadius: '50%', border: 'none', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4b5563', cursor: 'pointer' }}>
-            <Bell size={20} />
-          </button>
-          <button style={{ width: '36px', height: '36px', borderRadius: '50%', border: 'none', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4b5563', cursor: 'pointer' }}>
-            <User size={20} />
-          </button>
+        {/* UJUMBE WA KARIBU KATIKATI (Desktop tu) */}
+        <div style={{
+          flex: 1,
+          display: isMobile ? 'none' : 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '0 20px'
+        }}>
+          <span style={{
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#6b7280',
+            letterSpacing: '0.5px'
+          }}>
+            Karibu kwenye Skyfall.com
+          </span>
+        </div>
+
+        {/* SEHEMU YA KULIA (ICONS) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', position: 'relative' }}>
+          
+          {/* 🔥 1. ARIFA (NOTIFICATIONS) */}
+          <div 
+            style={{ position: 'relative', cursor: 'pointer', transition: 'transform 0.2s ease' }}
+            onClick={() => navigate('/dashboard/supplier-notifications')}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            <Bell size={20} color="#4b5563" />
+          </div>
+
+          {/* 🔥 2. ODA ZA WATEJA (SUPPLIER ORDERS) - ICON MPYA IMEONGEWA HAPA! */}
+          <div 
+            style={{ position: 'relative', cursor: 'pointer', transition: 'transform 0.2s ease' }}
+            onClick={() => navigate('/dashboard/supplier-orders')}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            <ClipboardList size={20} color="#4b5563" />
+          </div>
+
+          {/* 🔥 3. UJUMBE (MESSAGES) */}
+          <div 
+            style={{ position: 'relative', cursor: 'pointer', transition: 'transform 0.2s ease' }}
+            onClick={() => navigate('/dashboard/supplier-messages')}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            <MessageSquare size={20} color="#4b5563" />
+            
+            {/* Badge ya idadi ya ujumbe mpya (kwenye chat) */}
+            {unreadMessages > 0 && (
+              <span style={{
+                position: 'absolute',
+                top: '-6px',
+                right: '-6px',
+                backgroundColor: '#ef4444',
+                color: 'white',
+                borderRadius: '50%',
+                width: '18px',
+                height: '18px',
+                fontSize: '10px',
+                fontWeight: 'bold',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '2px solid white'
+              }}>
+                {unreadMessages > 9 ? '9+' : unreadMessages}
+              </span>
+            )}
+          </div>
+
+          {/* 🔥 4. IKON YA USER / ACCOUNT (Dropdown) */}
+          <div style={{ position: 'relative' }}>
+            <button 
+              onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                border: 'none',
+                background: '#f97316',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                cursor: 'pointer',
+                transition: 'transform 0.2s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            >
+              <span style={{ fontWeight: 'bold', fontSize: '16px' }}>
+                {myStore?.store_name ? myStore.store_name.charAt(0).toUpperCase() : 'U'}
+              </span>
+            </button>
+
+            {/* MENU YA ACCOUNT */}
+            {isAccountMenuOpen && (
+              <div style={{
+                position: 'absolute',
+                top: '55px',
+                right: '0',
+                width: '240px',
+                backgroundColor: 'white',
+                borderRadius: '16px',
+                boxShadow: '0 20px 35px rgba(0,0,0,0.15)',
+                border: '1px solid #f3f4f6',
+                padding: '12px 0',
+                zIndex: 200,
+                overflow: 'hidden'
+              }}>
+                <div style={{ padding: '12px 16px 16px 16px', borderBottom: '1px solid #f3f4f6' }}>
+                  <p style={{ fontWeight: 'bold', fontSize: '14px', margin: 0, color: '#1f2937' }}>
+                    {myStore?.store_name || "Jina la Duka"}
+                  </p>
+                  <p style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0 0 0', wordBreak: 'break-all' }}>
+                    {myStore?.email || "supplier@skyfall.com"}
+                  </p>
+                </div>
+                
+                <div style={{ padding: '8px 0' }}>
+                  <div 
+                    onClick={() => navigate('/dashboard/messages')}
+                    style={{ padding: '10px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', color: '#374151', fontSize: '14px' }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  >
+                    <MessageSquare size={16} /> Ujumbe
+                    {unreadMessages > 0 && (
+                      <span style={{ marginLeft: 'auto', backgroundColor: '#ef4444', color: 'white', fontSize: '10px', padding: '2px 8px', borderRadius: '10px' }}>
+                        {unreadMessages}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ borderTop: '1px solid #f3f4f6', padding: '8px 0' }}>
+                  <div 
+                    onClick={handleLogout}
+                    style={{ padding: '10px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', color: '#ef4444', fontSize: '14px', fontWeight: '500' }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#fef2f2'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  >
+                    <LogOut size={16} /> Toka (Logout)
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
         </div>
       </header>
 
       {/* CONTAINER KUU */}
       <div style={{ display: 'flex', flexDirection: 'row', height: 'calc(100vh - 70px)' }}>
         
-        {/* SIDEBAR */}
+               {/* SIDEBAR */}
         <aside style={{
           width: isMobile ? '280px' : '260px',
           background: 'white',
@@ -431,10 +623,10 @@ export default function PhysicalDashboard() {
           ...(isMobile && {
             position: 'fixed',
             left: 0,
-            top: '70px',
+            top:'70px',
             height: 'calc(100vh - 70px)',
             width: '280px',
-            zIndex: 999,
+            zIndex: 9997,
             boxShadow: '2px 0 10px rgba(0,0,0,0.1)'
           })
         }}>
@@ -449,9 +641,20 @@ export default function PhysicalDashboard() {
                 <li
                   key={item.id}
                   onClick={() => {
-                    setActiveTab(item.id);
-                    if (isMobile) setIsSidebarOpen(false);
-                  }}
+  // 🔥 MABADILIKO: Ikiwa ni Logout, toa nje
+  if (item.id === 'logout') {
+    handleLogout();
+  } 
+  // 🔥 MABADILIKO: Ikiwa ni Settings, elekeza kwenye ukurasa wa Mipangilio ya Muuzaji
+  else if (item.id === 'settings') {
+    navigate('/dashboard/supplier-settings');
+  } 
+  // Vinginevyo, badilisha Tab pekee
+  else {
+    setActiveTab(item.id);
+    if (isMobile) setIsSidebarOpen(false);
+  }
+}}
                   onMouseEnter={() => setHoveredSidebarItem(item.id)}
                   onMouseLeave={() => setHoveredSidebarItem(null)}
                   style={{
@@ -461,11 +664,13 @@ export default function PhysicalDashboard() {
                     borderRadius: '14px',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
-                    color: isActive ? '#ea580c' : (isHovered ? '#374151' : '#6b7280'),
+                    // 🔥 MABADILIKO HAPA: Logout iwe na rangi nyekundu (kwa usalama) au iwe kama zingine
+                    color: item.id === 'logout' ? '#ef4444' : (isActive ? '#ea580c' : (isHovered ? '#374151' : '#6b7280')),
                     fontWeight: 600,
                     fontSize: '14px',
                     marginBottom: '4px',
-                    backgroundColor: isActive ? '#fff7ed' : (isHovered ? '#f9fafb' : 'transparent'),
+                    // 🔥 MABADILIKO HAPA: Logout ikiguswa iwe na background nyekundu hafifu
+                    backgroundColor: item.id === 'logout' && isHovered ? '#fef2f2' : (isActive ? '#fff7ed' : (isHovered ? '#f9fafb' : 'transparent')),
                     border: isActive ? '1px solid #ffedd5' : 'none'
                   }}
                 >
@@ -482,45 +687,59 @@ export default function PhysicalDashboard() {
           <div style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '80px' }}>
             
             {/* --- TAB 1: OVERVIEW (Sasa ni Nadhifu) --- */}
-            <div style={{ display: activeTab === 'overview' ? 'block' : 'none' }}>
-              <StoreHeader
-                myStore={myStore}
-                bannerPreview={bannerPreview}
-                setBannerFile={setBannerFile}
-                setBannerPreview={setBannerPreview}
-                logoPreview={logoPreview}
-                setLogoFile={setLogoFile}
-                setLogoPreview={setLogoPreview}
-              />
-              <section style={{ marginBottom: '16px', marginTop: '16px' }}>
-                <BusinessAnalytics products={myProducts} sellerId={myStore?.id} />
-                <div
-                  onClick={() => navigate('/advertise')}
-                  style={{
-                    background: 'linear-gradient(135deg, #ff4e00 0%, #ec2f4b 100%)',
-                    borderRadius: '20px',
-                    padding: '20px',
-                    color: 'white',
-                    cursor: 'pointer',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    marginTop: '16px'
-                  }}
-                >
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Rocket size={20} />
-                      <b>ONGEZA MAUZO LEO!</b>
-                    </div>
-                    <p style={{ fontSize: '12px', opacity: 0.9, margin: '4px 0 0 0' }}>Weka bidhaa zako mbele ya maelfu ya wateja sasa.</p>
-                  </div>
-                  <button style={{ backgroundColor: 'white', color: '#ff4e00', padding: '10px 20px', borderRadius: '12px', fontWeight: 'bold', border: 'none' }}>TANGAA SASA 🚀</button>
-                </div>
-              </section>
-            </div>
+{/* --- TAB 1: OVERVIEW --- */}
+<div style={{ display: activeTab === 'overview' ? 'block' : 'none' }}>
+  
+  {/* Container inayoshikilia StoreHeader na Logo zake */}
+  <div style={{ 
+    position: 'relative', 
+    zIndex: 9998,
+    // 🔥 HAPA NDIYO SULUHISHO: Tunahamisha marginBottom hapa
+    marginBottom: isMobile ? '45px' : '60px'
+  }}>  
+    <StoreHeader
+      myStore={myStore}
+      bannerPreview={bannerPreview}
+      setBannerFile={setBannerFile}
+      setBannerPreview={setBannerPreview}
+      logoPreview={logoPreview}
+      setLogoFile={setLogoFile}
+      setLogoPreview={setLogoPreview}
+    />
+  </div>
+
+  {/* 🔥 Logo inaweza kuwekwa hapa kwa kutumia position absolute, au ndani ya StoreHeader ikiwa imebaki */}
+  {/* ... logo yako ikiwa haiko ndani ya StoreHeader ... */}
+
+  <section style={{ marginBottom: '16px', marginTop: '16px' }}>
+    <BusinessAnalytics products={myProducts} sellerId={myStore?.id} />
+    <div
+      onClick={() => navigate('/advertise')}
+      style={{
+        background: 'linear-gradient(135deg, #ff4e00 0%, #ec2f4b 100%)',
+        borderRadius: '20px',
+        padding: '20px',
+        color: 'white',
+        cursor: 'pointer',
+        position: 'relative',
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginTop: '16px'
+      }}
+    >
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Rocket size={20} />
+          <b>ONGEZA MAUZO LEO!</b>
+        </div>
+        <p style={{ fontSize: '12px', opacity: 0.9, margin: '4px 0 0 0' }}>Weka bidhaa zako mbele ya maelfu ya wateja sasa.</p>
+      </div>
+      <button style={{ backgroundColor: 'white', color: '#ff4e00', padding: '10px 20px', borderRadius: '12px', fontWeight: 'bold', border: 'none' }}>TANGAA SASA 🚀</button>
+    </div>
+  </section>
+</div>
 
             {/* --- TAB 2: PRODUCTS --- */}
             <div style={{ display: activeTab === 'products' ? 'block' : 'none' }}>
