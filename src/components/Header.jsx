@@ -221,14 +221,14 @@ const Header = () => {
             <SearchBar search={search} setSearch={setSearch} />
           </div>
 
-          {/* 3. Vifaa vya Kulia (Location, UserTools, Globe) */}
+                    {/* 3. Vifaa vya Kulia (Location, UserTools, Globe) */}
           <div 
             className="user-tools-group" 
             style={{ 
               display: 'flex', 
               alignItems: 'center', 
               gap: isMobile ? '6px' : '12px',
-              flexShrink: 0 /* 🔥 IMEONGEZWA: Inazuia vifaa visivunjwe na search kubwa */
+              flexShrink: 0
             }}
           >
             {/* LOCATION SELECTOR */}
@@ -246,8 +246,10 @@ const Header = () => {
               {isLocationOpen && <LocationDropdown />}
             </div>
 
-            {/* USER TOOLS (CART, PROFILE, ETC) */}
-            <UserTools isMobile={isMobile} />
+            {/* ✨ BADILISHA HAPA: Weka !isMobile ili isionekane kwenye Mobile! */}
+            {!isMobile && (
+              <UserTools isMobile={isMobile} />
+            )}
 
             {/* GLOBE - LUUGHA NA SARAFU */}
             <div ref={dropdownRef} style={{ position: 'relative' }}>
@@ -266,7 +268,7 @@ const Header = () => {
           </div>
         </div>
 
-        {/* ==========================================
+                {/* ==========================================
             NAV LINKS - RESPONSIVE (Desktop & Mobile)
            ========================================== */}
         <div className="header-navigation-row" key={language}>

@@ -123,7 +123,7 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
         margin: isMobile ? '2px 0' : '10px 0'
       }}
     >
-     {/* Header Section */}
+{/* Header Section */}
 <div style={{ 
   display: 'flex', 
   justifyContent: 'space-between', 
@@ -141,26 +141,38 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
       marginBottom: isMobile ? '2px' : '8px' 
     }}>
       <Sparkles size={isMobile ? 12 : 24} style={{ color: '#eab308' }} />
-     <h2 style={{ 
-  fontSize: isMobile ? '13px' : '24px', 
-  fontWeight: 'bold', 
-  margin: 0,
-  lineHeight: isMobile ? '1.3' : '1.4'
-}}>
-  {t('new_arrivals')} {selectedCategory && `${t('in')} ${getCategoryDisplayName(selectedCategory)}`}
-</h2>
+      
+      {/* ✅ MABADILIKO: Kichwa kimebadilishwa kuwa rahisi */}
+      <h2 style={{ 
+        fontSize: isMobile ? '13px' : '24px', 
+        fontWeight: 'bold', 
+        margin: 0,
+        lineHeight: isMobile ? '1.3' : '1.4'
+      }}>
+        {selectedCategory ? (
+          `${t('new_arrivals')} ${t('in')} ${getCategoryDisplayName(selectedCategory)}`
+        ) : (
+          t('new_arrivals')
+        )}
+      </h2>
     </div>
+
+    {/* ✅ MABADILIKO: Subtitle inaendana na kichwa */}
     <p style={{ 
-  margin: 0, 
-  color: '#888',
-  fontSize: isMobile ? '9px' : '16px',
-  lineHeight: isMobile ? '1.2' : '1.5'
-}}>
-  {t('discover_latest_arrivals')}
-  {selectedCategory && ` ${t('in')} ${getCategoryDisplayName(selectedCategory)}`}
-</p>
+      margin: 0, 
+      color: '#888',
+      fontSize: isMobile ? '9px' : '16px',
+      lineHeight: isMobile ? '1.2' : '1.5'
+    }}>
+      {selectedCategory ? (
+        `${t('discover_latest_arrivals')} ${t('in')} ${getCategoryDisplayName(selectedCategory)}`
+      ) : (
+        t('discover_latest_arrivals')
+      )}
+    </p>
   </div>
   
+  {/* Button inabaki sawa */}
   <button 
     onClick={() => navigate('/products', { 
       state: { 
