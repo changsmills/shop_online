@@ -90,7 +90,9 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
         // ✅ 3. Pembe za duara kidogo kwa kontena zima
         borderRadius: isMobile ? '8px' : '16px',
         margin: isMobile ? '2px 0' : '10px 0',
-        paddingBottom: isMobile ? '45px' : '30px'
+        paddingBottom: isMobile ? '45px' : '30px',
+        marginBottom: isMobile ? '65px' : '10px'
+
 
       }}
     >
