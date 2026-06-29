@@ -251,7 +251,7 @@ function App() {
   if (loading) return (
     <div className="flex flex-col items-center justify-center h-screen space-y-4">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
-      <p className="text-gray-500 font-medium">Inatambua akaunti yako...</p>
+      <p className="text-gray-500 font-medium">please wait...</p>
     </div>
   );
 
