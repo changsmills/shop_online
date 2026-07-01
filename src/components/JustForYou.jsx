@@ -189,11 +189,10 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
     price={item.price}
     originalPrice={item.original_price}
     isMobile={isMobile}
-    // --- HAPA NDIYO PANAPOKOSEKANA ---
-    moq={item.moq}                   // Inatoka kwenye database column 'moq'
-    subtitle={item.store_address}    // Au column yoyote ya eneo (Location)
-    categoryName={item.category_name} // Jina la kundi la bidhaa
-    isTopDeal={true}                 // Lazima iwe true ili bei ionekane kama isStore ipo
+    moq={item.moq}                   
+    subtitle={item.store_address}    
+    categoryName={item.category_name} 
+    isTopDeal={true}                 
     views={item.views}
                 onClick={() => navigate('/products', { 
                   state: { 

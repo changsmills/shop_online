@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as LucideIcons from 'lucide-react';
 
 const SkyfallBusinessPage = () => {
   const navigate = useNavigate();
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile screen
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Navigation handlers
   const handleStartSelling = () => {
@@ -11,7 +20,6 @@ const SkyfallBusinessPage = () => {
   };
 
   const handleLearnMore = () => {
-    // Scroll to steps section au navigate to about page
     const stepsSection = document.getElementById('steps-section');
     if (stepsSection) {
       stepsSection.scrollIntoView({ behavior: 'smooth' });
@@ -27,37 +35,65 @@ const SkyfallBusinessPage = () => {
   };
 
   return (
-    <div style={{ fontFamily: "'Inter', sans-serif", color: '#333', backgroundColor: '#fff' }}>
+    <div style={{ 
+      fontFamily: "'Inter', sans-serif", 
+      color: '#333', 
+      backgroundColor: '#fff',
+      overflowX: 'hidden'
+    }}>
       
-      {/* 1. HERO SECTION */}
+      {/* ============================================
+      1. HERO SECTION - RESPONSIVE
+      ============================================ */}
       <section style={{ 
-        padding: '80px 10% 60px 10%', 
+        padding: isMobile ? '40px 5%' : '80px 10%',
+        paddingBottom: isMobile ? '40px' : '60px',
         background: 'linear-gradient(135deg, #fff7f2 0%, #ffffff 100%)',
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
+        display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
         alignItems: 'center',
-        gap: '40px'
+        gap: isMobile ? '30px' : '40px'
       }}>
-        <div>
-          <h1 style={{ fontSize: '48px', fontWeight: '800', lineHeight: '1.1', color: '#111', marginBottom: '20px' }}>
+        {/* Left Content */}
+        <div style={{ flex: 1 }}>
+          <h1 style={{ 
+            fontSize: isMobile ? '28px' : '48px', 
+            fontWeight: '800', 
+            lineHeight: '1.1', 
+            color: '#111', 
+            marginBottom: isMobile ? '15px' : '20px' 
+          }}>
             Skyfall ni nini? <br/>
             <span style={{ color: '#ff6a00' }}>Soko Kuu la Kidijitali Tanzania.</span>
           </h1>
-          <p style={{ fontSize: '18px', color: '#666', lineHeight: '1.6', marginBottom: '30px', maxWidth: '500px' }}>
+          <p style={{ 
+            fontSize: isMobile ? '15px' : '18px', 
+            color: '#666', 
+            lineHeight: '1.6', 
+            marginBottom: isMobile ? '20px' : '30px',
+            maxWidth: '500px'
+          }}>
             Skyfall ni jukwaa la kibiashara linalounganisha wauzaji wa jumla na rejareja nchi nzima. Tunarahisisha biashara kwa kukupa teknolojia ya kisasa ya kuwafikia wateja wengi zaidi.
           </p>
-          <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+          
+          <div style={{ 
+            display: 'flex', 
+            gap: isMobile ? '10px' : '15px', 
+            flexWrap: 'wrap',
+            flexDirection: isMobile ? 'column' : 'row'
+          }}>
             <button 
               onClick={handleStartSelling}
               style={{ 
                 backgroundColor: '#ff6a00', 
                 color: 'white', 
-                padding: '15px 30px', 
+                padding: isMobile ? '14px 20px' : '15px 30px', 
                 borderRadius: '8px', 
                 border: 'none', 
                 fontWeight: 'bold', 
-                fontSize: '16px', 
+                fontSize: isMobile ? '14px' : '16px', 
                 cursor: 'pointer',
+                width: isMobile ? '100%' : 'auto',
                 transition: 'all 0.3s ease'
               }}
               onMouseEnter={(e) => e.target.style.backgroundColor = '#e55a00'}
@@ -70,12 +106,13 @@ const SkyfallBusinessPage = () => {
               style={{ 
                 backgroundColor: 'transparent', 
                 color: '#ff6a00', 
-                padding: '15px 30px', 
+                padding: isMobile ? '14px 20px' : '15px 30px', 
                 borderRadius: '8px', 
                 border: '2px solid #ff6a00', 
                 fontWeight: 'bold', 
-                fontSize: '16px', 
+                fontSize: isMobile ? '14px' : '16px', 
                 cursor: 'pointer',
+                width: isMobile ? '100%' : 'auto',
                 transition: 'all 0.3s ease'
               }}
               onMouseEnter={(e) => {
@@ -91,7 +128,6 @@ const SkyfallBusinessPage = () => {
             </button>
           </div>
           
-          {/* Login link for existing sellers */}
           <p style={{ marginTop: '20px', fontSize: '14px', color: '#666' }}>
             Tayari una akaunti? <span 
               onClick={handleLogin}
@@ -102,8 +138,14 @@ const SkyfallBusinessPage = () => {
           </p>
         </div>
         
-        {/* STATS CARDS */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+        {/* Stats Cards - Responsive Grid */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: isMobile ? '1fr 1fr' : '1fr 1fr', 
+          gap: isMobile ? '12px' : '20px',
+          width: isMobile ? '100%' : '50%',
+          flexShrink: 0
+        }}>
           {[
             { label: 'Mikoa na Wilaya', val: '500+', sub: 'Tanzania nzima' },
             { label: 'Viwanda & Store', val: '1,000+', sub: 'Zilizothibitishwa' },
@@ -111,74 +153,115 @@ const SkyfallBusinessPage = () => {
             { label: 'Lugha za Biashara', val: '2+', sub: 'Kiswahili & English' }
           ].map((stat, i) => (
             <div key={i} style={{ 
-              padding: '30px', 
+              padding: isMobile ? '16px' : '30px', 
               backgroundColor: 'white', 
               boxShadow: '0 10px 30px rgba(0,0,0,0.05)', 
               borderRadius: '12px', 
               border: '1px solid #eee',
               transition: 'transform 0.3s ease',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              textAlign: 'center'
             }}
             onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
             onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             >
-              <h2 style={{ fontSize: '32px', fontWeight: '800', color: '#ff6a00', margin: '0 0 5px 0' }}>{stat.val}</h2>
-              <p style={{ fontSize: '14px', fontWeight: '600', color: '#111', margin: '0' }}>{stat.label}</p>
-              <p style={{ fontSize: '12px', color: '#999', margin: '5px 0 0 0' }}>{stat.sub}</p>
+              <h2 style={{ 
+                fontSize: isMobile ? '22px' : '32px', 
+                fontWeight: '800', 
+                color: '#ff6a00', 
+                margin: '0 0 5px 0' 
+              }}>{stat.val}</h2>
+              <p style={{ 
+                fontSize: isMobile ? '12px' : '14px', 
+                fontWeight: '600', 
+                color: '#111', 
+                margin: '0' 
+              }}>{stat.label}</p>
+              <p style={{ 
+                fontSize: isMobile ? '10px' : '12px', 
+                color: '#999', 
+                margin: '5px 0 0 0' 
+              }}>{stat.sub}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 2. STEPS SECTION (Mchakato wa Kuanza) */}
-      <section id="steps-section" style={{ padding: '80px 10%', backgroundColor: '#f9fafb' }}>
-        <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-          <h2 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '15px' }}>Ni rahisi kuanza kuuza kwenye Skyfall</h2>
-          <p style={{ color: '#666' }}>Fuata hatua hizi chache kukuza biashara yako leo.</p>
+      {/* ============================================
+      2. STEPS SECTION - RESPONSIVE
+      ============================================ */}
+      <section id="steps-section" style={{ 
+        padding: isMobile ? '40px 5%' : '80px 10%', 
+        backgroundColor: '#f9fafb' 
+      }}>
+        <div style={{ textAlign: 'center', marginBottom: isMobile ? '30px' : '60px' }}>
+          <h2 style={{ 
+            fontSize: isMobile ? '24px' : '32px', 
+            fontWeight: '800', 
+            marginBottom: '10px' 
+          }}>Ni rahisi kuanza kuuza kwenye Skyfall</h2>
+          <p style={{ color: '#666', fontSize: isMobile ? '14px' : '16px' }}>
+            Fuata hatua hizi chache kukuza biashara yako leo.
+          </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '60px', alignItems: 'center' }}>
-          <div style={{ 
-            position: 'relative', 
-            borderRadius: '20px', 
-            overflow: 'hidden', 
-            boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
-            cursor: 'pointer'
-          }}>
-            <img 
-              src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop" 
-              alt="Business Growth" 
-              style={{ width: '100%', display: 'block', objectFit: 'cover' }} 
-            />
-          </div>
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: isMobile ? '30px' : '60px', 
+          alignItems: 'center' 
+        }}>
+          {/* Image - Hidden on mobile */}
+          {!isMobile && (
+            <div style={{ 
+              position: 'relative', 
+              borderRadius: '20px', 
+              overflow: 'hidden', 
+              boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+              cursor: 'pointer',
+              flex: 1
+            }}>
+              <img 
+                src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop" 
+                alt="Business Growth" 
+                style={{ width: '100%', display: 'block', objectFit: 'cover' }} 
+              />
+            </div>
+          )}
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: isMobile ? '16px' : '25px',
+            flex: 1,
+            width: isMobile ? '100%' : 'auto'
+          }}>
             {[
               { 
                 title: 'Fungua Akaunti', 
                 desc: 'Jisajili kama muuzaji na upate duka lako la kidijitali ndani ya dakika 2.', 
-                icon: <LucideIcons.UserPlus />,
+                icon: <LucideIcons.UserPlus size={isMobile ? 20 : 24} />,
                 action: () => navigate('/dashboard/register'),
                 path: '/dashboard/register'
               },
               { 
                 title: 'Pakia Bidhaa', 
                 desc: 'Weka picha nzuri na bei za bidhaa zako ili wateja wazione.', 
-                icon: <LucideIcons.Package />,
+                icon: <LucideIcons.Package size={isMobile ? 20 : 24} />,
                 action: () => navigate('/dashboard/products'),
                 path: '/dashboard/products'
               },
               { 
                 title: 'Weka Matangazo (Ads)', 
                 desc: 'Tumia Skyfall Ads kupata kipaumbele na kuonekana mbele ya washindani.', 
-                icon: <LucideIcons.Zap />,
+                icon: <LucideIcons.Zap size={isMobile ? 20 : 24} />,
                 action: () => navigate('/advertise'),
                 path: '/advertise'
               },
               { 
                 title: 'Pokea Oda na Kulipwa', 
                 desc: 'Ongea na wateja na upokee malipo yako kwa usalama kabisa.', 
-                icon: <LucideIcons.CreditCard />,
+                icon: <LucideIcons.CreditCard size={isMobile ? 20 : 24} />,
                 action: () => navigate('/dashboard/orders'),
                 path: '/dashboard/orders'
               }
@@ -187,11 +270,12 @@ const SkyfallBusinessPage = () => {
                 key={i} 
                 style={{ 
                   display: 'flex', 
-                  gap: '20px',
+                  gap: isMobile ? '14px' : '20px',
                   cursor: 'pointer',
-                  padding: '10px',
+                  padding: isMobile ? '8px' : '10px',
                   borderRadius: '12px',
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease',
+                  alignItems: 'flex-start'
                 }}
                 onClick={step.action}
                 onMouseEnter={(e) => {
@@ -206,8 +290,8 @@ const SkyfallBusinessPage = () => {
                 <div style={{ 
                   backgroundColor: '#fff', 
                   color: '#ff6a00', 
-                  width: '50px', 
-                  height: '50px', 
+                  width: isMobile ? '40px' : '50px', 
+                  height: isMobile ? '40px' : '50px', 
                   borderRadius: '50%', 
                   display: 'flex', 
                   justifyContent: 'center', 
@@ -218,8 +302,17 @@ const SkyfallBusinessPage = () => {
                   {step.icon}
                 </div>
                 <div>
-                  <h4 style={{ margin: '0 0 5px 0', fontSize: '18px', fontWeight: '700' }}>Hatua ya {i+1}: {step.title}</h4>
-                  <p style={{ margin: 0, fontSize: '14px', color: '#666', lineHeight: '1.5' }}>{step.desc}</p>
+                  <h4 style={{ 
+                    margin: '0 0 5px 0', 
+                    fontSize: isMobile ? '15px' : '18px', 
+                    fontWeight: '700' 
+                  }}>Hatua ya {i+1}: {step.title}</h4>
+                  <p style={{ 
+                    margin: 0, 
+                    fontSize: isMobile ? '13px' : '14px', 
+                    color: '#666', 
+                    lineHeight: '1.5' 
+                  }}>{step.desc}</p>
                 </div>
               </div>
             ))}
@@ -227,52 +320,91 @@ const SkyfallBusinessPage = () => {
         </div>
       </section>
 
-      {/* 3. FEATURES SECTION (Nyongeza) */}
-      <section style={{ padding: '80px 10%', backgroundColor: '#fff' }}>
-        <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-          <h2 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '15px' }}>Kwa nini kuchagua Skyfall?</h2>
-          <p style={{ color: '#666' }}>Tunakupa zana bora za kukuza biashara yako</p>
+      {/* ============================================
+      3. FEATURES SECTION - RESPONSIVE
+      ============================================ */}
+      <section style={{ 
+        padding: isMobile ? '40px 5%' : '80px 10%', 
+        backgroundColor: '#fff' 
+      }}>
+        <div style={{ textAlign: 'center', marginBottom: isMobile ? '30px' : '60px' }}>
+          <h2 style={{ 
+            fontSize: isMobile ? '24px' : '32px', 
+            fontWeight: '800', 
+            marginBottom: '10px' 
+          }}>Kwa nini kuchagua Skyfall?</h2>
+          <p style={{ color: '#666', fontSize: isMobile ? '14px' : '16px' }}>
+            Tunakupa zana bora za kukuza biashara yako
+          </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '30px' }}>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(250px, 1fr))', 
+          gap: isMobile ? '16px' : '30px' 
+        }}>
           {[
-            { icon: <LucideIcons.Shield size={40} />, title: 'Usalama wa Juu', desc: 'Malipo na taarifa zako zinalindwa kwa teknolojia za kisasa' },
-            { icon: <LucideIcons.Truck size={40} />, title: 'Usafirishaji Rahisi', desc: 'Tunaungana na makampuni bora ya usafirishaji Tanzania' },
-            { icon: <LucideIcons.Headphones size={40} />, title: 'Msaada wa 24/7', desc: 'Timu yetu iko tayari kukusaidia wakati wote' },
-            { icon: <LucideIcons.BarChart3 size={40} />, title: 'Analytics za Biashara', desc: 'Fuata mauzo yako na ujue wateja wako wanataka nini' }
+            { icon: <LucideIcons.Shield size={isMobile ? 32 : 40} />, title: 'Usalama wa Juu', desc: 'Malipo na taarifa zako zinalindwa kwa teknolojia za kisasa' },
+            { icon: <LucideIcons.Truck size={isMobile ? 32 : 40} />, title: 'Usafirishaji Rahisi', desc: 'Tunaungana na makampuni bora ya usafirishaji Tanzania' },
+            { icon: <LucideIcons.Headphones size={isMobile ? 32 : 40} />, title: 'Msaada wa 24/7', desc: 'Timu yetu iko tayari kukusaidia wakati wote' },
+            { icon: <LucideIcons.BarChart3 size={isMobile ? 32 : 40} />, title: 'Analytics za Biashara', desc: 'Fuata mauzo yako na ujue wateja wako wanataka nini' }
           ].map((feature, i) => (
             <div key={i} style={{ 
               textAlign: 'center', 
-              padding: '30px',
+              padding: isMobile ? '20px' : '30px',
               borderRadius: '12px',
               transition: 'all 0.3s ease',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              border: '1px solid transparent'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = '#f9fafb';
               e.currentTarget.style.transform = 'translateY(-5px)';
+              e.currentTarget.style.borderColor = '#ff6a00';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';
               e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.borderColor = 'transparent';
             }}
             >
-              <div style={{ color: '#ff6a00', marginBottom: '20px' }}>{feature.icon}</div>
-              <h3 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '10px' }}>{feature.title}</h3>
-              <p style={{ color: '#666', lineHeight: '1.5' }}>{feature.desc}</p>
+              <div style={{ color: '#ff6a00', marginBottom: '15px' }}>{feature.icon}</div>
+              <h3 style={{ 
+                fontSize: isMobile ? '17px' : '20px', 
+                fontWeight: '700', 
+                marginBottom: '8px' 
+              }}>{feature.title}</h3>
+              <p style={{ color: '#666', lineHeight: '1.5', fontSize: isMobile ? '14px' : '15px' }}>
+                {feature.desc}
+              </p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 4. TESTIMONIALS SECTION */}
-      <section style={{ padding: '80px 10%', backgroundColor: '#f9fafb' }}>
-        <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-          <h2 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '15px' }}>Wanachosema Wajasiriamali</h2>
-          <p style={{ color: '#666' }}>Maelfu ya wauzaji wanathamini Skyfall</p>
+      {/* ============================================
+      4. TESTIMONIALS SECTION - RESPONSIVE
+      ============================================ */}
+      <section style={{ 
+        padding: isMobile ? '40px 5%' : '80px 10%', 
+        backgroundColor: '#f9fafb' 
+      }}>
+        <div style={{ textAlign: 'center', marginBottom: isMobile ? '30px' : '60px' }}>
+          <h2 style={{ 
+            fontSize: isMobile ? '24px' : '32px', 
+            fontWeight: '800', 
+            marginBottom: '10px' 
+          }}>Wanachosema Wajasiriamali</h2>
+          <p style={{ color: '#666', fontSize: isMobile ? '14px' : '16px' }}>
+            Maelfu ya wauzaji wanathamini Skyfall
+          </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(300px, 1fr))', 
+          gap: isMobile ? '16px' : '30px' 
+        }}>
           {[
             { name: 'John Mwita', store: 'Mwita Electronics', comment: 'Tangu nianze kutumia Skyfall, mauzo yangu yameongezeka kwa 150%!' },
             { name: 'Sarah John', store: 'Sarah Fashion', comment: 'Rahisi kutumia na wateja wananiamini kwa sababu ya Skyfall.' },
@@ -280,12 +412,17 @@ const SkyfallBusinessPage = () => {
           ].map((testimonial, i) => (
             <div key={i} style={{ 
               backgroundColor: '#fff', 
-              padding: '30px', 
+              padding: isMobile ? '20px' : '30px', 
               borderRadius: '12px',
               boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
             }}>
               <div style={{ color: '#ff6a00', fontSize: '30px', marginBottom: '10px' }}>"</div>
-              <p style={{ color: '#555', lineHeight: '1.6', fontStyle: 'italic' }}>{testimonial.comment}</p>
+              <p style={{ 
+                color: '#555', 
+                lineHeight: '1.6', 
+                fontStyle: 'italic',
+                fontSize: isMobile ? '14px' : '15px'
+              }}>{testimonial.comment}</p>
               <div style={{ marginTop: '20px' }}>
                 <p style={{ fontWeight: '700', margin: 0 }}>{testimonial.name}</p>
                 <p style={{ fontSize: '12px', color: '#999', margin: 0 }}>{testimonial.store}</p>
@@ -295,10 +432,28 @@ const SkyfallBusinessPage = () => {
         </div>
       </section>
 
-      {/* 5. CTA SECTION (Kumalizia) */}
-      <section style={{ padding: '100px 10%', textAlign: 'center', background: 'linear-gradient(135deg, #ff6a00 0%, #e55a00 100%)', color: 'white' }}>
-        <h2 style={{ fontSize: '40px', fontWeight: '800', marginBottom: '20px' }}>Tayari kukuza biashara yako?</h2>
-        <p style={{ fontSize: '18px', opacity: 0.9, marginBottom: '40px', maxWidth: '700px', margin: '0 auto 40px auto' }}>
+      {/* ============================================
+      5. CTA SECTION - RESPONSIVE
+      ============================================ */}
+      <section style={{ 
+        padding: isMobile ? '60px 5%' : '100px 10%', 
+        textAlign: 'center', 
+        background: 'linear-gradient(135deg, #ff6a00 0%, #e55a00 100%)', 
+        color: 'white' 
+      }}>
+        <h2 style={{ 
+          fontSize: isMobile ? '28px' : '40px', 
+          fontWeight: '800', 
+          marginBottom: '15px' 
+        }}>Tayari kukuza biashara yako?</h2>
+        <p style={{ 
+          fontSize: isMobile ? '15px' : '18px', 
+          opacity: 0.9, 
+          marginBottom: '30px', 
+          maxWidth: '700px', 
+          margin: '0 auto 30px auto',
+          padding: '0 10px'
+        }}>
           Jiunge na maelfu ya Store za Tanzania zilizopo Skyfall sasa hivi na uanze kuwafikia wateja kutoka kila pembe ya nchi.
         </p>
         <button 
@@ -306,12 +461,13 @@ const SkyfallBusinessPage = () => {
           style={{ 
             backgroundColor: 'white', 
             color: '#ff6a00', 
-            padding: '18px 45px', 
+            padding: isMobile ? '14px 30px' : '18px 45px', 
             borderRadius: '30px', 
             border: 'none', 
             fontWeight: 'bold', 
-            fontSize: '18px', 
+            fontSize: isMobile ? '15px' : '18px', 
             cursor: 'pointer',
+            width: isMobile ? '100%' : 'auto',
             transition: 'all 0.3s ease'
           }}
           onMouseEnter={(e) => {
@@ -325,15 +481,37 @@ const SkyfallBusinessPage = () => {
         >
           Jisajili Kama Muuzaji Sasa
         </button>
-        <p style={{ marginTop: '20px', fontSize: '14px', opacity: 0.8 }}>
-          Au <span onClick={handleLogin} style={{ textDecoration: 'underline', cursor: 'pointer' }}>ingia kwenye akaunti yako</span> ikiwa tayari una store
+        <p style={{ 
+          marginTop: '20px', 
+          fontSize: isMobile ? '13px' : '14px', 
+          opacity: 0.8 
+        }}>
+          Au <span onClick={handleLogin} style={{ textDecoration: 'underline', cursor: 'pointer' }}>
+            ingia kwenye akaunti yako
+          </span> ikiwa tayari una store
         </p>
       </section>
 
-      {/* Footer */}
-      <footer style={{ padding: '40px 10%', backgroundColor: '#111', color: '#666', textAlign: 'center' }}>
-        <p>&copy; 2024 Skyfall. Haki zote zimehifadhiwa.</p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '20px' }}>
+      {/* ============================================
+      FOOTER - RESPONSIVE
+      ============================================ */}
+      <footer style={{ 
+        padding: isMobile ? '30px 5%' : '40px 10%', 
+        backgroundColor: '#111', 
+        color: '#666', 
+        textAlign: 'center' 
+      }}>
+        <p style={{ fontSize: isMobile ? '13px' : '14px' }}>
+          &copy; 2024 Skyfall. Haki zote zimehifadhiwa.
+        </p>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          gap: isMobile ? '12px' : '20px', 
+          marginTop: '15px',
+          flexWrap: 'wrap',
+          fontSize: isMobile ? '13px' : '14px'
+        }}>
           <span onClick={() => navigate('/terms')} style={{ cursor: 'pointer' }}>Terms</span>
           <span onClick={() => navigate('/privacy')} style={{ cursor: 'pointer' }}>Privacy</span>
           <span onClick={() => navigate('/contact-us')} style={{ cursor: 'pointer' }}>Contact</span>

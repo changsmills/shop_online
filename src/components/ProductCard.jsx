@@ -46,11 +46,16 @@ export default function ProductCard({ product, isMobile = false, isPriority = fa
     ? name.substring(0, maxNameLength - 3) + '...' 
     : name;
 
-  const numericPrice = parseFloat(price) || 0;
-  const numericOriginal = parseFloat(original_price) || 0;
-  const hasDiscount = numericOriginal > 0 && numericOriginal > numericPrice;
-  const displayPrice = hasDiscount ? numericOriginal : numericPrice;
+  // BADILISHA KUWA:
+const numericPrice = parseFloat(price) || 0;
+const numericOriginal = parseFloat(original_price) || 0;
+const hasDiscount = numericOriginal > 0 && numericOriginal < numericPrice;  // ← HAPA! > imebadilish
   const oldPrice = hasDiscount ? numericPrice : null;
+
+  const displayPrice = hasDiscount ? numericOriginal : numericPrice;
+const discountPercent = hasDiscount 
+  ? Math.round(((numericPrice - numericOriginal) / numericPrice) * 100) 
+  : 0;
 
   // ========== MOBILE VERSION (Sawa na DashboardCard style) ==========
   if (isMobile) {
@@ -102,23 +107,22 @@ export default function ProductCard({ product, isMobile = false, isPriority = fa
             </div>
           )}
 
-          {/* Discount Badge */}
           {hasDiscount && (
-            <div style={{
-              position: 'absolute',
-              top: '6px',
-              right: '6px',
-              backgroundColor: '#ca290d',
-              color: '#fff',
-              fontSize: '9px',
-              fontWeight: 'bold',
-              padding: '2px 6px',
-              borderRadius: '4px',
-              zIndex: 2,
-            }}>
-              -{Math.round(((numericOriginal - numericPrice) / numericOriginal) * 100)}%
-            </div>
-          )}
+  <div style={{
+    position: 'absolute',
+    top: '6px',
+    right: '6px',
+    backgroundColor: '#ca290d',
+    color: '#fff',
+    fontSize: '9px',
+    fontWeight: 'bold',
+    padding: '2px 6px',
+    borderRadius: '4px',
+    zIndex: 2,
+  }}>
+    -{discountPercent}% 
+  </div>
+)}
 
           {/* MOQ Badge (Bottom) */}
           {moq && (
@@ -187,48 +191,50 @@ export default function ProductCard({ product, isMobile = false, isPriority = fa
             {displayName}
           </h4>
           
-          {/* Price Row */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              gap: '4px',
-              flexWrap: 'wrap',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'baseline' }}>
-              <span 
-                style={{
-                  fontSize: '9px',
-                  fontWeight: '700',
-                  color: '#ca290d',
-                }}
-              >
-                TSh
-              </span>
-              <span 
-                style={{
-                  fontSize: '13px',
-                  fontWeight: '700',
-                  color: '#ca290d',
-                }}
-              >
-                {displayPrice.toLocaleString()}
-              </span>
-            </div>
-            
-            {oldPrice && (
-              <span 
-                style={{
-                  textDecoration: 'line-through',
-                  color: '#999',
-                  fontSize: '9px',
-                }}
-              >
-                {oldPrice.toLocaleString()}
-              </span>
-            )}
-          </div>
+          {/* ✅ PRICE ROW - IMEREKEBISHWA */}
+<div
+  style={{
+    display: 'flex',
+    alignItems: 'baseline',
+    gap: '4px',
+    flexWrap: 'wrap',
+  }}
+>
+  {/* Bei ya sasa (displayPrice) */}
+  <div style={{ display: 'flex', alignItems: 'baseline' }}>
+    <span 
+      style={{
+        fontSize: '9px',
+        fontWeight: '700',
+        color: '#ca290d',
+      }}
+    >
+      TSh
+    </span>
+    <span 
+      style={{
+        fontSize: '13px',
+        fontWeight: '700',
+        color: '#ca290d',
+      }}
+    >
+      {displayPrice.toLocaleString()}  {/* ✅ BEI YA DISCOUNT */}
+    </span>
+  </div>
+  
+  {/* Bei ya awali (oldPrice) - ikiwa ipo */}
+  {oldPrice && (
+    <span 
+      style={{
+        textDecoration: 'line-through',
+        color: '#999',
+        fontSize: '9px',
+      }}
+    >
+      {oldPrice.toLocaleString()}  {/* ✅ BEI YA AWALI (STRIKE-THROUGH) */}
+    </span>
+  )}
+</div>
 
           {/* MOQ row (kama haiko kwenye image overlay) */}
           {!moq && (
@@ -327,23 +333,22 @@ export default function ProductCard({ product, isMobile = false, isPriority = fa
             🔥 Hot
           </div>
         )}
-
-        {hasDiscount && (
-          <div style={{
-            position: 'absolute',
-            top: '8px',
-            right: '8px',
-            backgroundColor: '#ca290d',
-            color: '#fff',
-            fontSize: '10px',
-            fontWeight: 'bold',
-            padding: '2px 8px',
-            borderRadius: '4px',
-            zIndex: 2,
-          }}>
-            -{Math.round(((numericOriginal - numericPrice) / numericOriginal) * 100)}%
-          </div>
-        )}
+{hasDiscount && (
+  <div style={{
+    position: 'absolute',
+    top: '8px',
+    right: '8px',
+    backgroundColor: '#ca290d',
+    color: '#fff',
+    fontSize: '10px',
+    fontWeight: 'bold',
+    padding: '2px 8px',
+    borderRadius: '4px',
+    zIndex: 2,
+  }}>
+    -{discountPercent}% 
+  </div>
+)}
 
         <img 
   src={finalImage} 

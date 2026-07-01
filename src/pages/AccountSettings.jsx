@@ -336,6 +336,7 @@ useEffect(() => {
 
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} />, path: '/dashboard', label: 'Dashboard' },
+    { icon: <Store size={20} />, path: '/dashboard/seller', label: 'Sell on Skyfall' }, // ✅ MPYA
     { icon: <MessageSquare size={20} />, path: '/dashboard/messages', label: 'Messages' },
     { icon: <ClipboardList size={20} />, path: '/dashboard/orders', label: 'Orders' },
     { icon: <BarChart3 size={20} />, path: '/dashboard/analytics', label: 'Analytics' },
@@ -354,6 +355,8 @@ useEffect(() => {
     { icon: <FileText size={18} />, title: 'Refund Policy', path: '/refund-policy' },
     { icon: <Globe size={18} />, title: 'About Skyfall', path: '/about-skyfall' },
     { icon: <FileText size={18} />, title: 'How to Buy', path: '/how-to-buy' },
+    { icon: <Store size={18} />, title: 'Sell on Skyfall', path: '/dashboard/seller' },
+
   
   ];
 

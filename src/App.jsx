@@ -65,8 +65,7 @@ import AdRequest from './pages/AdRequest';
 import StorePage from "./pages/StorePage";
 import AllStores from './pages/AllStores';
 import SupplierAccountSettings from './pages/SupplierAccountSettings'; 
-
-
+import SellerDashboard from './pages/SellerDashboard'; 
 
 
 // ========== COMPONENT MPYA YA KUDHIBITI BOTTOM NAV ==========
@@ -182,6 +181,7 @@ function AppContent({ session }) {
         <Route path="/store/:storeId" element={<StorePage session={session} />} />
         <Route path="/dashboard/supplier-messages" element={<SupplierMessages session={session} />} />
 
+       <Route path="/dashboard/seller" element={<SellerDashboard />} />
 
         <Route path="/dashboard/supplier-notifications" element={<SupplierNotifications session={session} />} />
         
