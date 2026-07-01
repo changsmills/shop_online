@@ -4,14 +4,23 @@ import { ChevronRight, ChevronLeft, Flame } from "lucide-react";
 import { supabase } from "../supabaseClient";
 import DashboardCard from "./DashboardCard";
 import { useTranslation } from 'react-i18next';
+//import { getCategoryDisplayName } from '../pages/Dashboard'; // Au mahali ulipoifafanua
+
 
 export default function TopDeals({ navigate, selectedCategory, isMobile }) {
-  const { t } = useTranslation();
+  //const { t } = useTranslation();
+  const { t, i18n } = useTranslation(); // Hakikisha umeimport i18n
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const scrollContainerRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
+
+  const getCategoryDisplayName = (category) => {
+    if (!category) return '';
+    return i18n.language === 'sw' ? (category.name_sw || category.name) : category.name;
+  };
+
 
   useEffect(() => {
     const fetchDeals = async () => {
