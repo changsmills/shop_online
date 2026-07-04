@@ -23,7 +23,7 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
       let query = supabase
         .from("products_engines")
         .select("*")
-        .eq("is_approved", true)
+        //.eq("is_approved", true)
         .order("created_at", { ascending: false })
         .limit(30);
 

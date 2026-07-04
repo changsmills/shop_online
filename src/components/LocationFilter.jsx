@@ -23,13 +23,12 @@ export default function LocationFilter({ navigate, isMobile }) {
           .select(`
             cover_image,
             price,
-            is_approved,
             stores_engine!inner (
               city,
               physical_address
             )
           `)
-          .eq('is_approved', true)
+          //.eq('is_approved', true)
           .not('stores_engine', 'is', null);
 
         if (error) throw error;
@@ -38,6 +37,7 @@ export default function LocationFilter({ navigate, isMobile }) {
         data.forEach(item => {
           const cityName = item.stores_engine?.city;
           const address = item.stores_engine?.physical_address;
+
           
           if (cityName && !cityMap[cityName]) {
             cityMap[cityName] = {

@@ -20,7 +20,7 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
         let query = supabase
           .from('products_engines')
           .select('*')
-          .eq('is_approved', true)
+         // .eq('is_approved', true)
           .order('created_at', { ascending: false })
           .limit(10);
 

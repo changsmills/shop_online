@@ -28,7 +28,7 @@ export default function TopStores({ navigate, isMobile }) {
             name
           )
         `) 
-        .eq("status", "active") 
+       // .eq("status", "active") 
         .limit(10); 
 
       if (error) throw error;

@@ -26,7 +26,7 @@ export default function RecentlyViewed({ navigate, isMobile }) {
             .from("products_engines")
             .select("*")
             .in("id", ids)
-            .eq("is_approved", true);
+           // .eq("is_approved", true);
 
           if (error) throw error;
 

@@ -21,7 +21,7 @@ export default function TrendingNow({ navigate, selectedCategory, isMobile }) {
         let query = supabase
           .from('products_engines')
           .select('*')
-          .eq('is_approved', true)
+          //.eq('is_approved', true)
           .or('order_count.gt.0,views.gt.0')
           .order('order_count', { ascending: false })
           .order('views', { ascending: false })

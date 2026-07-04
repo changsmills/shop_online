@@ -29,7 +29,7 @@ export default function TopDeals({ navigate, selectedCategory, isMobile }) {
         let query = supabase
           .from('products_engines')
           .select('*')
-          .eq('is_approved', true)
+         // .eq('is_approved', true)
           .not('original_price', 'is', null)
           .gt('original_price', 0);
 
