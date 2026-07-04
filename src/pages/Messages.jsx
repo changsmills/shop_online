@@ -17,7 +17,6 @@ const Messages = ({ session }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const messagesEndRef = useRef(null);
-
   const [isExpanded, setIsExpanded] = useState(false);
   const [chats, setChats] = useState([]);
   const [activeChat, setActiveChat] = useState(null);

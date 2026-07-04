@@ -90,7 +90,6 @@ const handleLeafChange = (e) => {
         const parsed = JSON.parse(leaf.condition_options);
         conditionOptions = Array.isArray(parsed) ? parsed : [leaf.condition_options];
       } catch(e) {
-        // Kama ni string plain, iweke kwenye array
         conditionOptions = [leaf.condition_options];
       }
     } else {
@@ -99,8 +98,6 @@ const handleLeafChange = (e) => {
   }
   
   setSelectedLeaf(leaf);
-  
-  // Reset size mode
   setUseCustomSizes(false);
   setCustomSizeInput("");
 
@@ -110,7 +107,7 @@ const handleLeafChange = (e) => {
   console.log("size_format:", leaf?.size_format);
   console.log("color_required:", leaf?.color_required);
   console.log("warranty_required:", leaf?.warranty_required);
-  console.log("condition_options:", conditionOptions); // 🔥 Angalia hii sasa
+  console.log("condition_options:", conditionOptions);
 
   setAttributes({ 
     ...attributes, 
@@ -118,11 +115,11 @@ const handleLeafChange = (e) => {
     specifications: {},
 
     // Color images storage (moja kwa rangi)
-    color_images: {},  // 🔥 Map: color -> image URL
-    color_image_files: {},  // 🔥 Map: color -> File object
+    color_images: {},
+    color_image_files: {},
     
     // ========== ENABLE FLAGS (FALSE kwa default) ==========
-    has_colors: false,  // 🔥 Kwa default, bidhaa haina rangi tofauti
+    has_colors: false,
     enable_colors: false,
     enable_sizes: false,
     enable_gender: false,
@@ -130,7 +127,10 @@ const handleLeafChange = (e) => {
     enable_weight: false,
     enable_dimensions: false,
     enable_variations: false,
-    size_stock: {},  // 🔥 Ongeza hii
+    size_stock: {},
+
+    // ========== 🔥 MPYA: SIZE FORMAT ==========
+    size_format: leaf?.size_format || 'standard',  // 🔥 MUHIMU!
 
     // Shipping defaults
     shipping_method: "fixed",
@@ -151,10 +151,15 @@ const handleLeafChange = (e) => {
     target_audience: [],
     warranty_months: '',
     weight: '',
+    weight_unit: 'kg',  // 🔥 Ongeza hii
     dimensions: { length: '', width: '', height: '' },
-    marketplace_listings: [],  // 🔥 Hii MOJA tu! Futa nyingine
-    condition: conditionOptions.length > 0 ? conditionOptions[0] : 'new', // 🔥 FIXED!
-    custom_fields_values: {}
+    marketplace_listings: [],
+    condition: conditionOptions.length > 0 ? conditionOptions[0] : 'new',
+    custom_fields_values: {},
+
+    // ========== 🔥 MPYA KWA MAZULIA ==========
+    price_per_meter: '',   // 🔥 MUHIMU!
+    price_per_foot: '',    // 🔥 MUHIMU!
   });
 };
 
@@ -793,7 +798,77 @@ const handleTierChange = (index, field, value) => {
       borderRadius: "12px",
       marginBottom: "20px"
     }}>
-  
+      
+      {/* ========== 🔥 MPYA: SIZE FORMAT SELECTOR ========== */}
+      <div style={{
+        gridColumn: "1 / -1",  // Inachukua upana wote
+        padding: "12px 15px",
+        backgroundColor: "#f0fdf4",
+        borderRadius: "10px",
+        border: "2px solid #10b981",
+        marginBottom: "5px"
+      }}>
+        <label className="field-label-small" style={{ 
+          marginBottom: "8px", 
+          display: "block", 
+          fontWeight: "600",
+          color: "#065f46"
+        }}>
+          📏 Mfumo wa Ukubwa / Vipimo
+        </label>
+        <select
+          className="select-input"
+          value={attributes.size_format || 'standard'}
+          onChange={(e) => {
+            const format = e.target.value;
+            setAttributes({ 
+              ...attributes, 
+              size_format: format,
+              // Reset fields when format changes
+              ...(format === 'length' ? { 
+                dimensions: { length: '', width: '', height: '' },
+                sizes: [],
+                size_stock: {}
+              } : {}),
+              ...(format === 'dimensions' ? { 
+                price_per_meter: '', 
+                price_per_foot: '',
+                sizes: [],
+                size_stock: {}
+              } : {}),
+              ...(format === 'free' ? {
+                sizes: [],
+                size_stock: {},
+                dimensions: { length: '', width: '', height: '' },
+                price_per_meter: '',
+                price_per_foot: ''
+              } : {}),
+            });
+          }}
+          style={{
+            backgroundColor: "white",
+            border: "2px solid #10b981",
+            fontWeight: "500",
+            padding: "10px",
+            borderRadius: "8px",
+            width: "100%"
+          }}
+        >
+          <option value="standard">📏 Kawaida (S, M, L, XL)</option>
+          <option value="numeric">🔢 Nambari (36, 37, 38...)</option>
+          <option value="free">📦 Hakuna Ukubwa</option>
+          <option value="dimensions">📐 Vipimo (Makabati, Meza)</option>
+          <option value="length">📏 Urefu (Mazulia, Vitambaa)</option>
+        </select>
+        <small style={{ 
+          color: "#6b7280", 
+          fontSize: "11px", 
+          marginTop: "4px", 
+          display: "block" 
+        }}>
+          💡 Chagua mfumo unaofaa kwa aina ya bidhaa yako
+        </small>
+      </div>
 
       {/* Gender Toggle */}
       <button
@@ -907,49 +982,46 @@ const handleTierChange = (index, field, value) => {
         {attributes.enable_dimensions && <CheckCircle2 size={16} color="#10b981" />}
       </button>
 
-
-{/* BUTTON MOJA YA RANGI NA VARIATIONS - Unganisha hizi tatu */}
-<button
-  type="button"
-  onClick={() => {
-    if (!attributes.enable_variations) {
-      // Washa zote
-      setAttributes({ 
-        ...attributes, 
-        enable_variations: true,
-        has_colors: true,
-        enable_colors: true,
-        colors: []
-      });
-    } else {
-      // Zima zote
-      setAttributes({ 
-        ...attributes, 
-        enable_variations: false,
-        has_colors: false,
-        enable_colors: false,
-        colors: [],
-        sizes: []
-      });
-    }
-  }}
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    padding: "10px 15px",
-    borderRadius: "8px",
-    border: `2px solid ${attributes.enable_variations ? "#10b981" : "#cbd5e1"}`,
-    backgroundColor: attributes.enable_variations ? "#d1fae5" : "white",
-    cursor: "pointer"
-  }}
->
-  <Palette size={18} color={attributes.enable_variations ? "#10b981" : "#64748b"} />
-  <span style={{ flex: 1, textAlign: "left", fontWeight: attributes.enable_variations ? "600" : "400" }}>
-    🎨 Rangi na Ukubwa (Variations)
-  </span>
-  {attributes.enable_variations && <CheckCircle2 size={16} color="#10b981" />}
-</button>
+      {/* BUTTON MOJA YA RANGI NA VARIATIONS */}
+      <button
+        type="button"
+        onClick={() => {
+          if (!attributes.enable_variations) {
+            setAttributes({ 
+              ...attributes, 
+              enable_variations: true,
+              has_colors: true,
+              enable_colors: true,
+              colors: []
+            });
+          } else {
+            setAttributes({ 
+              ...attributes, 
+              enable_variations: false,
+              has_colors: false,
+              enable_colors: false,
+              colors: [],
+              sizes: []
+            });
+          }
+        }}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          padding: "10px 15px",
+          borderRadius: "8px",
+          border: `2px solid ${attributes.enable_variations ? "#10b981" : "#cbd5e1"}`,
+          backgroundColor: attributes.enable_variations ? "#d1fae5" : "white",
+          cursor: "pointer"
+        }}
+      >
+        <Palette size={18} color={attributes.enable_variations ? "#10b981" : "#64748b"} />
+        <span style={{ flex: 1, textAlign: "left", fontWeight: attributes.enable_variations ? "600" : "400" }}>
+          🎨 Rangi na Ukubwa (Variations)
+        </span>
+        {attributes.enable_variations && <CheckCircle2 size={16} color="#10b981" />}
+      </button>
 
     </div>
   </>

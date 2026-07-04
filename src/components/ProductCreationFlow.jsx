@@ -31,7 +31,40 @@ const ProductCreationFlow = ({
     price_tiers: [],
     target_audience: [], // Hapa itahifadhi mfano: ['Watoto', 'Vijana']
     available_sizes: [], // Hakikisha huu mstari upo hapa pia
-    moq: '' // Ongeza hii hapa              // Hii itakaa array ya vitu kama [{from_qty:.., unit_price:..}]
+    moq: '',
+
+      size_stock: {},           // Muhimu kwa bidhaa zenye rangi/ukubwa
+    colors: [],               // Rangi za bidhaa
+    sizes: [],                // Ukubwa wa bidhaa
+    has_colors: false,        // Je ina rangi?
+    enable_sizes: false,      // Je ina ukubwa?
+    enable_variations: false, // Je ina variations?
+    color_images: {},         // Picha kwa kila rangi
+    color_image_files: {},    // Files za picha za rangi
+    dimensions: { length: '', width: '', height: '' },
+    weight: '',
+    warranty_months: '',
+    gender: [],
+    condition: 'new',
+    shipping_method: 'fixed',
+    shipping_cost: '',
+    shipping_rate_per_km: '',
+    shipping_base_fee: '',
+    shipping_default_distance: '',
+    shipping_dar_cost: '',
+    shipping_outside_dar_cost: '',
+    shipping_remote_cost: '',
+    enable_pickup: false,
+    store_address: '',
+    marketplace_product_name: '',
+    marketplace_base_price: '',
+    marketplace_main_image: null,
+    marketplace_main_image_file: null,
+    // 🔥 MPYA KWA MAZULIA NA MAKABATI
+    price_per_meter: '',      // Kwa mazulia
+    price_per_foot: '',       // Kwa mazulia
+    size_format: 'standard',  // standard, dimensions, length, free
+
   };
 
   const [attributes, setAttributes] = React.useState(initialAttributes);
@@ -95,36 +128,68 @@ const handleFinalPublishAll = async () => {
   
   if (addedProducts.length === 0) return alert("Hakuna bidhaa ya kurusha!");
   
-  // VALIDATION KAMILI KABLA YA KUANZA
+  // ================================================================
+  // 🔥 VALIDATION KAMILI KABLA YA KUANZA
+  // ================================================================
   for (const p of addedProducts) {
     console.log(`\n📦 Validating product: ${p.name}`);
     
+    // 1. Jina la bidhaa
     if (!p.name) return alert(`Bidhaa "${p.name || 'Unknown'}" haina jina!`);
-    if (!p.price && p.is_retail) return alert(`Bidhaa "${p.name}" inahitaji bei kwa Retail!`);
+    
+    // 2. Retail - inahitaji bei
+    if (p.is_retail && !p.price) {
+      return alert(`Bidhaa "${p.name}" inahitaji bei kwa Retail!`);
+    }
+    
+    // 3. Wholesale - inahitaji price tiers
     if (p.is_wholesale && (!p.price_tiers || p.price_tiers.length === 0)) {
       return alert(`Bidhaa "${p.name}" imechagua Wholesale lakini haina price tiers!`);
     }
     
-    // KAMA BIDHAA INA RANGI (has_colors = true)
+    // 4. Wholesale - inahitaji MOQ
+    if (p.is_wholesale && !p.moq) {
+      return alert(`Bidhaa "${p.name}" inahitaji Minimum Order Quantity (MOQ)!`);
+    }
+    
+    // 5. 🆕 MAZULIA (size_format === 'length') - inahitaji bei kwa mita/futi
+    if (p.size_format === 'length') {
+      if (!p.price_per_meter && !p.price_per_foot) {
+        return alert(`Bidhaa "${p.name}" (Zulia) inahitaji bei kwa mita au futi!`);
+      }
+    }
+    
+    // 6. 🆕 MAKABATI (size_format === 'dimensions') - inahitaji vipimo
+    if (p.size_format === 'dimensions') {
+      if (!p.dimensions?.length || !p.dimensions?.width || !p.dimensions?.height) {
+        return alert(`Bidhaa "${p.name}" (Kabati/Meza) inahitaji vipimo (urefu, upana, kimo)!`);
+      }
+    }
+    
+    // 7. BIDHAA ZENYE RANGI - picha kwa kila rangi
     if (p.has_colors && p.colors && p.colors.length > 0) {
       for (const color of p.colors) {
         const colorStock = p.size_stock?.[color] || {};
         const totalStockForColor = Object.values(colorStock).reduce((sum, val) => sum + (Number(val) || 0), 0);
         console.log(`  - Color: ${color}, Total Stock: ${totalStockForColor}`);
         
-        // Angalia picha kwa rangi hii (lazima iwepo)
         if (!p.color_images?.[color] && !p.color_image_files?.[color]) {
           return alert(`Rangi ${color.toUpperCase()} kwenye bidhaa "${p.name}" haina picha! Tafadhali weka picha kwa rangi hii.`);
         }
       }
     }
     
-    // KAMA BIDHAA HINA RANGI LAKINI INA SIZES
+    // 8. BIDHAA ZENYE UKUBWA TU (hazina rangi)
     if (!p.has_colors && p.enable_sizes && p.sizes?.length > 0) {
       for (const size of p.sizes) {
         const stock = p.size_stock?.[size] || 0;
         console.log(`  - Size: ${size}, Stock: ${stock}`);
       }
+    }
+    
+    // 9. Picha kuu lazima iwepo kwa bidhaa zote
+    if (!p.cover_file && !p.marketplace_main_image_file) {
+      return alert(`Bidhaa "${p.name}" inahitaji picha kuu!`);
     }
   }
 
@@ -146,6 +211,9 @@ const handleFinalPublishAll = async () => {
     let successCount = 0;
     const errors = [];
 
+    // ================================================================
+    // 🔥 PROCESS KILA BIDHAA
+    // ================================================================
     for (const p of addedProducts) {
       try {
         console.log(`\n📝 Processing product: ${p.name}`);
@@ -158,7 +226,14 @@ const handleFinalPublishAll = async () => {
           console.log(`  ✓ Cover image uploaded`);
         }
 
-        // 2. Upload Gallery
+        // 2. 🆕 Upload Marketplace Main Image (kwa bidhaa zisizo na cover)
+        let finalMarketplaceImage = null;
+        if (p.marketplace_main_image_file) {
+          finalMarketplaceImage = await uploadFile(p.marketplace_main_image_file, productPath, "product-images");
+          console.log(`  ✓ Marketplace image uploaded`);
+        }
+
+        // 3. Upload Gallery
         const finalGalleryUrls = [];
         if (p.gallery_files && p.gallery_files.length > 0) {
           for (const item of p.gallery_files) {
@@ -168,14 +243,14 @@ const handleFinalPublishAll = async () => {
           console.log(`  ✓ Gallery images: ${finalGalleryUrls.length}`);
         }
 
-        // 3. Upload Video
+        // 4. Upload Video
         let finalVideoUrl = null;
         if (p.video_file) {
           finalVideoUrl = await uploadFile(p.video_file, productPath, "product-videos");
           console.log(`  ✓ Video uploaded`);
         }
 
-        // 4. PREPARE GENERAL SPECIFICATIONS
+        // 5. PREPARE GENERAL SPECIFICATIONS
         const generalSpecifications = {};
         
         if (p.brand_id) generalSpecifications.brand_id = p.brand_id;
@@ -184,9 +259,15 @@ const handleFinalPublishAll = async () => {
         if (p.description) generalSpecifications.description = p.description;
         if (p.specifications) Object.assign(generalSpecifications, p.specifications);
         
+        // 🆕 Ongeza size_format kwenye specifications kwa ajili ya mazulia/makabati
+        if (p.size_format) generalSpecifications.size_format = p.size_format;
+        if (p.price_per_meter) generalSpecifications.price_per_meter = p.price_per_meter;
+        if (p.price_per_foot) generalSpecifications.price_per_foot = p.price_per_foot;
+        if (p.dimensions) generalSpecifications.dimensions = p.dimensions;
+        
         console.log("  📋 General specifications:", generalSpecifications);
 
-        // 5. Calculate total stock based on product type
+        // 6. Calculate total stock based on product type
         let totalStock = 0;
         
         if (p.has_colors && p.colors?.length > 0) {
@@ -202,7 +283,7 @@ const handleFinalPublishAll = async () => {
         
         console.log(`  📊 Total stock calculated: ${totalStock}`);
 
-        // 6. Insert into products_engines
+        // 7. Insert into products_engines
         const productData = {
           user_id: user.id,
           store_id: storeId,
@@ -210,7 +291,7 @@ const handleFinalPublishAll = async () => {
           sku: p.barcode || `${p.name.substring(0,3).toUpperCase()}-${Date.now().toString().slice(-4)}`,
           price: parseFloat(p.marketplace_base_price) || parseFloat(p.price) || 0,
           original_price: parseFloat(p.compare_at_price) || 0,
-          cover_image: finalCoverUrl || (finalGalleryUrls.length > 0 ? finalGalleryUrls[0] : null),
+          cover_image: finalCoverUrl || finalMarketplaceImage || (finalGalleryUrls.length > 0 ? finalGalleryUrls[0] : null),
           category_id: p.category_id,
           leaf_category_id: p.leaf_category_id || null,
           parent_category_id: storeParentCategoryId,
@@ -240,6 +321,15 @@ const handleFinalPublishAll = async () => {
           store_address: p.store_address || "",
           has_colors: p.has_colors || false,
           enable_sizes: p.enable_sizes || false,
+          // 🆕 COLUMNS MPYA KWA MAZULIA NA MAKABATI
+          size_format: p.size_format || 'standard',
+          price_per_meter: parseFloat(p.price_per_meter) || 0,
+          price_per_foot: parseFloat(p.price_per_foot) || 0,
+          dimensions: p.dimensions || { length: '', width: '', height: '' },
+          weight: parseFloat(p.weight) || 0,
+          weight_unit: p.weight_unit || 'kg',
+          warranty_months: parseInt(p.warranty_months) || 0,
+          gender: p.gender || [],
           is_approved: false,
           created_at: new Date().toISOString()
         };
@@ -248,9 +338,13 @@ const handleFinalPublishAll = async () => {
           name: productData.name,
           has_colors: productData.has_colors,
           enable_sizes: productData.enable_sizes,
+          size_format: productData.size_format,
           sizes: productData.available_sizes,
           size_stock: productData.size_stock,
-          totalStock: productData.stock_quantity
+          totalStock: productData.stock_quantity,
+          dimensions: productData.dimensions,
+          price_per_meter: productData.price_per_meter,
+          price_per_foot: productData.price_per_foot
         });
 
         const { data: engineData, error: engineError } = await supabase
@@ -262,7 +356,7 @@ const handleFinalPublishAll = async () => {
         if (engineError) throw engineError;
         console.log(`  ✅ Product inserted with ID: ${engineData.id}`);
 
-        // 7. Insert Media Gallery
+        // 8. Insert Media Gallery
         const mediaPayload = [];
         if (finalVideoUrl) {
           mediaPayload.push({ 
@@ -273,7 +367,7 @@ const handleFinalPublishAll = async () => {
           });
         }
 
-        const uniqueGalleryUrls = finalGalleryUrls.filter(url => url !== finalCoverUrl);
+        const uniqueGalleryUrls = finalGalleryUrls.filter(url => url !== finalCoverUrl && url !== finalMarketplaceImage);
         uniqueGalleryUrls.forEach((url, i) => {
           mediaPayload.push({ 
             product_id: engineData.id, 
@@ -290,7 +384,7 @@ const handleFinalPublishAll = async () => {
         }
 
         // ============================================================
-        // 8. INSERT VARIATIONS (Kwa bidhaa zenye rangi)
+        // 9. INSERT VARIATIONS (Kwa bidhaa zenye rangi)
         // 🔥 MUUNDO MPYA: Kila rangi iwe ROW MOJA TU, size_stock iwe JSONB
         // ============================================================
         if (p.has_colors && p.colors && p.colors.length > 0) {
@@ -311,7 +405,7 @@ const handleFinalPublishAll = async () => {
             }
             
             // 🔥 MUHIMU: Kila rangi iwe ROW MOJA TU (sio kwa kila size)
-            const variationSku = `${engineData.id.slice(0,8)}-${color.replace('#', '')}`;
+            const variationSku = `${engineData.id.slice(0,8)}-${color.replace('#', '').replace(/\s/g, '')}`;
             
             // Calculate total stock from all sizes
             const totalStockForColor = Object.values(colorStock).reduce((sum, val) => sum + (Number(val) || 0), 0);
@@ -375,11 +469,9 @@ const handleFinalPublishAll = async () => {
           }
         } 
         // ============================================================
-        // 9. Kwa bidhaa zisizo na rangi (size stock already saved in products_engines)
+        // 10. Kwa bidhaa zisizo na rangi (size stock already saved in products_engines)
         // ============================================================
         else if (p.enable_sizes && p.sizes?.length > 0) {
-          // Kwa bidhaa zisizo na rangi, hakuna haja ya kuingiza kwenye product_variations
-          // size_stock tayari imehifadhiwa kwenye products_engines.size_stock
           console.log("  ℹ️ No color variations needed (size-only product) - size_stock saved in products_engines");
         }
         else {
@@ -391,16 +483,31 @@ const handleFinalPublishAll = async () => {
         
       } catch (productError) {
         console.error(`❌ Error kwenye bidhaa "${p.name}":`, productError.message);
-        errors.push({ name: p.name, error: productError.message });
+        errors.push({ 
+          name: p.name, 
+          error: productError.message,
+          stack: productError.stack 
+        });
       }
     }
 
+    // ================================================================
+    // 🔥 FINAL REPORT
+    // ================================================================
     if (successCount > 0) {
-      alert(`✅ Hongera! Bidhaa ${successCount} zimerushwa sokoni.`);
+      let message = `✅ Hongera! Bidhaa ${successCount} zimerushwa sokoni.`;
+      
       if (errors.length > 0) {
         console.warn("Products with errors:", errors);
-        alert(`⚠️ Bidhaa ${errors.length} zimeshindwa. Angalia console kwa maelezo.`);
+        message += `\n\n⚠️ Bidhaa ${errors.length} zimeshindwa:\n`;
+        errors.forEach((err, i) => {
+          message += `${i+1}. ${err.name}: ${err.error}\n`;
+        });
+        alert(message);
+      } else {
+        alert(message);
       }
+      
       if (onComplete) onComplete();
       setCurrentStep(1);
       // Reset all states
@@ -414,7 +521,7 @@ const handleFinalPublishAll = async () => {
 
   } catch (err) {
     console.error("Fatal error:", err);
-    alert("Hitilafu: " + err.message);
+    alert("Hitilafu ya mfumo: " + err.message);
   } finally {
     setLoading(false);
   }

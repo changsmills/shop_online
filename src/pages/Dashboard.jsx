@@ -786,18 +786,20 @@ export default function Dashboard() {
               )}
             </>
           )}
-
-          {/* ========== COMPONENTS ========== */}
+             {/* ========== COMPONENTS ========== */}
           <div style={{ 
             marginTop: isMobile ? 1 : 5,
             paddingTop: isMobile ? 1 : 3,
           }}>
             <RecentlyViewed
+              key={i18n.language}
               navigate={navigate}
               isMobile={isMobile}
             />
 
+            {/* 🔥 MUHIMU: Hata kama umeweka key, hakikisha hizi components ndani zina useEffect({}, [i18n.language]) */}
             <TrendingNow 
+              key={i18n.language}
               products={trendingProducts} 
               navigate={navigate} 
               selectedCategory={selectedCategoryForComponents} 
@@ -805,30 +807,35 @@ export default function Dashboard() {
             />
 
             <LocationFilter 
+              key={i18n.language}
               navigate={navigate} 
               selectedCategory={selectedCategoryForComponents}  
               isMobile={isMobile} 
             />
 
             <TopStores 
+              key={i18n.language}
               navigate={navigate} 
               selectedCategory={selectedCategoryForComponents} 
               isMobile={isMobile}  
             />
 
             <TopDeals 
+              key={i18n.language}
               navigate={navigate}
               selectedCategory={selectedCategoryForComponents}
               isMobile={isMobile}
             />
 
             <NewArrivals 
+              key={i18n.language}
               navigate={navigate}
               selectedCategory={selectedCategoryForComponents} 
               isMobile={isMobile} 
             />
 
             <JustForYou 
+              key={i18n.language}
               handleAction={handleProtectedAction} 
               search={search}
               selectedCategory={selectedCategoryForComponents}

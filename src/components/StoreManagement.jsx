@@ -106,7 +106,6 @@ const StoreManagement = ({
     }
   };
 
-  // UPDATE SHIPPING METHOD
   const handleUpdateShipping = async (id, updatedFields) => {
     const { error } = await supabase
       .from('shipping_methods')

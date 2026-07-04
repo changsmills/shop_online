@@ -3,8 +3,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, History } from "lucide-react";
 import { supabase } from "../supabaseClient";
 import DashboardCard from "./DashboardCard";
+import { useTranslation } from 'react-i18next'; // ✅ 1. ONGEZA HAPA
+
 
 export default function RecentlyViewed({ navigate, isMobile }) {
+   const { t, i18n } = useTranslation(); // ✅ 2. ONGEZA HAPA
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const scrollContainerRef = useRef(null);
@@ -41,7 +44,7 @@ export default function RecentlyViewed({ navigate, isMobile }) {
     };
 
     fetchRecentlyViewed();
-  }, []);
+  }, [i18n.language]); // ✅ 3. MUHIMU: Ongeza i18n.language hapa!
 
   const checkScrollPosition = () => {
     if (scrollContainerRef.current) {
@@ -90,7 +93,7 @@ export default function RecentlyViewed({ navigate, isMobile }) {
         margin: isMobile ? '2px 0' : '10px 0'
       }}
     >
-      {/* Header Section - Same as NewArrivals */}
+            {/* Header Section - Same as NewArrivals */}
       <div style={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
@@ -114,7 +117,8 @@ export default function RecentlyViewed({ navigate, isMobile }) {
               margin: 0,
               lineHeight: isMobile ? '1.3' : '1.4'
             }}>
-              Recently Viewed
+              {/* ✅ BADILISHA HAPA: Badilisha maandishi kuwa {t('...')} */}
+              {t('recently_viewed')}
             </h2>
           </div>
           <p style={{ 
@@ -123,7 +127,8 @@ export default function RecentlyViewed({ navigate, isMobile }) {
             fontSize: isMobile ? '9px' : '16px',
             lineHeight: isMobile ? '1.2' : '1.5'
           }}>
-            Items you recently viewed on Skyfall.com
+            {/* ✅ BADILISHA HAPA: Badilisha subtitle kuwa {t('...')} */}
+            {t('items_you_recently_viewed')}
           </p>
         </div>
         
@@ -131,7 +136,8 @@ export default function RecentlyViewed({ navigate, isMobile }) {
           <button 
             onClick={() => navigate('/products', { 
               state: { 
-                sectionName: "Recently Viewed"
+                /* ✅ BADILISHA HAPA: Badilisha jina la section */
+                sectionName: t('recently_viewed')
               } 
             })}
             style={{ 
@@ -159,7 +165,8 @@ export default function RecentlyViewed({ navigate, isMobile }) {
               e.currentTarget.style.boxShadow = '0 2px 8px rgba(16, 185, 129, 0.3)';
             }}
           >
-            <span>View more</span>
+            {/* ✅ BADILISHA HAPA: Badilisha "View more" kuwa {t('view_more')} */}
+            <span>{t('view_more')}</span>
             <ChevronRight size={isMobile ? 10 : 16} />
           </button>
         )}
@@ -203,7 +210,8 @@ export default function RecentlyViewed({ navigate, isMobile }) {
                 onClick={() => navigate('/products', {
                   state: {
                     priorityId: product.id,
-                    sectionName: "Recently Viewed"
+                   sectionName: t('recently_viewed')
+
                   }
                 })}
               />
@@ -280,7 +288,7 @@ export default function RecentlyViewed({ navigate, isMobile }) {
           onClick={() => {
             // 1. Maandalizi ya URL params
             const priorityId = product.id;
-            const sectionName = encodeURIComponent("Recently Viewed");
+            const sectionName = encodeURIComponent(t('recently_viewed')); // ✅ BADILISHA HAPA
 
             // 2. Kutengeneza URL
             const url = `/products?priorityId=${priorityId}&sectionName=${sectionName}`;

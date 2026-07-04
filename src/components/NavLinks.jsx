@@ -350,8 +350,7 @@ export default function NavLinks({ isMobile }) {
 
   // ===============================================
   // 🔥 MWANZO WA LOGIC YA MOBILE BOTTOM NAV (Imeongezwa hapa!)
-  // ===============================================
-  if (isMobile) {
+    if (isMobile) {
     return (
       <div style={{
         position: 'fixed',
@@ -369,26 +368,23 @@ export default function NavLinks({ isMobile }) {
       }}>
         <Link to="/" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#666', textDecoration: 'none', fontSize: '10px' }}>
           <LucideIcons.Home size={24} />
-          <span>Home</span>
+          <span>{t('home')}</span>
         </Link>
         <Link to="/categories" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#666', textDecoration: 'none', fontSize: '10px' }}>
           <LucideIcons.Grid size={24} />
-          <span>Categories</span>
+          <span>{t('categories')}</span>
         </Link>
         <Link to="/cart" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#666', textDecoration: 'none', fontSize: '10px' }}>
           <LucideIcons.ShoppingCart size={24} />
-          <span>Cart</span>
+          <span>{t('cart')}</span>
         </Link>
         <Link to="/dashboard/login" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#666', textDecoration: 'none', fontSize: '10px' }}>
           <LucideIcons.User size={24} />
-          <span>Account</span>
+          <span>{t('account')}</span>
         </Link>
       </div>
     );
   }
-  // ===============================================
-  // MWISHO WA LOGIC YA MOBILE BOTTOM NAV
-  // ===============================================
 
   // ===============================================
   // DESKTOP NAVIGATION (Inabaki kama ilivyo)
@@ -522,31 +518,31 @@ export default function NavLinks({ isMobile }) {
       
       {/* Sehemu yako ya kwanza: Ulinzi wa Malipo */}
       <div>
-        <h4 style={headerStyle}>Ulinzi wa Malipo</h4>
+        <h4 style={headerStyle}>{t('payment_protection')}</h4>
         <ul style={ulStyle}>
-          <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.Lock size={16} color="#27ae60" /><Link to="/payment-protection" style={linkStyle}>Malipo yako yanalindwa</Link></li>
-          <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.CreditCard size={16} color="#27ae60" /><Link to="/refund-policy" style={linkStyle}>Sera ya Kurudisha Pesa</Link></li>
-          <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.ShieldCheck size={16} color="#27ae60" /><Link to="/buyer-protection" style={linkStyle}>Ulinzi wa Mnunuzi</Link></li>
+          <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.Lock size={16} color="#27ae60" /><Link to="/payment-protection" style={linkStyle}>{t('your_payment_protected')}</Link></li>
+          <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.CreditCard size={16} color="#27ae60" /><Link to="/refund-policy" style={linkStyle}>{t('refund_policy')}</Link></li>
+          <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.ShieldCheck size={16} color="#27ae60" /><Link to="/buyer-protection" style={linkStyle}>{t('buyer_protection')}</Link></li>
         </ul>
       </div>
       
       {/* Sehemu yako ya pili: Ukiwa na Tatizo la Bidhaa */}
       <div>
-        <h4 style={headerStyle}>Ukiwa na Tatizo la Bidhaa</h4>
+        <h4 style={headerStyle}>{t('product_issues')}</h4>
         <ul style={ulStyle}>
-          <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.FileWarning size={16} color="#dc2626" /><Link to="/dispute" style={linkStyle}>Fungua Shauri (Dispute)</Link></li>
-          <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.Flag size={16} color="#dc2626" /><Link to="/report-product" style={linkStyle}>Ripoti Bidhaa Mbovu</Link></li>
-          <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.MessageCircle size={16} color="#dc2626" /><Link to="/contact-support" style={linkStyle}>Wasiliana na Msaada</Link></li>
+          <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.FileWarning size={16} color="#dc2626" /><Link to="/dispute" style={linkStyle}>{t('file_dispute')}</Link></li>
+          <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.Flag size={16} color="#dc2626" /><Link to="/report-product" style={linkStyle}>{t('report_bad_product')}</Link></li>
+          <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.MessageCircle size={16} color="#dc2626" /><Link to="/contact-support" style={linkStyle}>{t('contact_support')}</Link></li>
         </ul>
       </div>
       
       {/* Sehemu yako ya tatu: Uhakiki wa Bidhaa */}
       <div>
-        <h4 style={headerStyle}>Uhakiki wa Bidhaa</h4>
+        <h4 style={headerStyle}>{t('verified_products')}</h4>
         <ul style={ulStyle}>
-          <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.CheckCircle size={16} color="#0071dc" /><Link to="/verification" style={linkStyle}>Bidhaa Zilizothibitishwa</Link></li>
-          <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.Star size={16} color="#0071dc" /><Link to="/reviews" style={linkStyle}>Mapitio ya Wanunuzi</Link></li>
-          <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.Truck size={16} color="#0071dc" /><Link to="/shipping-protection" style={linkStyle}>Ulinzi wa Usafirishaji</Link></li>
+          <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.CheckCircle size={16} color="#0071dc" /><Link to="/verification" style={linkStyle}>{t('product_verification')}</Link></li>
+          <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.Star size={16} color="#0071dc" /><Link to="/reviews" style={linkStyle}>{t('buyer_reviews')}</Link></li>
+          <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.Truck size={16} color="#0071dc" /><Link to="/shipping-protection" style={linkStyle}>{t('shipping_protection')}</Link></li>
         </ul>
       </div>
 
@@ -591,46 +587,46 @@ export default function NavLinks({ isMobile }) {
       
       {/* Sehemu ya Kwanza */}
       <div>
-        <h4 style={headerStyle}>Kwanini Skyfall?</h4>
+        <h4 style={headerStyle}>{t('why_skyfall')}</h4>
         <ul style={ulStyle}>
-          <li style={liStyle}><Link to="/about-skyfall" style={linkStyle}>Skyfall ni nini?</Link></li>
-          <li style={liStyle}><Link to="/how-to-buy" style={linkStyle}>Jinsi ya kununua (Guide)</Link></li>
-          <li style={liStyle}><Link to="/wholesale-benefits" style={linkStyle}>Faida za wanachama</Link></li>
-          <li style={liStyle}><Link to="/blogs" style={linkStyle}>Makala za Biashara</Link></li>
+          <li style={liStyle}><Link to="/about-skyfall" style={linkStyle}>{t('what_is_skyfall')}</Link></li>
+          <li style={liStyle}><Link to="/how-to-buy" style={linkStyle}>{t('how_to_buy')}</Link></li>
+          <li style={liStyle}><Link to="/wholesale-benefits" style={linkStyle}>{t('wholesale_benefits')}</Link></li>
+          <li style={liStyle}><Link to="/blogs" style={linkStyle}>{t('business_articles')}</Link></li>
         </ul>
       </div>
       
       {/* Sehemu ya Pili */}
       <div>
-        <h4 style={headerStyle}>Huduma za Biashara</h4>
+        <h4 style={headerStyle}>{t('business_services')}</h4>
         <ul style={ulStyle}>
-          <li style={liStyle}><Link to="/protections" style={linkStyle}>Ulinzi wa Malipo</Link></li>
-          <li style={liStyle}><Link to="/logistics" style={linkStyle}>Fuatilia Stendi (Logistics)</Link></li>
-          <li style={liStyle}><Link to="/quotes" style={linkStyle}>Maombi ya Invoice</Link></li>
-          <li style={liStyle}><Link to="/verification" style={linkStyle}>Uhakiki wa Bidhaa</Link></li>
+          <li style={liStyle}><Link to="/protections" style={linkStyle}>{t('payment_protection')}</Link></li>
+          <li style={liStyle}><Link to="/logistics" style={linkStyle}>{t('track_logistics')}</Link></li>
+          <li style={liStyle}><Link to="/quotes" style={linkStyle}>{t('invoice_requests')}</Link></li>
+          <li style={liStyle}><Link to="/verification" style={linkStyle}>{t('product_verification')}</Link></li>
         </ul>
       </div>
       
       {/* Sehemu ya Tatu */}
       <div>
-        <h4 style={headerStyle}>Msaada & Huduma</h4>
+        <h4 style={headerStyle}>{t('support_help')}</h4>
         <ul style={ulStyle}>
-          <li style={liStyle}><Link to="/help-center" style={linkStyle}>Kwa Wanunuzi</Link></li>
-          <li style={liStyle}><Link to="/dispute" style={linkStyle}>Fungua Shauri (Dispute)</Link></li>
-          <li style={liStyle}><Link to="/report" style={linkStyle}>Ripoti Tatizo</Link></li>
-          <li style={liStyle}><a href="https://wa.me/255..." style={linkStyle}>Chat nasi WhatsApp</a></li>
+          <li style={liStyle}><Link to="/help-center" style={linkStyle}>{t('for_buyers')}</Link></li>
+          <li style={liStyle}><Link to="/dispute" style={linkStyle}>{t('open_dispute')}</Link></li>
+          <li style={liStyle}><Link to="/report" style={linkStyle}>{t('report_issue')}</Link></li>
+          <li style={liStyle}><a href="https://wa.me/255..." style={linkStyle}>{t('chat_whatsapp')}</a></li>
         </ul>
       </div>
       
       {/* Sehemu ya Nne (Upande wa kulia) */}
       <div style={{ borderLeft: '1px solid #eee', paddingLeft: '30px' }}>
-        <h4 style={headerStyle}>Washirika Wetu</h4>
+        <h4 style={headerStyle}>{t('our_partners')}</h4>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px', padding: '15px', border: '1px solid #eee', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
           <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ff6a00' }}>SF</div>
           <div>
-            <div style={{ fontWeight: '600', fontSize: '14px' }}>Unganisha Duka Lako</div>
-            <p style={{ fontSize: '12px', color: '#666', margin: '4px 0' }}>Sajili duka lako uanze kuuza jumla nchi nzima.</p>
-            <Link to="/create-store" style={{ color: '#ff6a00', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>Anza Sasa →</Link>
+            <div style={{ fontWeight: '600', fontSize: '14px' }}>{t('connect_your_store')}</div>
+            <p style={{ fontSize: '12px', color: '#666', margin: '4px 0' }}>{t('register_store_description')}</p>
+            <Link to="/create-store" style={{ color: '#ff6a00', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>{t('start_now')}</Link>
           </div>
         </div>
       </div>
@@ -673,43 +669,43 @@ export default function NavLinks({ isMobile }) {
       
       {/* Sehemu ya kwanza */}
       <div>
-        <h4 style={headerStyle}>Msaada kwa Wanunuzi</h4>
+        <h4 style={headerStyle}>{t('buyer_help')}</h4>
         <ul style={ulStyle}>
-          <li style={liStyle}><Link to="/help-center" style={linkStyle}>Kituo cha Msaada (FAQ)</Link></li>
-          <li style={liStyle}><Link to="/how-to-buy" style={linkStyle}>Jinsi ya kununua</Link></li>
-          <li style={liStyle}><Link to="/shipping-info" style={linkStyle}>Maelezo ya Usafirishaji</Link></li>
-          <li style={liStyle}><Link to="/refund-policy" style={linkStyle}>Sera ya kurudisha pesa</Link></li>
+          <li style={liStyle}><Link to="/help-center" style={linkStyle}>{t('help_center_desc')}</Link></li>
+          <li style={liStyle}><Link to="/how-to-buy" style={linkStyle}>{t('how_to_buy')}</Link></li>
+          <li style={liStyle}><Link to="/shipping-info" style={linkStyle}>{t('shipping_info')}</Link></li>
+          <li style={liStyle}><Link to="/refund-policy" style={linkStyle}>{t('refund_policy')}</Link></li>
         </ul>
       </div>
       
       {/* Sehemu ya pili */}
       <div>
-        <h4 style={headerStyle}>Usalama & Sheria</h4>
+        <h4 style={headerStyle}>{t('security_policies')}</h4>
         <ul style={ulStyle}>
-          <li style={liStyle}><Link to="/dispute" style={linkStyle}>Fungua Shauri (Dispute)</Link></li>
-          <li style={liStyle}><Link to="/report-abuse" style={linkStyle}>Ripoti utapeli/ubadhifu</Link></li>
-          <li style={liStyle}><Link to="/terms" style={linkStyle}>Vigezo na Masharti</Link></li>
-          <li style={liStyle}><Link to="/privacy" style={linkStyle}>Sera ya Faragha</Link></li>
+          <li style={liStyle}><Link to="/dispute" style={linkStyle}>{t('open_dispute')}</Link></li>
+          <li style={liStyle}><Link to="/report-abuse" style={linkStyle}>{t('report_scam')}</Link></li>
+          <li style={liStyle}><Link to="/terms" style={linkStyle}>{t('terms_conditions')}</Link></li>
+          <li style={liStyle}><Link to="/privacy" style={linkStyle}>{t('privacy_policy')}</Link></li>
         </ul>
       </div>
       
       {/* Sehemu ya tatu */}
       <div>
-        <h4 style={headerStyle}>Wasiliana Nasi</h4>
+        <h4 style={headerStyle}>{t('contact_us')}</h4>
         <ul style={ulStyle}>
-          <li style={liStyle}><a href="https://wa.me/255..." style={linkStyle}>Chat na Msaidizi (WhatsApp)</a></li>
-          <li style={liStyle}><Link to="/contact-us" style={linkStyle}>Tutumie Barua Pepe</Link></li>
-          <li style={liStyle}><Link to="/office-location" style={linkStyle}>Ofisi zetu zilipo</Link></li>
+          <li style={liStyle}><a href="https://wa.me/255..." style={linkStyle}>{t('chat_whatsapp')}</a></li>
+          <li style={liStyle}><Link to="/contact-us" style={linkStyle}>{t('email_us')}</Link></li>
+          <li style={liStyle}><Link to="/office-location" style={linkStyle}>{t('our_offices')}</Link></li>
         </ul>
       </div>
       
       {/* Sehemu ya nne (Upande wa kulia) */}
       <div style={{ borderLeft: '1px solid #eee', paddingLeft: '30px' }}>
-        <h4 style={headerStyle}>Jifunze zaidi</h4>
+        <h4 style={headerStyle}>{t('learn_more')}</h4>
         <div style={{ padding: '15px', border: '1px solid #eef2ff', borderRadius: '8px', backgroundColor: '#f8faff' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}><LucideIcons.PlayCircle size={24} color="#0071dc" /><span style={{ fontWeight: '600', fontSize: '14px' }}>Video Tutorials</span></div>
-          <p style={{ fontSize: '12px', color: '#666', lineHeight: '1.5' }}>Tazama video fupi za jinsi ya kutumia Skyfall kupata bidhaa bora kwa bei ya jumla.</p>
-          <Link to="/tutorials" style={{ color: '#0071dc', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none', display: 'block', marginTop: '10px' }}>Tazama Video →</Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}><LucideIcons.PlayCircle size={24} color="#0071dc" /><span style={{ fontWeight: '600', fontSize: '14px' }}>{t('video_tutorials')}</span></div>
+          <p style={{ fontSize: '12px', color: '#666', lineHeight: '1.5' }}>{t('video_description')}</p>
+          <Link to="/tutorials" style={{ color: '#0071dc', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none', display: 'block', marginTop: '10px' }}>{t('watch_videos')}</Link>
         </div>
       </div>
 
@@ -719,7 +715,7 @@ export default function NavLinks({ isMobile }) {
 )}
 
         <div onClick={handleSellNavigation} className="nav-sell-link" onMouseEnter={() => setActiveNav('sell')} onMouseLeave={() => setActiveNav(null)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', whiteSpace: 'nowrap', flexShrink: 0, padding: '8px 12px', border: '1px solid #eee', borderRadius: '4px', textDecoration: 'none', color: 'inherit', backgroundColor: user ? 'transparent' : '#fff7f2', position: 'relative', cursor: 'pointer' }}>
-          <span style={{ fontWeight: '500', fontSize: '14px' }}>{t('sell_on_skyfall', 'Sell on Skyfall.com')}</span>
+          <span style={{ fontWeight: '500', fontSize: '14px' }}>{t('sell_on_skyfall')}</span>
           {activeNav === 'sell' && (<div style={{ position: 'absolute', bottom: '-8px', left: '0', right: '0', height: '3px', backgroundColor: '#ff6a00', borderRadius: '2px', transition: 'all 0.2s ease' }} />)}
         </div>
       </div>

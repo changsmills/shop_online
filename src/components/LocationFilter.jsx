@@ -3,8 +3,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, MapPin } from "lucide-react";
 import { supabase } from "../supabaseClient";
 import DashboardCard from "./DashboardCard";
+import { useTranslation } from 'react-i18next'; // ✅ 1. ONGEZA HAPA
+
 
 export default function LocationFilter({ navigate, isMobile }) {
+  const { t, i18n } = useTranslation(); // ✅ 2. ONGEZA HAPA
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const scrollContainerRef = useRef(null);
@@ -60,7 +63,7 @@ export default function LocationFilter({ navigate, isMobile }) {
       }
     };
     fetchLocations();
-  }, []);
+  }, [i18n.language]);
 
   const checkScrollPosition = () => {
     if (scrollContainerRef.current) {
@@ -112,7 +115,7 @@ export default function LocationFilter({ navigate, isMobile }) {
         margin: isMobile ? '2px 0' : '10px 0'
       }}
     >
-      {/* Header Section - Same as TopDeals */}
+            {/* Header Section - Same as TopDeals */}
       <div style={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
@@ -136,7 +139,8 @@ export default function LocationFilter({ navigate, isMobile }) {
               margin: 0,
               lineHeight: isMobile ? '1.3' : '1.4'
             }}>
-              Shop by Location
+              {/* ✅ 4. BADILISHA HAPA */}
+              {t('shop_by_location')}
             </h2>
           </div>
           <p style={{ 
@@ -145,12 +149,13 @@ export default function LocationFilter({ navigate, isMobile }) {
             fontSize: isMobile ? '9px' : '16px',
             lineHeight: isMobile ? '1.2' : '1.5'
           }}>
-            Find the best deals from verified sellers near your city.
+            {/* ✅ 5. BADILISHA HAPA */}
+            {t('find_best_deals_near_you')}
           </p>
         </div>
         
         <button 
-          onClick={() => navigate('/products', { state: { sectionName: "Shop by Location" } })}
+          onClick={() => navigate('/products', { state: { sectionName: t('shop_by_location') } })} // ✅ 6. BADILISHA HAPA
           style={{ 
             display: 'flex', 
             alignItems: 'center', 
@@ -176,7 +181,8 @@ export default function LocationFilter({ navigate, isMobile }) {
             e.currentTarget.style.boxShadow = '0 2px 8px rgba(59, 130, 246, 0.3)';
           }}
         >
-          <span>View more</span>
+          {/* ✅ 7. BADILISHA HAPA */}
+          <span>{t('view_more')}</span>
           <ChevronRight size={isMobile ? 10 : 16} />
         </button>
       </div>
@@ -216,10 +222,10 @@ export default function LocationFilter({ navigate, isMobile }) {
                 price={loc.price}
                 isLocation={true}
                 isMobile={isMobile}
-                onClick={() => navigate('/products', { 
+                  onClick={() => navigate('/products', { 
                   state: { 
                     location: loc.name, 
-                    sectionName: `Products in ${loc.name}` 
+                    sectionName: `${t('products_in')} ${loc.name}` // ✅ 8. BADILISHA HAPA
                   } 
                 })}
               />
@@ -293,10 +299,10 @@ export default function LocationFilter({ navigate, isMobile }) {
   price={loc.price}
   isLocation={true}
   isMobile={isMobile}
-  onClick={() => {
+   onClick={() => {
     // 1. Maandalizi ya data kwa ajili ya URL
     const locationName = encodeURIComponent(loc.name);
-    const sectionTitle = `Products in ${loc.name}`;
+    const sectionTitle = `${t('products_in')} ${loc.name}`; // ✅ 9. BADILISHA HAPA
     const encodedSectionName = encodeURIComponent(sectionTitle);
 
     // 2. Tengeneza URL string

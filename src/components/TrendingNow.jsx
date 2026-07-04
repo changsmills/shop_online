@@ -3,8 +3,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, TrendingUp } from "lucide-react";
 import { supabase } from "../supabaseClient";
 import DashboardCard from "./DashboardCard";
+import { useTranslation } from 'react-i18next'; // ✅ ONGEZA HAPA
+
 
 export default function TrendingNow({ navigate, selectedCategory, isMobile }) {
+  const { t, i18n } = useTranslation(); // ✅ ONGEZA HAPA
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const scrollContainerRef = useRef(null);
@@ -39,7 +42,7 @@ export default function TrendingNow({ navigate, selectedCategory, isMobile }) {
     };
 
     fetchTrending();
-  }, [selectedCategory]);
+  }, [selectedCategory, i18n.language]);
 
   const checkScrollPosition = () => {
     if (scrollContainerRef.current) {
@@ -91,7 +94,7 @@ export default function TrendingNow({ navigate, selectedCategory, isMobile }) {
         margin: isMobile ? '2px 0' : '10px 0'
       }}
     >
-      {/* Header Section - Same as TopDeals */}
+            {/* Header Section - Same as TopDeals */}
       <div style={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
@@ -115,7 +118,12 @@ export default function TrendingNow({ navigate, selectedCategory, isMobile }) {
               margin: 0,
               lineHeight: isMobile ? '1.3' : '1.4'
             }}>
-              Hot Picks {selectedCategory && `in ${selectedCategory.name}`}
+              {/* ✅ BADILISHA HAPA: Tumia t() na usionyeshe 'in' ikiwa hakuna category */}
+              {selectedCategory && selectedCategory.id !== null ? (
+                `${t('hot_picks')} ${t('in')} ${getCategoryDisplayName(selectedCategory)}`
+              ) : (
+                t('hot_picks')
+              )}
             </h2>
           </div>
           <p style={{ 
@@ -124,14 +132,15 @@ export default function TrendingNow({ navigate, selectedCategory, isMobile }) {
             fontSize: isMobile ? '9px' : '16px',
             lineHeight: isMobile ? '1.2' : '1.5'
           }}>
-            Check out the most popular items people are buying right now.
+            {/* ✅ BADILISHA HAPA */}
+            {t('check_popular_items')}
           </p>
         </div>
         
         <button 
           onClick={() => navigate('/products', { 
             state: { 
-              sectionName: 'Trending Now',
+              sectionName: t('hot_picks'), // ✅ BADILISHA HAPA
               categoryId: selectedCategory?.id 
             } 
           })}
@@ -160,7 +169,8 @@ export default function TrendingNow({ navigate, selectedCategory, isMobile }) {
             e.currentTarget.style.boxShadow = '0 2px 8px rgba(139, 92, 246, 0.3)';
           }}
         >
-          <span>View more</span>
+          {/* ✅ BADILISHA HAPA */}
+          <span>{t('view_more')}</span>
           <ChevronRight size={isMobile ? 10 : 16} />
         </button>
       </div>
@@ -200,11 +210,11 @@ export default function TrendingNow({ navigate, selectedCategory, isMobile }) {
                 views={item.views}
                 rank={index + 1}
                 isMobile={isMobile}
-                onClick={() => navigate('/products', {
+                                onClick={() => navigate('/products', {
                   state: {
                     sortBy: 'order_count',
                     order: 'desc',
-                    sectionName: `Trending in ${selectedCategory?.name || 'All'}`,
+                    sectionName: `${t('hot_picks')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`, // ✅ BADILISHA HAPA
                     priorityId: item.id,
                     categoryId: selectedCategory?.id
                   }
@@ -280,12 +290,11 @@ export default function TrendingNow({ navigate, selectedCategory, isMobile }) {
                   views={item.views}
                   rank={index + 1}
                   isMobile={isMobile}
- onClick={() => {
+  onClick={() => {
   const queryParams = {
-    // Inatuma categoryId TU kama ipo, kuzuia kosa la "all" kuwa UUID
     ...(selectedCategory?.id && { categoryId: selectedCategory.id }),
     categoryName: selectedCategory?.name || 'All',
-    sectionName: `Trending in ${selectedCategory?.name || 'All'}`,
+    sectionName: `${t('hot_picks')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`, // ✅ BADILISHA HAPA
     sortBy: 'order_count',
     order: 'desc',
     priorityId: item.id

@@ -72,14 +72,18 @@ const Header = () => {
       }}
     >
       <div style={{ marginBottom: '20px' }}>
-        <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: '700', color: '#1a1a1a' }}>Set language and currency</h3>
+        <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: '700', color: '#1a1a1a' }}>
+          {t('set_language_currency')}
+        </h3>
         <p style={{ margin: 0, fontSize: '13px', color: '#666', lineHeight: '1.4' }}>
-          Select your preferred language and currency.
+          {t('select_preferred_language')}
         </p>
       </div>
 
       <div style={{ marginBottom: '16px' }}>
-        <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#333' }}>Language</label>
+        <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#333' }}>
+          {t('language')}
+        </label>
         <select 
           value={language} 
           onChange={(e) => changeLanguage(e.target.value)}
@@ -94,7 +98,9 @@ const Header = () => {
       </div>
 
       <div style={{ marginBottom: '20px' }}>
-        <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#333' }}>Currency</label>
+        <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#333' }}>
+          {t('currency')}
+        </label>
         <select 
           value={currency} 
           onChange={(e) => setCurrency(e.target.value)}
@@ -119,7 +125,7 @@ const Header = () => {
         onMouseOver={(e) => e.target.style.background = '#e55a00'}
         onMouseOut={(e) => e.target.style.background = '#FF6600'}
       >
-        Save
+        {t('save')}
       </button>
     </div>
   );
@@ -142,9 +148,11 @@ const Header = () => {
       }}
     >
       <div style={{ marginBottom: '20px' }}>
-        <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: '700', color: '#1a1a1a' }}>Specify your location</h3>
+        <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: '700', color: '#1a1a1a' }}>
+          {t('specify_location')}
+        </h3>
         <p style={{ margin: 0, fontSize: '13px', color: '#666', lineHeight: '1.4' }}>
-          Shipping options and fees vary based on your location.
+          {t('shipping_options_desc')}
         </p>
       </div>
 
@@ -156,11 +164,11 @@ const Header = () => {
           cursor: 'pointer', marginBottom: '15px'
         }}
       >
-        Add address
+        {t('add_address')}
       </button>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999', fontSize: '12px', marginBottom: '15px' }}>
-        <span style={{ padding: '0 10px', background: '#fff' }}>Or</span>
+        <span style={{ padding: '0 10px', background: '#fff' }}>{t('or')}</span>
       </div>
 
       <div style={{ marginBottom: '12px' }}>
@@ -181,7 +189,7 @@ const Header = () => {
       <div style={{ marginBottom: '20px' }}>
         <input 
           type="text" 
-          placeholder="Enter ZIP or postal code"
+          placeholder={t('enter_zip_postal')}
           value={zipCode}
           onChange={(e) => setZipCode(e.target.value)}
           style={{
@@ -201,7 +209,7 @@ const Header = () => {
         onMouseOver={(e) => e.target.style.background = '#e55a00'}
         onMouseOut={(e) => e.target.style.background = '#FF6600'}
       >
-        Save
+        {t('save')}
       </button>
     </div>
   );

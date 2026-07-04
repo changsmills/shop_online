@@ -690,11 +690,10 @@ export default function PhysicalDashboard() {
 {/* --- TAB 1: OVERVIEW --- */}
 <div style={{ display: activeTab === 'overview' ? 'block' : 'none' }}>
   
-  {/* Container inayoshikilia StoreHeader na Logo zake */}
+  {/* StoreHeader */}
   <div style={{ 
     position: 'relative', 
     zIndex: 9998,
-    // 🔥 HAPA NDIYO SULUHISHO: Tunahamisha marginBottom hapa
     marginBottom: isMobile ? '45px' : '60px'
   }}>  
     <StoreHeader
@@ -708,35 +707,59 @@ export default function PhysicalDashboard() {
     />
   </div>
 
-  {/* 🔥 Logo inaweza kuwekwa hapa kwa kutumia position absolute, au ndani ya StoreHeader ikiwa imebaki */}
-  {/* ... logo yako ikiwa haiko ndani ya StoreHeader ... */}
-
   <section style={{ marginBottom: '16px', marginTop: '16px' }}>
+    
+    {/* 1. MUHTASARI WA BIASHARA */}
     <BusinessAnalytics products={myProducts} sellerId={myStore?.id} />
-    <div
-      onClick={() => navigate('/advertise')}
-      style={{
-        background: 'linear-gradient(135deg, #ff4e00 0%, #ec2f4b 100%)',
-        borderRadius: '20px',
-        padding: '20px',
-        color: 'white',
-        cursor: 'pointer',
-        position: 'relative',
-        overflow: 'hidden',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginTop: '16px'
-      }}
-    >
-      <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Rocket size={20} />
-          <b>ONGEZA MAUZO LEO!</b>
+
+    {/* 🔥 2. STORE MANAGEMENT - SASA IMEKUWA SEHEMU YA KUKAA CHINI YA ANALYTICS */}
+    <div style={{ marginTop: '24px' }}>
+      <StoreManagement
+        isManageMode={isManageMode}
+        isMobile={isMobile}
+        setIsManageMode={setIsManageMode}
+        myStoreSubCats={myStoreSubCats}
+        attributes={attributes}
+        setAttributes={setAttributes}
+        handleRemoveCategoryFromStore={handleRemoveCategoryFromStore}
+        setShowCategoryManager={setShowCategoryManager}
+        officePreviews={officePreviews}
+        setOfficeFiles={setOfficeFiles}
+        setOfficePreviews={setOfficePreviews}
+        officeInputRefs={officeInputRefs}
+        storeMeta={storeMeta}
+        setStoreMeta={setStoreMeta}
+        isUpdatingStore={isUpdatingStore}
+        handleUpdateStoreDetails={handleUpdateStoreDetails}
+      />
+    </div>
+
+    {/* 3. BANNER YA MATANGAZO (Inabaki chini kabisa) */}
+    <div style={{ marginTop: '24px' }}>
+      <div
+        onClick={() => navigate('/advertise')}
+        style={{
+          background: 'linear-gradient(135deg, #ff4e00 0%, #ec2f4b 100%)',
+          borderRadius: '20px',
+          padding: '20px',
+          color: 'white',
+          cursor: 'pointer',
+          position: 'relative',
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
+      >
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Rocket size={20} />
+            <b>ONGEZA MAUZO LEO!</b>
+          </div>
+          <p style={{ fontSize: '12px', opacity: 0.9, margin: '4px 0 0 0' }}>Weka bidhaa zako mbele ya maelfu ya wateja sasa.</p>
         </div>
-        <p style={{ fontSize: '12px', opacity: 0.9, margin: '4px 0 0 0' }}>Weka bidhaa zako mbele ya maelfu ya wateja sasa.</p>
+        <button style={{ backgroundColor: 'white', color: '#ff4e00', padding: '10px 20px', borderRadius: '12px', fontWeight: 'bold', border: 'none' }}>TANGAA SASA 🚀</button>
       </div>
-      <button style={{ backgroundColor: 'white', color: '#ff4e00', padding: '10px 20px', borderRadius: '12px', fontWeight: 'bold', border: 'none' }}>TANGAA SASA 🚀</button>
     </div>
   </section>
 </div>
@@ -836,28 +859,6 @@ export default function PhysicalDashboard() {
             {/* --- TAB 4: ANALYTICS --- */}
             <div style={{ display: activeTab === 'analytics' ? 'block' : 'none' }}>
               <BusinessAnalytics products={myProducts} sellerId={myStore?.id} />
-            </div>
-
-            {/* --- TAB 5: STORE SETTINGS --- */}
-            <div style={{ display: activeTab === 'store-settings' ? 'block' : 'none' }}>
-              <StoreManagement
-                isManageMode={isManageMode}
-                isMobile={isMobile}
-                setIsManageMode={setIsManageMode}
-                myStoreSubCats={myStoreSubCats}
-                attributes={attributes}
-                setAttributes={setAttributes}
-                handleRemoveCategoryFromStore={handleRemoveCategoryFromStore}
-                setShowCategoryManager={setShowCategoryManager}
-                officePreviews={officePreviews}
-                setOfficeFiles={setOfficeFiles}
-                setOfficePreviews={setOfficePreviews}
-                officeInputRefs={officeInputRefs}
-                storeMeta={storeMeta}
-                setStoreMeta={setStoreMeta}
-                isUpdatingStore={isUpdatingStore}
-                handleUpdateStoreDetails={handleUpdateStoreDetails}
-              />
             </div>
 
             {/* --- TAB 6: ADVERTISE --- */}

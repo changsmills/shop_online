@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 import "../Footer.css";
-import { FaFacebook, FaInstagram, FaTwitter, FaYoutube, FaCcVisa, FaCcMastercard, FaMobile } from "react-icons/fa";
+import { FaFacebook, FaInstagram, FaTwitter, FaYoutube, FaCcVisa, FaCcMastercard } from "react-icons/fa";
+import { useTranslation } from 'react-i18next';
 
 export default function Footer() {
+  const { t, i18n } = useTranslation();
+
   return (
     <footer className="main-footer">
       <div className="footer-container">
@@ -12,47 +15,47 @@ export default function Footer() {
           
           {/* Customer Care */}
           <div className="footer-column">
-            <h3>Customer Care</h3>
+            <h3>{t('customer_care')}</h3>
             <ul>
-              <li><Link to="/help-center">Help Center</Link></li>
-              <li><Link to="/how-to-buy">How to Buy</Link></li>
-              <li><Link to="/refund-policy">Returns & Refunds</Link></li>
-              <li><Link to="/contact-us">Contact Us</Link></li>
-              <li><Link to="/dispute">Fungua Shauri</Link></li>
+              <li><Link to="/help-center">{t('help_center')}</Link></li>
+              <li><Link to="/how-to-buy">{t('how_to_buy')}</Link></li>
+              <li><Link to="/refund-policy">{t('returns_refunds')}</Link></li>
+              <li><Link to="/contact-us">{t('contact_us')}</Link></li>
+              <li><Link to="/dispute">{t('file_dispute')}</Link></li>
             </ul>
           </div>
 
           {/* About Skyfall */}
           <div className="footer-column">
-            <h3>About Skyfall</h3>
+            <h3>{t('about_skyfall')}</h3>
             <ul>
-              <li><Link to="/about-skyfall">Skyfall ni nini?</Link></li>
-              <li><Link to="/how-it-works">Jinsi ya kuanza kununua</Link></li>
-              <li><Link to="/wholesale-benefits">Faida za wanachama</Link></li>
-              <li><Link to="/blogs">Makala za Biashara</Link></li>
-              <li><Link to="/tutorials">Video Tutorials</Link></li>
+              <li><Link to="/about-skyfall">{t('what_is_skyfall')}</Link></li>
+              <li><Link to="/how-it-works">{t('how_to_start')}</Link></li>
+              <li><Link to="/wholesale-benefits">{t('wholesale_benefits')}</Link></li>
+              <li><Link to="/blogs">{t('business_articles')}</Link></li>
+              <li><Link to="/tutorials">{t('video_tutorials')}</Link></li>
             </ul>
           </div>
 
           {/* Business Services */}
           <div className="footer-column">
-            <h3>Business Services</h3>
+            <h3>{t('business_services')}</h3>
             <ul>
-              <li><Link to="/payment-protection">Ulinzi wa Malipo</Link></li>
-              <li><Link to="/logistics">Fuatilia Stendi</Link></li>
-              <li><Link to="/quotes">Maombi ya Invoice</Link></li>
-              <li><Link to="/verification">Uhakiki wa Bidhaa</Link></li>
-              <li><Link to="/ad-request">Skyfall Ads</Link></li>
+              <li><Link to="/payment-protection">{t('payment_protection')}</Link></li>
+              <li><Link to="/logistics">{t('track_logistics')}</Link></li>
+              <li><Link to="/quotes">{t('invoice_requests')}</Link></li>
+              <li><Link to="/verification">{t('product_verification')}</Link></li>
+              <li><Link to="/ad-request">{t('skyfall_ads')}</Link></li>
             </ul>
           </div>
 
           {/* Legal & Policies */}
           <div className="footer-column">
-            <h3>Legal & Policies</h3>
+            <h3>{t('legal_policies')}</h3>
             <ul>
-              <li><Link to="/privacy">Sera ya Faragha</Link></li>
-              <li><Link to="/terms">Vigezo na Masharti</Link></li>
-              <li><Link to="/report-abuse">Ripoti Utapeli</Link></li>
+              <li><Link to="/privacy">{t('privacy_policy')}</Link></li>
+              <li><Link to="/terms">{t('terms_conditions')}</Link></li>
+              <li><Link to="/report-abuse">{t('report_scam')}</Link></li>
             </ul>
           </div>
 
@@ -63,68 +66,68 @@ export default function Footer() {
           
           {/* Seller Info */}
           <div className="footer-column">
-            <h3>Sell on Platform</h3>
+            <h3>{t('sell_on_platform')}</h3>
             <ul>
-              <li><Link to="/seller-center">Seller Center</Link></li>
-              <li><Link to="/become-partner">Become a Logistics Partner</Link></li>
-              <li><Link to="/warehouse">Warehouse Services</Link></li>
-              <li><Link to="/dashboard/login">Login to Sell</Link></li>
+              <li><Link to="/seller-center">{t('seller_center')}</Link></li>
+              <li><Link to="/become-partner">{t('become_partner')}</Link></li>
+              <li><Link to="/warehouse">{t('warehouse_services')}</Link></li>
+              <li><Link to="/dashboard/login">{t('login_to_sell')}</Link></li>
             </ul>
           </div>
 
           {/* Advertising */}
           <div className="footer-column">
-            <h3>Advertising</h3>
+            <h3>{t('advertising')}</h3>
             <ul>
-              <li><Link to="/ad-request">Ombi la Tangazo</Link></li>
-              <li><Link to="/my-ad-requests">Maombi Yangu</Link></li>
-              <li><Link to="/payments">Bei za Matangazo</Link></li>
-              <li><Link to="/ads-guide">Mwongozo wa Matangazo</Link></li>
+              <li><Link to="/ad-request">{t('ad_request')}</Link></li>
+              <li><Link to="/my-ad-requests">{t('my_ad_requests')}</Link></li>
+              <li><Link to="/payments">{t('ad_prices')}</Link></li>
+              <li><Link to="/ads-guide">{t('ad_guide')}</Link></li>
             </ul>
           </div>
 
           {/* Support */}
           <div className="footer-column">
-            <h3>Support</h3>
+            <h3>{t('support')}</h3>
             <ul>
-              <li><a href="https://wa.me/255700000000">WhatsApp Support</a></li>
-              <li><Link to="/contact-us">Barua Pepe</Link></li>
-              <li><Link to="/office-location">Ofisi zetu</Link></li>
-              <li><Link to="/shipping-info">Maelezo ya Usafirishaji</Link></li>
+              <li><a href="https://wa.me/255700000000">{t('whatsapp_support')}</a></li>
+              <li><Link to="/contact-us">{t('email_us')}</Link></li>
+              <li><Link to="/office-location">{t('our_offices')}</Link></li>
+              <li><Link to="/shipping-info">{t('shipping_info')}</Link></li>
             </ul>
           </div>
 
-       {/* Social & Payment */}
-<div className="footer-column">
-  <h3>Follow Us</h3>
-  <div className="social-icons">
-    <a href="https://facebook.com" target="_blank" rel="noreferrer"><FaFacebook className="icon" /></a>
-    <a href="https://instagram.com" target="_blank" rel="noreferrer"><FaInstagram className="icon" /></a>
-    <a href="https://twitter.com" target="_blank" rel="noreferrer"><FaTwitter className="icon" /></a>
-    <a href="https://youtube.com" target="_blank" rel="noreferrer"><FaYoutube className="icon" /></a>
-  </div>
-  
-  <h3 className="mt-4" style={{ marginTop: '30px', fontSize: '18px', fontWeight: '700' }}>
-    Njia za Malipo (Tanzania)
-  </h3>
-  
-  <div className="payment-methods" style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap', marginTop: '10px' }}>
-    {/* Huduma za Kimataifa */}
-    <FaCcVisa size={35} title="Visa" />
-    <FaCcMastercard size={35} title="Mastercard" />
+          {/* Social & Payment */}
+          <div className="footer-column">
+            <h3>{t('follow_us')}</h3>
+            <div className="social-icons">
+              <a href="https://facebook.com" target="_blank" rel="noreferrer"><FaFacebook className="icon" /></a>
+              <a href="https://instagram.com" target="_blank" rel="noreferrer"><FaInstagram className="icon" /></a>
+              <a href="https://twitter.com" target="_blank" rel="noreferrer"><FaTwitter className="icon" /></a>
+              <a href="https://youtube.com" target="_blank" rel="noreferrer"><FaYoutube className="icon" /></a>
+            </div>
+            
+            <h3 className="mt-4" style={{ marginTop: '30px', fontSize: '18px', fontWeight: '700' }}>
+              {t('payment_methods')}
+            </h3>
+            
+            <div className="payment-methods" style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap', marginTop: '10px' }}>
+              {/* Huduma za Kimataifa */}
+              <FaCcVisa size={35} title="Visa" />
+              <FaCcMastercard size={35} title="Mastercard" />
 
-    {/* Huduma za Nyumbani - Maneno tu */}
-    <span style={{ padding: '4px 10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '12px' }}>M-Pesa</span>
-    <span style={{ padding: '4px 10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '12px' }}>Airtel Money</span>
-    <span style={{ padding: '4px 10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '12px' }}>Tigo Pesa</span>
-    <span style={{ padding: '4px 10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '12px' }}>CRDB</span>
-    <span style={{ padding: '4px 10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '12px' }}>NMB</span>
-  </div>
-  
-  <p style={{ fontSize: '11px', color: '#888', marginTop: '15px' }}>
-    Malipo salama 100%
-  </p>
-</div>
+              {/* Huduma za Nyumbani - Maneno tu */}
+              <span style={{ padding: '4px 10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '12px' }}>M-Pesa</span>
+              <span style={{ padding: '4px 10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '12px' }}>Airtel Money</span>
+              <span style={{ padding: '4px 10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '12px' }}>Tigo Pesa</span>
+              <span style={{ padding: '4px 10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '12px' }}>CRDB</span>
+              <span style={{ padding: '4px 10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '12px' }}>NMB</span>
+            </div>
+            
+            <p style={{ fontSize: '11px', color: '#888', marginTop: '15px' }}>
+              {t('secure_payment')}
+            </p>
+          </div>
 
         </div>
 
@@ -132,12 +135,12 @@ export default function Footer() {
 
         {/* SECTION 2: BOTTOM FOOTER */}
         <div className="footer-bottom">
-          <p>© 2026 Skyfall Virtual Store Platform. All rights reserved.</p>
+          <p>{t('copyright')}</p>
           <div className="footer-bottom-links">
-            <Link to="/terms">Terms</Link>
-            <Link to="/privacy">Privacy</Link>
-            <Link to="/help-center">Help</Link>
-            <Link to="/contact-us">Contact</Link>
+            <Link to="/terms">{t('terms')}</Link>
+            <Link to="/privacy">{t('privacy')}</Link>
+            <Link to="/help-center">{t('help')}</Link>
+            <Link to="/contact-us">{t('contact')}</Link>
           </div>
         </div>
       </div>

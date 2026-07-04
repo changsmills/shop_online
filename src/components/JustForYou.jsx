@@ -3,10 +3,12 @@ import React, { useEffect, useState, useMemo, useRef } from "react";
 import { supabase } from "../supabaseClient";
 import { Loader2, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from 'react-i18next'; // 🆕 ONGEZA HAPA!
 import DashboardCard from "./DashboardCard";
 import "../JustForYou.css"; 
 
 export default function JustForYou({ handleAction, search = "", selectedCategory, isMobile }) {
+  const { t, i18n } = useTranslation(); // 🆕 ONGEZA HAPA!
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -48,11 +50,11 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
     }
   };
 
-  useEffect(() => {
+   useEffect(() => {
     isMounted.current = true;
     fetchJustForYou();
     return () => { isMounted.current = false; };
-  }, [selectedCategory]);
+  }, [selectedCategory, i18n.language]);
 
   const filteredProducts = useMemo(() => {
     if (!search) return products;
@@ -77,6 +79,14 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
       </div>
     );
   }
+  
+  const getCategoryName = () => {
+    if (!selectedCategory) return '';
+    // Ikiwa lugha ni Swahili na ipo, tumia name_sw. Vinginevyo tumia name ya kawaida.
+    return i18n.language === 'sw' 
+      ? (selectedCategory.name_sw || selectedCategory.name) 
+      : selectedCategory.name;
+  };
 
   return (
     <section 
@@ -96,76 +106,86 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
 
       }}
     >
-    {/* Header - Responsive for mobile */}
-<div 
-  className="section-header"
-  style={{
-    padding: isMobile ? '0 8px 12px 8px' : '0 16px 16px 16px',
-    margin: 0,
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    gap: '8px',
-  }}
->
-  <div className="header-main" style={{ flex: 1 }}>
-    <div className="header-text-group">
-      <h2 
-        className="just-title"
-        style={{
-          fontSize: isMobile ? '14px' : '24px',
-          fontWeight: 'bold',
-          margin: 0,
-          lineHeight: isMobile ? '1.3' : '1.4',
-          color:  'black',
-        }}
-      >
-        Just For You {selectedCategory && `in ${selectedCategory.name}`}
-      </h2>
-      <p 
-        className="just-subtitle"
-        style={{
-          fontSize: isMobile ? '9px' : '14px',
-          margin: isMobile ? '2px 0 0 0' : '4px 0 0 0',
-          color: '#312c2c',
-          lineHeight: isMobile ? '1.2' : '1.4',
-        }}
-      >
-        Curated picks for your style on Skyfall.com
-        {selectedCategory && ` in ${selectedCategory.name}`}
-      </p>
-    </div>
-  </div>
-  
-  {filteredProducts.length > 3 && (
-    <button 
-      className="view-all-just" 
-      onClick={() => navigate("/products", { 
-        state: { 
-          sectionName: "Just For You",
-          categoryId: selectedCategory?.id 
-        } 
-      })}
+       {/* Header - Responsive for mobile */}
+    <div 
+      className="section-header"
       style={{
-        fontSize: isMobile ? '9px' : '14px',
-        fontWeight: isMobile ? '500' : 'normal',
-        background: isMobile ? 'rgba(255,102,0,0.1)' : 'none',
-        border: 'none',
-        borderRadius: isMobile ? '16px' : '0',
-        padding: isMobile ? '4px 10px' : '0',
-        color: '#7a380c',
-        cursor: 'pointer',
+        padding: isMobile ? '0 8px 12px 8px' : '0 16px 16px 16px',
+        margin: 0,
         display: 'flex',
-        alignItems: 'center',
-        gap: '4px',
-        whiteSpace: 'nowrap',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        gap: '8px',
       }}
     >
-      <span>View all</span>
-      <ChevronRight size={isMobile ? 12 : 16} />
-    </button>
-  )}
-</div>
+      <div className="header-main" style={{ flex: 1 }}>
+        <div className="header-text-group">
+                    <h2 
+            className="just-title"
+            style={{
+              fontSize: isMobile ? '14px' : '24px',
+              fontWeight: 'bold',
+              margin: 0,
+              lineHeight: isMobile ? '1.3' : '1.4',
+              color: 'black',
+            }}
+          >
+            {/* ✅ BADILISHA HAPA: Ongeza `&& selectedCategory.id !== null` */}
+            {selectedCategory && selectedCategory.id !== null ? (
+              `${t('just_for_you')} ${t('in')} ${getCategoryName()}`
+            ) : (
+              t('just_for_you')
+            )}
+          </h2>
+                    <p 
+            className="just-subtitle"
+            style={{
+              fontSize: isMobile ? '9px' : '14px',
+              margin: isMobile ? '2px 0 0 0' : '4px 0 0 0',
+              color: '#312c2c',
+              lineHeight: isMobile ? '1.2' : '1.4',
+            }}
+          >
+            {/* ✅ BADILISHA HAPA: Ongeza `&& selectedCategory.id !== null` */}
+            {selectedCategory && selectedCategory.id !== null ? (
+              `${t('curated_picks')} ${t('in')} ${getCategoryName()}`
+            ) : (
+              t('curated_picks')
+            )}
+          </p>
+        </div>
+      </div>
+      
+      {filteredProducts.length > 3 && (
+        <button 
+          className="view-all-just" 
+          onClick={() => navigate("/products", { 
+            state: { 
+              sectionName: t('just_for_you'), // ✅ BADILISHA HAPA
+              categoryId: selectedCategory?.id 
+            } 
+          })}
+          style={{
+            fontSize: isMobile ? '9px' : '14px',
+            fontWeight: isMobile ? '500' : 'normal',
+            background: isMobile ? 'rgba(255,102,0,0.1)' : 'none',
+            border: 'none',
+            borderRadius: isMobile ? '16px' : '0',
+            padding: isMobile ? '4px 10px' : '0',
+            color: '#7a380c',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {/* ✅ BADILISHA HAPA: Tumia t() */}
+          <span>{t('view_all')}</span>
+          <ChevronRight size={isMobile ? 12 : 16} />
+        </button>
+      )}
+    </div>
 
       {/* ========== MOBILE: FULL WIDTH GRID (ZERO PADDING) ========== */}
       {isMobile ? (
@@ -194,10 +214,10 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
     categoryName={item.category_name} 
     isTopDeal={true}                 
     views={item.views}
-                onClick={() => navigate('/products', { 
+                    onClick={() => navigate('/products', { 
                   state: { 
                     priorityId: item.id, 
-                    sectionName: `Just For You ${selectedCategory ? `in ${selectedCategory.name}` : ''}`,
+                    sectionName: `${t('just_for_you')} ${selectedCategory && selectedCategory.id !== null ? `${t('in')} ${getCategoryName()}` : ''}`, // ✅ BADILISHA HAPA
                     categoryId: selectedCategory?.id
                   } 
                 })}
@@ -236,12 +256,13 @@ key={item.id}
     categoryName={item.category_name} // Jina la kundi la bidhaa
     isTopDeal={true}                 // Lazima iwe true ili bei ionekane kama isStore ipo
     views={item.views}
-  onClick={() => {
+
+    onClick={() => {
     // 1. Maandalizi ya data
     const priorityId = item.id;
-    const sectionName = encodeURIComponent(`Just For You ${selectedCategory ? `in ${selectedCategory.name}` : ''}`);
+    const sectionName = encodeURIComponent(`${t('just_for_you')} ${selectedCategory && selectedCategory.id !== null ? `${t('in')} ${getCategoryName()}` : ''}`); // ✅ BADILISHA HAPA
     const categoryId = selectedCategory?.id || '';
-    const categoryName = encodeURIComponent(selectedCategory?.name || 'All');
+    const categoryName = encodeURIComponent(getCategoryName() || 'All');
 
     // 2. Tengeneza URL string
     const url = `/products?priorityId=${priorityId}&sectionName=${sectionName}&categoryId=${categoryId}&categoryName=${categoryName}`;
@@ -249,6 +270,7 @@ key={item.id}
     // 3. Fungua Tab mpya
     window.open(url, '_blank');
   }}
+
 />
             ))
           ) : (

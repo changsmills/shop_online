@@ -3,8 +3,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, Factory } from "lucide-react";
 import { supabase } from "../supabaseClient";
 import DashboardCard from "./DashboardCard";
+import { useTranslation } from 'react-i18next'; // ✅ ONGEZA HAPA
+
 
 export default function TopStores({ navigate, isMobile }) {
+  const { t, i18n } = useTranslation(); // ✅ ONGEZA HAPA
   const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(true);
   const scrollContainerRef = useRef(null);
@@ -40,7 +43,7 @@ export default function TopStores({ navigate, isMobile }) {
   };
 
   fetchTopStores();
-}, []);
+},  [i18n.language]);
 
   const checkScrollPosition = () => {
     if (scrollContainerRef.current) {
@@ -90,13 +93,13 @@ export default function TopStores({ navigate, isMobile }) {
 
       }}
     >
+
     {/* Header Section - Fixed Version */}
 <div style={{ 
   display: 'flex', 
   justifyContent: 'space-between', 
   alignItems: 'center', 
   marginBottom: isMobile ? '8px' : '15px',
-  // ✅ Badilisha wrap iwe nowrap ili button isishuke chini
   flexWrap: 'nowrap', 
   gap: isMobile ? '4px' : '10px',
   padding: isMobile ? '0 10px' : '0', 
@@ -115,7 +118,8 @@ export default function TopStores({ navigate, isMobile }) {
         margin: 0,
         whiteSpace: 'nowrap'
       }}>
-        Elite Suppliers
+        {/* ✅ BADILISHA HAPA */}
+        {t('top_suppliers')}
       </h2>
     </div>
     <p style={{ 
@@ -126,30 +130,30 @@ export default function TopStores({ navigate, isMobile }) {
       overflow: 'hidden',
       textOverflow: 'ellipsis'
     }}>
-      Maduka ya jumla yaliyohakikiwa
+      {/* ✅ BADILISHA HAPA */}
+      {t('verified_wholesale_stores')}
     </p>
   </div>
   
-  {/* ✅ Ondoa sharti la stores.length > 6 ili ionekane muda wote */}
   <button 
     onClick={() => navigate('/products', { state: { filterType: 'Wholesaler' } })}
     style={{ 
       display: 'flex', 
       alignItems: 'center', 
       gap: '2px', 
-      background: 'transparent', // ✅ Ondoa gradient, weka transparent
+      background: 'transparent',
       color: '#f97316', 
       border: 'none',
       cursor: 'pointer',
       fontWeight: '600',
       fontSize: isMobile ? '11px' : '16px',
       whiteSpace: 'nowrap',
-      flexShrink: 0, // ✅ Inazuia button isinywee
+      flexShrink: 0,
       padding: '4px 0'
     }}
   >
-    {/* ✅ Badilisha "Ona Yote" kuwa "View more" */}
-    <span>View more</span>
+    {/* ✅ BADILISHA HAPA */}
+    <span>{t('view_more')}</span>
     <ChevronRight size={isMobile ? 12 : 16} />
   </button>
 </div>
@@ -195,9 +199,9 @@ export default function TopStores({ navigate, isMobile }) {
             image={officeImg}
             logo={store.store_logo}
             title={store.store_name}
-            subtitle={
+                              subtitle={
               store.categories?.name 
-              ? `${store.categories.name.toUpperCase()} • ${store.city}` 
+              ? `${store.categories.name} • ${store.city}` 
               : `${store.business_type} • ${store.city}`
             }
             isVerified={store.is_verified}
@@ -301,11 +305,11 @@ export default function TopStores({ navigate, isMobile }) {
           image={officeImg}
           logo={store.store_logo}
           title={store.store_name}
-          subtitle={
-    store.categories?.name 
-    ? `${store.categories.name.toUpperCase()} • ${store.city}` 
-    : `${store.business_type} • ${store.city}`
-  }
+                      subtitle={
+              store.categories?.name 
+              ? `${store.categories.name} • ${store.city}` 
+              : `${store.business_type} • ${store.city}`
+            }
           isVerified={store.is_verified}
           businessType={store.business_type}
           moq={store.moq}

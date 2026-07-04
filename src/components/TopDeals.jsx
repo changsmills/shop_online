@@ -65,7 +65,7 @@ export default function TopDeals({ navigate, selectedCategory, isMobile }) {
     };
 
     fetchDeals();
-  }, [selectedCategory]);
+  },  [selectedCategory, i18n.language]);
 
   const getDiscountPercentage = (originalPrice, currentPrice) => {
     const beiYaAwali = parseFloat(originalPrice) || 0;
@@ -127,7 +127,7 @@ export default function TopDeals({ navigate, selectedCategory, isMobile }) {
         margin: isMobile ? '2px 0' : '10px 0'
       }}
     >
-      {/* Header Section - Same as NewArrivals */}
+            {/* Header Section */}
       <div style={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
@@ -145,30 +145,34 @@ export default function TopDeals({ navigate, selectedCategory, isMobile }) {
             marginBottom: isMobile ? '1px' : '1px' 
           }}>
             <Flame size={isMobile ? 12 : 24} style={{ color: '#f97316' }} />
-           <h2 style={{ 
-  fontSize: isMobile ? '13px' : '24px', 
-  fontWeight: 'bold', 
-  margin: 0,
-  lineHeight: isMobile ? '1.3' : '1.4'
-}}>
-  {t('top_deals')} {selectedCategory && `${t('in')} ${getCategoryDisplayName(selectedCategory)}`}
-</h2>
+            
+            {/* ✅ Hapa ndio muhimu! Badilisha "Top Deals" kuwa t('top_deals') */}
+            <h2 style={{ 
+              fontSize: isMobile ? '13px' : '24px', 
+              fontWeight: 'bold', 
+              margin: 0,
+              lineHeight: isMobile ? '1.3' : '1.4'
+            }}>
+              {t('top_deals')} {selectedCategory && `${t('in')} ${getCategoryDisplayName(selectedCategory)}`}
+            </h2>
           </div>
+          
+          {/* ✅ Badilisha subtitle pia */}
           <p style={{ 
-  margin: 0, 
-  color: '#888',
-  fontSize: isMobile ? '9px' : '16px',
-  lineHeight: isMobile ? '1.2' : '1.5'
-}}>
-  {t('score_lowest_price')}
-  {selectedCategory && ` ${t('in')} ${getCategoryDisplayName(selectedCategory)}`}
-</p>
+            margin: 0, 
+            color: '#888',
+            fontSize: isMobile ? '9px' : '16px',
+            lineHeight: isMobile ? '1.2' : '1.5'
+          }}>
+            {t('score_lowest_price')}
+            {selectedCategory && ` ${t('in')} ${getCategoryDisplayName(selectedCategory)}`}
+          </p>
         </div>
         
         <button 
           onClick={() => navigate('/products', { 
             state: { 
-              sectionName: `Top Deals ${selectedCategory ? `in ${selectedCategory.name}` : ''}`,
+              sectionName: t('top_deals'), /* ✅ Badilisha hapa pia */
               categoryId: selectedCategory?.id
             } 
           })}
@@ -184,20 +188,11 @@ export default function TopDeals({ navigate, selectedCategory, isMobile }) {
             cursor: 'pointer',
             fontWeight: '500',
             fontSize: isMobile ? '9px' : '16px',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 2px 8px rgba(249, 115, 22, 0.3)',
             whiteSpace: 'nowrap'
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(249, 115, 22, 0.4)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 2px 8px rgba(249, 115, 22, 0.3)';
-          }}
         >
-          <span>View more</span>
+          {/* ✅ Badilisha "View more" kuwa t('view_more') */}
+          <span>{t('view_more')}</span>
           <ChevronRight size={isMobile ? 10 : 16} />
         </button>
       </div>

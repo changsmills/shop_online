@@ -123,6 +123,7 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
         margin: isMobile ? '2px 0' : '10px 0'
       }}
     >
+
 {/* Header Section */}
 <div style={{ 
   display: 'flex', 
@@ -142,14 +143,14 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
     }}>
       <Sparkles size={isMobile ? 12 : 24} style={{ color: '#eab308' }} />
       
-      {/* ✅ MABADILIKO: Kichwa kimebadilishwa kuwa rahisi */}
       <h2 style={{ 
         fontSize: isMobile ? '13px' : '24px', 
         fontWeight: 'bold', 
         margin: 0,
         lineHeight: isMobile ? '1.3' : '1.4'
       }}>
-        {selectedCategory ? (
+        {/* ✅ MABADILIKO HAPA: Usionyeshe "katika" ikiwa hakuna category maalum */}
+        {selectedCategory && selectedCategory.id !== null ? (
           `${t('new_arrivals')} ${t('in')} ${getCategoryDisplayName(selectedCategory)}`
         ) : (
           t('new_arrivals')
@@ -157,14 +158,14 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
       </h2>
     </div>
 
-    {/* ✅ MABADILIKO: Subtitle inaendana na kichwa */}
     <p style={{ 
       margin: 0, 
       color: '#888',
       fontSize: isMobile ? '9px' : '16px',
       lineHeight: isMobile ? '1.2' : '1.5'
     }}>
-      {selectedCategory ? (
+      {/* ✅ MABADILIKO HAPA: Subtitle pia isionyeshe "katika" ikiwa hakuna category */}
+      {selectedCategory && selectedCategory.id !== null ? (
         `${t('discover_latest_arrivals')} ${t('in')} ${getCategoryDisplayName(selectedCategory)}`
       ) : (
         t('discover_latest_arrivals')
@@ -172,11 +173,11 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
     </p>
   </div>
   
-  {/* Button inabaki sawa */}
+    {/* Button ya Header - Sahihishwa */}
   <button 
     onClick={() => navigate('/products', { 
       state: { 
-        sectionName: `${t('new_arrivals')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`,
+        sectionName: `${t('new_arrivals')} ${selectedCategory && selectedCategory.id !== null ? `${t('in')} ${selectedCategory.name}` : ''}`,
         categoryId: selectedCategory?.id,
         categoryName: selectedCategory?.name
       } 
@@ -270,10 +271,11 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
       originalPrice={product.original_price}
       views={product.views}
       isMobile={isMobile}
-      onClick={() => navigate('/products', {
+            onClick={() => navigate('/products', {
         state: {
           priorityId: product.id,
-          sectionName: `New Arrivals ${selectedCategory ? `in ${selectedCategory.name}` : ''}`,
+          /* ✅ Badilisha hapa kuwa t('new_arrivals') */
+          sectionName: `${t('new_arrivals')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`,
           categoryId: selectedCategory?.id,
           categoryName: selectedCategory?.name
         }
@@ -349,11 +351,13 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
   originalPrice={product.original_price}
   views={product.views}
   isMobile={isMobile}
-  onClick={() => {
+    onClick={() => {
     // 1. Andaa vigezo (Params)
     const priorityId = product.id;
-    // Tumia encodeURIComponent ili kuzuia makosa kama jina lina alama au nafasi
-    const sectionName = encodeURIComponent(`New Arrivals ${selectedCategory ? `in ${selectedCategory.name}` : ''}`);
+    
+    /* ✅ Badilisha hapa kuwa t('new_arrivals') */
+    const sectionName = encodeURIComponent(`${t('new_arrivals')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`);
+    
     const categoryId = selectedCategory?.id || '';
     const categoryName = encodeURIComponent(selectedCategory?.name || 'All');
 
