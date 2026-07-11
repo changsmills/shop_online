@@ -6,13 +6,16 @@ import DashboardCard from "./DashboardCard";
 import { useTranslation } from 'react-i18next'; // ✅ ONGEZA HAPA
 
 
-export default function TrendingNow({ navigate, selectedCategory, isMobile }) {
+export default function TrendingNow({ navigate, selectedCategory,   getCategoryDisplayName,
+isMobile }) {
   const { t, i18n } = useTranslation(); // ✅ ONGEZA HAPA
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const scrollContainerRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
+    const title = getCategoryDisplayName(selectedCategory) || t('trending_now');
+
 
   useEffect(() => {
     const fetchTrending = async () => {

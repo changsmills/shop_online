@@ -17,6 +17,7 @@ export default function AdvertisePage({ session }) {
   const [preview, setPreview] = useState(null);
   const [stores, setStores] = useState([]);
   const [selectedStore, setSelectedStore] = useState(null);
+  const [cachedAds, setCachedAds] = useState([]);
 
   
   const [formData, setFormData] = useState({
@@ -70,6 +71,49 @@ export default function AdvertisePage({ session }) {
 
     fetchUserStores();
   }, [session, navigate]);
+
+
+  useEffect(() => {
+  const fetchAds = async () => {
+    try {
+      // ✅ Tumia table 'advertisements'
+      const { data, error } = await supabase
+        .from('advertisements')
+        .select('*')
+        .eq('status', 'active');
+
+      if (error) {
+        console.error("Ad fetch error:", error);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        setCachedAds(data);
+        localStorage.setItem('skyfall_ads', JSON.stringify(data));
+        localStorage.setItem('skyfall_ads_time', String(Date.now()));
+      } else {
+        setCachedAds([]);
+        localStorage.removeItem('skyfall_ads');
+        localStorage.removeItem('skyfall_ads_time');
+      }
+    } catch (err) {
+      console.error("Failed to fetch ads:", err);
+    }
+  };
+
+  fetchAds();
+}, []);
+
+// ✅ Tumia extension ya URL kuamua kama ni video
+const isVideoAd = (ad) => {
+  if (!ad?.media_url) return false;
+  return ad.media_url.match(/\.(mp4|webm|mov)$/i) !== null;
+};
+
+// ✅ Ikiwa cachedAds ipo, chagua ad ya sasa
+const activeAd = cachedAds.length > 0 
+  ? cachedAds[currentAdIndex % cachedAds.length] 
+  : null;
 
   // 2. HANDLE STORE SELECTION
   const handleStoreChange = (storeId) => {

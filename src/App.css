@@ -1,5 +1,5 @@
 /* ============================================
-   1. GLOBAL RESET & BASE STYLES
+   LAYER 1: GLOBAL RESET & BASE
    ============================================ */
 * {
   margin: 0;
@@ -11,14 +11,21 @@ html, body {
   margin: 0 !important;
   padding: 0 !important;
   overflow-x: hidden;
-}
-
-body {
   font-family: 'Roboto', Helvetica, Arial, sans-serif;
   background-color: #f7f8fa;
 }
+
 /* ============================================
-   2. HEADER - STICKY ON TOP
+   LAYER 2: DASHBOARD WRAPPER (HAIJAFUTWA)
+   ============================================ */
+.dashboard-wrapper {
+  background: #f7f8fa;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ============================================
+   LAYER 3: HEADER - STICKY
    ============================================ */
 .sticky-header {
   position: sticky;
@@ -27,1230 +34,71 @@ body {
   z-index: 1000;
   background: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding-top: 80px;
 }
-
 /* ============================================
-   3. MAIN CONTENT - WITH PADDING TOP TO AVOID OVERLAP
+   FIX: ONDOA PENGO LA HEADER KWA MOBILE & TABLET
+   ============================================ */
+@media (max-width: 1024px) {
+  .sticky-header {
+    padding-top: 50px;
+  }
+}
+/* ============================================
+   LAYER 4: MAIN CONTENT
    ============================================ */
 .main-content {
   background-color: #f7f8fa;
   min-height: 100vh;
-  padding-top: 20px; /* Small padding, header is sticky so no large gap */
+  padding-top: 0;
+  width: 100%;
+  overflow-x: hidden;
 }
 
-/* Content Container */
+/* ============================================
+   LAYER 5: CONTENT CONTAINER - FLUID
+   ============================================ */
 .content-container-simple {
+  width: 100%;
   max-width: 1400px;
   margin: 0 auto;
- /* padding: 0 20px 30px 20px;*/
-   padding: 0;  /* ← Weka sifuri */
-  padding-top: 85px;
+  padding: 0 8px;
 }
 
-/* SIDEBAR CATEGORIES - Fixed height with scroll */
-.side-categories {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-  border: 1px solid #f0f0f0;
-  overflow: hidden;
-  height: 480px;
-  display: flex;
-  flex-direction: column;
+/* Tablet+ */
+@media (min-width: 600px) {
+  .content-container-simple {
+    padding: 0 16px;
+  }
 }
 
-.side-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 16px 20px;
-  font-weight: 700;
-  font-size: 1rem;
-  color: #1a1a1a;
-  border-bottom: 1px solid #f0f0f0;
-  background: white;
-  flex-shrink: 0;
-}
-
-.categories-list {
-  list-style: none;
-  margin: 0;
-  padding: 8px 0;
-  overflow-y: auto;
-  flex: 1;
-}
-
-/* Custom scrollbar for categories */
-.categories-list::-webkit-scrollbar {
-  width: 4px;
-}
-
-.categories-list::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
-}
-
-.categories-list::-webkit-scrollbar-thumb {
-  background: #ff6600;
-  border-radius: 10px;
-}
-
-.categories-list li {
-  display: flex;
-  align-items: center;
-  padding: 10px 20px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  gap: 12px;
-}
-
-.categories-list li:hover {
-  background: #fff5f0;
-  padding-left: 24px;
-}
-
-.categories-list li .cat-icon {
-  color: #666;
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.categories-list li .cat-name {
-  flex: 1;
-  font-size: 0.875rem;
-  color: #444;
-  font-weight: 500;
-}
-
-.categories-list li .arrow {
-  color: #ccc;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.categories-list li:hover .arrow {
-  opacity: 1;
-  color: #ff6600;
-}
-
-/* HERO BANNER - Matching sidebar height */
-.hero-banners-container {
-  flex: 1;
-  height: 480px;
-}
-
-.hot-picks-banner {
-  position: relative;
-  overflow: hidden;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  height: 100%;
-  width: 100%;
-}
-
-.banner-video-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.hot-picks-banner:hover .banner-video-bg {
-  transform: scale(1.05);
-}
-
-.banner-overlay-text {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 32px;
-  background: linear-gradient(to top, 
-    rgba(0, 0, 0, 0.85) 0%,
-    rgba(0, 0, 0, 0.4) 50%,
-    transparent 100%);
-  color: white;
-}
-
-.ad-tag {
-  background: rgba(255, 102, 0, 0.9);
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  display: inline-block;
-  width: fit-content;
-  margin-bottom: 12px;
-  letter-spacing: 0.5px;
-}
-
-.banner-title {
-  font-size: 1.8rem;
-  font-weight: 800;
-  margin: 0 0 8px 0;
-  line-height: 1.2;
-}
-
-.banner-desc {
-  font-size: 0.875rem;
-  margin: 0 0 16px 0;
-  opacity: 0.9;
-  max-width: 80%;
-  line-height: 1.5;
-}
-
-.view-more-banner {
-  padding: 10px 28px;
-  background: #ff6600;
-  color: white;
-  border: none;
-  border-radius: 30px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.view-more-banner:hover {
-  background: #e55a00;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 102, 0, 0.3);
+/* Desktop */
+@media (min-width: 1025px) {
+  .content-container-simple {
+    padding: 0 24px;
+  }
 }
 
 /* ============================================
-   5. MOBILE LAYOUT
+   LAYER 6: CATEGORY SLIDER (Mobile/Tablet)
    ============================================ */
-/* Horizontal Categories Scroll */
-.category-tabs-scroll {
-  display: flex;
-  overflow-x: auto;
-  gap: 12px;
-  padding: 12px 0 16px 0;
-  margin-bottom: 16px;
-  scrollbar-width: thin;
-  -webkit-overflow-scrolling: touch;
-}
-
-.category-tabs-scroll::-webkit-scrollbar {
-  height: 3px;
-}
-
-.category-tabs-scroll::-webkit-scrollbar-track {
-  background: #f0f0f0;
-  border-radius: 10px;
-}
-
-.category-tabs-scroll::-webkit-scrollbar-thumb {
-  background: #ff6600;
-  border-radius: 10px;
-}
-
-.tab-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-  padding: 10px 20px;
-  background: white;
-  border-radius: 40px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: 1px solid #e5e5e5;
-}
-
-.tab-item.active {
-  background: #ff6600;
-  color: white;
-  border-color: #ff6600;
-  box-shadow: 0 2px 8px rgba(255, 102, 0, 0.3);
-}
-
-/* Mobile Banner */
-.mobile-banner {
-  margin: 0 0 20px 0;
-  border-radius: 16px;
-  overflow: hidden;
-  position: relative;
-  height: 200px;
-}
-
-.mobile-banner img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.mobile-banner .banner-overlay-text {
-  padding: 20px;
-}
-
-.mobile-banner .banner-title {
-  font-size: 1.1rem;
-}
-
-.source-btn {
-  background: #ff6600;
-  border: none;
-  padding: 8px 20px;
-  color: white;
-  border-radius: 30px;
-  font-weight: 600;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.source-btn:hover {
-  background: #e55a00;
-  transform: scale(1.05);
-}
-
-/* ============================================
-   6. BOTTOM NAVIGATION (Mobile only)
-   ============================================ */
-.mobile-bottom-nav {
-  display: none;
-}
-
-/* ============================================
-   7. PRODUCT GRIDS & CARDS
-   ============================================ */
-.alibaba-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-}
-
-.just-for-you-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-  padding: 10px 0;
-}
-
-.compact-card {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  cursor: pointer;
-  border: 1px solid #f0f0f0;
-  transition: all 0.3s ease;
-}
-
-.compact-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-  border-color: #ff6600;
-}
-
-.compact-card img {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
+.category-slider-wrapper {
   display: block;
-}
-
-.compact-card .info {
-  padding: 12px;
-}
-
-.compact-card .name {
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 5px;
-}
-
-.compact-card .price {
-  font-weight: 800;
-  color: #ff6a00;
-  font-size: 16px;
-}
-
-/* Summary Grid */
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-}
-
-.summary-card {
   background: white;
-  border-radius: 12px;
-  position: relative;
-  border: 1px solid #eee;
-  padding: 20px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.summary-card:hover {
-  transform: translateY(-5px);
-  border-color: #ff9000;
-}
-
-.rank-badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: linear-gradient(45deg, #ff9000, #ff5000);
-  color: white;
-  padding: 3px 12px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 800;
-}
-
-.summary-card img {
-  width: 100%;
-  height: 130px;
-  object-fit: contain;
-  margin-bottom: 12px;
-}
-
-.summary-name {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #333;
-}
-
-/* Horizontal Grid */
-.horizontal-grid {
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  padding-bottom: 15px;
-  cursor: grab;
-  scrollbar-width: none;
-}
-
-.horizontal-grid::-webkit-scrollbar {
-  display: none;
-}
-
-.mini-card {
-  min-width: 180px;
-  background: white;
-  border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  flex-shrink: 0;
-}
-
-.mini-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-}
-
-.mini-card img {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-.mini-card .price {
-  font-weight: 800;
-  color: #ff6a00;
-  font-size: 1rem;
-  margin-top: 8px;
-}
-
-/* Section Header */
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 30px 0 20px 0;
-}
-
-.section-header h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #222;
-  margin: 0;
-}
-
-.view-more-btn {
-  background: transparent;
-  color: #ff6a00;
-  border: 1px solid #ff6a00;
-  padding: 6px 18px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.view-more-btn:hover {
-  background: #ff6a00;
-  color: white;
-}
-
-/* ============================================
-   8. RESPONSIVE DESIGN (MOBILE)
-   ============================================ */
-@media only screen and (max-width: 768px) {
-  /* Content container */
-  .content-container-simple {
-    padding: 0 12px 30px 12px;
-  }
-  
-  .main-content {
-    padding-top: 10px;
-  }
-  
-  /* Hide sidebar on mobile */
-  .side-categories {
-    display: none !important;
-  }
-  
-  /* Desktop layout becomes block */
-  .alibaba-top-layout {
-    display: block !important;
-    gap: 0;
-    margin-bottom: 20px;
-  }
-  
-  /* Hero banner for mobile */
-  .hero-banners-container {
-    height: auto;
-  }
-  
-  .hot-picks-banner {
-    min-height: 200px !important;
-    height: auto;
-    margin-bottom: 15px;
-  }
-  
-  .banner-overlay-text {
-    padding: 16px !important;
-  }
-  
-  .banner-title {
-    font-size: 1rem !important;
-  }
-  
-  .banner-desc {
-    font-size: 0.7rem !important;
-    max-width: 100% !important;
-  }
-  
-  .ad-tag {
-    font-size: 0.6rem !important;
-    padding: 2px 8px !important;
-  }
-  
-  .view-more-banner {
-    padding: 6px 16px !important;
-    font-size: 0.7rem !important;
-  }
-  
-  /* Grid adjustments */
-  .alibaba-grid,
-  .just-for-you-grid,
-  .summary-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px !important;
-  }
-  
-  .compact-card img {
-    height: 120px !important;
-  }
-  
-  .compact-card .name {
-    font-size: 12px !important;
-  }
-  
-  .compact-card .price {
-    font-size: 13px !important;
-  }
-  
-  .summary-card img {
-    height: 100px !important;
-  }
-  
-  .summary-name {
-    font-size: 12px !important;
-  }
-  
-  .horizontal-grid {
-    gap: 12px !important;
-  }
-  
-  .mini-card {
-    min-width: 140px !important;
-  }
-  
-  .mini-card img {
-    height: 110px !important;
-  }
-  
-  /* Section header */
-  .section-header h3 {
-    font-size: 1rem !important;
-  }
-  
-  .view-more-btn {
-    padding: 4px 12px !important;
-    font-size: 0.7rem !important;
-  }
-  
-  /* Bottom navigation */
-  .mobile-bottom-nav {
-    display: flex !important;
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    background: white !important;
-    border-top: 1px solid #eee !important;
-    padding: 10px 0 !important;
-    z-index: 1000 !important;
-    justify-content: space-around !important;
-  }
-  
-  .mobile-bottom-nav .nav-item {
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 4px !important;
-    cursor: pointer;
-    transition: color 0.2s;
-  }
-  
-  .mobile-bottom-nav .nav-item:hover {
-    color: #ff6600;
-  }
-  
-  .mobile-bottom-nav .nav-item span {
-    font-size: 10px !important;
-    color: #666 !important;
-  }
-}
-
-/* ============================================
-   9. LARGER SCREENS
-   ============================================ */
-@media (min-width: 1400px) {
-  .content-container-simple {
-    max-width: 1400px;
-    padding: 0 40px 40px 40px;
-  }
-  
-  .side-categories {
-    height: 520px;
-  }
-  
-  .hero-banners-container {
-    height: 520px;
-  }
-}
-
-@media (min-width: 1920px) {
-  .content-container-simple {
-    max-width: 1600px;
-  }
-}
-
-/* ============================================
-   10. UTILITY CLASSES
-   ============================================ */
-/* Loading Animation */
-@keyframes bounce {
-  0%, 80%, 100% { transform: scale(0); }
-  40% { transform: scale(1.0); }
-}
-
-.loading-dots {
-  display: flex;
-  gap: 6px;
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
-  background-color: #ff6600;
-  border-radius: 50%;
-  animation: bounce 1.4s infinite ease-in-out both;
-}
-
-/* Scrollbar hide for mobile */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-.hero-banners-container {
-  flex: 1; /* Inachukua nafasi yote iliyobaki upande wa kulia */
-  height: 500px; /* Ilingane na max-height ya sidebar */
-}
-
-.hot-picks-banner {
-  width: 100%;
-  height: 100%;
-  border-radius: 8px;
-  overflow: hidden;
-  position: relative;
-}
-
-.hot-picks-banner img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Inahakikisha picha haijivuti (distortion) */
-}
-
-/* ============================================
-   MEGA MENU PORTAL - ALIBABA STYLE
-   ============================================ */
-
-/* Overlay - Inafunika screen nzima kwa giza */
-.alibaba-mega-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  animation: fadeIn 0.2s ease;
-}
-
-/* Mega Card - Kadi nyeupe kuu */
-.alibaba-mega-card {
-  width: 90%;
-  max-width: 1200px;
-  height: 85vh;
-  background: white;
-  border-radius: 16px;
-  display: flex;
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-  animation: slideDown 0.3s ease;
-}
-
-/* ============================================
-   SIDEBAR YA KUSHOTO (Categories)
-   ============================================ */
-.mega-sidebar-left {
-  width: 280px;
-  background: #f8f9fa;
-  border-right: 1px solid #eee;
-  overflow-y: auto;
-  flex-shrink: 0;
-}
-
-/* Category item kwenye sidebar */
-.mega-cat-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 20px;
-  cursor: pointer;
-  transition: all 0.2s;
-  gap: 12px;
-  color: #444;
-}
-
-.mega-cat-item:hover {
-  background: #fff0e5;
-  color: #ff6600;
-}
-
-.mega-cat-item.active {
-  background: #fff0e5;
-  color: #ff6600;
-  border-left: 3px solid #ff6600;
-  font-weight: 600;
-}
-
-.mega-cat-item .cat-icon {
-  width: 24px;
-  display: flex;
-  align-items: center;
-}
-
-.mega-cat-item .cat-text {
-  flex: 1;
-  font-size: 0.9rem;
-}
-
-.mega-cat-item .cat-arrow {
-  color: #ccc;
-  font-size: 14px;
-}
-
-.mega-cat-item:hover .cat-arrow {
-  color: #ff6600;
-}
-
-/* ============================================
-   CONTENT YA KULIA (Products Grid)
-   ============================================ */
-.mega-content-right {
-  flex: 1;
-  background: white;
-  overflow-y: auto;
-  padding: 24px;
-}
-
-.content-inner {
-  height: 100%;
-}
-
-/* Header ya content (Title + See All + Close) */
-.content-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid #f0f0f0;
-}
-
-.content-header h2 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0;
-}
-
-/* See All button */
-.see-all-btn {
-  color: #ff6600;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.85rem;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: gap 0.2s;
-}
-
-.see-all-btn:hover {
-  gap: 10px;
-}
-
-/* Close button kwenye content */
-.close-content-btn {
-  border: none;
-  background: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #999;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.2s;
-}
-
-.close-content-btn:hover {
-  background: #f0f0f0;
-  color: #333;
-}
-
-/* ============================================
-   CIRCLE GRID - Picha za Subcategories
-   ============================================ */
-.alibaba-circle-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: 24px;
-}
-
-.circle-item {
-  text-align: center;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.circle-item:hover {
-  transform: translateY(-5px);
-}
-
-/* Circle image holder */
-.circle-item .img-holder {
-  width: 90px;
-  height: 90px;
-  margin: 0 auto 12px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #f5f5f5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.circle-item:hover .img-holder {
-  box-shadow: 0 8px 20px rgba(255, 102, 0, 0.2);
-  transform: scale(1.02);
-}
-
-.circle-item .img-holder img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.circle-item p {
-  font-size: 0.8rem;
-  color: #444;
-  margin: 0;
-  font-weight: 500;
-}
-
-.circle-item:hover p {
-  color: #ff6600;
-}
-
-/* View All special card */
-.circle-item .img-holder.view-all {
-  background: #fff0e5;
-  border: 2px dashed #ff6600;
-}
-
-.view-all-text {
-  color: #ff6600;
-  font-weight: 600;
-}
-
-/* ============================================
-   ANIMATIONS
-   ============================================ */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ============================================
-   SCROLLBAR STYLING
-   ============================================ */
-.mega-sidebar-left::-webkit-scrollbar,
-.mega-content-right::-webkit-scrollbar {
-  width: 5px;
-}
-
-.mega-sidebar-left::-webkit-scrollbar-track,
-.mega-content-right::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
-}
-
-.mega-sidebar-left::-webkit-scrollbar-thumb,
-.mega-content-right::-webkit-scrollbar-thumb {
-  background: #ff6600;
-  border-radius: 10px;
-}
-
-/* ============================================
-   RESPONSIVE - MOBILE
-   ============================================ */
-@media (max-width: 768px) {
-  .alibaba-mega-card {
-    width: 95%;
-    height: 90vh;
-    flex-direction: column;
-  }
-  
-  .mega-sidebar-left {
-    width: 100%;
-    max-height: 180px;
-    border-right: none;
-    border-bottom: 1px solid #eee;
-  }
-  
-  .mega-cat-item {
-    padding: 10px 16px;
-  }
-  
-  .mega-content-right {
-    padding: 16px;
-  }
-  
-  .alibaba-circle-grid {
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 16px;
-  }
-  
-  .circle-item .img-holder {
-    width: 70px;
-    height: 70px;
-  }
-  
-  .circle-item p {
-    font-size: 0.7rem;
-  }
-}
-
-/* ============================================
-   PORTAL 2: EXPLORE FULL STYLES
-   ============================================ */
-.explore-overlay-full {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: white;
-  z-index: 9999;
-  animation: slideUp 0.3s ease;
-}
-
-.explore-container-alibaba {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-}
-
-.explore-top-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 24px;
   border-bottom: 1px solid #eee;
-  background: white;
-  flex-shrink: 0;
+  padding: 8px 0;
 }
 
-.nav-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.back-btn-circle {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 1px solid #ddd;
-  background: white;
-  cursor: pointer;
-  font-size: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.back-btn-circle:hover {
-  background: #f5f5f5;
-  border-color: #ff6600;
-}
-
-.close-x {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: none;
-  background: transparent;
-  font-size: 24px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.close-x:hover {
-  background: #f5f5f5;
-}
-
-.explore-main-layout {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-}
-
-.explore-sidebar {
-  width: 280px;
-  background: #f8f9fa;
-  border-right: 1px solid #eee;
-  overflow-y: auto;
-  flex-shrink: 0;
-}
-
-.explore-sub-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.explore-sub-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 20px;
-  cursor: pointer;
-  transition: all 0.2s;
-  gap: 12px;
-}
-
-.explore-sub-item:hover {
-  background: #fff0e5;
-}
-
-.explore-sub-item.active {
-  background: #fff0e5;
-  border-left: 3px solid #ff6600;
-}
-
-.explore-sub-item .sub-text {
-  flex: 1;
-  font-size: 0.9rem;
-}
-
-.explore-content-grid {
-  flex: 1;
-  padding: 24px;
-  overflow-y: auto;
-}
-
-.grid-header {
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid #ff6600;
-}
-
-.grid-header h3 {
-  margin: 0;
-  color: #333;
-}
-
-.alibaba-style-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 20px;
-}
-
-.alibaba-item-card {
-  text-align: center;
-  cursor: pointer;
-  transition: transform 0.2s;
-  padding: 12px;
-  border-radius: 12px;
-}
-
-.alibaba-item-card:hover {
-  transform: translateY(-5px);
-  background: #f8f9fa;
-}
-
-.image-circle-wrapper {
-  width: 100px;
-  height: 100px;
-  margin: 0 auto 12px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #f5f5f5;
-}
-
-.image-circle-wrapper img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.item-name {
-  font-size: 0.85rem;
-  color: #333;
-  margin: 0;
-}
-
-.loader-box {
-  text-align: center;
-  padding: 40px;
-  color: #666;
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
+@media (min-width: 1025px) {
+  .category-slider-wrapper {
+    display: none;
   }
 }
 
-/* Mobile Explore */
-@media (max-width: 768px) {
-  .explore-main-layout {
-    flex-direction: column;
-  }
-  
-  .explore-sidebar {
-    width: 100%;
-    max-height: 180px;
-  }
-  
-  .alibaba-style-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 12px;
-  }
-  
-  .image-circle-wrapper {
-    width: 80px;
-    height: 80px;
-  }
-}
-/* MobileCategorySlider.css */
 .mobile-category-slider-container {
   position: relative;
   background: white;
-  border-bottom: 1px solid #f0f0f0;
-  padding: 16px 0 12px 0;  /* ← Ongeza padding top */
-  display: none;
-  margin-top: 0;
-}
-
-@media (max-width: 768px) {
-  .mobile-category-slider-container {
-    display: block;
-  }
-  
-  .side-categories {
-    display: none !important;
-  }
+  padding: 16px 0 12px 0;
 }
 
 .mobile-category-slider {
@@ -1262,12 +110,8 @@ body {
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
+.mobile-category-slider::-webkit-scrollbar { display: none; }
 
-.mobile-category-slider::-webkit-scrollbar {
-  display: none;
-}
-
-/* Slider Arrows */
 .slider-arrow {
   position: absolute;
   top: 50%;
@@ -1282,38 +126,22 @@ body {
   justify-content: center;
   cursor: pointer;
   z-index: 10;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
+.slider-arrow:active { transform: translateY(-50%) scale(0.95); }
+.slider-arrow.left { left: 4px; }
+.slider-arrow.right { right: 4px; }
 
-.slider-arrow:active {
-  transform: translateY(-50%) scale(0.95);
-  background: #f5f5f5;
-}
-
-.slider-arrow.left {
-  left: 4px;
-}
-
-.slider-arrow.right {
-  right: 4px;
-}
-
-/* Category Items */
 .mobile-cat-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   min-width: 70px;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s;
 }
+.mobile-cat-item:active { transform: scale(0.95); }
 
-.mobile-cat-item:active {
-  transform: scale(0.95);
-}
-
-/* Circle without icon - just a colored circle */
 .cat-circle-icon {
   width: 56px;
   height: 56px;
@@ -1323,440 +151,1048 @@ body {
   align-items: center;
   justify-content: center;
   margin-bottom: 8px;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
 }
-
-/* Active state - orange circle */
 .mobile-cat-item.active .cat-circle-icon {
   background: #ff6a00;
-  border: none;
 }
 
-/* Text styles */
 .mobile-cat-item span {
   font-size: 11px;
   color: #666;
   text-align: center;
   max-width: 70px;
-  white-space: normal;
   word-break: break-word;
 }
-
 .mobile-cat-item.active span {
   color: #ff6a00;
   font-weight: 500;
 }
-/* App.css - Mobile Banner Styles */
 
-/* Mobile Banner */
-@media (max-width: 768px) {
-  .hero-banners-container {
-    width: 100%;
-    padding: 0 12px;
-    margin: 10px 0;
-  }
-  
-  .hot-picks-banner.mobile-banner {
-    height: 200px;
-    border-radius: 16px;
-    overflow: hidden;
-    position: relative;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-  
-  .mobile-overlay {
-    padding: 16px !important;
-    background: linear-gradient(to top, 
-      rgba(0, 0, 0, 0.85) 0%,
-      rgba(0, 0, 0, 0.4) 50%,
-      transparent 100%);
-  }
-  
-  .mobile-title {
-    font-size: 16px !important;
-    font-weight: 700 !important;
-    margin-bottom: 4px !important;
-  }
-  
-  .mobile-desc {
-    font-size: 11px !important;
-    margin-bottom: 12px !important;
-    opacity: 0.9;
-  }
-  
-  .mobile-btn {
-    padding: 6px 14px !important;
-    font-size: 11px !important;
-    background: #ff6a00 !important;
-    border-radius: 20px !important;
-  }
-  
-  .ad-tag {
-    font-size: 10px;
-    padding: 3px 10px;
-    margin-bottom: 8px;
-    display: inline-block;
-    background: rgba(255, 102, 0, 0.9);
-    border-radius: 20px;
-  }
-}
-
-/* Desktop Banner - remains same */
-@media (min-width: 769px) {
-  .hero-banners-container {
-    height: 480px;
-  }
-  
-  .hot-picks-banner {
-    height: 100%;
-    border-radius: 16px;
-  }
-}
-
-
-/* ============================================ */
-/* FIX: REMOVE GAP BETWEEN BANNER AND COMPONENTS ON MOBILE */
-/* ============================================ */
-
-/* Fix 1: Punguza padding ya content container kwenye simu */
-@media (max-width: 768px) {
-  .content-container-simple {
-    padding-top: 0 !important;
-    padding-bottom: 20px !important;
-  }
-  
-  /* Fix 2: Ondoa margin ya alibaba-top-layout kwenye simu */
-  .alibaba-top-layout {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-  }
-  
-  /* Fix 3: Punguza margin ya hero-banners-container */
-  .hero-banners-container {
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-  
-  /* Fix 4: Punguza margin ya mobile banner */
-  .hot-picks-banner.mobile-banner {
-    margin-bottom: 0 !important;
-  }
-  
-  /* Fix 5: Punguza margin ya section-header kwenye simu */
-  .section-header {
-    margin-top: 0 !important;
-    margin-bottom: 8px !important;
-  }
-  
-  /* Fix 6: Punguza margin ya trending component */
-  .trending-main-wrapper {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-  }
-}
-
-
-/* Kwa simu, ifanye iwe 0 */
-@media (max-width: 768px) {
-  .content-container-simple {
-    padding-top: 85px;
-  }
-}
-/* ============================================ */
-/* NO PADDING ON MOBILE - EXTREME FULL WIDTH */
-/* ============================================ */
-
-@media (max-width: 768px) {
-  /* Remove ALL padding from everything */
-  .content-container-simple,
-  .hero-banners-container,
-  .mobile-category-slider-container,
-  .section-header,
-  .trending-main-wrapper,
-  .top-stores-premium,
-  .top-deals-wrapper,
-  .new-arrivals-section,
-  .just-for-you-container,
-  .recently-viewed-container {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-  }
-  
-  /* Banner full width with no border radius */
-  .hot-picks-banner.mobile-banner {
-    border-radius: 0 !important;
-    margin: 0 !important;
-  }
-  
-  /* Grid products - minimal padding for readability */
-  .alibaba-grid,
-  .universal-grid-layout,
-  .deals-scroll-grid {
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-    gap: 8px !important;
-  }
-  
-  /* Cards take full width of grid */
-  .product-card-item,
-  .alibaba-card {
-    border-radius: 4px !important;
-  }
-}
-/* ============================================ */
-/* MOBILE FIX - REMOVE ALL WHITE SPACE GAPS */
-/* ============================================ */
-
-@media (max-width: 768px) {
-  /* Fix 1: Remove padding from main content */
-  .main-content {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-  }
-  
-  /* Fix 2: Remove all padding from content container */
-  .content-container-simple {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-  }
-  
-  /* Fix 3: Destroy desktop layout completely */
-  .alibaba-top-layout {
-    display: none !important;
-  }
-  
-  /* Fix 4: Mobile container fills width fully */
-  .mobile-only-container {
-    display: block !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-  
-  /* Fix 5: Mobile banner touches edges */
-  .hot-picks-banner.mobile-banner {
-    margin: 0 !important;
-    border-radius: 0 !important;
-    width: 100% !important;
-  }
-  
-  /* Fix 6: Remove any gap after banner */
-  .hero-banners-container {
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-  
-  /* Fix 7: Components start immediately after banner */
-  .trending-main-wrapper,
-  .top-stores-premium,
-  .top-deals-wrapper,
-  .new-arrivals-section,
-  .recently-viewed-container,
-  .just-for-you-container,
-  .location-filter-wrapper {
-    margin-top: 0 !important;
-    padding-top: 4px !important;
-  }
-  
-  /* Fix 8: Section headers spacing */
-  .section-header {
-    margin-top: 4px !important;
-    margin-bottom: 8px !important;
-  }
-}
 /* ============================================
-   DESKTOP LAYOUT - TWO COLUMNS
+   LAYER 7: TOP LAYOUT (Sidebar + Banner)
    ============================================ */
-@media (min-width: 769px) {
+.alibaba-top-layout {
+  display: block;
+  width: 100%;
+  margin: 12px 0;
+}
+
+@media (min-width: 600px) and (max-width: 1024px) {
+  .alibaba-top-layout { margin: 20px 0; }
+}
+
+@media (min-width: 1025px) {
   .alibaba-top-layout {
     display: grid;
-    grid-template-columns: 280px 1fr;
+    grid-template-columns: 260px 1fr;
     gap: 24px;
-    margin-top: 20px;
-    margin-bottom: 40px;
+    margin: 30px 0;
     align-items: start;
   }
 }
 
 /* ============================================
-   MOBILE LAYOUT - NO GAPS
+   SIDEBAR - Desktop Only
    ============================================ */
-@media (max-width: 768px) {
-  .alibaba-top-layout {
-    display: block; /* Ondoa grid/flex kwenye simu */
-    margin-top: 0 !important;
-    margin-bottom: 10px !important;
-    gap: 0 !important;
-  }
-
-  .hero-banners-container.mobile-only-container {
-    margin-top: 0 !important;
-    padding: 0 !important;
-  }
-}
-/* ============================================ */
-/* FIX WHITE SPACE GAP BETWEEN BANNER & COMPONENTS */
-/* ============================================ */
-
-/* Remove all margins and paddings from banner containers */
-.hero-banners-container,
-.mobile-only-container,
-.hot-picks-banner,
-.mobile-banner,
-.alibaba-top-layout {
-  margin: 0 !important;
-  padding: 0 !important;
+.side-categories {
+  display: none;
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+  max-height: 480px;
+  flex-direction: column;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
 }
 
-/* Fix images - remove space below */
-.banner-video-bg,
-.hot-picks-banner img,
-.mobile-banner img {
-  display: block !important;
-  width: 100%;
-  height: auto;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
+@media (min-width: 1025px) {
+  .side-categories { display: flex; }
 }
 
-/* Fix overlay text positioning */
-.banner-overlay-text {
-  position: absolute !important;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: 0 !important;
-  padding: 20px !important;
+.side-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #1a1a1a;
+  border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0;
+  background: white;
 }
 
-/* Mobile specific fixes */
-@media (max-width: 768px) {
-  .hero-banners-container,
-  .mobile-only-container {
-    line-height: 0 !important;
-    font-size: 0 !important;
-  }
-  
-  .hot-picks-banner,
-  .mobile-banner {
-    line-height: 0 !important;
-  }
+.categories-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+  overflow-y: auto;
+  flex: 1;
 }
+.categories-list::-webkit-scrollbar { width: 6px; }
+.categories-list::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+.categories-list::-webkit-scrollbar-thumb { background: #ff6600; border-radius: 10px; }
 
-/* Desktop specific fixes */
-@media (min-width: 769px) {
-  .alibaba-top-layout {
-    display: flex !important;
-    gap: 20px !important;
-    margin-bottom: 0 !important;
-  }
-  
-  .side-categories {
-    width: 260px !important;
-    flex-shrink: 0 !important;
-  }
-  
-  .hero-banners-container {
-    flex: 1 !important;
-  }
+.categories-list li {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  gap: 12px;
+  border-bottom: 1px solid #f0f0f0;
 }
-
-/* Remove any margin from the first component after banner */
-.trending-now-section:first-child,
-.location-filter-section:first-child,
-[class*="trending"],
-[class*="location"] {
-  margin-top: 0 !important;
-  padding-top: 0 !important;
+.categories-list li:hover {
+  background: #fff5f0;
+  padding-left: 24px;
 }
-
-/* Kwenye App.css au faili lako la CSS */
-.content-container-simple {
-    width: 100%;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    max-width: none !important; /* Hii itazuia kuzuiliwa katikati */
+.cat-icon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #666;
+}
+.cat-name {
+  font-size: 0.875rem;
+  color: #444;
+  font-weight: 500;
+}
+.arrow {
+  color: #ccc;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.categories-list li:hover .arrow {
+  opacity: 1;
+  color: #ff6600;
 }
 
 /* ============================================
-   REPLACE ENTIRE CONTENT CONTAINER SECTION
+   HERO BANNER
    ============================================ */
-
-/* Desktop default */
-.content-container-simple {
-  max-width: 1400px;
-  margin: 0 auto;
+.hero-banners-container {
   width: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  line-height: 0;
 }
 
-/* MOBILE - NO PADDING AT ALL */
-@media only screen and (max-width: 768px) {
-  .content-container-simple {
-    padding: 0 !important;
-    margin: 0 !important;
-    max-width: 100% !important;
-    width: 100vw !important;
-    overflow-x: hidden !important;
-  }
-  
-  /* Remove all padding from ALL containers inside */
-  .content-container-simple > * {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
-  
-  /* Category slider - full width */
-  .mobile-category-slider-container {
-    padding: 0 !important;
-    margin: 0 !important;
-    width: 100% !important;
-  }
-  
-  .mobile-category-slider {
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-  }
-  
-  /* Banner - full width with no gaps */
-  .hero-banners-container {
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-  
+.hot-picks-banner {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  overflow: hidden;
+  border-radius: 0;
+}
+
+@media (min-width: 600px) {
+  .hot-picks-banner { aspect-ratio: 16/7; }
+}
+
+@media (min-width: 1025px) {
   .hot-picks-banner {
-    border-radius: 0 !important;
-    margin: 0 !important;
+    aspect-ratio: auto;
+    height: 480px;
+    border-radius: 12px;
   }
-  
-  /* Grid products - just a little padding for breathing */
-  .alibaba-grid,
-  .just-for-you-grid,
-  .summary-grid,
-  .universal-grid-layout {
-    padding-left: 8px !important;
-    padding-right: 8px !important;
+}
+
+.banner-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.banner-overlay-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 16px;
+  color: white;
+  background: linear-gradient(90deg, rgba(0,0,0,0.6) 0%, transparent 70%);
+  pointer-events: none;
+}
+@media (min-width: 600px) {
+  .banner-overlay-text { padding: 24px; }
+}
+@media (min-width: 1025px) {
+  .banner-overlay-text { padding: 40px; }
+}
+
+.banner-overlay-text .ad-tag {
+  background: #ff6a00;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 10px;
+  display: inline-block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  width: fit-content;
+}
+.banner-overlay-text .banner-title {
+  margin: 4px 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  line-height: 1.3;
+}
+@media (min-width: 600px) {
+  .banner-overlay-text .banner-title { font-size: 1.6rem; }
+}
+@media (min-width: 1025px) {
+  .banner-overlay-text .banner-title { font-size: 2rem; }
+}
+
+.banner-overlay-text .banner-desc {
+  margin: 4px 0;
+  font-size: 0.8rem;
+  max-width: 70%;
+  line-height: 1.4;
+}
+@media (max-width: 768px) {
+  .banner-overlay-text .banner-desc { max-width: 100%; }
+}
+
+.banner-overlay-text .view-more-banner {
+  background: #ff6a00;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-top: 8px;
+  font-weight: 600;
+  pointer-events: auto;
+  width: fit-content;
+  transition: 0.2s;
+}
+.banner-overlay-text .view-more-banner:hover { background: #e55a00; }
+
+/* ============================================
+   LAYER 8: COMPONENTS WRAPPER
+   ============================================ */
+.components-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+@media (min-width: 600px) {
+  .components-wrapper { gap: 24px; margin-top: 24px; }
+}
+
+/* ============================================
+   LAYER 9: FOOTER & BOTTOM NAV - RESPONSIVE
+   ============================================ */
+
+/* FOOTER - Inaonekana Desktop pekee (≥1025px) */
+.footer-wrapper {
+  display: block; /* Default kwenye desktop */
+}
+
+/* Simu na Kompyuta Kibao: FICHA FOOTER */
+@media (max-width: 1024px) {
+  .footer-wrapper {
+    display: none !important;
+  }
+}
+
+/* ============================================
+   LAYER 10: BOTTOM NAV - Mobile/Tablet
+   ============================================ */
+.bottom-nav-wrapper {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .bottom-nav-wrapper {
+    display: block !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 999; /* Chini ya mobile-menu-overlay (99999) */
+  }
+}
+
+/* ============================================
+   LAYER 11: GRIDS & CARDS
+   ============================================ */
+.alibaba-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+@media (min-width: 600px) {
+  .alibaba-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+}
+@media (min-width: 1025px) {
+  .alibaba-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+}
+
+.just-for-you-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  padding: 10px 0;
+}
+@media (min-width: 600px) {
+  .just-for-you-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+@media (min-width: 600px) {
+  .summary-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+}
+
+/* Cards */
+.compact-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
+}
+.compact-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  border-color: #ff6600;
+}
+.compact-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+}
+.compact-card .info { padding: 12px; }
+.compact-card .name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 5px;
+}
+.compact-card .price {
+  font-weight: 800;
+  color: #ff6a00;
+  font-size: 16px;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 12px;
+  position: relative;
+  border: 1px solid #eee;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.summary-card:hover {
+  transform: translateY(-5px);
+  border-color: #ff9000;
+}
+.rank-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: linear-gradient(45deg, #ff9000, #ff5000);
+  color: white;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+.summary-card img {
+  width: 100%;
+  height: 130px;
+  object-fit: contain;
+  margin-bottom: 12px;
+}
+.summary-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Horizontal scroll grid */
+.horizontal-grid {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 15px;
+  cursor: grab;
+  scrollbar-width: none;
+}
+.horizontal-grid::-webkit-scrollbar { display: none; }
+
+.mini-card {
+  min-width: 180px;
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+.mini-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+.mini-card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.mini-card .price {
+  font-weight: 800;
+  color: #ff6a00;
+  font-size: 1rem;
+  margin-top: 8px;
+}
+
+/* ============================================
+   LAYER 12: SECTION HEADERS
+   ============================================ */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 30px 0 20px 0;
+}
+.section-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #222;
+  margin: 0;
+}
+.view-more-btn {
+  background: transparent;
+  color: #ff6a00;
+  border: 1px solid #ff6a00;
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.view-more-btn:hover {
+  background: #ff6a00;
+  color: white;
+}
+
+/* ============================================
+   LAYER 13: SEARCH RESULTS
+   ============================================ */
+.search-results-wrapper { padding: 16px 0; }
+.search-heading { margin-bottom: 16px; font-size: 1.1rem; }
+
+/* ============================================
+   LAYER 14: ERROR & LOADING
+   ============================================ */
+.error-container {
+  text-align: center;
+  padding: 60px 20px;
+}
+.error-title { color: #dc2626; }
+.error-message { color: #666; }
+.error-retry-btn {
+  background: #FF6600;
+  color: white;
+  border: none;
+  padding: 10px 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+.loading-container { padding-top: 20px; }
+
+/* ============================================
+   LAYER 15: MEGA MENU - DESKTOP HOVER (PORTAL)
+   ============================================ */
+.mega-menu-container {
+  position: fixed;
+  top: 70px; /* Chini ya header */
+  left: 0;
+  right: 0;
+  background: white;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  z-index: 9999;
+  animation: slideDown 0.25s ease;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.mega-menu-inner {
+  display: flex;
+  max-width: 1400px;
+  margin: 0 auto;
+  height: 100%;
+}
+
+.mega-menu-sidebar {
+  width: 260px;
+  background: #f8f9fa;
+  border-right: 1px solid #eee;
+  flex-shrink: 0;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+.mega-menu-sidebar::-webkit-scrollbar { width: 5px; }
+.mega-menu-sidebar::-webkit-scrollbar-track { background: #f1f1f1; }
+.mega-menu-sidebar::-webkit-scrollbar-thumb { background: #ff6600; border-radius: 10px; }
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  gap: 10px;
+  color: #444;
+}
+.sidebar-item:hover {
+  background: #fff0e5;
+  color: #ff6600;
+}
+.sidebar-item.active {
+  background: #fff0e5;
+  color: #ff6600;
+  border-left: 3px solid #ff6600;
+  font-weight: 600;
+}
+.sidebar-item-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sidebar-back-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  cursor: pointer;
+  color: #ff6a00;
+  font-weight: 600;
+  border-bottom: 1px solid #eee;
+}
+
+.mega-menu-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+.mega-menu-content::-webkit-scrollbar { width: 5px; }
+.mega-menu-content::-webkit-scrollbar-track { background: #f1f1f1; }
+.mega-menu-content::-webkit-scrollbar-thumb { background: #ff6600; border-radius: 10px; }
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f0f0f0;
+}
+.content-header h3 { font-size: 1.25rem; font-weight: 700; margin: 0; }
+.view-all-btn {
+  color: #ff6600;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: gap 0.2s;
+}
+.view-all-btn:hover { gap: 10px; }
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 24px;
+}
+
+.grid-item {
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.grid-item:hover { transform: translateY(-5px); }
+
+.image-circle {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: all 0.2s;
+}
+.image-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.grid-item:hover .image-circle {
+  box-shadow: 0 8px 20px rgba(255,102,0,0.2);
+  transform: scale(1.02);
+}
+.grid-text {
+  font-size: 0.8rem;
+  color: #444;
+  margin: 0;
+  font-weight: 500;
+}
+.grid-item:hover .grid-text { color: #ff6600; }
+
+.see-all-card .image-circle.see-all-circle {
+  background: #fff0e5;
+  border: 2px dashed #ff6600;
+}
+.see-all-text { color: #ff6600; font-weight: 600; }
+/* ============================================
+   LAYER 16: MOBILE MENU (PORTAL OVERLAY) - SCROLL FIX & TABLET 4 COLUMNS
+   ============================================ */
+
+.mobile-menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 99999 !important;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  animation: fadeIn 0.2s ease;
+}
+
+.mobile-menu-sheet {
+  width: 100%;
+  max-height: 80vh;
+  background: white;
+  border-radius: 20px 20px 0 0;
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+}
+
+.mobile-menu-handle {
+  width: 40px;
+  height: 4px;
+  background: #ddd;
+  border-radius: 4px;
+  margin: 12px auto;
+}
+
+/* MWILI - grid 2 (sidebar + content) */
+.mobile-menu-body {
+  display: flex;
+  flex-direction: row;
+  height: calc(80vh - 30px);  /* Urefu halisi, si max-height */
+  max-height: calc(80vh - 30px);
+  overflow: hidden;           /* Zuia kuvuja nje */
+}
+
+/* ============================================
+   LAYER 16: MOBILE MENU (PORTAL OVERLAY) - SCROLL FIX & TABLET 4 COLUMNS
+   ============================================ */
+
+.mobile-menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 99999 !important;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  animation: fadeIn 0.2s ease;
+}
+
+.mobile-menu-sheet {
+  width: 100%;
+  max-height: 80vh;
+  background: white;
+  border-radius: 20px 20px 0 0;
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+}
+
+.mobile-menu-handle {
+  width: 40px;
+  height: 4px;
+  background: #ddd;
+  border-radius: 4px;
+  margin: 12px auto;
+}
+
+/* MWILI - grid 2 (sidebar + content) */
+.mobile-menu-body {
+  display: flex;
+  flex-direction: row;
+  height: calc(80vh - 30px);  /* Urefu halisi, si max-height */
+  max-height: calc(80vh - 30px);
+  overflow: hidden;           /* Zuia kuvuja nje */
+}
+
+/* ============================================
+   SIDEBAR - 30% upana, SCROLLABLE
+   ============================================ */
+.mobile-menu-sidebar {
+  width: 30% !important;
+  flex-shrink: 0;
+  height: 100%;               /* Inachukua urefu wote wa mzazi */
+  overflow-y: auto;           /* Hii inawezesha scrolling! */
+  overflow-x: hidden;
+  background: #f8f9fa;
+  border-right: 1px solid #eee;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Scrollbar styling */
+.mobile-menu-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+.mobile-menu-sidebar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+.mobile-menu-sidebar::-webkit-scrollbar-thumb {
+  background: #ff6a00;
+  border-radius: 4px;
+}
+
+/* Kila kategoria */
+.mobile-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: transparent;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mobile-sidebar-item.active {
+  background: #ff6a00;
+  color: white;
+}
+.mobile-sidebar-item .mobile-sidebar-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.mobile-sidebar-item .mobile-sidebar-text {
+  font-size: 12px;
+  font-weight: 500;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobile-sidebar-back {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  cursor: pointer;
+  color: #ff6a00;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+/* ============================================
+   MAUDHUI - 70% upana, SCROLLABLE
+   ============================================ */
+.mobile-menu-content {
+  flex: 1;
+  width: 70%;
+  height: 100%;               /* Inachukua urefu wote wa mzazi */
+  overflow-y: auto;           /* Hii inawezesha scrolling! */
+  overflow-x: hidden;
+  padding: 10px 8px;
+}
+
+.mobile-menu-content::-webkit-scrollbar {
+  width: 4px;
+}
+.mobile-menu-content::-webkit-scrollbar-thumb {
+  background: #ff6a00;
+  border-radius: 4px;
+}
+
+.mobile-content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.mobile-content-header h4 {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.mobile-view-all-btn {
+  background: none;
+  border: none;
+  color: #ff6a00;
+  font-weight: 600;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+/* ============================================
+   GRID YA PICHA ZA DUARA
+   ============================================ */
+.mobile-grid-3 {
+  display: grid;
+  gap: 10px;
+}
+
+/* DEFAULT (simu ndogo) - 3 kwa safu */
+.mobile-grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* TABLET NA SKRINI KUBWA ZAIDI - 4 kwa safu */
+@media (min-width: 600px) {
+  .mobile-grid-3 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Simu kubwa / tablet ndogo */
+@media (min-width: 480px) and (max-width: 599px) {
+  .mobile-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.mobile-grid-item {
+  text-align: center;
+  cursor: pointer;
+}
+
+/* Picha za duara - 60px */
+.mobile-grid-image {
+  width: 60px !important;
+  height: 60px !important;
+  margin: 0 auto 4px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+.mobile-grid-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.mobile-grid-image.view-all {
+  background: #fff0e5;
+  border: 2px dashed #ff6a00;
+}
+.mobile-grid-item:hover .mobile-grid-image {
+  transform: scale(1.05);
+}
+
+/* Majina ya bidhaa - 10px */
+.mobile-grid-item p {
+  font-size: 10px !important;
+  margin: 0;
+  color: #444;
+  font-weight: 500;
+  line-height: 1.2;
+  max-width: 70px;
+  margin: 0 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.view-all-text {
+  color: #ff6a00;
+  font-weight: 600;
+  font-size: 10px !important;
+}
+
+.mobile-empty-state {
+  padding: 20px;
+  text-align: center;
+  color: #999;
+  font-size: 12px;
+}
+
+/* ============================================
+   LAYER 17: ANIMATIONS
+   ============================================ */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1.0); }
+}
+.loading-dots {
+  display: flex;
+  gap: 6px;
+}
+.dot {
+  width: 10px;
+  height: 10px;
+  background-color: #ff6600;
+  border-radius: 50%;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+/* ============================================
+   LAYER 18: RESPONSIVE FIXES
+   ============================================ */
+@media (max-width: 768px) {
+  .content-container-simple { padding: 0 !important; max-width: 100% !important; }
+  .main-content { padding-top: 0; }
+  .side-categories { display: none !important; }
+  .alibaba-top-layout { display: block !important; margin-top: 0 !important; gap: 0; }
+  .hero-banners-container { height: auto; padding: 0; margin: 0; }
+  .hot-picks-banner { min-height: 200px !important; border-radius: 0 !important; margin: 0; }
+  .banner-overlay-text { padding: 16px !important; }
+  .banner-title { font-size: 1rem !important; }
+  .banner-desc { font-size: 0.7rem !important; max-width: 100% !important; }
+  .ad-tag { font-size: 0.6rem !important; padding: 2px 8px !important; }
+  .view-more-banner { padding: 6px 16px !important; font-size: 0.7rem !important; }
+  .alibaba-grid, .just-for-you-grid, .summary-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
     gap: 8px !important;
+    padding-left: 4px !important;
+    padding-right: 4px !important;
   }
-  
-  /* Remove section header padding */
-  .section-header {
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-    margin: 8px 0 !important;
+  .compact-card img { height: 120px !important; }
+  .compact-card .name { font-size: 12px !important; }
+  .compact-card .price { font-size: 13px !important; }
+  .section-header { margin: 8px 0 !important; padding: 0 8px; }
+  .section-header h3 { font-size: 1rem !important; }
+  .view-more-btn { padding: 4px 12px !important; font-size: 0.7rem !important; }
+  .mobile-bottom-nav {
+    display: flex !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: white !important;
+    border-top: 1px solid #eee !important;
+    padding: 10px 0 !important;
+    z-index: 1000 !important;
+    justify-content: space-around !important;
   }
-  
-  /* Make just-for-you items full width */
-  .just-for-you-container {
-    width: 100% !important;
-    padding: 0 !important;
+  .mobile-bottom-nav .nav-item {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 4px !important;
+    cursor: pointer;
   }
+  .mobile-bottom-nav .nav-item span {
+    font-size: 10px !important;
+    color: #666 !important;
+  }
+}
+
+/* Tablet tweaks */
+@media (min-width: 600px) and (max-width: 1024px) {
+  .content-container-simple { padding: 0 16px; }
+  .alibaba-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+}
+
+/* Large screens */
+@media (min-width: 1400px) {
+  .content-container-simple { max-width: 1400px; }
+  .side-categories { max-height: 520px; }
+  .hot-picks-banner { height: 520px; }
+}
+@media (min-width: 1920px) {
+  .content-container-simple { max-width: 1600px; }
+}
+
+/* Utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* ============================================
+   LAYER 19: DASHBOARD CARD (CLASS IMEHIFADHIWA)
+   ============================================ */
+.dashboard-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  border-color: #ff6600;
+}
+.dashboard-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+.dashboard-card h4 {
+  padding: 10px 12px 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+.dashboard-card p {
+  padding: 0 12px 12px;
+  font-weight: 800;
+  color: #ff6a00;
+  font-size: 16px;
 }
