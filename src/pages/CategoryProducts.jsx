@@ -1,9 +1,12 @@
+// src/components/CategoryProducts.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { ChevronRight, Loader2, PackageOpen } from "lucide-react";
+import DashboardCard from "../components/DashboardCard"; // ✅ Ongeza hii!
+import { ChevronRight } from "lucide-react";
+import "../CategoryProducts.css";
 
 export default function CategoryProducts() {
   const { leafId } = useParams();
@@ -91,21 +94,21 @@ export default function CategoryProducts() {
     return "https://placehold.co/400x400?text=No+Image";
   };
 
-  useEffect(() => {
-    console.log("Products loaded:", products.length);
-    if (products.length > 0) {
-      console.log("Sample cover_image:", products[0].cover_image);
-    }
-  }, [products]);
-
+  // ========== SKELETON LOADING ==========
   if (loading) {
     return (
-      <div style={{ backgroundColor: '#f7f8fa', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <div className="cat-page skeleton">
         <Header search="" setSearch={() => {}} />
-        <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-            <Loader2 className="animate-spin" size={40} color="#ff6600" />
-            <p style={{ marginLeft: '12px', color: '#666' }}>Inapakia...</p>
+        <div className="cat-skeleton-wrapper">
+          <div className="cat-skeleton-breadcrumb"></div>
+          <div className="cat-skeleton-grid">
+            {Array.from({ length: isMobile ? 6 : 12 }).map((_, i) => (
+              <div key={i} className="cat-skeleton-card">
+                <div className="cat-skeleton-img"></div>
+                <div className="cat-skeleton-text"></div>
+                <div className="cat-skeleton-text short"></div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -114,107 +117,56 @@ export default function CategoryProducts() {
 
   if (error) {
     return (
-      <div style={{ backgroundColor: '#f7f8fa', minHeight: '100vh' }}>
+      <div className="cat-page error">
         <Header search="" setSearch={() => {}} />
-        <div style={{ textAlign: 'center', padding: '80px 20px' }}>
-          <p style={{ color: '#dc2626' }}>{error}</p>
-          <button onClick={() => window.location.reload()} style={{ marginTop: '16px', padding: '8px 20px', background: '#ff6600', color: 'white', border: 'none', borderRadius: '8px' }}>Jaribu tena</button>
+        <div className="cat-error-container">
+          <p className="cat-error-msg">{error}</p>
+          <button className="cat-error-btn" onClick={() => window.location.reload()}>
+            Jaribu tena
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ background: '#f7f8fa', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="cat-page">
       <Header search="" setSearch={() => {}} />
-      <div style={{ height: isMobile ? '70px' : '100px' }}></div>
+      <div className="cat-header-spacer"></div>
 
-      <main style={{ flex: 1, maxWidth: '1400px', margin: '0 auto', width: '100%', padding: '0 20px' }}>
+      <main className="cat-main">
         {/* Breadcrumb */}
-        <nav style={{ marginBottom: '16px' }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: isMobile ? '4px' : '8px',
-            fontSize: isMobile ? '10px' : '13px'
-          }}>
-            <span style={{ cursor: 'pointer', color: '#333' }} onClick={() => navigate('/')}>Home</span>
-            <ChevronRight size={isMobile ? 10 : 14} />
-            <span style={{ color: '#666' }}>{hierarchy.category}</span>
-            <ChevronRight size={isMobile ? 10 : 14} />
-            <span style={{ color: '#666' }}>{hierarchy.sub}</span>
-            <ChevronRight size={isMobile ? 10 : 14} />
-            <span style={{ color: '#ff6600', fontWeight: 'bold' }}>{hierarchy.leaf}</span>
+        <nav className="cat-breadcrumb">
+          <div className="cat-breadcrumb-items">
+            <span className="cat-breadcrumb-link" onClick={() => navigate('/')}>Home</span>
+            <ChevronRight className="cat-breadcrumb-icon" />
+            <span className="cat-breadcrumb-text">{hierarchy.category}</span>
+            <ChevronRight className="cat-breadcrumb-icon" />
+            <span className="cat-breadcrumb-text">{hierarchy.sub}</span>
+            <ChevronRight className="cat-breadcrumb-icon" />
+            <span className="cat-breadcrumb-current">{hierarchy.leaf}</span>
           </div>
         </nav>
 
-        {/* Products Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-          gap: isMobile ? '10px' : '15px',
-          padding: isMobile ? '8px' : '10px'
-        }}>
+        {/* Products Grid using DashboardCard */}
+        <div className="cat-products-grid">
           {products.map((item) => (
-            <div
+            <DashboardCard
               key={item.id}
+              image={getProductImage(item)}
+              title={item.name}
+              price={item.price}
+              originalPrice={item.original_price}
+              isMobile={isMobile}
               onClick={() => navigate(`/product/${item.id}`)}
-              style={{ textAlign: 'center', cursor: 'pointer' }}
-            >
-              {/* Image Container - RESPONSIVE: 100% width, aspect-ratio 1:1, no fixed px */}
-              <div style={{
-                width: '100%',
-                aspectRatio: '1 / 1',
-                borderRadius: isMobile ? '10px' : '12px',
-                overflow: 'hidden',
-                border: '1px solid #eee',
-                backgroundColor: '#f5f5f5',
-                marginBottom: '8px'
-              }}>
-                <img
-                  src={getProductImage(item)}
-                  alt={item.name}
-                  loading="lazy"
-                  onError={(e) => { e.target.src = "https://placehold.co/400x400?text=No+Image"; }}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    objectPosition: 'center',
-                    display: 'block'
-                  }}
-                />
-              </div>
-
-              {/* Product Info */}
-              <div>
-                <p style={{
-                  fontSize: isMobile ? '12px' : '14px',
-                  fontWeight: '500',
-                  margin: '0 0 4px 0',
-                  color: '#333',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }}>{item.name}</p>
-                {item.price && (
-                  <p style={{
-                    fontSize: isMobile ? '11px' : '13px',
-                    color: '#ff6600',
-                    fontWeight: 'bold',
-                    margin: 0
-                  }}>
-                    TSh {Number(item.price).toLocaleString()}
-                  </p>
-                )}
-              </div>
-            </div>
+            />
           ))}
         </div>
       </main>
 
-      {!isMobile && <Footer />}
+      <div className="cat-footer-wrapper">
+        {!isMobile && <Footer />}
+      </div>
     </div>
   );
 }

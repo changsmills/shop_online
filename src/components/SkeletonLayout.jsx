@@ -3,13 +3,22 @@ import React from 'react';
 import SkeletonCard from './SkeletonCard';
 import '../App_skeleton.css';
 
-// ✅ isMobile imeondolewa kabisa!
 const SkeletonLayout = () => {
   return (
     <div className="skeleton-layout-wrapper">
       
       {/* Mobile & Tablet Layout - Inaonekana <1024px */}
       <div className="skeleton-mobile">
+        
+        {/* ✅ ONGEZA HII: Skeleton ya Category Slider kwa Mobile */}
+        <div className="skeleton-category-slider">
+          <div className="skeleton-cat-item active"></div>
+          <div className="skeleton-cat-item"></div>
+          <div className="skeleton-cat-item"></div>
+          <div className="skeleton-cat-item"></div>
+          <div className="skeleton-cat-item"></div>
+        </div>
+
         <div className="skeleton-banner-mobile"></div>
         <div className="skeleton-grid-mobile">
           {[1, 2, 3, 4, 5, 6].map(i => <SkeletonCard key={i} />)}

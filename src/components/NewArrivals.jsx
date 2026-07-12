@@ -1,9 +1,10 @@
-// src/components/NewArrivals.jsx (Fixed Version - Square Images on Mobile)
+// src/components/NewArrivals.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, Sparkles } from "lucide-react";
 import { supabase } from "../supabaseClient";
 import DashboardCard from "./DashboardCard";
 import { useTranslation } from 'react-i18next';
+import '../NewArrivals.css';  // ✅ ONGEZA HII
 
 export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
   const { t, i18n } = useTranslation();
@@ -20,7 +21,6 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
         let query = supabase
           .from('products_engines')
           .select('*')
-         // .eq('is_approved', true)
           .order('created_at', { ascending: false })
           .limit(10);
 
@@ -41,12 +41,10 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
     fetchNewArrivals();
   }, [selectedCategory]);
 
-
   const getCategoryDisplayName = (category) => {
-  if (!category) return '';
-  return i18n.language === 'sw' ? (category.name_sw || category.name) : category.name;
-};
-
+    if (!category) return '';
+    return i18n.language === 'sw' ? (category.name_sw || category.name) : category.name;
+  };
 
   const checkScrollPosition = () => {
     if (scrollContainerRef.current) {
@@ -71,7 +69,6 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
     if (container && !isMobile) {
       container.addEventListener('scroll', checkScrollPosition);
       setTimeout(checkScrollPosition, 100);
-      
       return () => {
         container.removeEventListener('scroll', checkScrollPosition);
       };
@@ -79,344 +76,116 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
   }, [products, isMobile]);
 
   if (loading) return (
-    <div className="skeleton-loader-h" style={{height: '280px', margin: '20px', borderRadius: '15px'}} />
+    <div className="skeleton-loader-h" />
   );
   
   if (products.length === 0) return null;
 
-  <style>{`
-  .hide-scrollbar-mobile {
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  
-  .hide-scrollbar-mobile::-webkit-scrollbar {
-    display: none;
-  }
-  
-  /* Force horizontal scroll on mobile */
-  @media (max-width: 768px) {
-    .hide-scrollbar-mobile {
-      display: flex !important;
-      flex-direction: row !important;
-      flex-wrap: nowrap !important;
-      overflow-x: auto !important;
-      -webkit-overflow-scrolling: touch;
-    }
-  }
-`}</style>
-
   return (
-    <div 
-      className="new-arrivals-main-wrapper" 
-      style={{ 
-         padding: isMobile ? '4px 0' : '0px',
-        position: 'relative',
-        width: '100%',
-        // ✅ 2. Rangi ya background ya kijivu (Light Gray kama Alibaba)
-        backgroundColor: 'white', 
-        // ✅ 3. Pembe za duara kidogo kwa kontena zima
-        borderRadius: isMobile ? '8px' : '16px',
-        margin: isMobile ? '2px 0' : '10px 0'
-      }}
-    >
-
-{/* Header Section */}
-<div style={{ 
-  display: 'flex', 
-  justifyContent: 'space-between', 
-  alignItems: 'center', 
-  marginBottom: isMobile ? '12px' : '20px',
-  flexWrap: 'wrap',
-  gap: isMobile ? '6px' : '10px',
-  padding: isMobile ? '0 8px' : '0',
-}}>
-  <div>
-    <div style={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-      gap: isMobile ? '4px' : '8px', 
-      marginBottom: isMobile ? '2px' : '8px' 
-    }}>
-      <Sparkles size={isMobile ? 12 : 24} style={{ color: '#eab308' }} />
+    <div className="new-arrivals-main-wrapper">
       
-      <h2 style={{ 
-        fontSize: isMobile ? '13px' : '24px', 
-        fontWeight: 'bold', 
-        margin: 0,
-        lineHeight: isMobile ? '1.3' : '1.4'
-      }}>
-        {/* ✅ MABADILIKO HAPA: Usionyeshe "katika" ikiwa hakuna category maalum */}
-        {selectedCategory && selectedCategory.id !== null ? (
-          `${t('new_arrivals')} ${t('in')} ${getCategoryDisplayName(selectedCategory)}`
-        ) : (
-          t('new_arrivals')
-        )}
-      </h2>
-    </div>
+      {/* Header Section */}
+      <div className="na-header">
+        <div className="na-header-left">
+          <div className="na-title-group">
+            <Sparkles className="na-sparkle-icon" />
+            <h2 className="na-title">
+              {selectedCategory && selectedCategory.id !== null ? (
+                `${t('new_arrivals')} ${t('in')} ${getCategoryDisplayName(selectedCategory)}`
+              ) : (
+                t('new_arrivals')
+              )}
+            </h2>
+          </div>
+          <p className="na-subtitle">
+            {selectedCategory && selectedCategory.id !== null ? (
+              `${t('discover_latest_arrivals')} ${t('in')} ${getCategoryDisplayName(selectedCategory)}`
+            ) : (
+              t('discover_latest_arrivals')
+            )}
+          </p>
+        </div>
 
-    <p style={{ 
-      margin: 0, 
-      color: '#888',
-      fontSize: isMobile ? '9px' : '16px',
-      lineHeight: isMobile ? '1.2' : '1.5'
-    }}>
-      {/* ✅ MABADILIKO HAPA: Subtitle pia isionyeshe "katika" ikiwa hakuna category */}
-      {selectedCategory && selectedCategory.id !== null ? (
-        `${t('discover_latest_arrivals')} ${t('in')} ${getCategoryDisplayName(selectedCategory)}`
+        <button 
+          className="na-view-more-btn"
+          onClick={() => navigate('/products', { 
+            state: { 
+              sectionName: `${t('new_arrivals')} ${selectedCategory && selectedCategory.id !== null ? `${t('in')} ${selectedCategory.name}` : ''}`,
+              categoryId: selectedCategory?.id,
+              categoryName: selectedCategory?.name
+            } 
+          })}
+        >
+          <span>{t('view_more')}</span>
+          <ChevronRight size={isMobile ? 10 : 16} />
+        </button>
+      </div>
+
+      {/* ========== MOBILE VIEW: Horizontal Scroll ========== */}
+      {isMobile ? (
+        <div className="na-mobile-scroll hide-scrollbar-mobile">
+          {products.map((product) => (
+            <div key={product.id} className="na-mobile-card-wrapper">
+              <DashboardCard
+                image={product.cover_image}
+                title={product.name}
+                price={product.price}
+                originalPrice={product.original_price}
+                views={product.views}
+                isMobile={isMobile}
+                onClick={() => navigate('/products', {
+                  state: {
+                    priorityId: product.id,
+                    sectionName: `${t('new_arrivals')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`,
+                    categoryId: selectedCategory?.id,
+                    categoryName: selectedCategory?.name
+                  }
+                })}
+              />
+            </div>
+          ))}
+        </div>
       ) : (
-        t('discover_latest_arrivals')
-      )}
-    </p>
-  </div>
-  
-    {/* Button ya Header - Sahihishwa */}
-  <button 
-    onClick={() => navigate('/products', { 
-      state: { 
-        sectionName: `${t('new_arrivals')} ${selectedCategory && selectedCategory.id !== null ? `${t('in')} ${selectedCategory.name}` : ''}`,
-        categoryId: selectedCategory?.id,
-        categoryName: selectedCategory?.name
-      } 
-    })}
-    style={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-      gap: isMobile ? '4px' : '8px', 
-      padding: isMobile ? '4px 10px' : '8px 20px',
-      background: isMobile ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-      color: 'white',
-      border: 'none',
-      borderRadius: isMobile ? '20px' : '10px',
-      cursor: 'pointer',
-      fontWeight: isMobile ? '500' : '500',
-      fontSize: isMobile ? '9px' : '16px',
-      transition: 'all 0.3s ease',
-      boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)',
-      whiteSpace: 'nowrap'
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'translateY(-2px)';
-      e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.4)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = 'translateY(0)';
-      e.currentTarget.style.boxShadow = '0 2px 8px rgba(59, 130, 246, 0.3)';
-    }}
-  >
-    <span>{t('view_more')}</span>
-    <ChevronRight size={isMobile ? 10 : 16} />
-  </button>
-</div>
-      
-     {/* ========== MOBILE VIEW: Horizontal Scroll with SQUARE Images ========== */}
-{isMobile ? (
-  <div
-    style={{
-      display: 'flex',
-      flexDirection: 'row',
-      flexWrap: 'nowrap',           // ← MUHIMU: Inazuia vipengele kujikunja
-      gap: '12px',
-      overflowX: 'auto',            // ← MUHIMU: Inawezesha horizontal scroll
-      overflowY: 'hidden',
-      scrollBehavior: 'smooth',
-      WebkitOverflowScrolling: 'touch',  // ← MUHIMU: Kwa iOS smooth scroll
-      padding: '10px 0 20px 0',
-      width: '100%',
-      msOverflowStyle: 'none',
-      scrollbarWidth: 'none'
-    }}
-    className="hide-scrollbar-mobile"
-  >
-
-  {products.map((product) => (
-  <div
-    key={product.id}
-    style={{
-      flex: '0 0 auto',
-      width: isMobile ? '140px' : '180px',
-      minWidth: isMobile ? '140px' : '180px',
-      /* 🔥 MUHIMU SANA: Hapa ndipo tunatengeneza Card inayoonekana! */
-      backgroundColor: '#ffffff',
-      borderRadius: '12px', /* Pembe za duara */
-      padding: isMobile ? '8px' : '10px', /* Punguza padding kidogo */
-      border: '1px solid #e5e7eb', /* 🔥 Hii ndio inayotengeneza mstari wa kijivu unaoonekana */
-      boxShadow: '0 2px 8px rgba(0,0,0,0.04)', /* 🔥 Kivuli kidogo sana kinacholeta 3D effect */
-      transition: 'all 0.2s ease',
-      cursor: 'pointer',
-      marginBottom: '8px'
-    }}
-    onMouseEnter={(e) => {
-      if (!isMobile) {
-        e.currentTarget.style.transform = 'translateY(-3px)';
-        e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.08)';
-        e.currentTarget.style.borderColor = '#ff6a00'; /* Inageuka orange ukikausha */
-      }
-    }}
-    onMouseLeave={(e) => {
-      if (!isMobile) {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
-        e.currentTarget.style.borderColor = '#e5e7eb';
-      }
-    }}
-  >
-    <DashboardCard
-      image={product.cover_image}
-      title={product.name}
-      price={product.price}
-      originalPrice={product.original_price}
-      views={product.views}
-      isMobile={isMobile}
-            onClick={() => navigate('/products', {
-        state: {
-          priorityId: product.id,
-          /* ✅ Badilisha hapa kuwa t('new_arrivals') */
-          sectionName: `${t('new_arrivals')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`,
-          categoryId: selectedCategory?.id,
-          categoryName: selectedCategory?.name
-        }
-      })}
-    />
-  </div>
-))}
-  </div>
-) : (
         /* ========== DESKTOP VIEW: Horizontal Scroll with Arrows ========== */
-        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+        <div className="na-desktop-wrapper">
           {showLeftArrow && (
-            <button
-              onClick={() => scroll('left')}
-              style={{
-                position: 'absolute',
-                left: '-15px',
-                zIndex: 10,
-                backgroundColor: 'white',
-                border: '1px solid #e2e8f0',
-                borderRadius: '50%',
-                width: '40px',
-                height: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                transition: 'all 0.2s ease',
-                outline: 'none'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#f7f9fc';
-                e.currentTarget.style.transform = 'scale(1.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'white';
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
-            >
+            <button className="na-arrow-btn na-arrow-left" onClick={() => scroll('left')}>
               <ChevronLeft size={24} />
             </button>
           )}
           
-          <div
-            ref={scrollContainerRef}
-            style={{
-              display: 'flex',
-              gap: '20px',
-              overflowX: 'auto',
-              overflowY: 'hidden',
-              scrollBehavior: 'smooth',
-              padding: '10px 5px 20px 5px',
-              width: '100%',
-              msOverflowStyle: 'none',
-              scrollbarWidth: 'none'
-            }}
-            className="hide-scrollbar-desktop"
-          >
+          <div ref={scrollContainerRef} className="na-desktop-scroll hide-scrollbar-desktop">
             {products.map((product) => (
-              <div
-                key={product.id}
-                style={{
-                  flex: '0 0 auto',
-                  width: '200px',
-                  minWidth: '200px'
-                }}
-              >
-              <DashboardCard
-  image={product.cover_image}
-  title={product.name}
-  price={product.price}
-  originalPrice={product.original_price}
-  views={product.views}
-  isMobile={isMobile}
-    onClick={() => {
-    // 1. Andaa vigezo (Params)
-    const priorityId = product.id;
-    
-    /* ✅ Badilisha hapa kuwa t('new_arrivals') */
-    const sectionName = encodeURIComponent(`${t('new_arrivals')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`);
-    
-    const categoryId = selectedCategory?.id || '';
-    const categoryName = encodeURIComponent(selectedCategory?.name || 'All');
-
-    // 2. Tengeneza URL kamili
-    const url = `/products?priorityId=${priorityId}&sectionName=${sectionName}&categoryId=${categoryId}&categoryName=${categoryName}`;
-
-    // 3. Fungua kwenye Window/Tab mpya
-    window.open(url, '_blank');
-  }}
-/>
+              <div key={product.id} className="na-desktop-card-wrapper">
+                <DashboardCard
+                  image={product.cover_image}
+                  title={product.name}
+                  price={product.price}
+                  originalPrice={product.original_price}
+                  views={product.views}
+                  isMobile={isMobile}
+                  onClick={() => {
+                    const priorityId = product.id;
+                    const sectionName = encodeURIComponent(`${t('new_arrivals')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`);
+                    const categoryId = selectedCategory?.id || '';
+                    const categoryName = encodeURIComponent(selectedCategory?.name || 'All');
+                    const url = `/products?priorityId=${priorityId}&sectionName=${sectionName}&categoryId=${categoryId}&categoryName=${categoryName}`;
+                    window.open(url, '_blank');
+                  }}
+                />
               </div>
             ))}
           </div>
           
           {showRightArrow && (
-            <button
-              onClick={() => scroll('right')}
-              style={{
-                position: 'absolute',
-                right: '-15px',
-                zIndex: 10,
-                backgroundColor: 'white',
-                border: '1px solid #e2e8f0',
-                borderRadius: '50%',
-                width: '40px',
-                height: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                transition: 'all 0.2s ease',
-                outline: 'none'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#f7f9fc';
-                e.currentTarget.style.transform = 'scale(1.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'white';
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
-            >
+            <button className="na-arrow-btn na-arrow-right" onClick={() => scroll('right')}>
               <ChevronRight size={24} />
             </button>
           )}
         </div>
       )}
 
-      <style>{`
-        .hide-scrollbar-mobile::-webkit-scrollbar,
-        .hide-scrollbar-desktop::-webkit-scrollbar {
-          display: none;
-        }
-        .hide-scrollbar-mobile, .hide-scrollbar-desktop {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
+      {/* CSS ya scrollbar hiding iko kwenye NewArrivals.css sasa */}
     </div>
   );
 }

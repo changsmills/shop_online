@@ -1,575 +1,6 @@
-/* CONTAINER KUU - Imeboreshwa kufuata muundo wa ProductCard */
-.product-card-item {
-  background: #050505;
-  border-radius: 8px; /* Radius ndogo kidogo kama Alibaba */
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
-  border: 1px solid #ece6e6;
-  width: 100%; 
-  position: relative;
-  transition: box-shadow 0.2s;
-}
-
-.product-card-item:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-/* PICHA - Aspect ratio ni muhimu ili kadi zote ziwe na urefu sawa */
-.product-card-media {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  background: #e0d7d7;
-  overflow: hidden;
-}
-
-.product-card-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* BADGES (Rank, Views, Location) */
-.rank-indicator {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  z-index: 2;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 10px;
-  font-weight: bold;
-}
-
-.rank-level-1 { background: #ff4d4f; }
-.rank-level-2 { background: #ff7a45; }
-.rank-level-3 { background: #ffc53d; }
-
-.product-card-stats {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  background: rgba(0, 0, 0, 0.4);
-  color: white;
-  padding: 2px 5px;
-  border-radius: 4px;
-  font-size: 9px;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.product-card-location {
-  position: absolute;
-  bottom: 6px;
-  left: 6px;
-  background: rgba(240, 239, 239, 0.9);
-  padding: 2px 5px;
-  border-radius: 4px;
-  font-size: 9px;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  color: #555;
-}
-
-/* INFO BOX - Hapa ndipo tulifanya iwe kama ProductCard */
-.product-card-info {
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.product-card-title {
-  margin: 0;
-  font-size: 13px;
-  color: #333;
-  font-weight: 400;
-  line-height: 1.3;
-  height: 2.6em; /* Inakata baada ya mistari miwili */
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.product-card-price-row {
-  display: flex;
-  align-items: baseline;
-  gap: 2px;
-  margin-top: 2px;
-}
-
-.price-currency {
-  font-size: 11px;
-  font-weight: 700;
-  color: #000;
-}
-
-.price-amount {
-  font-size: 15px;
-  font-weight: 700;
-  color: #000;
-}
-
-.product-card-subtitle {
-  font-size: 10px;
-  color: #888;
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-/* 1. Container lazima ifiche picha inayovimba */
-/* 1. Container ya picha lazima ifiche kinachozidi (Clipper) */
-.product-card-media {
-  width: 100%;
-  aspect-ratio: 1 / 1; /* Inahakikisha picha ni Square daima */
-  position: relative;
-  overflow: hidden; /* MUHIMU: Inazuia picha isifunike title/bei wakati wa zoom */
-  background: #f8f8f8;
-  border-radius: 8px 8px 0 0; /* Inalingana na kona za kadi */
-}
-
-/* 2. Style ya picha na jinsi itakavyojivuta */
-.product-card-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Inazuia picha isijivute vibaya */
-  display: block;
-  /* Inafanya zoom iwe laini sana (Smooth Transition) */
-  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-/* 3. Zoom inatokea hapa - Inashika kadi nzima lakini inaathiri picha tu */
-.product-card-item:hover .product-card-img {
-  transform: scale(1.12); /* Picha inazoom kwa 12% ndani ya box lake */
-}
-
-/* 4. Support ya Simu (Touch) */
-@media (hover: none) {
-  .product-card-item:active .product-card-img {
-    transform: scale(1.12);
-  }
-}
-
-/* 5. Inahakikisha maandishi hayatikisiki wakati picha inazoom */
-.product-card-info {
-  padding: 10px;
-  background: rgb(110, 15, 15);
-  z-index: 2; /* Inakaa juu ya picha kuzuia overlapping */
-  position: relative;
-}
-.product-card-price-row {
-  display: flex;
-  align-items: baseline; /* Inafanya bei zilingane mstari wa chini */
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.price-main {
-  color: #e20808;
-  font-weight: 700;
-}
-
-/* HII NDIO STYLE MUHIMU */
-.price-original-strikethrough {
-  text-decoration: line-through; /* Inakata mstari */
-  color: #a0a0a0; /* Rangi ya kijivu */
-  font-size: 0.75rem; /* Saizi ndogo kidogo */
-  font-weight: 400;
-}
-
-.discount-badge-mini {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: #ff3b3b;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: bold;
-  z-index: 2;
-}
-/* Bei kuu inayolipwa (Bei ndogo) */
-.price-amount {
-  color: #f97316;
-  font-size: 1.25rem; /* Imeongezwa ukubwa kutoka 1.1rem */
-  font-weight: 800;   /* Imekuwa nzito zaidi */
-}
-
-.price-currency {
-  color: #f97316;
-  font-size: 0.9rem;
-  font-weight: 700;
-  margin-right: 2px;
-}
-
-/* Bei ya awali iliyokatwa (Bei kubwa) */
-.price-original-strikethrough {
-  text-decoration: line-through;
-  color: #47250d;    /* Kijivu inayovutia kidogo */
-  font-size: 1.5rem;   /* Imeongezwa kutoka 0.75rem ili isipotee sana */
-  font-weight: 900;
-  margin-left: 8px;
- background: linear-gradient(135deg, #e91d50 0%, #93ce09 100%);
-}
-
-/* Kama uliweka ile badge ya asilimia juu ya picha */
-.discount-badge-mini {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: #ef4444; /* Nyekundu inayokolea */
-  color: white;
-  padding: 4px 10px;  /* Imeongezwa nafasi ndani */
-  border-radius: 6px;
-  font-size: 0.85rem; /* Imeongezwa ukubwa */
-  font-weight: 800;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Inafanya ijitokeze nje */
-  z-index: 2;
-}
-
-
-/* Inatafuta kadi ambayo ni ya Location tu */
-.product-card-item .product-card-title {
-    /* Title ya kawaida (Mkoa) */
-    font-weight: 700; 
-    color: #000000;
-}
-
-/* Inafanya Subtitle (City/Address) iwe Bold zaidi */
-.product-card-subtitle {
-    font-size: 0.85rem;
-    color: #475569;
-    margin-top: 4px;
-    font-weight: 600; /* Hapa ndipo tunafanya city iwe bold */
-}
-
-/* Ikiwa unataka kadi za mikoa ziwe na muonekano wa kipekee zaidi */
-.product-card-item[data-is-location="true"] .product-card-title {
-    font-size: 1.1rem;
-    font-weight: 800; /* Bold nzito zaidi kwa jina la Mkoa */
-    text-transform: capitalize;
-}
-/* Badge iliyo juu ya picha */
-.moq-badge {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  background: #ff6b00; /* Rangi ya machungwa kuonyesha ni biashara */
-  color: white;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 800;
-  z-index: 10;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-/* Maandishi ya MOQ chini ya Title */
-.store-moq-info {
-  display: flex;
-  flex-direction: column;
-  margin-top: 4px;
-  margin-bottom: 4px;
-}
-
-.moq-label {
-  font-size: 10px;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.moq-value {
-  font-size: 13px;
-  font-weight: 700;
-  color: #1e293b;
-}
 /* ============================================ */
-/* FIX 1: Picha Zisikate Kwenye Simu (Object-Fit) */
+/* LAYER 1: CARD CONTAINER                      */
 /* ============================================ */
-
-/* Hakikisha picha zote zina object-fit: cover */
-.product-card-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-/* Kwa simu - hakikisha container ya picha ina aspect ratio sahihi */
-@media (max-width: 768px) {
-  .product-card-media {
-    aspect-ratio: 1 / 1;
-    width: 100%;
-    overflow: hidden;
-  }
-  
-  .product-card-img {
-    object-fit: cover;
-    width: 100%;
-    height: 100%;
-  }
-}
-
-/* ============================================ */
-/* FIX 2: Mobile Grid - Bidhaa 2 kwa Mstari */
-/* ============================================ */
-
-@media (max-width: 768px) {
-  /* Kwa grid zote za bidhaa */
-  .universal-grid-layout,
-  .alibaba-grid,
-  .category-grid,
-  .deals-scroll-grid,
-  .trending-grid {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px !important;
-    padding: 0 12px !important;
-  }
-  
-  /* Kwa horizontal scroll components - zigeuke kuwa grid */
-  .stores-horizontal-scroll,
-  .deals-horizontal-scroll,
-  .trending-horizontal-scroll,
-  .arrivals-horizontal-scroll,
-  .just-horizontal-scroll {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px !important;
-    overflow-x: visible !important;
-    padding: 0 12px !important;
-  }
-  
-  /* Kila card ijaze nafasi yake */
-  .product-card-item {
-    width: 100%;
-    min-width: 0;
-    margin: 0;
-  }
-  
-  /* Title usiwe mrefu sana */
-  .product-card-title {
-    font-size: 12px;
-    height: auto;
-    min-height: 2.6em;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  
-  /* Bei iwe vizuri kwenye simu */
-  .price-amount {
-    font-size: 14px;
-  }
-  
-  .price-currency {
-    font-size: 10px;
-  }
-  
-  .price-original-strikethrough {
-    font-size: 11px;
-  }
-  
-  /* Badges ziwe ndogo kidogo */
-  .discount-badge-mini {
-    padding: 2px 6px;
-    font-size: 10px;
-    top: 6px;
-    right: 6px;
-  }
-  
-  .rank-indicator {
-    padding: 2px 4px;
-    font-size: 9px;
-  }
-}
-
-/* ============================================ */
-/* FIX 3: Kwa simu ndogo sana (under 400px) */
-/* ============================================ */
-
-@media (max-width: 480px) {
-  .universal-grid-layout,
-  .alibaba-grid,
-  .category-grid,
-  .deals-scroll-grid {
-    gap: 8px !important;
-    padding: 0 8px !important;
-  }
-  
-  .product-card-info {
-    padding: 6px;
-  }
-  
-  .product-card-title {
-    font-size: 11px;
-  }
-  
-  .price-amount {
-    font-size: 13px;
-  }
-}
-
-/* ============================================ */
-/* FIX 4: Inline style za bei (Zilizokosea) */
-/* ============================================ */
-
-/* Hii inasahihisha gradient iliyokuwa kwenye original price */
-.price-original-strikethrough {
-  text-decoration: line-through;
-  color: #999;
-  font-size: 12px;
-  font-weight: 400;
-  margin-left: 6px;
-  /* Ondoa gradient hii: background: linear-gradient(...) */
-  background: none;
-}
-
-/* Hakikisha bei ya sasa ni machungwa */
-.price-amount {
-  color: #ff6a00;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.price-currency {
-  color: #ff6a00;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-/* ============================================ */
-/* FIX 5: Store cards kwenye simu */
-/* ============================================ */
-
-@media (max-width: 768px) {
-  .store-moq-info {
-    margin-top: 2px;
-  }
-  
-  .moq-label {
-    font-size: 9px;
-  }
-  
-  .moq-value {
-    font-size: 11px;
-  }
-  
-  .product-card-subtitle {
-    font-size: 10px;
-    white-space: normal;
-    word-break: break-word;
-  }
-}
-/* ============================================ */
-/* PICHA NYEMBAMBA NA NDEFU (ASPECT RATIO 3:4) */
-/* ============================================ */
-
-.product-card-media {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 1;  /* ← Badilisha kutoka 1/1 hadi 3/4 (Nyembamba, ndefu) */
-  background: #f8f8f8;
-  overflow: hidden;
-  border-radius: 8px 8px 0 0;
-}
-
-.product-card-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;     /* Inajaza eneo lote */
-  object-position: center;
-  display: block;
-  transition: transform 0.3s ease;
-}
-
-/* ============================================ */
-/* KWA SIMU (Mobile) - Bado nyembamba */
-/* ============================================ */
-@media (max-width: 768px) {
-  .product-card-media {
-    aspect-ratio: 3 / 4;  /* Inabakia nyembamba kwenye simu */
-  }
-}
-
-/* ============================================ */
-/* KWA PC (Desktop) */
-/* ============================================ */
-@media (min-width: 769px) {
-  .product-card-media {
-    aspect-ratio: 3 / 4;  /* Nyembamba pia */
-  }
-  
-  .product-card-item {
-    max-width: 200px;     /* Upana mdogo - inafanya ionekane nyembamba */
-    margin: 0 auto;
-  }
-}
-/* DashboardCard.css - Ongeza hizi CSS */
-
-/* Default image size kwa PC/Laptop */
-.product-card-img {
-  width: 100%;
-  height: 220px;        /* Change this to your preferred size */
-  object-fit: cover;
-  border-radius: 12px 12px 0 0;
-  transition: transform 0.3s ease;
-}
-
-/* Zoom effect on hover (PC only) */
-.product-card-item:hover .product-card-img {
-  transform: scale(1.05);
-}
-
-/* Tablet size (768px - 1024px) */
-@media (min-width: 768px) and (max-width: 1024px) {
-  .product-card-img {
-    height: 200px;
-  }
-}
-
-/* Mobile size (≤768px) */
-@media (max-width: 768px) {
-  .product-card-img {
-    height: 160px;      /* Smaller for mobile */
-  }
-}
-
-/* Very small mobile (≤480px) */
-@media (max-width: 480px) {
-  .product-card-img {
-    height: 140px;
-  }
-}
-
-/* Large desktop (≥1400px) */
-@media (min-width: 1400px) {
-  .product-card-img {
-    height: 250px;
-  }
-}
-
-/* Image container to prevent overflow on zoom */
-.product-card-media {
-  position: relative;
-  overflow: hidden;
-  border-radius: 12px 12px 0 0;
-}
-/* DashboardCard.css - Simplified since we use inline styles */
 
 .product-card-item {
   background: #ffffff;
@@ -578,30 +9,71 @@
   cursor: pointer;
   border: 1px solid #f0f0f0;
   width: 100%;
-  transition: box-shadow 0.2s;
+  transition: box-shadow 0.2s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .product-card-item:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* Zoom effect on image */
-.product-card-img {
-  transition: transform 0.3s ease;
-}
-
-.product-card-item:hover .product-card-img {
-  transform: scale(1.08);
-}
-
-/* Touch devices - no zoom on hover */
-@media (hover: none) {
-  .product-card-item:active .product-card-img {
-    transform: scale(1.05);
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .product-card-item {
+    border-radius: 6px;
+    border-width: 1px;
   }
 }
 
-/* Badge styles */
+/* ============================================ */
+/* LAYER 2: IMAGE & MEDIA – SQUARE (1/1)        */
+/* ============================================ */
+
+.product-card-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1; /* ✅ IMERUDISHWA KUWA SQUARE */
+  background: #f8f8f8;
+  overflow: hidden;
+  border-radius: 8px 8px 0 0;
+}
+
+.product-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  /* ✅ IMEBADILISHWA: Inafanya zoom iwe laini sana (Smooth Transition) */
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* ✅ IMEBADILISHWA: Zoom inatokea hapa (Inashika kadi nzima lakini inaathiri picha tu) */
+.product-card-item:hover .product-card-img {
+  transform: scale(1.12); /* Picha inazoom kwa 12% ndani ya box lake */
+}
+
+/* ✅ Support ya Simu (Touch) */
+@media (hover: none) {
+  .product-card-item:active .product-card-img {
+    transform: scale(1.12);
+  }
+}
+
+/* Mobile square size */
+@media (max-width: 768px) {
+  .product-card-media {
+    aspect-ratio: 1 / 1; /* ✅ SQUARE KWENYE SIMU PIA */
+    border-radius: 6px 6px 0 0;
+  }
+}
+
+/* ============================================ */
+/* LAYER 3: BADGES (Rank, Discount, Stats)      */
+/* ============================================ */
+
 .rank-indicator {
   position: absolute;
   top: 6px;
@@ -621,18 +93,37 @@
 .rank-level-2 { background: #ff7a45; }
 .rank-level-3 { background: #ffc53d; }
 
+.discount-badge-mini {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: #ef4444;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  z-index: 2;
+}
+
 .product-card-stats {
   position: absolute;
   top: 6px;
   right: 6px;
   background: rgba(0, 0, 0, 0.5);
-  color: white;
-  padding: 2px 5px;
+  color: #ffd700;
+  padding: 2px 6px;
   border-radius: 4px;
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
+  font-size: 9px;
+  font-weight: 600;
   z-index: 2;
+}
+
+.product-card-stats svg {
+  color: #d6d5d5;
+  opacity: 0.8;
 }
 
 .product-card-location {
@@ -650,42 +141,193 @@
   z-index: 2;
 }
 
-.discount-badge-mini {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  background: #ef4444;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: bold;
-  z-index: 2;
+/* Mobile badge sizes */
+@media (max-width: 768px) {
+  .rank-indicator { font-size: 9px; padding: 2px 4px; }
+  .discount-badge-mini { font-size: 10px; padding: 2px 4px; top: 4px; right: 4px; }
+  .product-card-stats { font-size: 8px; padding: 1px 4px; }
+  .product-card-location { font-size: 8px; padding: 1px 4px; }
 }
 
-/* Remove any conflicting styles */
+/* ============================================ */
+/* LAYER 4: INFO SECTION (Title, Price, MOQ)    */
+/* ============================================ */
+
 .product-card-info {
-  background: rgb(151, 11, 11);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: transparent;
   position: relative;
   z-index: 2;
 }
 
-.product-card-stats {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  background: rgba(0, 0, 0, 0.5);
-  color: #ffd700;  /* Gold color for numbers */
-  padding: 2px 6px;
-  border-radius: 4px;
+/* Mobile info padding */
+@media (max-width: 768px) {
+  .product-card-info {
+    padding: 6px 8px 8px 8px;
+    gap: 2px;
+  }
+}
+
+/* Title */
+.product-card-title {
+  margin: 0;
+  font-size: 13px;
+  color: #333;
+  font-weight: 500;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .product-card-title {
+    font-size: 11px;
+    line-height: 1.2;
+    -webkit-line-clamp: 2;
+  }
+}
+
+/* Price Row */
+.product-card-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.price-currency {
+  color: #ff6a00;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.price-amount {
+  color: #ff6a00;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.price-original-strikethrough {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 12px;
+  font-weight: 400;
+  margin-left: 6px;
+  background: none;
+}
+
+@media (max-width: 768px) {
+  .price-currency { font-size: 10px; }
+  .price-amount { font-size: 14px; }
+  .price-original-strikethrough { font-size: 11px; }
+}
+
+/* MOQ */
+.store-moq-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.moq-label {
+  font-size: 10px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.moq-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+@media (max-width: 768px) {
+  .moq-label { font-size: 9px; }
+  .moq-value { font-size: 11px; }
+}
+
+/* Category Name */
+.product-card-category {
+  font-size: 11px;
+  font-weight: 700;
+  color: #f97316;
+  margin: 4px 0 0 0;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+  .product-card-category {
+    font-size: 9px;
+    margin: 2px 0 0 0;
+  }
+}
+
+/* Subtitle (Location) */
+.product-card-subtitle-row {
   display: flex;
   align-items: center;
   gap: 3px;
-  font-size: 9px;
-  font-weight: 600;
-  z-index: 2;
+  margin-top: 2px;
 }
 
-.product-card-stats svg {
-  color: #d6d5d5;  /* White eye icon */
-  opacity: 0.8;
+.subtitle-icon {
+  color: #888;
+  flex-shrink: 0;
+}
+
+.product-card-subtitle {
+  font-size: 10px;
+  color: #888;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+  .product-card-subtitle {
+    font-size: 9px;
+  }
+}
+
+/* ============================================ */
+/* LAYER 5: VARIANT STYLES (Store, Location)    */
+/* ============================================ */
+
+.product-card-item.is-store .product-card-title {
+  font-weight: 700;
+}
+
+.product-card-item.is-location .product-card-title {
+  font-weight: 800;
+  font-size: 1.1rem;
+  text-transform: capitalize;
+}
+
+.product-card-item.is-location .product-card-subtitle {
+  font-weight: 600;
+}
+
+/* ============================================ */
+/* LAYER 6: UTILITIES                           */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+    padding: 0 12px !important;
+  }
 }

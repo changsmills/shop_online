@@ -1,14 +1,14 @@
-// src/components/JustForYou.jsx (Updated Version)
+// src/components/JustForYou.jsx (Refactored - No Inline CSS & No isMobile in Grid)
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import { supabase } from "../supabaseClient";
-import { Loader2, ChevronRight } from "lucide-react";
+import { Loader2, ChevronRight, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from 'react-i18next'; // 🆕 ONGEZA HAPA!
+import { useTranslation } from 'react-i18next';
 import DashboardCard from "./DashboardCard";
 import "../JustForYou.css"; 
 
 export default function JustForYou({ handleAction, search = "", selectedCategory, isMobile }) {
-  const { t, i18n } = useTranslation(); // 🆕 ONGEZA HAPA!
+  const { t, i18n } = useTranslation();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,7 +23,6 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
       let query = supabase
         .from("products_engines")
         .select("*")
-        //.eq("is_approved", true)
         .order("created_at", { ascending: false })
         .limit(30);
 
@@ -50,7 +49,7 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
     }
   };
 
-   useEffect(() => {
+  useEffect(() => {
     isMounted.current = true;
     fetchJustForYou();
     return () => { isMounted.current = false; };
@@ -75,211 +74,115 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
   if (error) {
     return (
       <div className="error-container">
-        <p>Failed to load products. Please try again.</p>
+        <div className="error-content">
+          <p className="error-message">
+            Oops! Hatukuweza kupakia bidhaa. Tafadhali angalia mtandao wako.
+          </p>
+          <button 
+            className="error-retry-btn" 
+            onClick={() => fetchJustForYou()}
+          >
+            <RefreshCw size={16} /> Jaribu tena
+          </button>
+        </div>
       </div>
     );
   }
   
   const getCategoryName = () => {
     if (!selectedCategory) return '';
-    // Ikiwa lugha ni Swahili na ipo, tumia name_sw. Vinginevyo tumia name ya kawaida.
     return i18n.language === 'sw' 
       ? (selectedCategory.name_sw || selectedCategory.name) 
       : selectedCategory.name;
   };
 
-  return (
-    <section 
-      className="just-for-you-container"
-      style={{
-          padding: isMobile ? '4px 0' : '0px',
-        position: 'relative',
-        width: '100%',
-        // ✅ 2. Rangi ya background ya kijivu (Light Gray kama Alibaba)
-        backgroundColor: '#eceef1', 
-        // ✅ 3. Pembe za duara kidogo kwa kontena zima
-        borderRadius: isMobile ? '8px' : '16px',
-        margin: isMobile ? '2px 0' : '10px 0',
-        paddingBottom: isMobile ? '45px' : '30px',
-        marginBottom: isMobile ? '65px' : '10px'
-
-
-      }}
-    >
-       {/* Header - Responsive for mobile */}
-    <div 
-      className="section-header"
-      style={{
-        padding: isMobile ? '0 8px 12px 8px' : '0 16px 16px 16px',
-        margin: 0,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        gap: '8px',
-      }}
-    >
-      <div className="header-main" style={{ flex: 1 }}>
-        <div className="header-text-group">
-                    <h2 
-            className="just-title"
-            style={{
-              fontSize: isMobile ? '14px' : '24px',
-              fontWeight: 'bold',
-              margin: 0,
-              lineHeight: isMobile ? '1.3' : '1.4',
-              color: 'black',
-            }}
-          >
-            {/* ✅ BADILISHA HAPA: Ongeza `&& selectedCategory.id !== null` */}
-            {selectedCategory && selectedCategory.id !== null ? (
-              `${t('just_for_you')} ${t('in')} ${getCategoryName()}`
-            ) : (
-              t('just_for_you')
-            )}
-          </h2>
-                    <p 
-            className="just-subtitle"
-            style={{
-              fontSize: isMobile ? '9px' : '14px',
-              margin: isMobile ? '2px 0 0 0' : '4px 0 0 0',
-              color: '#312c2c',
-              lineHeight: isMobile ? '1.2' : '1.4',
-            }}
-          >
-            {/* ✅ BADILISHA HAPA: Ongeza `&& selectedCategory.id !== null` */}
-            {selectedCategory && selectedCategory.id !== null ? (
-              `${t('curated_picks')} ${t('in')} ${getCategoryName()}`
-            ) : (
-              t('curated_picks')
-            )}
-          </p>
-        </div>
-      </div>
-      
-      {filteredProducts.length > 3 && (
-        <button 
-          className="view-all-just" 
-          onClick={() => navigate("/products", { 
-            state: { 
-              sectionName: t('just_for_you'), // ✅ BADILISHA HAPA
-              categoryId: selectedCategory?.id 
-            } 
-          })}
-          style={{
-            fontSize: isMobile ? '9px' : '14px',
-            fontWeight: isMobile ? '500' : 'normal',
-            background: isMobile ? 'rgba(255,102,0,0.1)' : 'none',
-            border: 'none',
-            borderRadius: isMobile ? '16px' : '0',
-            padding: isMobile ? '4px 10px' : '0',
-            color: '#7a380c',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {/* ✅ BADILISHA HAPA: Tumia t() */}
-          <span>{t('view_all')}</span>
-          <ChevronRight size={isMobile ? 12 : 16} />
-        </button>
-      )}
-    </div>
-
-      {/* ========== MOBILE: FULL WIDTH GRID (ZERO PADDING) ========== */}
-      {isMobile ? (
-        <div 
-          className="just-mobile-grid"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
-            gap: '8px',
-            padding: 0,           // ← ZERO PADDING
-            margin: 0,
-            width: '100%',
-          }}
-        >
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((item) => (
-              <DashboardCard 
-                key={item.id}
-    image={item.cover_image}
-    title={item.name}
-    price={item.price}
-    originalPrice={item.original_price}
-    isMobile={isMobile}
-    moq={item.moq}                   
-    subtitle={item.store_address}    
-    categoryName={item.category_name} 
-    isTopDeal={true}                 
-    views={item.views}
-                    onClick={() => navigate('/products', { 
-                  state: { 
-                    priorityId: item.id, 
-                    sectionName: `${t('just_for_you')} ${selectedCategory && selectedCategory.id !== null ? `${t('in')} ${getCategoryName()}` : ''}`, // ✅ BADILISHA HAPA
-                    categoryId: selectedCategory?.id
-                  } 
-                })}
-              />
-            ))
-          ) : (
-            <div className="empty-state">
-              <p>No products available in {selectedCategory?.name || 'this category'} right now.</p>
-            </div>
-          )}
-        </div>
-      ) : (
-        /* ========== DESKTOP: GRID LAYOUT ========== */
-        <div 
-          className="universal-grid-layout"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(6, 1fr)',
-            gap: '16px',
-            padding: '0 16px',
-            margin: 0,
-          }}
-        >
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((item) => (
-              <DashboardCard 
-key={item.id}
-    image={item.cover_image}
-    title={item.name}
-    price={item.price}
-    originalPrice={item.original_price}
-    isMobile={isMobile}
-    // --- HAPA NDIYO PANAPOKOSEKANA ---
-    moq={item.moq}                   // Inatoka kwenye database column 'moq'
-    subtitle={item.store_address}    // Au column yoyote ya eneo (Location)
-    categoryName={item.category_name} // Jina la kundi la bidhaa
-    isTopDeal={true}                 // Lazima iwe true ili bei ionekane kama isStore ipo
-    views={item.views}
-
-    onClick={() => {
-    // 1. Maandalizi ya data
+  // Logic ya kuunda URL kwa desktop
+  const handleCardClick = (item) => {
     const priorityId = item.id;
-    const sectionName = encodeURIComponent(`${t('just_for_you')} ${selectedCategory && selectedCategory.id !== null ? `${t('in')} ${getCategoryName()}` : ''}`); // ✅ BADILISHA HAPA
+    const sectionName = encodeURIComponent(`${t('just_for_you')} ${selectedCategory && selectedCategory.id !== null ? `${t('in')} ${getCategoryName()}` : ''}`);
     const categoryId = selectedCategory?.id || '';
     const categoryName = encodeURIComponent(getCategoryName() || 'All');
-
-    // 2. Tengeneza URL string
     const url = `/products?priorityId=${priorityId}&sectionName=${sectionName}&categoryId=${categoryId}&categoryName=${categoryName}`;
-    
-    // 3. Fungua Tab mpya
     window.open(url, '_blank');
-  }}
+  };
 
-/>
-            ))
-          ) : (
-            <div className="empty-state">
-              <p>No products available in {selectedCategory?.name || 'this category'} right now.</p>
-            </div>
-          )}
+  return (
+    <section className="just-for-you-container">
+      
+      {/* Header - Responsive via CSS Media Queries */}
+      <div className="section-header">
+        <div className="header-main">
+          <div className="header-text-group">
+            <h2 className="just-title">
+              {selectedCategory && selectedCategory.id !== null ? (
+                `${t('just_for_you')} ${t('in')} ${getCategoryName()}`
+              ) : (
+                t('just_for_you')
+              )}
+            </h2>
+            <p className="just-subtitle">
+              {selectedCategory && selectedCategory.id !== null ? (
+                `${t('curated_picks')} ${t('in')} ${getCategoryName()}`
+              ) : (
+                t('curated_picks')
+              )}
+            </p>
+          </div>
         </div>
-      )}
+        
+        {filteredProducts.length > 3 && (
+          <button 
+            className="view-all-just" 
+            onClick={() => navigate("/products", { 
+              state: { 
+                sectionName: t('just_for_you'),
+                categoryId: selectedCategory?.id 
+              } 
+            })}
+          >
+            <span>{t('view_all')}</span>
+            <ChevronRight size={isMobile ? 12 : 16} />
+          </button>
+        )}
+      </div>
+
+      {/* ✅ GRID MOJA - INAJIPANGA KWA CSS MEDIA QUERIES (Hakuna isMobile) */}
+      <div className="product-grid">
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map((item) => (
+            <DashboardCard 
+              key={item.id}
+              image={item.cover_image}
+              title={item.name}
+              price={item.price}
+              originalPrice={item.original_price}
+              isMobile={isMobile} // Hii bado inahitajika kwa styling ndani ya card
+              moq={item.moq}
+              subtitle={item.store_address}
+              categoryName={item.category_name}
+              isTopDeal={true}
+              views={item.views}
+              onClick={() => handleCardClick(item)}
+            />
+          ))
+        ) : (
+          /* ✅ EMPTY STATE CARD - Inaiga DashboardCard yenye Try Again */
+          <div className="empty-state-card">
+            <div className="empty-state-image"></div>
+            <div className="empty-state-info">
+              <p className="empty-state-title">
+                Hakuna bidhaa katika {selectedCategory?.name || 'kategoria hii'}.
+              </p>
+              <button 
+                className="empty-state-btn" 
+                onClick={() => fetchJustForYou()}
+              >
+                <RefreshCw size={14} /> Jaribu tena
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </section>
   );
 }

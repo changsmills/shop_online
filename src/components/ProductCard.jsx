@@ -1,3 +1,4 @@
+// src/components/ProductCard.jsx
 import { useNavigate } from "react-router-dom";
 import { MapPin, Star, ChevronRight } from "lucide-react";
 import "../ProductCard.css";
@@ -46,244 +47,97 @@ export default function ProductCard({ product, isMobile = false, isPriority = fa
     ? name.substring(0, maxNameLength - 3) + '...' 
     : name;
 
-  // BADILISHA KUWA:
-const numericPrice = parseFloat(price) || 0;
-const numericOriginal = parseFloat(original_price) || 0;
-const hasDiscount = numericOriginal > 0 && numericOriginal < numericPrice;  // ← HAPA! > imebadilish
+  const numericPrice = parseFloat(price) || 0;
+  const numericOriginal = parseFloat(original_price) || 0;
+  const hasDiscount = numericOriginal > 0 && numericOriginal < numericPrice;
   const oldPrice = hasDiscount ? numericPrice : null;
 
   const displayPrice = hasDiscount ? numericOriginal : numericPrice;
-const discountPercent = hasDiscount 
-  ? Math.round(((numericPrice - numericOriginal) / numericPrice) * 100) 
-  : 0;
+  const discountPercent = hasDiscount 
+    ? Math.round(((numericPrice - numericOriginal) / numericPrice) * 100) 
+    : 0;
 
-  // ========== MOBILE VERSION (Sawa na DashboardCard style) ==========
+  // ========== MOBILE VERSION ==========
   if (isMobile) {
     return (
       <div 
-        className="product-card-item" 
+        className="product-card-item mobile-card"
         onClick={() => navigate(`/product/${id}`)}
-        onContextMenu={(e) => e.preventDefault()} // <---
-        style={{
-          backgroundColor: 'transparent',
-          border: 'none',
-          boxShadow: 'none',
-          padding: 0,
-          margin: 0,
-          cursor: 'pointer',
-          // 2. Inazuia rangi ya kijani/bluu (highlight) unapogusa
-          WebkitTapHighlightColor: 'transparent', // <---
-          WebkitUserSelect: 'none',               // <---
-          userSelect: 'none'
-        }}
+        onContextMenu={(e) => e.preventDefault()}
       >
-        {/* IMAGE CONTAINER - Square kama DashboardCard */}
-        <div 
-          style={{
-            position: 'relative',
-            width: '100%',
-            aspectRatio: '1 / 1',
-            backgroundColor: '#ece7e7',
-            overflow: 'hidden',
-            borderRadius: '8px',
-            WebkitTouchCallout: 'none' // <---
-          }}
-        >
-          {/* Hot Sale Badge */}
+        {/* IMAGE CONTAINER - SQUARE */}
+        <div className="product-card-media">
           {hot_sale_tag && (
-            <div style={{
-              position: 'absolute',
-              top: '6px',
-              left: '6px',
-              backgroundColor: '#ff4d4f',
-              color: '#fff',
-              fontSize: '9px',
-              fontWeight: 'bold',
-              padding: '2px 6px',
-              borderRadius: '4px',
-              zIndex: 2,
-            }}>
+            <div className="tag-hot">
               Hot
             </div>
           )}
 
           {hasDiscount && (
-  <div style={{
-    position: 'absolute',
-    top: '6px',
-    right: '6px',
-    backgroundColor: '#ca290d',
-    color: '#fff',
-    fontSize: '9px',
-    fontWeight: 'bold',
-    padding: '2px 6px',
-    borderRadius: '4px',
-    zIndex: 2,
-  }}>
-    -{discountPercent}% 
-  </div>
-)}
+            <div className="tag-discount">
+              -{discountPercent}%
+            </div>
+          )}
 
           {/* MOQ Badge (Bottom) */}
           {moq && (
-            <div style={{
-              position: 'absolute',
-              bottom: '0',
-              left: '0',
-              right: '0',
-              background: 'linear-gradient(transparent, rgba(0,0,0,0.6))',
-              color: 'white',
-              fontSize: '10px',
-              padding: '12px 6px 4px',
-              fontWeight: '500'
-            }}>
+            <div className="tag-moq">
               MOQ: {moq} {moq > 1 ? 'pcs' : 'pc'}
             </div>
           )}
           
-       <img 
-  src={finalImage} 
-  alt={name} 
-  // 4. Inazuia picha isivutike (drag) na menu ya picha isitokee
-            draggable="false"                          // <---
-            onContextMenu={(e) => e.preventDefault()} // <---
-  style={{
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    objectPosition: 'center',
-    transition: 'transform 0.3s ease-in-out',
-    cursor: 'pointer'
-  }}
-  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-  onTouchStart={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-  onTouchEnd={(e) => e.currentTarget.style.transform = 'scale(1)'}
-  onError={(e) => { e.target.src = '/images/placeholder.png'; }} 
-/>
+          <img 
+            src={finalImage} 
+            alt={name} 
+            className="product-card-img"
+            draggable="false"
+            onContextMenu={(e) => e.preventDefault()}
+            onError={(e) => { e.target.src = '/images/placeholder.png'; }} 
+          />
         </div>
 
-        {/* INFO SECTION - Kama DashboardCard */}
-        <div 
-          style={{
-            padding: '6px 4px 4px 4px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '2px',
-            backgroundColor: 'transparent',
-          }}
-        >
-          {/* Product Name */}
-          <h4 
-            style={{
-              margin: 0,
-              fontSize: '11px',
-              color: '#333',
-              fontWeight: '500',
-              lineHeight: '1.3',
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-              minHeight: '28px',
-            }}
-          >
-            {displayName}
-          </h4>
+        {/* INFO SECTION */}
+        <div className="product-card-info mobile-info">
+          <h4 className="product-card-title mobile-title">{displayName}</h4>
           
-          {/* ✅ PRICE ROW - IMEREKEBISHWA */}
-<div
-  style={{
-    display: 'flex',
-    alignItems: 'baseline',
-    gap: '4px',
-    flexWrap: 'wrap',
-  }}
->
-  {/* Bei ya sasa (displayPrice) */}
-  <div style={{ display: 'flex', alignItems: 'baseline' }}>
-    <span 
-      style={{
-        fontSize: '9px',
-        fontWeight: '700',
-        color: '#ca290d',
-      }}
-    >
-      TSh
-    </span>
-    <span 
-      style={{
-        fontSize: '13px',
-        fontWeight: '700',
-        color: '#ca290d',
-      }}
-    >
-      {displayPrice.toLocaleString()}  {/* ✅ BEI YA DISCOUNT */}
-    </span>
-  </div>
-  
-  {/* Bei ya awali (oldPrice) - ikiwa ipo */}
-  {oldPrice && (
-    <span 
-      style={{
-        textDecoration: 'line-through',
-        color: '#999',
-        fontSize: '9px',
-      }}
-    >
-      {oldPrice.toLocaleString()}  {/* ✅ BEI YA AWALI (STRIKE-THROUGH) */}
-    </span>
-  )}
-</div>
+          {/* PRICE ROW */}
+          <div className="product-card-price-row mobile-price-row">
+            <div className="price-main">
+              <span className="price-currency mobile-currency">TSh</span>
+              <span className="price-amount mobile-amount">
+                {displayPrice.toLocaleString()}
+              </span>
+            </div>
+            {oldPrice && (
+              <span className="price-original-strikethrough mobile-old">
+                {oldPrice.toLocaleString()}
+              </span>
+            )}
+          </div>
 
-          {/* MOQ row (kama haiko kwenye image overlay) */}
+          {/* MOQ row */}
           {!moq && (
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '4px', 
-              marginTop: '1px',
-            }}>
-              <span style={{ fontSize: '9px', color: '#666' }}>MOQ:</span>
-              <span style={{ fontSize: '10px', fontWeight: '600', color: '#333' }}>1</span>
+            <div className="product-card-moq">
+              <span className="moq-label">MOQ:</span>
+              <span className="moq-value">1</span>
             </div>
           )}
 
           {/* Stats Row (Sold & Location) */}
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            fontSize: '9px', 
-            color: '#999',
-            marginTop: '2px' 
-          }}>
+          <div className="product-card-stats mobile-stats">
             <span>{soldCount?.toLocaleString() || 0} sold</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-              <MapPin size={8} color="#999" />
+            <div className="stat-location">
+              <MapPin size={8} />
               <span>{location || 'Tanzania'}</span>
             </div>
           </div>
 
           {/* Verified Badge */}
           {is_verified && (
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '4px', 
-              marginTop: '4px',
-              paddingTop: '3px',
-              borderTop: '0.5px solid #f0f0f0' 
-            }}>
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '2px',
-                backgroundColor: '#fff7e6',
-                padding: '1px 4px',
-                borderRadius: '2px'
-              }}>
-                <span style={{ color: '#fa8c16', fontSize: '9px', fontWeight: '600' }}>{seller_years || 1}y</span>
-                <span style={{ color: '#fa8c16', fontSize: '8px', fontWeight: '500' }}>Verified</span>
+            <div className="product-card-verified mobile-verified">
+              <div className="verified-pill">
+                <span className="years">{seller_years || 1}y</span>
+                <span>Verified</span>
               </div>
             </div>
           )}
@@ -292,135 +146,63 @@ const discountPercent = hasDiscount
     );
   }
 
-  // ========== DESKTOP VERSION (Sawa na DashboardCard style) ==========
+  // ========== DESKTOP VERSION ==========
   return (
     <div 
-      className="product-card-item"
+      className="product-card-item desktop-card"
       onClick={() => navigate(`/product/${id}`)}
-      style={{
-        backgroundColor: 'transparent',
-        border: 'none',
-        boxShadow: 'none',
-        padding: 0,
-        margin: 0,
-        cursor: 'pointer',
-      }}
     >
       {/* IMAGE CONTAINER */}
-      <div 
-        style={{
-          position: 'relative',
-          width: '100%',
-          aspectRatio: '1 / 1',
-          backgroundColor: '#ece7e7',
-          overflow: 'hidden',
-          borderRadius: '8px',
-        }}
-      >
+      <div className="product-card-media">
         {hot_sale_tag && (
-          <div style={{
-            position: 'absolute',
-            top: '8px',
-            left: '8px',
-            backgroundColor: '#ff4d4f',
-            color: '#fff',
-            fontSize: '10px',
-            fontWeight: 'bold',
-            padding: '2px 8px',
-            borderRadius: '4px',
-            zIndex: 2,
-          }}>
+          <div className="tag-hot desktop-tag">
             🔥 Hot
           </div>
         )}
-{hasDiscount && (
-  <div style={{
-    position: 'absolute',
-    top: '8px',
-    right: '8px',
-    backgroundColor: '#ca290d',
-    color: '#fff',
-    fontSize: '10px',
-    fontWeight: 'bold',
-    padding: '2px 8px',
-    borderRadius: '4px',
-    zIndex: 2,
-  }}>
-    -{discountPercent}% 
-  </div>
-)}
+        {hasDiscount && (
+          <div className="tag-discount desktop-tag">
+            -{discountPercent}%
+          </div>
+        )}
 
         <img 
-  src={finalImage} 
-  alt={name} 
-  style={{
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    objectPosition: 'center',
-    transition: 'transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1)',
-    cursor: 'pointer'
-  }}
-  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
-  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-  onTouchStart={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-  onTouchEnd={(e) => e.currentTarget.style.transform = 'scale(1)'}
-  onError={(e) => { e.target.src = '/images/placeholder.png'; }} 
-/>
+          src={finalImage} 
+          alt={name} 
+          className="product-card-img"
+          onError={(e) => { e.target.src = '/images/placeholder.png'; }} 
+        />
       </div>
 
       {/* INFO SECTION - Desktop */}
-      <div 
-        style={{
-          padding: '8px 6px 6px 6px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '4px',
-          backgroundColor: 'transparent',
-        }}
-      >
-        <h4 
-          style={{
-            margin: 0,
-            fontSize: '13px',
-            color: '#333',
-            fontWeight: '500',
-            lineHeight: '1.3',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-          }}
-        >
-          {displayName}
-        </h4>
+      <div className="product-card-info desktop-info">
+        <h4 className="product-card-title desktop-title">{displayName}</h4>
         
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'baseline' }}>
-            <span style={{ fontSize: '11px', fontWeight: '700', color: '#ca290d' }}>TSh</span>
-            <span style={{ fontSize: '16px', fontWeight: '700', color: '#ca290d' }}>
+        <div className="product-card-price-row desktop-price-row">
+          <div className="price-main">
+            <span className="price-currency desktop-currency">TSh</span>
+            <span className="price-amount desktop-amount">
               {displayPrice.toLocaleString()}
             </span>
           </div>
           {oldPrice && (
-            <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '11px' }}>
+            <span className="price-original-strikethrough desktop-old">
               {oldPrice.toLocaleString()}
             </span>
           )}
         </div>
 
-        <div style={{ display: 'flex', gap: '12px', fontSize: '10px', color: '#666', marginTop: '2px' }}>
+        <div className="product-card-stats desktop-stats">
           <span>MOQ: {moq || 1}</span>
           <span>{soldCount?.toLocaleString() || 0} sold</span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
-          <MapPin size={10} color="#999" />
-          <span style={{ fontSize: '9px', color: '#999' }}>{location || 'Tanzania'}</span>
+        <div className="product-card-location desktop-location">
+          <MapPin size={10} />
+          <span>{location || 'Tanzania'}</span>
           {is_verified && (
             <>
-              <span style={{ color: '#ddd' }}>•</span>
-              <span style={{ fontSize: '9px', color: '#fa8c16' }}>✓ {seller_years || 1}y Verified</span>
+              <span className="divider">•</span>
+              <span className="verified-text">✓ {seller_years || 1}y Verified</span>
             </>
           )}
         </div>

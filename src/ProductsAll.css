@@ -1,982 +1,194 @@
-/* =========================================
-   1. GLOBAL & PAGE LAYOUT
-   ========================================= */
+/* ============================================ */
+/* LAYER 1: PAGE CONTAINER & ERROR STATES       */
+/* ============================================ */
+
 .products-all-page {
-    background-color: #f7f8fa;
-    min-height: 100vh;
-    font-family: 'Roboto', sans-serif; /* Au font unayopendelea */
+  background-color: #f7f8fa;
+  min-height: 100vh;
+  font-family: 'Roboto', sans-serif;
+  padding: 0;
+  margin: 0;
+  overflow-x: hidden;
+  width: 100%;
 }
 
-.all-products-container, 
-.products-main-content {
-    width: 100% !important;
-    display: block !important;
+/* Mobile specific - remove all paddings */
+@media (max-width: 768px) {
+  .products-all-page {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .all-products-container {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .products-main-content {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  body, #root {
+    padding: 0;
+    margin: 0;
+    overflow-x: hidden;
+  }
 }
 
-/* =========================================
-   2. TOP BANNER (ALIBABA STYLE)
-   ========================================= */
+/* Error */
+.error-page {
+  padding: 20px;
+  text-align: center;
+}
+.error-title { color: #dc2626; }
+.error-message { color: #666; }
+.error-retry-btn {
+  background: #FF6600;
+  color: white;
+  border: none;
+  padding: 10px 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+/* ============================================ */
+/* LAYER 2: TOP BANNER                          */
+/* ============================================ */
+
 .alibaba-style-banner {
-    background: linear-gradient(to right, #FF5000, #FF2000); 
-    color: white;
-    text-align: center;
-    padding: 30px 10px;
-    position: relative;
+  background: linear-gradient(135deg, #FF6A00 0%, #FF8C00 100%);
+  color: white;
+  text-align: center;
+  padding: 40px 20px;
+  margin: 0;
 }
 
-.alibaba-style-banner h1 {
-    font-size: 32px;
-    font-weight: 800;
-    margin-bottom: 5px;
+.banner-title {
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0;
 }
 
-.top-deals-banner {
-    background: linear-gradient(90deg, #ff6a00 0%, #ee0979 100%);
-    color: white;
-    padding: 40px 20px;
-    text-align: center;
-    margin-bottom: 20px;
+.banner-desc {
+  font-size: 16px;
+  margin-top: 8px;
+  opacity: 0.9;
 }
 
-.top-deals-banner .badge {
-    background: rgba(255,255,255,0.2);
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
+/* Mobile Banner */
+@media (max-width: 768px) {
+  .alibaba-style-banner {
+    padding: 24px 16px;
+  }
+  .banner-title { font-size: 24px; }
+  .banner-desc { font-size: 14px; }
 }
 
-/* =========================================
-   3. CATEGORY TABS & NAVIGATION (STICKY)
-   ========================================= */
+@media (max-width: 480px) {
+  .alibaba-style-banner { padding: 20px 12px; }
+  .banner-title { font-size: 20px; }
+  .banner-desc { font-size: 12px; }
+}
+
+/* ============================================ */
+/* LAYER 3: CATEGORY TABS & NAVIGATION          */
+/* ============================================ */
+
 .category-tabs-wrapper {
-    position: sticky;
-    top: 60px; /* Hakikisha inakaa chini ya Header yako */
-    z-index: 100;
-    background: #ffffff;
-    border-bottom: 1px solid #e5e5e5;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    height: 60px;
-    overflow: hidden;
+  position: sticky;
+  top: 60px;
+  z-index: 100;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e5e5;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 60px;
+  overflow: hidden;
 }
 
 .category-tabs-scroll {
-    display: flex;
-    flex-direction: row;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    white-space: nowrap;
-    width: 100%;
-    padding: 0 50px;
-    scrollbar-width: none; /* Firefox */
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  white-space: nowrap;
+  width: 100%;
+  padding: 0 50px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-
-.category-tabs-scroll::-webkit-scrollbar {
-    display: none; /* Chrome/Safari */
-}
+.category-tabs-scroll::-webkit-scrollbar { display: none; }
 
 .nav-arrow {
-    position: absolute;
-    z-index: 20;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid #ddd;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    top: 50%;
-    transform: translateY(-50%);
+  position: absolute;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  top: 50%;
+  transform: translateY(-50%);
 }
+.nav-arrow:hover { background: #f7f9fc; }
 
 .nav-arrow.left { left: 10px; }
 .nav-arrow.right { right: 10px; }
 
 .tab-item {
-    display: inline-block;
-    padding: 15px 20px;
-    font-size: 14px;
-    color: #333;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-weight: 500;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s ease;
-    position: relative;
+  display: inline-block;
+  padding: 15px 20px;
+  font-size: 14px;
+  color: #333;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  position: relative;
 }
-
 .tab-item.active {
-    color: #ff6600;
-    border-bottom: 2px solid #000000; /* Mstari mweusi kama Alibaba */
-    font-weight: bold;
+  color: #ff6600;
+  border-bottom: 2px solid #000000;
+  font-weight: bold;
 }
+.tab-item.loading-tab { color: #999; }
 
-/* Sub-category Pills */
-.sub-category-pills {
-    display: flex;
-    gap: 12px;
-    padding: 20px;
-    overflow-x: auto;
-}
-
-.pill-item {
-    padding: 8px 20px;
-    border-radius: 20px;
-    border: 1px solid #ddd;
-    background: white;
-    cursor: pointer;
-    white-space: nowrap;
-    font-size: 13px;
-}
-
-.pill-item.active {
-    background: #fff;
-    border-color: #000;
-    font-weight: bold;
-    box-shadow: inset 0 0 0 1px #000;
-}
-
-/* =========================================
-   4. SIDEBAR (PC ONLY)
-   ========================================= */
-.products-sidebar {
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 12px;
-    border: 1px solid #ebebeb;
-    position: sticky;
-    top: 100px; 
-    height: fit-content;
-}
-
-.sidebar-section h4 {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 18px;
-    color: #222;
-    margin-bottom: 15px;
-}
-
-.filter-group {
-    margin-top: 25px;
-}
-
-.price-inputs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
-}
-
-.price-inputs input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 13px;
-}
-
-.apply-btn {
-    width: 100%;
-    padding: 10px;
-    background: #ff6600;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: 0.3s;
-}
-
-.apply-btn:hover { background: #e65c00; }
-
-/* =========================================
-   5. TOOLBAR & CONTROLS
-   ========================================= */
-.modern-toolbar, .list-toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: white;
-    padding: 15px 25px;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 20px;
-    border-radius: 12px;
-}
-
-.view-controls {
-    display: flex;
-    gap: 10px;
-    color: #aaa;
-}
-
-.view-controls svg.active { color: #ff6600; }
-
-.tag {
-    padding: 6px 16px;
-    border: 1px solid #ddd;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    cursor: pointer;
-    margin-right: 8px;
-    transition: 0.3s;
-}
-
-.tag.active {
-    background: #ff6a00;
-    color: white;
-    border-color: #ff6a00;
-}
-
-/* =========================================
-   6. PRODUCT GRID (ALIBABA STYLE)
-   ========================================= */
-.alibaba-grid-layout, 
-.products-display-wrapper.grid, 
-.products-render-area.grid {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
-    gap: 16px !important;
-    padding: 20px !important;
-    width: 100% !important;
-    max-width: 1400px;
-    margin: 0 auto;
-    box-sizing: border-box !important;
-    align-items: start !important;
-}
-
-/* Card Style */
-.alibaba-card, .product-card {
-    width: 100% !important;
-    background: white;
-    border: 1px solid #eee;
-    border-radius: 12px;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden;
-    transition: 0.3s;
-}
-
-.alibaba-card:hover {
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-.alibaba-card img, .product-card img {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    border-bottom: 1px solid #f9f9f9;
-}
-
-.product-card .info { padding: 8px; }
-
-.product-card .price {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #222;
-    margin: 4px 0;
-}
-
-/* List Mode Option */
-.products-display-wrapper.list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-/* =========================================
-   7. RESPONSIVE (MOBILE)
-   ========================================= */
-@media (max-width: 992px) {
-    .products-sidebar {
-        display: none; /* Inafichwa kwenye simu */
-    }
-}
-
+/* Mobile Tabs */
 @media (max-width: 768px) {
-    .alibaba-grid-layout, 
-    .products-display-wrapper.grid, 
-    .products-render-area.grid {
-        grid-template-columns: repeat(2, 1fr) !important; /* Bidhaa 2 kwa mstari */
-        gap: 8px !important;
-        padding: 10px !important;
-    }
-
-    .top-deals-banner h1 { font-size: 1.5rem; }
-    
-    .category-tabs-wrapper {
-        top: 0; /* Adjust kulingana na kama una header mobile */
-    }
+  .category-tabs-wrapper {
+    top: 0;
+    height: 50px;
+  }
+  .category-tabs-scroll { padding: 0 40px; }
+  .nav-arrow { width: 30px; height: 30px; }
+  .nav-arrow svg { width: 16px; height: 16px; }
+  .tab-item { padding: 12px 16px; font-size: 12px; }
+  .category-tabs-wrapper .nav-arrow { display: none !important; }
 }
 
-/* =========================================
-   8. MISC COMPONENTS
-   ========================================= */
-.loading-state, .no-results {
-    text-align: center;
-    padding: 50px;
-    background: #fff;
-    border-radius: 12px;
-    grid-column: 1 / -1;
+@media (max-width: 480px) {
+  .category-tabs-wrapper { height: 45px; }
+  .category-tabs-scroll { padding: 0 35px; }
+  .nav-arrow { width: 26px; height: 26px; }
+  .tab-item { padding: 10px 14px; font-size: 11px; }
 }
 
-.back-to-top {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background: #ff6a00;
-    color: white;
-    border: none;
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    cursor: pointer;
-    z-index: 999;
-}
 /* ============================================ */
-/* RESPONSIVE DESIGN - PRODUCTS ALL PAGE */
+/* LAYER 4: PRODUCTS GRID (MOBILE / DESKTOP)     */
 /* ============================================ */
 
-/* =========================================
-   1. GLOBAL & PAGE LAYOUT - RESPONSIVE
-   ========================================= */
-.products-all-page {
-    background-color: #f7f8fa !important;
-    min-height: 100vh !important;
-    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif !important;
-}
-
-.all-products-container, 
+.all-products-container,
 .products-main-content {
-    width: 100% !important;
-    display: block !important;
+  width: 100%;
+  display: block;
 }
-
-/* =========================================
-   2. TOP BANNER - RESPONSIVE
-   ========================================= */
-.alibaba-style-banner {
-    background: linear-gradient(135deg, #FF5000, #FF2000) !important;
-    color: white !important;
-    text-align: center !important;
-    padding: 40px 20px !important;
-    position: relative !important;
-}
-
-.alibaba-style-banner h1 {
-    font-size: 32px !important;
-    font-weight: 800 !important;
-    margin-bottom: 8px !important;
-}
-
-.alibaba-style-banner p {
-    font-size: 16px !important;
-    opacity: 0.9 !important;
-}
-
-.top-deals-banner {
-    background: linear-gradient(90deg, #ff6a00 0%, #ee0979 100%) !important;
-    color: white !important;
-    padding: 40px 20px !important;
-    text-align: center !important;
-    margin-bottom: 20px !important;
-}
-
-.top-deals-banner .badge {
-    background: rgba(255, 255, 255, 0.2) !important;
-    padding: 4px 12px !important;
-    border-radius: 20px !important;
-    font-size: 0.8rem !important;
-}
-
-@media (max-width: 768px) {
-    .alibaba-style-banner {
-        padding: 30px 16px !important;
-    }
-    
-    .alibaba-style-banner h1 {
-        font-size: 24px !important;
-    }
-    
-    .alibaba-style-banner p {
-        font-size: 13px !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .alibaba-style-banner {
-        padding: 20px 12px !important;
-    }
-    
-    .alibaba-style-banner h1 {
-        font-size: 20px !important;
-    }
-    
-    .alibaba-style-banner p {
-        font-size: 11px !important;
-    }
-}
-
-/* =========================================
-   3. CATEGORY TABS & NAVIGATION - RESPONSIVE
-   ========================================= */
-.category-tabs-wrapper {
-    position: sticky !important;
-    top: 60px !important;
-    z-index: 100 !important;
-    background: #ffffff !important;
-    border-bottom: 1px solid #e5e5e5 !important;
-    display: flex !important;
-    align-items: center !important;
-    width: 100% !important;
-    height: 60px !important;
-    overflow: hidden !important;
-}
-
-.category-tabs-scroll {
-    display: flex !important;
-    flex-direction: row !important;
-    overflow-x: auto !important;
-    scroll-behavior: smooth !important;
-    white-space: nowrap !important;
-    width: 100% !important;
-    padding: 0 50px !important;
-    scrollbar-width: none !important;
-}
-
-.category-tabs-scroll::-webkit-scrollbar {
-    display: none !important;
-}
-
-.nav-arrow {
-    position: absolute !important;
-    z-index: 20 !important;
-    background: rgba(255, 255, 255, 0.95) !important;
-    border: 1px solid #ddd !important;
-    border-radius: 50% !important;
-    width: 36px !important;
-    height: 36px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-}
-
-.nav-arrow.left { 
-    left: 10px !important; 
-}
-
-.nav-arrow.right { 
-    right: 10px !important; 
-}
-
-.tab-item {
-    display: inline-block !important;
-    padding: 15px 20px !important;
-    font-size: 14px !important;
-    color: #333 !important;
-    background: none !important;
-    border: none !important;
-    cursor: pointer !important;
-    font-weight: 500 !important;
-    border-bottom: 2px solid transparent !important;
-    transition: all 0.2s ease !important;
-    position: relative !important;
-}
-
-.tab-item.active {
-    color: #ff6600 !important;
-    border-bottom: 2px solid #000000 !important;
-    font-weight: bold !important;
-}
-
-@media (max-width: 768px) {
-    .category-tabs-wrapper {
-        top: 0 !important;
-        height: 50px !important;
-    }
-    
-    .category-tabs-scroll {
-        padding: 0 40px !important;
-    }
-    
-    .nav-arrow {
-        width: 30px !important;
-        height: 30px !important;
-    }
-    
-    .nav-arrow svg {
-        width: 16px !important;
-        height: 16px !important;
-    }
-    
-    .tab-item {
-        padding: 12px 16px !important;
-        font-size: 12px !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .category-tabs-wrapper {
-        height: 45px !important;
-    }
-    
-    .category-tabs-scroll {
-        padding: 0 35px !important;
-    }
-    
-    .nav-arrow {
-        width: 26px !important;
-        height: 26px !important;
-    }
-    
-    .tab-item {
-        padding: 10px 14px !important;
-        font-size: 11px !important;
-    }
-}
-
-/* =========================================
-   4. SIDEBAR (PC ONLY) - RESPONSIVE
-   ========================================= */
-.products-sidebar {
-    background: #ffffff !important;
-    padding: 20px !important;
-    border-radius: 12px !important;
-    border: 1px solid #ebebeb !important;
-    position: sticky !important;
-    top: 100px !important;
-    height: fit-content !important;
-}
-
-.sidebar-section h4 {
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    font-size: 18px !important;
-    color: #222 !important;
-    margin-bottom: 15px !important;
-}
-
-.filter-group {
-    margin-top: 25px !important;
-}
-
-.price-inputs {
-    display: flex !important;
-    gap: 8px !important;
-    margin-bottom: 10px !important;
-}
-
-.price-inputs input {
-    width: 100% !important;
-    padding: 8px !important;
-    border: 1px solid #ddd !important;
-    border-radius: 6px !important;
-    font-size: 13px !important;
-}
-
-.apply-btn {
-    width: 100% !important;
-    padding: 10px !important;
-    background: #ff6600 !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 6px !important;
-    cursor: pointer !important;
-    font-weight: 600 !important;
-    transition: 0.3s !important;
-}
-
-.apply-btn:hover {
-    background: #e65c00 !important;
-}
-
-/* Hide sidebar on mobile */
-@media (max-width: 992px) {
-    .products-sidebar {
-        display: none !important;
-    }
-}
-
-/* =========================================
-   5. TOOLBAR & CONTROLS - RESPONSIVE
-   ========================================= */
-.modern-toolbar, 
-.list-toolbar {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    background: white !important;
-    padding: 12px 20px !important;
-    border-bottom: 1px solid #eee !important;
-    margin-bottom: 20px !important;
-    border-radius: 12px !important;
-    flex-wrap: wrap !important;
-    gap: 12px !important;
-}
-
-.view-controls {
-    display: flex !important;
-    gap: 10px !important;
-    color: #aaa !important;
-}
-
-.view-controls svg.active { 
-    color: #ff6600 !important; 
-}
-
-.tag {
-    padding: 6px 16px !important;
-    border: 1px solid #ddd !important;
-    border-radius: 20px !important;
-    font-size: 0.85rem !important;
-    cursor: pointer !important;
-    margin-right: 8px !important;
-    transition: 0.3s !important;
-}
-
-.tag.active {
-    background: #ff6a00 !important;
-    color: white !important;
-    border-color: #ff6a00 !important;
-}
-
-@media (max-width: 640px) {
-    .modern-toolbar, 
-    .list-toolbar {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        padding: 12px 16px !important;
-    }
-    
-    .view-controls {
-        order: 2 !important;
-    }
-}
-
-/* =========================================
-   6. PRODUCT GRID - RESPONSIVE
-   ========================================= */
-.alibaba-grid-layout, 
-.products-display-wrapper.grid, 
-.products-render-area.grid {
-    display: grid !important;
-    gap: 20px !important;
-    padding: 20px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    align-items: start !important;
-}
-
-/* Desktop: 4 columns */
-.alibaba-grid-layout,
-.products-display-wrapper.grid,
-.products-render-area.grid {
-    grid-template-columns: repeat(4, 1fr) !important;
-}
-
-/* Large Desktop (≥1400px): 5 columns */
-@media (min-width: 1400px) {
-    .alibaba-grid-layout,
-    .products-display-wrapper.grid,
-    .products-render-area.grid {
-        grid-template-columns: repeat(5, 1fr) !important;
-        gap: 24px !important;
-        max-width: 1400px !important;
-        margin: 0 auto !important;
-    }
-}
-
-/* Tablet (768px - 1023px): 3 columns */
-@media (min-width: 768px) and (max-width: 1023px) {
-    .alibaba-grid-layout,
-    .products-display-wrapper.grid,
-    .products-render-area.grid {
-        grid-template-columns: repeat(3, 1fr) !important;
-        gap: 16px !important;
-        padding: 16px !important;
-    }
-}
-
-/* Simu (≤767px): 2 columns */
-@media (max-width: 767px) {
-    .alibaba-grid-layout,
-    .products-display-wrapper.grid,
-    .products-render-area.grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 12px !important;
-        padding: 12px !important;
-    }
-}
-
-/* Simu ndogo (≤480px): 2 columns with smaller gap */
-@media (max-width: 480px) {
-    .alibaba-grid-layout,
-    .products-display-wrapper.grid,
-    .products-render-area.grid {
-        gap: 10px !important;
-        padding: 10px !important;
-    }
-}
-
-/* Simu ndogo sana (≤360px): 1 column */
-@media (max-width: 360px) {
-    .alibaba-grid-layout,
-    .products-display-wrapper.grid,
-    .products-render-area.grid {
-        grid-template-columns: 1fr !important;
-        gap: 12px !important;
-    }
-}
-
-/* =========================================
-   CARD STYLES
-   ========================================= */
-.alibaba-card, 
-.product-card {
-    width: 100% !important;
-    background: white !important;
-    border: 1px solid #eee !important;
-    border-radius: 12px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-    transition: all 0.3s ease !important;
-    height: 100% !important;
-}
-
-.alibaba-card:hover,
-.product-card:hover {
-    transform: translateY(-4px) !important;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
-    border-color: #ff6a00 !important;
-}
-
-.alibaba-card img, 
-.product-card img {
-    width: 100% !important;
-    aspect-ratio: 1 / 1 !important;
-    object-fit: cover !important;
-    border-bottom: 1px solid #f9f9f9 !important;
-}
-
-.product-card .info { 
-    padding: 10px !important; 
-}
-
-.product-card .price {
-    font-size: 1rem !important;
-    font-weight: 700 !important;
-    color: #ff6a00 !important;
-    margin: 4px 0 !important;
-}
-
-@media (max-width: 480px) {
-    .product-card .price {
-        font-size: 0.9rem !important;
-    }
-    
-    .product-card .info {
-        padding: 8px !important;
-    }
-}
-
-/* =========================================
-   LIST MODE OPTION
-   ========================================= */
-.products-display-wrapper.list {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 15px !important;
-}
-
-.products-display-wrapper.list .product-card {
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 15px !important;
-}
-
-.products-display-wrapper.list .product-card img {
-    width: 100px !important;
-    height: 100px !important;
-}
-
-@media (max-width: 480px) {
-    .products-display-wrapper.list .product-card {
-        flex-direction: column !important;
-        text-align: center !important;
-    }
-    
-    .products-display-wrapper.list .product-card img {
-        width: 100% !important;
-        height: auto !important;
-    }
-}
-
-/* =========================================
-   LOADING & NO RESULTS
-   ========================================= */
-.loading-state, 
-.no-results {
-    text-align: center !important;
-    padding: 60px 20px !important;
-    background: #fff !important;
-    border-radius: 16px !important;
-    grid-column: 1 / -1 !important;
-}
-
-@media (max-width: 480px) {
-    .loading-state, 
-    .no-results {
-        padding: 40px 16px !important;
-    }
-}
-
-/* =========================================
-   BACK TO TOP BUTTON - RESPONSIVE
-   ========================================= */
-.back-to-top {
-    position: fixed !important;
-    bottom: 30px !important;
-    right: 30px !important;
-    background: #ff6a00 !important;
-    color: white !important;
-    border: none !important;
-    width: 45px !important;
-    height: 45px !important;
-    border-radius: 50% !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
-    cursor: pointer !important;
-    z-index: 999 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    transition: all 0.3s ease !important;
-}
-
-.back-to-top:hover {
-    transform: translateY(-3px) !important;
-    background: #e55a00 !important;
-}
-
-/* ============================================ */
-/* PRODUCTS ALL - MOBILE HORIZONTAL SCROLL ADDITIONS */
-/* ============================================ */
-
-/* Mobile product list - horizontal scroll (no visible scrollbar) */
-@media (max-width: 768px) {
-  /* Container for products with horizontal scroll */
-  .products-grid-horizontal {
-    display: flex !important;
-    gap: 12px !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    padding: 8px 12px 20px 12px !important;
-    scroll-snap-type: x mandatory !important;
-    -webkit-overflow-scrolling: touch !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    scrollbar-width: none !important; /* Hide scrollbar for Firefox */
-    -ms-overflow-style: none !important; /* Hide scrollbar for IE/Edge */
-  }
-
-  /* Hide scrollbar for Chrome/Safari */
-  .products-grid-horizontal::-webkit-scrollbar {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
-  }
-
-  /* Individual product item in horizontal scroll */
-  .products-horizontal-item {
-    flex-shrink: 0 !important;
-    scroll-snap-align: start !important;
-    width: 160px !important;
-  }
-
-  /* Wider for larger phones */
-  @media (min-width: 480px) {
-    .products-horizontal-item {
-      width: 190px !important;
-    }
-    .products-grid-horizontal {
-      gap: 14px !important;
-    }
-  }
-
-  /* Very small phones */
-  @media (max-width: 380px) {
-    .products-horizontal-item {
-      width: 145px !important;
-    }
-    .products-grid-horizontal {
-      gap: 10px !important;
-      padding: 8px 8px 20px 8px !important;
-    }
-  }
-
-  /* Make cards fill the horizontal item */
-  .products-horizontal-item .product-card-item {
-    width: 100% !important;
-    margin: 0 !important;
-    height: 100% !important;
-  }
-
-  /* Compact card styling for horizontal scroll */
-  .products-horizontal-item .product-card-img {
-    height: 120px !important;
-    object-fit: cover !important;
-  }
-
-  .products-horizontal-item .product-card-info {
-    padding: 10px 8px !important;
-  }
-
-  .products-horizontal-item .product-card-title {
-    font-size: 11px !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
-
-  .products-horizontal-item .price-amount {
-    font-size: 12px !important;
-  }
-
-  .products-horizontal-item .price-currency {
-    font-size: 9px !important;
-  }
-
-  .products-horizontal-item .price-original-strikethrough {
-    font-size: 9px !important;
-  }
-
-  /* Hide grid layout on mobile */
-  .products-grid {
-    display: none !important;
-  }
-}
-
-/* Desktop: Show grid, hide horizontal scroll */
-@media (min-width: 769px) {
-  .products-grid-horizontal {
-    display: none !important;
-  }
-}
-
-/* ============================================ */
-/* EXISTING PRODUCT GRID (KEEP AS IS) */
-/* ============================================ */
 
 .products-grid {
   display: grid;
@@ -987,22 +199,7 @@
   box-sizing: border-box;
 }
 
-/* Tablet (768px - 1024px) */
-@media (min-width: 768px) and (max-width: 1024px) {
-  .products-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
-  }
-}
-
-/* Small desktop (1024px - 1280px) */
-@media (min-width: 1024px) and (max-width: 1280px) {
-  .products-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-/* Large desktop */
+/* Desktop: 5 columns */
 @media (min-width: 1280px) {
   .products-grid {
     grid-template-columns: repeat(5, 1fr);
@@ -1012,7 +209,17 @@
   }
 }
 
-/* Extra large */
+/* Small desktop / Large tablet: 4 columns */
+@media (min-width: 1024px) and (max-width: 1280px) {
+  .products-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* Tablet: 4 columns */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .products-grid { grid-template-columns: repeat(4, 1fr); gap: 18px; }
+}
+
+/* Extra large: 6 columns */
 @media (min-width: 1600px) {
   .products-grid {
     grid-template-columns: repeat(6, 1fr);
@@ -1022,85 +229,147 @@
 }
 
 /* ============================================ */
-/* MOBILE OPTIMIZATIONS FOR OTHER ELEMENTS */
+/* LAYER 5: MOBILE HORIZONTAL SCROLL            */
 /* ============================================ */
 
 @media (max-width: 768px) {
-  .all-products-container {
-    padding: 0 0 20px 0 !important;
+  .products-grid { display: none !important; }
+  
+  .products-grid-horizontal {
+    display: flex !important;
+    gap: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 8px 12px 20px 12px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    box-sizing: border-box;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .products-grid-horizontal::-webkit-scrollbar { display: none !important; }
+
+  .products-horizontal-item {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    width: 160px;
   }
 
-  .products-main-content {
+  @media (min-width: 480px) {
+    .products-horizontal-item { width: 190px; }
+    .products-grid-horizontal { gap: 14px; }
+  }
+
+  @media (max-width: 380px) {
+    .products-horizontal-item { width: 145px; }
+    .products-grid-horizontal { gap: 10px; padding: 8px 8px 20px 8px; }
+  }
+
+  .products-horizontal-item .product-card-item {
     width: 100% !important;
-    overflow-x: hidden !important;
+    margin: 0 !important;
+    height: 100% !important;
   }
 
-  /* Hide category navigation arrows on mobile (optional) */
-  .category-tabs-wrapper .nav-arrow {
-    display: none !important;
-  }
+  .products-horizontal-item .product-card-img { height: 120px !important; object-fit: cover !important; }
+  .products-horizontal-item .product-card-info { padding: 10px 8px !important; }
+  .products-horizontal-item .product-card-title { font-size: 11px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+  .products-horizontal-item .price-amount { font-size: 12px !important; }
+  .products-horizontal-item .price-currency { font-size: 9px !important; }
+  .products-horizontal-item .price-original-strikethrough { font-size: 9px !important; }
+}
 
-  .category-tabs-scroll {
-    overflow-x: auto !important;
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-  }
+/* Desktop: Show grid, hide horizontal scroll */
+@media (min-width: 769px) {
+  .products-grid-horizontal { display: none !important; }
+}
 
-  .category-tabs-scroll::-webkit-scrollbar {
-    display: none !important;
+/* ============================================ */
+/* LAYER 6: LIST MODE (Alternative View)        */
+/* ============================================ */
+
+.products-display-wrapper.list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.products-display-wrapper.list .product-card {
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+}
+.products-display-wrapper.list .product-card img {
+  width: 100px;
+  height: 100px;
+}
+
+@media (max-width: 480px) {
+  .products-display-wrapper.list .product-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  .products-display-wrapper.list .product-card img {
+    width: 100%;
+    height: auto;
   }
 }
 
 /* ============================================ */
-/* TOUCH OPTIMIZATIONS */
+/* LAYER 7: LOADING & NO RESULTS                */
 /* ============================================ */
 
-@media (hover: none) and (pointer: coarse) {
-  .products-horizontal-item:active {
-    transform: scale(0.97);
-    transition: transform 0.05s ease;
-  }
-}
-/* ProductsAll.css - Add these rules */
-
-/* Remove any default padding/margin */
-.products-all-page {
-  width: 100%;
-  overflow-x: hidden;
+.loading-state, .no-results {
+  text-align: center;
+  padding: 60px 20px;
+  background: #fff;
+  border-radius: 16px;
+  grid-column: 1 / -1;
 }
 
-/* Mobile specific - remove all paddings */
+@media (max-width: 480px) {
+  .loading-state, .no-results { padding: 40px 16px; }
+}
+
+/* ============================================ */
+/* LAYER 8: BACK TO TOP BUTTON                  */
+/* ============================================ */
+
+.back-to-top-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #FF6600;
+  color: white;
+  border: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.back-to-top-btn:hover {
+  transform: translateY(-3px);
+  background: #e55a00;
+}
+
+/* Mobile back to top */
 @media (max-width: 768px) {
-  .products-all-page {
-    padding: 0 !important;
-    margin: 0 !important;
+  .back-to-top-btn {
+    bottom: 16px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
   }
-  
-  .all-products-container {
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-  
-  .products-main-content {
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-  
-  /* Category tabs full width */
-  .category-tabs-wrapper {
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-  
-  /* Remove body padding */
-  body {
-    padding: 0;
-    margin: 0;
-    overflow-x: hidden;
-  }
-  
-  #root {
-    padding: 0;
-    margin: 0;
-  }
+  .back-to-top-icon { width: 20px; height: 20px; }
+}
+
+@media (min-width: 769px) {
+  .back-to-top-icon { width: 24px; height: 24px; }
 }

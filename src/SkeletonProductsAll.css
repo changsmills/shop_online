@@ -1,0 +1,168 @@
+/* ============================================ */
+/* SKELETON PRODUCTS ALL - FULL PAGE LAYOUT    */
+/* ============================================ */
+
+.skeleton-products-all-page {
+  background-color: #f7f8fa;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* ============================================ */
+/* 1. BANNER SKELETON                          */
+/* ============================================ */
+
+.skeleton-banner {
+  background: #e0e0e0;
+  height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 0 20px;
+  width: 100%;
+}
+
+.skeleton-banner-title {
+  width: 40%;
+  height: 32px;
+  background: #d0d0d0;
+  border-radius: 8px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-banner-desc {
+  width: 60%;
+  height: 16px;
+  background: #d0d0d0;
+  border-radius: 8px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* ============================================ */
+/* 2. TABS SKELETON                             */
+/* ============================================ */
+
+.skeleton-tabs-wrapper {
+  background: white;
+  border-bottom: 1px solid #eee;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  width: 100%;
+}
+
+.skeleton-tabs-scroll {
+  display: flex;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.skeleton-tab-item {
+  width: 80px;
+  height: 32px;
+  background: #e0e0e0;
+  border-radius: 20px;
+  flex-shrink: 0;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* ============================================ */
+/* 3. GRID SKELETON                             */
+/* ============================================ */
+
+.skeleton-grid-wrapper {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.skeleton-grid {
+  display: grid;
+  gap: 20px;
+}
+
+/* Desktop: 5 columns */
+@media (min-width: 1280px) {
+  .skeleton-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* Small Desktop / Large Tablet: 4 columns */
+@media (min-width: 1024px) and (max-width: 1280px) {
+  .skeleton-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Tablet: 4 columns */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .skeleton-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Mobile: 2 columns */
+@media (max-width: 768px) {
+  .skeleton-grid-wrapper {
+    padding: 12px;
+  }
+  .skeleton-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+/* ============================================ */
+/* 4. SKELETON CARD                             */
+/* ============================================ */
+
+.skeleton-product-card {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.skeleton-product-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #e0e0e0;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-product-info {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.skeleton-text-line {
+  height: 12px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-text-line.short { width: 40%; }
+.skeleton-text-line.medium { width: 60%; }
+.skeleton-text-line.long { width: 100%; }
+
+/* ============================================ */
+/* 5. ANIMATION                                  */
+/* ============================================ */
+
+@keyframes pulse {
+  0% { background-color: #e0e0e0; }
+  50% { background-color: #f0f0f0; }
+  100% { background-color: #e0e0e0; }
+}

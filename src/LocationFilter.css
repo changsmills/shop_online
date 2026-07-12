@@ -1,17 +1,17 @@
 /* ============================================ */
-/* NEW ARRIVALS - CONTAINER & WRAPPER           */
+/* LOCATION FILTER - CONTAINER & WRAPPER        */
 /* ============================================ */
 
-.new-arrivals-main-wrapper {
+.location-main-wrapper {
   position: relative;
   width: 100%;
-  background-color: white;
+  background-color: #eceef1;
   box-sizing: border-box;
 }
 
 /* Mobile container */
 @media (max-width: 768px) {
-  .new-arrivals-main-wrapper {
+  .location-main-wrapper {
     padding: 4px 0;
     border-radius: 8px;
     margin: 2px 0;
@@ -20,7 +20,7 @@
 
 /* Desktop container */
 @media (min-width: 769px) {
-  .new-arrivals-main-wrapper {
+  .location-main-wrapper {
     padding: 0;
     border-radius: 16px;
     margin: 10px 0;
@@ -31,98 +31,107 @@
 /* HEADER SECTION                                */
 /* ============================================ */
 
-.na-header {
+.loc-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
+  width: 100%;
 }
 
+/* Mobile header */
 @media (max-width: 768px) {
-  .na-header {
+  .loc-header {
     padding: 0 8px;
     margin-bottom: 12px;
     gap: 6px;
   }
 }
 
+/* Desktop header */
 @media (min-width: 769px) {
-  .na-header {
+  .loc-header {
     padding: 0;
     margin-bottom: 20px;
     gap: 10px;
   }
 }
 
-.na-header-left {
+.loc-header-left {
   display: flex;
   flex-direction: column;
 }
 
-.na-title-group {
+.loc-title-group {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
+/* Mobile title gap */
 @media (max-width: 768px) {
-  .na-title-group {
+  .loc-title-group {
     gap: 4px;
     margin-bottom: 2px;
   }
 }
 
+/* Desktop title gap */
 @media (min-width: 769px) {
-  .na-title-group {
+  .loc-title-group {
     gap: 8px;
     margin-bottom: 8px;
   }
 }
 
-.na-sparkle-icon {
-  color: #eab308;
+.loc-map-icon {
+  color: #3b82f6;
 }
 
 @media (max-width: 768px) {
-  .na-sparkle-icon { width: 12px; height: 12px; }
+  .loc-map-icon { width: 12px; height: 12px; }
 }
 @media (min-width: 769px) {
-  .na-sparkle-icon { width: 24px; height: 24px; }
+  .loc-map-icon { width: 24px; height: 24px; }
 }
 
-.na-title {
+.loc-title {
   font-weight: bold;
   margin: 0;
 }
 
+/* Mobile title */
 @media (max-width: 768px) {
-  .na-title {
+  .loc-title {
     font-size: 13px;
     line-height: 1.3;
   }
 }
 
+/* Desktop title */
 @media (min-width: 769px) {
-  .na-title {
+  .loc-title {
     font-size: 24px;
     line-height: 1.4;
   }
 }
 
-.na-subtitle {
+.loc-subtitle {
   margin: 0;
   color: #888;
 }
 
+/* Mobile subtitle */
 @media (max-width: 768px) {
-  .na-subtitle {
+  .loc-subtitle {
     font-size: 9px;
     line-height: 1.2;
   }
 }
 
+/* Desktop subtitle */
 @media (min-width: 769px) {
-  .na-subtitle {
+  .loc-subtitle {
     font-size: 16px;
     line-height: 1.5;
   }
@@ -132,7 +141,7 @@
 /* VIEW MORE BUTTON (Blue Gradient)             */
 /* ============================================ */
 
-.na-view-more-btn {
+.loc-view-more-btn {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -146,13 +155,13 @@
   white-space: nowrap;
 }
 
-.na-view-more-btn:hover {
+.loc-view-more-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
 @media (max-width: 768px) {
-  .na-view-more-btn {
+  .loc-view-more-btn {
     padding: 4px 10px;
     border-radius: 20px;
     font-size: 9px;
@@ -161,7 +170,7 @@
 }
 
 @media (min-width: 769px) {
-  .na-view-more-btn {
+  .loc-view-more-btn {
     padding: 8px 20px;
     border-radius: 10px;
     font-size: 16px;
@@ -173,7 +182,7 @@
 /* MOBILE SCROLL WRAPPER                         */
 /* ============================================ */
 
-.na-mobile-scroll {
+.loc-mobile-scroll {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -186,39 +195,23 @@
   width: 100%;
 }
 
-.na-mobile-card-wrapper {
+.loc-mobile-card-wrapper {
   flex: 0 0 auto;
   width: 140px;
   min-width: 140px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  padding: 8px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  transition: all 0.2s ease;
-  cursor: pointer;
-  margin-bottom: 8px;
-}
-
-@media (min-width: 480px) {
-  .na-mobile-card-wrapper {
-    width: 180px;
-    min-width: 180px;
-    padding: 10px;
-  }
 }
 
 /* ============================================ */
 /* DESKTOP SCROLL WRAPPER & ARROWS              */
 /* ============================================ */
 
-.na-desktop-wrapper {
+.loc-desktop-wrapper {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.na-desktop-scroll {
+.loc-desktop-scroll {
   display: flex;
   gap: 20px;
   overflow-x: auto;
@@ -228,14 +221,14 @@
   width: 100%;
 }
 
-.na-desktop-card-wrapper {
+.loc-desktop-card-wrapper {
   flex: 0 0 auto;
   width: 200px;
   min-width: 200px;
 }
 
-/* 🔥 SCROLL ARROWS - ZINAFANYA KAZI SAWA */
-.na-arrow-btn {
+/* ARROWS */
+.loc-arrow-btn {
   position: absolute;
   z-index: 10;
   background-color: white;
@@ -252,18 +245,13 @@
   outline: none;
 }
 
-.na-arrow-btn:hover {
+.loc-arrow-btn:hover {
   background-color: #f7f9fc;
   transform: scale(1.05);
 }
 
-.na-arrow-left {
-  left: -15px;
-}
-
-.na-arrow-right {
-  right: -15px;
-}
+.loc-arrow-left { left: -15px; }
+.loc-arrow-right { right: -15px; }
 
 /* ============================================ */
 /* UTILITY: HIDE SCROLLBAR                      */

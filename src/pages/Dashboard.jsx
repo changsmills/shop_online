@@ -1,18 +1,28 @@
-import { useState, useEffect, useRef } from "react";
+import React, { Suspense, lazy, useState, useEffect, useRef } from "react";
 import ReactDOM from 'react-dom';
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "../App.css";
-import TopStores from "../components/TopStores";
-import LocationFilter from "../components/LocationFilter";
-import JustForYou from "../components/JustForYou";
-import TopDeals from "../components/TopDeals"; 
-import NewArrivals from "../components/NewArrivals"; 
-import RecentlyViewed from "../components/RecentlyViewed";
+//import TopStores from "../components/TopStores";
+//import LocationFilter from "../components/LocationFilter";
+//import JustForYou from "../components/JustForYou";
+//import TopDeals from "../components/TopDeals"; 
+//import NewArrivals from "../components/NewArrivals"; 
+//import RecentlyViewed from "../components/RecentlyViewed";
 import DashboardCard from "../components/DashboardCard";
-import TrendingNow from "../components/TrendingNow";
+//import TrendingNow from "../components/TrendingNow";
+
+// Badala ya React.lazy, tumia lazy moja kwa moja
+const TopStores = lazy(() => import("../components/TopStores"));
+const LocationFilter = lazy(() => import("../components/LocationFilter"));
+const JustForYou = lazy(() => import("../components/JustForYou"));
+const TopDeals = lazy(() => import("../components/TopDeals"));
+const NewArrivals = lazy(() => import("../components/NewArrivals"));
+const RecentlyViewed = lazy(() => import("../components/RecentlyViewed"));
+const TrendingNow = lazy(() => import("../components/TrendingNow"));
+
 import { useDashboardData } from "../hooks/useDashboardData";
 import BottomNav from "../components/BottomNav";
 import MobileCategorySlider from "../components/MobileCategorySlider";
@@ -379,6 +389,17 @@ const isVideoAd = (ad) => {
     return <IconComponent size={18} />;
   };
 
+  // ========== FALLBACK COMPONENT KWA SUSPENSE ==========
+const ComponentFallback = () => (
+  <div className="loading-container">
+    <div className="loading-dots">
+      <div className="dot"></div>
+      <div className="dot"></div>
+      <div className="dot"></div>
+    </div>
+  </div>
+);
+
   // ========== RENDER ==========
   if (dataError) {
     return (
@@ -527,43 +548,63 @@ const isVideoAd = (ad) => {
             </div>
           )}
 
-          {/* Components */}
-          <div className="components-wrapper">
-            <RecentlyViewed key={i18n.language} navigate={navigate} />
-            <TrendingNow 
-              key={i18n.language}
-              products={trendingProducts} 
-              navigate={navigate} 
-              selectedCategory={selectedCategoryForComponents} 
-              getCategoryDisplayName={getCategoryDisplayName}
-            />
-            <LocationFilter 
-              key={i18n.language}
-              navigate={navigate} 
-              selectedCategory={selectedCategoryForComponents}  
-            />
-            <TopStores 
-              key={i18n.language}
-              navigate={navigate} 
-              selectedCategory={selectedCategoryForComponents} 
-            />
-            <TopDeals 
-              key={i18n.language}
-              navigate={navigate}
-              selectedCategory={selectedCategoryForComponents}
-            />
-            <NewArrivals 
-              key={i18n.language}
-              navigate={navigate}
-              selectedCategory={selectedCategoryForComponents} 
-            />
-            <JustForYou 
-              key={i18n.language}
-              handleAction={handleProtectedAction} 
-              search={search}
-              selectedCategory={selectedCategoryForComponents}
-            />
-          </div>
+{/* Components */}
+<div className="components-wrapper">
+  <Suspense fallback={<ComponentFallback />}>
+    <RecentlyViewed key={i18n.language} navigate={navigate} />
+  </Suspense>
+
+  <Suspense fallback={<ComponentFallback />}>
+    <TrendingNow 
+      key={i18n.language}
+      products={trendingProducts} 
+      navigate={navigate} 
+      selectedCategory={selectedCategoryForComponents} 
+      getCategoryDisplayName={getCategoryDisplayName}
+    />
+  </Suspense>
+
+  <Suspense fallback={<ComponentFallback />}>
+    <LocationFilter 
+      key={i18n.language}
+      navigate={navigate} 
+      selectedCategory={selectedCategoryForComponents}  
+    />
+  </Suspense>
+
+  <Suspense fallback={<ComponentFallback />}>
+    <TopStores 
+      key={i18n.language}
+      navigate={navigate} 
+      selectedCategory={selectedCategoryForComponents} 
+    />
+  </Suspense>
+
+  <Suspense fallback={<ComponentFallback />}>
+    <TopDeals 
+      key={i18n.language}
+      navigate={navigate}
+      selectedCategory={selectedCategoryForComponents}
+    />
+  </Suspense>
+
+  <Suspense fallback={<ComponentFallback />}>
+    <NewArrivals 
+      key={i18n.language}
+      navigate={navigate}
+      selectedCategory={selectedCategoryForComponents} 
+    />
+  </Suspense>
+
+  <Suspense fallback={<ComponentFallback />}>
+    <JustForYou 
+      key={i18n.language}
+      handleAction={handleProtectedAction} 
+      search={search}
+      selectedCategory={selectedCategoryForComponents}
+    />
+  </Suspense>
+</div>
 
           {/* Footer - Inaonekana desktop & tablet tu (CSS inaficha kwenye mobile) */}
           <div className="footer-wrapper">

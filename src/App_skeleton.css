@@ -5,15 +5,59 @@
   background: #f7f8fa;
   min-height: 100vh;
   width: 100%;
-    padding: 30px 0 0 0; 
+  padding: 0;
+  padding-top: 30px; /* ✅ Sasa ni 50px */
+
 }
 
 /* ==============================================
-   MOBILE & TABLET LAYOUT (<1024px)
+   DESKTOP LAYOUT (≥1025px) - 90px
+   ============================================== */
+@media (min-width: 1025px) {
+  .skeleton-layout-wrapper {
+    padding-top: 90px; 
+  }
+  .skeleton-mobile {
+    display: none !important;
+  }
+  .skeleton-desktop {
+    display: block !important;
+  }
+}
+
+/* ==============================================
+   TABLET LAYOUT (768px - 1024px) - 50px
+   ============================================== */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .skeleton-layout-wrapper {
+    padding-top: 50px; /* ✅ Sasa ni 50px */
+  }
+  .skeleton-grid-mobile {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ==============================================
+   MOBILE LAYOUT (<600px) - 50px
+   ============================================== */
+@media (max-width: 599px) {
+  .skeleton-layout-wrapper {
+    padding-top: 50px; /* ✅ Sasa ni 50px */
+  }
+  .skeleton-banner-mobile {
+    height: 140px;
+  }
+  .skeleton-grid-mobile {
+    gap: 12px;
+  }
+}
+
+/* ==============================================
+   MOBILE & TABLET LAYOUT (Default)
    ============================================== */
 .skeleton-mobile {
   display: block;
-  padding: 20px 12px;
+  padding: 20px 0; /* Hakuna padding left/right */
   width: 100%;
 }
 
@@ -21,7 +65,7 @@
   width: 100%;
   height: 180px;
   background: #e0e0e0;
-  border-radius: 12px;
+  border-radius: 0; /* Inagusa edges */
   margin-bottom: 20px;
   animation: pulse 1.5s infinite ease-in-out;
 }
@@ -29,15 +73,16 @@
 .skeleton-grid-mobile {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 12px;
+  padding: 0 8px;
 }
 
 /* ==============================================
-   DESKTOP LAYOUT (≥1024px)
+   DESKTOP LAYOUT (Default)
    ============================================== */
 .skeleton-desktop {
   display: none;
-  padding: 0; /* Tunaondoa padding hapa kwa sababu wrapper tayari ina padding-top */
+  padding: 0;
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
@@ -124,40 +169,28 @@
   50% { background-color: #f0f0f0; }
   100% { background-color: #e0e0e0; }
 }
-
 /* ==============================================
-   RESPONSIVE MEDIA QUERIES
+   SKELETON YA CATEGORY SLIDER (Mobile & Tablet)
    ============================================== */
-
-/* Tablet (768px - 1024px) */
-@media (min-width: 768px) and (max-width: 1024px) {
-  .skeleton-grid-mobile {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  .skeleton-layout-wrapper {
-    padding-top: 100px; /* Tablet header ni ndogo kidogo */
-  }
+.skeleton-category-slider {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding: 12px 16px;
+  background: white;
+  border-bottom: 1px solid #eee;
+  scrollbar-width: none;
 }
+.skeleton-category-slider::-webkit-scrollbar { display: none; }
 
-/* Desktop (≥1024px) */
-@media (min-width: 1025px) {
-  .skeleton-mobile {
-    display: none !important;
-  }
-  .skeleton-desktop {
-    display: block !important;
-  }
+.skeleton-cat-item {
+  width: 90px;
+  height: 32px;
+  background: #e0e0e0;
+  border-radius: 20px;
+  flex-shrink: 0;
+  animation: pulse 1.5s infinite ease-in-out;
 }
-
-/* Mobile (<600px) */
-@media (max-width: 599px) {
-  .skeleton-banner-mobile {
-    height: 140px;
-  }
-  .skeleton-grid-mobile {
-    gap: 12px;
-  }
-  .skeleton-layout-wrapper {
-    padding-top: 70px; /* Mobile header ni ndogo */
-  }
+.skeleton-cat-item.active {
+  width: 40px;
 }

@@ -1,744 +1,242 @@
-/* Container kuu ya ukurasa */
-.category-page-wrapper {
-  background-color: #f7f7f7;
+/* ============================================ */
+/* LAYER 1: PAGE CONTAINER                      */
+/* ============================================ */
+
+.cat-page {
+  background: #f7f8fa;
   min-height: 100vh;
-  font-family: 'Roboto', sans-serif;
+  display: flex;
+  flex-direction: column;
 }
 
-.category-main {
+.cat-page.skeleton {
+  background: #f7f8fa;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.cat-page.error {
+  background: #f7f8fa;
+  min-height: 100vh;
+}
+
+/* ============================================ */
+/* LAYER 2: HEADER SPACER                       */
+/* ============================================ */
+
+.cat-header-spacer {
+  height: 100px;
+}
+
+@media (max-width: 768px) {
+  .cat-header-spacer {
+    height: 70px;
+  }
+}
+
+/* ============================================ */
+/* LAYER 3: MAIN CONTENT                        */
+/* ============================================ */
+
+.cat-main {
+  flex: 1;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 20px;
+  width: 100%;
+  padding: 0 20px;
 }
 
-/* Breadcrumbs (Home > Laptops) */
-.breadcrumb-nav {
+@media (max-width: 768px) {
+  .cat-main {
+    padding: 0 12px;
+  }
+}
+
+/* ============================================ */
+/* LAYER 4: BREADCRUMB                          */
+/* ============================================ */
+
+.cat-breadcrumb {
+  margin-bottom: 16px;
+}
+
+.cat-breadcrumb-items {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 25px;
-  font-size: 14px;
-  color: #757575;
+  flex-wrap: wrap;
 }
 
-.breadcrumb-nav span {
+.cat-breadcrumb-link {
   cursor: pointer;
-  transition: color 0.2s;
-}
-
-.breadcrumb-nav span:hover {
-  color: #ff6600;
-}
-
-.breadcrumb-nav .current {
-  color: #222;
-  font-weight: 600;
-}
-
-/* Header ya Ukurasa */
-.category-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-.header-left h1 {
-  font-size: 24px;
   color: #333;
-  margin-bottom: 5px;
 }
 
-.header-left p {
-  color: #888;
-  font-size: 14px;
-}
-
-/* Grid ya Bidhaa (Alibaba Style) */
-.alibaba-style-large-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 20px;
-}
-
-/* Card ya Bidhaa */
-.product-card-v2 {
-  background: #fff;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid transparent;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  flex-direction: column;
-}
-
-.product-card-v2:hover {
-  border-color: #ff6600;
-  transform: translateY(-5px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.1);
-}
-
-/* Picha ya Bidhaa */
-.image-wrapper {
-  position: relative;
-  width: 100%;
-  padding-top: 100%; /* Inatengeneza square (1:1 aspect ratio) */
-  background: #f9f9f9;
-}
-
-.image-wrapper img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.promo-tag {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: #ff6600;
-  color: #fff;
-  padding: 4px 8px;
-  font-size: 11px;
-  font-weight: bold;
-  border-radius: 4px;
-  text-transform: uppercase;
-}
-
-/* Maelezo ya Bidhaa */
-.product-details {
-  padding: 15px;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.product-title {
-  font-size: 14px;
-  line-height: 1.4;
-  height: 40px;
-  color: #444;
-  margin-bottom: 12px;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-}
-
-.price-row {
-  margin-top: auto;
-  color: #222;
-  font-weight: 700;
-  font-size: 18px;
-}
-
-.currency {
-  font-size: 14px;
-  margin-right: 3px;
-}
-
-.moq-text {
-  font-size: 12px;
-  color: #999;
-  margin: 8px 0;
-}
-
-/* Supplier Branding */
-.supplier-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border-top: 1px solid #f0f0f0;
-  padding-top: 10px;
-  margin-top: 10px;
-}
-
-.verified-tick {
-  color: #159e15;
-  font-size: 11px;
-  font-weight: bold;
-  background: #e8f5e8;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.years {
-  font-size: 11px;
+.cat-breadcrumb-text {
   color: #666;
 }
 
-/* Skeleton Loading State */
-.skeleton-card-large {
-  height: 350px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: loading 1.5s infinite;
-  border-radius: 10px;
+.cat-breadcrumb-current {
+  color: #ff6600;
+  font-weight: bold;
 }
 
-@keyframes loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-/* ============================================ */
-/* RESPONSIVE DESIGN - CATEGORY PRODUCTS PAGE */
-/* ============================================ */
-
-/* Container kuu ya ukurasa */
-.category-page-wrapper {
-  background-color: #f7f7f7 !important;
-  min-height: 100vh !important;
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif !important;
+.cat-breadcrumb-icon {
+  color: #ccc;
 }
 
-.category-main {
-  max-width: 1400px !important;
-  margin: 0 auto !important;
-  padding: 20px !important;
-}
-
-/* ============================================ */
-/* BREADCRUMB NAVIGATION */
-/* ============================================ */
-
-.breadcrumb-nav {
-  display: flex !important;
-  align-items: center !important;
-  flex-wrap: wrap !important;
-  gap: 10px !important;
-  margin-bottom: 25px !important;
-  font-size: 14px !important;
-  color: #757575 !important;
-}
-
-.breadcrumb-nav span {
-  cursor: pointer !important;
-  transition: color 0.2s !important;
-}
-
-.breadcrumb-nav span:hover {
-  color: #ff6600 !important;
-}
-
-.breadcrumb-nav .current {
-  color: #222 !important;
-  font-weight: 600 !important;
-}
-
-/* ============================================ */
-/* CATEGORY HEADER - RESPONSIVE */
-/* ============================================ */
-
-.category-header {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  flex-wrap: wrap !important;
-  gap: 15px !important;
-  background: #fff !important;
-  padding: 20px !important;
-  border-radius: 12px !important;
-  margin-bottom: 30px !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
-}
-
-.header-left h1 {
-  font-size: 24px !important;
-  color: #333 !important;
-  margin-bottom: 5px !important;
-}
-
-.header-left p {
-  color: #888 !important;
-  font-size: 14px !important;
-}
-
-@media (max-width: 600px) {
-  .category-header {
-    padding: 15px !important;
-    flex-direction: column !important;
-    text-align: center !important;
+@media (max-width: 768px) {
+  .cat-breadcrumb-items {
+    gap: 4px;
+    font-size: 10px;
   }
-  
-  .header-left h1 {
-    font-size: 20px !important;
+  .cat-breadcrumb-icon { width: 10px; height: 10px; }
+}
+
+@media (min-width: 769px) {
+  .cat-breadcrumb-items {
+    gap: 8px;
+    font-size: 13px;
   }
-  
-  .header-left p {
-    font-size: 12px !important;
+  .cat-breadcrumb-icon { width: 14px; height: 14px; }
+}
+
+/* ============================================ */
+/* LAYER 5: PRODUCTS GRID                        */
+/* ============================================ */
+
+.cat-products-grid {
+  display: grid;
+  gap: 15px;
+  padding: 10px;
+}
+
+/* ✅ Mobile: 2 columns */
+@media (max-width: 768px) {
+  .cat-products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 8px;
+  }
+}
+
+/* ✅ Tablet: 3 columns */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .cat-products-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ✅ Desktop: 4 columns */
+@media (min-width: 1025px) {
+  .cat-products-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
 /* ============================================ */
-/* ALIBABA GRID - RESPONSIVE */
+/* LAYER 6: SKELETON LOADING                     */
 /* ============================================ */
 
-.alibaba-style-large-grid {
-  display: grid !important;
-  gap: 20px !important;
+.cat-skeleton-wrapper {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
 }
 
-/* Default: Kadi 4 kwa mstari kwenye desktop */
-.alibaba-style-large-grid {
-  grid-template-columns: repeat(4, 1fr) !important;
+.cat-skeleton-breadcrumb {
+  width: 60%;
+  height: 20px;
+  background: #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  animation: pulse 1.5s infinite ease-in-out;
 }
 
-/* Kwa desktop kubwa (≥1400px) - Kadi 5 kwa mstari */
-@media (min-width: 1400px) {
-  .alibaba-style-large-grid {
-    grid-template-columns: repeat(5, 1fr) !important;
-    gap: 24px !important;
+.cat-skeleton-grid {
+  display: grid;
+  gap: 15px;
+}
+
+@media (max-width: 768px) {
+  .cat-skeleton-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 8px;
   }
 }
 
-/* Kwa laptop (992px - 1199px) - Kadi 4 kwa mstari */
-@media (min-width: 992px) and (max-width: 1199px) {
-  .alibaba-style-large-grid {
-    grid-template-columns: repeat(4, 1fr) !important;
-    gap: 18px !important;
+@media (min-width: 769px) {
+  .cat-skeleton-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
-/* Kwa tablets (768px - 991px) - Kadi 3 kwa mstari */
-@media (min-width: 768px) and (max-width: 991px) {
-  .alibaba-style-large-grid {
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 16px !important;
-  }
+.cat-skeleton-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-/* Kwa simu (480px - 767px) - Kadi 2 kwa mstari */
-@media (min-width: 480px) and (max-width: 767px) {
-  .alibaba-style-large-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px !important;
-  }
+.cat-skeleton-img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #e0e0e0;
+  border-radius: 12px;
+  animation: pulse 1.5s infinite ease-in-out;
 }
 
-/* Kwa simu ndogo (≤479px) - Kadi 2 kwa mstari (gap ndogo) */
-@media (max-width: 479px) {
-  .alibaba-style-large-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
-  }
+.cat-skeleton-text {
+  height: 16px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
 }
 
-/* Kwa simu ndogo sana (≤360px) - Kadi 1 kwa mstari */
-@media (max-width: 360px) {
-  .alibaba-style-large-grid {
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-  }
+.cat-skeleton-text.short {
+  width: 60%;
 }
 
-/* ============================================ */
-/* PRODUCT CARD - RESPONSIVE */
-/* ============================================ */
-
-.product-card-v2 {
-  background: #fff !important;
-  border-radius: 12px !important;
-  overflow: hidden !important;
-  border: 1px solid #eee !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  height: 100% !important;
-}
-
-.product-card-v2:hover {
-  border-color: #ff6600 !important;
-  transform: translateY(-5px) !important;
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* Image wrapper (square) */
-.image-wrapper {
-  position: relative !important;
-  width: 100% !important;
-  padding-top: 100% !important;
-  background: #f9f9f9 !important;
-  overflow: hidden !important;
-}
-
-.image-wrapper img {
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  transition: transform 0.3s ease !important;
-}
-
-.product-card-v2:hover .image-wrapper img {
-  transform: scale(1.05) !important;
-}
-
-.promo-tag {
-  position: absolute !important;
-  top: 10px !important;
-  left: 10px !important;
-  background: #ff6600 !important;
-  color: #fff !important;
-  padding: 4px 8px !important;
-  font-size: 11px !important;
-  font-weight: bold !important;
-  border-radius: 4px !important;
-  text-transform: uppercase !important;
-  z-index: 1 !important;
-}
-
-/* Product details */
-.product-details {
-  padding: 12px !important;
-  flex-grow: 1 !important;
-  display: flex !important;
-  flex-direction: column !important;
-}
-
-.product-title {
-  font-size: 14px !important;
-  line-height: 1.4 !important;
-  min-height: 40px !important;
-  color: #444 !important;
-  margin-bottom: 8px !important;
-  overflow: hidden !important;
-  display: -webkit-box !important;
-  -webkit-line-clamp: 2 !important;
-  -webkit-box-orient: vertical !important;
-}
-
-@media (max-width: 600px) {
-  .product-title {
-    font-size: 12px !important;
-    min-height: auto !important;
-    margin-bottom: 6px !important;
-  }
-  
-  .product-details {
-    padding: 10px !important;
-  }
-}
-
-/* Price row */
-.price-row {
-  margin-top: auto !important;
-  color: #222 !important;
-  font-weight: 700 !important;
-  font-size: 18px !important;
-}
-
-.currency {
-  font-size: 13px !important;
-  margin-right: 2px !important;
-}
-
-@media (max-width: 600px) {
-  .price-row {
-    font-size: 15px !important;
-  }
-  
-  .currency {
-    font-size: 11px !important;
-  }
-}
-
-/* MOQ text */
-.moq-text {
-  font-size: 11px !important;
-  color: #999 !important;
-  margin: 6px 0 !important;
-}
-
-@media (max-width: 600px) {
-  .moq-text {
-    font-size: 10px !important;
-    margin: 4px 0 !important;
-  }
-}
-
-/* Supplier info */
-.supplier-info {
-  display: flex !important;
-  align-items: center !important;
-  flex-wrap: wrap !important;
-  gap: 6px !important;
-  border-top: 1px solid #f0f0f0 !important;
-  padding-top: 8px !important;
-  margin-top: 8px !important;
-}
-
-.verified-tick {
-  color: #159e15 !important;
-  font-size: 11px !important;
-  font-weight: bold !important;
-  background: #e8f5e8 !important;
-  padding: 2px 6px !important;
-  border-radius: 4px !important;
-}
-
-.years {
-  font-size: 11px !important;
-  color: #666 !important;
-}
-
-@media (max-width: 600px) {
-  .verified-tick,
-  .years {
-    font-size: 9px !important;
-  }
+@keyframes pulse {
+  0% { background-color: #e0e0e0; }
+  50% { background-color: #f0f0f0; }
+  100% { background-color: #e0e0e0; }
 }
 
 /* ============================================ */
-/* LOADING STATE */
+/* LAYER 7: ERROR STATE                          */
 /* ============================================ */
 
-.loading-container {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 80px 20px !important;
-  background: #fff !important;
-  border-radius: 16px !important;
-  min-height: 300px !important;
+.cat-error-container {
+  text-align: center;
+  padding: 80px 20px;
 }
 
-.loading-container p {
-  margin-top: 16px !important;
-  color: #999 !important;
-  font-weight: 500 !important;
-  font-size: 14px !important;
+.cat-error-msg {
+  color: #dc2626;
 }
 
-.animate-spin {
-  animation: spin 1s linear infinite !important;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.cat-error-btn {
+  margin-top: 16px;
+  padding: 8px 20px;
+  background: #ff6600;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 /* ============================================ */
-/* EMPTY STATE */
+/* LAYER 8: FOOTER                               */
 /* ============================================ */
 
-.empty-state {
-  text-align: center !important;
-  padding: 80px 20px !important;
-  background: #fff !important;
-  border-radius: 24px !important;
-  border: 1px solid #eee !important;
+.cat-footer-wrapper {
+  display: block;
 }
 
-.empty-icon {
-  margin-bottom: 20px !important;
-  opacity: 0.6 !important;
-}
-
-.empty-state h2 {
-  font-size: 22px !important;
-  font-weight: 700 !important;
-  color: #333 !important;
-  margin-bottom: 10px !important;
-}
-
-.empty-state p {
-  font-size: 14px !important;
-  color: #888 !important;
-  margin-bottom: 20px !important;
-}
-
-.go-back-btn {
-  margin-top: 20px !important;
-  background: linear-gradient(135deg, #ff6600, #ff4400) !important;
-  color: #fff !important;
-  border: none !important;
-  padding: 12px 32px !important;
-  border-radius: 50px !important;
-  cursor: pointer !important;
-  font-weight: 700 !important;
-  font-size: 14px !important;
-  transition: all 0.2s ease !important;
-}
-
-.go-back-btn:hover {
-  opacity: 0.9 !important;
-  transform: translateY(-2px) !important;
-}
-
-@media (max-width: 480px) {
-  .empty-state {
-    padding: 60px 16px !important;
-  }
-  
-  .empty-state h2 {
-    font-size: 18px !important;
-  }
-  
-  .empty-state p {
-    font-size: 12px !important;
-  }
-  
-  .go-back-btn {
-    padding: 10px 24px !important;
-    font-size: 13px !important;
-  }
-}
-
-/* ============================================ */
-/* SKELETON LOADING STATE */
-/* ============================================ */
-
-.skeleton-card-large {
-  height: 350px !important;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%) !important;
-  background-size: 200% 100% !important;
-  animation: loading 1.5s infinite !important;
-  border-radius: 12px !important;
-}
-
-@keyframes loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* ============================================ */
-/* TOUCH OPTIMIZATIONS */
-/* ============================================ */
-
-@media (hover: none) and (pointer: coarse) {
-  .product-card-v2:active {
-    transform: scale(0.98) !important;
-    transition: transform 0.05s ease !important;
-  }
-  
-  .go-back-btn:active,
-  .breadcrumb-nav span:active {
-    opacity: 0.7 !important;
-  }
-  
-  /* Larger tap targets */
-  .breadcrumb-nav span {
-    padding: 4px 0 !important;
-    display: inline-block !important;
-  }
-}
-
-/* ============================================ */
-/* PRINT STYLES */
-/* ============================================ */
-
-@media print {
-  .category-page-wrapper {
-    background: white !important;
-  }
-  
-  .breadcrumb-nav,
-  .category-header,
-  .go-back-btn {
-    display: none !important;
-  }
-  
-  .alibaba-style-large-grid {
-    grid-template-columns: repeat(3, 1fr) !important;
-  }
-  
-  .product-card-v2 {
-    break-inside: avoid !important;
-    border: 1px solid #ddd !important;
-    box-shadow: none !important;
-  }
-}
-
-/* ============================================ */
-/* SAFE AREA FOR NOTCH DEVICES */
-/* ============================================ */
-
-@supports (padding: max(0px)) {
-  @media (max-width: 767px) {
-    .category-main {
-      padding-left: max(15px, env(safe-area-inset-left)) !important;
-      padding-right: max(15px, env(safe-area-inset-right)) !important;
-    }
-  }
-}
-
-/* ============================================ */
-/* SCROLLBAR STYLING */
-/* ============================================ */
-
-.category-main::-webkit-scrollbar {
-  width: 6px !important;
-}
-
-.category-main::-webkit-scrollbar-track {
-  background: #f1f1f1 !important;
-  border-radius: 10px !important;
-}
-
-.category-main::-webkit-scrollbar-thumb {
-  background: #ff6600 !important;
-  border-radius: 10px !important;
-}
-
-.category-main::-webkit-scrollbar-thumb:hover {
-  background: #e55a00 !important;
-}
-
-/* ============================================ */
-/* DARK MODE SUPPORT (Optional) */
-/* ============================================ */
-
-@media (prefers-color-scheme: dark) {
-  .category-page-wrapper {
-    background-color: #1f2937 !important;
-  }
-  
-  .category-header,
-  .product-card-v2 {
-    background: #374151 !important;
-  }
-  
-  .header-left h1,
-  .product-title,
-  .price-row {
-    color: #f3f4f6 !important;
-  }
-  
-  .header-left p,
-  .moq-text,
-  .years {
-    color: #9ca3af !important;
-  }
-  
-  .supplier-info {
-    border-top-color: #4b5563 !important;
-  }
-  
-  .verified-tick {
-    background: #065f46 !important;
-    color: #34d399 !important;
-  }
-  
-  .empty-state {
-    background: #374151 !important;
-    border-color: #4b5563 !important;
-  }
-  
-  .empty-state h2 {
-    color: #f3f4f6 !important;
-  }
-  
-  .empty-state p {
-    color: #9ca3af !important;
+@media (max-width: 768px) {
+  .cat-footer-wrapper {
+    display: none;
   }
 }

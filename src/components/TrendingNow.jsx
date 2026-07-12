@@ -1,21 +1,19 @@
-// src/components/TrendingNow.jsx (Fixed Version - Same as TopDeals)
+// src/components/TrendingNow.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, TrendingUp } from "lucide-react";
 import { supabase } from "../supabaseClient";
 import DashboardCard from "./DashboardCard";
-import { useTranslation } from 'react-i18next'; // ✅ ONGEZA HAPA
+import { useTranslation } from 'react-i18next';
+import '../TrendingNow.css'; // ✅ ONGEZA HII
 
-
-export default function TrendingNow({ navigate, selectedCategory,   getCategoryDisplayName,
-isMobile }) {
-  const { t, i18n } = useTranslation(); // ✅ ONGEZA HAPA
+export default function TrendingNow({ navigate, selectedCategory, getCategoryDisplayName, isMobile }) {
+  const { t, i18n } = useTranslation();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const scrollContainerRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
-    const title = getCategoryDisplayName(selectedCategory) || t('trending_now');
-
+  const title = getCategoryDisplayName(selectedCategory) || t('trending_now');
 
   useEffect(() => {
     const fetchTrending = async () => {
@@ -24,7 +22,6 @@ isMobile }) {
         let query = supabase
           .from('products_engines')
           .select('*')
-          //.eq('is_approved', true)
           .or('order_count.gt.0,views.gt.0')
           .order('order_count', { ascending: false })
           .order('views', { ascending: false })
@@ -70,7 +67,6 @@ isMobile }) {
     if (container && !isMobile) {
       container.addEventListener('scroll', checkScrollPosition);
       setTimeout(checkScrollPosition, 100);
-      
       return () => {
         container.removeEventListener('scroll', checkScrollPosition);
       };
@@ -78,50 +74,20 @@ isMobile }) {
   }, [products, isMobile]);
 
   if (loading) return (
-    <div className="skeleton-loader-h" style={{height: '280px', margin: '20px', borderRadius: '15px'}} />
+    <div className="skeleton-loader-h" />
   );
   
   if (products.length === 0) return null;
 
   return (
-    <div 
-      className="trending-main-wrapper" 
-      style={{ 
-        padding: isMobile ? '4px 0' : '0px',
-        position: 'relative',
-        width: '100%',
-        // ✅ 2. Rangi ya background ya kijivu (Light Gray kama Alibaba)
-        backgroundColor: '#eceef1', 
-        // ✅ 3. Pembe za duara kidogo kwa kontena zima
-        borderRadius: isMobile ? '8px' : '16px',
-        margin: isMobile ? '2px 0' : '10px 0'
-      }}
-    >
-            {/* Header Section - Same as TopDeals */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        marginBottom: isMobile ? '12px' : '20px',
-        flexWrap: 'wrap',
-        gap: isMobile ? '6px' : '10px',
-        padding: isMobile ? '0 8px' : '0',
-      }}>
-        <div>
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: isMobile ? '4px' : '8px', 
-            marginBottom: isMobile ? '2px' : '3px' 
-          }}>
-            <TrendingUp size={isMobile ? 12 : 24} style={{ color: '#8b5cf6' }} />
-            <h2 style={{ 
-              fontSize: isMobile ? '13px' : '24px', 
-              fontWeight: 'bold', 
-              margin: 0,
-              lineHeight: isMobile ? '1.3' : '1.4'
-            }}>
-              {/* ✅ BADILISHA HAPA: Tumia t() na usionyeshe 'in' ikiwa hakuna category */}
+    <div className="trending-main-wrapper">
+      
+      {/* Header Section - Responsive via CSS */}
+      <div className="trend-header">
+        <div className="trend-header-left">
+          <div className="trend-title-group">
+            <TrendingUp className="trend-icon" />
+            <h2 className="trend-title">
               {selectedCategory && selectedCategory.id !== null ? (
                 `${t('hot_picks')} ${t('in')} ${getCategoryDisplayName(selectedCategory)}`
               ) : (
@@ -129,95 +95,40 @@ isMobile }) {
               )}
             </h2>
           </div>
-          <p style={{ 
-            margin: 0, 
-            color: '#888',
-            fontSize: isMobile ? '9px' : '16px',
-            lineHeight: isMobile ? '1.2' : '1.5'
-          }}>
-            {/* ✅ BADILISHA HAPA */}
-            {t('check_popular_items')}
-          </p>
+          <p className="trend-subtitle">{t('check_popular_items')}</p>
         </div>
-        
+
         <button 
+          className="trend-view-more-btn"
           onClick={() => navigate('/products', { 
             state: { 
-              sectionName: t('hot_picks'), // ✅ BADILISHA HAPA
+              sectionName: t('hot_picks'),
               categoryId: selectedCategory?.id 
             } 
           })}
-          style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: isMobile ? '4px' : '8px', 
-            padding: isMobile ? '4px 10px' : '8px 20px',
-            background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
-            color: 'white',
-            border: 'none',
-            borderRadius: isMobile ? '20px' : '10px',
-            cursor: 'pointer',
-            fontWeight: '500',
-            fontSize: isMobile ? '9px' : '16px',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 2px 8px rgba(139, 92, 246, 0.3)',
-            whiteSpace: 'nowrap'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(139, 92, 246, 0.4)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 2px 8px rgba(139, 92, 246, 0.3)';
-          }}
         >
-          {/* ✅ BADILISHA HAPA */}
           <span>{t('view_more')}</span>
           <ChevronRight size={isMobile ? 10 : 16} />
         </button>
       </div>
-      
+
       {/* ========== MOBILE VIEW: Horizontal Scroll ========== */}
       {isMobile ? (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            flexWrap: 'nowrap',
-            gap: '12px',
-            overflowX: 'auto',
-            overflowY: 'hidden',
-            scrollBehavior: 'smooth',
-            WebkitOverflowScrolling: 'touch',
-            padding: '10px 0 20px 0',
-            width: '100%',
-            msOverflowStyle: 'none',
-            scrollbarWidth: 'none'
-          }}
-          className="hide-scrollbar-mobile"
-        >
+        <div className="trend-mobile-scroll hide-scrollbar-mobile">
           {products.map((item, index) => (
-            <div
-              key={item.id}
-              style={{
-                flex: '0 0 auto',
-                width: '140px',
-                minWidth: '140px'
-              }}
-            >
-               <DashboardCard
+            <div key={item.id} className="trend-mobile-card-wrapper">
+              <DashboardCard
                 image={item.cover_image}
                 title={item.name}
                 price={item.price}
                 views={item.views}
                 rank={index + 1}
                 isMobile={isMobile}
-                                onClick={() => navigate('/products', {
+                onClick={() => navigate('/products', {
                   state: {
                     sortBy: 'order_count',
                     order: 'desc',
-                    sectionName: `${t('hot_picks')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`, // ✅ BADILISHA HAPA
+                    sectionName: `${t('hot_picks')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`,
                     priorityId: item.id,
                     categoryId: selectedCategory?.id
                   }
@@ -228,64 +139,16 @@ isMobile }) {
         </div>
       ) : (
         /* ========== DESKTOP VIEW: Horizontal Scroll with Arrows ========== */
-        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+        <div className="trend-desktop-wrapper">
           {showLeftArrow && (
-            <button
-              onClick={() => scroll('left')}
-              style={{
-                position: 'absolute',
-                left: '-15px',
-                zIndex: 10,
-                backgroundColor: 'white',
-                border: '1px solid #e2e8f0',
-                borderRadius: '50%',
-                width: '40px',
-                height: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                transition: 'all 0.2s ease',
-                outline: 'none'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#f7f9fc';
-                e.currentTarget.style.transform = 'scale(1.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'white';
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
-            >
+            <button className="trend-arrow-btn trend-arrow-left" onClick={() => scroll('left')}>
               <ChevronLeft size={24} />
             </button>
           )}
           
-          <div
-            ref={scrollContainerRef}
-            style={{
-              display: 'flex',
-              gap: '20px',
-              overflowX: 'auto',
-              overflowY: 'hidden',
-              scrollBehavior: 'smooth',
-              padding: '10px 5px 20px 5px',
-              width: '100%',
-              msOverflowStyle: 'none',
-              scrollbarWidth: 'none'
-            }}
-            className="hide-scrollbar-desktop"
-          >
+          <div ref={scrollContainerRef} className="trend-desktop-scroll hide-scrollbar-desktop">
             {products.map((item, index) => (
-              <div
-                key={item.id}
-                style={{
-                  flex: '0 0 auto',
-                  width: '200px',
-                  minWidth: '200px'
-                }}
-              >
+              <div key={item.id} className="trend-desktop-card-wrapper">
                 <DashboardCard
                   image={item.cover_image}
                   title={item.name}
@@ -293,89 +156,31 @@ isMobile }) {
                   views={item.views}
                   rank={index + 1}
                   isMobile={isMobile}
-  onClick={() => {
-  const queryParams = {
-    ...(selectedCategory?.id && { categoryId: selectedCategory.id }),
-    categoryName: selectedCategory?.name || 'All',
-    sectionName: `${t('hot_picks')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`, // ✅ BADILISHA HAPA
-    sortBy: 'order_count',
-    order: 'desc',
-    priorityId: item.id
-  };
-
-  const params = new URLSearchParams(queryParams).toString();
-  const url = `/products?${params}`;
-  window.open(url, '_blank');
-}}
+                  onClick={() => {
+                    const queryParams = {
+                      ...(selectedCategory?.id && { categoryId: selectedCategory.id }),
+                      categoryName: selectedCategory?.name || 'All',
+                      sectionName: `${t('hot_picks')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`,
+                      sortBy: 'order_count',
+                      order: 'desc',
+                      priorityId: item.id
+                    };
+                    const params = new URLSearchParams(queryParams).toString();
+                    const url = `/products?${params}`;
+                    window.open(url, '_blank');
+                  }}
                 />
               </div>
             ))}
           </div>
           
           {showRightArrow && (
-            <button
-              onClick={() => scroll('right')}
-              style={{
-                position: 'absolute',
-                right: '-15px',
-                zIndex: 10,
-                backgroundColor: 'white',
-                border: '1px solid #e2e8f0',
-                borderRadius: '50%',
-                width: '40px',
-                height: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                transition: 'all 0.2s ease',
-                outline: 'none'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#f7f9fc';
-                e.currentTarget.style.transform = 'scale(1.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'white';
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
-            >
+            <button className="trend-arrow-btn trend-arrow-right" onClick={() => scroll('right')}>
               <ChevronRight size={24} />
             </button>
           )}
         </div>
       )}
-
-      {/* Global styles to hide scrollbars */}
-      <style>{`
-        .hide-scrollbar-mobile {
-          overflow-x: auto !important;
-          overflow-y: hidden !important;
-          -webkit-overflow-scrolling: touch;
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-        }
-        .hide-scrollbar-mobile::-webkit-scrollbar {
-          display: none;
-        }
-        @media (max-width: 768px) {
-          .hide-scrollbar-mobile {
-            display: flex !important;
-            flex-direction: row !important;
-            flex-wrap: nowrap !important;
-            overflow-x: auto !important;
-            -webkit-overflow-scrolling: touch;
-          }
-        }
-        .hide-scrollbar-desktop::-webkit-scrollbar {
-          display: none;
-        }
-        .hide-scrollbar-desktop {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
     </div>
   );
 }
