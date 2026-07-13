@@ -133,23 +133,24 @@
   .moq-label { font-size: 9px; }
   .moq-value { font-size: 11px; }
 }
+
+
 /* ============================================ */
-/* ✅ LAYER 6: ULTIMATE SMALL CARD FIX          */
+/* ✅ LAYER 6: ALIBABA ULTIMATE MOBILE SIZE     */
 /* ============================================ */
 
 /* 1. DESKTOP (Skrini kubwa) */
 .universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
   display: grid !important;
-  /* Desktop iwe na kadi za ukubwa wa 220px */
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)) !important;
   gap: 16px !important;
   padding: 20px !important;
   width: 100% !important;
   box-sizing: border-box !important;
-  justify-content: center !important; /* Weka katikati kama skrini ni kubwa */
+  justify-content: center !important; /* Weka katikati kama skrini ni kubwa sana */
 }
 
-/* 2. TABLET (Kati ya 769px na 1024px) */
+/* 2. TABLET */
 @media (max-width: 1024px) and (min-width: 769px) {
   .universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
@@ -158,50 +159,30 @@
   }
 }
 
-/* ✅ 3. MOBILE - HAPA NDIYO SIRI YA KUPUNGUZA KWA NUSU! */
+/* ✅ 3. MOBILE - HAPA NDIYO SIRI KUBWA (Alibaba Look) */
 @media (max-width: 768px) {
   .universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
     display: grid !important;
     
-    /* ✅ BADILISHA 1fr kuwa 140px! Hii inafanya kadi kuwa ndogo sana! */
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+    /* ✅ TUMA 150px: Hii inazuia kadi isipande zaidi ya 150px! */
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
     
-    /* Punguza nafasi kati ya kadi */
-    gap: 6px !important; 
+    /* Nafasi ndogo kati ya kadi */
+    gap: 8px !important; 
     
-    /* Ongeza padding pande ili zisiguse ukingo kabisa */
-    padding: 0 20px 16px 20px !important; 
+    /* ✅ ONGEZA PADDING (NAFASI) PANDENI! Hii inatoa white space kama Alibaba */
+    padding: 0 24px 16px 24px !important; 
     
     width: 100% !important;
     box-sizing: border-box !important;
   }
 }
 
-/* 4. SIMU NDOGO SANA (Chini ya 400px) - Weka 130px */
+/* 4. SIMU NDOGO SANA (Chini ya 400px) */
 @media (max-width: 400px) {
   .universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
-    gap: 5px !important;
-    padding: 0 12px 12px 12px !important;
-  }
-}
-
-/* 5. KWA SLIDER (Hot Picks) - Kadi lazima iwe ndogo */
-@media (max-width: 768px) {
-  .slider-container, .hot-picks-scroll {
-    display: flex !important;
-    overflow-x: auto !important;
-    gap: 8px !important;
-    padding: 0 20px !important;
-    scroll-snap-type: x mandatory !important;
-  }
-  
-  /* Kwenye slider, kila kadi inalazimishwa kuwa 140px tu! */
-  .slider-container .product-card-item, 
-  .hot-picks-scroll .product-card-item {
-    flex: 0 0 140px !important; /* Hii inazuia kadi kupanuka! */
-    width: 140px !important;
-    height: auto !important;
-    scroll-snap-align: start !important;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+    gap: 6px !important;
+    padding: 0 16px 12px 16px !important;
   }
 }

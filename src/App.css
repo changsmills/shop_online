@@ -1091,7 +1091,7 @@ html, body {
    LAYER 18: RESPONSIVE FIXES
    ============================================ */
 @media (max-width: 768px) {
-  .content-container-simple { padding: 0 !important; max-width: 100% !important; }
+  .content-container-simple { padding: 0 5px !important; max-width: 100% !important; }
   .main-content { padding-top: 0; }
   .side-categories { display: none !important; }
   .alibaba-top-layout { display: block !important; margin-top: 0 !important; gap: 0; }
@@ -1102,11 +1102,10 @@ html, body {
   .banner-desc { font-size: 0.7rem !important; max-width: 100% !important; }
   .ad-tag { font-size: 0.6rem !important; padding: 2px 8px !important; }
   .view-more-banner { padding: 6px 16px !important; font-size: 0.7rem !important; }
-  .alibaba-grid, .just-for-you-grid, .summary-grid {
+    .alibaba-grid, .just-for-you-grid, .summary-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 8px !important;
-    padding-left: 4px !important;
-    padding-right: 4px !important;
+    padding: 0 !important; /* Acha content-container-simple isimamie padding */
   }
   .compact-card img { height: 120px !important; }
   .compact-card .name { font-size: 12px !important; }
