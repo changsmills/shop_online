@@ -134,42 +134,44 @@
   .moq-value { font-size: 11px; }
 }
 
-
 /* ============================================ */
-/* ✅ LAYER 6: GRID & UTILITIES (MUHIMU SANA!)  */
+/* ✅ LAYER 6: GRID & UTILITIES (VERSION 2.0)   */
 /* ============================================ */
 
-/* CSS ya Desktop (Kwa skrini kubwa) */
+/* 1. DESKTOP (Skrini kubwa) - Kadi 4 au 5 */
 .universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
   display: grid !important;
-  grid-template-columns: repeat(4, 1fr) !important;
-  gap: 16px !important;
+  /* Tumia minmax: Kadi hazitapanda zaidi ya 300px, hata kama skrini ni kubwa */
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
+  gap: 20px !important;
   padding: 20px !important;
   width: 100% !important;
-  box-sizing: border-box !important; /* Inazuia padding kuongeza ukubwa wa skrini */
+  box-sizing: border-box !important;
 }
 
-/* Responsive: Tablet (Safu 3) */
-@media (max-width: 1024px) {
+/* 2. TABLET (Skrini za kati) - Kadi 3 (Lakini ndogo zaidi) */
+@media (max-width: 1024px) and (min-width: 769px) {
   .universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
+    /* Hapa tunalazimisha kadi ziwe na upana wa 30% tu ili ziwe 3 kwa safu */
     grid-template-columns: repeat(3, 1fr) !important;
     gap: 12px !important;
     padding: 16px !important;
   }
 }
 
-/* ✅ Responsive: Mobile - HAPA NDIPO TATIZO LINAWEA KUREKEBISHWA! */
+/* 3. MOBILE (Simu za kawaida) - Kadi 2 lakini ZIMEPUNGUA UKUBWA KWA NUSU! */
 @media (max-width: 768px) {
   .universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
     display: grid !important;
     
-    /* Safu 2 kwa kadi */
-    grid-template-columns: repeat(2, 1fr) !important; 
+    /* ✅ HAPA NDIO SIRI: Badala ya 2fr (50%), tumia 160px fixed width! */
+    /* Hii inafanya kadi ziwe na upana wa 160px pekee, na zikawekwa katikati. */
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
     
-    /* ✅ Punguza gap (nafasi kati ya kadi) ili zibane */
-    gap: 6px !important; 
+    /* ✅ Punguza gap sana ili zikaribiane kama Alibaba */
+    gap: 8px !important; 
     
-    /* ✅ ONGEZA padding (mapumziko) kushoto na kulia ili zisiguse skrini! */
+    /* ✅ Weka padding za kutosha kushoto na kulia ili zisiguse ukingo */
     padding: 0 12px 16px 12px !important; 
     
     width: 100% !important;
@@ -177,10 +179,31 @@
   }
 }
 
-/* Mobile ndogo sana (chini ya 400px) - Weka padding ndogo zaidi */
+/* 4. SIMU NDOGO SANA (Chini ya 400px) */
 @media (max-width: 400px) {
   .universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
+    /* Punguza zaidi upana wa kadi kwenye simu ndogo sana */
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
     gap: 5px !important;
-    padding: 0 8px 12px 8px !important; /* Bado kuna nafasi ya kuzuia kugusa ukingo */
+    padding: 0 6px 12px 6px !important;
+  }
+}
+
+/* 5. KWA AJILI YA SLIDER (Kama Hot Picks) - Hii inabana sana! */
+@media (max-width: 768px) {
+  .slider-container, .hot-picks-scroll {
+    display: flex !important;
+    overflow-x: auto !important;
+    gap: 8px !important;
+    padding: 0 12px !important;
+    scroll-snap-type: x mandatory !important;
+  }
+  
+  /* Kwa slider, kila kadi inalazimishwa kuwa 160px tu! */
+  .slider-container .product-card-item, 
+  .hot-picks-scroll .product-card-item {
+    flex: 0 0 160px !important; /* Hii inazuia kadi kupanuka! */
+    width: 160px !important;
+    scroll-snap-align: start !important;
   }
 }
