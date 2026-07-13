@@ -14,7 +14,7 @@
 /* Kwenye simu, header ni ndogo, hivyo padding imepunguzwa */
 @media (max-width: 768px) {
   .product-page-root {
-    padding-top: 50px;
+    padding-top: 10px;
     padding-bottom: 80px; /* Nafasi kwa Bottom Navigation ya simu */
   }
 }
