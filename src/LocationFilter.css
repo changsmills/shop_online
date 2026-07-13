@@ -9,12 +9,12 @@
   box-sizing: border-box;
 }
 
-/* Mobile container */
+/* Mobile container - 🔥 UPDATED: Flush edges */
 @media (max-width: 768px) {
   .location-main-wrapper {
-    padding: 4px 0;
-    border-radius: 8px;
-    margin: 2px 0;
+    padding: 4px 0 !important;
+    border-radius: 0 !important;
+    margin: 2px 0 !important;
   }
 }
 
@@ -39,12 +39,14 @@
   width: 100%;
 }
 
-/* Mobile header */
+/* Mobile header - 🔥 UPDATED: Zero side padding & prevent breaking */
 @media (max-width: 768px) {
   .loc-header {
-    padding: 0 8px;
-    margin-bottom: 12px;
+    padding: 0 0 12px 0 !important; /* No left/right padding */
+    margin-bottom: 0 !important;
     gap: 6px;
+    flex-wrap: nowrap !important; /* Keep button on same line */
+    align-items: center;
   }
 }
 
@@ -68,11 +70,12 @@
   gap: 8px;
 }
 
-/* Mobile title gap */
+/* Mobile title gap - 🔥 UPDATED: Allow shrinking */
 @media (max-width: 768px) {
   .loc-title-group {
     gap: 4px;
-    margin-bottom: 2px;
+    margin-bottom: 0;
+    flex-shrink: 1; /* Allow title to shrink if space is tight */
   }
 }
 
@@ -166,6 +169,7 @@
     border-radius: 20px;
     font-size: 9px;
     gap: 4px;
+    flex-shrink: 0 !important; /* 🔥 UPDATED: Prevent button from shrinking too small */
   }
 }
 
