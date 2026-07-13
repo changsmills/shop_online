@@ -23,14 +23,14 @@
 .product-details-container {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 0 20px 20px 20px;
+  padding: 0 0 0 0;
   width: 100%;
   box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
   .product-details-container {
-    padding: 0 12px 20px 12px;
+    padding: 0 0 20px 0; /* Hakuna padding kushoto/kulia */
     max-width: 100%;
   }
 }
@@ -120,8 +120,6 @@
     background: #ffffff;
     box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s ease, transform 0.2s ease;
-    
-    /* Tumeondoa overflow-y na max-height ili isilete scrollbar mbili zisizo na mpango */
   }
 
   .sticky-info-wrapper:hover {
@@ -142,11 +140,11 @@
     top: 0;
     max-height: none;
     overflow-y: visible;
-    padding: 12px;
+    padding: 12px 0;                /* Hakuna padding kushoto/kulia */
     background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    border: 1px solid #eef0f2;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
   }
 }
 
@@ -186,7 +184,7 @@
 
 @media (max-width: 768px) {
   .product-hero-section {
-    padding: 12px;
+    padding: 0;                    /* Hakuna padding ili picha iguse ukingo */
     margin-bottom: 12px;
     border-radius: 0;
     box-shadow: none;
@@ -198,13 +196,6 @@
 .product-description-section {
   margin-top: 24px;
   width: 100%;
-}
-
-@media (max-width: 768px) {
-  .product-description-section {
-    padding-left: 0;
-    padding-right: 0;
-  }
 }
 
 /* ============================================ */
@@ -223,7 +214,7 @@
     flex: 0 0 35%; /* Inachukua 35% ya upana kwenye Desktop */
     padding: 20px 0 0 20px;
     border-left: 1px solid #e5e7eb;
-    position: relative;           /* Sio sticky – hii inafanya iwe normal */
+    position: relative;           
     align-self: flex-start;
     height: auto;
   }
@@ -231,9 +222,10 @@
 
 @media (max-width: 768px) {
   .right-sidebar {
-    padding: 0;
+    padding: 0 !important;        /* 🔥 IMEBADILISHWA: Inaenda flush kabisa kushoto/kulia */
     border-left: none;
     position: relative;
+    width: 100% !important;
   }
 }
 
@@ -766,7 +758,10 @@
 
 /* Mabadiliko yote ya Mobile yamekusanywa hapa */
 @media (max-width: 768px) {
-  .product-bottom-details { padding: 12px; margin-top: 0; }
+  .product-bottom-details { 
+    padding: 12px 0;             /* Hakuna padding kushoto/kulia */
+    margin-top: 0; 
+  }
   .verification-header-box { padding: 12px; margin-bottom: 15px; }
   .verification-header-box h2 { font-size: 16px; }
   .verification-header-box p { font-size: 12px; }
@@ -786,7 +781,13 @@
   .store-full-details-card img[alt*="TIN"] { max-height: 150px; }
   .store-full-details-card > div div[style*="display: flex; flex-wrap: wrap; gap: 10px"] { gap: 8px; }
   .store-full-details-card a[href*="instagram"], .store-full-details-card a[href*="tiktok"], .store-full-details-card a[href*="google"] { padding: 8px 12px; font-size: 11px; }
-  .right-sidebar .sticky-info-wrapper { padding: 8px; }
+  
+  .right-sidebar .sticky-info-wrapper { 
+    padding: 12px 0 !important;  /* Hakuna padding kushoto/kulia */
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
   .breadcrumb-nav span:not(.active-path) { display: none; }
   .breadcrumb-nav .sep { display: none; }
   .store-full-details-card .action-row { flex-direction: column; }
@@ -1119,7 +1120,7 @@
 /* Mobile: Punguza size na nafasi */
 @media (max-width: 768px) {
   .product-bottom-details {
-    padding: 16px !important;
+    padding: 16px 0 !important;      /* Hakuna padding kushoto/kulia */
     margin-top: 10px !important;
     border-radius: 12px !important;
   }
@@ -1209,5 +1210,47 @@
     font-size: 12px !important;
     flex: 1 !important;
     justify-content: center !important;
+  }
+}
+
+/* ============================================ */
+/* LAYER 20: FULL WIDTH OVERRIDE - Slider & Components */
+/* ============================================ */
+@media (max-width: 768px) {
+  /* 1. Hakikisha Gallery/Slider zinaenda upana kamili (na kuondoa nafasi nyeusi kando) */
+  .product-hero-section > div,
+  .product-hero-section .main-image-container,
+  div[class*="slider"],
+  div[class*="gallery"],
+  div[class*="carousel"],
+  .product-gallery {
+    max-width: 100% !important;
+    width: 100vw !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  /* 2. Picha za bidhaa lazima zijaze skrini nzima (object-fit cover) */
+  .product-hero-section img,
+  .product-hero-section video,
+  div[class*="slider"] img,
+  div[class*="gallery"] img {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    object-fit: cover !important; /* Hii inaondoa kabisa nafasi nyeusi kando! */
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* 3. Ongeza hii kuhakikisha RIGHT SIDEBAR haina padding */
+  .right-sidebar {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
   }
 }

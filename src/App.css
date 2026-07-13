@@ -1,6 +1,7 @@
 /* ============================================
    LAYER 1: GLOBAL RESET & BASE
    ============================================ */
+
 * {
   margin: 0;
   padding: 0;
@@ -41,7 +42,7 @@ html, body {
    ============================================ */
 @media (max-width: 1024px) {
   .sticky-header {
-    padding-top: 50px;
+    padding-top: 60px;
   }
 }
 /* ============================================
@@ -62,23 +63,22 @@ html, body {
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 8px;
+  padding: 0; /* 🔥 IMEBADILISHWA: 0 padding default */
 }
 
 /* Tablet+ */
 @media (min-width: 600px) {
   .content-container-simple {
-    padding: 0 16px;
+    padding: 0; /* 🔥 IMEBADILISHWA: Inabaki 0 */
   }
 }
 
 /* Desktop */
 @media (min-width: 1025px) {
   .content-container-simple {
-    padding: 0 24px;
+    padding: 0 24px; /* Desktop pekee ndiyo inabaki na padding za upande */
   }
 }
-
 /* ============================================
    LAYER 6: CATEGORY SLIDER (Mobile/Tablet)
    ============================================ */
@@ -988,10 +988,20 @@ html, body {
 }
 
 /* ============================================
-   LAYER 18: RESPONSIVE FIXES
+   LAYER 18: RESPONSIVE FIXES (ZERO PADDING LEFT/RIGHT)
    ============================================ */
-@media (max-width: 768px) {
-  .content-container-simple { padding: 0 5px !important; max-width: 100% !important; }
+@media (max-width: 1024px) { /* 🔥 IMEBADILISHWA: Sasa inagusa tablets zote (hadi 1024px) */
+  /* 🔥 Hakuna padding kushoto wala kulia kwenye simu na tablet */
+  .content-container-simple { 
+    padding: 0 !important; 
+    max-width: 100% !important; 
+  }
+
+  /* 🔥 Hakikisha components zake hazina padding upande */
+  .components-wrapper {
+    padding: 0 !important;
+  }
+
   .main-content { padding-top: 0; }
   .side-categories { display: none !important; }
   .alibaba-top-layout { display: block !important; margin-top: 0 !important; gap: 0; }
@@ -1002,11 +1012,14 @@ html, body {
   .banner-desc { font-size: 0.7rem !important; max-width: 100% !important; }
   .ad-tag { font-size: 0.6rem !important; padding: 2px 8px !important; }
   .view-more-banner { padding: 6px 16px !important; font-size: 0.7rem !important; }
-    .alibaba-grid, .just-for-you-grid, .summary-grid {
+  
+  /* ✅ GRID UPDATES: Hakuna padding, gap ndogo tu */
+  .alibaba-grid, .just-for-you-grid, .summary-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px !important;
-    padding: 0 !important; /* Acha content-container-simple isimamie padding */
+    gap: 5px !important;
+    padding: 0 !important;
   }
+  
   .compact-card img { height: 120px !important; }
   .compact-card .name { font-size: 12px !important; }
   .compact-card .price { font-size: 13px !important; }
@@ -1038,30 +1051,6 @@ html, body {
     color: #666 !important;
   }
 }
-
-/* Tablet tweaks */
-@media (min-width: 600px) and (max-width: 1024px) {
-  .content-container-simple { padding: 0 16px; }
-  .alibaba-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-}
-
-/* Large screens */
-@media (min-width: 1400px) {
-  .content-container-simple { max-width: 1400px; }
-  .side-categories { max-height: 520px; }
-  .hot-picks-banner { height: 520px; }
-}
-@media (min-width: 1920px) {
-  .content-container-simple { max-width: 1600px; }
-}
-
-/* Utility */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.scrollbar-hide::-webkit-scrollbar { display: none; }
-
 /* ============================================
    LAYER 19: DASHBOARD CARD (CLASS IMEHIFADHIWA)
    ============================================ */
