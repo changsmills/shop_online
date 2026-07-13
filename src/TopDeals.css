@@ -96,7 +96,7 @@
 }
 
 .td-title {
-  font-weight: 600; /* ✅ Punguza uzito: bold → 600 */
+  font-weight: 600;
   margin: 0;
 }
 
@@ -253,6 +253,35 @@
 
 .td-arrow-left { left: -15px; }
 .td-arrow-right { right: -15px; }
+
+/* ============================================ */
+/* ✅ RESPONSIVE ARROWS - FIX GAP AND POSITION  */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  /* 1. Punguza ukubwa wa mishale */
+  .td-arrow-btn {
+    width: 30px;
+    height: 30px;
+    /* 2. Fanya mishale ionekane kama vitufe vya overlay nyeupe */
+    background: rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid #eee !important;
+  }
+
+  /* 3. Sogeza mishale kwenye kingo (sio katikati) */
+  .td-arrow-left {
+    left: 4px !important;
+  }
+  .td-arrow-right {
+    right: 4px !important;
+  }
+
+  /* 4. Punguza padding ya pande (Ondoa 45px, weka 12px) */
+  .td-desktop-scroll {
+    padding: 10px 12px 20px 12px !important;
+  }
+}
 
 /* ============================================ */
 /* UTILITY: HIDE SCROLLBAR                      */

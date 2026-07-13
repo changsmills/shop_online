@@ -1,0 +1,187 @@
+/* ============================================ */
+/* ALL STORES - PAGE CONTAINER                  */
+/* ============================================ */
+
+.all-stores-page {
+  background-color: #f7f8fa;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================ */
+/* ALL STORES - MAIN CONTAINER                  */
+/* ============================================ */
+
+.all-stores-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Desktop adjustment */
+@media (min-width: 769px) {
+  .all-stores-container {
+    padding: 30px 20px;
+  }
+}
+
+/* ============================================ */
+/* HEADER SECTION                                */
+/* ============================================ */
+
+.all-stores-header {
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.all-stores-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0;
+  color: #1f2937;
+}
+
+.all-stores-subtitle {
+  margin-top: 8px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+@media (min-width: 769px) {
+  .all-stores-header {
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+  }
+  .all-stores-title {
+    font-size: 28px;
+  }
+  .all-stores-subtitle {
+    font-size: 14px;
+  }
+}
+
+/* ============================================ */
+/* STORES GRID - RESPONSIVE                     */
+/* ============================================ */
+
+.all-stores-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+/* Tablet (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .all-stores-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+}
+
+/* Desktop (≥1025px) */
+@media (min-width: 1025px) {
+  .all-stores-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 24px;
+  }
+}
+
+/* Very small mobile (≤480px) */
+@media (max-width: 480px) {
+  .all-stores-grid {
+    gap: 12px;
+  }
+}
+
+/* ============================================ */
+/* EMPTY STATE                                   */
+/* ============================================ */
+
+.all-stores-empty {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: white;
+  border-radius: 12px;
+  color: #999;
+}
+
+/* ============================================ */
+/* SKELETON LOADING                              */
+/* ============================================ */
+
+.all-stores-loading-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.all-stores-skeleton-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 769px) {
+  .all-stores-skeleton-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+}
+@media (min-width: 1025px) {
+  .all-stores-skeleton-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+}
+
+.all-stores-skeleton-card {
+  background: white;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.all-stores-skeleton-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #e0e0e0;
+  border-radius: 8px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.all-stores-skeleton-text {
+  height: 14px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+.all-stores-skeleton-text.short {
+  width: 60%;
+}
+
+@keyframes pulse {
+  0% { background-color: #e0e0e0; }
+  50% { background-color: #f0f0f0; }
+  100% { background-color: #e0e0e0; }
+}
+
+/* ============================================ */
+/* FOOTER - HIDE ON MOBILE                       */
+/* ============================================ */
+
+/* Footer imeonyeshwa kwa default, lakini kwenye mobile inafichwa */
+@media (max-width: 768px) {
+  .all-stores-page footer {
+    display: none !important;
+  }
+}

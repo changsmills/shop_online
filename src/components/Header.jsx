@@ -1,3 +1,4 @@
+// src/components/Header.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import Logo from './Logo';
 import SearchBar from './SearchBar';
@@ -12,25 +13,16 @@ const Header = () => {
   const { t } = useTranslation();
   const { language, changeLanguage } = useLanguage();
   const [search, setSearch] = useState("");
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [currency, setCurrency] = useState("TZS");
   const dropdownRef = useRef(null);
 
-  // States za Location Selector
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [deliveryCountry, setDeliveryCountry] = useState("TZ");
   const [zipCode, setZipCode] = useState("");
   const locationDropdownRef = useRef(null);
 
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Kufunga dropdowns unapobonyeza nje
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -54,60 +46,32 @@ const Header = () => {
     setIsLocationOpen(false);
   };
 
-  // Component ya Dropdown ya Lugha na Sarafu
+  // Dropdown ya Lugha na Sarafu
   const LanguageCurrencyDropdown = () => (
-    <div 
-      className="lang-currency-card"
-      style={{
-        position: 'absolute',
-        top: '42px',
-        right: '0',
-        width: isMobile ? '280px' : '360px',
-        background: '#fff',
-        borderRadius: '12px',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
-        border: '1px solid #f0f0f0',
-        padding: '20px',
-        zIndex: 10000,
-      }}
-    >
-      <div style={{ marginBottom: '20px' }}>
-        <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: '700', color: '#1a1a1a' }}>
-          {t('set_language_currency')}
-        </h3>
-        <p style={{ margin: 0, fontSize: '13px', color: '#666', lineHeight: '1.4' }}>
-          {t('select_preferred_language')}
-        </p>
+    <div className="dropdown-card lang-currency-dropdown">
+      <div className="dropdown-header">
+        <h3>{t('set_language_currency')}</h3>
+        <p>{t('select_preferred_language')}</p>
       </div>
 
-      <div style={{ marginBottom: '16px' }}>
-        <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#333' }}>
-          {t('language')}
-        </label>
+      <div className="dropdown-field">
+        <label>{t('language')}</label>
         <select 
           value={language} 
           onChange={(e) => changeLanguage(e.target.value)}
-          style={{
-            width: '100%', padding: '10px 12px', borderRadius: '8px',
-            border: '1px solid #d1d5db', fontSize: '14px', outline: 'none', background: '#fff'
-          }}
+          className="dropdown-select"
         >
           <option value="en">English</option>
           <option value="sw">Kiswahili</option>
         </select>
       </div>
 
-      <div style={{ marginBottom: '20px' }}>
-        <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#333' }}>
-          {t('currency')}
-        </label>
+      <div className="dropdown-field">
+        <label>{t('currency')}</label>
         <select 
           value={currency} 
           onChange={(e) => setCurrency(e.target.value)}
-          style={{
-            width: '100%', padding: '10px 12px', borderRadius: '8px',
-            border: '1px solid #d1d5db', fontSize: '14px', outline: 'none', background: '#fff'
-          }}
+          className="dropdown-select"
         >
           <option value="TZS">TZS - Tanzanian Shilling</option>
           <option value="USD">USD - US Dollar</option>
@@ -117,68 +81,37 @@ const Header = () => {
 
       <button 
         onClick={handleSave}
-        style={{
-          width: '100%', background: '#FF6600', color: 'white', border: 'none',
-          borderRadius: '40px', padding: '12px 0', fontSize: '15px', fontWeight: '700',
-          cursor: 'pointer', boxShadow: '0 4px 6px rgba(255, 102, 0, 0.2)'
-        }}
-        onMouseOver={(e) => e.target.style.background = '#e55a00'}
-        onMouseOut={(e) => e.target.style.background = '#FF6600'}
+        className="dropdown-save-btn"
       >
         {t('save')}
       </button>
     </div>
   );
 
-  // Component ya Dropdown ya Location
+  // Dropdown ya Location
   const LocationDropdown = () => (
-    <div 
-      className="location-dropdown-card"
-      style={{
-        position: 'absolute',
-        top: '42px',
-        right: '0',
-        width: isMobile ? '280px' : '360px',
-        background: '#fff',
-        borderRadius: '12px',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
-        border: '1px solid #f0f0f0',
-        padding: '20px',
-        zIndex: 10000,
-      }}
-    >
-      <div style={{ marginBottom: '20px' }}>
-        <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: '700', color: '#1a1a1a' }}>
-          {t('specify_location')}
-        </h3>
-        <p style={{ margin: 0, fontSize: '13px', color: '#666', lineHeight: '1.4' }}>
-          {t('shipping_options_desc')}
-        </p>
+    <div className="dropdown-card location-dropdown">
+      <div className="dropdown-header">
+        <h3>{t('specify_location')}</h3>
+        <p>{t('shipping_options_desc')}</p>
       </div>
 
       <button 
         onClick={() => console.log("Add address clicked")}
-        style={{
-          width: '100%', background: '#FF6600', color: 'white', border: 'none',
-          borderRadius: '40px', padding: '10px 0', fontSize: '14px', fontWeight: '700',
-          cursor: 'pointer', marginBottom: '15px'
-        }}
+        className="dropdown-add-address-btn"
       >
         {t('add_address')}
       </button>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999', fontSize: '12px', marginBottom: '15px' }}>
-        <span style={{ padding: '0 10px', background: '#fff' }}>{t('or')}</span>
+      <div className="dropdown-or-divider">
+        <span>{t('or')}</span>
       </div>
 
-      <div style={{ marginBottom: '12px' }}>
+      <div className="dropdown-field">
         <select 
           value={deliveryCountry} 
           onChange={(e) => setDeliveryCountry(e.target.value)}
-          style={{
-            width: '100%', padding: '10px 12px', borderRadius: '8px',
-            border: '1px solid #d1d5db', fontSize: '14px', outline: 'none', background: '#fff'
-          }}
+          className="dropdown-select"
         >
           <option value="TZ">🇹🇿 Tanzania</option>
           <option value="KE">🇰🇪 Kenya</option>
@@ -186,28 +119,19 @@ const Header = () => {
         </select>
       </div>
 
-      <div style={{ marginBottom: '20px' }}>
+      <div className="dropdown-field">
         <input 
           type="text" 
           placeholder={t('enter_zip_postal')}
           value={zipCode}
           onChange={(e) => setZipCode(e.target.value)}
-          style={{
-            width: '100%', padding: '10px 12px', borderRadius: '8px',
-            border: '1px solid #d1d5db', fontSize: '14px', outline: 'none', background: '#fff'
-          }}
+          className="dropdown-input"
         />
       </div>
 
       <button 
         onClick={handleLocationSave}
-        style={{
-          width: '100%', background: '#FF6600', color: 'white', border: 'none',
-          borderRadius: '40px', padding: '12px 0', fontSize: '15px', fontWeight: '700',
-          cursor: 'pointer', boxShadow: '0 4px 6px rgba(255, 102, 0, 0.2)'
-        }}
-        onMouseOver={(e) => e.target.style.background = '#e55a00'}
-        onMouseOut={(e) => e.target.style.background = '#FF6600'}
+        className="dropdown-save-btn"
       >
         {t('save')}
       </button>
@@ -218,69 +142,51 @@ const Header = () => {
     <header className="main-header">
       <div className="header-container">
         
-                {/* ROW 1: Logo, Search, na Vifaa vya Kulia */}
-        <div className="header-top-bar" style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+        {/* ROW 1: Logo, Search, na Vifaa vya Kulia */}
+        <div className="header-top-bar">
           
-          {/* 1. Logo upande wa Kushoto */}
           <div className="logo-wrapper"><Logo /></div>
 
-          {/* 🔥 2. Search Bar katikati (IMEONGEZWA flex: 1 na minWidth ili ijaze nafasi!) */}
-          <div className="search-bar-wrapper" style={{ flex: 1, display: 'flex', alignItems: 'center', width: '100%', minWidth: isMobile ? '80px' : '150px' }}>
+          <div className="search-bar-wrapper">
             <SearchBar search={search} setSearch={setSearch} />
           </div>
 
-                    {/* 3. Vifaa vya Kulia (Location, UserTools, Globe) */}
-          <div 
-            className="user-tools-group" 
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: isMobile ? '6px' : '12px',
-              flexShrink: 0
-            }}
-          >
+          <div className="user-tools-group">
             {/* LOCATION SELECTOR */}
-            <div ref={locationDropdownRef} style={{ position: 'relative' }}>
+            <div ref={locationDropdownRef} className="header-dropdown-wrapper">
               <button 
                 onClick={() => setIsLocationOpen(!isLocationOpen)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '4px', background: 'none',
-                  border: 'none', cursor: 'pointer', fontWeight: '500', fontSize: '13px', color: '#333'
-                }}
+                className="header-icon-btn"
               >
-                <MapPin size={isMobile ? 22 : 18} />
-                {!isMobile && <span style={{ fontWeight: 'bold' }}>{deliveryCountry === 'TZ' ? 'TZ' : deliveryCountry}</span>}
+                <MapPin className="header-icon" size={20} />
+                <span className="header-icon-text desktop-only">{deliveryCountry === 'TZ' ? 'TZ' : deliveryCountry}</span>
               </button>
               {isLocationOpen && <LocationDropdown />}
             </div>
 
-            {/* ✨ BADILISHA HAPA: Weka !isMobile ili isionekane kwenye Mobile! */}
-            {!isMobile && (
-              <UserTools isMobile={isMobile} />
-            )}
+            {/* USER TOOLS */}
+            <UserTools />
 
             {/* GLOBE - LUUGHA NA SARAFU */}
-            <div ref={dropdownRef} style={{ position: 'relative' }}>
+            <div ref={dropdownRef} className="header-dropdown-wrapper">
               <button 
                 onClick={() => setIsLangOpen(!isLangOpen)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '4px', background: 'none',
-                  border: 'none', cursor: 'pointer', fontWeight: '500', fontSize: '13px', color: '#333'
-                }}
+                className="header-icon-btn"
               >
-                <Globe size={isMobile ? 22 : 20} />
-                {!isMobile && <><span style={{ fontWeight: 'bold' }}>{language === 'en' ? 'English' : 'Kiswahili'}-{currency}</span><ChevronDown size={14} /></>}
+                <Globe className="header-icon" size={20} />
+                <span className="header-icon-text desktop-only">{language === 'en' ? 'English' : 'Kiswahili'}-{currency}</span>
+                <ChevronDown className="header-icon small" size={14} />
               </button>
               {isLangOpen && <LanguageCurrencyDropdown />}
             </div>
           </div>
         </div>
 
-                {/* ==========================================
+        {/* ==========================================
             NAV LINKS - RESPONSIVE (Desktop & Mobile)
            ========================================== */}
         <div className="header-navigation-row" key={language}>
-          <NavLinks isMobile={isMobile} />
+          <NavLinks />
         </div>
         
       </div>

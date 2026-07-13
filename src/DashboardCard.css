@@ -162,7 +162,7 @@
 @media (max-width: 768px) {
   .universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
     display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)) !important; /* 150px → 110px */
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important; /* 150px → 110px */
     gap: 6px !important; /* Punguza pengo kati ya kadi */
     padding: 0 12px 12px 12px !important; /* Punguza padding ya pembeni */
     width: 100% !important;
@@ -173,7 +173,7 @@
 /* 4. SIMU NDOGO SANA (Chini ya 400px) */
 @media (max-width: 400px) {
   .universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
-    grid-template-columns: repeat(auto-fill, minmax(10px, 1fr)) !important; /* 140px → 100px */
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)) !important; /* 140px → 100px */
     gap: 4px !important;
     padding: 0 8px 10px 8px !important;
   }

@@ -234,7 +234,7 @@
   min-width: 200px;
 }
 
-/* 🔥 SCROLL ARROWS - ZINAFANYA KAZI SAWA */
+/* 🔥 SCROLL ARROWS */
 .na-arrow-btn {
   position: absolute;
   z-index: 10;
@@ -263,6 +263,35 @@
 
 .na-arrow-right {
   right: -15px;
+}
+
+/* ============================================ */
+/* ✅ FIX: RESPONSIVE ARROWS (Ondoa Gap & Float) */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  /* 1. Punguza ukubwa wa mishale */
+  .na-arrow-btn {
+    width: 30px;
+    height: 30px;
+    /* ✅ Inafanya mishale ionekane kama vitufe vinavyoelea */
+    background: rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid #eee !important;
+  }
+
+  /* ✅ Sogeza mishale kwenye kingo (sio katikati) */
+  .na-arrow-left {
+    left: 4px !important;
+  }
+  .na-arrow-right {
+    right: 4px !important;
+  }
+
+  /* ✅ Punguza padding ya pande ili bidhaa zitande nafasi (Ondoa 45px) */
+  .na-desktop-scroll {
+    padding: 10px 12px 20px 12px !important;
+  }
 }
 
 /* ============================================ */
