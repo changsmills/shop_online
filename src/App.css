@@ -422,147 +422,47 @@ html, body {
   }
 }
 
-/* ============================================
-   LAYER 11: GRIDS & CARDS
-   ============================================ */
+/* Badilisha minmax kuwa ndogo ili kutoshea card nyingi */
 .alibaba-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); /* Badilisha 140px → 130px */
+  gap: 10px; /* Badilisha 12px → 10px */
 }
 @media (min-width: 600px) {
-  .alibaba-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+  .alibaba-grid { 
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* Badilisha 180px → 160px */
+    gap: 14px; 
+  }
 }
 @media (min-width: 1025px) {
-  .alibaba-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+  .alibaba-grid { 
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); /* Badilisha 220px → 190px */
+    gap: 18px; 
+  }
 }
 
-.just-for-you-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 12px;
-  padding: 10px 0;
-}
-@media (min-width: 600px) {
-  .just-for-you-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-}
-
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 12px;
-}
-@media (min-width: 600px) {
-  .summary-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-}
-
-/* Cards */
-.compact-card {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  cursor: pointer;
-  border: 1px solid #f0f0f0;
-  transition: all 0.3s ease;
-}
-.compact-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-  border-color: #ff6600;
-}
+/* Punguza ukubwa wa picha na maandishi ndani ya card */
 .compact-card img {
   width: 100%;
-  height: 160px;
+  height: 130px; /* Badilisha 160px → 130px */
   object-fit: cover;
   display: block;
 }
-.compact-card .info { padding: 12px; }
+.compact-card .info { 
+  padding: 10px; /* Badilisha 12px → 10px */
+}
 .compact-card .name {
-  font-size: 14px;
+  font-size: 13px; /* Badilisha 14px → 13px */
   font-weight: 600;
   color: #333;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 .compact-card .price {
   font-weight: 800;
   color: #ff6a00;
-  font-size: 16px;
+  font-size: 14px; /* Badilisha 16px → 14px */
 }
 
-.summary-card {
-  background: white;
-  border-radius: 12px;
-  position: relative;
-  border: 1px solid #eee;
-  padding: 20px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-.summary-card:hover {
-  transform: translateY(-5px);
-  border-color: #ff9000;
-}
-.rank-badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: linear-gradient(45deg, #ff9000, #ff5000);
-  color: white;
-  padding: 3px 12px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 800;
-}
-.summary-card img {
-  width: 100%;
-  height: 130px;
-  object-fit: contain;
-  margin-bottom: 12px;
-}
-.summary-name {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #333;
-}
-
-/* Horizontal scroll grid */
-.horizontal-grid {
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  padding-bottom: 15px;
-  cursor: grab;
-  scrollbar-width: none;
-}
-.horizontal-grid::-webkit-scrollbar { display: none; }
-
-.mini-card {
-  min-width: 180px;
-  background: white;
-  border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  flex-shrink: 0;
-}
-.mini-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-}
-.mini-card img {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-.mini-card .price {
-  font-weight: 800;
-  color: #ff6a00;
-  font-size: 1rem;
-  margin-top: 8px;
-}
 
 /* ============================================
    LAYER 12: SECTION HEADERS
