@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { supabase } from "../supabaseClient";
+//import { supabase } from "../supabaseClient";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
   Bell, ShoppingBag, Home, User, ChevronRight, 
@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import UserTools from '../components/UserTools';
 import toast from 'react-hot-toast';
-import "../NotificationsPage.css"; 
+//import "../NotificationsPage.css"; 
 
 export default function NotificationsPage({ session }) {
   const [sellerOrders, setSellerOrders] = useState([]);

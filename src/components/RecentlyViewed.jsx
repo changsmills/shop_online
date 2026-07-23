@@ -1,10 +1,12 @@
 // src/components/RecentlyViewed.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, History } from "lucide-react";
-import { supabase } from "../supabaseClient";
+import api from "../axiosConfig"; // 🔥 BADILISHA: Tumia api badala ya axios!
 import DashboardCard from "./DashboardCard";
 import { useTranslation } from 'react-i18next';
-import '../RecentlyViewed.css'; // ✅ ONGEZA HII
+import '../RecentlyViewed.css';
+
+// 🔥 ONDOA API_BASE_URL – ipo kwenye api config!
 
 export default function RecentlyViewed({ navigate, isMobile }) {
   const { t, i18n } = useTranslation();
@@ -22,14 +24,16 @@ export default function RecentlyViewed({ navigate, isMobile }) {
       
       if (ids.length > 0) {
         try {
-          const { data, error } = await supabase
-            .from("products_engines")
-            .select("*")
-            .in("id", ids);
+          // 🔥 BADILISHA: Tumia api.get, sio axios.get!
+          const response = await api.get('/products/', {
+            params: { id__in: ids.join(',') }
+          });
 
-          if (error) throw error;
+          // 🔥 KAGUA PAGINATION – DRF inarudisha { results: [...] }
+          const data = response.data.results || response.data || [];
 
           if (data) {
+            // Mantiki ya kupanga data kufuatana na mpangilio wa IDs kwenye localStorage
             const sortedData = ids
               .map(id => data.find(p => p.id === id))
               .filter(Boolean);

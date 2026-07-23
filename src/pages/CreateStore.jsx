@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../supabaseClient";
+import axios from "axios";
 import StoreForm from "./StoreForm"; 
 import "../CreateStore.css";
 
@@ -10,35 +10,128 @@ export default function CreateStore() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // State ya formData ikiwa na picha na maelezo yote ya ziada
+  // ✅ Imepanuliwa kuendana na StoreForm na Backend model
   const [formData, setFormData] = useState({
     name: "",
-    category: "",
-    location: "",
+    category_id: "",
+    sub_category_ids: [],
+    business_type: "",
     phone: "",
+    email: "",
+    location: "",
+    city: "",
     maps_link: "",
+    description: "",
     experience: "",
     staff_count: "",
-    description: "",
-    image1: null, 
+    moq: "",
+    lead_time: "",
+    supply_capacity: "",
+    packaging_type: "",
+    
+    logo: null,
+    banner: null,
+    tin_image: null,
+    image1: null,
     image2: null,
-    image3: null
+    image3: null,
+    
+    whatsapp: "",
+    instagram: "",
+    tiktok: "",
+    twitter: "",
+    youtube: "",
+    
+    tin_number: "",
+    agreed_to_terms: false
   });
 
   useEffect(() => {
     document.title = "Business Registration | Changsmills";
   }, []);
 
-  // Function ya kushughulikia mabadiliko kwenye input (Text na Files)
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    setFormData({ 
-      ...formData, 
-      [name]: files ? files[0] : value 
-    });
+    const { name, value, files, type, checked } = e.target;
+    if (type === 'checkbox') {
+      setFormData({ ...formData, [name]: checked });
+    } else if (files) {
+      setFormData({ ...formData, [name]: files[0] }); 
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
-  // Screen ya mafanikio baada ya duka kusajiliwa
+  // ✅ Msimbo uliosahihishwa wa kutuma data
+  const handleSubmitToDjango = async (e) => {
+    if (e) e.preventDefault(); // Ongezeko la usalama
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        alert("Tafadhali ingia kwanza!");
+        setIsLoading(false);
+        return;
+      }
+
+      const submissionData = new FormData();
+      
+      // --- Data za maandishi ---
+      submissionData.append("store_name", formData.name);
+      // ✅ Hapa ndio muhimu: Inakagua kama category_id ipo kabla ya kutuma!
+      if (formData.category_id) submissionData.append("category", formData.category_id);
+      
+      // JSON fields zinapaswa kubadilishwa kuwa string kwa Django
+      submissionData.append("sub_category_ids", JSON.stringify(formData.sub_category_ids || []));
+      submissionData.append("business_type", formData.business_type || "");
+      submissionData.append("phone_number", formData.phone);
+      submissionData.append("email", formData.email || "");
+      submissionData.append("physical_address", formData.location);
+      submissionData.append("city", formData.city || "Dar es Salaam");
+      submissionData.append("google_maps_url", formData.maps_link);
+      submissionData.append("description", formData.description);
+      submissionData.append("experience", formData.experience || "");
+      submissionData.append("staff_count", formData.staff_count || "");
+      submissionData.append("moq", formData.moq || "");
+      submissionData.append("lead_time", formData.lead_time || "");
+      submissionData.append("supply_capacity", formData.supply_capacity || "");
+      submissionData.append("packaging_type", formData.packaging_type || "");
+
+      // --- Mitandao ya Kijamii ---
+      submissionData.append("whatsapp_number", formData.whatsapp || formData.phone);
+      submissionData.append("instagram_handle", formData.instagram || "");
+      submissionData.append("tiktok_handle", formData.tiktok || "");
+      submissionData.append("twitter_handle", formData.twitter || "");
+      submissionData.append("youtube_link", formData.youtube || "");
+
+      // --- Picha (Files) ---
+      if (formData.logo) submissionData.append("store_logo", formData.logo);
+      if (formData.banner) submissionData.append("store_banner", formData.banner);
+      if (formData.tin_image) submissionData.append("tin_image", formData.tin_image);
+      
+      // ✅ Picha 3 za Ofisi (majina yanalingana na Backend)
+      if (formData.image1) submissionData.append("office_image_1", formData.image1);
+      if (formData.image2) submissionData.append("office_image_2", formData.image2);
+      if (formData.image3) submissionData.append("office_image_3", formData.image3);
+
+      // --- Tuma ---
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/stores/",
+        submissionData,
+        { headers: { "Authorization": `Bearer ${token}` } } // Content-Type imeachwa kwa Axios
+      );
+
+      if (response.status === 201) {
+        setIsSuccess(true);
+        setTimeout(() => navigate(`/dashboard/physical/${response.data.id}`), 2000);
+      }
+    } catch (error) {
+      console.error("Error creating store:", error.response?.data || error.message);
+      alert("Kuna kosa limejitokeza: " + (error.response?.data?.detail || "Tafadhali jaribu tena"));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (isSuccess) {
     return (
       <div className="create-store-page">
@@ -63,7 +156,6 @@ export default function CreateStore() {
 
       <div className="main-container">
         {!storeType ? (
-          /* SELECTION VIEW - Mtumiaji anachagua Virtual au Physical */
           <div className="selection-view animate-fade">
             <div className="text-center mb-5">
               <h1 className="hero-title">Anzisha Biashara Yako</h1>
@@ -81,7 +173,6 @@ export default function CreateStore() {
             </div>
           </div>
         ) : (
-          /* FORM VIEW - Mtumiaji anajaza taarifa za duka */
           <StoreForm
             storeType={storeType}
             formData={formData}
@@ -90,7 +181,8 @@ export default function CreateStore() {
             isLoading={isLoading}
             setIsLoading={setIsLoading} 
             setIsSuccess={setIsSuccess} 
-            navigate={navigate}         
+            navigate={navigate} 
+            handleSubmit={handleSubmitToDjango} 
           />
         )}
       </div>

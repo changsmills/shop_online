@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
+//import { supabase } from '../supabaseClient';
 import ReactDOM from 'react-dom';
 import { 
   LayoutDashboard, Package, ShoppingCart, BarChart3, Users, Settings, LogOut, 

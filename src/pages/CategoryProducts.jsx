@@ -1,7 +1,7 @@
 // src/components/CategoryProducts.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { supabase } from "../supabaseClient";
+//import { supabase } from "../supabaseClient";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import DashboardCard from "../components/DashboardCard"; // ✅ Ongeza hii!

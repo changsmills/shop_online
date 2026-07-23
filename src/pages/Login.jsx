@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../supabaseClient';
+import axios from 'axios'; // ✅ Badilisha: Axios badala ya Supabase
 import { useNavigate } from 'react-router-dom';
 import { toast, Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-// Unaweza kuongeza icons hizi kama tayari umesakinisha lucide-react
-// import { Google, Facebook, Linkedin } from 'lucide-react'; 
+
+const API_BASE_URL = "http://127.0.0.1:8000/api"; // ✅ Ongeza hii
 
 const Login = () => {
   const { t } = useTranslation();
@@ -12,6 +12,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 900);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true); // 🔥 Ongeza hii
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,82 +21,125 @@ const Login = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-    const handleLogin = async (e) => {
+  // 🔥 ONGEZA HII useEffect: Angalia kama user tayari ameingia
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        setIsCheckingAuth(false);
+        return;
+      }
+
+      try {
+        // Thibitisha kama token ni halali kwa kutuma ombi la profile
+        const profileRes = await axios.get(`${API_BASE_URL}/profile/`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        const userProfile = profileRes.data;
+        const role = userProfile.role;
+
+        // Tuma kwenye dashboard sahihi kama token ni halali
+        if (role === 'supplier') {
+          const storeRes = await axios.get(`${API_BASE_URL}/stores/`, {
+            params: { owner_id: userProfile.id },
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (storeRes.data && storeRes.data.length > 0) {
+            navigate(`/dashboard/sellerboard/${storeRes.data[0].id}`, { replace: true });
+          } else {
+            navigate('/create-store', { replace: true });
+          }
+        } else {
+          navigate('/dashboard', { replace: true });
+        }
+      } catch (err) {
+        // Token ni batili au imekwisha muda -> futa token na uache user aingie
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        setIsCheckingAuth(false);
+      }
+    };
+
+    checkAuth();
+  }, [navigate]);
+
+  // ✅ BADILISHA: Handle Login kwa Django JWT
+  const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // 🔥 1. Jaribu kuingiza mtumiaji kwa email na password
-      const { data, error } = await supabase.auth.signInWithPassword({ 
-        email: email.trim(), 
-        password 
+      // 1. Pata Token (JWT) kutoka endpoint ya /api/token/
+      // Kumbuka: Kwa sababu USERNAME_FIELD = 'email', SimpleJWT inatarajia 'email' hapa
+      const tokenRes = await axios.post(`${API_BASE_URL}/token/`, {
+        email: email.trim(),
+        password: password
+      });
+
+      const { access, refresh } = tokenRes.data;
+      
+      // 2. Hifadhi token kwenye localStorage
+      localStorage.setItem('access_token', access);
+      localStorage.setItem('refresh_token', refresh);
+
+      // 3. Pata Profile ya mtumiaji (Kujua role) kwa kutumia token
+      const profileRes = await axios.get(`${API_BASE_URL}/profile/`, {
+        headers: { Authorization: `Bearer ${access}` }
       });
       
-      if (error) throw error;
+      const userProfile = profileRes.data;
+      const role = userProfile.role;
 
-      if (data.session) {
-        const user = data.session.user;
-        console.log("✅ User logged in:", user.id);
+      console.log("✅ Role found:", role);
 
-        // 🔥 2. Pata role ya mtumiaji kwenye table ya 'profiles'
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
+      // 4. Kama ni Supplier, tafuta Store ID yake
+      if (role === 'supplier') {
+        console.log("⏳ Searching for supplier's store...");
+        const storeRes = await axios.get(`${API_BASE_URL}/stores/`, {
+          params: { owner_id: userProfile.id },
+          headers: { Authorization: `Bearer ${access}` }
+        });
 
-        if (profileError) {
-          // Kama hana profile bado (mgeni), mpeleke kwenye dashboard ya mteja
-          toast.success("Karibu kwenye Skyfall!");
-          navigate('/dashboard', { replace: true });
-          return;
+        // 5. Kama store ipo, peleka na ID; Kama haipo, peleka kuunda store
+        if (storeRes.data && storeRes.data.length > 0) {
+          console.log("✅ Store ID found:", storeRes.data[0].id);
+          toast.success("Karibu Muuzaji! Inaelekeza kwenye Dashboard yako...");
+          navigate(`/dashboard/sellerboard/${storeRes.data[0].id}`, { replace: true });
+        } else {
+          console.warn("⚠️ Supplier has no store yet. Redirecting to create store.");
+          toast.success("Karibu Muuzaji! Tafadhali unda duka lako kwanza.");
+          navigate('/create-store', { replace: true });
         }
-
-        const role = profileData?.role;
-        console.log("✅ Role found:", role);
-
-        // 🔥 3. Kama ni Supplier, tafuta Store ID yake
-        if (role === 'supplier') {
-          console.log("⏳ Searching for supplier's store...");
-          const { data: storeData, error: storeError } = await supabase
-            .from('stores_engine')
-            .select('id')
-            .eq('owner_id', user.id)
-            .maybeSingle(); // 📌 Tumia maybeSingle ili usipate error kama hakuna store
-
-          // 🔥 4. Kama store ipo, peleka na ID; Kama haipo, peleka kuunda store
-          if (storeData && !storeError) {
-            console.log("✅ Store ID found:", storeData.id);
-            toast.success("Karibu Muuzaji! Inaelekeza kwenye Dashboard yako...");
-            navigate(`/dashboard/sellerboard/${storeData.id}`, { replace: true });
-          } else {
-            console.warn("⚠️ Supplier has no store yet. Redirecting to create store.");
-            toast.success("Karibu Muuzaji! Tafadhali unda duka lako kwanza.");
-            navigate('/create-store', { replace: true });
-          }
-        } 
-        // 🔥 5. Kama ni Customer, peleka kwenye dashboard ya kawaida
-        else {
-          console.log("✅ Customer detected. Redirecting to customer dashboard.");
-          toast.success("Karibu Mteja!");
-          navigate('/dashboard', { replace: true });
-        }
+      } 
+      // 6. Kama ni Customer, peleka kwenye dashboard ya kawaida
+      else {
+        console.log("✅ Customer detected. Redirecting to customer dashboard.");
+        toast.success("Karibu Mteja!");
+        navigate('/dashboard', { replace: true });
       }
     } catch (err) {
-      console.error("❌ Login error:", err.message);
-      toast.error("Kosa: " + err.message);
+      console.error("❌ Login error:", err.response?.data || err.message);
+      
+      // 🔥 Boresha ujumbe wa makosa: Angalia ikiwa ni 401 (User haipo / password ni mbaya)
+      if (err.response?.status === 401) {
+        toast.error("Barua pepe au nenosiri si sahihi. Tafadhali jaribu tena.");
+      } else {
+        toast.error("Kosa la mtandao: " + (err.response?.data?.detail || err.message));
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // Social Login Helpers (Mfano tu - unaweza kuunganisha supabase OAuth hapa)
+  // Social Login (Placeholder kwa sasa - Utahitaji backend kwa OAuth)
   const handleSocialLogin = (provider) => {
-    toast(`Inaanza ${provider} login...`, { icon: '⏳' });
-    // Mfano: supabase.auth.signInWithOAuth({ provider: 'google' })
+    toast(`Inaanza ${provider} login... (OAuth inahitaji usanidi upande wa Backend)`, { icon: '⏳' });
+    // Mfano: baadaye unaweza ku-redirect kwa backend OAuth URL
+    // window.location.href = `${API_BASE_URL}/auth/${provider.toLowerCase()}/`;
   };
 
-  // Styles za Layout (Split Screen)
+  // Styles za Layout (Split Screen) - HAZIJABADILISHWA
   const styles = {
     container: {
       display: 'flex',
@@ -106,7 +150,7 @@ const Login = () => {
     },
     leftPanel: {
       flex: 1,
-      backgroundImage: 'url("https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1000&auto=format&fit=crop")', // Badilisha URL kwa picha yako mwenyewe
+      backgroundImage: 'url("https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1000&auto=format&fit=crop")',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       position: 'relative',
@@ -132,6 +176,15 @@ const Login = () => {
       backgroundColor: '#fff',
     },
   };
+
+  // Ikiwa bado inakagua token, onyesha skrini ya kupakia
+  if (isCheckingAuth) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div style={styles.container}>

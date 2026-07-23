@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../supabaseClient';
+import axios from 'axios'; // ✅ Badilisha: Axios badala ya Supabase
 import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
+
+const API_BASE_URL = "http://127.0.0.1:8000/api";
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -11,6 +13,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false); // 🔥 ONGEZA HII (Njia ya 2)
   
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 900);
@@ -20,6 +23,21 @@ const Register = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // 🔥 ONGEZA HII useEffect (Kwa ajili ya Navigation isiyoshindwa)
+  useEffect(() => {
+    if (isSuccess) {
+      const timer = setTimeout(() => {
+        // Futa token ili Login isimrudishe kiotomatiki
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        // Peleka kwenye Login
+        navigate("/dashboard/login");
+      }, 1500);
+      // Safisha timer ikiwa mtumiaji ataondoka kwenye ukurasa kabla ya muda kuisha
+      return () => clearTimeout(timer);
+    }
+  }, [isSuccess, navigate]);
 
   const generateDefaultNameFromEmail = (email) => {
     if (!email) return "Skyfall User";
@@ -38,59 +56,12 @@ const Register = () => {
     return name;
   };
 
-  const createUserProfile = async (userId, email) => {
-    try {
-      const defaultName = generateDefaultNameFromEmail(email);
-      const baseUsername = defaultName.toLowerCase().replace(/\s/g, '');
-      const username = `${baseUsername}${Math.floor(Math.random() * 10000)}`;
-      
-      console.log("Creating profile for user:", userId);
-      
-      const { data: existingProfile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', userId)
-        .maybeSingle();
-      
-      if (existingProfile) {
-        console.log("Profile already exists, skipping creation");
-        return true;
-      }
-      
-      const { error } = await supabase
-        .from('profiles')
-        .insert({
-          id: userId,
-          full_name: defaultName,
-          username: username,
-          avatar_url: null,
-          bio: `Hi! I'm ${defaultName} on Skyfall`,
-          updated_at: new Date().toISOString()
-        });
-      
-      if (error) {
-        console.error("Profile creation error details:", error);
-        if (error.code === '23505') return true;
-        if (error.message.includes('row-level security policy')) {
-          toast.error("Tatizo la usalama wa database (RLS).");
-          return false;
-        }
-        return false;
-      }
-      
-      console.log("Profile created successfully");
-      return true;
-      
-    } catch (err) {
-      console.error("Unexpected error in profile creation:", err);
-      return false;
-    }
-  };
-
+  // ✅ BADILISHA: Handle Signup kwa Django API
   const handleSignup = async (e) => {
     e.preventDefault();
     setErrorMessage('');
     
+    // Validations (zimebaki sawa)
     if (!email.trim()) {
       toast.error('Tafadhali weka barua pepe');
       setErrorMessage('Barua pepe inahitajika');
@@ -125,94 +96,57 @@ const Register = () => {
     setLoading(true);
     
     try {
-      console.log("Starting registration for:", email);
-      
-      const { data, error } = await supabase.auth.signUp({ 
-        email, 
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/login`,
-          data: {
-            full_name: generateDefaultNameFromEmail(email),
-          }
-        }
+      // 1. Tuma data kwenye endpoint ya Django (Backend itaunda User na Profile kwa pamoja)
+      const response = await axios.post(`${API_BASE_URL}/register/`, {
+        email: email.trim(),
+        password: password,
+        full_name: generateDefaultNameFromEmail(email) // Tumia hii kujaza full_name kwenye Profile
       });
-      
-      console.log("Signup response:", { user: data?.user?.id, error: error?.message });
-      
-      if (error) {
-        if (error.message.includes('already registered')) {
-          toast.error("Barua pepe tayari imesajiliwa. Tafadhali ingia au tumia email nyingine.");
-          setErrorMessage('Email tayari ipo');
-        } else if (error.message.includes('password')) {
-          toast.error("Nenosiri dhaifu. Tumia herufi 6 au zaidi.");
-          setErrorMessage('Nenosiri dhaifu');
-        } else {
-          toast.error("Hitilafu: " + error.message);
-          setErrorMessage(error.message);
-        }
-        setLoading(false);
-        return;
+
+      // 2. Ikiwa backend inarudisha tokens moja kwa moja (inashauriwa), zihifadhi
+      if (response.data.access && response.data.refresh) {
+        localStorage.setItem('access_token', response.data.access);
+        localStorage.setItem('refresh_token', response.data.refresh);
       }
+
+      // 3. Ujumbe wa mafanikio
+      toast.success(`🎉 Karibu ${generateDefaultNameFromEmail(email)}! Akaunti yako imeundwa.`, { duration: 4000 });
       
-      if (!data?.user) {
-        console.error("No user data returned");
-        toast.error("Hitilafu ya kusajili. Tafadhali jaribu tena.");
-        setLoading(false);
-        return;
-      }
-      
-      console.log("User created successfully with ID:", data.user.id);
-      
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      let profileCreated = false;
-      let retries = 0;
-      const maxRetries = 3;
-      
-      while (!profileCreated && retries < maxRetries) {
-        profileCreated = await createUserProfile(data.user.id, email);
-        if (!profileCreated && retries < maxRetries - 1) {
-          console.log(`Retrying profile creation (attempt ${retries + 2})...`);
-          await new Promise(resolve => setTimeout(resolve, 2000));
-        }
-        retries++;
-      }
-      
-      if (profileCreated) {
-        toast.success(
-          `🎉 Karibu ${generateDefaultNameFromEmail(email)}! Akaunti yako imeundwa kikamilifu. Tafadhali ingia sasa.`,
-          { duration: 4000 }
-        );
-        
-        setTimeout(() => {
-          navigate("/dashboard/login");
-        }, 1500);
-        
-      } else {
-        toast.error("Akaunti imeundwa lakini kuna tatizo la profile. Tafadhali jaribu kuingia.");
-        setTimeout(() => {
-          navigate("/dashboard/login");
-        }, 2000);
-      }
+      // 4. 🔥 MABADILIKO HAPA: Badala ya setTimeout, tumia setIsSuccess
+      setIsSuccess(true);
       
     } catch (err) {
-      console.error("Unexpected error during signup:", err);
-      toast.error("Hitilafu isiyotarajiwa. Tafadhali jaribu tena.");
-      setErrorMessage(err.message);
+      console.error("Registration error:", err.response?.data || err.message);
+      
+      // Kama kuna makosa kutoka backend
+      const backendError = err.response?.data;
+      let errorMsg = "Hitilafu isiyotarajiwa. Tafadhali jaribu tena.";
+      
+      if (backendError?.email) {
+        errorMsg = backendError.email.join(' ');
+      } else if (backendError?.password) {
+        errorMsg = backendError.password.join(' ');
+      } else if (backendError?.non_field_errors) {
+        errorMsg = backendError.non_field_errors.join(' ');
+      } else if (backendError?.detail) {
+        errorMsg = backendError.detail;
+      }
+      
+      toast.error(errorMsg);
+      setErrorMessage(errorMsg);
     } finally {
       setLoading(false);
     }
   };
-
-  // Handle Social Login (Unaweza kuunganisha na supabase OAuth hapa)
+  
+  // Social Login (Placeholder - Inahitaji usanidi wa Backend OAuth kama django-allauth)
   const handleSocialLogin = (provider) => {
-    toast(`Inaanza ${provider} login...`, { icon: '⏳' });
-    // Mfano: 
-    // const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google' })
+    toast(`Inaanza ${provider} login... (OAuth inahitaji usanidi wa Backend)`, { icon: '⏳' });
+    // Mfano wa redirect baadaye:
+    // window.location.href = `${API_BASE_URL}/auth/${provider.toLowerCase()}/`;
   };
 
-  // Styles za Layout (Split Screen - Sawa na Login)
+  // Styles za Layout (Split Screen - Sawa na Login) - HAZIJABADILISHWA
   const styles = {
     container: {
       display: 'flex',
@@ -485,7 +419,7 @@ const LinkedInIcon = () => (
 
 const AppleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.5 1.3 0 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.5 1.3 0 2.5 .87 3.29 .87 .78 0 2.26-1.07 3.8-.91 .65 .03 2.47 .26 3.64 1.98-.09 .06-2.17 1.28-2.15 3.81 .03 3.02 2.65 4.03 2.68 4.04-.03 .07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69 .85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
   </svg>
 );
 

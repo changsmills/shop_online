@@ -1,8 +1,10 @@
 import { useRef, useState, useEffect } from "react";
-import { supabase } from "../supabaseClient";
+import axios from "axios"; // ✅ Badilisha: Axios badala ya Supabase
 import { useNavigate } from "react-router-dom";
 import { createPortal } from 'react-dom'; 
 import { useTranslation } from 'react-i18next';
+
+const API_BASE_URL = "http://127.0.0.1:8000/api"; // ✅ Ongeza hii
 
 export default function SearchBar({ search = "", setSearch }) {
   const { t } = useTranslation();
@@ -69,8 +71,6 @@ export default function SearchBar({ search = "", setSearch }) {
      wrapper: {
       position: 'relative',
       flex: 1,
-      // 🔥 BADILISHA HAPA: Pandisha maxWidth kuwa 1200px kwa desktop 
-      // ili ichukue nafasi yote (auto-expand), lakini 100% kwenye mobile.
       maxWidth: isDesktopLarge ? '1200px' : (isMobile ? '100%' : '800px'),
       margin: isMobile ? '0 4px' : '0 30px',
       zIndex: 1000,
@@ -113,7 +113,7 @@ export default function SearchBar({ search = "", setSearch }) {
       color: 'white',
       border: 'none',
       height: isMobile ? '30px' : '36px',
-      width: isMobile ? '30px' : 'auto', /* Duara kwenye mobile! */
+      width: isMobile ? '30px' : 'auto',
       padding: isMobile ? '0' : '0 24px',
       borderRadius: isMobile ? '50%' : '40px',
       fontWeight: 'bold',
@@ -181,13 +181,15 @@ export default function SearchBar({ search = "", setSearch }) {
     }
   };
 
-  // Fetch placeholders
+  // ✅ BADILISHA: Fetch placeholders kutoka Django API
   useEffect(() => {
     const fetchLeafCategoryNames = async () => {
       try {
-        const { data, error } = await supabase.from('leaf_categories').select('name').limit(15);
-        if (data && !error) {
-          const names = data.map(item => item.name);
+        const response = await axios.get(`${API_BASE_URL}/leaf-categories/`, {
+          params: { limit: 15 }
+        });
+        if (response.data) {
+          const names = response.data.map(item => item.name);
           if (names.length > 0) setPlaceholders(names);
         }
       } catch (err) {
@@ -208,7 +210,7 @@ export default function SearchBar({ search = "", setSearch }) {
     return () => clearInterval(timer);
   }, [placeholders]);
 
-  // Fetch suggestions (categories + products) with debounce
+  // ✅ BADILISHA: Fetch suggestions (categories + products) with debounce
   useEffect(() => {
     const getCombinedSuggestions = async () => {
       if (!search || typeof search !== "string" || search.trim().length < 2) {
@@ -220,14 +222,19 @@ export default function SearchBar({ search = "", setSearch }) {
       const query = search.trim();
       
       try {
-        const [catData, prodData] = await Promise.all([
-          supabase.from("leaf_categories").select("id, name").ilike("name", `%${query}%`).limit(4),
-          supabase.from("products_engines").select("id, name").ilike("name", `%${query}%`).limit(4)
+        // Tumia endpoints za Django + SearchFilter (Lazima backend isaidie 'search' parameter)
+        const [catRes, prodRes] = await Promise.all([
+          axios.get(`${API_BASE_URL}/leaf-categories/`, {
+            params: { search: query, limit: 4 }
+          }),
+          axios.get(`${API_BASE_URL}/products/`, {
+            params: { search: query, limit: 4 }
+          })
         ]);
 
         const combined = [
-          ...(catData.data || []).map(item => ({ ...item, type: 'category' })),
-          ...(prodData.data || []).map(item => ({ ...item, type: 'product' }))
+          ...(catRes.data || []).map(item => ({ ...item, type: 'category' })),
+          ...(prodRes.data || []).map(item => ({ ...item, type: 'product' }))
         ];
 
         if (combined.length > 0) {
@@ -272,7 +279,6 @@ export default function SearchBar({ search = "", setSearch }) {
 
   return (
     <>
-      {/* Hii style tag inashughulikia hover, active, scrollbars, na animations */}
       <style>{injectedCss}</style>
       
       <div className="search-wrapper-main" style={styles.wrapper}>
@@ -301,7 +307,10 @@ export default function SearchBar({ search = "", setSearch }) {
           />
 
           <div className="search-tools" style={styles.tools}>
-            
+            {/* Kamera imebaki ikiwa imekatwa kama ilivyokuwa */}
+            {/* <button className="search-camera-btn" style={styles.cameraBtn} onClick={handleImageSearch}>
+              <svg xmlns="http://www.w3.org/2000/svg" width={isMobile ? "16" : "22"} height={isMobile ? "16" : "22"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            </button> */}
             
             <button className="search-submit-btn" style={styles.submitBtn} onClick={handleSearchSubmit}>
               <svg xmlns="http://www.w3.org/2000/svg" width={isMobile ? "14" : "20"} height={isMobile ? "14" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>

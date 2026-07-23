@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../supabaseClient';
+import axios from 'axios'; // ✅ Badilisha: Axios badala ya Supabase
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, MessageSquare, ClipboardList, 
@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
 import '../MyOrders.css';
+
+const API_BASE_URL = "http://127.0.0.1:8000/api"; // ✅ Ongeza hii
 
 const SupplierOrders = ({ session }) => {
   const [orders, setOrders] = useState([]);
@@ -24,20 +26,28 @@ const SupplierOrders = ({ session }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // 🔥 1. Pata ID ya duka, kisha pata ODA ZA WATEJA
+  // ✅ FETCH SUPPLIER ORDERS (Kupitia Django API)
   const fetchSupplierOrders = async () => {
     if (!session) return;
     setLoading(true);
 
     try {
-      // Pata duka la muuzaji
-      const { data: storeData, error: storeError } = await supabase
-        .from('stores_engine')
-        .select('id')
-        .eq('owner_id', session.user.id)
-        .maybeSingle();
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        toast.error("Tafadhali ingia tena!");
+        setLoading(false);
+        return;
+      }
+      const headers = { Authorization: `Bearer ${token}` };
 
-      if (storeError || !storeData) {
+      // 1. Pata duka la muuzaji (owner_id = session.user.id)
+      const storeRes = await axios.get(`${API_BASE_URL}/stores/`, {
+        params: { owner_id: session.user.id },
+        headers
+      });
+      const storeData = storeRes.data?.[0]; // Chukua duka la kwanza (kwa wauzaji walio na duka moja)
+
+      if (!storeData) {
         toast.error("Hujasajili duka bado");
         setLoading(false);
         return;
@@ -45,23 +55,16 @@ const SupplierOrders = ({ session }) => {
 
       const storeId = storeData.id;
 
-      // Pata oda zote za duka hili (na jina la mteja kutoka profiles)
-      const { data, error } = await supabase
-        .from('orders')
-        .select(`
-          *,
-          order_items (*),
-          profiles:customer_id ( full_name, avatar_url )
-        `)
-        .eq('store_id', storeId)
-        .order('created_at', { ascending: false });
+      // 2. Pata oda zote za duka hili (Nested items na profiles zitajumuishwa na serializer)
+      const ordersRes = await axios.get(`${API_BASE_URL}/orders/`, {
+        params: { store_id: storeId, ordering: '-created_at' },
+        headers
+      });
 
-      if (error) throw error;
-
-      setOrders(data || []);
+      setOrders(ordersRes.data || []);
       
     } catch (error) {
-      console.error("Error fetching supplier orders:", error.message);
+      console.error("Error fetching supplier orders:", error.response?.data || error.message);
       toast.error("Imeshindwa kupata oda za wateja.");
     } finally {
       setLoading(false);
@@ -248,10 +251,10 @@ const SupplierOrders = ({ session }) => {
                             <span style={{ fontSize: '12px', color: '#888' }}>Oda #{order.order_number?.slice(0, 12)}</span>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '5px' }}>
                               <span style={{ fontSize: '13px', fontWeight: '600', color: '#333' }}>
-                                {order.profiles?.full_name || 'Mteja Asiyejulikana'}
+                                {order.profiles?.full_name || order.customer?.full_name || 'Mteja Asiyejulikana'}
                               </span>
-                              {order.profiles?.avatar_url && (
-                                <img src={order.profiles.avatar_url} alt="" style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover' }} />
+                              {(order.profiles?.avatar_url || order.customer?.avatar_url) && (
+                                <img src={order.profiles?.avatar_url || order.customer?.avatar_url} alt="" style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover' }} />
                               )}
                             </div>
                             <p style={{ margin: '3px 0 0', fontSize: '12px', color: '#666' }}>

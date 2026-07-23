@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { supabase } from "../supabaseClient";
+import axios from "axios"; // ✅ Badilisha: Axios badala ya Supabase
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
   Bell, ShoppingBag, Home, ChevronRight, 
@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import toast from 'react-hot-toast';
 import "../NotificationsPage.css"; 
+
+const API_BASE_URL = "http://127.0.0.1:8000/api"; // ✅ Ongeza hii
 
 export default function SupplierNotifications({ session }) {
   const navigate = useNavigate();
@@ -27,58 +29,62 @@ export default function SupplierNotifications({ session }) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-   // 🔥 SIDEBAR KWA MUUZAJI PEKEE (SAHIHI)
+  // 🔥 SIDEBAR KWA MUUZAJI PEKEE (SAHIHI)
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} />, path: '/dashboard/sellerboard', label: 'Duka Lako' },
     { icon: <MessageSquare size={20} />, path: '/dashboard/supplier-messages', label: 'Ujumbe' },
-    // 🔥 BADILISHA HAPA: "/dashboard/notifications" -> "/dashboard/supplier-notifications"
     { icon: <ClipboardList size={20} />, path: '/dashboard/supplier-notifications', label: 'Arifa (Oda)' }, 
     { icon: <Settings size={20} />, path: '/dashboard/supplier-settings', label: 'Mipangilio' },
   ];
 
-  // 1. FETCH SUPPLIER ORDERS (Mauzo Yangu tu)
+  // ✅ FETCH SUPPLIER ORDERS (Kupitia Django API)
   useEffect(() => {
     const fetchSellerOrders = async () => {
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      if (!currentSession) {
+      // Check token
+      const token = localStorage.getItem("access_token");
+      if (!token) {
         setLoading(false);
         return;
       }
+
+      const headers = { Authorization: `Bearer ${token}` };
       
       try {
-        const { data: store } = await supabase
-          .from("stores_engine")
-          .select("id")
-          .eq("owner_id", currentSession.user.id)
-          .maybeSingle();
-        
+        // 1. Pata store ya mtumiaji
+        const storeRes = await axios.get(`${API_BASE_URL}/stores/`, {
+          params: { owner_id: session?.user?.id }, // endpoint inabidi ichuje kwa owner_id
+          headers
+        });
+        const store = storeRes.data?.[0];
+
         if (store) {
           setMyStoreId(store.id);
+
+          // 2. Pata orders za store hii
+          const ordersRes = await axios.get(`${API_BASE_URL}/orders/`, {
+            params: { store_id: store.id, ordering: '-created_at' },
+            headers
+          });
+
+          // 3. Chukua data na uishughulikie
+          const orders = ordersRes.data || [];
           
-          const { data: sOrders } = await supabase
-            .from('orders')
-            .select('*')
-            .eq('store_id', store.id)
-            .order('created_at', { ascending: false });
-          
-          const sOrdersWithCustomers = await Promise.all(
-            (sOrders || []).map(async (order) => {
-              const { data: customer } = await supabase
-                .from('profiles')
-                .select('full_name, avatar_url')
-                .eq('id', order.customer_id)
-                .maybeSingle();
-              return { ...order, profiles: customer || { full_name: 'Mteja Mpya' } };
-            })
-          );
-          
-          setSellerOrders(sOrdersWithCustomers);
+          // Kama Django inarudisha customer profile kwa nested serializer, hii inatosha.
+          // Ikiwa haijajumuishwa, unaweza ku-map kwa kutumia `customer_id` na kupiga `/api/profile/{id}/`
+          // Lakini kwa mfano huu, tunachukulia kuwa `customer` (au `profiles`) iko kwenye response.
+          const ordersWithCustomers = orders.map(order => {
+            // Tunaweka profile dummy kama haijajumuishwa
+            const customerData = order.customer || { full_name: 'Mteja Mpya' };
+            return { ...order, profiles: customerData };
+          });
+
+          setSellerOrders(ordersWithCustomers);
         } else {
           setMyStoreId(null);
         }
         
       } catch (error) { 
-        console.error("Error fetching orders:", error);
+        console.error("Error fetching orders:", error.response?.data || error.message);
         toast.error("Hitilafu ilitokea kupata orders zako");
       } finally { 
         setLoading(false); 
@@ -86,122 +92,41 @@ export default function SupplierNotifications({ session }) {
     };
     
     fetchSellerOrders();
-  }, []);
+  }, [session?.user?.id]);
 
-  // 2. REAL-TIME + POLLING (Inabaki kwa ajili ya Supplier)
+  // ✅ POLLING (Kwa sababu Django bado haina Realtime WebSocket)
   useEffect(() => {
-    if (!session?.user?.id) return;
+    if (!session?.user?.id || !myStoreId) return;
     
-    let channel = null;
     let pollingInterval = null;
     let lastCheckTime = new Date().toISOString();
     
-    const setupRealtime = async () => {
-      let storeId = myStoreId;
-      
-      if (!storeId) {
-        const { data: store } = await supabase
-          .from("stores_engine")
-          .select("id")
-          .eq("owner_id", session.user.id)
-          .maybeSingle();
-        storeId = store?.id;
-        if (storeId) setMyStoreId(storeId);
-      }
-      
-      if (!storeId) return;
-      
-      channel = supabase
-        .channel(`store-orders-${storeId}`)
-        .on(
-          'postgres_changes',
-          { 
-            event: 'INSERT', 
-            schema: 'public', 
-            table: 'orders',
-            filter: `store_id=eq.${storeId}`
-          },
-          async (payload) => {
-            console.log("🆕 Order mpya real-time:", payload);
-            
-            const newOrder = payload.new;
-            
-            const { data: customerProfile } = await supabase
-              .from('profiles')
-              .select('full_name')
-              .eq('id', newOrder.customer_id)
-              .maybeSingle();
-            
-            const orderWithCustomer = {
-              ...newOrder,
-              profiles: customerProfile || { full_name: 'Mteja Mpya' }
-            };
-            
-            setSellerOrders(prev => {
-              const exists = prev.some(order => order.id === newOrder.id);
-              if (exists) return prev;
-              return [orderWithCustomer, ...prev];
-            });
-            
-            toast.success(
-              `📦 Oda Mpya! #${newOrder.order_number}\n` +
-              `👤 Mteja: ${customerProfile?.full_name || 'Mteja Mpya'}\n` +
-              `💰 Kiasi: TSH ${parseInt(newOrder.grand_total).toLocaleString()}`,
-              {
-                duration: 8000,
-                icon: '💰',
-              }
-            );
-            
-            try {
-              const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-              audio.volume = 0.3;
-              await audio.play();
-            } catch (error) {
-              console.log("Sound play failed:", error);
-            }
-            
-            document.title = `🔔 Oda Mpya! - Skyfall`;
-            setTimeout(() => { document.title = "Skyfall"; }, 10000);
-            
-            if (window.navigator && window.navigator.vibrate) {
-              window.navigator.vibrate(200);
-            }
-          }
-        )
-        .subscribe();
-    };
-    
     const startPolling = (storeId) => {
-      if (pollingInterval) return;
-      
-      console.log("🔄 Starting polling fallback (every 5 seconds)");
+      console.log("🔄 Starting polling fallback (every 10 seconds)");
       
       const checkForNewOrders = async () => {
         try {
-          const { data: orders, error } = await supabase
-            .from('orders')
-            .select('*')
-            .eq('store_id', storeId)
-            .gt('created_at', lastCheckTime)
-            .order('created_at', { ascending: false });
-          
-          if (error) throw error;
-          
-          if (orders && orders.length > 0) {
+          const token = localStorage.getItem("access_token");
+          if (!token) return;
+
+          const headers = { Authorization: `Bearer ${token}` };
+          const params = { 
+            store_id: storeId, 
+            created_at__gt: lastCheckTime,
+            ordering: '-created_at'
+          };
+
+          const { data: orders, status } = await axios.get(`${API_BASE_URL}/orders/`, { params, headers });
+
+          if (status === 200 && orders && orders.length > 0) {
             console.log(`📦 Found ${orders.length} new order(s) via polling`);
             lastCheckTime = new Date().toISOString();
             
-            const ordersWithCustomers = await Promise.all(
-              orders.map(async (order) => {
-                const { data: customer } = await supabase
-                  .from('profiles')
-                  .select('full_name')
-                  .eq('id', order.customer_id)
-                  .maybeSingle();
-                return { ...order, profiles: customer || { full_name: 'Mteja Mpya' } };
-              })
-            );
+            // Map customer data
+            const ordersWithCustomers = orders.map(order => ({
+              ...order,
+              profiles: order.customer || { full_name: 'Mteja Mpya' }
+            }));
             
             setSellerOrders(prev => {
               let newOrders = [...prev];
@@ -229,16 +154,14 @@ export default function SupplierNotifications({ session }) {
         }
       };
       
+      // Check immediately then every 10 seconds
       checkForNewOrders();
-      pollingInterval = setInterval(checkForNewOrders, 5000);
+      pollingInterval = setInterval(checkForNewOrders, 10000);
     };
     
-    setupRealtime();
+    startPolling(myStoreId);
     
     return () => {
-      if (channel) {
-        supabase.removeChannel(channel);
-      }
       if (pollingInterval) {
         clearInterval(pollingInterval);
       }
@@ -433,7 +356,7 @@ export default function SupplierNotifications({ session }) {
         </main>
       </div>
       
-            {/* MOBILE BOTTOM NAV - SUPPLIER VERSION (SAHIHI) */}
+      {/* MOBILE BOTTOM NAV - SUPPLIER VERSION (SAHIHI) */}
       {isMobile && (
         <nav className="mobile-bottom-nav" style={{
           position: 'fixed',

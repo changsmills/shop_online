@@ -1,6 +1,6 @@
-// src/components/JustForYou.jsx (Refactored - No Inline CSS & No isMobile in Grid)
+// src/components/JustForYou.jsx (Refactored - Fixed DRF Pagination)
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import { supabase } from "../supabaseClient";
+import api from "../axiosConfig"; // ✅ Tumia api pekee
 import { Loader2, ChevronRight, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
@@ -20,22 +20,21 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
       setLoading(true);
       setError(null);
       
-      let query = supabase
-        .from("products_engines")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(30);
+      const params = {
+        ordering: '-created_at',
+        limit: 30
+      };
 
       if (selectedCategory?.id) {
-        query = query.eq("parent_category_id", selectedCategory.id);
+        params.parent_category = selectedCategory.id;
       }
 
-      const { data, error } = await query;
+      const response = await api.get('/products/', { params });
 
-      if (error) throw error;
-      
       if (isMounted.current) {
-        setProducts(data || []);
+        // 🔥 MABADILIKO MUHIMU: Kagua kama data ina 'results' (DRF Pagination)
+        const data = response.data.results || response.data || [];
+        setProducts(data);
       }
     } catch (error) {
       console.error("Error:", error.message);
@@ -96,7 +95,6 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
       : selectedCategory.name;
   };
 
-  // Logic ya kuunda URL kwa desktop
   const handleCardClick = (item) => {
     const priorityId = item.id;
     const sectionName = encodeURIComponent(`${t('just_for_you')} ${selectedCategory && selectedCategory.id !== null ? `${t('in')} ${getCategoryName()}` : ''}`);
@@ -109,7 +107,6 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
   return (
     <section className="just-for-you-container">
       
-      {/* Header - Responsive via CSS Media Queries */}
       <div className="section-header">
         <div className="header-main">
           <div className="header-text-group">
@@ -146,7 +143,7 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
         )}
       </div>
 
-      {/* ✅ GRID MOJA - INAJIPANGA KWA CSS MEDIA QUERIES (Hakuna isMobile) */}
+      {/* ✅ GRID YA BIDHAA */}
       <div className="product-grid">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((item) => (
@@ -156,7 +153,7 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
               title={item.name}
               price={item.price}
               originalPrice={item.original_price}
-              isMobile={isMobile} // Hii bado inahitajika kwa styling ndani ya card
+              isMobile={isMobile}
               moq={item.moq}
               subtitle={item.store_address}
               categoryName={item.category_name}
@@ -166,7 +163,6 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
             />
           ))
         ) : (
-          /* ✅ EMPTY STATE CARD - Inaiga DashboardCard yenye Try Again */
           <div className="empty-state-card">
             <div className="empty-state-image"></div>
             <div className="empty-state-info">

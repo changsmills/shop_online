@@ -5,7 +5,7 @@ import {
   Bell, Search, MapPin, ChevronLeft, Lock
 } from 'lucide-react';
 import UserTools from '../components/UserTools';
-import { supabase } from '../supabaseClient';
+//import { supabase } from '../supabaseClient';
 import { toast, Toaster } from 'react-hot-toast'; 
 import '../CheckoutPage.css';
 import { useCart } from '../context/CartContext';

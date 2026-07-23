@@ -1,0 +1,94 @@
+/* ===== LOCATION SECTION (STEP 2) ===== */
+
+/* Grid ya Mji na Anwani - badala ya style={{ display: 'grid', gap: '1.5rem' }} */
+.location-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .location-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Flex column gap - badala ya style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }} */
+.flex-col-gap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Label nzuri - badala ya style={{ color: '#9ca3af', fontSize: '0.75rem', fontWeight: 'bold' }} */
+.premium-label-light {
+  color: #9ca3af;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Wrapper ya relative kwa dropdown arrow - badala ya style={{ position: 'relative' }} */
+.relative-wrapper {
+  position: relative;
+}
+
+/* Custom Select - badala ya style ya select kubwa */
+.custom-select {
+  width: 100%;
+  background-color: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px;
+  color: white;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.custom-select:focus {
+  border-color: #f97316; /* Orange-500 */
+}
+
+/* Arrow ya dropdown - badala ya style={{ position: 'absolute', right: '12px', ... }} */
+.custom-select-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #666;
+}
+
+/* Custom Input (Anwani) - badala ya style ya input ya location */
+.custom-input {
+  width: 100%;
+  background-color: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px;
+  color: white;
+  outline: none;
+}
+
+.custom-input:focus {
+  border-color: #f97316;
+}
+
+
+/* ===== STEP 3: PREVIEW IMAGES ===== */
+
+/* Picha ya TIN - badala ya style={{ maxHeight: '120px', borderRadius: '8px', border: '1px solid #f97316' }} */
+.preview-tin-img {
+  max-height: 120px;
+  border-radius: 8px;
+  border: 1px solid #f97316; /* Orange-500 */
+}
+
+/* ===== OTHER GLOBAL CLASSES (Ikiwa unataka kuongeza) ===== */
+
+/* Kwa ujumla classes zilizotumika kwenye Tailwind kwa sasa zinaweza kubaki (kama `grid`, `flex`, `p-4` nk), 
+   lakini kama unataka kuondoa Tailwind kabisa, unaweza kubadilisha hizo pia kuwa hizi CSS za kawaida.
+*/

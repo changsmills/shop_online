@@ -1,0 +1,200 @@
+/* ============================================ */
+/* TOP DEALS SECTION WRAPPER                    */
+/* ============================================ */
+.top-deals-section {
+  background: white;
+  border-radius: 24px;
+  border: 1px solid #f3f4f6;
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Header */
+.top-deals-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.top-deals-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.top-deals-pulse {
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border-radius: 50%;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.top-deals-title {
+  font-size: 16px;
+  font-weight: 900;
+  color: #1f2937;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+.top-deals-badge {
+  font-size: 10px;
+  font-weight: bold;
+  background: #fff7ed;
+  color: #ea580c;
+  padding: 4px 8px;
+  border-radius: 9999px;
+}
+
+/* ============================================ */
+/* RESPONSIVE GRID                               */
+/* ============================================ */
+.top-deals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+/* Scrollbar styling */
+.top-deals-grid::-webkit-scrollbar { width: 5px; }
+.top-deals-grid::-webkit-scrollbar-track { background: #f8fafc; border-radius: 10px; }
+.top-deals-grid::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+.top-deals-grid::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+/* Mobile: 2 columns */
+@media (max-width: 640px) {
+  .top-deals-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+}
+
+/* ============================================ */
+/* FLASH SALE CARD (VERTICAL)                   */
+/* ============================================ */
+.flash-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #f3f4f6;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+.flash-card:hover {
+  border-color: #e5e7eb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transform: translateY(-3px);
+}
+
+/* Image Container */
+.flash-card-img-wrap {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #f8fafc;
+  position: relative;
+  overflow: hidden;
+}
+.flash-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.flash-card-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #ef4444;
+  color: white;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+/* Card Body */
+.flash-card-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.flash-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1f2937;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+.flash-card-price-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.flash-card-original {
+  font-size: 11px;
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+.flash-card-offer {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ea580c;
+}
+
+/* Input Area */
+.flash-card-input-area { margin-top: 4px; }
+.flash-card-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.flash-card-label {
+  font-size: 9px;
+  font-weight: bold;
+  color: #6b7280;
+  display: block;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+.flash-card-label.locked { color: #ef4444; }
+
+.flash-card-input {
+  width: 60px;
+  padding: 4px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 12px;
+  background: white;
+}
+.flash-card-input:disabled { background: #f3f4f6; }
+
+.flash-card-btn {
+  padding: 4px 12px;
+  background: #ea580c;
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.flash-card-btn:disabled { background: #d1d5db; cursor: not-allowed; }
+.flash-card-btn:hover:not(:disabled) { background: #c2410c; }
+
+/* Empty State */
+.flash-card-empty {
+  text-align: center;
+  padding: 40px 0;
+  color: #9ca3af;
+  font-size: 12px;
+  font-style: italic;
+}

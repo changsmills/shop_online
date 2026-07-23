@@ -1,10 +1,12 @@
 // src/components/TopStores.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, Factory } from "lucide-react";
-import { supabase } from "../supabaseClient";
+import api from "../axiosConfig"; // 🔥 BADILISHA: Tumia api badala ya axios!
 import DashboardCard from "./DashboardCard";
 import { useTranslation } from 'react-i18next';
-import '../TopStores.css'; // ✅ ONGEZA HII
+import '../TopStores.css';
+
+// 🔥 ONDOA API_BASE_URL – ipo kwenye api config!
 
 export default function TopStores({ navigate, isMobile }) {
   const { t, i18n } = useTranslation();
@@ -18,18 +20,13 @@ export default function TopStores({ navigate, isMobile }) {
     const fetchTopStores = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from("stores_engine")
-          .select(`
-            *,
-            categories:category_id (
-              name
-            )
-          `)
-          .limit(10);
+        
+        // ✅ BADILISHA: Tumia api.get, sio axios.get!
+        const response = await api.get('/stores/', { params: { limit: 10 } });
 
-        if (error) throw error;
-        setStores(data || []);
+        // 🔥 KAGUA PAGINATION – DRF inarudisha { results: [...] }
+        const storesData = response.data.results || response.data || [];
+        setStores(storesData);
       } catch (error) {
         console.error("Error fetching stores:", error.message);
       } finally {
@@ -100,6 +97,8 @@ export default function TopStores({ navigate, isMobile }) {
           {stores.map((store) => {
             let officeImg = 'https://via.placeholder.com/300x150?text=Verified+Store';
             try {
+              // Kwenye Django, office_images ni JSONField inayorudi kama Array moja kwa moja.
+              // Hapa tumeiweka robust kukubali String (kama zamani) au Array.
               if (store.office_images) {
                 const images = typeof store.office_images === 'string' ? JSON.parse(store.office_images) : store.office_images;
                 officeImg = Array.isArray(images) ? images.find(img => img !== null) : officeImg;
@@ -113,8 +112,9 @@ export default function TopStores({ navigate, isMobile }) {
                   logo={store.store_logo}
                   title={store.store_name}
                   subtitle={
-                    store.categories?.name 
-                    ? `${store.categories.name} • ${store.city}` 
+                    // Katika Django, uhusiano wa Foreign Key upande wa 'store' unaitwa 'category'
+                    store.category?.name 
+                    ? `${store.category.name} • ${store.city}` 
                     : `${store.business_type} • ${store.city}`
                   }
                   isVerified={store.is_verified}
@@ -164,8 +164,9 @@ export default function TopStores({ navigate, isMobile }) {
                     logo={store.store_logo}
                     title={store.store_name}
                     subtitle={
-                      store.categories?.name 
-                      ? `${store.categories.name} • ${store.city}` 
+                      // Badilisha 'categories' kuwa 'category' kama ilivyo kwenye Django Model
+                      store.category?.name 
+                      ? `${store.category.name} • ${store.city}` 
                       : `${store.business_type} • ${store.city}`
                     }
                     isVerified={store.is_verified}

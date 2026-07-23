@@ -1,29 +1,29 @@
 // src/pages/AccountSettings.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
+import api from '../axiosConfig'; // 🔥 Badilisha: Tumia api kutoka axiosConfig!
 import { 
   LayoutDashboard, MessageSquare, ClipboardList, 
   Settings, BarChart3, Bell, Search, User, LogOut, ChevronRight, Menu, X, Eye, EyeOff,
   Camera, Upload, Save, HelpCircle, FileText, Shield, Phone, Mail, Globe, Truck, Store
 } from 'lucide-react';
 import UserTools from '../components/UserTools';
-import { useTranslation } from 'react-i18next'; // ✅ Ongeza hii
-import { useLanguage } from '../context/LanguageContext.jsx'; // ✅ Ongeza hii
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import toast from 'react-hot-toast';
 import '../AccountSettings.css';
 
-const AccountSettings = ({ session }) => {
-  const { t } = useTranslation(); // ✅ Tafsiri
-  const { language, changeLanguage } = useLanguage(); // ✅ Language hook
+const AccountSettings = () => { // 🔥 Imeondolewa { session }!
+  const { t } = useTranslation();
+  const { language, changeLanguage } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
-  const user = session?.user;
 
   // --- STATE ZA SIDEBAR NA DATA ---
   const [isExpanded, setIsExpanded] = useState(false);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   // --- STATE ZA EDIT PROFILE MODAL ---
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -49,44 +49,49 @@ const AccountSettings = ({ session }) => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
 
-  // --- 1. VUTA DATA KUTOKA DATABASE ---
+  // =======================================================
+  // 🔥 1. VUTA PROFILE KUTOKA DJANGO API
+  // =======================================================
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!user) return;
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-
-        if (error) throw error;
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+          navigate('/dashboard/login');
+          return;
+        }
+        
+        // Pata profile data
+        const res = await api.get('/profile/');
+        const data = res.data;
+        
         setProfile(data);
-        setFullName(data?.full_name || '');
-        setUsername(data?.username || '');
-        setBio(data?.bio || '');
+        setCurrentUserId(data.id);
+        setFullName(data.full_name || '');
+        setUsername(data.username || '');
+        setBio(data.bio || '');
       } catch (error) {
-        console.error('Error fetching profile:', error.message);
+        console.error('Error fetching profile:', error.response?.data || error.message);
+        toast.error('Imeshindwa kupata taarifa za profile.');
       } finally {
         setLoading(false);
       }
     };
     fetchProfile();
-  }, [user]);
+  }, [navigate]);
 
-  // Check if user has a store
+  // =======================================================
+  // 🔥 2. ANGAZIA KAMA MTUMIAJI ANA DUKA
+  // =======================================================
   useEffect(() => {
     const checkUserStore = async () => {
-      if (!user) return;
+      if (!currentUserId) return;
       try {
-        const { data: store, error } = await supabase
-          .from('stores_engine')
-          .select('id')
-          .eq('owner_id', user.id)
-          .maybeSingle();
-        if (!error && store) {
-          setUserStoreId(store.id);
+        const res = await api.get('/stores/', { params: { owner: currentUserId } });
+        const stores = res.data.results || res.data || [];
+        if (stores.length > 0) {
+          setUserStoreId(stores[0].id);
         } else {
           setUserStoreId(null);
         }
@@ -96,7 +101,7 @@ const AccountSettings = ({ session }) => {
       }
     };
     checkUserStore();
-  }, [user]);
+  }, [currentUserId]);
 
   // --- 2. HANDLE AVATAR FILE SELECTION ---
   const handleAvatarChange = (e) => {
@@ -115,36 +120,9 @@ const AccountSettings = ({ session }) => {
     }
   };
 
-  // --- 3. UPLOAD AVATAR TO SUPABASE STORAGE ---
-  const uploadAvatar = async (userId, file) => {
-    if (!file) return null;
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${userId}.${fileExt}`;
-    const filePath = fileName;
-    try {
-      const { data: existingFiles } = await supabase.storage
-        .from('avatars')
-        .list('', { search: userId });
-      if (existingFiles && existingFiles.length > 0) {
-        await supabase.storage.from('avatars').remove([existingFiles[0].name]);
-      }
-    } catch (error) {
-      console.log('No existing avatar to delete');
-    }
-    const { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(filePath, file, { upsert: true });
-    if (uploadError) {
-      console.error('Upload error:', uploadError);
-      return null;
-    }
-    const { data: publicUrl } = supabase.storage
-      .from('avatars')
-      .getPublicUrl(filePath);
-    return publicUrl.publicUrl;
-  };
-
-  // --- 4. UPDATE PROFILE ---
+  // =======================================================
+  // 🔥 3. UPDATE PROFILE (Picha na Maelezo)
+  // =======================================================
   const handleUpdateProfile = async () => {
     if (!fullName.trim()) {
       toast.error('Tafadhali weka jina lako kamili');
@@ -152,35 +130,22 @@ const AccountSettings = ({ session }) => {
     }
     setProfileSaving(true);
     try {
-      let avatarUrl = profile?.avatar_url;
+      const formData = new FormData();
+      formData.append('full_name', fullName);
+      formData.append('username', username || '');
+      formData.append('bio', bio || '');
+
+      // Kama kuna picha mpya, iongeze kwenye FormData
       if (avatarFile) {
-        toast.loading('Inapakia picha...', { id: 'avatar-upload' });
-        const uploadedUrl = await uploadAvatar(user.id, avatarFile);
-        if (uploadedUrl) {
-          avatarUrl = uploadedUrl;
-          toast.success('Picha imepakiwa!', { id: 'avatar-upload' });
-        } else {
-          toast.error('Imeshindikana kupakia picha', { id: 'avatar-upload' });
-        }
+        formData.append('avatar_url', avatarFile); // Au 'avatar_file' kulingana na serializer yako
       }
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          full_name: fullName,
-          username: username || null,
-          bio: bio || null,
-          avatar_url: avatarUrl,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
-      if (error) throw error;
-      setProfile({
-        ...profile,
-        full_name: fullName,
-        username: username,
-        bio: bio,
-        avatar_url: avatarUrl
+
+      // Tumia PATCH kusasisha profile (Endpoints: /api/profile/ au /api/profiles/{id}/)
+      const res = await api.patch('/profile/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
+
+      setProfile(res.data);
       toast.success('Profile imesasishwa kwa mafanikio!');
       setIsEditingProfile(false);
       setAvatarFile(null);
@@ -189,14 +154,16 @@ const AccountSettings = ({ session }) => {
         setAvatarPreview(null);
       }
     } catch (error) {
-      console.error('Profile update error:', error);
-      toast.error('Imeshindikana kusasisha profile: ' + error.message);
+      console.error('Profile update error:', error.response?.data || error.message);
+      toast.error('Imeshindikana kusasisha profile: ' + (error.response?.data?.detail || error.message));
     } finally {
       setProfileSaving(false);
     }
   };
 
   // --- 5. UPDATE EMAIL ---
+  // 🔥 Django inahitaji endpoint maalum kwa mabadiliko ya email. 
+  // Hii inatuma ombi kwa endpoint inayofaa (kama /api/change-email/)
   const handleUpdateEmail = async () => {
     if (!newEmail.trim()) {
       toast.error('Tafadhali weka email mpya');
@@ -209,20 +176,19 @@ const AccountSettings = ({ session }) => {
     }
     setEmailLoading(true);
     try {
-      const { error } = await supabase.auth.updateUser({ email: newEmail });
-      if (error) throw error;
-      await supabase.from('profiles').update({ email: newEmail }).eq('id', user.id);
+      await api.post('/api/change-email/', { new_email: newEmail });
       toast.success('Maombi yamepokelewa! Kagua email yako mpya kuthibitisha.');
       setIsEditingEmail(false);
       setNewEmail('');
     } catch (error) {
-      toast.error('Imeshindikana kusasisha email: ' + error.message);
+      toast.error('Imeshindikana kusasisha email: ' + (error.response?.data?.detail || error.message));
     } finally {
       setEmailLoading(false);
     }
   };
 
   // --- 6. UPDATE PASSWORD ---
+  // 🔥 Django inahitaji endpoint maalum kwa mabadiliko ya password (kama /api/change-password/)
   const handleUpdatePassword = async () => {
     if (!currentPassword.trim()) {
       toast.error('Tafadhali weka password yako ya sasa');
@@ -242,24 +208,17 @@ const AccountSettings = ({ session }) => {
     }
     setPasswordLoading(true);
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: currentPassword
+      await api.post('/api/change-password/', {
+        old_password: currentPassword,
+        new_password: newPassword
       });
-      if (signInError) {
-        toast.error('Password yako ya sasa si sahihi');
-        setPasswordLoading(false);
-        return;
-      }
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
-      if (error) throw error;
       toast.success('Password imesasishwa kwa mafanikio!');
       setIsEditingPassword(false);
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
     } catch (error) {
-      toast.error('Imeshindikana kusasisha password: ' + error.message);
+      toast.error('Imeshindikana kusasisha password: ' + (error.response?.data?.detail || error.message));
     } finally {
       setPasswordLoading(false);
     }
@@ -268,13 +227,11 @@ const AccountSettings = ({ session }) => {
   // --- 7. RESET PASSWORD ---
   const handlePasswordReset = async () => {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
-        redirectTo: `${window.location.origin}/account-settings`,
-      });
-      if (error) throw error;
-      toast.success(`Link imetumwa kwenye email yako: ${user.email}`, { duration: 6000 });
+      // Django inahitaji endpoint ya password reset (kama /api/password-reset/)
+      await api.post('/api/password-reset/', { email: profile?.email });
+      toast.success(`Link imetumwa kwenye email yako: ${profile?.email}`, { duration: 6000 });
     } catch (error) {
-      toast.error("Error: " + error.message);
+      toast.error("Error: " + (error.response?.data?.detail || error.message));
     }
   };
 
@@ -283,16 +240,20 @@ const AccountSettings = ({ session }) => {
     const confirm = window.confirm('Je, una uhakika unataka kufuta akaunti yako? Hatua hii haiwezi kubadilishwa!');
     if (!confirm) return;
     try {
-      await supabase.from('profiles').delete().eq('id', user.id);
-      await supabase.auth.admin.deleteUser(user.id);
+      await api.delete('/api/delete-account/');
       toast.success('Akaunti imefutwa kwa mafanikio');
-      await supabase.auth.signOut();
+      // Logout baada ya kufuta
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
       window.location.href = '/';
     } catch (error) {
-      toast.error('Imeshindikana kufuta akaunti: ' + error.message);
+      toast.error('Imeshindikana kufuta akaunti: ' + (error.response?.data?.detail || error.message));
     }
   };
 
+  // =======================================================
+  // 🔥 SIDEBAR LINKS
+  // =======================================================
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} />, path: '/dashboard', label: 'Dashboard' },
     { icon: <Store size={20} />, path: '/dashboard/seller', label: 'Sell on Skyfall' },
@@ -315,6 +276,20 @@ const AccountSettings = ({ session }) => {
     { icon: <FileText size={18} />, title: 'How to Buy', path: '/how-to-buy' },
     { icon: <Store size={18} />, title: 'Sell on Skyfall', path: '/dashboard/seller' },
   ];
+
+  // =======================================================
+  // 🔥 SIGN OUT (Ondoa token na redirect)
+  // =======================================================
+  const handleSignOut = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    navigate('/');
+    toast.success('Umefanikiwa kutoka!');
+  };
+
+  if (loading) {
+    return <div className="dashboard-loading">Inapakia...</div>;
+  }
 
   return (
     <div className="dashboard-layout">
@@ -340,7 +315,8 @@ const AccountSettings = ({ session }) => {
 
         <div className="header-right">
           <Bell size={20} className="icon-btn" />
-          <UserTools session={session} />
+          {/* 🔥 UserTools sasa inaweza kupokea profile kupitia prop au context */}
+          <UserTools profile={profile} /> 
         </div>
       </header>
 
@@ -376,14 +352,14 @@ const AccountSettings = ({ session }) => {
                   {profile?.avatar_url ? (
                     <img src={profile.avatar_url} alt="Profile" className="avatar-img-real" />
                   ) : (
-                    (profile?.full_name || user?.email)?.charAt(0).toUpperCase()
+                    (profile?.full_name || profile?.email)?.charAt(0).toUpperCase()
                   )}
                 </div>
                 <div className="user-details-text">
                   <h2 className="user-full-name">
-                    {profile?.full_name || user?.email?.split('@')[0]}
+                    {profile?.full_name || profile?.email?.split('@')[0]}
                   </h2>
-                  <p className="user-email-sub">{user?.email}</p>
+                  <p className="user-email-sub">{profile?.email}</p>
                   {profile?.username && <p className="user-username">@{profile.username}</p>}
                 </div>
                 <button className="btn-edit-profile" onClick={() => setIsEditingProfile(true)}>
@@ -406,7 +382,7 @@ const AccountSettings = ({ session }) => {
                   
                   <li className="link-item flex-between" onClick={() => setIsEditingEmail(!isEditingEmail)}>
                     <span>Change email</span>
-                    <span className="sub-text">{user?.email}</span>
+                    <span className="sub-text">{profile?.email}</span>
                   </li>
                   
                   {/* Language Switcher */}
@@ -552,14 +528,7 @@ const AccountSettings = ({ session }) => {
 
               {/* SIGN OUT BUTTON */}
               <div className="sign-out-wrapper">
-                <button
-                  className="sign-out-btn"
-                  onClick={async () => {
-                    await supabase.auth.signOut();
-                    navigate('/');
-                    toast.success('Umefanikiwa kutoka!');
-                  }}
-                >
+                <button className="sign-out-btn" onClick={handleSignOut}>
                   <LogOut size={18} /> Sign Out
                 </button>
               </div>

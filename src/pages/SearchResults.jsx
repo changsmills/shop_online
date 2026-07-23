@@ -1,7 +1,7 @@
 // src/components/SearchResults.jsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { supabase } from "../supabaseClient";
+//import { supabase } from "../supabaseClient";
 import { Globe } from 'lucide-react';
 
 // --- IMPORT ZA COMPONENTS ZAKO ---

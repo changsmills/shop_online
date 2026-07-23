@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom"; // Muhimu kwa URL na Back button
-import { supabase } from "../supabaseClient";
+import { useParams, useNavigate } from "react-router-dom";
+import api from "../axiosConfig"; // 🔥 Tumia api yako!
 import { Camera, Trash2, Save, ArrowLeft, Loader2, Plus, X } from "lucide-react";
 import "../UpdateProduct.css";
 
 const UpdateProductPage = () => {
-  // 1. Pata productId kutoka kwenye URL (e.g., /update/123)
   const { productId } = useParams();
   const navigate = useNavigate();
 
@@ -15,157 +14,196 @@ const UpdateProductPage = () => {
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  // ========== STATES ZA KATEGORIA ==========
+  const [storeSubCats, setStoreSubCats] = useState([]);      // Subcategories za duka (ili kuchagua)
+  const [leafCategories, setLeafCategories] = useState([]);  // Leaf categories kwa subcategory iliyochaguliwa
+  const [selectedSubCategory, setSelectedSubCategory] = useState("");
+  const [selectedLeafCategory, setSelectedLeafCategory] = useState("");
+
+  // ========== FETCH DATA ==========
   useEffect(() => {
     if (productId) {
-      fetchData();
+      fetchAllData();
     } else {
       alert("ID ya bidhaa haijapatikana!");
       navigate(-1);
     }
   }, [productId]);
 
-  const fetchData = async () => {
+  const fetchAllData = async () => {
     setLoading(true);
     try {
-      // 1. Vuta Taarifa za Bidhaa
-      const { data: prod, error: prodError } = await supabase
-        .from("products_engines")
-        .select("*")
-        .eq("id", productId)
-        .single();
+      const token = localStorage.getItem("access_token");
 
-      if (prodError) throw prodError;
+      // 1. Pata bidhaa yenyewe
+      const prodRes = await api.get(`/products/${productId}/`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const productData = prodRes.data;
+      setProduct(productData);
 
-      // 2. Vuta Picha za Gallery
-      const { data: med, error: medError } = await supabase
-        .from("product_media")
-        .select("*")
-        .eq("product_id", productId);
+      // 2. Pata gallery (media)
+      const mediaRes = await api.get(`/product-media/?product_id=${productId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setGallery(mediaRes.data.results || mediaRes.data || []);
 
-      if (medError) throw medError;
+      // 3. Pata subcategories za duka (kwa dropdown) - tunachukua kutoka store iliyopo
+      if (productData.store_id) {
+        const storeRes = await api.get(`/stores/${productData.store_id}/`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const storeData = storeRes.data;
+        // Subcategories zipo kwenye 'sub_categories' (kutoka serializer)
+        setStoreSubCats(storeData.sub_categories || []);
 
-      setProduct(prod);
-      setGallery(med || []);
+        // Set subcategory iliyopo sasa
+        if (productData.sub_category_id) {
+          setSelectedSubCategory(productData.sub_category_id);
+        }
+        // Set leaf category iliyopo
+        if (productData.leaf_category_id) {
+          setSelectedLeafCategory(productData.leaf_category_id);
+        }
+      }
+
+      // 4. Fetch leaf categories kulingana na subcategory iliyochaguliwa
+      if (productData.sub_category_id) {
+        fetchLeafCategories(productData.sub_category_id);
+      }
+
     } catch (error) {
-      console.error("Error fetching data:", error.message);
+      console.error("Error fetching data:", error);
       alert("Imeshindwa kuvuta data za bidhaa.");
     } finally {
       setLoading(false);
     }
   };
 
- const handleFileUpload = async (e, type) => {
+  // ========== FETCH LEAF CATEGORIES KWA SUB ==========
+  const fetchLeafCategories = async (subCatId) => {
+    try {
+      const token = localStorage.getItem("access_token");
+      const res = await api.get(`/leaf-categories/?sub_category=${subCatId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setLeafCategories(res.data.results || res.data || []);
+    } catch (error) {
+      console.error("Error fetching leaf categories:", error);
+      setLeafCategories([]);
+    }
+  };
+
+  // ========== HANDLE SUB CATEGORY CHANGE ==========
+  const handleSubCategoryChange = (e) => {
+    const newSubId = e.target.value;
+    setSelectedSubCategory(newSubId);
+    setSelectedLeafCategory(""); // Reset leaf
+    setLeafCategories([]);       // Clear previous leafs
+    if (newSubId) {
+      fetchLeafCategories(newSubId);
+    }
+    // Update product state (kwa ajili ya save)
+    setProduct(prev => ({ ...prev, sub_category_id: newSubId, leaf_category_id: null }));
+  };
+
+  // ========== HANDLE LEAF CATEGORY CHANGE ==========
+  const handleLeafChange = (e) => {
+    const leafId = e.target.value;
+    setSelectedLeafCategory(leafId);
+    setProduct(prev => ({ ...prev, leaf_category_id: leafId }));
+  };
+
+  // ========== FILE UPLOAD (COVER & GALLERY) ==========
+  const handleFileUpload = async (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
 
     setUploading(true);
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-    const filePath = `products/${productId}/${fileName}`;
+    const formData = new FormData();
+    formData.append("product", productId);  // Kwa gallery, foreign key
 
     try {
-      // 1. Upload kwenda Bucket (Hakikisha jina ni picha_za_duka)
-      const { error: uploadError } = await supabase.storage
-        .from("picha_za_duka")
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      // 2. Pata Public URL (LAZIMA iwe picha_za_duka pia)
-      const { data: { publicUrl } } = supabase.storage
-        .from("picha_za_duka") 
-        .getPublicUrl(filePath);
+      const token = localStorage.getItem("access_token");
+      const headers = { Authorization: `Bearer ${token}` };
 
       if (type === "cover") {
-        // Hapa inafanya UPDATE kwenye table ya bidhaa
-        const { error: updateError } = await supabase
-          .from("products_engines")
-          .update({ cover_image: publicUrl })
-          .eq("id", productId);
-        
-        if (updateError) throw updateError;
-        setProduct({ ...product, cover_image: publicUrl });
+        // 1. Tuma cover image update kwenye products_engines
+        const coverForm = new FormData();
+        coverForm.append("cover_image", file);
+        const res = await api.patch(`/products/${productId}/`, coverForm, {
+          headers: { ...headers, "Content-Type": "multipart/form-data" }
+        });
+        setProduct(prev => ({ ...prev, cover_image: res.data.cover_image }));
       } else {
-        // Hapa inaongeza picha MPYA kwenye gallery ya hiyo bidhaa husika
-        const { data: newMedia, error: insertError } = await supabase
-          .from("product_media")
-          .insert([{ product_id: productId, media_url: publicUrl, media_type: "image" }])
-          .select()
-          .single();
+        // 2. Tuma gallery image kwenye product-media
+        formData.append("media_type", "image");
+        formData.append("media_url", file); // Backend inapaswa kushughulikia upload ya file kwa Cloudinary
+        // Kumbuka: Unaweza kutumia media_url kuwa file, na serializers zishughulikie.
+        // Kama backend inatarajia file, tumia 'media_file' au 'file'.
+        // Hapa nafikiri unatuma file kama 'media_url' – lakini angalia serializer yako.
+        // Kwa sasa natumia 'media_file' kama jina la field kwa file.
+        const mediaForm = new FormData();
+        mediaForm.append("product", productId);
+        mediaForm.append("media_type", "image");
+        mediaForm.append("media_file", file); // 🔥 Badilisha jina kulingana na serializer yako!
         
-        if (insertError) throw insertError;
-        setGallery([...gallery, newMedia]);
+        const res = await api.post(`/product-media/`, mediaForm, {
+          headers: { ...headers, "Content-Type": "multipart/form-data" }
+        });
+        setGallery(prev => [...prev, res.data]);
       }
     } catch (err) {
-      alert("Error uploading file: " + err.message);
+      alert("Error uploading file: " + (err.response?.data?.detail || err.message));
     } finally {
       setUploading(false);
     }
   };
 
+  // ========== DELETE MEDIA ==========
   const deleteMedia = async (id) => {
     if (!window.confirm("Una uhakika unataka kufuta picha hii?")) return;
-    
-    const { error } = await supabase.from("product_media").delete().eq("id", id);
-    if (!error) {
+    try {
+      const token = localStorage.getItem("access_token");
+      await api.delete(`/product-media/${id}/`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setGallery(gallery.filter((m) => m.id !== id));
-    } else {
+    } catch (err) {
       alert("Imeshindwa kufuta picha.");
     }
   };
 
-const handleUpdateInfo = async () => {
-  setSaving(true);
-  try {
-    // 1. Angalia kama kuna mabadiliko kwenye original_price
-    // Tunalinganisha bei mpya iliyo kwenye 'product' state na ile ya zamani iliyotoka DB
-    const isPriceChanged = parseFloat(product.original_price) !== parseFloat(product.old_original_price_from_db);
+  // ========== UPDATE BIDHAA (INAFANYA PATCH) ==========
+  const handleUpdateInfo = async () => {
+    setSaving(true);
+    try {
+      const token = localStorage.getItem("access_token");
+      const updateData = {
+        name: product.name,
+        price: product.price,
+        original_price: product.original_price,
+        stock_quantity: product.stock_quantity,
+        description: product.description,
+        sub_category_id: product.sub_category_id,
+        leaf_category_id: product.leaf_category_id,
+      };
 
-    if (isPriceChanged && product.offer_started_at) {
-      const mwanzo = new Date(product.offer_started_at).getTime();
-      const sasa = new Date().getTime();
-      const masaa24 = 24 * 60 * 60 * 1000;
-
-      // Kama bado saa 24 hazijapita, zuia mabadiliko
-      if ((sasa - mwanzo) < masaa24) {
-        const masaaYaliyobaki = Math.ceil((masaa24 - (sasa - mwanzo)) / (1000 * 60 * 60));
-        alert(`Hauruhusiwi kubadilisha bei ya ofa mpaka saa 24 zipite. Bado saa ${masaaYaliyobaki} hivi.`);
-        setSaving(false);
-        return; // Acha kuendelea na update
-      }
+      // Tumia PATCH badala ya PUT (kama unataka kubadilisha sehemu)
+      await api.patch(`/products/${productId}/`, updateData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      alert("Taarifa zimehifadhiwa kikamilifu!");
+      fetchAllData(); // Refresh data
+    } catch (err) {
+      alert("Kuna tatizo limejitokeza: " + (err.response?.data?.detail || err.message));
+    } finally {
+      setSaving(false);
     }
+  };
 
-    // 2. Kama amepita kigezo cha muda (au hajabadilisha bei), fanya update
-    const updateData = {
-      name: product.name,
-      price: product.price,
-      original_price: product.original_price,
-      stock_quantity: product.stock_quantity,
-      description: product.description
-    };
-
-    // Kama amebadilisha bei na muda ulishapita, tuna-reset 'offer_started_at' kuwa sasa
-    if (isPriceChanged) {
-      updateData.offer_started_at = new Date().toISOString();
-    }
-
-    const { error } = await supabase
-      .from("products_engines")
-      .update(updateData)
-      .eq("id", productId);
-
-    if (error) throw error;
-    
-    alert("Taarifa zimehifadhiwa kikamilifu!");
-    fetchData(); // Refresh data ili kupata muda mpya wa ofa kama uli-update
-
-  } catch (err) {
-    alert("Kuna tatizo limejitokeza: " + err.message);
-  } finally {
-    setSaving(false);
-  }
-};
-
+  // ========== LOADING STATE ==========
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
@@ -247,6 +285,42 @@ const handleUpdateInfo = async () => {
         <div className="up-card">
           <h3 className="mb-4 text-sm font-semibold">Maelezo ya Bidhaa</h3>
           <div className="up-form space-y-4">
+            {/* ========== KATEGORIA ZA BIDHAA ========== */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="up-input-group">
+                <label className="text-xs font-medium text-gray-600 block mb-1">Kategoria Ndogo (Sub-category)</label>
+                <select
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  value={selectedSubCategory}
+                  onChange={handleSubCategoryChange}
+                >
+                  <option value="">-- Chagua Sub-category --</option>
+                  {storeSubCats.map((sub) => (
+                    <option key={sub.id} value={sub.id}>{sub.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="up-input-group">
+                <label className="text-xs font-medium text-gray-600 block mb-1">Aina Maalum (Leaf Category)</label>
+                <select
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  value={selectedLeafCategory}
+                  onChange={handleLeafChange}
+                  disabled={!selectedSubCategory || leafCategories.length === 0}
+                >
+                  <option value="">-- Chagua Aina --</option>
+                  {leafCategories.map((leaf) => (
+                    <option key={leaf.id} value={leaf.id}>{leaf.name}</option>
+                  ))}
+                </select>
+                {selectedSubCategory && leafCategories.length === 0 && (
+                  <p className="text-xs text-orange-500 mt-1">Hakuna aina maalum kwa kategoria hii.</p>
+                )}
+              </div>
+            </div>
+
+            {/* ========== DATA ZINGINE ========== */}
             <div className="up-input-group">
               <label className="text-xs font-medium text-gray-600 block mb-1">Jina la Bidhaa</label>
               <input 

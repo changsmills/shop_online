@@ -1,10 +1,12 @@
 // src/components/TrendingNow.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, TrendingUp } from "lucide-react";
-import { supabase } from "../supabaseClient";
+import api from "../axiosConfig"; // 🔥 BADILISHA: Tumia api badala ya axios!
 import DashboardCard from "./DashboardCard";
 import { useTranslation } from 'react-i18next';
-import '../TrendingNow.css'; // ✅ ONGEZA HII
+import '../TrendingNow.css';
+
+// 🔥 ONDOA API_BASE_URL – ipo kwenye api config!
 
 export default function TrendingNow({ navigate, selectedCategory, getCategoryDisplayName, isMobile }) {
   const { t, i18n } = useTranslation();
@@ -19,21 +21,21 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
     const fetchTrending = async () => {
       setLoading(true);
       try {
-        let query = supabase
-          .from('products_engines')
-          .select('*')
-          .or('order_count.gt.0,views.gt.0')
-          .order('order_count', { ascending: false })
-          .order('views', { ascending: false })
-          .limit(10);
+        const params = {
+          limit: 10,
+          ordering: '-order_count,-views',
+        };
 
         if (selectedCategory?.id) {
-          query = query.eq('parent_category_id', selectedCategory.id);
+          params.parent_category = selectedCategory.id;
         }
 
-        const { data, error } = await query;
-        if (error) throw error;
-        setProducts(data || []);
+        // 🔥 BADILISHA: Tumia api.get, sio axios.get!
+        const response = await api.get('/products/', { params });
+        
+        const productsData = response.data.results || response.data || [];
+        setProducts(productsData);
+        
       } catch (err) {
         console.error("Trending Fetch Error:", err.message);
       } finally {

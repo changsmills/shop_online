@@ -1,12 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { supabase } from '../supabaseClient';
+import axios from 'axios'; // ✅ Badilisha kutoka supabase
+const API_BASE_URL = 'http://127.0.0.1:8000/api'; // ✅ URL ya Backend yako
+
 import ProductSelectionDrawer from '../pages/ProductSelectionDrawer';
 import { MessageSquare, Star, ChevronRight, ShoppingCart, Zap } from 'lucide-react';
 import '../ProductInfo.css';
 import { useCart } from '../context/CartContext';
-
 
 const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) => {
   const [productMedia, setProductMedia] = useState([]);
@@ -25,9 +26,9 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
   const [loading, setLoading] = useState(false);
 
   // ✅ 1. State sahihi (Hakikisha majina yanaendana)
-const [activeColor, setActiveColor] = useState(null);
-const [activeSize, setActiveSize] = useState(null);
-const [isSelectionOpen, setIsSelectionOpen] = useState(false); // Hii ndio state ya drawer yako
+  const [activeColor, setActiveColor] = useState(null);
+  const [activeSize, setActiveSize] = useState(null);
+  const [isSelectionOpen, setIsSelectionOpen] = useState(false); // Hii ndio state ya drawer yako
 
   const moq = product?.moq || 1;
   const productImage = product?.cover_image || "https://via.placeholder.com/150";
@@ -60,12 +61,12 @@ const [isSelectionOpen, setIsSelectionOpen] = useState(false); // Hii ndio state
     return grouped;
   }, [productVariations]);
 
-// ✅ 2. Update function ya kufungua drawer
-const openDrawer = (color, size) => {
+  // ✅ 2. Update function ya kufungua drawer
+  const openDrawer = (color, size) => {
     setActiveColor(color);
     setActiveSize(size);
     setIsSelectionOpen(true); // Badilisha kutoka setDrawerOpen kwenda setIsSelectionOpen
-};
+  };
 
   const availableSizesForColor = useMemo(() => {
     if (!selectedColor) return [];
@@ -149,226 +150,221 @@ const openDrawer = (color, size) => {
   const formatPrice = (price) => (price ? Number(price).toLocaleString() : "0");
 
   const selectVariationAndOpenDrawer = (variation, action = 'order') => {
-  if (!variation) return;
+    if (!variation) return;
 
-  // Sasa tunaruhusu mtumiaji kuchagua bila kukaguliwa kama ameingia (login)
-  setSelectedVariationObj(variation);
-  setSelectedColor(variation.color_name);
-  setSelectedSize(variation.size_value || "");
-  setDrawerAction(action);
-  
-  let itemKey = variation.size_value ? `${variation.id}::${variation.size_value}` : variation.id;
-  setSelectedItems({ [itemKey]: 1 });
-  setPurchaseQty(1);
-  setIsSelectionOpen(true);
+    // Sasa tunaruhusu mtumiaji kuchagua bila kukaguliwa kama ameingia (login)
+    setSelectedVariationObj(variation);
+    setSelectedColor(variation.color_name);
+    setSelectedSize(variation.size_value || "");
+    setDrawerAction(action);
+    
+    let itemKey = variation.size_value ? `${variation.id}::${variation.size_value}` : variation.id;
+    setSelectedItems({ [itemKey]: 1 });
+    setPurchaseQty(1);
+    setIsSelectionOpen(true);
 
-  // Ujumbe wa mafanikio (optional)
-  toast.success(`${variation.color_name}${variation.size_value ? ` - ${variation.size_value}` : ''} imechaguliwa`);
-};
+    // Ujumbe wa mafanikio (optional)
+    toast.success(`${variation.color_name}${variation.size_value ? ` - ${variation.size_value}` : ''} imechaguliwa`);
+  };
 
-// ✅ 3. Update handleColorSelect ili i-trigger drawer na initial values
-const handleColorSelect = async (color) => {
+  // ✅ 3. Update handleColorSelect ili i-trigger drawer na initial values
+  const handleColorSelect = async (color) => {
     const colorData = variationsByColor[color];
     if (colorData) {
-        const sizes = Object.keys(colorData.size_stock || {});
-        const firstSize = sizes.length > 0 ? sizes[0] : "";
-        
-        // Tunaset hizi ili drawer izipokee kama "Initial State"
-        setActiveColor(color);
-        setActiveSize(firstSize);
-        
-        const variation = getCurrentVariation(color, firstSize || null);
-        await selectVariationAndOpenDrawer(variation, 'order');
+      const sizes = Object.keys(colorData.size_stock || {});
+      const firstSize = sizes.length > 0 ? sizes[0] : "";
+      
+      // Tunaset hizi ili drawer izipokee kama "Initial State"
+      setActiveColor(color);
+      setActiveSize(firstSize);
+      
+      const variation = getCurrentVariation(color, firstSize || null);
+      await selectVariationAndOpenDrawer(variation, 'order');
     }
-};
+  };
 
   // ✅ 4. Update handleSizeSelect
-const handleSizeSelect = async (size) => {
+  const handleSizeSelect = async (size) => {
     if (selectedColor) {
-        const stockQty = getStockForSize(selectedColor, size);
-        if (stockQty === 0) {
-            toast.error(`Ukubwa ${size} haupo stokini`);
-            return;
-        }
-        
-        setActiveColor(selectedColor);
-        setActiveSize(size);
-        
-        const variation = getCurrentVariation(selectedColor, size);
-        if (variation) {
-            await selectVariationAndOpenDrawer(variation, 'order');
-        }
-    }
-};
-
- const handleOpenDrawer = (action) => {
-  // ✅ Angalia kama rangi imechaguliwa
-  if (!selectedColor) {
-    toast.error("Tafadhali chagua rangi kwanza!");
-    return;
-  }
-  
-  // ✅ Angalia kama ukubwa umechaguliwa (kama bidhaa ina sizes)
-  if (availableSizesForColor.length > 0 && !selectedSize) {
-    toast.error("Tafadhali chagua ukubwa kwanza!");
-    return;
-  }
-  
-  // ✅ Hakikisha variation ipo
-  let targetVariation = selectedVariationObj;
-  if (!targetVariation) {
-    const variation = getCurrentVariation(selectedColor, selectedSize);
-    if (variation) {
-      targetVariation = variation;
-      setSelectedVariationObj(variation);
-    } else {
-      toast.error("Tafadhali chagua rangi na ukubwa kwanza!");
-      return;
-    }
-  }
-  
-  // Umeondoa block ya Supabase session ili drawer ifunguke bila login
-  setDrawerAction(action);
-  
-  const itemKey = selectedSize 
-    ? `${targetVariation.id}::${selectedSize}` 
-    : targetVariation.id;
-    
-  setSelectedItems({ [itemKey]: 1 });
-  setIsSelectionOpen(true);
-};
-
-const handleQtyChange = (variant, delta = 1) => {
-  const targetId = variant?.id;
-  const stockQty = variant?.stock_quantity || currentStock;
-  
-  if (stockQty > 0) {
-    setSelectedItems(prev => {
-      const currentQty = prev[targetId] || 0;  // ← Badilisha kutoka 1 hadi 0
-      let newQty = currentQty + delta;
-      
-      // ✅ ONDOA HII - Usilazimishe MOQ wakati wa kupunguza
-      // if (product?.is_wholesale && moq > 1 && newQty < moq && delta < 0) newQty = moq;
-      
-      // ✅ RUHUSA KUWEKA 0
-      if (newQty < 0) newQty = 0;
-      
-      if (newQty > stockQty) {
-        toast.error(`Zipo ${stockQty} tu zimebaki`);
-        return prev;
+      const stockQty = getStockForSize(selectedColor, size);
+      if (stockQty === 0) {
+        toast.error(`Ukubwa ${size} haupo stokini`);
+        return;
       }
-      return { ...prev, [targetId]: newQty };
-    });
-    
-    setPurchaseQty(prev => {
-      let newQty = prev + delta;
-      // ✅ RUHUSA KUWEKA 0
-      if (newQty < 0) newQty = 0;
-      if (newQty > stockQty) return prev;
-      return newQty;
-    });
-  } else {
-    toast.error("Samahani, bidhaa hii imeisha stoo.");
-  }
-};
+      
+      setActiveColor(selectedColor);
+      setActiveSize(size);
+      
+      const variation = getCurrentVariation(selectedColor, size);
+      if (variation) {
+        await selectVariationAndOpenDrawer(variation, 'order');
+      }
+    }
+  };
 
-const handleDrawerConfirm = async () => {
-  // 1. Zuia double submission
-  if (loading) return; 
-  setLoading(true);
-
-  const finalQty = Object.values(selectedItems).reduce((sum, qty) => sum + qty, 0);
-  
-  if (finalQty === 0) {
-    toast.error("Tafadhali chagua angalau bidhaa moja");
-    setLoading(false); // ✅ LAZIMA UZIME LOADING HAPA
-    return;
-  }
-
-  // 2. Kagua Session (Kama ni Order)
-  if (drawerAction === 'order') {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      toast.dismiss(); // ✅ Futa toast zote zilizoganda
-      toast.error("Tafadhali ingia kwanza!");
-      setLoading(false); // ✅ LAZIMA UZIME LOADING
-      navigate("/dashboard/login");
+  const handleOpenDrawer = (action) => {
+    // ✅ Angalia kama rangi imechaguliwa
+    if (!selectedColor) {
+      toast.error("Tafadhali chagua rangi kwanza!");
       return;
     }
-  }
-
-  // 3. Andaa vitu vya ku-process
-  const itemsToProcess = [];
-  Object.entries(selectedItems).forEach(([itemKey, qty]) => {
-    if (qty <= 0) return;
     
-    let variantIdFromKey = itemKey.split('::')[0];
-    let selectedSizeFromKey = itemKey.includes('::') ? itemKey.split('::')[1] : null;
+    // ✅ Angalia kama ukubwa umechaguliwa (kama bidhaa ina sizes)
+    if (availableSizesForColor.length > 0 && !selectedSize) {
+      toast.error("Tafadhali chagua ukubwa kwanza!");
+      return;
+    }
     
-    let variant = productVariations.find(v => String(v.id) === String(variantIdFromKey));
-    if (!variant) return;
-
-    itemsToProcess.push({
-      id: product.id,
-      variant_id: variant.id,
-      name: product.name,
-      selected_color: variant.color_name || 'Standard',
-      selected_size: selectedSizeFromKey || 'Free Size',
-      quantity: qty,
-      price: Number(variant.price) || Number(product?.price) || 0,
-      image: variant.color_image || product?.cover_image,
-      store_id: product.store_id
-    });
-  });
-
-  if (itemsToProcess.length === 0) {
-    toast.error("Hakuna bidhaa zilizochaguliwa");
-    setLoading(false); // ✅ LAZIMA UZIME LOADING
-    return;
-  }
-
-  // 4. Mwisho: Safisha na Navigate
-  setIsSelectionOpen(false); // Funga drawer
-  setSelectedItems({});      // Futa selection
-  setPurchaseQty(1);         // Rudisha idadi 1
-  setLoading(false);         // Zima loading
-
-  if (drawerAction === 'cart') {
-    itemsToProcess.forEach(item => addToCart(item));
-    toast.success("Imeongezwa kwenye kikapu!");
-    navigate('/cart');
-  } else {
-    navigate('/checkout', { state: { orderItems: itemsToProcess } });
-  }
-};
-
-const handleWhatsAppOrder = async () => {
-  // 1. Badili action iwe WhatsApp
-  setDrawerAction('whatsapp');
-
-  // 2. Angalia kama kuna rangi na saizi tayari imechaguliwa nje
-  if (selectedColor && selectedVariationObj) {
-    // Tunatumia logic ile ile ya kutengeneza Item Key
+    // ✅ Hakikisha variation ipo
+    let targetVariation = selectedVariationObj;
+    if (!targetVariation) {
+      const variation = getCurrentVariation(selectedColor, selectedSize);
+      if (variation) {
+        targetVariation = variation;
+        setSelectedVariationObj(variation);
+      } else {
+        toast.error("Tafadhali chagua rangi na ukubwa kwanza!");
+        return;
+      }
+    }
+    
+    // Umeondoa block ya Supabase session ili drawer ifunguke bila login
+    setDrawerAction(action);
+    
     const itemKey = selectedSize 
-      ? `${selectedVariationObj.id}::${selectedSize}` 
-      : selectedVariationObj.id;
-
-    // Set machaguo ya sasa hivi ili drawer isifunguke ikiwa tupu (0)
+      ? `${targetVariation.id}::${selectedSize}` 
+      : targetVariation.id;
+      
     setSelectedItems({ [itemKey]: 1 });
+    setIsSelectionOpen(true);
+  };
+
+  const handleQtyChange = (variant, delta = 1) => {
+    const targetId = variant?.id;
+    const stockQty = variant?.stock_quantity || currentStock;
     
-    // Hakikisha state za drawer (initial states) nazo ziko up-to-date
-    setActiveColor(selectedColor);
-    setActiveSize(selectedSize);
-  } else {
-    // Kama hajachagua chochote, anza upya
-    setSelectedItems({});
-  }
+    if (stockQty > 0) {
+      setSelectedItems(prev => {
+        const currentQty = prev[targetId] || 0;
+        let newQty = currentQty + delta;
+        
+        if (newQty < 0) newQty = 0;
+        
+        if (newQty > stockQty) {
+          toast.error(`Zipo ${stockQty} tu zimebaki`);
+          return prev;
+        }
+        return { ...prev, [targetId]: newQty };
+      });
+      
+      setPurchaseQty(prev => {
+        let newQty = prev + delta;
+        if (newQty < 0) newQty = 0;
+        if (newQty > stockQty) return prev;
+        return newQty;
+      });
+    } else {
+      toast.error("Samahani, bidhaa hii imeisha stoo.");
+    }
+  };
 
-  // 3. Fungua drawer
-  setIsSelectionOpen(true);
-};
+  const handleDrawerConfirm = async () => {
+    // 1. Zuia double submission
+    if (loading) return; 
+    setLoading(true);
 
-   const handleChatWithSeller = () => {
+    const finalQty = Object.values(selectedItems).reduce((sum, qty) => sum + qty, 0);
+    
+    if (finalQty === 0) {
+      toast.error("Tafadhali chagua angalau bidhaa moja");
+      setLoading(false);
+      return;
+    }
+
+    // ✅ 2. Kagua Login (Badilisha Supabase Session -> Django JWT Token)
+    if (drawerAction === 'order') {
+      const token = localStorage.getItem('access_token'); // Hii ndio token ya Django JWT
+      if (!token) {
+        toast.dismiss();
+        toast.error("Tafadhali ingia kwanza!");
+        setLoading(false);
+        navigate("/dashboard/login");
+        return;
+      }
+    }
+
+    // 3. Andaa vitu vya ku-process
+    const itemsToProcess = [];
+    Object.entries(selectedItems).forEach(([itemKey, qty]) => {
+      if (qty <= 0) return;
+      
+      let variantIdFromKey = itemKey.split('::')[0];
+      let selectedSizeFromKey = itemKey.includes('::') ? itemKey.split('::')[1] : null;
+      
+      let variant = productVariations.find(v => String(v.id) === String(variantIdFromKey));
+      if (!variant) return;
+
+      itemsToProcess.push({
+        id: product.id,
+        variant_id: variant.id,
+        name: product.name,
+        selected_color: variant.color_name || 'Standard',
+        selected_size: selectedSizeFromKey || 'Free Size',
+        quantity: qty,
+        price: Number(variant.price) || Number(product?.price) || 0,
+        image: variant.color_image || product?.cover_image,
+        store_id: product.store_id
+      });
+    });
+
+    if (itemsToProcess.length === 0) {
+      toast.error("Hakuna bidhaa zilizochaguliwa");
+      setLoading(false);
+      return;
+    }
+
+    // 4. Mwisho: Safisha na Navigate
+    setIsSelectionOpen(false); // Funga drawer
+    setSelectedItems({});      // Futa selection
+    setPurchaseQty(1);         // Rudisha idadi 1
+    setLoading(false);         // Zima loading
+
+    if (drawerAction === 'cart') {
+      itemsToProcess.forEach(item => addToCart(item));
+      toast.success("Imeongezwa kwenye kikapu!");
+      navigate('/cart');
+    } else {
+      navigate('/checkout', { state: { orderItems: itemsToProcess } });
+    }
+  };
+
+  const handleWhatsAppOrder = async () => {
+    // 1. Badili action iwe WhatsApp
+    setDrawerAction('whatsapp');
+
+    // 2. Angalia kama kuna rangi na saizi tayari imechaguliwa nje
+    if (selectedColor && selectedVariationObj) {
+      // Tunatumia logic ile ile ya kutengeneza Item Key
+      const itemKey = selectedSize 
+        ? `${selectedVariationObj.id}::${selectedSize}` 
+        : selectedVariationObj.id;
+
+      // Set machaguo ya sasa hivi ili drawer isifunguke ikiwa tupu (0)
+      setSelectedItems({ [itemKey]: 1 });
+      
+      // Hakikisha state za drawer (initial states) nazo ziko up-to-date
+      setActiveColor(selectedColor);
+      setActiveSize(selectedSize);
+    } else {
+      // Kama hajachagua chochote, anza upya
+      setSelectedItems({});
+    }
+
+    // 3. Fungua drawer
+    setIsSelectionOpen(true);
+  };
+
+  const handleChatWithSeller = () => {
     // 1. Angalia kama muuzaji yupo (Tumia owner_id sasa, siyo user_id)
     if (!product?.stores?.owner_id) {
       toast.error("Samahani, muuzaji huyu hajapatikana.");
@@ -389,39 +385,53 @@ const handleWhatsAppOrder = async () => {
     await handleOpenDrawer('cart');
   };
 
-useEffect(() => {
-  const fetchProductData = async () => {
-    if (!product?.id) return;
-    const { data: mediaData } = await supabase.from('product_media').select('*').eq('product_id', product.id);
-    const { data: varData } = await supabase.from('product_variations').select('*').eq('product_id', product.id);
-    
-    if (mediaData) setProductMedia(mediaData);
-    
-    if (varData && varData.length > 0) {
-      setProductVariations(varData);
-      
-      // 1. Tafuta variation ya kwanza yenye mzigo (stock)
-      const defaultVar = varData.find(v => v.stock_quantity > 0) || varData[0];
-      
-      // 2. Set hiyo rangi ya kwanza
-      setSelectedColor(defaultVar.color_name);
-      
-      // 3. Tafuta size ya kwanza inayopatikana kwenye hiyo rangi
-      const sizes = Object.keys(defaultVar.size_stock || {});
-      const firstSize = sizes.length > 0 ? sizes[0] : "";
-      
-      setSelectedSize(firstSize);
+  // ==========================================================
+  // ✅ TUMEBADILISHA HAPA: FETCH DATA KWA KUTUMIA AXIOS + DJANGO
+  // ==========================================================
+  useEffect(() => {
+    const fetchProductData = async () => {
+      if (!product?.id) return;
 
-      // 4. Set object nzima ya variation kwa ajili ya bei na specifications
-      setSelectedVariationObj({
-        ...defaultVar,
-        size_value: firstSize || null,
-        stock_quantity: firstSize ? (defaultVar.size_stock?.[firstSize] || 0) : defaultVar.stock_quantity
-      });
-    }
-  };
-  fetchProductData();
-}, [product?.id]);
+      try {
+        // 1. Pata Media (Picha na Video)
+        const mediaRes = await axios.get(`${API_BASE_URL}/product-media/?product_id=${product.id}`);
+        const mediaData = mediaRes.data.results || mediaRes.data;
+
+        // 2. Pata Variations (Rangi, Sizes, Bei)
+        const varRes = await axios.get(`${API_BASE_URL}/product-variations/?product_id=${product.id}`);
+        const varData = varRes.data.results || varRes.data;
+        
+        if (mediaData) setProductMedia(mediaData);
+        
+        if (varData && varData.length > 0) {
+          setProductVariations(varData);
+          
+          // 1. Tafuta variation ya kwanza yenye mzigo (stock)
+          const defaultVar = varData.find(v => v.stock_quantity > 0) || varData[0];
+          
+          // 2. Set hiyo rangi ya kwanza
+          setSelectedColor(defaultVar.color_name);
+          
+          // 3. Tafuta size ya kwanza inayopatikana kwenye hiyo rangi
+          const sizes = Object.keys(defaultVar.size_stock || {});
+          const firstSize = sizes.length > 0 ? sizes[0] : "";
+          
+          setSelectedSize(firstSize);
+
+          // 4. Set object nzima ya variation kwa ajili ya bei na specifications
+          setSelectedVariationObj({
+            ...defaultVar,
+            size_value: firstSize || null,
+            stock_quantity: firstSize ? (defaultVar.size_stock?.[firstSize] || 0) : defaultVar.stock_quantity
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching product media/variations:", error);
+        toast.error("Imeshindwa kupata data za bidhaa.");
+      }
+    };
+    fetchProductData();
+  }, [product?.id]);
 
   return (
     <div className="info-main-container" style={{ height: 'auto', minHeight: '100%' }}>

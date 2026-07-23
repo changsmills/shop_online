@@ -1,10 +1,12 @@
 // src/components/NewArrivals.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, Sparkles } from "lucide-react";
-import { supabase } from "../supabaseClient";
+import api from "../axiosConfig"; // 🔥 BADILISHA: Tumia api badala ya axios!
 import DashboardCard from "./DashboardCard";
 import { useTranslation } from 'react-i18next';
-import '../NewArrivals.css';  // ✅ ONGEZA HII
+import '../NewArrivals.css';
+
+// 🔥 ONDOA API_BASE_URL – ipo kwenye api config!
 
 export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
   const { t, i18n } = useTranslation();
@@ -18,19 +20,22 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
     const fetchNewArrivals = async () => {
       setLoading(true);
       try {
-        let query = supabase
-          .from('products_engines')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(10);
+        const params = {
+          ordering: '-created_at', // Panga kwa tarehe mpya kushuka
+          limit: 10
+        };
 
         if (selectedCategory?.id) {
-          query = query.eq('parent_category_id', selectedCategory.id);
+          params.parent_category = selectedCategory.id;
         }
 
-        const { data, error } = await query;
-        if (error) throw error;
-        setProducts(data || []);
+        // 🔥 BADILISHA: Tumia api.get, sio axios.get!
+        const response = await api.get('/products/', { params });
+        
+        // 🔥 KAGUA PAGINATION – DRF inarudisha { results: [...] }
+        const productsData = response.data.results || response.data || [];
+        setProducts(productsData);
+        
       } catch (err) {
         console.error("New Arrivals Fetch Error:", err.message);
       } finally {
@@ -39,7 +44,7 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
     };
 
     fetchNewArrivals();
-  }, [selectedCategory]);
+  }, [selectedCategory, i18n.language]); // 🔥 Ongeza i18n.language
 
   const getCategoryDisplayName = (category) => {
     if (!category) return '';
@@ -184,8 +189,6 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
           )}
         </div>
       )}
-
-      {/* CSS ya scrollbar hiding iko kwenye NewArrivals.css sasa */}
     </div>
   );
 }

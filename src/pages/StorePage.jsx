@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
+import api from '../axiosConfig'; // 🔥 Badilisha: import api kutoka axiosConfig!
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { 
@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import '../StorePage.css';
 
-export default function StorePage({ session }) {
+export default function StorePage() { // 🔥 Imeondolewa { session }
   const { storeId } = useParams();
   const navigate = useNavigate();
   const [store, setStore] = useState(null);
@@ -22,7 +22,7 @@ export default function StorePage({ session }) {
   const [categories, setCategories] = useState([]);
   
   // =======================================================
-  // 🔥 SULUHISHO LA TATIZO LA FOOTER KUPOTEA
+  // 🔥 MOBILE DETECTION
   // =======================================================
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -32,10 +32,9 @@ export default function StorePage({ session }) {
   });
 
   // =======================================================
-  // 🔥 SULUHISHO LA TATIZO LA "viewMode is not defined"
+  // 🔥 VIEW MODE
   // =======================================================
   const [viewMode, setViewMode] = useState('grid'); 
-  // =======================================================
 
   // Detect mobile screen resize
   useEffect(() => {
@@ -44,40 +43,42 @@ export default function StorePage({ session }) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Fetch store data
+  // =======================================================
+  // 🔥 FETCH STORE DATA (Django API)
+  // =======================================================
   useEffect(() => {
     const fetchStoreData = async () => {
       if (!storeId) return;
       
       setLoading(true);
       try {
-        const { data: storeData, error: storeError } = await supabase
-          .from('stores_engine')
-          .select('*')
-          .eq('id', storeId)
-          .single();
-
-        if (storeError) throw storeError;
+        // 1. Pata taarifa za duka
+        const storeRes = await api.get(`/stores/${storeId}/`);
+        const storeData = storeRes.data;
         setStore(storeData);
 
-        const { data: productsData, error: productsError } = await supabase
-          .from('products_engines')
-          .select('*')
-          .eq('store_id', storeId)
-          .eq('is_approved', true)
-          .order('created_at', { ascending: false });
+        // 2. Pata bidhaa za duka hili (zilizothibitishwa)
+        const productsRes = await api.get('/products/', {
+          params: {
+            store_id: storeId,
+            is_approved: true,
+            ordering: '-created_at'
+          }
+        });
+        // DRF inarudisha { results: [...] } ikiwa pagination imewashwa
+        const productsData = productsRes.data.results || productsRes.data || [];
+        setProducts(productsData);
+        setFilteredProducts(productsData);
 
-        if (productsError) throw productsError;
-        setProducts(productsData || []);
-        setFilteredProducts(productsData || []);
-
-        if (productsData && productsData.length > 0) {
-          const uniqueCats = [...new Set(productsData.map(p => p.category_name).filter(Boolean))];
+        // 3. Pata kategoria za kipekee kutoka kwenye bidhaa
+        if (productsData.length > 0) {
+          // Tumia 'sub_category_name' au 'category_name' kulingana na serializer yako
+          const uniqueCats = [...new Set(productsData.map(p => p.sub_category_name || p.category_name).filter(Boolean))];
           setCategories(uniqueCats);
         }
 
       } catch (error) {
-        console.error('Error fetching store data:', error.message);
+        console.error('Error fetching store data:', error.response?.data || error.message);
       } finally {
         setLoading(false);
       }
@@ -86,7 +87,9 @@ export default function StorePage({ session }) {
     fetchStoreData();
   }, [storeId]);
 
-  // Filter products
+  // =======================================================
+  // 🔥 FILTER PRODUCTS
+  // =======================================================
   useEffect(() => {
     let filtered = [...products];
     if (searchTerm) {
@@ -95,7 +98,7 @@ export default function StorePage({ session }) {
       );
     }
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(p => p.category_name === selectedCategory);
+      filtered = filtered.filter(p => (p.sub_category_name || p.category_name) === selectedCategory);
     }
     setFilteredProducts(filtered);
   }, [searchTerm, selectedCategory, products]);
@@ -204,7 +207,8 @@ export default function StorePage({ session }) {
                   <span className="detail-value">{store.business_type}</span>
                 </div>
               )}
-              {store.established_year && (
+              {/* 🔥 Safe check: ikiwa established_year haipo, haionyeshi chochote */}
+              {store?.established_year && (
                 <div className="detail-item">
                   <span className="detail-label">Established:</span>
                   <span className="detail-value">{store.established_year}</span>
@@ -241,7 +245,8 @@ export default function StorePage({ session }) {
             )}
           </div>
 
-          {(store.instagram_handle || store.tiktok_handle || store.facebook_handle) && (
+          {/* 🔥 Imeondolewa facebook_handle na kuongezwa twitter_handle & youtube_link! */}
+          {(store.instagram_handle || store.tiktok_handle || store.twitter_handle || store.youtube_link) && (
             <div className="info-card">
               <h3><Globe size={18} /> Connect With Us</h3>
               <div className="social-links">
@@ -255,9 +260,19 @@ export default function StorePage({ session }) {
                     <span className="tiktok-icon">🎵</span> TikTok
                   </a>
                 )}
+                {store.twitter_handle && (
+                  <a href={`https://twitter.com/${store.twitter_handle.replace('@','')}`} target="_blank" rel="noreferrer" className="social-link twitter">
+                    <span className="twitter-icon">🐦</span> Twitter / X
+                  </a>
+                )}
                 {store.google_maps_url && (
                   <a href={store.google_maps_url} target="_blank" rel="noreferrer" className="social-link maps">
                     <MapPin size={18} /> Google Maps
+                  </a>
+                )}
+                {store.youtube_link && (
+                  <a href={store.youtube_link} target="_blank" rel="noreferrer" className="social-link youtube">
+                    <span className="youtube-icon">▶️</span> YouTube
                   </a>
                 )}
               </div>
@@ -294,7 +309,7 @@ export default function StorePage({ session }) {
                 </select>
               )}
 
-              {/* 🔥 SEHEMU YA VIEW TOGGLE IMEBADILISHWA KUWA INLINE CSS ILI KUTATUA ERROR NA KUDUMISHA MUONEKANO */}
+              {/* View Toggle */}
               <div style={{ display: 'flex', gap: '5px' }}>
                 <button 
                   style={{
@@ -380,7 +395,7 @@ export default function StorePage({ session }) {
                   <img src={product.cover_image || 'https://placehold.co/80'} alt={product.name} />
                   <div className="product-list-info">
                     <h4>{product.name}</h4>
-                    <p className="product-category">{product.category_name}</p>
+                    <p className="product-category">{product.sub_category_name || product.category_name || ''}</p>
                     <div className="product-price">
                       <span className="current-price">TSh {formatPrice(product.price)}</span>
                     </div>
@@ -395,7 +410,7 @@ export default function StorePage({ session }) {
         </div>
       </div>
 
-      {/* Footer sasa haina 'flash' kwa sababu state inachekiwa kwa haraka */}
+      {/* Footer */}
       {!isMobile && <Footer />}
     </div>
   );

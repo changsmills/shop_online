@@ -4,7 +4,9 @@ import { useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "../ProductDetails.css";
-import { supabase } from "../supabaseClient";
+
+import api from "../axiosConfig"; 
+
 import { toast } from 'react-hot-toast';
 import { Link } from "react-router-dom";
 import { 
@@ -12,7 +14,6 @@ import {
   ShieldCheck, Box, Video, FileText, Store, X, ChevronRight, Eye
 } from 'lucide-react';
 
-// ✅ LAZY IMPORTS
 const ProductGallery = React.lazy(() => import("../components/ProductGallery"));
 const ProductInfo = React.lazy(() => import("../components/ProductInfo"));
 const SkeletonProductDetails = React.lazy(() => import("../components/SkeletonProductDetails"));
@@ -43,10 +44,12 @@ export default function ProductDetails() {
       if (!id) return;
       const viewedProducts = JSON.parse(localStorage.getItem("viewed_products") || "[]");
       if (!viewedProducts.includes(id)) {
-        const { error } = await supabase.rpc('increment_product_views', { row_id: id });
-        if (!error) {
+        try {
+          await api.post(`/products/${id}/increment_views/`);
           viewedProducts.push(id);
           localStorage.setItem("viewed_products", JSON.stringify(viewedProducts));
+        } catch (error) {
+          console.error("❌ [incrementView] Imeshindwa kuongeza views kwa bidhaa:", id, error.message);
         }
       }
     };
@@ -57,76 +60,109 @@ export default function ProductDetails() {
     async function getFullProductData() {
       try {
         setIsLoading(true);
-        const { data: productData, error: prodError } = await supabase
-          .from("products_engines")
-          .select("*") 
-          .eq("id", id)
-          .single();
-        if (prodError) throw prodError;
-
-        if (productData?.store_id) {
-          const { data: sProducts } = await supabase
-            .from("products_engines")
-            .select("*")
-            .eq("store_id", productData.store_id)
-            .neq("id", id)
-            .limit(10);
-          setStoreProducts(sProducts || []);
+        
+        let productData = null;
+        try {
+          const productRes = await api.get(`/products/${id}/`);
+          productData = productRes.data;
+          console.log("✅ [Fetch 1] Product data imepatikana.");
+        } catch (err) {
+          console.error("❌ [Fetch 1] Imeshindwa kupata product kwa ID:", id, err.message);
+          setProduct(null);
+          setIsLoading(false);
+          return; 
         }
-
-        const { data: variationsData } = await supabase
-          .from('products_engines')
-          .select('*')
-          .eq('leaf_category_id', productData.leaf_category_id)
-          .neq('id', id)
-          .limit(5);
+        
+        if (!productData) {
+          setProduct(null);
+          setIsLoading(false);
+          return;
+        }
 
         let storeData = null;
-        if (productData.store_id) {
-          const { data: sData } = await supabase
-            .from("stores_engine")
-            .select("*")
-            .eq("id", productData.store_id)
-            .single();
-          storeData = sData;
-        }
+        let variationsData = [];
+        let mediaData = [];
 
+        let sList = [];
         if (productData?.store_id) {
-          const { data: catData } = await supabase
-            .from("products_engines")
-            .select("sub_category_name")
-            .eq("store_id", productData.store_id);
-          if (catData) {
-            const uniqueCats = [...new Set(catData.map(c => c.sub_category_name))];
-            setStoreCategories(uniqueCats);
+          try {
+            const sProductsRes = await api.get(`/products/?store_id=${productData.store_id}`);
+            sList = sProductsRes.data.results || sProductsRes.data || [];
+            sList = sList.filter(p => p.id !== id);
+            setStoreProducts(sList.slice(0, 10));
+            console.log("✅ [Fetch 2] Store products (bidhaa za duka) zimepatikana.");
+          } catch (err) {
+            console.error("❌ [Fetch 2] Imeshindwa kupata bidhaa za duka kwa store_id:", productData.store_id, err.message);
           }
-          setActiveCategory(productData.sub_category_name);
+
+          try {
+            const uniqueCats = [...new Set(sList.map(p => p.sub_category_name).filter(Boolean))];
+            setStoreCategories(uniqueCats);
+            setActiveCategory(productData.sub_category_name);
+          } catch (err) {
+            console.error("❌ [Processing] Imeshindwa kuchuja subcategories.", err.message);
+          }
         }
 
-        const { data: mediaData } = await supabase
-          .from("product_media")
-          .select("media_url, media_type")
-          .eq("product_id", id);
-
-        setProduct({
-          ...productData,
-          stores: storeData,
-          variations: variationsData || [],
-          media_list: [
-            { url: productData.cover_image, type: 'image' }, 
-            ...(mediaData || []).map(m => ({ url: m.media_url, type: m.media_type })),
-            productData.promo_video_url ? { url: productData.promo_video_url, type: 'video' } : null
-          ].filter(Boolean)
-        });
-
-        if (productData?.id) {
-          const recentlyViewed = JSON.parse(localStorage.getItem("recentlyViewed") || "[]");
-          const filtered = recentlyViewed.filter(id => id !== productData.id);
-          const updated = [productData.id, ...filtered].slice(0, 10);
-          localStorage.setItem("recentlyViewed", JSON.stringify(updated));
+        if (productData?.leaf_category_id) {
+          try {
+            const variationsRes = await api.get(`/products/?leaf_category_id=${productData.leaf_category_id}`);
+            let vList = variationsRes.data.results || variationsRes.data || [];
+            vList = vList.filter(p => p.id !== id);
+            variationsData = vList.slice(0, 5);
+            console.log("✅ [Fetch 3] Variations (bidhaa za kategoria) zimepatikana.");
+          } catch (err) {
+            console.error("❌ [Fetch 3] Imeshindwa kupata variations kwa leaf_category_id:", productData.leaf_category_id, err.message);
+          }
         }
+
+        if (productData.store_id) {
+          try {
+            const storeRes = await api.get(`/stores/${productData.store_id}/`);
+            storeData = storeRes.data;
+            console.log("✅ [Fetch 4] Store data (maelezo ya duka) imepatikana.");
+          } catch (err) {
+            console.error("❌ [Fetch 4] Imeshindwa kabisa kupata store kwa ID:", productData.store_id, "Error:", err.message);
+          }
+        }
+
+        try {
+          const mediaRes = await api.get(`/product-media/?product_id=${id}`);
+          mediaData = mediaRes.data.results || mediaRes.data || [];
+          console.log("✅ [Fetch 6] Media (picha/video) imepatikana.");
+        } catch (err) {
+          console.error("❌ [Fetch 6] Imeshindwa kupata media kwa product_id:", id, err.message);
+        }
+
+        try {
+          setProduct({
+            ...productData,
+            stores: storeData,
+            variations: variationsData || [],
+            media_list: [
+              { url: productData.cover_image, type: 'image' }, 
+              ...(mediaData || []).map(m => ({ url: m.media_url, type: m.media_type })),
+              productData.promo_video_url ? { url: productData.promo_video_url, type: 'video' } : null
+            ].filter(Boolean)
+          });
+          console.log("✅ [State] Product state imewekwa sawa.");
+        } catch (err) {
+          console.error("❌ [State] Imeshindwa kuweka product state.", err.message);
+        }
+
+        try {
+          if (productData?.id) {
+            const recentlyViewed = JSON.parse(localStorage.getItem("recentlyViewed") || "[]");
+            const filtered = recentlyViewed.filter(pId => pId !== productData.id);
+            const updated = [productData.id, ...filtered].slice(0, 10);
+            localStorage.setItem("recentlyViewed", JSON.stringify(updated));
+          }
+        } catch (err) {
+          console.error("❌ [LocalStorage] Imeshindwa kuhifadhi recentlyViewed.", err.message);
+        }
+
       } catch (err) {
-        console.error("Error fetching data:", err.message);
+        console.error("❌ [Main Catcher] getFullProductData imeanguka kwa ujumla:", err.message);
       } finally {
         setIsLoading(false);
       }
@@ -148,20 +184,17 @@ export default function ProductDetails() {
   const handleRateProduct = async (stars) => {
     const loadingToast = toast.loading("Tunahifadhi rating yako...");
     try {
-      const { error } = await supabase.rpc('increment_rating', { row_id: id, user_rating: stars });
+      await api.post(`/products/${id}/rate/`, { rating: stars });
       toast.dismiss(loadingToast);
-      if (error) {
-        toast.error("Imeshindikana: " + error.message);
-      } else {
-        toast.success(`Asante kwa rating ya nyota ${stars}!`);
-        setProduct(prev => {
-          const newTotal = (prev.total_reviews || 0) + 1;
-          const newAverage = (((prev.average_rating || 0) * (prev.total_reviews || 0)) + stars) / newTotal;
-          return { ...prev, total_reviews: newTotal, average_rating: newAverage };
-        });
-      }
+      toast.success(`Asante kwa rating ya nyota ${stars}!`);
+      setProduct(prev => {
+        const newTotal = (prev.total_reviews || 0) + 1;
+        const newAverage = (((prev.average_rating || 0) * (prev.total_reviews || 0)) + stars) / newTotal;
+        return { ...prev, total_reviews: newTotal, average_rating: newAverage };
+      });
     } catch (err) {
       toast.dismiss(loadingToast);
+      console.error("❌ [Rate] Imeshindwa kutuma rating kwa product:", id, err.message);
       toast.error("Tatizo la mtandao limetokea.");
     }
   };
@@ -172,9 +205,12 @@ export default function ProductDetails() {
     setIsImageViewerOpen(true);
   };
 
-  // ✅ SKELETON LOADING
   if (isLoading) {
     return <SkeletonProductDetails isMobile={isMobile} />;
+  }
+
+  if (!product) {
+    return <div className="text-center py-10 text-gray-500">Bidhaa haijapatikana. (Angalia console kwa makosa ❌)</div>;
   }
 
   return (
@@ -184,18 +220,14 @@ export default function ProductDetails() {
       </div>
 
       <div className="product-details-container">
-        {/* Breadcrumb */}
         <nav className="breadcrumb-nav">
           <span>Home</span> <span className="sep">/</span> 
           <span>Products</span> <span className="sep">/</span> 
-          <span className="active-path">{product.name}</span>
+          <span className="active-path">{product?.name}</span>
         </nav>
 
-        {/* Main Layout */}
         <main className="product-main-layout">
           <div className="main-grid-container">
-            
-            {/* ================= UPANDE WA KUSHOTO ================= */}
             <div className="left-content">
               <section className="product-hero-section">
                 <Suspense fallback={<div className="skeleton-loader">Inapakia picha...</div>}>
@@ -203,7 +235,6 @@ export default function ProductDetails() {
                 </Suspense>
               </section>
 
-              {/* Product Description */}
               <div className="product-description-section">
                 <h3 className="text-lg font-bold mb-3 text-gray-800">Maelezo ya Bidhaa</h3>
                 <div className="prose prose-sm max-w-none text-gray-600">
@@ -212,7 +243,6 @@ export default function ProductDetails() {
               </div>
             </div>
 
-            {/* ================= UPANDE WA KULIA (STICKY) ================= */}
             <div className="right-sidebar">
               <div className="sticky-info-wrapper">
                 <Suspense fallback={<div className="skeleton-loader">Inapakia maelezo...</div>}>
@@ -229,10 +259,9 @@ export default function ProductDetails() {
           </div>
         </main>
 
-        {/* ========================================================== */}
-        {/* 🔥 STORE DETAILS - SASA INAONEKANA KWENYE MOBILE PIA! */}
-        {/* ========================================================== */}
-        {product.stores && (
+        {/* 🔥 SEHEMU YA STORE DETAILS - IKO KABISA HAPA! */}
+        {/* Ikiwa bado haijapata store, itaonyesha ujumbe mdogo badala ya kuondoka kabisa */}
+        {product.stores ? (
           <section className="product-bottom-details">
             <div className="verification-header-box">
               <div className="header-text">
@@ -349,13 +378,17 @@ export default function ProductDetails() {
               </div>
             </div>
           </section>
+        ) : (
+          // 🔥 FALLBACK - Ikiwa store bado haijapata data
+          <div className="text-center py-4 text-gray-400 text-sm border-t mt-8">
+            (Taarifa za duka zinapakuliwa...)
+          </div>
         )}
 
       </div>
 
       {!isMobile && <Footer />}
 
-      {/* ========== IMAGE VIEWER MODAL ========== */}
       {isImageViewerOpen && selectedImage && (
         <div className="image-viewer-overlay" onClick={() => setIsImageViewerOpen(false)}>
           <div className="image-viewer-content" onClick={(e) => e.stopPropagation()}>

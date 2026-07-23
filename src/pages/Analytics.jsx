@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
+import axios from 'axios'; // ✅ Badilisha: Axios badala ya Supabase
 import { 
   LayoutDashboard, MessageSquare, ClipboardList, 
   Settings, BarChart3, Bell, Search, Menu, TrendingUp, 
@@ -14,6 +14,8 @@ import {
 import UserTools from '../components/UserTools';
 import toast from 'react-hot-toast';
 import '../AccountSettings.css'; 
+
+const API_BASE_URL = "http://127.0.0.1:8000/api"; // ✅ Ongeza hii
 
 export default function Analytics({ session }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -33,31 +35,44 @@ export default function Analytics({ session }) {
   
   const location = useLocation();
 
-  // Fetch user's store ID
+  // ✅ BADILISHA: Fetch user's store ID using Axios
   useEffect(() => {
     const fetchStore = async () => {
       if (!session?.user?.id) return;
       
-      const { data, error } = await supabase
-        .from('stores_engine')
-        .select('id')
-        .eq('owner_id', session.user.id)
-        .maybeSingle();
-      
-      if (!error && data) {
-        setStoreId(data.id);
+      const token = localStorage.getItem("access_token");
+      if (!token) return;
+
+      try {
+        const response = await axios.get(`${API_BASE_URL}/stores/`, {
+          params: { owner_id: session.user.id },
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.data && response.data.length > 0) {
+          setStoreId(response.data[0].id);
+        }
+      } catch (error) {
+        console.error('Error fetching store:', error);
+        toast.error('Imeshindwa kupata store ID.');
       }
     };
     
     fetchStore();
   }, [session]);
 
-  // Fetch analytics data
+  // ✅ BADILISHA: Fetch analytics data using Axios
   useEffect(() => {
     if (!storeId) return;
     
     const fetchAnalytics = async () => {
       setLoading(true);
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        toast.error("Tafadhali ingia tena.");
+        setLoading(false);
+        return;
+      }
+      const headers = { Authorization: `Bearer ${token}` };
       
       try {
         // Calculate date range
@@ -75,16 +90,18 @@ export default function Analytics({ session }) {
         const startDateStr = startDate.toISOString();
         
         // 1. Fetch orders
-        const { data: orders, error: ordersError } = await supabase
-          .from('orders')
-          .select('*')
-          .eq('store_id', storeId)
-          .gte('created_at', startDateStr)
-          .order('created_at', { ascending: true });
+        const ordersRes = await axios.get(`${API_BASE_URL}/orders/`, {
+          params: {
+            store_id: storeId,
+            created_at__gte: startDateStr,
+            ordering: 'created_at'
+          },
+          headers
+        });
         
-        if (ordersError) throw ordersError;
+        const orders = ordersRes.data || [];
         
-        // 2. Process revenue by date
+        // 2. Process revenue by date (Mantiki imebaki sawa)
         const revenueByDate = {};
         const uniqueCustomers = new Set();
         
@@ -124,22 +141,24 @@ export default function Analytics({ session }) {
         const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
         
         // 4. Fetch total products
-        const { count: totalProducts, error: productsError } = await supabase
-          .from('products_engine')
-          .select('*', { count: 'exact', head: true })
-          .eq('store_id', storeId);
-        
-        if (productsError) throw productsError;
+        const productsRes = await axios.get(`${API_BASE_URL}/products/`, {
+          params: { store_id: storeId },
+          headers
+        });
+        // Ikiwa backend inarudisha list, tunatumia .length. Ikiwa inarudisha pagination (count), tumia productsRes.data.count
+        const productsCount = Array.isArray(productsRes.data) 
+          ? productsRes.data.length 
+          : (productsRes.data?.count || productsRes.data?.results?.length || 0);
         
         setStats({
           totalRevenue,
           totalOrders,
           averageOrderValue,
-          totalProducts: totalProducts || 0,
+          totalProducts: productsCount,
           totalCustomers: uniqueCustomers.size
         });
         
-        // 5. Orders by status
+        // 5. Orders by status (Logic imebaki sawa)
         const statusCount = {};
         orders.forEach(order => {
           const status = order.status || 'pending';
@@ -166,19 +185,20 @@ export default function Analytics({ session }) {
         setOrdersByStatus(statusData);
         
         // 6. Recent orders (last 5)
-        const { data: recent, error: recentError } = await supabase
-          .from('orders')
-          .select('*, profiles!orders_customer_id_fkey(full_name)')
-          .eq('store_id', storeId)
-          .order('created_at', { ascending: false })
-          .limit(5);
+        const recentRes = await axios.get(`${API_BASE_URL}/orders/`, {
+          params: {
+            store_id: storeId,
+            ordering: '-created_at',
+            limit: 5
+          },
+          headers
+        });
         
-        if (!recentError && recent) {
-          setRecentOrders(recent);
-        }
+        // Ikiwa backend inajumuisha customer profile kwa nested serializer (depth=1)
+        setRecentOrders(recentRes.data || []);
         
       } catch (error) {
-        console.error('Error fetching analytics:', error);
+        console.error('Error fetching analytics:', error.response?.data || error.message);
         toast.error('Hitilafu ilitokea kupata data za analytics');
       } finally {
         setLoading(false);

@@ -1,6 +1,6 @@
 // src/hooks/useDashboardData.js
 import { useState, useEffect } from 'react';
-import { supabase } from '../supabaseClient';
+import api from '../axiosConfig'; // ✅ MUHIMU: Tumia api!
 
 export const useDashboardData = () => {
   const [data, setData] = useState({
@@ -19,7 +19,7 @@ export const useDashboardData = () => {
       try {
         setData(prev => ({ ...prev, loading: true, error: null }));
 
-        // 🔥 QUERY ZOTE KWA PAMOJA - Parallel fetching
+        // 🔥 FETCH ZOTE KWA PAMOJA - Tumia api.get (sio axios.get!)
         const [
           categoriesRes,
           trendingRes,
@@ -27,67 +27,42 @@ export const useDashboardData = () => {
           featuredRes,
           subCategoriesRes
         ] = await Promise.all([
-          // 1. Categories
-          supabase
-            .from('categories')
-            .select('*')
-            .order('name', { ascending: true }),
-          
-          // 2. Trending Products
-          supabase
-            .from('products_engines')
-            .select('*')
-            .eq('is_approved', true)
-            .order('views', { ascending: false })
-            .limit(8),
-          
-          // 3. Advertisements
-          supabase
-            .from('advertisements')
-            .select('*')
-            .eq('status', 'active'),
-          
-          // 4. Featured Products (All categories)
-          supabase
-            .from('products_engines')
-            .select(`
-              leaf_category_id,
-              cover_image,
-              leaf_categories!inner (
-                id,
-                name,
-                name_sw
-              )
-            `)
-            .not('cover_image', 'is', null)
-            .limit(50),
-          
-          // 5. Sub Categories (All)
-          supabase
-            .from('sub_categories')
-            .select('*')
-            .order('name', { ascending: true })
+          api.get('/categories/'),
+          api.get('/products/', {
+            params: { is_approved: true, ordering: '-views', limit: 8 }
+          }),
+          api.get('/advertisements/', {
+            params: { status: 'active' }
+          }),
+          api.get('/products/', {
+            params: { has_cover_image: true, limit: 50 }
+          }),
+          api.get('/subcategories/')
         ]);
 
-        // Process categories (add "All")
+        const categoriesData = categoriesRes.data.results || categoriesRes.data;
+        const trendingData = trendingRes.data.results || trendingRes.data;
+        const adsData = adsRes.data.results || adsRes.data;
+        const featuredData = featuredRes.data.results || featuredRes.data;
+        const subCategoriesData = subCategoriesRes.data.results || subCategoriesRes.data;
+
         let categories = [];
-        if (!categoriesRes.error && categoriesRes.data) {
+        if (categoriesData) {
           const allCategory = { id: null, name: 'All', name_sw: 'Zote' };
-          categories = [allCategory, ...categoriesRes.data];
+          categories = [allCategory, ...categoriesData];
         }
 
-        // Process featured products (unique)
         let featuredProducts = [];
-        if (!featuredRes.error && featuredRes.data) {
+        if (featuredData) {
           const seenIds = new Set();
-          featuredRes.data.forEach(item => {
+          featuredData.forEach(item => {
             if (!seenIds.has(item.leaf_category_id)) {
               seenIds.add(item.leaf_category_id);
               featuredProducts.push({
                 id: item.leaf_category_id,
                 leaf_category_id: item.leaf_category_id,
                 cover_image: item.cover_image,
-                leaf_categories: item.leaf_categories
+                leaf_categories: item.leaf_categories || { name: 'Unknown', name_sw: 'Haijulikani' }
               });
             }
           });
@@ -96,10 +71,10 @@ export const useDashboardData = () => {
 
         setData({
           categories,
-          trendingProducts: trendingRes.data || [],
-          ads: adsRes.data || [],
+          trendingProducts: trendingData || [],
+          ads: adsData || [],
           featuredProducts,
-          subCategories: subCategoriesRes.data || [],
+          subCategories: subCategoriesData || [],
           leafsForSub: [],
           loading: false,
           error: null
@@ -110,7 +85,7 @@ export const useDashboardData = () => {
         setData(prev => ({ 
           ...prev, 
           loading: false, 
-          error: error.message 
+          error: error.response?.data?.detail || error.message 
         }));
       }
     };

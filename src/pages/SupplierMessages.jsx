@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { supabase } from '../supabaseClient';
+import axios from 'axios';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, MessageSquare, ClipboardList, 
@@ -10,7 +10,9 @@ import '../Messages.css';
 import '../AccountSettings.css';
 import messageImage from "../images/messageSent.svg"; 
 
-const SupplierMessages = ({ session }) => {
+const API_BASE_URL = "http://127.0.0.1:8000/api";
+
+const SupplierMessages = () => { // 🔥 IMEONDOLEShA { session }!
   const navigate = useNavigate();
   const location = useLocation();
   const messagesEndRef = useRef(null);
@@ -23,6 +25,9 @@ const SupplierMessages = ({ session }) => {
   const [newMessage, setNewMessage] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const [showMobileChat, setShowMobileChat] = useState(false);
+  
+  // 🔥 MPYA: Pata ID ya mtumiaji kutoka Backend
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
@@ -39,67 +44,133 @@ const SupplierMessages = ({ session }) => {
     scrollToBottom();
   }, [messages]);
 
+  // 🔥 FETCH MTUMIAJI (Profile ID) kutoka Backend
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+          navigate('/dashboard/login');
+          return;
+        }
+        const res = await axios.get(`${API_BASE_URL}/profile/`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setCurrentUserId(res.data.id); // Hapa tunapata ID ya Profile
+      } catch (err) {
+        console.error("Failed to get profile ID:", err);
+      }
+    };
+    fetchProfile();
+  }, [navigate]);
+
+  // ✅ FETCH MESSAGES FOR A SPECIFIC CHAT
   const fetchMessages = async (partnerId) => {
-    if (!partnerId || !session?.user?.id) return;
+    if (!partnerId || !currentUserId) return;
     try {
-      const { data, error } = await supabase
-        .from('messages')
-        .select(`*,
-          sender:sender_id ( id, full_name, avatar_url ),
-          receiver:receiver_id ( id, full_name, avatar_url )`)
-        .or(`and(sender_id.eq.${session.user.id},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${session.user.id})`)
-        .order('created_at', { ascending: true });
-      if (!error && data) setMessages(data);
-      else setMessages([]);
-    } catch (err) { setMessages([]); }
+      const token = localStorage.getItem("access_token");
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const response = await axios.get(`${API_BASE_URL}/messages/`, {
+        params: {
+          sender: currentUserId,
+          receiver: partnerId
+        },
+        headers
+      });
+
+      setMessages(response.data || []);
+    } catch (err) {
+      console.error("Error fetching messages:", err.response?.data || err.message);
+      setMessages([]);
+    }
   };
 
+  // ✅ FETCH INBOX (ALL CHATS)
   const fetchInbox = async () => {
-    if (!session?.user) return;
+    if (!currentUserId) return;
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('messages')
-        .select(`*,
-          sender:sender_id ( id, full_name, avatar_url ),
-          receiver:receiver_id ( id, full_name, avatar_url )`)
-        .or(`sender_id.eq.${session.user.id},receiver_id.eq.${session.user.id}`)
-        .order('created_at', { ascending: false });
-      if (data) {
-        const chatGroups = {};
-        data.forEach(msg => {
-          const isISender = msg.sender_id === session.user.id;
-          const partnerId = isISender ? msg.receiver_id : msg.sender_id;
-          const partnerData = isISender ? msg.receiver : msg.sender;
-          if (partnerId && !chatGroups[partnerId]) {
-            chatGroups[partnerId] = {
-              id: partnerId,
-              name: partnerData?.full_name || `Mteja ${partnerId.slice(0,4)}`,
-              avatar: partnerData?.avatar_url || null,
-              lastMsg: msg.content,
-              date: new Date(msg.created_at).toLocaleDateString(),
-              timestamp: new Date(msg.created_at).getTime()
-            };
-          }
-        });
-        setChats(Object.values(chatGroups).sort((a,b) => b.timestamp - a.timestamp));
-      }
+      const token = localStorage.getItem("access_token");
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const response = await axios.get(`${API_BASE_URL}/messages/`, {
+        params: {
+          user_id: currentUserId,
+          ordering: '-created_at'
+        },
+        headers
+      });
+
+      const data = response.data || [];
+      const chatGroups = {};
+
+      data.forEach(msg => {
+        const isISender = msg.sender_id === currentUserId;
+        const partnerId = isISender ? msg.receiver_id : msg.sender_id;
+        const partnerData = isISender ? msg.receiver : msg.sender;
+        const partnerName = partnerData?.full_name || `Mteja ${partnerId.slice(0,4)}`;
+        
+        if (partnerId && !chatGroups[partnerId]) {
+          chatGroups[partnerId] = {
+            id: partnerId,
+            name: partnerName,
+            avatar: partnerData?.avatar_url || null,
+            lastMsg: msg.content,
+            date: new Date(msg.created_at).toLocaleDateString(),
+            timestamp: new Date(msg.created_at).getTime()
+          };
+        }
+      });
+
+      setChats(Object.values(chatGroups).sort((a,b) => b.timestamp - a.timestamp));
     } catch (err) {
-      console.error(err);
-    } finally { setLoading(false); }
+      console.error("Error fetching inbox:", err.response?.data || err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  useEffect(() => { 
+    if (currentUserId) fetchInbox(); 
+  }, [currentUserId]);
+
+  // ✅ HANDLE SEND MESSAGE
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim() || !activeChat) return;
-    const tempMsg = { id: Date.now(), sender_id: session.user.id, receiver_id: activeChat.id, content: newMessage, created_at: new Date().toISOString() };
+    if (!newMessage.trim() || !activeChat || !currentUserId) return;
+
+    const tempMsg = { 
+      id: Date.now(), 
+      sender_id: currentUserId, 
+      receiver_id: activeChat.id, 
+      content: newMessage, 
+      created_at: new Date().toISOString() 
+    };
     setMessages(prev => [...prev, tempMsg]);
     const originalMessage = newMessage;
     setNewMessage("");
     scrollToBottom();
-    const { error } = await supabase.from('messages').insert([{ sender_id: session.user.id, receiver_id: activeChat.id, content: originalMessage }]);
-    if (error) setNewMessage(originalMessage);
-    else fetchMessages(activeChat.id);
+
+    try {
+      const token = localStorage.getItem("access_token");
+      const headers = { Authorization: `Bearer ${token}` };
+
+      await axios.post(
+        `${API_BASE_URL}/messages/`,
+        {
+          sender_id: currentUserId,
+          receiver_id: activeChat.id,
+          content: originalMessage
+        },
+        { headers }
+      );
+
+      fetchMessages(activeChat.id);
+    } catch (error) {
+      console.error("Error sending message:", error.response?.data || error.message);
+      setNewMessage(originalMessage);
+    }
   };
 
   const handleChatSelect = async (chat) => {
@@ -111,20 +182,13 @@ const SupplierMessages = ({ session }) => {
 
   const handleBackToChatList = () => setShowMobileChat(false);
 
-  useEffect(() => { fetchInbox(); }, [session]);
-
-  // 🔥 MABADILIKO HAPA: SIDEBAR INAELEKEZA KWENYE '/dashboard/supplier-notifications'
+  // 🔥 SIDEBAR LINKS
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} />, path: '/dashboard/sellerboard', label: 'Duka Lako' },
     { icon: <MessageSquare size={20} />, path: '/dashboard/supplier-messages', label: 'Ujumbe' },
-    { icon: <ClipboardList size={20} />, path: '/dashboard/supplier-notifications', label: 'Arifa (Oda)' }, // 🔥 Imebadilishwa
+    { icon: <ClipboardList size={20} />, path: '/dashboard/supplier-notifications', label: 'Arifa (Oda)' },
     { icon: <Settings size={20} />, path: '/dashboard/supplier-settings', label: 'Mipangilio' },
   ];
-
-  const getSenderName = (msg) => {
-    if (msg.sender_id === session.user.id) return "Me";
-    return msg.sender?.full_name || "User";
-  };
 
   return (
     <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -191,8 +255,8 @@ const SupplierMessages = ({ session }) => {
                 </div>
                 <div style={{ flex: 1, overflowY: 'auto', padding: '20px', backgroundColor: '#f5f5f7' }}>
                   {messages.length === 0 ? <p style={{ textAlign: 'center', color: '#999' }}>Hakuna ujumbe bado</p> : messages.map((msg, idx) => (
-                    <div key={idx} style={{ display: 'flex', justifyContent: msg.sender_id === session.user.id ? 'flex-end' : 'flex-start', marginBottom: '10px' }}>
-                      <div style={{ maxWidth: '70%', padding: '10px 15px', borderRadius: '12px', backgroundColor: msg.sender_id === session.user.id ? '#ff6a00' : '#e5e7eb', color: msg.sender_id === session.user.id ? '#fff' : '#333' }}>
+                    <div key={idx} style={{ display: 'flex', justifyContent: msg.sender_id === currentUserId ? 'flex-end' : 'flex-start', marginBottom: '10px' }}>
+                      <div style={{ maxWidth: '70%', padding: '10px 15px', borderRadius: '12px', backgroundColor: msg.sender_id === currentUserId ? '#ff6a00' : '#e5e7eb', color: msg.sender_id === currentUserId ? '#fff' : '#333' }}>
                         <p style={{ margin: 0 }}>{msg.content}</p>
                         <span style={{ fontSize: '10px', opacity: 0.7, display: 'block', marginTop: '4px' }}>{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
@@ -210,7 +274,7 @@ const SupplierMessages = ({ session }) => {
         </div>
       </div>
 
-      {/* 🔥 MABADILIKO HAPA: MOBILE BOTTOM NAV INAELEKEZA KWENYE '/dashboard/supplier-notifications' */}
+      {/* MOBILE BOTTOM NAV */}
       {isMobile && (
         <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'white', display: 'flex', justifyContent: 'space-around', alignItems: 'center', padding: '10px 0 20px', borderTop: '1px solid #eee', zIndex: 1000 }}>
           <button onClick={() => navigate('/dashboard/sellerboard')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', flex: 1 }}>
@@ -218,14 +282,10 @@ const SupplierMessages = ({ session }) => {
             <span style={{ fontSize: '10px', color: location.pathname.startsWith('/dashboard/sellerboard') ? '#ff6600' : '#666' }}>Duka</span>
           </button>
 
-         {/* Oda - Inaelekeza kwenye supplier-orders, sio notifications */}
-          <button 
-           onClick={() => navigate('/dashboard/supplier-orders')} // 🔥 BADILISHA HAPA!
-          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', flex: 1 }}
-            >
-         <ClipboardList size={22} color={location.pathname === '/dashboard/supplier-orders' ? '#ff6600' : '#666'} />
-         <span style={{ fontSize: '10px', color: location.pathname === '/dashboard/supplier-orders' ? '#ff6600' : '#666' }}>Oda</span>
-         </button>
+          <button onClick={() => navigate('/dashboard/supplier-orders')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', flex: 1 }}>
+            <ClipboardList size={22} color={location.pathname === '/dashboard/supplier-orders' ? '#ff6600' : '#666'} />
+            <span style={{ fontSize: '10px', color: location.pathname === '/dashboard/supplier-orders' ? '#ff6600' : '#666' }}>Oda</span>
+          </button>
 
           <button onClick={() => navigate('/advertise')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', flex: 1 }}>
             <Megaphone size={22} color={location.pathname === '/advertise' ? '#ff6600' : '#666'} />

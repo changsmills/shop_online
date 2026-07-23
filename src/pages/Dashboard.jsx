@@ -1,20 +1,11 @@
 import React, { Suspense, lazy, useState, useEffect, useRef } from "react";
 import ReactDOM from 'react-dom';
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../supabaseClient";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "../App.css";
-//import TopStores from "../components/TopStores";
-//import LocationFilter from "../components/LocationFilter";
-//import JustForYou from "../components/JustForYou";
-//import TopDeals from "../components/TopDeals"; 
-//import NewArrivals from "../components/NewArrivals"; 
-//import RecentlyViewed from "../components/RecentlyViewed";
+import axios from "axios";
 import DashboardCard from "../components/DashboardCard";
-//import TrendingNow from "../components/TrendingNow";
-
-// Badala ya React.lazy, tumia lazy moja kwa moja
 const TopStores = lazy(() => import("../components/TopStores"));
 const LocationFilter = lazy(() => import("../components/LocationFilter"));
 const JustForYou = lazy(() => import("../components/JustForYou"));
@@ -22,6 +13,9 @@ const TopDeals = lazy(() => import("../components/TopDeals"));
 const NewArrivals = lazy(() => import("../components/NewArrivals"));
 const RecentlyViewed = lazy(() => import("../components/RecentlyViewed"));
 const TrendingNow = lazy(() => import("../components/TrendingNow"));
+const API_BASE_URL = "http://127.0.0.1:8000/api";
+const getToken = () => localStorage.getItem("access_token");
+
 
 import { useDashboardData } from "../hooks/useDashboardData";
 import BottomNav from "../components/BottomNav";
@@ -37,25 +31,6 @@ import {
 } from "lucide-react";
 
 const placeholderImg = "https://via.placeholder.com/100?text=Skyfall";
-
-const getCachedSession = () => {
-  try {
-    const supabaseSession = localStorage.getItem('supabase.auth.token');
-    if (supabaseSession) {
-      const parsed = JSON.parse(supabaseSession);
-      if (parsed?.currentSession?.access_token) {
-        const expiresAt = parsed.currentSession.expires_at;
-        if (expiresAt && Date.now() < expiresAt * 1000) {
-          return parsed.currentSession;
-        }
-      }
-    }
-    return null;
-  } catch (err) {
-    console.error("Error reading cached session:", err);
-    return null;
-  }
-};
 
 export default function Dashboard() {
   const { t, i18n } = useTranslation();
@@ -100,19 +75,22 @@ export default function Dashboard() {
         return;
       }
 
-      // ✅ BADILISHA HAPA: 'ads' → 'advertisements' NA ONGEZA .eq('status', 'active')
-      const { data, error } = await supabase
-        .from('advertisements')
-        .select('*')
-        .eq('status', 'active');
-
-      if (!error && data) {
-        setCachedAds(data);
-        localStorage.setItem('skyfall_ads', JSON.stringify(data));
-        localStorage.setItem('skyfall_ads_time', String(Date.now()));
+      try {
+        // ✅ BADILISHA: Piga API ya Django kwa matangazo yaliyo 'active'
+        const response = await axios.get(`${API_BASE_URL}/advertisements/`, {
+          params: { status: 'active' } // Kama backend inaweza kuchuja kwa parameter
+        });
+        
+        const data = response.data;
+        if (data) {
+          setCachedAds(data);
+          localStorage.setItem('skyfall_ads', JSON.stringify(data));
+          localStorage.setItem('skyfall_ads_time', String(Date.now()));
+        }
+      } catch (error) {
+        console.error("Error fetching ads:", error);
       }
     };
-
     fetchAdsWithCache();
   }, []);
 
@@ -128,95 +106,76 @@ const isVideoAd = (ad) => {
   return ad.media_url.match(/\.(mp4|webm|mov)$/i) !== null;
 };
 
-  // ========== DYNAMIC FETCH FUNCTIONS ==========
+   // 1. Fetch Featured Leafs (Kategoria za kipekee zenye picha)
   const fetchFeaturedLeafs = async (categoryId) => {
     if (!categoryId) return;
-    
-    const { data, error } = await supabase
-      .from('products_engines')
-      .select(`
-        leaf_category_id,
-        cover_image,
-        leaf_categories!inner (
-          id,
-          name,
-          name_sw
-        )
-      `)
-      .eq('parent_category_id', categoryId)
-      .not('cover_image', 'is', null)
-      .limit(50);
+    try {
+      const response = await axios.get(`${API_BASE_URL}/products/`, {
+        params: { parent_category: categoryId }
+      });
 
-    if (!error && data) {
-      const uniqueCategories = [];
+      // Chuja ili tu kupata leaf categories za kipekee zenye picha
       const seenIds = new Set();
-
-      data.forEach(item => {
-        if (!seenIds.has(item.leaf_category_id)) {
+      const uniqueLeafs = response.data
+        .filter(item => item.cover_image && !seenIds.has(item.leaf_category_id))
+        .map(item => {
           seenIds.add(item.leaf_category_id);
-          uniqueCategories.push({
+          return {
             id: item.leaf_category_id,
             leaf_category_id: item.leaf_category_id,
             cover_image: item.cover_image,
-            leaf_categories: item.leaf_categories
-          });
-        }
-      });
-
-      setFeaturedProducts(uniqueCategories.slice(0, 17));
-    } else {
+            leaf_categories: item.leaf_categories || { name: 'Unknown', name_sw: 'Haijulikani' }
+          };
+        });
+        
+      setFeaturedProducts(uniqueLeafs.slice(0, 17));
+    } catch (error) {
+      console.error(error);
       setFeaturedProducts([]);
     }
   };
 
+  // 2. Fetch Subcategories (Sahihi na rahisi)
   const fetchSubCategories = async (categoryId) => {
-    const { data } = await supabase
-      .from('sub_categories')
-      .select('*')
-      .eq('category_id', categoryId)
-      .order('name', { ascending: true });
-    
-    if (data) {
-      setSubCategories(data);
-      if (data.length > 0) {
-        setSelectedSubCategory(data[0]);
-        await fetchLeafsForSub(data[0].id);
+    try {
+      const response = await axios.get(`${API_BASE_URL}/subcategories/`, {
+        params: { category_id: categoryId }
+      });
+      setSubCategories(response.data);
+      if (response.data.length > 0) {
+        setSelectedSubCategory(response.data[0]);
+        await fetchLeafsForSub(response.data[0].id);
       }
+    } catch (error) {
+      console.error(error);
     }
   };
 
+  // 3. Fetch Leafs for Subcategory (Inachuja kupitia bidhaa, kama Supabase)
   const fetchLeafsForSub = async (subCategoryId) => {
-    const { data, error } = await supabase
-      .from('products_engines')
-      .select(`
-        leaf_category_id,
-        cover_image,
-        leaf_categories!inner (
-          id,
-          name,
-          name_sw
-        )
-      `)
-      .eq('category_id', subCategoryId)
-      .not('cover_image', 'is', null);
-
-    if (!error && data) {
-      const uniqueLeafs = [];
-      const seenLeafIds = new Set();
-
-      data.forEach(item => {
-        if (!seenLeafIds.has(item.leaf_category_id)) {
-          seenLeafIds.add(item.leaf_category_id);
-          uniqueLeafs.push({
-            id: item.leaf_category_id,
-            name: item.leaf_categories.name,
-            name_sw: item.leaf_categories.name_sw,
-            cover_image: item.cover_image
-          });
-        }
+    try {
+      // Tumia endpoint ya products kwa sababu ni hapo ndipo kuna cover_image
+      const response = await axios.get(`${API_BASE_URL}/products/`, {
+        params: { category: subCategoryId } // Tafuta products zenye subCategoryId
       });
+
+      // Sasa chuja na upate leaf categories za kipekee kwa kategoria hii
+      const seenLeafIds = new Set();
+      const uniqueLeafs = response.data
+        .filter(item => item.cover_image && !seenLeafIds.has(item.leaf_category_id))
+        .map(item => {
+          seenLeafIds.add(item.leaf_category_id);
+          return {
+            id: item.leaf_category_id,
+            name: item.leaf_categories?.name || 'Unknown',
+            name_sw: item.leaf_categories?.name_sw || 'Haijulikani',
+            cover_image: item.cover_image
+          };
+        });
+        
       setLeafsForSub(uniqueLeafs);
-    } else {
+    } catch (error) {
+      console.error(error);
       setLeafsForSub([]);
     }
   };
@@ -242,47 +201,6 @@ const isVideoAd = (ad) => {
     }
   }, [initialSubCategories]);
 
-  useEffect(() => {
-    let isMounted = true;
-
-    const checkAuth = async () => {
-      const cached = getCachedSession();
-
-      if (cached && isMounted) {
-        setSession(cached);
-      }
-
-      try {
-        const { data: { session: latestSession } } = await supabase.auth.getSession();
-        
-        if (!isMounted) return;
-
-        if (latestSession) {
-          setSession(latestSession);
-        } else {
-          setSession(null);
-        }
-      } catch (err) {
-        console.error("Auth error:", err);
-        setSession(null);
-      } finally {
-        if (isMounted) setSessionLoading(false);
-      }
-    };
-
-    checkAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      if (isMounted) {
-        setSession(newSession);
-      }
-    });
-
-    return () => {
-      isMounted = false;
-      subscription?.unsubscribe();
-    };
-  }, []);
 
   useEffect(() => {
     if (selectedCategory?.id && activeMenu === 'categories') {
@@ -324,6 +242,22 @@ const isVideoAd = (ad) => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, []);
+
+  useEffect(() => {
+  let isMounted = true;
+  const checkAuth = async () => {
+    const token = getToken();
+    if (token && isMounted) {
+      // Kwa sasa, token ipo. Unaweza ku-verify kwa kupiga endpoint ya profile.
+      // Hapa tutachukulia kuwa ameingia.
+      setSession({ user: { id: "authenticated" } }); // Dummy session kwa UI
+    } else {
+      setSession(null);
+    }
+    if (isMounted) setSessionLoading(false);
+  };
+  checkAuth();
+}, []);
 
   // ========== HANDLERS ==========
   const handleMouseEnter = (menuName) => {

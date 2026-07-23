@@ -1,5 +1,5 @@
 /* ============================================ */
-/* LAYER 1: CARD CONTAINER (IMEBOLEWA)          */
+/* LAYER 1: CARD CONTAINER                      */
 /* ============================================ */
 
 .product-card-item {
@@ -13,35 +13,34 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box; /* Inazuia kadi kupanuka zaidi ya container yake */
+  box-sizing: border-box;
 }
 
 .product-card-item:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
-/* ✅ Mobile adjustments kwa Container */
 @media (max-width: 768px) {
   .product-card-item {
-    border-radius: 6px;
+    border-radius: 4px; /* Imepunguzwa zaidi */
     border-width: 1px;
   }
 }
 
 
 /* ============================================ */
-/* LAYER 2, 3, 4, 5 (ZIMEBADILISHWA PADGING)    */
+/* LAYER 2: MEDIA (PICHA)                       */
 /* ============================================ */
 
-/* LAYER 2: Picha (Hakuna mabadiliko, inabaki square) */
 .product-card-media {
   position: relative;
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 3 / 4;
   background: #f8f8f8;
   overflow: hidden;
   border-radius: 8px 8px 0 0;
 }
+
 .product-card-img {
   width: 100%;
   height: 100%;
@@ -50,131 +49,162 @@
   display: block;
   transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
+
 .product-card-item:hover .product-card-img {
-  transform: scale(1.12);
-}
-@media (hover: none) {
-  .product-card-item:active .product-card-img { transform: scale(1.12); }
-}
-@media (max-width: 768px) {
-  .product-card-media { border-radius: 6px 6px 0 0; }
+  transform: scale(1.05);
 }
 
-/* LAYER 3: Badges */
+@media (hover: none) {
+  .product-card-item:active .product-card-img { transform: scale(1.05); }
+}
+
+/* Mobile: Picha mraba (1/1) */
+@media (max-width: 768px) {
+  .product-card-media { 
+    aspect-ratio: 1 / 1 !important; 
+    border-radius: 4px 4px 0 0; 
+  }
+}
+
+
+/* ============================================ */
+/* LAYER 3: BADGES (NDOGO SANA)                 */
+/* ============================================ */
+
 .rank-indicator {
-  position: absolute; top: 6px; left: 6px; z-index: 2;
+  position: absolute; top: 4px; left: 4px; z-index: 2;
   background: rgba(0, 0, 0, 0.7); color: white;
-  padding: 2px 6px; border-radius: 4px;
-  display: flex; align-items: center; gap: 3px; font-weight: bold;
+  padding: 2px 6px; border-radius: 3px;
+  display: flex; align-items: center; gap: 3px; font-weight: bold; font-size: 10px;
 }
 .rank-level-1 { background: #ff4d4f; }
 .rank-level-2 { background: #ff7a45; }
 .rank-level-3 { background: #ffc53d; }
+
 .discount-badge-mini {
-  position: absolute; top: 6px; right: 6px;
+  position: absolute; top: 4px; right: 4px;
   background: #ef4444; color: white;
-  padding: 2px 6px; border-radius: 4px; font-weight: bold; z-index: 2;
+  padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 10px; z-index: 2;
 }
+
 @media (max-width: 768px) {
-  .rank-indicator { font-size: 9px; padding: 2px 4px; }
-  .discount-badge-mini { font-size: 10px; padding: 2px 4px; top: 4px; right: 4px; }
+  .rank-indicator { font-size: 6px; padding: 1px 3px; top: 2px; left: 2px; }
+  .discount-badge-mini { font-size: 7px; padding: 1px 3px; top: 2px; right: 2px; }
 }
 
-/* ✅ LAYER 4: INFO SECTION (PADDING IMEPUNGUA SANA) */
+
+/* ============================================ */
+/* LAYER 4: INFO SECTION (PADDING)              */
+/* ============================================ */
+
 .product-card-info {
-  padding: 8px 8px 10px 8px; /* Imepungua kwa desktop */
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  background: transparent;
-  position: relative;
-  z-index: 2;
+  padding: 12px 12px 14px 12px;
+  display: flex; flex-direction: column; gap: 4px;
+  background: transparent; position: relative; z-index: 2;
 }
 
-/* ✅ Mobile info padding (Sahihi sana kwa UI/UX) */
+/* ✅ Punguza padding hadi 2px tu kwenye mobile */
 @media (max-width: 768px) {
   .product-card-info {
-    padding: 4px 4px 6px 4px; /* Punguza padding sana, lakini usiondoe kabisa */
-    gap: 2px;
+    padding: 2px 2px 3px 2px !important; /* Ndogo kabisa */
+    gap: 1px !important;
   }
 }
 
-/* Title */
+
+/* ============================================ */
+/* LAYER 5: TYPOGRAPHY (NDOGO KABISA)           */
+/* ============================================ */
+
 .product-card-title {
-  margin: 0; font-size: 13px; color: #333; font-weight: 500;
-  line-height: 1.3;
+  margin: 0; font-size: 14px; color: #1a1a1a; font-weight: 600; line-height: 1.3;
   display: -webkit-box; -webkit-box-orient: vertical;
   -webkit-line-clamp: 2; overflow: hidden;
 }
+
 @media (max-width: 768px) {
-  .product-card-title { font-size: 11px; line-height: 1.2; }
+  .product-card-title { 
+    font-size: 8px !important; /* 8px tu */
+    line-height: 1.1; 
+    -webkit-line-clamp: 1 !important; /* Mstari mmoja tu ili kuokoa urefu */
+  }
 }
 
-/* Price Row */
 .product-card-price-row {
-  display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; margin-top: 2px;
-}
-.price-currency { color: #ff6a00; font-size: 0.85rem; font-weight: 600; }
-.price-amount { color: #ff6a00; font-size: 1.2rem; font-weight: 800; }
-.price-original-strikethrough {
-  text-decoration: line-through; color: #999; font-size: 11px; font-weight: 400;
-}
-@media (max-width: 768px) {
-  .price-currency { font-size: 10px; }
-  .price-amount { font-size: 14px; }
-  .price-original-strikethrough { font-size: 10px; }
+  display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; margin-top: 1px;
 }
 
-/* MOQ */
-.store-moq-info { display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+.price-currency { color: #ff6a00; font-size: 0.8rem; font-weight: 600; }
+.price-amount { color: #ff6a00; font-size: 0.9rem; font-weight: 700; }
+.price-original-strikethrough {
+  text-decoration: line-through; color: #999; font-size: 10px; font-weight: 400;
+}
+
+@media (max-width: 768px) {
+  .price-currency { font-size: 7px !important; }
+  .price-amount { font-size: 8px !important; } 
+  .price-original-strikethrough { font-size: 7px !important; }
+}
+
+.store-moq-info { display: flex; align-items: center; gap: 3px; margin-top: 1px; }
 .moq-label { font-size: 10px; color: #64748b; font-weight: 500; }
 .moq-value { font-size: 13px; font-weight: 700; color: #1e293b; }
+
 @media (max-width: 768px) {
-  .moq-label { font-size: 9px; }
-  .moq-value { font-size: 11px; }
+  .moq-label { font-size: 7px !important; }
+  .moq-value { font-size: 8px !important; }
 }
 
+
 /* ============================================ */
-/* ✅ LAYER 6: ULTIMATE MOBILE SIZE (IMEBOLEWA) */
+/* LAYER 6: HIDING UNNECESSARY INFO ON MOBILE   */
 /* ============================================ */
 
-/* 1. DESKTOP (Skrini kubwa) - PUNGUZA HADI 170px */
+@media (max-width: 768px) {
+  .product-card-category { display: none !important; }
+  .product-card-subtitle-row { display: none !important; }
+  .store-moq-info { display: none !important; } /* Ficha MOQ ili kuokoa nafasi */
+}
+
+
+/* ============================================ */
+/* ✅ LAYER 7: ULTIMATE GRID RESPONSIVENESS     */
+/* ============================================ */
+
+/* Desktop */
 .universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
   display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)) !important; /* 230px → 170px */
-  gap: 16px !important;
-  padding: 20px !important;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important; /* 150px */
+  gap: 12px !important;
+  padding: 16px !important;
   width: 100% !important;
   box-sizing: border-box !important;
   justify-content: center !important; 
 }
 
-/* 2. TABLET - PUNGUZA HADI 140px */
+/* ✅ Tablet - SAFU 6 (Kadi 6 kwa mstari) */
 @media (max-width: 1024px) and (min-width: 769px) {
   .universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important; /* 180px → 140px */
-    gap: 12px !important;
-    padding: 16px !important;
+    grid-template-columns: repeat(6, 1fr) !important; 
+    gap: 4px !important;
+    padding: 8px !important;
   }
 }
 
-/* 3. MOBILE - PUNGUZA HADI 110px (Kwa safu 3) */
+/* ✅ Mobile - SAFU 5 (Kadi 5 kwa mstari) */
 @media (max-width: 768px) {
   .universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important; /* 150px → 110px */
-    gap: 6px !important; /* Punguza pengo kati ya kadi */
-    padding: 0 12px 12px 12px !important; /* Punguza padding ya pembeni */
-    width: 100% !important;
-    box-sizing: border-box !important;
+    grid-template-columns: repeat(5, 1fr) !important; 
+    gap: 2px !important; 
+    padding: 0 1px 2px 1px !important; 
   }
 }
 
-/* 4. SIMU NDOGO SANA (Chini ya 400px) */
+/* ✅ Simu Ndogo Sana - BADO SAFU 5 (Pengo la 1px) */
 @media (max-width: 400px) {
   .universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
-    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)) !important; /* 140px → 100px */
-    gap: 4px !important;
-    padding: 0 8px 10px 8px !important;
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 1px !important;
+    padding: 0 0px 1px 0px !important;
   }
 }

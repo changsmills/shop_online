@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { supabase } from '../supabaseClient';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, MessageSquare, ClipboardList, 
@@ -8,12 +7,15 @@ import {
   Plus, Megaphone, Loader2
 } from 'lucide-react';
 
+// 🔥 BADILISHA: Import api kutoka axiosConfig, sio supabase!
+import api from "../axiosConfig"; 
+
 import UserTools from '../components/UserTools';
 import '../Messages.css';
 import '../AccountSettings.css';
 import messageImage from "../images/messageSent.svg"; 
 
-const Messages = ({ session }) => {
+const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
   const navigate = useNavigate();
   const location = useLocation();
   const messagesEndRef = useRef(null);
@@ -31,28 +33,29 @@ const Messages = ({ session }) => {
   const [showSearchModal, setShowSearchModal] = useState(false);
 
   // ==========================================
-  // 🔥 MPYA: LOGIC YA KUTAMBUA USER (SUPPLIER AU CUSTOMER)
+  // 🔥 MPYA: PATA USER ID NA ROLE KUTOKA BACKEND
   // ==========================================
-  const [userRole, setUserRole] = useState('customer'); // 'customer' au 'supplier'
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [userRole, setUserRole] = useState('customer');
 
   useEffect(() => {
-    const checkUserRole = async () => {
-      if (!session?.user) return;
-      
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .maybeSingle(); // Tumia maybeSingle ili usipate error
-
-      if (profile?.role === 'supplier') {
-        setUserRole('supplier');
-      } else {
-        setUserRole('customer');
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+          navigate('/dashboard/login');
+          return;
+        }
+        const res = await api.get('/profile/');
+        setCurrentUserId(res.data.id);
+        setUserRole(res.data.role || 'customer');
+      } catch (err) {
+        console.error("Failed to get profile ID:", err);
+        navigate('/dashboard/login');
       }
     };
-    checkUserRole();
-  }, [session]);
+    fetchProfile();
+  }, [navigate]);
 
   // ==========================================
   // MWISHO WA LOGIC MPYA
@@ -66,10 +69,10 @@ const Messages = ({ session }) => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Sikiliza kama kuna mteja anakuja kuanza chat mpya
+  // Sikiliza kama kuna mteja anakuja kuanza chat mpya kupitia location.state
   useEffect(() => {
     const startNewChat = async () => {
-      if (location.state?.sellerId) {
+      if (location.state?.sellerId && currentUserId) {
         const { sellerId, sellerName, productContext } = location.state;
         const existingChat = chats.find(c => c.id === sellerId);
 
@@ -92,10 +95,10 @@ const Messages = ({ session }) => {
       }
     };
 
-    if (location.state?.sellerId) {
+    if (location.state?.sellerId && currentUserId) {
       startNewChat();
     }
-  }, [location.state, chats, isMobile]);
+  }, [location.state, chats, isMobile, currentUserId]);
 
   useEffect(() => {
     if (!isMobile) {
@@ -111,55 +114,47 @@ const Messages = ({ session }) => {
     scrollToBottom();
   }, [messages]);
 
+  // ==========================================
+  // 🔥 FETCH MESSAGES (Django API)
+  // ==========================================
   const fetchMessages = async (partnerId) => {
-    if (!partnerId || !session?.user?.id) return;
+    if (!partnerId || !currentUserId) return;
     try {
-      const { data, error } = await supabase
-        .from('messages')
-        .select(`
-          *,
-          sender:sender_id ( id, full_name, avatar_url ),
-          receiver:receiver_id ( id, full_name, avatar_url )
-        `)
-        .or(`and(sender_id.eq.${session.user.id},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${session.user.id})`)
-        .order('created_at', { ascending: true });
-
-      if (!error && data) {
-        setMessages(data);
-      } else {
-        console.error("Error fetching messages:", error);
-        setMessages([]); 
-      }
+      const res = await api.get('/messages/', {
+        params: {
+          sender: currentUserId,
+          receiver: partnerId
+        }
+      });
+      // DRF inarudisha { results: [...] } ikiwa pagination ipo
+      setMessages(res.data.results || res.data || []);
     } catch (err) {
-      console.error("Network error while fetching messages:", err);
+      console.error("Error fetching messages:", err.response?.data || err.message);
       setMessages([]);
     }
   };
 
+  // ==========================================
+  // 🔥 FETCH INBOX (Django API)
+  // ==========================================
   const fetchInbox = async () => {
-    if (!session?.user) return;
+    if (!currentUserId) return;
     setLoading(true);
 
     try {
-      const { data, error } = await supabase
-        .from('messages')
-        .select(`
-          *,
-          sender:sender_id ( id, full_name, avatar_url ),
-          receiver:receiver_id ( id, full_name, avatar_url )
-        `)
-        .or(`sender_id.eq.${session.user.id},receiver_id.eq.${session.user.id}`)
-        .order('created_at', { ascending: false });
+      const res = await api.get('/messages/', {
+        params: {
+          user_id: currentUserId,
+          ordering: '-created_at'
+        }
+      });
 
-      if (error) {
-        console.error("Error fetching inbox:", error);
-        return;
-      }
+      const data = res.data.results || res.data || [];
 
       if (data) {
         const chatGroups = {};
         data.forEach(msg => {
-          const isISender = msg.sender_id === session.user.id;
+          const isISender = msg.sender_id === currentUserId;
           const partnerId = isISender ? msg.receiver_id : msg.sender_id;
           const partnerData = isISender ? msg.receiver : msg.sender;
 
@@ -184,6 +179,9 @@ const Messages = ({ session }) => {
     }
   };
 
+  // ==========================================
+  // 🔥 SEARCH STORES (Django API)
+  // ==========================================
   const handleSearchStores = async (query) => {
     setSearchQuery(query);
     if (query.trim().length < 2) {
@@ -192,15 +190,13 @@ const Messages = ({ session }) => {
     }
 
     setIsSearching(true);
-    const { data, error } = await supabase
-      .from('stores_engine')
-      .select('owner_id, store_name, store_logo')
-      .ilike('store_name', `%${query}%`)
-      .neq('owner_id', session.user.id)
-      .limit(5);
-
-    if (!error && data) {
-      setSearchResults(data);
+    try {
+      // Mfumo wa Search kwenye Django unahitaji 'search' kwenye filterset
+      const res = await api.get('/stores/', { params: { search: query } });
+      setSearchResults(res.data.results || res.data || []);
+    } catch (err) {
+      console.error("Error searching stores:", err);
+      setSearchResults([]);
     }
     setIsSearching(false);
   };
@@ -227,13 +223,17 @@ const Messages = ({ session }) => {
     setSearchResults([]);
   };
 
+  // ==========================================
+  // 🔥 SEND MESSAGE (Django API)
+  // ==========================================
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim() || !activeChat) return;
+    if (!newMessage.trim() || !activeChat || !currentUserId) return;
 
+    // Temporary message for UI
     const tempMsg = {
       id: Date.now(),
-      sender_id: session.user.id,
+      sender_id: currentUserId,
       receiver_id: activeChat.id,
       content: newMessage,
       created_at: new Date().toISOString(),
@@ -245,22 +245,19 @@ const Messages = ({ session }) => {
     setNewMessage("");
     scrollToBottom();
 
-    const { error } = await supabase
-      .from('messages')
-      .insert([
-        {
-          sender_id: session.user.id,
-          receiver_id: activeChat.id,
-          content: originalMessage,
-        }
-      ]);
+    try {
+      await api.post('/messages/', {
+        sender_id: currentUserId,
+        receiver_id: activeChat.id,
+        content: originalMessage,
+      });
 
-    if (error) {
+      // Fetch updated messages to get real IDs and timestamps
+      fetchMessages(activeChat.id);
+    } catch (error) {
       console.error("Error sending:", error);
       setMessages(prev => prev.filter(msg => msg.id !== tempMsg.id));
       setNewMessage(originalMessage);
-    } else {
-      fetchMessages(activeChat.id);
     }
   };
 
@@ -277,28 +274,28 @@ const Messages = ({ session }) => {
     setShowMobileChat(false);
   };
 
-  // Initial fetch & realtime subscription
+  // ==========================================
+  // 🔥 POLLING: Kuchukua nafasi ya Supabase Realtime
+  // ==========================================
   useEffect(() => {
-    fetchInbox();
-    
-    const channel = supabase
-      .channel('realtime_messages')
-      .on('postgres_changes', 
-        { event: 'INSERT', schema: 'public', table: 'messages' }, 
-        async (payload) => {
-          await fetchInbox();
-          if (activeChat && (payload.new.sender_id === activeChat.id || payload.new.receiver_id === activeChat.id)) {
-            await fetchMessages(activeChat.id);
-            scrollToBottom();
-          }
-        }
-      )
-      .subscribe();
-
+    let intervalId;
+    if (activeChat && currentUserId) {
+      // Piga API kila sekunde 5 kuangalia ujumbe mpya
+      intervalId = setInterval(() => {
+        fetchMessages(activeChat.id);
+      }, 5000);
+    }
     return () => {
-      supabase.removeChannel(channel);
+      if (intervalId) clearInterval(intervalId);
     };
-  }, [session, activeChat]);
+  }, [activeChat, currentUserId]);
+
+  // Initial fetch
+  useEffect(() => {
+    if (currentUserId) {
+      fetchInbox();
+    }
+  }, [currentUserId]);
 
   // Hifadhi activeChat kwenye localStorage
   useEffect(() => {
@@ -318,11 +315,11 @@ const Messages = ({ session }) => {
   }, [chats, activeChat]);
 
   const getSenderName = (msg) => {
-    if (msg.sender_id === session.user.id) return "Me";
+    if (msg.sender_id === currentUserId) return "Me";
     return msg.sender?.full_name || "User";
   };
 
-  // 🔥 MABADILIKO HAPA: SIDEBAR INABADILIKA KULINGANA NA ROLE (Supplier/Customer)
+  // 🔥 SIDEBAR INABADILIKA KULINGANA NA ROLE
   const isSupplier = userRole === 'supplier';
   
   const sidebarItems = isSupplier ? [
@@ -373,7 +370,7 @@ const Messages = ({ session }) => {
           {!isMobile && (
             <>
               <Bell size={20} style={{ cursor: 'pointer', color: '#666' }} />
-              <UserTools session={session} />
+              <UserTools /> {/* 🔥 Imeondolewa { session } */}
             </>
           )}
         </div>
@@ -400,7 +397,6 @@ const Messages = ({ session }) => {
             }}
           >
             {sidebarItems.map((item) => {
-              // 🔥 Logic ya kuangalia kama link ni active (Inafanya kazi kwa Supplier na Customer)
               const isActive = isSupplier
                 ? (item.path === '/dashboard/sellerboard' && location.pathname.startsWith('/dashboard/sellerboard'))
                 : location.pathname === item.path;
@@ -825,7 +821,7 @@ const Messages = ({ session }) => {
                     messages.map((msg, index) => (
                       <div 
                         key={index} 
-                        className={`message-bubble ${msg.sender_id === session.user.id ? 'sent' : 'received'}`}
+                        className={`message-bubble ${msg.sender_id === currentUserId ? 'sent' : 'received'}`}
                       >
                         <div className="bubble-content">
                           <div className="message-sender-name" style={{ fontSize: '12px', fontWeight: '600', marginBottom: '4px', color: '#ff6a00' }}>

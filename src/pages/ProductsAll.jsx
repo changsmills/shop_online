@@ -3,7 +3,9 @@ import React, { useState, useEffect, useRef, useMemo, useCallback, Suspense } fr
 import { useLocation, useSearchParams } from "react-router-dom";
 import { ArrowUp, ChevronLeft, ChevronRight } from "lucide-react";
 import "../ProductsAll.css";
-import { supabase } from "../supabaseClient";
+import axios from 'axios'; // 🔥 ONGEZA HII
+const API_BASE_URL = 'http://127.0.0.1:8000/api'; // 🔥 ONGEZA HII URL ya Backend
+
 import ProductList from "./ProductList";
 
 // ✅ MUHIMU: LAZY IMPORT YA SKELETON (Haipaki mpaka inahitajika!)
@@ -97,7 +99,7 @@ export default function ProductsAll() {
   }, [activeCategory.name, activeSection]);
 
   // ============================================
-  // 7. FETCH CATEGORIES (With Error Handling)
+  // 7. FETCH CATEGORIES (🔥 MABADILIKO HAPA: AXIOS + DJANGO)
   // ============================================
   
   useEffect(() => {
@@ -106,14 +108,11 @@ export default function ProductsAll() {
         setLoading(true);
         setError(null);
         
-        const { data, error } = await supabase
-          .from("categories")
-          .select("id, name")
-          .order("name", { ascending: true });
+        // 🔥 Badilisha Supabase kuwa Axios + Django Endpoint
+        const response = await axios.get(`${API_BASE_URL}/categories/`);
+        const data = response.data;
 
-        if (error) throw error;
-
-        if (data && data.length > 0) {
+        if (Array.isArray(data) && data.length > 0) {
           setCategories([
             { id: null, name: "All" },
             ...data.map((cat) => ({ id: cat.id, name: cat.name }))

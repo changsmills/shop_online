@@ -1,23 +1,17 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { supabase } from "./supabaseClient";
 import { CartProvider } from "./context/CartContext"; 
 import BottomNav from "./components/BottomNav";
 import { Toaster, toast } from 'react-hot-toast';
-import { LanguageProvider } from './context/LanguageContext.jsx'; // Ongeza import
-// Tafuta sehemu ya imports na ongeza hizi
+import { LanguageProvider } from './context/LanguageContext.jsx'; 
 import ProductCreationFlow from './components/ProductCreationFlow';
 import QuickInventoryManager from './components/QuickInventoryManager';
 import BusinessAnalytics from './components/BusinessAnalytics';
 import TopDealsSection from './components/TopDealsSection';
 import StoreManagement from './components/StoreManagement';
-import SupplierMessages from './pages/SupplierMessages'; // 🔥 Ongeza import
-import SupplierNotifications from './pages/SupplierNotifications'; // 🔥 Ongeza import
+import SupplierMessages from './pages/SupplierMessages'; 
+import SupplierNotifications from './pages/SupplierNotifications'; 
 import SupplierOrders from './pages/SupplierOrders';
-
-
-
-
 
 // Import Pages
 import Home from "./pages/Home"; 
@@ -71,7 +65,7 @@ import SellerDashboard from './pages/SellerDashboard';
 // ========== COMPONENT MPYA YA KUDHIBITI BOTTOM NAV ==========
 function AppContent({ session }) {
   const location = useLocation();
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -79,7 +73,6 @@ function AppContent({ session }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  
   // ORODHA YA KURASA ZINAZOONESHA BOTTOM NAV (DASHBOARD PEKEE)
   const showBottomNavPaths = [
     "/dashboard",
@@ -103,23 +96,20 @@ function AppContent({ session }) {
     const hasShownWelcome = sessionStorage.getItem('welcomeShown');
 
     if (session && !hasShownWelcome) {
-      // Tunatumia toast ya react-hot-toast ambayo tayari unayo
-      toast.success(`Karibu tena, ${session.user.email?.split('@')[0]}!`, {
-        duration: 4000,       // Itakaa kwa sekunde 4
-        id: 'welcome-toast',   // ID hii inazuia popup zisijirundike (duplicate prevention)
+      toast.success(`Karibu tena, ${session.user.email?.split('@')[0] || 'Mteja'}!`, {
+        duration: 4000,       
+        id: 'welcome-toast',   
       });
       
-      // Weka alama kuwa ujumbe umeshaonyeshwa
       sessionStorage.setItem('welcomeShown', 'true');
     }
-  }, [session]); // Ita-trigger pale tu session inapobadilika (mtu akiingia)
+  }, [session]); 
   // --- ISHIA HAPA ---
   
   // Angalia kama current path inafaa kuonesha BottomNav
   const shouldShowBottomNav = () => {
     const currentPath = location.pathname;
     
-    // Ficha bottom nav kwenye product pages
     if (currentPath.startsWith("/product/")) return false;
     if (currentPath === "/products") return false;
     if (currentPath.startsWith("/products")) return false;
@@ -132,7 +122,6 @@ function AppContent({ session }) {
     if (currentPath === "/advertise") return false;
     if (currentPath === "/payments") return false;
     
-    // Angalia kama path iko kwenye list ya kurasa zinazoonesha BottomNav
     return showBottomNavPaths.some(path => {
       if (path.endsWith("/")) {
         return currentPath.startsWith(path);
@@ -181,8 +170,7 @@ function AppContent({ session }) {
         <Route path="/store/:storeId" element={<StorePage session={session} />} />
         <Route path="/dashboard/supplier-messages" element={<SupplierMessages session={session} />} />
 
-       <Route path="/dashboard/seller" element={<SellerDashboard />} />
-
+        <Route path="/dashboard/seller" element={<SellerDashboard />} />
         <Route path="/dashboard/supplier-notifications" element={<SupplierNotifications session={session} />} />
         
         <Route path="/advertise" element={session ? <AdvertisePage session={session} /> : <Navigate to="/dashboard/login" />} />
@@ -195,14 +183,10 @@ function AppContent({ session }) {
         <Route path="/dashboard/register" element={<Register />} />
         <Route path="/dashboard/register-supplier" element={<SupplierAuth />} />
         
-       <Route path="/dashboard/supplier-settings" element={<SupplierAccountSettings session={session} />} />
-
+        <Route path="/dashboard/supplier-settings" element={<SupplierAccountSettings session={session} />} />
 
         <Route path="/stores/:storeId" element={<AllStores session={session} />} />
-
-
-
-         <Route path="/dashboard/sellerboard/:id?" element={<PhysicalDashboard session={session} />} />
+        <Route path="/dashboard/sellerboard/:id?" element={<PhysicalDashboard session={session} />} />
 
         {/* DASHBOARD SUB-PAGES */}
         <Route path="/dashboard/analytics" element={<Analytics session={session} />} />
@@ -210,7 +194,6 @@ function AppContent({ session }) {
         <Route path="/dashboard/products" element={<ProductManagement session={session} />} />
         <Route path="/create-store" element={<CreateStore session={session} />} />
         <Route path="/dashboard/supplier-orders" element={<SupplierOrders session={session} />} />
-
 
         {/* Default Redirects */}
         <Route path="/" element={<Navigate replace to="/dashboard" />} />
@@ -221,7 +204,7 @@ function AppContent({ session }) {
       </Routes>
 
       {/* BOTTOM NAV - INAONEKANA KWA MASHARTI TU */}
-     {/*{shouldShowBottomNav() && <BottomNav />}*/}
+      {/* {shouldShowBottomNav() && <BottomNav />} */}
      
     </div>
   );
@@ -231,21 +214,31 @@ function App() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // ✅ BADILISHA: Kagua JWT Token kutoka localStorage badala ya Supabase
   useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session: activeSession } } = await supabase.auth.getSession();
-      setSession(activeSession);
+    const checkAuth = () => {
+      const token = localStorage.getItem("access_token");
+      if (token) {
+        // Kama token ipo, tunaweza kuwa na dummy user au kupiga /api/profile/ kwa maelezo
+        // Kwa sasa, tutumie dummy user ili UI isijue mtumiaji ameingia
+        setSession({ user: { email: "Mfanyabiashara@skyfall.com", id: "authenticated" } });
+      } else {
+        setSession(null);
+      }
       setLoading(false);
     };
 
-    checkSession();
+    checkAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    // Sikiliza mabadiliko ya localStorage (ikiwa mtumiaji anatoka/kuingia kwenye tab nyingine)
+    const handleStorageChange = (e) => {
+      if (e.key === 'access_token') {
+        checkAuth();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   if (loading) return (
@@ -256,36 +249,29 @@ function App() {
   );
 
   return (
-   <LanguageProvider>  {/* Ongeza hii - IWE NJE YA CartProvider au ndani */}
-    <CartProvider>
-      <Toaster 
-  position="top-right" 
-  reverseOrder={false} 
-  gutter={8} // Hii inaongeza nafasi kati ya toast ili zisigandane
-  toastOptions={{
-    style: {
-      zIndex: 9999,
-      borderRadius: '8px',
-      background: '#333',
-      color: '#fff',
-    },
-    // Hii itahakikisha kila toast inatoweka baada ya sekunde 3 (3000ms)
-    duration: 2000, 
-    // Hii inazuia toast nyingi sana kuonekana kwa wakati mmoja
-    success: {
-      duration: 2000,
-    },
-    error: {
-      duration: 3000,
-    },
-  }}
-/>
-      <BrowserRouter>
-        <AppContent session={session} />
-      </BrowserRouter>
-    </CartProvider>
-     </LanguageProvider>
-
+    <LanguageProvider>
+      <CartProvider>
+        <Toaster 
+          position="top-right" 
+          reverseOrder={false} 
+          gutter={8}
+          toastOptions={{
+            style: {
+              zIndex: 9999,
+              borderRadius: '8px',
+              background: '#333',
+              color: '#fff',
+            },
+            duration: 2000, 
+            success: { duration: 2000 },
+            error: { duration: 3000 },
+          }}
+        />
+        <BrowserRouter>
+          <AppContent session={session} />
+        </BrowserRouter>
+      </CartProvider>
+    </LanguageProvider>
   );
 }
 

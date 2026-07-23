@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import { supabase } from "../supabaseClient";
+import api from "../axiosConfig"; // 🔥 MUHIMU: Tumia api pekee!
 import ProductCard from "../components/ProductCard";
 
 export default function ProductList({ 
@@ -66,10 +66,8 @@ export default function ProductList({
     setLoading(true);
 
     try {
-      let query = supabase
-        .from("products_engines")
-        .select("*")
-        .eq("is_approved", true);
+      // 🔥 MABADILIKO: ONDOA FILTER KABISA! Sasa params ni tupu.
+      const params = {};
 
       const currentCategoryId = currentParamsRef.current.categoryId;
       const currentSearch = currentParamsRef.current.search;
@@ -80,70 +78,81 @@ export default function ProductList({
       const currentMaxPrice = currentParamsRef.current.maxPrice;
       const currentFilterType = currentParamsRef.current.filterType;
 
+      // 1. Filtering kwa Store na Category
+      if (storeId) {
+        params.store_id = storeId;
+      }
       if (currentCategoryId) {
-        query = query.eq("parent_category_id", currentCategoryId);
+        params.parent_category = currentCategoryId;
       }
 
+      // 2. Search
       if (currentSearch && currentSearch.trim()) {
-        query = query.ilike("name", `%${currentSearch.trim()}%`);
+        params.search = currentSearch.trim();
       }
 
-
-      // Ongeza hii ndani ya fetchProducts kabla ya range()
-if (storeId) {
-  query = query.eq("store_id", storeId);
-}
-
-      // ========== SEHEMU ILIYOREKEBISHWA ==========
+      // 3. Sorting & Section Logic
+      let ordering = '';
       if (currentSection === "Top Deals") {
-        query = query.not("original_price", "is", null).gt("original_price", 0);  // ← HAPA ILIKOSA: =.query imeondolewa
+        ordering = '-created_at';
       } else if (currentSection === "New Arrivals") {
-        query = query.order("created_at", { ascending: false });
+        ordering = '-created_at';
       } else if (currentSection === "Top Rankings") {
-        query = query.order("order_count", { ascending: false });
+        ordering = '-order_count';
       } else if (currentSection === "Trending" || currentSection === "Inayovuma Sasa") {
-        query = query.order("views", { ascending: false });
+        ordering = '-views';
       } else if (currentSection === "Flash Sale") {
-        query = query.eq("is_flash_sale", true).gt("sale_end_date", new Date().toISOString());
+        params.is_flash_sale = true;
+        params.sale_end_date__gte = new Date().toISOString();
+        ordering = '-created_at';
       } else if (currentSection === "Featured") {
-        query = query.eq("is_featured", true);
+        params.is_featured = true;
+        ordering = '-created_at';
       } else if (currentSection === "Just For You") {
-        query = query.order("created_at", { ascending: false });
+        ordering = '-created_at';
       } else {
         const validSortColumns = ["created_at", "price", "name", "views", "order_count", "average_rating"];
         const sortColumn = validSortColumns.includes(currentSortBy) ? currentSortBy : "created_at";
-        query = query.order(sortColumn, { ascending: currentOrder === "asc" });
+        ordering = currentOrder === "asc" ? sortColumn : `-${sortColumn}`;
       }
+      if (ordering) params.ordering = ordering;
 
+      // 4. Price filters
       if (currentMinPrice > 0) {
-        query = query.gte("price", currentMinPrice);
+        params.price__gte = currentMinPrice;
       }
       if (currentMaxPrice !== Infinity && currentMaxPrice > 0) {
-        query = query.lte("price", currentMaxPrice);
+        params.price__lte = currentMaxPrice;
       }
 
+      // 5. Other filters
       if (currentFilterType === "in_stock") {
-        query = query.gt("stock_quantity", 0);
+        params.stock_quantity__gt = 0;
       } else if (currentFilterType === "retail") {
-        query = query.eq("is_retail", true);
+        params.is_retail = true;
       } else if (currentFilterType === "wholesale") {
-        query = query.eq("is_wholesale", true);
+        params.is_wholesale = true;
       }
 
-      const from = pageNum * ITEMS_PER_PAGE;
-      const to = from + ITEMS_PER_PAGE - 1;
-      query = query.range(from, to);
+      // 6. Pagination
+      params.limit = ITEMS_PER_PAGE;
+      params.offset = pageNum * ITEMS_PER_PAGE;
 
-      const { data, error: queryError } = await query;
+      // Tuma Request
+      const response = await api.get('/products/', {
+        params,
+        signal: abortController.signal
+      });
       
       if (abortController.signal.aborted || !mountedRef.current) {
         fetchingRef.current = false;
         return;
       }
       
-      if (queryError) throw new Error(queryError.message);
+      // 🔥 Inakagua 'results' kutoka Django REST Framework (pagination)!
+      const data = response.data?.results || response.data || [];
 
-      let sanitizedData = (data || []).map(p => {
+      let sanitizedData = data.map(p => {
         const beiKubwa = parseFloat(p.price) || 0;
         const beiYaOfa = parseFloat(p.original_price) || 0;
         const discountPercent = (beiKubwa > beiYaOfa && beiYaOfa > 0) 
@@ -187,9 +196,9 @@ if (storeId) {
       setHasMore(data && data.length === ITEMS_PER_PAGE);
       
     } catch (err) {
-      if (err.name !== 'AbortError' && mountedRef.current) {
-        console.error("Fetch error:", err.message);
-        setError(err.message);
+      if (err.name !== 'AbortError' && err.name !== 'CanceledError' && mountedRef.current) {
+        console.error("Fetch error:", err.response?.data?.detail || err.message);
+        setError(err.response?.data?.detail || err.message);
         if (onLoad) onLoad(0);
       }
     } finally {
@@ -201,7 +210,7 @@ if (storeId) {
         }
       }
     }
-  }, [onLoad, priorityId]);
+  }, [onLoad, priorityId, storeId]);
 
   useEffect(() => {
     currentParamsRef.current = {
@@ -278,7 +287,6 @@ if (storeId) {
     return limit ? result.slice(0, limit) : result;
   }, [products, search, limit, loading]);
 
-  // Error state
   if (error && products.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
@@ -295,7 +303,6 @@ if (storeId) {
     );
   }
 
-  // Loading state
   if (loading && products.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
@@ -305,25 +312,20 @@ if (storeId) {
     );
   }
 
-// ========== EMPTY STATE - CLEAN & MINIMALIST ==========
   if (!loading && products.length === 0 && !error) {
     return (
       <div className="w-full flex flex-col items-center justify-center py-20 px-4">
-        {/* Icon ya Box kwa kutumia CSS */}
         <div className="bg-gray-100 p-6 rounded-full mb-6">
           <span className="text-5xl">📦</span>
         </div>
-        
         <h3 className="text-2xl font-bold text-gray-800 mb-2">
           Bidhaa Hazijapatikana
         </h3>
-        
         <p className="text-gray-500 max-w-sm text-center mb-8">
           Samahani, kwa sasa hatuna bidhaa kwenye kategoria ya 
           <span className="font-semibold text-orange-600"> "{category}"</span>. 
           Tunaongeza bidhaa mpya kila siku, tafadhali rudi baadaye!
         </p>
-
         <button 
           onClick={() => window.location.href = '/'}
           className="flex items-center gap-2 px-8 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-black transition-all active:scale-95 shadow-lg"
@@ -334,45 +336,40 @@ if (storeId) {
     );
   }
 
-// ========== MAIN RETURN - RESPONSIVE GRID (LEFT ALIGNED) ==========
-return (
+  return (
+    <div className="w-full" style={{ margin: 0, padding: 0 }}>
+      <div style={{
+        display: 'grid',
+        gap: '1rem',
+        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(6, minmax(0, 1fr))',
+        width: '100%',
+        margin: 0,
+        padding: isMobile ? '0' : '0 16px',
+      }}>
+        {filteredProducts.map((product) => (
+          <ProductCard 
+            key={product.id} 
+            product={product}
+            isMobile={isMobile}
+            isPriority={product.id === priorityId}
+          />
+        ))}
+      </div>
 
-  <div className="w-full" style={{ margin: 0, padding: 0 }}>
-    {/* Grid - Force left alignment */}
-    <div style={{
-      display: 'grid',
-      gap: '1rem',
-      gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(6, minmax(0, 1fr))',
-      width: '100%',
-      margin: 0,
-      padding: isMobile ? '0' : '0 16px',  // ✅ ZERO padding on mobile!
-    }}>
-      {filteredProducts.map((product) => (
-        <ProductCard 
-          key={product.id} 
-          product={product}
-          isMobile={isMobile}
-          isPriority={product.id === priorityId}
-        />
-      ))}
+      {loading && products.length > 0 && (
+        <div className="flex justify-center items-center py-8 gap-3">
+          <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-gray-500 text-sm">Inavuta bidhaa zaidi...</p>
+        </div>
+      )}
+      
+      {!hasMore && products.length > 0 && (
+        <div className="flex items-center justify-center gap-4 my-10">
+          <hr className="flex-1 border-gray-200" />
+          <span className="text-gray-400 text-sm">✨ Umeifikia mwisho wa bidhaa ✨</span>
+          <hr className="flex-1 border-gray-200" />
+        </div>
+      )}
     </div>
-
-    {/* Loading more indicator */}
-    {loading && products.length > 0 && (
-      <div className="flex justify-center items-center py-8 gap-3">
-        <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-gray-500 text-sm">Inavuta bidhaa zaidi...</p>
-      </div>
-    )}
-    
-    {/* End of content */}
-    {!hasMore && products.length > 0 && (
-      <div className="flex items-center justify-center gap-4 my-10">
-        <hr className="flex-1 border-gray-200" />
-        <span className="text-gray-400 text-sm">✨ Umeifikia mwisho wa bidhaa ✨</span>
-        <hr className="flex-1 border-gray-200" />
-      </div>
-    )}
-  </div>
-);
+  );
 }

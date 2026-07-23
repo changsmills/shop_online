@@ -7,7 +7,9 @@ import {
   Palette  // 🔥 Ongeza hii!
 } from "lucide-react";
 
-import { supabase } from "../supabaseClient";
+import axios from 'axios';
+
+//import { supabase } from "../supabaseClient";
 import '../ProductAttributes.css';
 
 function ProductAttributes({ attributes, setAttributes, subCategoryId }) {
@@ -32,6 +34,8 @@ function ProductAttributes({ attributes, setAttributes, subCategoryId }) {
   // Weight unit
   const [weightUnit, setWeightUnit] = useState("kg");
 
+  const API_BASE_URL = "http://127.0.0.1:8000/api";
+
 
   // Ongeza useEffect
 useEffect(() => {
@@ -41,16 +45,25 @@ useEffect(() => {
   return () => window.removeEventListener('resize', checkMobile);
 }, []);
 
-  // 1. Fetch Brands
+  // 1. Fetch Brands kutoka Django
   useEffect(() => {
     const fetchBrands = async () => {
-      const { data } = await supabase.from('brands').select('id, name').order('name');
-      if (data) setBrands(data);
+      try {
+        const token = localStorage.getItem("access_token");
+        const { data } = await axios.get(`${API_BASE_URL}/brands/`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        // DRF inarudisha 'results' au direct array
+        setBrands(data.results || data || []);
+      } catch (error) {
+        console.warn("⚠️ Brands endpoint haipo (404). Endelea bila brands.");
+        setBrands([]);
+      }
     };
     fetchBrands();
   }, []);
 
-  // 2. Fetch Leaf Categories
+    // 2. Fetch Leaf Categories kutoka Django
   useEffect(() => {
     const fetchFilteredLeafs = async () => {
       if (!subCategoryId) {
@@ -59,18 +72,19 @@ useEffect(() => {
       }
 
       setLoading(true);
-      const { data, error } = await supabase
-        .from('leaf_categories')
-        .select('*')
-        .eq('sub_category_id', subCategoryId)
-        .order('name', { ascending: true });
-
-      if (error) {
-        console.error("Supabase Error:", error.message);
-      } else if (data) {
-        setLeafCategories(data);
+      try {
+        const token = localStorage.getItem("access_token");
+        const { data } = await axios.get(`${API_BASE_URL}/leaf-categories/`, {
+          params: { sub_category_id: subCategoryId }, // 🔥 Hii ndiyo filter muhimu!
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setLeafCategories(data.results || data || []);
+      } catch (error) {
+        console.error("Error fetching leaf categories:", error);
+        setLeafCategories([]);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchFilteredLeafs();

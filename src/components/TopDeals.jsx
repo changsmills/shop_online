@@ -1,10 +1,12 @@
 // src/components/TopDeals.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, Flame } from "lucide-react";
-import { supabase } from "../supabaseClient";
+import api from "../axiosConfig"; // 🔥 BADILISHA: Tumia api badala ya axios!
 import DashboardCard from "./DashboardCard";
 import { useTranslation } from 'react-i18next';
-import '../TopDeals.css';  // ✅ ONGEZA HII
+import '../TopDeals.css';
+
+// 🔥 ONDOA API_BASE_URL – ipo kwenye api config!
 
 export default function TopDeals({ navigate, selectedCategory, isMobile }) {
   const { t, i18n } = useTranslation();
@@ -23,20 +25,19 @@ export default function TopDeals({ navigate, selectedCategory, isMobile }) {
     const fetchDeals = async () => {
       setLoading(true);
       try {
-        let query = supabase
-          .from('products_engines')
-          .select('*')
-          .not('original_price', 'is', null)
-          .gt('original_price', 0);
-
+        const params = {};
         if (selectedCategory?.id) {
-          query = query.eq('parent_category_id', selectedCategory.id);
+          params.parent_category = selectedCategory.id;
         }
 
-        const { data, error } = await query;
-        if (error) throw error;
+        // 🔥 BADILISHA: Tumia api.get, sio axios.get!
+        const response = await api.get('/products/', { params });
+        
+        // 🔥 KAGUA PAGINATION – DRF inarudisha { results: [...] }
+        const data = response.data.results || response.data || [];
 
-        const calculatedDeals = (data || []).map(product => {
+        // Mantiki ya kukokotoa na kupanga ofa imebaki sawa kabisa!
+        const calculatedDeals = data.map(product => {
           const beiYaKawaida = parseFloat(product.price) || 0;
           const beiYaOfa = parseFloat(product.original_price) || 0;
           
@@ -61,7 +62,7 @@ export default function TopDeals({ navigate, selectedCategory, isMobile }) {
     };
 
     fetchDeals();
-  },  [selectedCategory, i18n.language]);
+  }, [selectedCategory, i18n.language]);
 
   const getDiscountPercentage = (originalPrice, currentPrice) => {
     const beiYaAwali = parseFloat(originalPrice) || 0;

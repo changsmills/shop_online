@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from "react"; 
 import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "../supabaseClient";
+import axios from "axios"; // ✅ Badilisha: Axios badala ya Supabase
 import { useCart } from "../context/CartContext"; 
 import { Bell, MessageSquare, ShoppingCart, User, LogOut, ChevronRight } from "lucide-react";
 import "../UserTools.css"; 
+
+const API_BASE_URL = "http://127.0.0.1:8000/api"; // ✅ Ongeza hii
 
 export default function UserTools({ session: propSession, isMobile }) {
   const [isUserOpen, setIsUserOpen] = useState(false);
@@ -15,40 +17,70 @@ export default function UserTools({ session: propSession, isMobile }) {
   const [localSession, setLocalSession] = useState(null);
   const [userStoreId, setUserStoreId] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [unreadMsgCount, setUnreadMsgCount] = useState(0);
   
   const { cartItems } = useCart(); 
   const navigate = useNavigate();
 
+  // ✅ BADILISHA: Check Authentication kupitia JWT Token
   useEffect(() => {
     let isMounted = true;
     const getSessionAndStore = async () => {
-      let currentSession = propSession;
-      if (!currentSession) {
-        const { data } = await supabase.auth.getSession();
-        currentSession = data.session;
-      }
+      // 1. Pata token kutoka localStorage
+      const token = localStorage.getItem("access_token");
+      
       if (!isMounted) return;
-      setLocalSession(currentSession);
 
-      if (currentSession?.user) {
-        const { data: stores } = await supabase
-          .from("stores_engine")
-          .select("id")
-          .eq("owner_id", currentSession.user.id)
-          .limit(1);
-        setUserStoreId(stores && stores.length > 0 ? stores[0].id : null);
+      if (token) {
+        // Ikiwa token ipo, tujulishe mtumiaji ameingia
+        setLocalSession({ 
+          user: { 
+            // Tutatumia token kama ishara ya kuingia. 
+            // Kwenye mfumo kamili, unaweza ku-decrypt token kupata email hapa.
+            email: "Mfanyabiashara" 
+          } 
+        });
+
+        // 2. Fetch store ya mtumiaji huyu
+        try {
+          const { data: stores } = await axios.get(`${API_BASE_URL}/stores/`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          // Kwa sasa tunachukua duka la kwanza kwenye orodha
+          if (stores && stores.length > 0) {
+            setUserStoreId(stores[0].id);
+          }
+        } catch (err) {
+          console.error("Error fetching user store:", err);
+        }
+
+        // 3. (Hiari) Fetch ujumbe usiosomwa
+        try {
+          const msgRes = await axios.get(`${API_BASE_URL}/messages/`, {
+            params: { is_read: false },
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setUnreadMsgCount(msgRes.data?.length || 0);
+        } catch (err) {
+          // Ignore error if messages endpoint not ready
+        }
+
       } else {
+        // Kama hakuna token, mtumiaji hajaingia
+        setLocalSession(null);
         setUserStoreId(null);
       }
     };
     getSessionAndStore();
     return () => { isMounted = false; };
-  }, [propSession]);
+  }, [propSession]); // PropSession bado ipo kwa ajili ya parent updates
 
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   
+  // ✅ BADILISHA: Logout - Futa token na navigate
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
     setLocalSession(null);
     setUserStoreId(null);
     setIsUserOpen(false);
@@ -145,7 +177,7 @@ export default function UserTools({ session: propSession, isMobile }) {
            ========================================== */
         <div className="flex items-center gap-4" style={{ display: 'flex', gap: isMobile ? '6px' : '12px', alignItems: 'center' }}>
           
-          {/* 🔥 B. ALERTS - SASA INA LINK (Inafanya kazi!) */}
+          {/* 🔥 B. ALERTS */}
           <Link 
             to="/dashboard/notifications"
             className="flex flex-col items-center hover:opacity-80 transition"
@@ -153,16 +185,19 @@ export default function UserTools({ session: propSession, isMobile }) {
           >
             <div style={{ position: 'relative', display: 'flex' }}>
               <Bell size={isMobile ? 22 : 20} />
-              {(unreadCount > 0) && <span style={{ position: 'absolute', top: '-4px', right: '-6px', background: '#ff4e00', color: 'white', borderRadius: '50%', width: '14px', height: '14px', fontSize: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>3</span>}
+              {/* Hapa ungeweza kuweka `unreadCount` ikiwa una notifications endpoint */}
+              <span style={{ position: 'absolute', top: '-4px', right: '-6px', background: '#ff4e00', color: 'white', borderRadius: '50%', width: '14px', height: '14px', fontSize: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>3</span>
             </div>
             {!isMobile && <span>Alerts</span>}
           </Link>
 
-          {/* C. Messages */}
+          {/* C. Messages - Sasa inatumia unreadMsgCount halisi! */}
           <Link to="/dashboard/messages" className="flex flex-col items-center hover:opacity-80 transition" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '10px', color: '#333', textDecoration: 'none' }}>
             <div style={{ position: 'relative', display: 'flex' }}>
               <MessageSquare size={isMobile ? 22 : 20} />
-              <span style={{ position: 'absolute', top: '-4px', right: '-6px', background: '#ff4e00', color: 'white', borderRadius: '50%', width: '14px', height: '14px', fontSize: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>1</span>
+              {unreadMsgCount > 0 && (
+                <span style={{ position: 'absolute', top: '-4px', right: '-6px', background: '#ff4e00', color: 'white', borderRadius: '50%', width: '14px', height: '14px', fontSize: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{unreadMsgCount}</span>
+              )}
             </div>
             {!isMobile && <span>Msg</span>}
           </Link>
@@ -201,9 +236,12 @@ export default function UserTools({ session: propSession, isMobile }) {
                   <Link to="/dashboard/orders" className="flex justify-between text-sm text-gray-700 hover:text-orange-600 transition" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#333', textDecoration: 'none' }}>
                     My Orders <ChevronRight size={14} className="text-gray-300" />
                   </Link>
-                  <Link to="/dashboard/analytics" className="flex justify-between text-sm text-gray-700 hover:text-orange-600 transition" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#333', textDecoration: 'none' }}>
-                    Analytics <ChevronRight size={14} className="text-gray-300" />
+                  
+                  {/* Ikiwa mtumiaji ni supplier, tumia storeId kuelekeza kwenye dashboard */}
+                  <Link to={userStoreId ? `/dashboard/physical/${userStoreId}` : "/dashboard"} className="flex justify-between text-sm text-gray-700 hover:text-orange-600 transition" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#333', textDecoration: 'none' }}>
+                    My Store <ChevronRight size={14} className="text-gray-300" />
                   </Link>
+                  
                   <Link to="/dashboard/settings" className="flex justify-between text-sm text-gray-700 hover:text-orange-600 transition" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#333', textDecoration: 'none' }}>
                     Settings <ChevronRight size={14} className="text-gray-300" />
                   </Link>

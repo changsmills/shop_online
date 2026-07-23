@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "../supabaseClient";
+//import { supabase } from "../supabaseClient";
 import * as LucideIcons from "lucide-react";
 
 export default function AdRequest() {

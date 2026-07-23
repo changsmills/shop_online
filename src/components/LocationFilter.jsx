@@ -1,10 +1,12 @@
 // src/components/LocationFilter.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, MapPin } from "lucide-react";
-import { supabase } from "../supabaseClient";
+import api from "../axiosConfig"; // 🔥 BADILISHA: Tumia api badala ya axios!
 import DashboardCard from "./DashboardCard";
 import { useTranslation } from 'react-i18next';
-import '../LocationFilter.css';  // ✅ ONGEZA HII
+import '../LocationFilter.css';
+
+// 🔥 ONDOA API_BASE_URL – ipo kwenye api config!
 
 export default function LocationFilter({ navigate, isMobile }) {
   const { t, i18n } = useTranslation();
@@ -18,24 +20,19 @@ export default function LocationFilter({ navigate, isMobile }) {
     const fetchLocations = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('products_engines')
-          .select(`
-            cover_image,
-            price,
-            stores_engine!inner (
-              city,
-              physical_address
-            )
-          `)
-          .not('stores_engine', 'is', null);
+        
+        // 🔥 BADILISHA: Tumia api.get, sio axios.get!
+        const response = await api.get('/products/');
+        
+        // 🔥 KAGUA PAGINATION – DRF inarudisha { results: [...] }
+        const data = response.data.results || response.data || [];
 
-        if (error) throw error;
-
+        // Logic hii ya kupanga kwa miji (unique cities) imebaki 100% sawa
         const cityMap = {};
         data.forEach(item => {
-          const cityName = item.stores_engine?.city;
-          const address = item.stores_engine?.physical_address;
+          const cityName = item.store?.city;
+          const address = item.store?.physical_address;
+          
           if (cityName && !cityMap[cityName]) {
             cityMap[cityName] = {
               image: item.cover_image,

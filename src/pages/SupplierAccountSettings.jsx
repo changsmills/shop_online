@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
+import axios from 'axios';
 import { 
   LayoutDashboard, MessageSquare, ClipboardList, 
   Settings, Bell, Search, User, LogOut, ChevronRight, Menu, X, Eye, EyeOff,
@@ -9,10 +9,12 @@ import {
 import toast from 'react-hot-toast';
 import '../AccountSettings.css';
 
+// 🔥 ONGEZA HII KWA AJILI YA BACKEND!
+const API_BASE_URL = "http://127.0.0.1:8000/api";
+
 const SupplierAccountSettings = ({ session }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const user = session?.user;
 
   // --- STATE ZA SIDEBAR NA DATA ---
   const [isExpanded, setIsExpanded] = useState(false);
@@ -33,16 +35,14 @@ const SupplierAccountSettings = ({ session }) => {
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
-  const [avatarFile, setAvatarFile] = useState(null);
-  const [avatarPreview, setAvatarPreview] = useState(null);
   const [profileSaving, setProfileSaving] = useState(false);
 
-  // --- STATE ZA EMAIL UPDATE ---
+  // --- STATE ZA EMAIL UPDATE (ZIMEZIMWA KWA SASA) ---
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [emailLoading, setEmailLoading] = useState(false);
 
-  // --- STATE ZA PASSWORD UPDATE ---
+  // --- STATE ZA PASSWORD UPDATE (ZIMEZIMWA KWA SASA) ---
   const [isEditingPassword, setIsEditingPassword] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -51,90 +51,36 @@ const SupplierAccountSettings = ({ session }) => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
 
-  // --- 1. VUTA DATA KUTOKA DATABASE ---
+  // 🔥 1. VUTA DATA KUTOKA DJANGO API (Badala ya Supabase)
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!user) return;
-      
       try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+          // Redirect login ikiwa token haipo
+          navigate('/dashboard/login');
+          return;
+        }
 
-        if (error) throw error;
-        setProfile(data);
-        setFullName(data?.full_name || '');
-        setUsername(data?.username || '');
-        setBio(data?.bio || '');
+        const headers = { Authorization: `Bearer ${token}` };
+        const response = await axios.get(`${API_BASE_URL}/profile/`, { headers });
+        
+        setProfile(response.data);
+        setFullName(response.data?.full_name || '');
+        setUsername(response.data?.username || '');
+        setBio(response.data?.bio || '');
       } catch (error) {
-        console.error('Error fetching profile:', error.message);
+        console.error('Error fetching profile:', error);
+        toast.error('Imeshindwa kupakia profile.');
       } finally {
         setLoading(false);
       }
     };
 
     fetchProfile();
-  }, [user]);
+  }, [navigate]);
 
-  // --- 2. HANDLE AVATAR FILE SELECTION ---
-  const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (!file.type.startsWith('image/')) {
-        toast.error('Tafadhali chagua picha tu (JPEG, PNG, GIF)');
-        return;
-      }
-      
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error('Picha inapaswa kuwa chini ya 2MB');
-        return;
-      }
-      
-      setAvatarFile(file);
-      setAvatarPreview(URL.createObjectURL(file));
-    }
-  };
-
-  // --- 3. UPLOAD AVATAR TO SUPABASE STORAGE ---
-  const uploadAvatar = async (userId, file) => {
-    if (!file) return null;
-    
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${userId}.${fileExt}`;
-    const filePath = fileName;
-    
-    try {
-      const { data: existingFiles } = await supabase.storage
-        .from('avatars')
-        .list('', { search: userId });
-      
-      if (existingFiles && existingFiles.length > 0) {
-        await supabase.storage.from('avatars').remove([existingFiles[0].name]);
-      }
-    } catch (error) {
-      console.log('No existing avatar to delete');
-    }
-    
-    const { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(filePath, file, { upsert: true });
-    
-    if (uploadError) {
-      console.error('Upload error:', uploadError);
-      return null;
-    }
-    
-    const { data: publicUrl } = supabase.storage
-      .from('avatars')
-      .getPublicUrl(filePath);
-    
-    return publicUrl.publicUrl;
-  };
-
-  // --- 4. UPDATE PROFILE ---
+  // --- 2. HANDLE UPDATE PROFILE (Hii ndio "ivute / weka" data kwenye backend) ---
   const handleUpdateProfile = async () => {
     if (!fullName.trim()) {
       toast.error('Tafadhali weka jina lako kamili');
@@ -142,168 +88,57 @@ const SupplierAccountSettings = ({ session }) => {
     }
     
     setProfileSaving(true);
-    
     try {
-      let avatarUrl = profile?.avatar_url;
-      
-      if (avatarFile) {
-        toast.loading('Inapakia picha...', { id: 'avatar-upload' });
-        const uploadedUrl = await uploadAvatar(user.id, avatarFile);
-        if (uploadedUrl) {
-          avatarUrl = uploadedUrl;
-          toast.success('Picha imepakiwa!', { id: 'avatar-upload' });
-        } else {
-          toast.error('Imeshindikana kupakia picha', { id: 'avatar-upload' });
-        }
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        toast.error("Session imeisha, tafadhali login tena.");
+        navigate('/dashboard/login');
+        return;
       }
+
+      const headers = { Authorization: `Bearer ${token}` };
       
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          full_name: fullName,
-          username: username || null,
-          bio: bio || null,
-          avatar_url: avatarUrl,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
-      
-      if (error) throw error;
-      
-      setProfile({
-        ...profile,
-        full_name: fullName,
-        username: username,
-        bio: bio,
-        avatar_url: avatarUrl
-      });
-      
+      // 🔥 Tuma data kwenye Django PATCH /api/profile/
+      const response = await axios.patch(
+        `${API_BASE_URL}/profile/`, 
+        { 
+          full_name: fullName, 
+          username: username || null, 
+          bio: bio || null 
+        },
+        { headers }
+      );
+
+      setProfile({ ...profile, ...response.data });
       toast.success('Profile imesasishwa kwa mafanikio!');
       setIsEditingProfile(false);
-      setAvatarFile(null);
-      
-      if (avatarPreview) {
-        URL.revokeObjectURL(avatarPreview);
-        setAvatarPreview(null);
-      }
       
     } catch (error) {
       console.error('Profile update error:', error);
-      toast.error('Imeshindikana kusasisha profile: ' + error.message);
+      toast.error('Imeshindikana kusasisha profile: ' + (error.response?.data?.detail || error.message));
     } finally {
       setProfileSaving(false);
     }
   };
 
-  // --- 5. UPDATE EMAIL ---
+  // ⛔ UPDATE EMAIL (ZIMWA - Inahitaji endpoint ya ziada kwa Django)
   const handleUpdateEmail = async () => {
-    if (!newEmail.trim()) {
-      toast.error('Tafadhali weka email mpya');
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(newEmail)) {
-      toast.error('Tafadhali weka email sahihi');
-      return;
-    }
-
-    setEmailLoading(true);
-    try {
-      const { error } = await supabase.auth.updateUser({ email: newEmail });
-      if (error) throw error;
-
-      await supabase.from('profiles').update({ email: newEmail }).eq('id', user.id);
-
-      toast.success('Maombi yamepokelewa! Kagua email yako mpya kuthibitisha.');
-      setIsEditingEmail(false);
-      setNewEmail('');
-      
-    } catch (error) {
-      toast.error('Imeshindikana kusasisha email: ' + error.message);
-    } finally {
-      setEmailLoading(false);
-    }
+    toast.error("Kubadilisha Email bado haijakamilika kwenye Backend.");
   };
 
-  // --- 6. UPDATE PASSWORD ---
+  // ⛔ UPDATE PASSWORD (ZIMWA - Inahitaji endpoint ya ziada kwa Django)
   const handleUpdatePassword = async () => {
-    if (!currentPassword.trim()) {
-      toast.error('Tafadhali weka password yako ya sasa');
-      return;
-    }
-    
-    if (!newPassword.trim()) {
-      toast.error('Tafadhali weka password mpya');
-      return;
-    }
-    
-    if (newPassword.length < 6) {
-      toast.error('Password mpya lazima iwe na herufi 6 au zaidi');
-      return;
-    }
-    
-    if (newPassword !== confirmPassword) {
-      toast.error('Password mpya na uthibitisho hazifanani');
-      return;
-    }
-
-    setPasswordLoading(true);
-    try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: currentPassword
-      });
-
-      if (signInError) {
-        toast.error('Password yako ya sasa si sahihi');
-        setPasswordLoading(false);
-        return;
-      }
-
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
-      if (error) throw error;
-
-      toast.success('Password imesasishwa kwa mafanikio!');
-      setIsEditingPassword(false);
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-      
-    } catch (error) {
-      toast.error('Imeshindikana kusasisha password: ' + error.message);
-    } finally {
-      setPasswordLoading(false);
-    }
+    toast.error("Kubadilisha Password inahitaji endpoint ya ziada kwenye Backend.");
   };
 
-  // --- 7. RESET PASSWORD ---
+  // ⛔ RESET PASSWORD (ZIMWA kwa sasa)
   const handlePasswordReset = async () => {
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
-        redirectTo: `${window.location.origin}/account-settings`,
-      });
-      if (error) throw error;
-      toast.success(`Link imetumwa kwenye email yako: ${user.email}`, { duration: 6000 });
-    } catch (error) {
-      toast.error("Error: " + error.message);
-    }
+    toast.error("Huduma ya Password Reset bado haijakamilika kwenye Backend.");
   };
 
-  // --- 8. DELETE ACCOUNT ---
+  // --- 8. DELETE ACCOUNT (ZIMWA) ---
   const handleDeleteAccount = async () => {
-    const confirm = window.confirm('Je, una uhakika unataka kufuta akaunti yako? Hatua hii haiwezi kubadilishwa!');
-    if (!confirm) return;
-    
-    try {
-      await supabase.from('profiles').delete().eq('id', user.id);
-      await supabase.auth.admin.deleteUser(user.id);
-      toast.success('Akaunti imefutwa kwa mafanikio');
-      await supabase.auth.signOut();
-      window.location.href = '/';
-    } catch (error) {
-      toast.error('Imeshindikana kufuta akaunti: ' + error.message);
-    }
+    toast.error("Kufuta akaunti bado haijakamilika kwenye Backend.");
   };
 
   // ========== 🔥 SIDEBAR KWA MUUZAJI (Supplier) ==========
@@ -311,10 +146,10 @@ const SupplierAccountSettings = ({ session }) => {
     { icon: <LayoutDashboard size={20} />, path: '/dashboard/sellerboard', label: 'Duka Lako' },
     { icon: <MessageSquare size={20} />, path: '/dashboard/supplier-messages', label: 'Ujumbe' },
     { icon: <ClipboardList size={20} />, path: '/dashboard/supplier-notifications', label: 'Arifa (Oda)' },
-    { icon: <Settings size={20} />, path: '/dashboard/supplier-settings', label: 'Mipangilio' }, // Mipangilio iko kwenye sellerboard
+    { icon: <Settings size={20} />, path: '/dashboard/supplier-settings', label: 'Mipangilio' },
   ];
 
-  // ========== HELPFUL LINKS (Inabaki sawa) ==========
+  // ========== HELPFUL LINKS ==========
   const helpfulLinks = [
     { icon: <HelpCircle size={18} />, title: 'Help Center', path: '/help-center' },
     { icon: <FileText size={18} />, title: 'Tutorials', path: '/tutorials' },
@@ -327,10 +162,18 @@ const SupplierAccountSettings = ({ session }) => {
     { icon: <Globe size={18} />, title: 'About Skyfall', path: '/about-skyfall' },
   ];
 
+  // 🔥 9. SIGN OUT (Sasa ni kufuta Token na redirect)
+  const handleSignOut = async () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    navigate('/dashboard/login');
+    toast.success('Umefanikiwa kutoka!');
+  };
+
   return (
     <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       
-      {/* HEADER (Imebadilishwa link ya nyumbani) */}
+      {/* HEADER */}
       <header className="dashboard-header" style={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
@@ -361,12 +204,10 @@ const SupplierAccountSettings = ({ session }) => {
           )}
         </div>
 
-        {/* 🔥 MABADILIKO: Imeondoa UserTools hapa */}
         <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
           {!isMobile && (
             <>
               <Bell size={20} style={{ cursor: 'pointer', color: '#666' }} />
-              {/* UserTools imeondolewa kabisa! */}
             </>
           )}
         </div>
@@ -374,7 +215,7 @@ const SupplierAccountSettings = ({ session }) => {
 
       <div className="dashboard-main" style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         
-        {/* SIDEBAR - Supplier Version */}
+        {/* SIDEBAR */}
         {!isMobile && (
           <aside 
             onMouseEnter={() => setIsExpanded(true)} 
@@ -437,14 +278,14 @@ const SupplierAccountSettings = ({ session }) => {
                   {profile?.avatar_url ? (
                     <img src={profile.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
-                    (profile?.full_name || user?.email)?.charAt(0).toUpperCase()
+                    (profile?.full_name || profile?.email || 'U')?.charAt(0).toUpperCase()
                   )}
                 </div>
                 <div className="user-details-text" style={{ flex: 1 }}>
                   <h2 className="user-full-name" style={{ margin: 0, fontSize: isMobile ? '18px' : '22px' }}>
-                    {profile?.full_name || user?.email?.split('@')[0]}
+                    {profile?.full_name || "Mtumiaji"}
                   </h2>
-                  <p className="user-email-sub" style={{ color: '#666', margin: '4px 0', fontSize: '13px' }}>{user?.email}</p>
+                  <p className="user-email-sub" style={{ color: '#666', margin: '4px 0', fontSize: '13px' }}>{profile?.email || "Hakuna Email"}</p>
                   {profile?.username && <p className="user-username" style={{ color: '#999', fontSize: '12px' }}>@{profile.username}</p>}
                 </div>
                 <button 
@@ -472,7 +313,7 @@ const SupplierAccountSettings = ({ session }) => {
                   <li style={{ display: 'flex', flexDirection: 'column', padding: '12px 0', borderBottom: '1px solid #fafafa' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', cursor: 'pointer' }} onClick={() => setIsEditingEmail(!isEditingEmail)}>
                       <span>Change email</span>
-                      <span style={{ fontSize: '12px', color: '#999' }}>{user?.email}</span>
+                      <span style={{ fontSize: '12px', color: '#999' }}>{profile?.email}</span>
                     </div>
                     
                     {isEditingEmail && (
@@ -546,7 +387,7 @@ const SupplierAccountSettings = ({ session }) => {
               </div>
             </div>
 
-            {/* 🔥 STORE SECTION - INAELEKEZA KWENYE SELLERBOARD */}
+            {/* 🔥 STORE SECTION - RUDI KWENYE DUKA */}
             <div className="store-section" style={{ marginTop: '32px' }}>
               <div 
                 onClick={() => navigate('/dashboard/sellerboard')}
@@ -620,14 +461,10 @@ const SupplierAccountSettings = ({ session }) => {
                 ))}
               </div>
 
-              {/* SIGN OUT BUTTON */}
+              {/* 🔥 SIGN OUT BUTTON - SASA INAFUTA TOKEN! */}
               <div style={{ marginTop: '24px' }}>
                 <button
-                  onClick={async () => {
-                    await supabase.auth.signOut();
-                    navigate('/');
-                    toast.success('Umefanikiwa kutoka!');
-                  }}
+                  onClick={handleSignOut}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -669,7 +506,7 @@ const SupplierAccountSettings = ({ session }) => {
         </div>
       </div>
 
-      {/* 🔥 MOBILE BOTTOM NAV - SUPPLIER VERSION (Imeongezwa hapa!) */}
+      {/* 🔥 MOBILE BOTTOM NAV - SUPPLIER VERSION */}
       {isMobile && (
         <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'white', display: 'flex', justifyContent: 'space-around', alignItems: 'center', padding: '10px 0 20px', borderTop: '1px solid #eee', zIndex: 1000 }}>
           <button onClick={() => navigate('/dashboard/sellerboard')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', flex: 1 }}>
@@ -691,31 +528,33 @@ const SupplierAccountSettings = ({ session }) => {
         </nav>
       )}
 
-      {/* EDIT PROFILE MODAL (Inabaki sawa) */}
+      {/* EDIT PROFILE MODAL (Imeondoa Camera icon - kutokana na model ya URLField) */}
       {isEditingProfile && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ backgroundColor: '#fff', borderRadius: '16px', width: '90%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px', borderBottom: '1px solid #eee' }}>
               <h3 style={{ margin: 0 }}>Edit Profile</h3>
-              <button onClick={() => { setIsEditingProfile(false); setAvatarFile(null); if(avatarPreview) URL.revokeObjectURL(avatarPreview); }} 
+              <button onClick={() => { setIsEditingProfile(false); }} 
                 style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
             </div>
             <div style={{ padding: '20px' }}>
-              <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              {/* 🔥 Picha bado inaweza kuonyeshwa, lakini Upload imezimwa kwa sababu Model ni URLField */}
+              <div style={{ textAlign: 'center', marginBottom: '20px', opacity: 0.5 }}>
                 <div style={{ position: 'relative', display: 'inline-block' }}>
                   <div style={{ width: '100px', height: '100px', borderRadius: '50%', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                    {avatarPreview || profile?.avatar_url ? (
-                      <img src={avatarPreview || profile?.avatar_url} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    {profile?.avatar_url ? (
+                      <img src={profile?.avatar_url} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
                       <User size={50} color="#ccc" />
                     )}
                   </div>
-                  <label htmlFor="avatar-upload" style={{ position: 'absolute', bottom: '5px', right: '5px', backgroundColor: '#ff6a00', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#fff' }}>
+                  <div style={{ position: 'absolute', bottom: '5px', right: '5px', backgroundColor: '#ccc', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', cursor: 'not-allowed' }}>
                     <Camera size={16} />
-                    <input id="avatar-upload" type="file" accept="image/*" onChange={handleAvatarChange} style={{ display: 'none' }} />
-                  </label>
+                  </div>
                 </div>
-                <p style={{ fontSize: '12px', color: '#999', marginTop: '8px' }}>Bonyeza kamera kubadilisha picha</p>
+                <p style={{ fontSize: '12px', color: '#999', marginTop: '8px', fontStyle: 'italic' }}>
+                  (Upload inahitaji backend kubadilisha 'avatar_url' kuwa ImageField)
+                </p>
               </div>
               <div style={{ marginBottom: '15px' }}>
                 <label style={{ display: 'block', marginBottom: '5px', fontWeight: '600', fontSize: '14px' }}>Full Name *</label>
@@ -733,7 +572,7 @@ const SupplierAccountSettings = ({ session }) => {
                   style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', resize: 'vertical' }} />
               </div>
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button onClick={() => { setIsEditingProfile(false); setAvatarFile(null); if(avatarPreview) URL.revokeObjectURL(avatarPreview); }} 
+                <button onClick={() => { setIsEditingProfile(false); }} 
                   style={{ padding: '10px 20px', backgroundColor: '#f5f5f5', border: '1px solid #ddd', borderRadius: '8px', cursor: 'pointer' }}>Cancel</button>
                 <button onClick={handleUpdateProfile} disabled={profileSaving}
                   style={{ padding: '10px 20px', backgroundColor: '#ff6a00', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', opacity: profileSaving ? 0.7 : 1 }}>

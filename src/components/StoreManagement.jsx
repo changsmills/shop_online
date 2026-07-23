@@ -1,18 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { Settings, CheckCircle, X, Plus, Phone, Instagram, Camera, Truck, Edit2, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
-import { supabase } from '../supabaseClient';
+import { Settings, CheckCircle, X, Plus, Phone, Instagram, Truck, Edit2, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import axios from 'axios';
+import '../StoreManagement.css';
+
+// ✅ 1. Tumia hii URL kwa Backend (Media files)
+const API_BASE_URL = "http://127.0.0.1:8000/api";
+const BACKEND_BASE_URL = "http://127.0.0.1:8000";
 
 const StoreManagement = ({
   isManageMode,
-  isMobile,
   setIsManageMode,
   myStoreSubCats,
   attributes,
   setAttributes,
   handleRemoveCategoryFromStore,
   setShowCategoryManager,
-  selectedCategory,
   officePreviews,
   officeFiles,
   setOfficeFiles,
@@ -21,33 +24,32 @@ const StoreManagement = ({
   storeMeta,
   setStoreMeta,
   isUpdatingStore,
-  handleUpdateStoreDetails
+  handleUpdateStoreDetails,
+  storeId 
 }) => {
-  // ========== PATA STORE UUID KUTOKA URL ==========
   const { id: paramId } = useParams();
   const [storeUuid, setStoreUuid] = useState(null);
 
-  // Resolve UUID kutoka paramId
   useEffect(() => {
     const resolveStoreId = async () => {
+      if (storeId) { setStoreUuid(storeId); return; }
       if (!paramId) return;
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       if (uuidRegex.test(paramId)) {
         setStoreUuid(paramId);
       } else {
-        const { data, error } = await supabase
-          .from('stores_engine')
-          .select('id')
-          .eq('store_index', parseInt(paramId))
-          .single();
-        if (data && !error) setStoreUuid(data.id);
-        else console.error("Store not found for index:", paramId);
+        try {
+          const response = await axios.get(`${API_BASE_URL}/stores/`, {
+            params: { store_index: parseInt(paramId) },
+            headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
+          });
+          if (response.data && response.data.length > 0) setStoreUuid(response.data[0].id);
+        } catch (error) { console.error("Error fetching store by index:", error); }
       }
     };
     resolveStoreId();
-  }, [paramId]);
+  }, [storeId, paramId]);
 
-  // ========== SHIPPING METHODS ==========
   const [shippingMethods, setShippingMethods] = useState([]);
   const [editingShippingId, setEditingShippingId] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -55,140 +57,119 @@ const StoreManagement = ({
     label: '', description: '', price_local: '', price_national: '', is_active: true
   });
 
-  // Fetch shipping methods
   useEffect(() => {
     if (!storeUuid) return;
     const fetchShippingMethods = async () => {
-      const { data, error } = await supabase
-        .from('shipping_methods')
-        .select('*')
-        .eq('store_id', storeUuid)
-        .order('created_at', { ascending: true });
-      if (error) console.error('Error fetching shipping methods:', error);
-      else setShippingMethods(data || []);
+      try {
+        const token = localStorage.getItem("access_token");
+        const response = await axios.get(`${API_BASE_URL}/shipping-methods/`, {
+          params: { store_id: storeUuid },
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setShippingMethods(response.data || []);
+      } catch (error) { console.error('Error fetching shipping methods:', error); }
     };
     fetchShippingMethods();
   }, [storeUuid]);
 
-  // SAVE NEW SHIPPING METHOD
   const handleAddShipping = async () => {
-    if (!storeUuid) {
-      alert("Store ID haijapatikana. Tafadhali refresh ukurasa.");
-      return;
-    }
-    if (!newShipping.label.trim()) {
-      alert('Tafadhali jaza jina la njia ya usafirishaji');
-      return;
-    }
-    if (!newShipping.price_local && !newShipping.price_national) {
-      alert('Tafadhali jaza angalau bei moja (Dar au Mikoa)');
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from('shipping_methods')
-      .insert([{
-        store_id: storeUuid,
-        label: newShipping.label,
-        description: newShipping.description || null,
-        price_local: parseFloat(newShipping.price_local) || 0,
-        price_national: parseFloat(newShipping.price_national) || 0,
-        is_active: true
-      }])
-      .select();
-
-    if (error) {
-      alert('Imeshindwa kuongeza: ' + error.message);
-    } else {
-      setShippingMethods([...shippingMethods, data[0]]);
+    if (!storeUuid) return alert("Store ID haipo.");
+    if (!newShipping.label.trim()) return alert('Tafadhali jaza jina la njia');
+    try {
+      const token = localStorage.getItem("access_token");
+      const response = await axios.post(`${API_BASE_URL}/shipping-methods/`, {
+          store_id: storeUuid, label: newShipping.label, description: newShipping.description || null,
+          price_local: parseFloat(newShipping.price_local) || 0, price_national: parseFloat(newShipping.price_national) || 0, is_active: true
+        }, { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setShippingMethods([...shippingMethods, response.data]);
       setNewShipping({ label: '', description: '', price_local: '', price_national: '', is_active: true });
       setShowAddForm(false);
-    }
+    } catch (error) { alert('Imeshindwa kuongeza: ' + (error.response?.data?.detail || error.message)); }
   };
 
   const handleUpdateShipping = async (id, updatedFields) => {
-    const { error } = await supabase
-      .from('shipping_methods')
-      .update(updatedFields)
-      .eq('id', id);
-    if (error) {
-      alert('Imeshindwa kusasisha: ' + error.message);
-    } else {
+    try {
+      const token = localStorage.getItem("access_token");
+      await axios.patch(`${API_BASE_URL}/shipping-methods/${id}/`, updatedFields, { headers: { Authorization: `Bearer ${token}` } });
       setShippingMethods(shippingMethods.map(m => m.id === id ? { ...m, ...updatedFields } : m));
       setEditingShippingId(null);
-    }
+    } catch (error) { alert('Imeshindwa kusasisha: ' + (error.response?.data?.detail || error.message)); }
   };
 
-  // DELETE SHIPPING METHOD
   const handleDeleteShipping = async (id) => {
     if (!window.confirm('Je, una uhakika unataka kufuta njia hii?')) return;
-    const { error } = await supabase.from('shipping_methods').delete().eq('id', id);
-    if (error) alert('Imeshindwa kufuta: ' + error.message);
-    else setShippingMethods(shippingMethods.filter(m => m.id !== id));
+    try {
+      const token = localStorage.getItem("access_token");
+      await axios.delete(`${API_BASE_URL}/shipping-methods/${id}/`, { headers: { Authorization: `Bearer ${token}` } });
+      setShippingMethods(shippingMethods.filter(m => m.id !== id));
+    } catch (error) { alert('Imeshindwa kufuta: ' + (error.response?.data?.detail || error.message)); }
   };
 
-  // TOGGLE ACTIVE STATUS
   const toggleActive = async (id, currentStatus) => {
     await handleUpdateShipping(id, { is_active: !currentStatus });
   };
 
-  // ========== RENDER ==========
+  // ✅ 2. Hapa ndio magic ya kutatua kategoria nyingi: 
+  // Tunafanya filter tu zile zilizopo kwenye storeMeta.sub_category_ids
+  const actualStoreSubCats = useMemo(() => {
+    if (!storeMeta || !storeMeta.sub_category_ids) return [];
+    
+    let storeSubIds = [];
+    // Tunaangalia kama ni string ya JSON au array tayari
+    if (typeof storeMeta.sub_category_ids === 'string') {
+      try {
+        storeSubIds = JSON.parse(storeMeta.sub_category_ids);
+      } catch (e) {
+        console.error("Error parsing sub_category_ids", e);
+        storeSubIds = [];
+      }
+    } else if (Array.isArray(storeMeta.sub_category_ids)) {
+      storeSubIds = storeMeta.sub_category_ids;
+    }
+
+    // Filter categories based on the store's IDs
+    return myStoreSubCats.filter(subCat => storeSubIds.includes(subCat.id));
+  }, [myStoreSubCats, storeMeta]);
+
+  // ✅ 3. Helper kwa ajili ya kuweka Backend URL mbele ya picha
+  const getFullImageUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith('http') || url.startsWith('data:') || url.startsWith('blob:')) {
+      return url;
+    }
+    // Hakikisha hakuna forward slash mbili
+    const cleanUrl = url.startsWith('/') ? url.slice(1) : url;
+    return `${BACKEND_BASE_URL}/${cleanUrl}`;
+  };
+
   return (
-    <section style={{ marginTop: '24px' }}>
-      <div style={{ background: 'white', borderRadius: '20px', padding: '16px', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)', border: '1px solid #f3f4f6' }}>
+    <section className="sm-section">
+      <div className="sm-card">
         
         {/* Kategoria */}
-        <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="sm-header">
           <div>
-            <h3 style={{ fontWeight: 'bold', color: '#1f2937', fontSize: '14px', margin: 0 }}>🏷️ Kategoria za Duka Lako</h3>
-            <p style={{ fontSize: '10px', color: '#6b7280', margin: '4px 0 0 0' }}>Chagua kategoria ya bidhaa unayotaka kuongeza</p>
+            <h3 className="sm-header-title">🏷️ Kategoria za Duka Lako</h3>
+            <p className="sm-header-sub">Chagua kategoria ya bidhaa unayotaka kuongeza</p>
           </div>
           <button 
             onClick={() => setIsManageMode(!isManageMode)}
-            style={{
-              fontSize: '10px',
-              padding: '6px 12px',
-              borderRadius: '8px',
-              fontWeight: 'bold',
-              border: '1px solid',
-              transition: 'all 0.2s',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              backgroundColor: isManageMode ? '#ef4444' : '#f9fafb',
-              color: isManageMode ? 'white' : '#4b5563',
-              borderColor: isManageMode ? '#ef4444' : '#e5e7eb',
-              boxShadow: isManageMode ? '0 4px 6px -1px rgba(0,0,0,0.1)' : 'none',
-              cursor: 'pointer'
-            }}
+            className={`sm-toggle-btn ${isManageMode ? 'active' : ''}`}
           >
             <Settings size={12} /> {isManageMode ? "MALIZA" : "DHIBITI"}
           </button>
         </div>
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '24px' }}>
-          {myStoreSubCats.length > 0 ? (
-            myStoreSubCats.map((sub) => (
-              <div key={sub.id} style={{ position: 'relative' }}>
+        <div className="sm-cat-wrapper">
+          {/* ✅ Tumia actualStoreSubCats badala ya myStoreSubCats */}
+          {actualStoreSubCats.length > 0 ? (
+            actualStoreSubCats.map((sub) => (
+              <div key={sub.id} className="sm-cat-item-wrap">
                 <button
                   type="button"
                   onClick={() => setAttributes({ ...attributes, category_id: sub.id })}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '8px 16px',
-                    borderRadius: '9999px',
-                    border: '1px solid',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    transition: 'all 0.2s',
-                    backgroundColor: attributes.category_id === sub.id ? '#f97316' : 'white',
-                    color: attributes.category_id === sub.id ? 'white' : '#374151',
-                    borderColor: attributes.category_id === sub.id ? '#f97316' : '#f3f4f6',
-                    boxShadow: attributes.category_id === sub.id ? '0 1px 2px 0 rgba(0, 0, 0, 0.05)' : 'none',
-                    cursor: 'pointer'
-                  }}
+                  className={`sm-cat-item ${attributes.category_id === sub.id ? 'active' : ''}`}
                 >
                   {sub.name}
                   {attributes.category_id === sub.id && <CheckCircle size={12} />}
@@ -196,19 +177,7 @@ const StoreManagement = ({
                 {isManageMode && (
                   <button 
                     onClick={() => handleRemoveCategoryFromStore(sub.id)}
-                    style={{
-                      position: 'absolute',
-                      top: '-4px',
-                      right: '-4px',
-                      backgroundColor: '#dc2626',
-                      color: 'white',
-                      borderRadius: '50%',
-                      padding: '2px',
-                      boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-                      zIndex: 10,
-                      border: 'none',
-                      cursor: 'pointer'
-                    }}
+                    className="sm-cat-remove"
                   >
                     <X size={10} />
                   </button>
@@ -216,54 +185,30 @@ const StoreManagement = ({
               </div>
             ))
           ) : (
-            <div style={{ width: '100%', padding: '16px 0', textAlign: 'center', border: '2px dashed #f3f4f6', borderRadius: '12px' }}>
-              <p style={{ color: '#9ca3af', fontSize: '10px', fontStyle: 'italic', margin: 0 }}>Hujachagua kategoria bado.</p>
+            <div className="sm-empty-cat">
+              <p>Hujachagua kategoria bado.</p>
             </div>
           )}
           <button 
             onClick={() => setShowCategoryManager(true)}
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              backgroundColor: '#fff7ed',
-              color: '#ea580c',
-              border: '1px solid #ffedd5',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
+            className="sm-add-cat-btn"
           >
             <Plus size={16} />
           </button>
         </div>
 
         {/* SEHEMU YA SHIPPING METHODS */}
-        <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #f3f4f6' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ padding: '8px', backgroundColor: '#fff7ed', borderRadius: '12px' }}>
-                <Truck size={20} style={{ color: '#f97316' }} />
+        <div className="sm-shipping-section">
+          <div className="sm-shipping-header">
+            <div className="sm-shipping-title-wrap">
+              <div className="sm-shipping-icon-wrap">
+                <Truck size={20} className="sm-shipping-icon" />
               </div>
-              <h3 style={{ fontWeight: 'bold', color: '#1f2937', fontSize: '16px', margin: 0 }}>🚚 Njia za Usafirishaji</h3>
+              <h3 className="sm-shipping-title">🚚 Njia za Usafirishaji</h3>
             </div>
             <button 
               onClick={() => setShowAddForm(!showAddForm)}
-              style={{
-                fontSize: '12px',
-                backgroundColor: '#fff7ed',
-                color: '#ea580c',
-                padding: '6px 12px',
-                borderRadius: '9999px',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                transition: 'all 0.2s'
-              }}
+              className="sm-shipping-toggle-btn"
             >
               {showAddForm ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
               {showAddForm ? "Ficha fomu" : "Ongeza njia"}
@@ -271,92 +216,75 @@ const StoreManagement = ({
           </div>
 
           {/* Grid ya shipping methods */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '16px' }}>
+          <div className="sm-shipping-grid">
             {shippingMethods.length === 0 ? (
-              <div style={{ gridColumn: 'span 1', textAlign: 'center', padding: '32px 0', backgroundColor: '#f9fafb', borderRadius: '12px', border: '1px dashed #e5e7eb' }}>
-                <Truck size={32} style={{ margin: '0 auto 8px auto', color: '#d1d5db' }} />
-                <p style={{ color: '#9ca3af', fontSize: '14px', margin: '0 0 8px 0' }}>Hakuna njia za usafirishaji</p>
-                <button 
-                  onClick={() => setShowAddForm(true)}
-                  style={{ color: '#f97316', fontSize: '12px', fontWeight: '500', background: 'transparent', border: 'none', cursor: 'pointer' }}
-                >
+              <div className="sm-shipping-empty">
+                <Truck size={32} className="sm-shipping-empty-icon" />
+                <p className="sm-shipping-empty-text">Hakuna njia za usafirishaji</p>
+                <button onClick={() => setShowAddForm(true)} className="sm-shipping-empty-btn">
                   + Weka njia ya kwanza
                 </button>
               </div>
             ) : (
               shippingMethods.map((method) => (
-                <div 
-                  key={method.id} 
-                  style={{ backgroundColor: 'white', borderRadius: '12px', border: '1px solid #f3f4f6', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', transition: 'all 0.2s' }}
-                >
+                <div key={method.id} className="sm-shipping-item">
                   {editingShippingId === method.id ? (
                     // Edit mode
-                    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                      <input 
-                        type="text" 
-                        style={{ width: '100%', padding: '8px', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px' }}
-                        value={method.label}
+                    <div className="sm-shipping-edit">
+                      <input type="text" className="sm-input-full" value={method.label}
                         onChange={(e) => {
                           const updated = { ...method, label: e.target.value };
                           setShippingMethods(shippingMethods.map(m => m.id === method.id ? updated : m));
-                        }}
-                      />
-                      <textarea 
-                        rows="1"
-                        style={{ width: '100%', padding: '8px', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px' }}
-                        placeholder="Maelezo"
-                        value={method.description || ''}
+                        }} />
+                      <textarea rows="1" className="sm-input-full" placeholder="Maelezo" value={method.description || ''}
                         onChange={(e) => {
                           const updated = { ...method, description: e.target.value };
                           setShippingMethods(shippingMethods.map(m => m.id === method.id ? updated : m));
-                        }}
-                      />
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                        <input type="number" placeholder="Dar" style={{ padding: '8px', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px' }} value={method.price_local}
+                        }} />
+                      <div className="sm-input-half-grid">
+                        <input type="number" placeholder="Dar" className="sm-input-full" value={method.price_local}
                           onChange={(e) => {
                             const updated = { ...method, price_local: e.target.value };
                             setShippingMethods(shippingMethods.map(m => m.id === method.id ? updated : m));
                           }} />
-                        <input type="number" placeholder="Mikoa" style={{ padding: '8px', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px' }} value={method.price_national}
+                        <input type="number" placeholder="Mikoa" className="sm-input-full" value={method.price_national}
                           onChange={(e) => {
                             const updated = { ...method, price_national: e.target.value };
                             setShippingMethods(shippingMethods.map(m => m.id === method.id ? updated : m));
                           }} />
                       </div>
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                      <div className="sm-edit-actions">
                         <button onClick={() => handleUpdateShipping(method.id, {
-                          label: method.label,
-                          description: method.description,
-                          price_local: method.price_local,
-                          price_national: method.price_national
-                        })} style={{ backgroundColor: '#22c55e', color: 'white', padding: '4px 12px', borderRadius: '8px', fontSize: '12px', border: 'none', cursor: 'pointer' }}>Hifadhi</button>
-                        <button onClick={() => setEditingShippingId(null)} style={{ backgroundColor: '#e5e7eb', padding: '4px 12px', borderRadius: '8px', fontSize: '12px', border: 'none', cursor: 'pointer' }}>Ghairi</button>
+                          label: method.label, description: method.description,
+                          price_local: method.price_local, price_national: method.price_national
+                        })} className="sm-btn-success">Hifadhi</button>
+                        <button onClick={() => setEditingShippingId(null)} className="sm-btn-cancel">Ghairi</button>
                       </div>
                     </div>
                   ) : (
                     // View mode
-                    <div style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                          <span style={{ fontWeight: '600', color: '#1f2937' }}>{method.label}</span>
-                          <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '9999px', backgroundColor: method.is_active ? '#dcfce7' : '#fee2e2', color: method.is_active ? '#16a34a' : '#ef4444' }}>
+                    <div className="sm-shipping-view">
+                      <div className="sm-shipping-view-content">
+                        <div className="sm-shipping-label-row">
+                          <span className="sm-shipping-label">{method.label}</span>
+                          <span className={`sm-shipping-status ${method.is_active ? 'active' : 'inactive'}`}>
                             {method.is_active ? 'Inatumika' : 'Imefichwa'}
                           </span>
                         </div>
-                        {method.description && <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>{method.description}</p>}
-                        <div style={{ display: 'flex', gap: '12px', marginTop: '8px', fontSize: '12px' }}>
+                        {method.description && <p className="sm-shipping-desc">{method.description}</p>}
+                        <div className="sm-shipping-prices">
                           <span>Dar: TZS {Number(method.price_local).toLocaleString()}</span>
                           <span>Mikoa: TZS {Number(method.price_national).toLocaleString()}</span>
                         </div>
                       </div>
-                      <div style={{ display: 'flex', gap: '4px' }}>
-                        <button onClick={() => setEditingShippingId(method.id)} style={{ padding: '6px', borderRadius: '50%', backgroundColor: '#eff6ff', color: '#2563eb', border: 'none', cursor: 'pointer' }}>
+                      <div className="sm-shipping-actions">
+                        <button onClick={() => setEditingShippingId(method.id)} className="sm-action-btn edit">
                           <Edit2 size={14} />
                         </button>
-                        <button onClick={() => toggleActive(method.id, method.is_active)} style={{ padding: '6px', borderRadius: '50%', backgroundColor: method.is_active ? '#f3f4f6' : '#dcfce7', color: method.is_active ? '#6b7280' : '#16a34a', border: 'none', cursor: 'pointer' }}>
+                        <button onClick={() => toggleActive(method.id, method.is_active)} className={`sm-action-btn ${method.is_active ? 'toggle-off' : 'toggle-on'}`}>
                           {method.is_active ? <X size={14} /> : <CheckCircle size={14} />}
                         </button>
-                        <button onClick={() => handleDeleteShipping(method.id)} style={{ padding: '6px', borderRadius: '50%', backgroundColor: '#fef2f2', color: '#ef4444', border: 'none', cursor: 'pointer' }}>
+                        <button onClick={() => handleDeleteShipping(method.id)} className="sm-action-btn delete">
                           <Trash2 size={14} />
                         </button>
                       </div>
@@ -369,50 +297,35 @@ const StoreManagement = ({
 
           {/* Form ya kuongeza (toggle) */}
           {showAddForm && (
-            <div style={{ backgroundColor: '#fff7ed', borderRadius: '12px', padding: '16px', border: '1px solid #ffedd5', marginTop: '8px' }}>
-              <h4 style={{ fontWeight: '600', color: '#9a3412', fontSize: '14px', margin: '0 0 12px 0' }}>➕ Njia mpya</h4>
+            <div className="sm-shipping-form-wrap">
+              <h4 className="sm-shipping-form-title">➕ Njia mpya</h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <input type="text" placeholder="Jina la njia *" style={{ width: '100%', padding: '8px', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px' }} value={newShipping.label} onChange={e => setNewShipping({...newShipping, label: e.target.value})} />
-                <textarea rows="1" placeholder="Maelezo (hiari)" style={{ width: '100%', padding: '8px', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px' }} value={newShipping.description} onChange={e => setNewShipping({...newShipping, description: e.target.value})} />
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                  <input type="number" placeholder="Bei Dar" style={{ padding: '8px', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px' }} value={newShipping.price_local} onChange={e => setNewShipping({...newShipping, price_local: e.target.value})} />
-                  <input type="number" placeholder="Bei Mikoa" style={{ padding: '8px', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px' }} value={newShipping.price_national} onChange={e => setNewShipping({...newShipping, price_national: e.target.value})} />
+                <input type="text" placeholder="Jina la njia *" className="sm-input-full" value={newShipping.label} onChange={e => setNewShipping({...newShipping, label: e.target.value})} />
+                <textarea rows="1" placeholder="Maelezo (hiari)" className="sm-input-full" value={newShipping.description} onChange={e => setNewShipping({...newShipping, description: e.target.value})} />
+                <div className="sm-input-half-grid">
+                  <input type="number" placeholder="Bei Dar" className="sm-input-full" value={newShipping.price_local} onChange={e => setNewShipping({...newShipping, price_local: e.target.value})} />
+                  <input type="number" placeholder="Bei Mikoa" className="sm-input-full" value={newShipping.price_national} onChange={e => setNewShipping({...newShipping, price_national: e.target.value})} />
                 </div>
-                <button onClick={handleAddShipping} style={{ width: '100%', backgroundColor: '#f97316', color: 'white', padding: '8px 0', borderRadius: '8px', fontSize: '14px', fontWeight: '600', border: 'none', cursor: 'pointer' }}>Weka Njia</button>
+                <button onClick={handleAddShipping} className="sm-shipping-submit-btn">Weka Njia</button>
               </div>
             </div>
           )}
         </div>
 
         {/* SEHEMU YA OFFICE IMAGES & STORE DETAILS */}
-        <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: '1px solid #f3f4f6' }}>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+        <div className="sm-details-section">
+          <div className="sm-office-grid">
             {officePreviews.map((url, index) => (
               <div 
                 key={`${index}-${url || index}`}
-                style={{
-                  position: 'relative',
-                  width: '100%',
-                  aspectRatio: '1/1',
-                  background: '#f3f4f6',
-                  border: '2px dashed #d1d5db',
-                  borderRadius: '12px',
-                  overflow: 'hidden',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s'
-                }}
+                className="sm-office-box"
                 onClick={() => officeInputRefs.current[index]?.click()}
               >
                 {url ? (
-                  <img 
-                    key={url} 
-                    src={url} 
-                    alt="Office" 
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                  />
+                  // ✅ 4. Tumia getFullImageUrl kwa image src
+                  <img src={getFullImageUrl(url)} alt="Office" />
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#6b7280', fontSize: '11px' }}>📸 Picha {index + 1}</div>
+                  <div className="sm-office-box-placeholder">📸 Picha {index + 1}</div>
                 )}
                 <input 
                   type="file" 
@@ -421,16 +334,18 @@ const StoreManagement = ({
                   onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
-                      if (officePreviews[index]) {
-                        URL.revokeObjectURL(officePreviews[index]);
+                      // ✅ 5. Kuepusha kuvunjika kwa revokeObjectURL kama sio blob
+                      if (officePreviews[index] && officePreviews[index].startsWith('blob:')) {
+                        try {
+                          URL.revokeObjectURL(officePreviews[index]);
+                        } catch (err) {
+                          console.warn("Could not revoke blob URL");
+                        }
                       }
                       const safeOfficeFiles = Array.isArray(officeFiles) ? officeFiles : [null, null, null];
-                      const nF = [...safeOfficeFiles];
-                      const nP = [...officePreviews];
-                      nF[index] = file; 
-                      nP[index] = URL.createObjectURL(file);
-                      setOfficeFiles(nF);
-                      setOfficePreviews(nP);
+                      const nF = [...safeOfficeFiles]; const nP = [...officePreviews];
+                      nF[index] = file; nP[index] = URL.createObjectURL(file);
+                      setOfficeFiles(nF); setOfficePreviews(nP);
                       e.target.value = null; 
                     }
                   }} 
@@ -439,51 +354,60 @@ const StoreManagement = ({
             ))}
           </div>
 
-          <div style={{ marginTop: '20px' }}>
-            <div style={isMobile ? { display: 'flex', flexDirection: 'column', gap: '12px' } : { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', flex: 1, marginBottom: '15px' }}>
-                <label style={{ fontSize: '13px', fontWeight: '600', marginBottom: '8px', color: '#1f2937' }}>Jina la Duka</label>
-                <input type="text" style={{ width: '100%', padding: '12px', border: '1.5px solid #e5e7eb', borderRadius: '10px', fontSize: '14px', background: '#fcfcfc' }} value={storeMeta.store_name} onChange={(e) => setStoreMeta({ ...storeMeta, store_name: e.target.value })} />
+          <div className="sm-details-form">
+            {/* Input 1 - Grid 2 columns */}
+            <div className="sm-form-row">
+              <div className="sm-input-group">
+                <label className="sm-label">Jina la Duka</label>
+                <input type="text" className="sm-input" value={storeMeta.store_name} onChange={(e) => setStoreMeta({ ...storeMeta, store_name: e.target.value })} />
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', flex: 1, marginBottom: '15px' }}>
-                <label style={{ fontSize: '13px', fontWeight: '600', marginBottom: '8px', color: '#1f2937' }}>Simu ya Biashara</label>
-                <input type="text" style={{ width: '100%', padding: '12px', border: '1.5px solid #e5e7eb', borderRadius: '10px', fontSize: '14px', background: '#fcfcfc' }} value={storeMeta.phone_number} onChange={(e) => setStoreMeta({ ...storeMeta, phone_number: e.target.value })} />
-              </div>
-            </div>
-            
-            <div style={isMobile ? { display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' } : { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '12px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', flex: 1, marginBottom: '15px' }}>
-                <label style={{ fontSize: '13px', fontWeight: '600', marginBottom: '8px', color: '#1f2937' }}><Phone size={14} style={{ display: 'inline', marginRight: '4px' }} /> WhatsApp</label>
-                <input type="text" style={{ width: '100%', padding: '12px', border: '1.5px solid #e5e7eb', borderRadius: '10px', fontSize: '14px', background: '#fcfcfc' }} placeholder="255..." value={storeMeta.whatsapp_number} onChange={(e) => setStoreMeta({ ...storeMeta, whatsapp_number: e.target.value })} />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', flex: 1, marginBottom: '15px' }}>
-                <label style={{ fontSize: '13px', fontWeight: '600', marginBottom: '8px', color: '#1f2937' }}><Instagram size={14} style={{ display: 'inline', marginRight: '4px' }} /> Instagram</label>
-                <input type="text" style={{ width: '100%', padding: '12px', border: '1.5px solid #e5e7eb', borderRadius: '10px', fontSize: '14px', background: '#fcfcfc' }} placeholder="@handle" value={storeMeta.instagram_handle} onChange={(e) => setStoreMeta({ ...storeMeta, instagram_handle: e.target.value })} />
+              <div className="sm-input-group">
+                <label className="sm-label">Simu ya Biashara</label>
+                <input type="text" className="sm-input" value={storeMeta.phone_number} onChange={(e) => setStoreMeta({ ...storeMeta, phone_number: e.target.value })} />
               </div>
             </div>
             
-            <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px', marginTop: '12px' }}>
-              <label style={{ fontSize: '13px', fontWeight: '600', marginBottom: '8px', color: '#1f2937' }}>Physical Address</label>
-              <input type="text" style={{ width: '100%', padding: '12px', border: '1.5px solid #e5e7eb', borderRadius: '10px', fontSize: '14px', background: '#fcfcfc' }} value={storeMeta.physical_address} onChange={(e) => setStoreMeta({ ...storeMeta, physical_address: e.target.value })} />
-            </div>
-            
-            <div style={isMobile ? { display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px' } : { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '16px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '4px', fontSize: '13px', fontWeight: '600', color: '#1f2937' }}>TIN Number 🔒</label>
-                <input type="text" value={storeMeta.tin_number || "Inapakia..."} readOnly style={{ width: '100%', padding: '12px', border: '1.5px solid #e5e7eb', borderRadius: '10px', fontSize: '14px', background: '#f3f4f6', cursor: 'not-allowed', opacity: 0.8, fontFamily: 'monospace' }} />
+            {/* Input 2 - Grid 2 columns */}
+            <div className="sm-form-row">
+              <div className="sm-input-group">
+                <label className="sm-label"><Phone size={14} className="sm-icon" /> WhatsApp</label>
+                <input type="text" className="sm-input" placeholder="255..." value={storeMeta.whatsapp_number} onChange={(e) => setStoreMeta({ ...storeMeta, whatsapp_number: e.target.value })} />
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '4px', fontSize: '13px', fontWeight: '600', color: '#1f2937' }}>TikTok Handle</label>
-                <input type="text" placeholder="@username" value={storeMeta.tiktok_handle || ""} onChange={(e) => setStoreMeta({ ...storeMeta, tiktok_handle: e.target.value })} style={{ width: '100%', padding: '12px', border: '1.5px solid #e5e7eb', borderRadius: '10px', fontSize: '14px', background: '#fcfcfc' }} />
+              <div className="sm-input-group">
+                <label className="sm-label"><Instagram size={14} className="sm-icon" /> Instagram</label>
+                <input type="text" className="sm-input" placeholder="@handle" value={storeMeta.instagram_handle} onChange={(e) => setStoreMeta({ ...storeMeta, instagram_handle: e.target.value })} />
               </div>
             </div>
             
-            <div style={{ display: 'flex', flexDirection: 'column', marginTop: '16px' }}>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '4px', color: '#374151' }}>Maelezo ya Duka</label>
-              <textarea rows="3" style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e5e7eb', color: '#1f2937' }} value={storeMeta.description || ""} onChange={(e) => setStoreMeta({ ...storeMeta, description: e.target.value })} />
+            {/* Input 3 - Full width */}
+            <div className="sm-form-row full">
+              <div className="sm-input-group">
+                <label className="sm-label">Physical Address</label>
+                <input type="text" className="sm-input" value={storeMeta.physical_address} onChange={(e) => setStoreMeta({ ...storeMeta, physical_address: e.target.value })} />
+              </div>
             </div>
             
-            <button onClick={handleUpdateStoreDetails} disabled={isUpdatingStore} style={{ width: '100%', padding: '16px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '12px', fontWeight: '700', cursor: isUpdatingStore ? 'not-allowed' : 'pointer', marginTop: '24px', opacity: isUpdatingStore ? 0.6 : 1 }}>
+            {/* Input 4 - Grid 2 columns */}
+            <div className="sm-form-row">
+              <div className="sm-input-group">
+                <label className="sm-label">TIN Number 🔒</label>
+                <input type="text" value={storeMeta.tin_number || "Inapakia..."} readOnly className="sm-input disabled" />
+              </div>
+              <div className="sm-input-group">
+                <label className="sm-label">TikTok Handle</label>
+                <input type="text" className="sm-input" placeholder="@username" value={storeMeta.tiktok_handle || ""} onChange={(e) => setStoreMeta({ ...storeMeta, tiktok_handle: e.target.value })} />
+              </div>
+            </div>
+            
+            {/* Textarea - Full width */}
+            <div className="sm-form-row full">
+              <div className="sm-input-group">
+                <label className="sm-label" style={{ fontSize: '14px', fontWeight: '500' }}>Maelezo ya Duka</label>
+                <textarea rows="3" className="sm-textarea" value={storeMeta.description || ""} onChange={(e) => setStoreMeta({ ...storeMeta, description: e.target.value })} />
+              </div>
+            </div>
+            
+            <button onClick={handleUpdateStoreDetails} disabled={isUpdatingStore} className="sm-submit-btn">
               {isUpdatingStore ? "Inasave..." : "Hifadhi Mabadiliko ya Duka ✅"}
             </button>
           </div>

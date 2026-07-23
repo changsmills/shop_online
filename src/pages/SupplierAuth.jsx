@@ -1,39 +1,86 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../supabaseClient'; // Hakikisha njia ni sahihi
+import axios from 'axios'; // ✅ Badilisha: Axios badala ya Supabase
 import { ChevronDown } from 'lucide-react';
+import toast from 'react-hot-toast';
+
+const API_BASE_URL = "http://127.0.0.1:8000/api"; // ✅ Ongeza hii
 
 const SupplierAuth = () => {
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(false); // Badilisha true kuwa Sign In, false kuwa Sign Up
+  const [isLogin, setIsLogin] = useState(false);
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [country, setCountry] = useState('TZ');
-  
+
   // Responsive Logic
   const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth <= 900 : false);
-  
+
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 900);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // ✅ BADILISHA: Handle submit kwa Django API
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // Hapa unaweza kuweka logic yako ya Supabase Auth
-    if (isLogin) {
-      console.log("Logging in with:", email);
-      // await supabase.auth.signInWithPassword({ email, password });
-    } else {
-      console.log("Signing up supplier with:", email);
-      // await supabase.auth.signUp({ email, password, options: { data: { role: 'supplier' } } });
+
+    try {
+      if (isLogin) {
+        // ===== LOGIN =====
+        const response = await axios.post(`${API_BASE_URL}/token/`, {
+          email: email.trim(),
+          password: password
+        });
+
+        const { access, refresh } = response.data;
+        localStorage.setItem('access_token', access);
+        localStorage.setItem('refresh_token', refresh);
+
+        // Pata profile kujua role
+        const profileRes = await axios.get(`${API_BASE_URL}/profile/`, {
+          headers: { Authorization: `Bearer ${access}` }
+        });
+
+        const role = profileRes.data.role;
+        toast.success('Umeingia kikamilifu!');
+
+        if (role === 'supplier') {
+          navigate('/create-store');
+        } else {
+          navigate('/dashboard');
+        }
+      } else {
+        // ===== SIGNUP (Supplier) =====
+        // Tuma data kwenye endpoint ya register
+        const response = await axios.post(`${API_BASE_URL}/register/`, {
+          email: email.trim(),
+          password: password,
+          role: 'supplier' // Hii itaambia backend kuunda Profile yenye role supplier
+        });
+
+        // Ikiwa backend inarudisha tokens, zihifadhi
+        if (response.data.access && response.data.refresh) {
+          localStorage.setItem('access_token', response.data.access);
+          localStorage.setItem('refresh_token', response.data.refresh);
+        }
+
+        toast.success('Akaunti ya supplier imeundwa!');
+        navigate('/create-store'); // Peleka kuunda duka
+      }
+    } catch (err) {
+      console.error('Auth error:', err.response?.data || err.message);
+      const errorMsg = err.response?.data?.detail || err.response?.data?.email?.[0] || 'Hitilafu. Tafadhali jaribu tena.';
+      toast.error(errorMsg);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
-  // Styles constants
+  // Styles constants (zimebaki sawa)
   const styles = {
     container: {
       display: 'flex',
@@ -44,7 +91,7 @@ const SupplierAuth = () => {
     },
     leftPanel: {
       flex: 1,
-      backgroundImage: 'url("https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1000&auto=format&fit=crop")', // Unaweza kubadilisha link hii
+      backgroundImage: 'url("https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1000&auto=format&fit=crop")',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       position: 'relative',
@@ -144,6 +191,22 @@ const SupplierAuth = () => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              style={{
+                width: '100%', padding: '14px 16px', borderRadius: '8px', border: '1px solid #d1d5db',
+                fontSize: '15px', outline: 'none', transition: '0.2s'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#FF6600'}
+              onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#333' }}>Password</label>
+            <input 
+              type="password" 
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               style={{
                 width: '100%', padding: '14px 16px', borderRadius: '8px', border: '1px solid #d1d5db',
                 fontSize: '15px', outline: 'none', transition: '0.2s'
