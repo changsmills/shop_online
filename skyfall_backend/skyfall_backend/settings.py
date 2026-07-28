@@ -125,8 +125,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://localhost:5173',
-    'https://jina-la-frontend-yako.vercel.app', # 🔥 ONGEZA HAPA URL YA LIVE FRONTEND
-
+    'https://shop-online-tan.vercel.app', 
 ]
 
 CORS_ALLOW_CREDENTIALS = True
