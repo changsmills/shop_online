@@ -4,8 +4,10 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "../App.css";
-import axios from "axios";
+// 🔥 TUMIA API (Sio axios moja kwa moja)
+import api from "../axiosConfig"; 
 import DashboardCard from "../components/DashboardCard";
+
 const TopStores = lazy(() => import("../components/TopStores"));
 const LocationFilter = lazy(() => import("../components/LocationFilter"));
 const JustForYou = lazy(() => import("../components/JustForYou"));
@@ -13,9 +15,8 @@ const TopDeals = lazy(() => import("../components/TopDeals"));
 const NewArrivals = lazy(() => import("../components/NewArrivals"));
 const RecentlyViewed = lazy(() => import("../components/RecentlyViewed"));
 const TrendingNow = lazy(() => import("../components/TrendingNow"));
-const API_BASE_URL = "http://127.0.0.1:8000/api";
-const getToken = () => localStorage.getItem("access_token");
 
+const getToken = () => localStorage.getItem("access_token");
 
 import { useDashboardData } from "../hooks/useDashboardData";
 import BottomNav from "../components/BottomNav";
@@ -35,7 +36,6 @@ const placeholderImg = "https://via.placeholder.com/100?text=Skyfall";
 export default function Dashboard() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  // ✅ useIsMobile imeondolewa kabisa!
 
   const { 
     categories, 
@@ -65,6 +65,7 @@ export default function Dashboard() {
   const timeoutRef = useRef(null);
   const [cachedAds, setCachedAds] = useState([]);
 
+  // 🔥 BADILISHA: Tumia `api.get` badala ya `axios.get`
    useEffect(() => {
     const fetchAdsWithCache = async () => {
       const storedAds = localStorage.getItem('skyfall_ads');
@@ -76,9 +77,9 @@ export default function Dashboard() {
       }
 
       try {
-        // ✅ BADILISHA: Piga API ya Django kwa matangazo yaliyo 'active'
-        const response = await axios.get(`${API_BASE_URL}/advertisements/`, {
-          params: { status: 'active' } // Kama backend inaweza kuchuja kwa parameter
+        // ✅ Badilisha axios.get kuwa api.get
+        const response = await api.get('/advertisements/', {
+          params: { status: 'active' }
         });
         
         const data = response.data;
@@ -100,21 +101,19 @@ export default function Dashboard() {
     description: "Pata bidhaa bora kutoka kwa wauzaji waliohakikiwa nchi nzima."
   };
 
-  // ✅ Tumia URL extension kuamua kama ni video
-const isVideoAd = (ad) => {
-  if (!ad?.media_url) return false;
-  return ad.media_url.match(/\.(mp4|webm|mov)$/i) !== null;
-};
+  const isVideoAd = (ad) => {
+    if (!ad?.media_url) return false;
+    return ad.media_url.match(/\.(mp4|webm|mov)$/i) !== null;
+  };
 
-   // 1. Fetch Featured Leafs (Kategoria za kipekee zenye picha)
+  // 1. Fetch Featured Leafs
   const fetchFeaturedLeafs = async (categoryId) => {
     if (!categoryId) return;
     try {
-      const response = await axios.get(`${API_BASE_URL}/products/`, {
+      const response = await api.get('/products/', {
         params: { parent_category: categoryId }
       });
 
-      // Chuja ili tu kupata leaf categories za kipekee zenye picha
       const seenIds = new Set();
       const uniqueLeafs = response.data
         .filter(item => item.cover_image && !seenIds.has(item.leaf_category_id))
@@ -135,10 +134,10 @@ const isVideoAd = (ad) => {
     }
   };
 
-  // 2. Fetch Subcategories (Sahihi na rahisi)
+  // 2. Fetch Subcategories
   const fetchSubCategories = async (categoryId) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/subcategories/`, {
+      const response = await api.get('/subcategories/', {
         params: { category_id: categoryId }
       });
       setSubCategories(response.data);
@@ -151,15 +150,13 @@ const isVideoAd = (ad) => {
     }
   };
 
-  // 3. Fetch Leafs for Subcategory (Inachuja kupitia bidhaa, kama Supabase)
+  // 3. Fetch Leafs for Subcategory
   const fetchLeafsForSub = async (subCategoryId) => {
     try {
-      // Tumia endpoint ya products kwa sababu ni hapo ndipo kuna cover_image
-      const response = await axios.get(`${API_BASE_URL}/products/`, {
-        params: { category: subCategoryId } // Tafuta products zenye subCategoryId
+      const response = await api.get('/products/', {
+        params: { category: subCategoryId }
       });
 
-      // Sasa chuja na upate leaf categories za kipekee kwa kategoria hii
       const seenLeafIds = new Set();
       const uniqueLeafs = response.data
         .filter(item => item.cover_image && !seenLeafIds.has(item.leaf_category_id))
@@ -200,7 +197,6 @@ const isVideoAd = (ad) => {
       setSubCategories(initialSubCategories);
     }
   }, [initialSubCategories]);
-
 
   useEffect(() => {
     if (selectedCategory?.id && activeMenu === 'categories') {
@@ -248,9 +244,7 @@ const isVideoAd = (ad) => {
   const checkAuth = async () => {
     const token = getToken();
     if (token && isMounted) {
-      // Kwa sasa, token ipo. Unaweza ku-verify kwa kupiga endpoint ya profile.
-      // Hapa tutachukulia kuwa ameingia.
-      setSession({ user: { id: "authenticated" } }); // Dummy session kwa UI
+      setSession({ user: { id: "authenticated" } });
     } else {
       setSession(null);
     }
@@ -323,18 +317,16 @@ const isVideoAd = (ad) => {
     return <IconComponent size={18} />;
   };
 
-  // ========== FALLBACK COMPONENT KWA SUSPENSE ==========
-const ComponentFallback = () => (
-  <div className="loading-container">
-    <div className="loading-dots">
-      <div className="dot"></div>
-      <div className="dot"></div>
-      <div className="dot"></div>
+  const ComponentFallback = () => (
+    <div className="loading-container">
+      <div className="loading-dots">
+        <div className="dot"></div>
+        <div className="dot"></div>
+        <div className="dot"></div>
+      </div>
     </div>
-  </div>
-);
+  );
 
-  // ========== RENDER ==========
   if (dataError) {
     return (
       <div className="dashboard-wrapper">
@@ -362,7 +354,6 @@ const ComponentFallback = () => (
   }
 
   return (
-    
     <div key={i18n.language} className="dashboard-wrapper">
       
       <div className="sticky-header">
@@ -371,7 +362,6 @@ const ComponentFallback = () => (
       
       <div className="main-content">
 
-        {/* Category Slider - Inaonekana kwenye mobile & tablet (CSS inaficha kwenye desktop) */}
         <div className="category-slider-wrapper">
           {!search && categories.length > 0 && (
             <MobileCategorySlider 
@@ -398,7 +388,6 @@ const ComponentFallback = () => (
 
         <div className="content-container-simple">
 
-          {/* Search Results */}
           {search && (
             <div className="search-results-wrapper">
               <h3 className="search-heading">{t('looking_for')}: {search}</h3>
@@ -418,11 +407,9 @@ const ComponentFallback = () => (
             </div>
           )}
 
-          {/* Hero Section - Banner na Sidebar */}
           {!search && (
             <div className="alibaba-top-layout">
               
-              {/* Sidebar - Inaonekana Desktop tu (>1024px) */}
               <aside className="side-categories">
                 <div className="side-header">
                   <Star size={18} /> <span>{t('categories')}</span>
@@ -440,7 +427,6 @@ const ComponentFallback = () => (
                 </ul>
               </aside>
 
-              {/* Banner - Inaonekana kwenye mobile, tablet, na desktop */}
               <div className="hero-banners-container">
                 <div className="hot-picks-banner">
                   {activeAd && isVideoAd(activeAd) ? (
@@ -483,11 +469,9 @@ const ComponentFallback = () => (
             </div>
           )}
 
-{/* Components */}
 <div className="components-wrapper">
   <Suspense fallback={<ComponentFallback />}>
     <RecentlyViewed key={i18n.language} navigate={navigate} />
-    
   </Suspense>
 
   <Suspense fallback={<ComponentFallback />}>
@@ -542,7 +526,6 @@ const ComponentFallback = () => (
   </Suspense>
 </div>
 
-          {/* Footer - Inaonekana desktop & tablet tu (CSS inaficha kwenye mobile) */}
           <div className="footer-wrapper">
             <Footer />
           </div>
@@ -550,7 +533,6 @@ const ComponentFallback = () => (
         </div>
       </div>
 
-      {/* Bottom Nav - Inaonekana mobile tu (CSS inaficha kwenye desktop & tablet) */}
       <div className="bottom-nav-wrapper">
         <BottomNav 
           session={session} 
@@ -559,9 +541,6 @@ const ComponentFallback = () => (
         />
       </div>
 
-      {/* ============================================ */}
-      {/* PORTAL: MEGA MENU - DESKTOP HOVER ONLY */}
-      {/* ============================================ */}
       {activeMenu === 'categories' && selectedCategory && ReactDOM.createPortal(
         <div 
           className="mega-menu-container"
@@ -569,8 +548,6 @@ const ComponentFallback = () => (
           onMouseLeave={handleMouseLeave}
         >
           <div className="mega-menu-inner">
-            
-            {/* SIDEBAR */}
             <aside className="mega-menu-sidebar">
               {viewMode === 'products' ? (
                 categories.map((cat) => (
@@ -603,8 +580,6 @@ const ComponentFallback = () => (
                 </>
               )}
             </aside>
-
-            {/* CONTENT */}
             <main className="mega-menu-content">
               <div className="content-header">
                 <h3>
@@ -618,7 +593,6 @@ const ComponentFallback = () => (
                   </button>
                 )}
               </div>
-
               <div className="category-grid">
                 {viewMode === 'products' ? (
                   <>
@@ -664,7 +638,6 @@ const ComponentFallback = () => (
         document.body
       )}
 
-      {/* ========== MOBILE MENU PORTAL ========== */}
       {mobileMenuOpen && ReactDOM.createPortal(
         <div 
           className="mobile-menu-overlay"
