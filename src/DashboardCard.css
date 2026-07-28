@@ -125,52 +125,96 @@
   }
 }
 
-
 /* ============================================ */
-/* LAYER 5: TYPOGRAPHY (NDOGO KABISA)           */
+/* LAYER 5: TYPOGRAPHY (MANENE NA YANAYOVUTIA)  */
 /* ============================================ */
 
 .product-card-title {
-  margin: 0; font-size: 14px; color: #1a1a1a; font-weight: 600; line-height: 1.3;
-  display: -webkit-box; -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2; overflow: hidden;
+  margin: 0; 
+  font-size: 16px;         /* 🔥 Imepanuliwa kidogo kwa desktop */
+  color: #111827;          /* 🔥 Nyeusi nzito yenye mtindo */
+  font-weight: 700;        /* 🔥 Manene (Bold) */
+  line-height: 1.3;
+  letter-spacing: 0.02em;  /* 🔥 Nafasi nzuri kati ya herufi */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
-/* ✅ Mobile - Jina kubwa la kutosha (Sio 8px tena) */
+/* ✅ Mobile - Jina kubwa na nzito */
 @media (max-width: 768px) {
   .product-card-title { 
-    font-size: 12px !important;  /* 🔥 Jina linasomeka vizuri */
+    font-size: 14px !important; 
+    font-weight: 700 !important; /* 🔥 Manene hata kwenye simu */
     line-height: 1.2; 
-    -webkit-line-clamp: 1 !important; 
+    -webkit-line-clamp: 2 !important; /* Ruhusu mistari 2 ili isikate mapema */
   }
 }
 
 .product-card-price-row {
-  display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; margin-top: 1px;
+  display: flex; 
+  align-items: baseline; 
+  gap: 4px; 
+  flex-wrap: wrap; 
+  margin-top: 2px;
 }
 
-.price-currency { color: #ff6a00; font-size: 0.8rem; font-weight: 600; }
-.price-amount { color: #ff6a00; font-size: 0.9rem; font-weight: 700; }
+/* Desktop Price */
+.price-currency { 
+  color: #ff6a00; 
+  font-size: 16px;         /* 🔥 Imepanuliwa */
+  font-weight: 700; 
+}
+.price-amount { 
+  color: #ff6a00; 
+  font-size: 22px;         /* 🔥 Bei kubwa na nzito sana! */
+  font-weight: 800;        /* 🔥 Manene kabisa */
+}
 .price-original-strikethrough {
-  text-decoration: line-through; color: #999; font-size: 10px; font-weight: 400;
+  text-decoration: line-through; 
+  color: #9ca3af; 
+  font-size: 14px; 
+  font-weight: 400;
 }
 
-/* ✅ Mobile - Bei Inayoonekana Wazi */
+/* ✅ Mobile - Bei inayoonekana wazi na nzito */
 @media (max-width: 768px) {
-  .price-currency { font-size: 10px !important; }
-  .price-amount { font-size: 13px !important; /* 🔥 Bei kubwa kama Alibaba */ } 
-  .price-original-strikethrough { font-size: 9px !important; }
+  .price-currency { 
+    font-size: 12px !important; 
+    font-weight: 700 !important; 
+  }
+  .price-amount { 
+    font-size: 16px !important; 
+    font-weight: 800 !important; /* 🔥 Nzito kwenye bei ya simu */
+  } 
+  .price-original-strikethrough { 
+    font-size: 11px !important; 
+  }
 }
 
-.store-moq-info { display: flex; align-items: center; gap: 3px; margin-top: 1px; }
-.moq-label { font-size: 10px; color: #64748b; font-weight: 500; }
-.moq-value { font-size: 13px; font-weight: 700; color: #1e293b; }
+/* MOQ (Kwa bidhaa za jumla / wholesale) */
+.store-moq-info { 
+  display: flex; 
+  align-items: center; 
+  gap: 3px; 
+  margin-top: 2px; 
+}
+.moq-label { 
+  font-size: 13px; 
+  color: #64748b; 
+  font-weight: 500; 
+}
+.moq-value { 
+  font-size: 14px; 
+  font-weight: 700;        /* 🔥 Imekuwa nzito */
+  color: #111827;          /* 🔥 Nyeusi inayosomeka vizuri */
+}
 
 @media (max-width: 768px) {
-  .moq-label { font-size: 9px !important; }
-  .moq-value { font-size: 9px !important; }
+  .moq-label { font-size: 11px !important; }
+  .moq-value { font-size: 11px !important; font-weight: 700 !important; }
 }
-
 
 /* ============================================ */
 /* LAYER 6: HIDING UNNECESSARY INFO ON MOBILE   */
@@ -213,5 +257,59 @@
     grid-template-columns: repeat(2, 1fr) !important;  /* 🔥 Imegeuka kuwa 2 kama Alibaba! */
     gap: 6px !important; 
     padding: 0 2px 2px 2px !important; 
+  }
+}
+
+/* ============================================ */
+/* 🔥 NEW: VERIFIED BADGE (Green Check)         */
+/* ============================================ */
+
+.verified-badge-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 1px;
+  margin-bottom: 2px;
+}
+
+.verified-icon {
+  color: #10b981; /* Rangi ya kijani kibichi (Alibaba/Amazon style) */
+}
+
+.verified-text {
+  font-size: 11px;
+  font-weight: 600;
+  color: #10b981;
+}
+
+@media (max-width: 768px) {
+  .verified-text {
+    font-size: 9px;
+  }
+  .verified-icon {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+/* ============================================ */
+/* 🔥 NEW: SOLD COUNT (Mtindo wa kuvutia)       */
+/* ============================================ */
+
+.sold-count-wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.sold-count-wrapper span {
+  font-size: 11px;
+  color: #64748b; /* Kijivu kinachosomeka */
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .sold-count-wrapper span {
+    font-size: 9px;
   }
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eye, Trophy, MapPin } from "lucide-react";
+import { Eye, Trophy, MapPin, BadgeCheck } from "lucide-react"; // 🔥 Ongeza BadgeCheck!
 import "../DashboardCard.css";
 import { useTranslation } from 'react-i18next';
 
@@ -9,7 +9,7 @@ export default function DashboardCard({
   price, 
   originalPrice, 
   moq,
-  views, 
+  views = 0, 
   rank, 
   overlay, 
   subtitle,
@@ -17,6 +17,7 @@ export default function DashboardCard({
   isStore, 
   isTopDeal,
   isLocation, 
+  isVerified = false, // 🔥 Ongeza hii
   onClick 
 }) {
   const numPrice = Number(price);
@@ -24,7 +25,6 @@ export default function DashboardCard({
   const numOriginal = Number(originalPrice);
   const hasValidPrice = price !== undefined && price !== null && !isNaN(numPrice);
 
-  // 🔥 Sasa truncation ya title inafanyika kupitia CSS, lakini tumebakiza hii kwa usalama
   const displayTitle = title?.length > 30 ? title.substring(0, 25) + '...' : title;
 
   return (
@@ -36,10 +36,9 @@ export default function DashboardCard({
       
       {/* IMAGE CONTAINER */}
       <div className="product-card-media">
-        
         {rank && Number(rank) > 0 ? (
           <div className={`rank-indicator rank-level-${rank}`}>
-            <Trophy size={10} fill="currentColor" /> {/* 🔥 Imebadilishwa kuwa statically 10px */}
+            <Trophy size={10} fill="currentColor" />
             <span>{rank}</span>
           </div>
         ) : null}
@@ -61,19 +60,32 @@ export default function DashboardCard({
 
         {overlay && (
           <div className="product-card-location">
-            <MapPin size={10} /> {/* 🔥 Imebadilishwa kuwa statically 10px */}
+            <MapPin size={10} />
             <span>{overlay}</span>
           </div>
         )}
-
       </div>
 
       {/* INFO SECTION */}
       <div className="product-card-info">
-        
         <h4 className="product-card-title">
           {displayTitle || title}
         </h4>
+
+        {/* 🔥 NEW: Verified Badge (Ikiwa ni Verified) */}
+        {isVerified && (
+          <div className="verified-badge-wrapper">
+            <BadgeCheck size={12} className="verified-icon" />
+            <span className="verified-text">Verified</span>
+          </div>
+        )}
+
+        {/* 🔥 NEW: Sold Count (Kutoka kwa views) */}
+        {!isStore && views > 0 && (
+          <div className="sold-count-wrapper">
+            <span>{views.toLocaleString()} sold</span>
+          </div>
+        )}
         
         {/* PRICE ROW */}
         {(!isStore || isTopDeal) && !isLocation && hasValidPrice && (
@@ -103,19 +115,16 @@ export default function DashboardCard({
           </div>
         )}
 
-        {/* Category Name */}
         {categoryName && (
           <p className="product-card-category">{categoryName}</p>
         )}
 
-        {/* Subtitle (Location) */}
         {subtitle && (
           <div className="product-card-subtitle-row">
-            <MapPin size={10} className="subtitle-icon" /> {/* 🔥 Imebadilishwa kuwa statically 10px */}
+            <MapPin size={10} className="subtitle-icon" />
             <span className="product-card-subtitle">{subtitle}</span>
           </div>
         )}
-       
       </div>
     </div>
   );

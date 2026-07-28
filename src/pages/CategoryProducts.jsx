@@ -26,7 +26,7 @@ export default function CategoryProducts() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // ============================================
+   // ============================================
   // 1. PATA DATA (HIERARCHY, FILTERS, PRODUCTS)
   // ============================================
   useEffect(() => {
@@ -40,9 +40,10 @@ export default function CategoryProducts() {
       setError(null);
       
       try {
-        // 1. Pata Leaf Category
+        console.log("📌 1. Inajarbu kupata Leaf Category kwa ID:", leafId);
         const leafRes = await api.get(`/leaf-categories/${leafId}/`);
         const leaf = leafRes.data;
+        console.log("✅ Leaf category imepatikana:", leaf);
 
         let mainCatName = "Marketplace";
         let subName = "General";
@@ -50,13 +51,18 @@ export default function CategoryProducts() {
 
         if (leaf && leaf.sub_category_id) {
           subId = leaf.sub_category_id;
+          console.log("📌 2. Inajarbu kupata Subcategory kwa ID:", subId);
           const subRes = await api.get(`/subcategories/${subId}/`);
           const subData = subRes.data;
+          console.log("✅ Subcategory imepatikana:", subData);
+          
           if (subData) {
             subName = subData.name;
             if (subData.category_id) {
+              console.log("📌 3. Inajarbu kupata Main Category kwa ID:", subData.category_id);
               const mainRes = await api.get(`/categories/${subData.category_id}/`);
               if (mainRes.data) mainCatName = mainRes.data.name;
+              console.log("✅ Main category imepatikana:", mainCatName);
             }
           }
         }
@@ -67,18 +73,20 @@ export default function CategoryProducts() {
           leaf: leaf?.name || "Products"
         });
 
-        // 🔥 2. Pata Filters (Leaf Categories nyingine za Subcategory hii)
+        // 🔥 2. Pata Filters
         if (subId) {
+          console.log("📌 4. Inajarbu kupata Filters (Leaf categories kwa subId):", subId);
           const filtersRes = await api.get('/leaf-categories/', {
             params: { sub_category_id: subId }
           });
-          // Hakikisha filter ya sasa ipo mwanzo, au chuja tu
           const allFilters = filtersRes.data.results || filtersRes.data || [];
           setFilters(allFilters);
+          console.log(`✅ ${allFilters.length} Filters zimepatikana.`);
         }
 
-        // 🔥 3. Pata Products (Kulingana na Active Filter au Leaf ya awali)
+        // 🔥 3. Pata Products
         const currentFilterId = activeFilterId || leafId;
+        console.log("📌 5. Inajarbu kupata Products kwa leaf_category ID:", currentFilterId);
         const productsRes = await api.get('/products/', {
           params: { 
             leaf_category: currentFilterId, 
@@ -88,16 +96,34 @@ export default function CategoryProducts() {
 
         const productsData = productsRes.data.results || productsRes.data || [];
         setProducts(productsData);
+        console.log(`✅ ${productsData.length} Products zimepatikana.`);
 
       } catch (err) {
-        console.error("Error fetching data:", err.message);
-        setError(err.response?.data?.detail || err.message || "Kuna tatizo la kupakia data");
+        console.error("❌ ERROR IMEJITOKEZA! Tafadhali angalia hapa chini:");
+
+        // 🔥 Hapa ndipo tunapotambua chanzo halisi cha error!
+        if (err.response) {
+          // Server ilijibu lakini na code ya error (404, 500, n.k)
+          console.error("📌 Server Status Code:", err.response.status);
+          console.error("📌 API Endpoint iliyoombwa:", err.config?.url);
+          console.error("📌 Error Message kutoka Backend:", err.response.data);
+          
+          setError(`Hitilafu kutoka server: ${err.response.status} - ${err.response.data?.detail || err.message}`);
+        } else if (err.request) {
+          // Ombi lilitumwa lakini hakuna jibu (Backend haijaanza / Network issue)
+          console.error("📌 Ombi lilitumwa, lakini hakuna jibu kutoka Backend.");
+          console.error("📌 Request object:", err.request);
+          setError("Imeshindwa kuungana na server. Hakikisha Django backend imewashwa (python manage.py runserver).");
+        } else {
+          // Kitu kingine (kama msimbo wa JS umepasuka kabla ya kuomba API)
+          console.error("📌 Error isiyojulikana (Labda logic):", err.message);
+          setError("Kuna tatizo la ndani la msimbo. Angalia console.");
+        }
       } finally {
         setLoading(false);
       }
     }
     fetchPageData();
-    // 🔥 Tunaongeza `activeFilterId` ili ikibadilika, products zipakie upya!
   }, [leafId, activeFilterId]);
 
   const getProductImage = (item) => {

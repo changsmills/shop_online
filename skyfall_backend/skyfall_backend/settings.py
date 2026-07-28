@@ -5,6 +5,8 @@ Django settings for skyfall_backend project.
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import dj_database_url # 🔥 Hakikisha umeinstall: pip install dj-database-url
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -16,9 +18,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-default-key-change-this')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+#DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+DEBUG = False
+
+#ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+ALLOWED_HOSTS = ['*'] 
+# Au baadaye: ALLOWED_HOSTS = ['skyfall.com', 'www.skyfall.com']
 
 # Application definition
 INSTALLED_APPS = [
@@ -48,6 +55,7 @@ AUTH_USER_MODEL = 'users.User'  # Sio 'products.Profile'!
 
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware', # 🔥 ONGEZA HII! (Inapaswa kuwa chini ya SecurityMiddleware)
     'corsheaders.middleware.CorsMiddleware',  # Must be at the top!
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -78,19 +86,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'skyfall_backend.wsgi.application'
 
-# ==================== DATABASE (MySQL) ====================
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'skyfall_db',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '3306',
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-        },
-    }
+    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
 }
 
 # ==================== AUTHENTICATION ====================
@@ -128,6 +125,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://localhost:5173',
+    'https://jina-la-frontend-yako.vercel.app', # 🔥 ONGEZA HAPA URL YA LIVE FRONTEND
+
 ]
 
 CORS_ALLOW_CREDENTIALS = True

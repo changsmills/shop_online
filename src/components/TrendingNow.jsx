@@ -99,7 +99,11 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
                 price={item.price}
                 views={item.views}
                 rank={index + 1}
+                  isVerified={true} // 🔥 Weka hivi kwa muda ili uone kama inaonekana!
+
                 // 🔥 TUMEONDOA KABISA `isMobile={isMobile}` HAPA!
+                 isVerified={item.is_verified || item.store?.is_verified} 
+
                 onClick={() => {
                   const queryParams = {
                     ...(selectedCategory?.id && { categoryId: selectedCategory.id }),
