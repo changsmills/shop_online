@@ -3,13 +3,17 @@
 /* ============================================ */
 
 .product-card-item {
-  background: #ffffff;
+  background: #f8f9fa;  /* 🔥 Kijivu chepesi kama Alibaba */
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
-  border: 1px solid #f0f0f0;
+  
+  /* 🔥 Mstari mwembamba wa kijivu kama Alibaba */
+  border: 1px solid #e5e7eb;         
+  
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05); 
+  transition: box-shadow 0.25s ease; /* 🔥 Inabadilisha kivuli tu, sio kadi nzima */        
   width: 100%;
-  transition: box-shadow 0.2s ease;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -17,12 +21,15 @@
 }
 
 .product-card-item:hover {
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  /* 🔥 Unapoelekeza kipanya: Mstari unageuka kijani */
+  border-color: #10b981;             
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1); 
 }
 
+/* ✅ Mobile - Mtindo wa Alibaba (Pembe za mviringo) */
 @media (max-width: 768px) {
   .product-card-item {
-    border-radius: 4px; /* Imepunguzwa zaidi */
+    border-radius: 10px;  /* 🔥 Pembe za mviringo sawa na Alibaba */
     border-width: 1px;
   }
 }
@@ -35,7 +42,7 @@
 .product-card-media {
   position: relative;
   width: 100%;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 1 / 1;
   background: #f8f8f8;
   overflow: hidden;
   border-radius: 8px 8px 0 0;
@@ -58,11 +65,13 @@
   .product-card-item:active .product-card-img { transform: scale(1.05); }
 }
 
-/* Mobile: Picha mraba (1/1) */
+/* ✅ Mobile - Uwiano wa Picha kama Alibaba (4/5) */
 @media (max-width: 768px) {
   .product-card-media { 
-    aspect-ratio: 1 / 1 !important; 
-    border-radius: 4px 4px 0 0; 
+    aspect-ratio: 1 / 1 !important;  /* 🔥 Picha ni ndefu kidogo kuliko upana (kama suruali) */
+    border-radius: 10px 10px 0 0; 
+    padding: 2px !important;         /* 🔥 Hii inapunguza ukubwa wa picha ndani! */
+
   }
 }
 
@@ -87,9 +96,14 @@
   padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 10px; z-index: 2;
 }
 
+/* ✅ Mobile - Badges zinazosomeka (Sio 6px tena) */
 @media (max-width: 768px) {
-  .rank-indicator { font-size: 6px; padding: 1px 3px; top: 2px; left: 2px; }
-  .discount-badge-mini { font-size: 7px; padding: 1px 3px; top: 2px; right: 2px; }
+  .rank-indicator { 
+    font-size: 8px; padding: 2px 5px; top: 4px; left: 4px; 
+  }
+  .discount-badge-mini { 
+    font-size: 8px; padding: 2px 5px; top: 4px; right: 4px; 
+  }
 }
 
 
@@ -103,11 +117,11 @@
   background: transparent; position: relative; z-index: 2;
 }
 
-/* ✅ Punguza padding hadi 2px tu kwenye mobile */
+/* ✅ Mobile - Nafasi ya kutosha (Sio 2px tena) */
 @media (max-width: 768px) {
   .product-card-info {
-    padding: 2px 2px 3px 2px !important; /* Ndogo kabisa */
-    gap: 1px !important;
+    padding: 8px 8px 10px 8px !important; /* 🔥 Nafasi ya kupumua kama Alibaba */
+    gap: 2px !important;
   }
 }
 
@@ -122,11 +136,12 @@
   -webkit-line-clamp: 2; overflow: hidden;
 }
 
+/* ✅ Mobile - Jina kubwa la kutosha (Sio 8px tena) */
 @media (max-width: 768px) {
   .product-card-title { 
-    font-size: 8px !important; /* 8px tu */
-    line-height: 1.1; 
-    -webkit-line-clamp: 1 !important; /* Mstari mmoja tu ili kuokoa urefu */
+    font-size: 12px !important;  /* 🔥 Jina linasomeka vizuri */
+    line-height: 1.2; 
+    -webkit-line-clamp: 1 !important; 
   }
 }
 
@@ -140,10 +155,11 @@
   text-decoration: line-through; color: #999; font-size: 10px; font-weight: 400;
 }
 
+/* ✅ Mobile - Bei Inayoonekana Wazi */
 @media (max-width: 768px) {
-  .price-currency { font-size: 7px !important; }
-  .price-amount { font-size: 8px !important; } 
-  .price-original-strikethrough { font-size: 7px !important; }
+  .price-currency { font-size: 10px !important; }
+  .price-amount { font-size: 13px !important; /* 🔥 Bei kubwa kama Alibaba */ } 
+  .price-original-strikethrough { font-size: 9px !important; }
 }
 
 .store-moq-info { display: flex; align-items: center; gap: 3px; margin-top: 1px; }
@@ -151,8 +167,8 @@
 .moq-value { font-size: 13px; font-weight: 700; color: #1e293b; }
 
 @media (max-width: 768px) {
-  .moq-label { font-size: 7px !important; }
-  .moq-value { font-size: 8px !important; }
+  .moq-label { font-size: 9px !important; }
+  .moq-value { font-size: 9px !important; }
 }
 
 
@@ -163,7 +179,7 @@
 @media (max-width: 768px) {
   .product-card-category { display: none !important; }
   .product-card-subtitle-row { display: none !important; }
-  .store-moq-info { display: none !important; } /* Ficha MOQ ili kuokoa nafasi */
+  .store-moq-info { display: none !important; } 
 }
 
 
@@ -182,29 +198,20 @@
   justify-content: center !important; 
 }
 
-/* ✅ Tablet - SAFU 6 (Kadi 6 kwa mstari) */
+/* ✅ Tablet - SAFU 3 au 4 (Kadi 3-4 kwa mstari) */
 @media (max-width: 1024px) and (min-width: 769px) {
   .universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
-    grid-template-columns: repeat(6, 1fr) !important; 
+    grid-template-columns: repeat(4, 1fr) !important; 
     gap: 4px !important;
     padding: 8px !important;
   }
 }
 
-/* ✅ Mobile - SAFU 5 (Kadi 5 kwa mstari) */
+/* ✅ Mobile - SAFU 2 KAMA ALIBABA! (Kadi 2 kwa mstari) */
 @media (max-width: 768px) {
   .universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
-    grid-template-columns: repeat(5, 1fr) !important; 
-    gap: 2px !important; 
-    padding: 0 1px 2px 1px !important; 
-  }
-}
-
-/* ✅ Simu Ndogo Sana - BADO SAFU 5 (Pengo la 1px) */
-@media (max-width: 400px) {
-  .universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
-    grid-template-columns: repeat(5, 1fr) !important;
-    gap: 1px !important;
-    padding: 0 0px 1px 0px !important;
+    grid-template-columns: repeat(2, 1fr) !important;  /* 🔥 Imegeuka kuwa 2 kama Alibaba! */
+    gap: 6px !important; 
+    padding: 0 2px 2px 2px !important; 
   }
 }

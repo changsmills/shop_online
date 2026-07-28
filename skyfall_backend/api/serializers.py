@@ -1,9 +1,11 @@
 from rest_framework import serializers
 from products.models import (
-    Category, SubCategory, ProductsEngine, LeafCategory, Advertisement,
+    Category, OrderItem, SubCategory, ProductsEngine, LeafCategory, Advertisement,
     StoreEngine, ProductMedia, Message, Profile,
     ShippingMethod, Brand, Lead,
-    ProductVariation  # 🔥 ONGEZA HII!
+    ProductVariation ,
+        Order
+
 )
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -100,4 +102,21 @@ class LeadSerializer(serializers.ModelSerializer):
 class ProductVariationSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductVariation
+        fields = '__all__'
+
+ # ============================================================
+ # 🔥 SERIALIZERS MPYA ZA ORDERS NA ORDER ITEMS
+ # ============================================================
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = '__all__'
+        # 🔥 'order_number' na 'customer' zinajazwa na backend (toka kwenye perform_create)
+        read_only_fields = ['customer']
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItem
         fields = '__all__'

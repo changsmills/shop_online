@@ -22,40 +22,81 @@
 }
 
 /* ============================================ */
-/* LAYER 2: HEADER SPACER                       */
+/* LAYER 2: MAIN LAYOUT (Sidebar + Content)     */
 /* ============================================ */
 
-.cat-header-spacer {
-  height: 100px;
-}
-
-@media (max-width: 768px) {
-  .cat-header-spacer {
-    height: 70px;
-  }
-}
-
-/* ============================================ */
-/* LAYER 3: MAIN CONTENT                        */
-/* ============================================ */
-
-.cat-main {
-  flex: 1;
-  max-width: 1400px;
-  margin: 0 auto;
+.cat-main-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr; /* Desktop: Sidebar 240px, Grid inabaki */
+  gap: 24px;
+  padding: 16px 0;
   width: 100%;
-  padding: 0 20px;
-}
-
-@media (max-width: 768px) {
-  .cat-main {
-    padding: 0 12px;
-  }
+  box-sizing: border-box;
 }
 
 /* ============================================ */
-/* LAYER 4: BREADCRUMB                          */
+/* LAYER 3: FILTER SIDEBAR (DESKTOP ONLY)       */
 /* ============================================ */
+
+.cat-filter-sidebar {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 16px;
+  position: sticky; /* 🔥 Inabaki juu unaposcroll chini! */
+  top: 100px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.filter-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  color: #1a1a1a;
+}
+
+.filter-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.filter-item {
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 4px;
+}
+
+.filter-item:hover {
+  background: #f3f4f6;
+}
+
+/* Kategoria iliyochaguliwa */
+.filter-item.active {
+  background: #fff5f0;
+  color: #ff6a00;
+  font-weight: 600;
+  border-left: 3px solid #ff6a00;
+  padding-left: 9px;
+}
+
+/* ============================================ */
+/* LAYER 4: CONTENT YA KULIA & BREADCRUMB       */
+/* ============================================ */
+
+.cat-products-content {
+  width: 100%;
+}
 
 .cat-breadcrumb {
   margin-bottom: 16px;
@@ -65,11 +106,18 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  gap: 6px;
+  font-size: 14px;
+  color: #666;
 }
 
 .cat-breadcrumb-link {
   cursor: pointer;
   color: #333;
+  transition: color 0.2s;
+}
+.cat-breadcrumb-link:hover {
+  color: #ff6a00;
 }
 
 .cat-breadcrumb-text {
@@ -77,7 +125,7 @@
 }
 
 .cat-breadcrumb-current {
-  color: #ff6600;
+  color: #ff6a00;
   font-weight: bold;
 }
 
@@ -85,57 +133,66 @@
   color: #ccc;
 }
 
-@media (max-width: 768px) {
-  .cat-breadcrumb-items {
-    gap: 4px;
-    font-size: 10px;
-  }
-  .cat-breadcrumb-icon { width: 10px; height: 10px; }
-}
-
-@media (min-width: 769px) {
-  .cat-breadcrumb-items {
-    gap: 8px;
-    font-size: 13px;
-  }
-  .cat-breadcrumb-icon { width: 14px; height: 14px; }
-}
-
 /* ============================================ */
-/* LAYER 5: PRODUCTS GRID                        */
+/* LAYER 5: FLUID PRODUCTS GRID (NYAMBU!)       */
 /* ============================================ */
 
 .cat-products-grid {
   display: grid;
-  gap: 15px;
-  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); /* 🔥 FLUID FLOW! */
+  padding: 0;
 }
 
-/* ✅ Mobile: 2 columns */
+/* ✅ Mobile: 2 columns (Alibaba style) */
 @media (max-width: 768px) {
   .cat-products-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    padding: 8px;
-  }
-}
-
-/* ✅ Tablet: 3 columns */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .cat-products-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-/* ✅ Desktop: 4 columns */
-@media (min-width: 1025px) {
-  .cat-products-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    padding: 0 !important;
   }
 }
 
 /* ============================================ */
-/* LAYER 6: SKELETON LOADING                     */
+/* LAYER 6: RESPONSIVE MEDIA QUERIES (Layout)   */
+/* ============================================ */
+
+/* 📱 MOBILE: Ficha Sidebar na badilisha Layout */
+@media (max-width: 768px) {
+  .cat-main-layout {
+    display: block !important;
+  }
+  .cat-filter-sidebar {
+    display: none !important;
+  }
+
+  .cat-breadcrumb-items {
+    font-size: 10px;
+    gap: 4px;
+  }
+  .cat-breadcrumb-icon { width: 10px; height: 10px; }
+}
+
+/* 💻 TABLET: Punguza Sidebar */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .cat-main-layout {
+    grid-template-columns: 200px 1fr;
+    gap: 16px;
+  }
+  .cat-breadcrumb-items { font-size: 13px; }
+  .cat-breadcrumb-icon { width: 14px; height: 14px; }
+}
+
+/* 🖥️ DESKTOP: Layout kamili */
+@media (min-width: 1025px) {
+  .cat-breadcrumb-items { font-size: 14px; }
+  .cat-breadcrumb-icon { width: 16px; height: 16px; }
+}
+
+/* ============================================ */
+/* LAYER 7: SKELETON LOADING                     */
 /* ============================================ */
 
 .cat-skeleton-wrapper {
@@ -169,7 +226,7 @@
 
 @media (min-width: 769px) {
   .cat-skeleton-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
   }
 }
 
@@ -205,7 +262,7 @@
 }
 
 /* ============================================ */
-/* LAYER 7: ERROR STATE                          */
+/* LAYER 8: ERROR STATE                          */
 /* ============================================ */
 
 .cat-error-container {
@@ -228,7 +285,7 @@
 }
 
 /* ============================================ */
-/* LAYER 8: FOOTER                               */
+/* LAYER 9: FOOTER                               */
 /* ============================================ */
 
 .cat-footer-wrapper {

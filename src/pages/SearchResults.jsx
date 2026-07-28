@@ -1,10 +1,9 @@
 // src/components/SearchResults.jsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-//import { supabase } from "../supabaseClient";
-import { Globe } from 'lucide-react';
+import api from "../axiosConfig"; // ✅ TUMIA API (Sio Supabase!)
+import { Globe, ChevronRight, Filter } from 'lucide-react';
 
-// --- IMPORT ZA COMPONENTS ZAKO ---
 import SearchBar from '../components/SearchBar';
 import UserTools from '../components/UserTools';
 import "../SearchResults.css";
@@ -16,151 +15,113 @@ export default function SearchResults({ session }) {
   // State
   const [search, setSearch] = useState(initialQuery);
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]); // 🔥 Kategoria za Sidebar
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
-  const [categoryId, setCategoryId] = useState(null);
-  const [categoryName, setCategoryName] = useState("");
+  
+  // 🔥 Filter States
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
   
   const navigate = useNavigate();
-
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   const lastProductRef = useRef();
-  
-  const PRODUCTS_PER_PAGE = 50;
+  const PRODUCTS_PER_PAGE = 20;
 
-  // STEP 1: Tafuta Category ID kutoka kwa jina la category
-  const fetchCategoryId = useCallback(async (categoryQuery) => {
-    if (!categoryQuery) return null;
-    
-    try {
-      const { data, error } = await supabase
-        .from('leaf_categories')
-        .select('id, name')
-        .ilike('name', `%${categoryQuery}%`)
-        .maybeSingle();
-
-      if (error) {
-        console.error("Error finding category:", error);
-        return null;
-      }
-      
-      if (data) {
-        console.log("Category found:", data);
-        setCategoryName(data.name);
-        return data.id;
-      }
-      
-      console.log("No category found for:", categoryQuery);
-      return null;
-    } catch (err) {
-      console.error("Network error:", err);
-      return null;
-    }
-  }, []);
-
-  // STEP 2: Fetch products kwa kutumia Category ID (na pagination)
-  const fetchProductsByCategoryId = useCallback(async (catId, pageNum = 1) => {
-    if (!catId) return [];
-    
-    const from = (pageNum - 1) * PRODUCTS_PER_PAGE;
-    const to = from + PRODUCTS_PER_PAGE - 1;
-    
-    try {
-      const { data, error, count } = await supabase
-        .from("products_engines")
-        .select(`
-          id, 
-          name, 
-          price, 
-          cover_image, 
-          description,
-          leaf_category_id
-        `, { count: 'exact' })
-        .eq('leaf_category_id', catId)
-        .range(from, to)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error("Error fetching products:", error);
-        return [];
-      }
-      
-      const totalFetched = pageNum * PRODUCTS_PER_PAGE;
-      setHasMore(totalFetched < (count || 0));
-      
-      return data || [];
-    } catch (err) {
-      console.error("Network error:", err);
-      return [];
-    }
-  }, []);
-
-  // STEP 3: Main search - inapobadilika initialQuery
+  // ============================================
+  // 1. PATA KATEGORIA ZA SIDEBAR (Filters)
+  // ============================================
   useEffect(() => {
-    const performSearch = async () => {
-      if (!initialQuery) {
-        setProducts([]);
-        setLoading(false);
-        return;
+    const fetchCategories = async () => {
+      try {
+        const response = await api.get('/leaf-categories/', { params: { limit: 50 } });
+        const data = response.data.results || response.data || [];
+        setCategories(data);
+      } catch (err) {
+        console.error("Error fetching categories for sidebar:", err);
       }
-      
-      setLoading(true);
-      
-      const foundCategoryId = await fetchCategoryId(initialQuery);
-      setCategoryId(foundCategoryId);
-      
-      const { data, error } = await supabase
-        .from("products_engines")
-        .select("id, name, price, cover_image, leaf_category_id")
-        .or(`name.ilike.%${initialQuery}%,leaf_category_id.eq.${foundCategoryId || '00000000-0000-0000-0000-000000000000'}`)
-        .range(0, PRODUCTS_PER_PAGE - 1)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error("Search Error:", error);
-      } else {
-        setProducts(data || []);
-      }
-      
-      setLoading(false);
     };
-    
-    performSearch();
-  }, [initialQuery, fetchCategoryId, fetchProductsByCategoryId]);
+    fetchCategories();
+  }, []);
 
-  // STEP 4: Load more products (Infinite Scroll)
-  const loadMoreProducts = useCallback(async () => {
-    if (loadingMore || !hasMore || !categoryId) return;
-    
-    setLoadingMore(true);
-    const nextPage = page + 1;
-    const moreProducts = await fetchProductsByCategoryId(categoryId, nextPage);
-    
-    if (moreProducts.length > 0) {
-      setProducts(prev => [...prev, ...moreProducts]);
-      setPage(nextPage);
+  // ============================================
+  // 2. PATA BIDHAA (Search + Filters)
+  // ============================================
+  const fetchProducts = useCallback(async (pageNum = 1, reset = true) => {
+    setLoading(reset ? true : false);
+    if (pageNum === 1) setLoadingMore(false);
+    else setLoadingMore(true);
+
+    try {
+      const params = {
+        limit: PRODUCTS_PER_PAGE,
+        offset: (pageNum - 1) * PRODUCTS_PER_PAGE,
+        ordering: '-created_at'
+      };
+
+      // 1. Search Query
+      if (initialQuery && initialQuery.trim()) {
+        params.search = initialQuery.trim();
+      }
+
+      // 2. Category Filter
+      if (selectedCategoryId) {
+        params.leaf_category = selectedCategoryId;
+      }
+
+      // 3. Price Filters
+      if (minPrice && !isNaN(minPrice)) {
+        params.price__gte = minPrice;
+      }
+      if (maxPrice && !isNaN(maxPrice)) {
+        params.price__lte = maxPrice;
+      }
+
+      const response = await api.get('/products/', { params });
+      const data = response.data.results || response.data || [];
+      const totalCount = response.data.count || data.length;
+
+      if (reset) {
+        setProducts(data);
+      } else {
+        setProducts(prev => [...prev, ...data]);
+      }
+
+      setHasMore(data.length === PRODUCTS_PER_PAGE);
+      setPage(pageNum);
+
+    } catch (err) {
+      console.error("Search Error:", err);
+      setProducts([]);
+      setHasMore(false);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
     }
-    
-    setLoadingMore(false);
-  }, [loadingMore, hasMore, categoryId, page, fetchProductsByCategoryId]);
+  }, [initialQuery, selectedCategoryId, minPrice, maxPrice]);
 
-  // STEP 5: Intersection Observer kwa infinite scroll
+  // ============================================
+  // 3. EFFECT: Ita `fetchProducts` wakati filters zinabadilika
+  // ============================================
   useEffect(() => {
-    if (loading || !hasMore) return;
+    setProducts([]);
+    setHasMore(true);
+    setPage(1);
+    fetchProducts(1, true);
+  }, [initialQuery, selectedCategoryId, minPrice, maxPrice, fetchProducts]);
+
+  // ============================================
+  // 4. INFINITE SCROLL (Observer)
+  // ============================================
+  useEffect(() => {
+    if (loading || loadingMore || !hasMore) return;
     
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && !loadingMore && hasMore) {
-          loadMoreProducts();
+          fetchProducts(page + 1, false);
         }
       },
       { threshold: 0.1, rootMargin: "100px" }
@@ -171,11 +132,9 @@ export default function SearchResults({ session }) {
     }
     
     return () => {
-      if (lastProductRef.current) {
-        observer.unobserve(lastProductRef.current);
-      }
+      if (lastProductRef.current) observer.unobserve(lastProductRef.current);
     };
-  }, [loading, hasMore, loadingMore, loadMoreProducts, products]);
+  }, [loading, loadingMore, hasMore, fetchProducts, page]);
 
   // Update search state pindi URL inapobadilika
   useEffect(() => {
@@ -186,6 +145,7 @@ export default function SearchResults({ session }) {
   if (loading && products.length === 0) {
     return (
       <div className="alibaba-container skeleton">
+        {/* Header skeleton tu... */}
         <header className="alibaba-header skeleton-header">
           <div className="header-wrapper">
             <div className="skeleton-logo"></div>
@@ -193,21 +153,10 @@ export default function SearchResults({ session }) {
             <div className="skeleton-icons"></div>
           </div>
         </header>
-        <main className="alibaba-main">
-          <div className="skeleton-results-bar"></div>
-          <div className="alibaba-grid skeleton-grid">
-            {Array.from({ length: isMobile ? 6 : 10 }).map((_, i) => (
-              <div key={i} className="skeleton-card">
-                <div className="skeleton-card-img"></div>
-                <div className="skeleton-card-info">
-                  <div className="skeleton-text long"></div>
-                  <div className="skeleton-text medium"></div>
-                  <div className="skeleton-text short"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </main>
+        <div className="search-skeleton-layout">
+          <div className="skeleton-sidebar"></div>
+          <div className="skeleton-main-grid"></div>
+        </div>
       </div>
     );
   }
@@ -218,7 +167,6 @@ export default function SearchResults({ session }) {
       {/* HEADER */}
       <header className="alibaba-header">
         <div className="header-wrapper">
-          
           <Link to="/" className="skyfall-logo">
             Skyfall<span>.com</span>
           </Link>
@@ -228,107 +176,156 @@ export default function SearchResults({ session }) {
           </div>
 
           <div className="header-right-actions">
-            {!isMobile && (
-              <div className="nav-action-item mini-lang">
-                <Globe size={14} />
-                <span className="mini-text">TZS</span>
-              </div>
-            )}
-            
-            {!isMobile && (
-              <div className="nav-action-item">
-                <UserTools session={session} />
-              </div>
-            )}
+            <div className="nav-action-item">
+              <UserTools session={session} />
+            </div>
           </div>
         </div>
       </header>
 
-      {/* MAIN CONTENT */}
-      <main className="alibaba-main">
-        <div className="results-info-bar">
-          <div className="deep-search-label">
-            <span className="sparkle">✦</span> 
-            {products.length > 0 ? (
-              categoryName ? (
-                <>Bidhaa katika kategoria ya <strong>"{categoryName}"</strong></>
-              ) : (
-                <>Matokeo ya utafutaji wa <strong>"{initialQuery}"</strong></>
-              )
-            ) : (
-              <>Samahani, hatukupata bidhaa kwa "{initialQuery}"</>
-            )}
+      {/* 🔥 MAIN LAYOUT: SIDEBAR + GRID */}
+      <main className="search-main-layout">
+        
+        {/* ============================================
+            LEFT SIDEBAR - FILTERS (Alibaba Style)
+           ============================================ */}
+        <aside className="search-filter-sidebar">
+          <div className="filter-header">
+            <Filter size={16} />
+            <span>Filters</span>
           </div>
 
-          {products.length > 0 && (
+          {/* 1. Kategoria (Categories) */}
+          <div className="filter-section">
+            <h4 className="filter-section-title">Kategoria</h4>
+            <ul className="filter-list">
+              <li 
+                className={`filter-item ${!selectedCategoryId ? 'active' : ''}`}
+                onClick={() => setSelectedCategoryId(null)}
+              >
+                Zote
+              </li>
+              {categories.map((cat) => (
+                <li 
+                  key={cat.id}
+                  className={`filter-item ${selectedCategoryId === cat.id ? 'active' : ''}`}
+                  onClick={() => setSelectedCategoryId(cat.id)}
+                >
+                  {cat.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* 2. Bei (Price Range) */}
+          <div className="filter-section">
+            <h4 className="filter-section-title">Bei (TSh)</h4>
+            <div className="price-filter-wrapper">
+              <input 
+                type="number" 
+                placeholder="Min" 
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
+                className="price-input"
+              />
+              <span className="price-sep">-</span>
+              <input 
+                type="number" 
+                placeholder="Max" 
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+                className="price-input"
+              />
+              <button className="price-ok-btn" onClick={() => fetchProducts(1, true)}>
+                OK
+              </button>
+            </div>
+          </div>
+
+          {/* 3. Min Order (MOQ) - Optional, unaweza kuongeza hapa baadaye */}
+          <div className="filter-section">
+            <h4 className="filter-section-title">Min. Order</h4>
+            <div className="moq-filter-wrapper">
+              <input type="number" placeholder="Min pieces" className="price-input" />
+              <button className="price-ok-btn">OK</button>
+            </div>
+          </div>
+          
+        </aside>
+
+        {/* ============================================
+            RIGHT SIDE - PRODUCTS CONTENT
+           ============================================ */}
+        <div className="search-products-content">
+          
+          {/* Results Info Bar */}
+          <div className="results-info-bar">
+            <div className="deep-search-label">
+              <span className="sparkle">✦</span> 
+              {products.length > 0 ? (
+                <>Matokeo ya <strong>"{initialQuery}"</strong></>
+              ) : (
+                <>Samahani, hatukupata bidhaa kwa "{initialQuery}"</>
+              )}
+            </div>
             <div className="results-count">
               {products.length}+ products found
             </div>
-          )}
-        </div>
+          </div>
 
-        <div className="alibaba-grid">
-          {products.length > 0 ? (
-            products.map((product, index) => (
-              <div 
-                key={product.id} 
-                className="alibaba-card"
-                ref={index === products.length - 1 ? lastProductRef : null}
-              >
-                <Link to={`/product/${product.id}`} className="card-link">
-                  <div className="card-image">
-                    <img 
-                      src={product.cover_image || '/placeholder-image.jpg'} 
-                      alt={product.name}
-                      onError={(e) => {
-                        e.target.src = '/placeholder-image.jpg';
-                      }}
-                    />
-                  </div>
-                  <div className="card-body">
-                    <h3 className="product-title">{product.name}</h3>
-                    <div className="price-tag">
-                      <span className="currency">TSH</span>
-                      <span className="amount">{Number(product.price).toLocaleString()}</span>
+          {/* Products Grid - Fluid Flow */}
+          <div className="search-products-grid">
+            {products.length > 0 ? (
+              products.map((product, index) => (
+                <div 
+                  key={product.id} 
+                  className="alibaba-card"
+                  ref={index === products.length - 1 ? lastProductRef : null}
+                >
+                  <Link to={`/product/${product.id}`} className="card-link">
+                    <div className="card-image">
+                      <img 
+                        src={product.cover_image || '/placeholder-image.jpg'} 
+                        alt={product.name}
+                        onError={(e) => { e.target.src = '/placeholder-image.jpg'; }}
+                      />
                     </div>
-                    <p className="moq-info">Min. Order: 1 piece</p>
-                    <div className="card-footer">
-                      <span className="category-tag">{categoryName}</span>
+                    <div className="card-body">
+                      <h3 className="product-title">{product.name}</h3>
+                      <div className="price-tag">
+                        <span className="currency">TSH</span>
+                        <span className="amount">{Number(product.price).toLocaleString()}</span>
+                      </div>
                     </div>
-                  </div>
-                </Link>
+                  </Link>
+                </div>
+              ))
+            ) : (
+              <div className="not-found">
+                <p>Samahani, hatukupata bidhaa zozote.</p>
+                <button onClick={() => navigate('/')} className="browse-all-btn">
+                  Rudi Kwenye Duka
+                </button>
               </div>
-            ))
-          ) : (
-            <div className="not-found">
-              <p>Samahani, hatukupata bidhaa zozote katika kategoria ya "{initialQuery}"</p>
-              <p className="suggestion-text">
-                Hakikisha umeandika jina la kategoria sahihi au jaribu kutafuta kategoria nyingine.
-              </p>
-              <button 
-                onClick={() => navigate('/')}
-                className="browse-all-btn"
-              >
-                Browse All Products
-              </button>
+            )}
+          </div>
+          
+          {/* Loading more indicator */}
+          {loadingMore && (
+            <div className="loading-more">
+              <div className="loader-small"></div>
+              <span>Inapakia bidhaa zaidi...</span>
+            </div>
+          )}
+          
+          {/* End of results message */}
+          {!hasMore && products.length > 0 && (
+            <div className="end-of-results">
+              <p>✨ Umeifikia mwisho wa matokeo ✨</p>
             </div>
           )}
         </div>
-        
-        {/* Loading more indicator */}
-        {loadingMore && (
-          <div className="loading-more">
-            <div className="loader-small"></div>
-            <span>Loading more products...</span>
-          </div>
-        )}
-        
-        {/* End of results message */}
-        {!hasMore && products.length > 0 && (
-          <div className="end-of-results">
-            <p>✨ Umefika mwisho wa matokeo ✨</p>
-          </div>
-        )}
+
       </main>
     </div>
   );

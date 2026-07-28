@@ -1,30 +1,23 @@
 /* ============================================ */
-/* TOP DEALS - CONTAINER & WRAPPER              */
+/* CONTAINER & WRAPPER                           */
 /* ============================================ */
 
 .top-deals-main-wrapper {
   position: relative;
   width: 100%;
-  background-color: #eceef1;
+  background-color: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  border-left: none;
+  border-right: none;
   box-sizing: border-box;
 }
 
-/* Mobile container */
 @media (max-width: 768px) {
-  .top-deals-main-wrapper {
-    padding: 4px 0;
-    border-radius: 8px;
-    margin: 2px 0;
-  }
+  .top-deals-main-wrapper { padding: 12px 8px; border-radius: 8px; margin: 2px 0; }
 }
-
-/* Desktop container */
 @media (min-width: 769px) {
-  .top-deals-main-wrapper {
-    padding: 0;
-    border-radius: 16px;
-    margin: 10px 0;
-  }
+  .top-deals-main-wrapper { padding: 16px 0; border-radius: 16px; margin: 10px 0; }
 }
 
 /* ============================================ */
@@ -33,177 +26,33 @@
 
 .td-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   flex-wrap: wrap;
   width: 100%;
 }
+@media (max-width: 768px) { .td-header { padding: 0 8px; margin-bottom: 12px; gap: 6px; } }
+@media (min-width: 769px) { .td-header { padding: 0; margin-bottom: 20px; gap: 10px; } }
 
-/* Mobile header */
-@media (max-width: 768px) {
-  .td-header {
-    padding: 0 8px;
-    margin-bottom: 12px;
-    gap: 6px;
-  }
-}
+.td-header-left { display: flex; flex-direction: column; }
+.td-title-group { display: flex; align-items: center; gap: 8px; }
+@media (max-width: 768px) { .td-title-group { gap: 4px; margin-bottom: 2px; } }
+@media (min-width: 769px) { .td-title-group { gap: 8px; margin-bottom: 8px; } }
 
-/* Desktop header */
-@media (min-width: 769px) {
-  .td-header {
-    padding: 0;
-    margin-bottom: 20px;
-    gap: 10px;
-  }
-}
+.td-flame-icon { color: #f97316; }
+@media (max-width: 768px) { .td-flame-icon { width: 12px; height: 12px; } }
+@media (min-width: 769px) { .td-flame-icon { width: 24px; height: 24px; } }
 
-.td-header-left {
-  display: flex;
-  flex-direction: column;
-}
+.td-title { font-weight: 600; margin: 0; }
+@media (max-width: 768px) { .td-title { font-size: 13px; line-height: 1.2; } }
+@media (min-width: 769px) { .td-title { font-size: 24px; line-height: 1.4; } }
 
-.td-title-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Mobile title gap */
-@media (max-width: 768px) {
-  .td-title-group {
-    gap: 4px;
-    margin-bottom: 2px;
-  }
-}
-
-/* Desktop title gap */
-@media (min-width: 769px) {
-  .td-title-group {
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-}
-
-.td-flame-icon {
-  color: #f97316;
-}
-
-@media (max-width: 768px) {
-  .td-flame-icon { width: 12px; height: 12px; }
-}
-@media (min-width: 769px) {
-  .td-flame-icon { width: 24px; height: 24px; }
-}
-
-.td-title {
-  font-weight: 600;
-  margin: 0;
-}
-
-/* Mobile title */
-@media (max-width: 768px) {
-  .td-title {
-    font-size: 13px;
-    line-height: 1.3;
-  }
-}
-
-/* Desktop title */
-@media (min-width: 769px) {
-  .td-title {
-    font-size: 24px;
-    line-height: 1.4;
-  }
-}
-
-.td-subtitle {
-  margin: 0;
-  color: #888;
-  font-weight: 400;
-}
-
-/* Mobile subtitle */
-@media (max-width: 768px) {
-  .td-subtitle {
-    font-size: 9px;
-    line-height: 1.2;
-  }
-}
-
-/* Desktop subtitle */
-@media (min-width: 769px) {
-  .td-subtitle {
-    font-size: 16px;
-    line-height: 1.5;
-  }
-}
+.td-subtitle { margin: 0; color: #888; font-weight: 400; }
+@media (max-width: 768px) { .td-subtitle { font-size: 9px; line-height: 1.2; } }
+@media (min-width: 769px) { .td-subtitle { font-size: 16px; line-height: 1.5; } }
 
 /* ============================================ */
-/* VIEW MORE BUTTON (Orange Gradient)           */
-/* ============================================ */
-
-.td-view-more-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
-  white-space: nowrap;
-}
-
-.td-view-more-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
-}
-
-@media (max-width: 768px) {
-  .td-view-more-btn {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 9px;
-    gap: 4px;
-  }
-}
-
-@media (min-width: 769px) {
-  .td-view-more-btn {
-    padding: 8px 20px;
-    border-radius: 10px;
-    font-size: 16px;
-    gap: 8px;
-  }
-}
-
-/* ============================================ */
-/* MOBILE SCROLL WRAPPER                         */
-/* ============================================ */
-
-.td-mobile-scroll {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  gap: 12px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  padding: 10px 0 20px 0;
-  width: 100%;
-}
-
-.td-mobile-card-wrapper {
-  flex: 0 0 auto;
-  width: 140px;
-  min-width: 140px;
-}
-
-/* ============================================ */
-/* DESKTOP SCROLL WRAPPER & ARROWS              */
+/* SCROLL WRAPPER - FLUID WIDTHS                 */
 /* ============================================ */
 
 .td-desktop-wrapper {
@@ -212,23 +61,52 @@
   align-items: center;
 }
 
-.td-desktop-scroll {
+.td-scroll-wrapper {
   display: flex;
-  gap: 20px;
-  overflow-x: auto;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
   overflow-y: hidden;
   scroll-behavior: smooth;
-  padding: 10px 5px 20px 5px;
+  padding: 10px 0 20px 0;
   width: 100%;
 }
 
-.td-desktop-card-wrapper {
+.td-card-wrapper {
   flex: 0 0 auto;
-  width: 200px;
-  min-width: 200px;
 }
 
-/* ARROWS */
+/* 🔥 FLUID MEDIA QUERIES ZA SCROLL */
+
+/* Desktop (≥1025px): Kadi pana zaidi */
+@media (min-width: 1025px) {
+  .td-scroll-wrapper { gap: 20px; }
+  .td-card-wrapper { width: 220px; max-width: 220px; }
+}
+
+/* Tablet (769px - 1024px): Kadi za ukubwa wa kati */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .td-scroll-wrapper { gap: 16px; }
+  .td-card-wrapper { width: 160px; max-width: 160px; }
+}
+
+/* Mobile (≤768px): Kadi 2 kwa mstari (Ukubwa 180px) */
+@media (max-width: 768px) {
+  .td-scroll-wrapper { 
+    gap: 12px !important;         /* 🔥 Nafasi kati ya kadi (kutoka 8px hadi 12px) */
+  }
+  .td-card-wrapper { 
+    width: 180px !important;      /* 🔥 Upana wa kadi 2 kwa mstari (kutoka 120px hadi 180px) */
+    max-width: 180px !important; 
+  }
+  
+  /* Ficha mishale kwenye simu */
+  .td-arrow-btn { display: none !important; }
+}
+
+/* ============================================ */
+/* ARROWS (Desktop na Tablet tu)                */
+/* ============================================ */
+
 .td-arrow-btn {
   position: absolute;
   z-index: 10;
@@ -245,72 +123,13 @@
   transition: all 0.2s ease;
   outline: none;
 }
-
-.td-arrow-btn:hover {
-  background-color: #f7f9fc;
-  transform: scale(1.05);
-}
-
+.td-arrow-btn:hover { background-color: #f7f9fc; transform: scale(1.05); }
 .td-arrow-left { left: -15px; }
 .td-arrow-right { right: -15px; }
-
-/* ============================================ */
-/* ✅ RESPONSIVE ARROWS - FIX GAP AND POSITION  */
-/* ============================================ */
-
-@media (max-width: 768px) {
-  /* 1. Punguza ukubwa wa mishale */
-  .td-arrow-btn {
-    width: 30px;
-    height: 30px;
-    /* 2. Fanya mishale ionekane kama vitufe vya overlay nyeupe */
-    background: rgba(255, 255, 255, 0.95) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-    border: 1px solid #eee !important;
-  }
-
-  /* 3. Sogeza mishale kwenye kingo (sio katikati) */
-  .td-arrow-left {
-    left: 4px !important;
-  }
-  .td-arrow-right {
-    right: 4px !important;
-  }
-
-  /* 4. Punguza padding ya pande (Ondoa 45px, weka 12px) */
-  .td-desktop-scroll {
-    padding: 10px 12px 20px 12px !important;
-  }
-}
 
 /* ============================================ */
 /* UTILITY: HIDE SCROLLBAR                      */
 /* ============================================ */
 
-.hide-scrollbar-mobile::-webkit-scrollbar,
-.hide-scrollbar-desktop::-webkit-scrollbar {
-  display: none;
-}
-.hide-scrollbar-mobile,
-.hide-scrollbar-desktop {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* ============================================ */
-/* SKELETON LOADER                               */
-/* ============================================ */
-
-.skeleton-loader-h {
-  height: 280px;
-  margin: 20px;
-  border-radius: 15px;
-  background: #e0e0e0;
-  animation: pulse 1.5s infinite ease-in-out;
-}
-
-@keyframes pulse {
-  0% { background-color: #e0e0e0; }
-  50% { background-color: #f0f0f0; }
-  100% { background-color: #e0e0e0; }
-}
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

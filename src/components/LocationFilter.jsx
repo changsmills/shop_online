@@ -1,14 +1,11 @@
-// src/components/LocationFilter.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, MapPin } from "lucide-react";
-import api from "../axiosConfig"; // 🔥 BADILISHA: Tumia api badala ya axios!
+import api from "../axiosConfig"; 
 import DashboardCard from "./DashboardCard";
 import { useTranslation } from 'react-i18next';
 import '../LocationFilter.css';
 
-// 🔥 ONDOA API_BASE_URL – ipo kwenye api config!
-
-export default function LocationFilter({ navigate, isMobile }) {
+export default function LocationFilter({ navigate }) {
   const { t, i18n } = useTranslation();
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,13 +18,9 @@ export default function LocationFilter({ navigate, isMobile }) {
       try {
         setLoading(true);
         
-        // 🔥 BADILISHA: Tumia api.get, sio axios.get!
         const response = await api.get('/products/');
-        
-        // 🔥 KAGUA PAGINATION – DRF inarudisha { results: [...] }
         const data = response.data.results || response.data || [];
 
-        // Logic hii ya kupanga kwa miji (unique cities) imebaki 100% sawa
         const cityMap = {};
         data.forEach(item => {
           const cityName = item.store?.city;
@@ -79,25 +72,20 @@ export default function LocationFilter({ navigate, isMobile }) {
 
   useEffect(() => {
     const container = scrollContainerRef.current;
-    if (container && !isMobile) {
+    if (container) {
       container.addEventListener('scroll', checkScrollPosition);
       setTimeout(checkScrollPosition, 100);
-      return () => {
-        container.removeEventListener('scroll', checkScrollPosition);
-      };
+      return () => container.removeEventListener('scroll', checkScrollPosition);
     }
-  }, [locations, isMobile]);
+  }, [locations]);
 
-  if (loading) return (
-    <div className="skeleton-loader-h" />
-  );
-  
+  if (loading) return <div className="skeleton-loader-h" />;
   if (locations.length === 0) return null;
 
   return (
     <div className="location-main-wrapper">
       
-      {/* Header Section - Responsive via CSS */}
+      {/* Header Section - Kitufe kimeondolewa! */}
       <div className="loc-header">
         <div className="loc-header-left">
           <div className="loc-title-group">
@@ -106,76 +94,44 @@ export default function LocationFilter({ navigate, isMobile }) {
           </div>
           <p className="loc-subtitle">{t('find_best_deals_near_you')}</p>
         </div>
-
-        <button 
-          className="loc-view-more-btn"
-          onClick={() => navigate('/products', { state: { sectionName: t('shop_by_location') } })}
-        >
-          <span>{t('view_more')}</span>
-          <ChevronRight size={isMobile ? 10 : 16} />
-        </button>
       </div>
 
-      {/* ========== MOBILE VIEW: Horizontal Scroll ========== */}
-      {isMobile ? (
-        <div className="loc-mobile-scroll hide-scrollbar-mobile">
+      {/* ✅ Layout Moja - Inabadilika automatically kwa CSS Media Queries! */}
+      <div className="loc-desktop-wrapper">
+        {showLeftArrow && (
+          <button className="loc-arrow-btn loc-arrow-left" onClick={() => scroll('left')}>
+            <ChevronLeft size={24} />
+          </button>
+        )}
+        
+        <div ref={scrollContainerRef} className="loc-scroll-wrapper hide-scrollbar">
           {locations.map((loc, index) => (
-            <div key={index} className="loc-mobile-card-wrapper">
+            <div key={index} className="loc-card-wrapper">
               <DashboardCard 
                 image={loc.image}
                 title={loc.name}
                 subtitle={loc.address?.split(',')[0]}
                 price={loc.price}
                 isLocation={true}
-                isMobile={isMobile}
-                onClick={() => navigate('/products', { 
-                  state: { 
-                    location: loc.name, 
-                    sectionName: `${t('products_in')} ${loc.name}`
-                  } 
-                })}
+                /* 🔥 TUMEONDOA KABISA `isMobile={isMobile}` HAPA! */
+                onClick={() => {
+                  const locationName = encodeURIComponent(loc.name);
+                  const sectionTitle = `${t('products_in')} ${loc.name}`;
+                  const encodedSectionName = encodeURIComponent(sectionTitle);
+                  const url = `/products?location=${locationName}&sectionName=${encodedSectionName}`;
+                  window.open(url, '_blank');
+                }}
               />
             </div>
           ))}
         </div>
-      ) : (
-        /* ========== DESKTOP VIEW: Horizontal Scroll with Arrows ========== */
-        <div className="loc-desktop-wrapper">
-          {showLeftArrow && (
-            <button className="loc-arrow-btn loc-arrow-left" onClick={() => scroll('left')}>
-              <ChevronLeft size={24} />
-            </button>
-          )}
-          
-          <div ref={scrollContainerRef} className="loc-desktop-scroll hide-scrollbar-desktop">
-            {locations.map((loc, index) => (
-              <div key={index} className="loc-desktop-card-wrapper">
-                <DashboardCard 
-                  image={loc.image}
-                  title={loc.name}
-                  subtitle={loc.address?.split(',')[0]}
-                  price={loc.price}
-                  isLocation={true}
-                  isMobile={isMobile}
-                  onClick={() => {
-                    const locationName = encodeURIComponent(loc.name);
-                    const sectionTitle = `${t('products_in')} ${loc.name}`;
-                    const encodedSectionName = encodeURIComponent(sectionTitle);
-                    const url = `/products?location=${locationName}&sectionName=${encodedSectionName}`;
-                    window.open(url, '_blank');
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-          
-          {showRightArrow && (
-            <button className="loc-arrow-btn loc-arrow-right" onClick={() => scroll('right')}>
-              <ChevronRight size={24} />
-            </button>
-          )}
-        </div>
-      )}
+        
+        {showRightArrow && (
+          <button className="loc-arrow-btn loc-arrow-right" onClick={() => scroll('right')}>
+            <ChevronRight size={24} />
+          </button>
+        )}
+      </div>
     </div>
   );
 }

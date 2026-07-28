@@ -1,14 +1,11 @@
-// src/components/NewArrivals.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, Sparkles } from "lucide-react";
-import api from "../axiosConfig"; // 🔥 BADILISHA: Tumia api badala ya axios!
+import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
 import { useTranslation } from 'react-i18next';
 import '../NewArrivals.css';
 
-// 🔥 ONDOA API_BASE_URL – ipo kwenye api config!
-
-export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
+export default function NewArrivals({ navigate, selectedCategory }) {
   const { t, i18n } = useTranslation();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,35 +13,28 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
 
+  // 🔥 Tumeacha `isMobile` kabisa. Sasa itadhibitiwa na CSS tu! (Kwa Scroll)
   useEffect(() => {
     const fetchNewArrivals = async () => {
       setLoading(true);
       try {
         const params = {
-          ordering: '-created_at', // Panga kwa tarehe mpya kushuka
+          ordering: '-created_at',
           limit: 10
         };
+        if (selectedCategory?.id) params.parent_category = selectedCategory.id;
 
-        if (selectedCategory?.id) {
-          params.parent_category = selectedCategory.id;
-        }
-
-        // 🔥 BADILISHA: Tumia api.get, sio axios.get!
         const response = await api.get('/products/', { params });
-        
-        // 🔥 KAGUA PAGINATION – DRF inarudisha { results: [...] }
         const productsData = response.data.results || response.data || [];
         setProducts(productsData);
-        
       } catch (err) {
         console.error("New Arrivals Fetch Error:", err.message);
       } finally {
         setLoading(false);
       }
     };
-
     fetchNewArrivals();
-  }, [selectedCategory, i18n.language]); // 🔥 Ongeza i18n.language
+  }, [selectedCategory, i18n.language]);
 
   const getCategoryDisplayName = (category) => {
     if (!category) return '';
@@ -62,28 +52,20 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
   const scroll = (direction) => {
     if (scrollContainerRef.current) {
       const scrollAmount = direction === 'left' ? -300 : 300;
-      scrollContainerRef.current.scrollBy({
-        left: scrollAmount,
-        behavior: 'smooth'
-      });
+      scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
   useEffect(() => {
     const container = scrollContainerRef.current;
-    if (container && !isMobile) {
+    if (container) {
       container.addEventListener('scroll', checkScrollPosition);
       setTimeout(checkScrollPosition, 100);
-      return () => {
-        container.removeEventListener('scroll', checkScrollPosition);
-      };
+      return () => container.removeEventListener('scroll', checkScrollPosition);
     }
-  }, [products, isMobile]);
+  }, [products]);
 
-  if (loading) return (
-    <div className="skeleton-loader-h" />
-  );
-  
+  if (loading) return <div className="skeleton-loader-h" />;
   if (products.length === 0) return null;
 
   return (
@@ -110,85 +92,45 @@ export default function NewArrivals({ navigate, selectedCategory, isMobile }) {
             )}
           </p>
         </div>
-
-        <button 
-          className="na-view-more-btn"
-          onClick={() => navigate('/products', { 
-            state: { 
-              sectionName: `${t('new_arrivals')} ${selectedCategory && selectedCategory.id !== null ? `${t('in')} ${selectedCategory.name}` : ''}`,
-              categoryId: selectedCategory?.id,
-              categoryName: selectedCategory?.name
-            } 
-          })}
-        >
-          <span>{t('view_more')}</span>
-          <ChevronRight size={isMobile ? 10 : 16} />
-        </button>
       </div>
 
-      {/* ========== MOBILE VIEW: Horizontal Scroll ========== */}
-      {isMobile ? (
-        <div className="na-mobile-scroll hide-scrollbar-mobile">
+      {/* ✅ Horizontal Scroll - Fluid kwa ukubwa wa skrini! */}
+      <div className="na-desktop-wrapper">
+        {showLeftArrow && (
+          <button className="na-arrow-btn na-arrow-left" onClick={() => scroll('left')}>
+            <ChevronLeft size={24} />
+          </button>
+        )}
+        
+        <div ref={scrollContainerRef} className="na-scroll-wrapper hide-scrollbar">
           {products.map((product) => (
-            <div key={product.id} className="na-mobile-card-wrapper">
+            <div key={product.id} className="na-card-wrapper">
               <DashboardCard
                 image={product.cover_image}
                 title={product.name}
                 price={product.price}
                 originalPrice={product.original_price}
                 views={product.views}
-                isMobile={isMobile}
-                onClick={() => navigate('/products', {
-                  state: {
-                    priorityId: product.id,
-                    sectionName: `${t('new_arrivals')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`,
-                    categoryId: selectedCategory?.id,
-                    categoryName: selectedCategory?.name
-                  }
-                })}
+                // 🔥 HAPA: TUMEONDOA `isMobile={isMobile}`
+                onClick={() => {
+                  const priorityId = product.id;
+                  const sectionName = encodeURIComponent(`${t('new_arrivals')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`);
+                  const categoryId = selectedCategory?.id || '';
+                  const categoryName = encodeURIComponent(selectedCategory?.name || 'All');
+                  const url = `/products?priorityId=${priorityId}&sectionName=${sectionName}&categoryId=${categoryId}&categoryName=${categoryName}`;
+                  window.open(url, '_blank');
+                }}
               />
             </div>
           ))}
         </div>
-      ) : (
-        /* ========== DESKTOP VIEW: Horizontal Scroll with Arrows ========== */
-        <div className="na-desktop-wrapper">
-          {showLeftArrow && (
-            <button className="na-arrow-btn na-arrow-left" onClick={() => scroll('left')}>
-              <ChevronLeft size={24} />
-            </button>
-          )}
-          
-          <div ref={scrollContainerRef} className="na-desktop-scroll hide-scrollbar-desktop">
-            {products.map((product) => (
-              <div key={product.id} className="na-desktop-card-wrapper">
-                <DashboardCard
-                  image={product.cover_image}
-                  title={product.name}
-                  price={product.price}
-                  originalPrice={product.original_price}
-                  views={product.views}
-                  isMobile={isMobile}
-                  onClick={() => {
-                    const priorityId = product.id;
-                    const sectionName = encodeURIComponent(`${t('new_arrivals')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`);
-                    const categoryId = selectedCategory?.id || '';
-                    const categoryName = encodeURIComponent(selectedCategory?.name || 'All');
-                    const url = `/products?priorityId=${priorityId}&sectionName=${sectionName}&categoryId=${categoryId}&categoryName=${categoryName}`;
-                    window.open(url, '_blank');
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-          
-          {showRightArrow && (
-            <button className="na-arrow-btn na-arrow-right" onClick={() => scroll('right')}>
-              <ChevronRight size={24} />
-            </button>
-          )}
-        </div>
-      )}
+        
+        {showRightArrow && (
+          <button className="na-arrow-btn na-arrow-right" onClick={() => scroll('right')}>
+            <ChevronRight size={24} />
+          </button>
+        )}
+      </div>
     </div>
   );
 }

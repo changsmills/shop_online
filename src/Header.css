@@ -2,10 +2,12 @@
    1. MAIN HEADER & CONTAINER
    ========================================= */
 .main-header {
-    position: fixed;
+    position: fixed;       /* 🔥 Imebadilishwa kutoka sticky kwenda fixed */
     top: 0;
+    left: 0;
     width: 100%;
-    z-index: 1000;
+    height: auto;
+    z-index: 1000;         /* Hakikisha header iko juu ya yote */
     background: #fff;
     border-bottom: 1px solid #f3f4f6;
 }

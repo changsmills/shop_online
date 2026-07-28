@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from api.views import (
-    CategoryViewSet, SubCategoryViewSet, ProductsEngineViewSet,
+    CategoryViewSet, OrderItemViewSet, SubCategoryViewSet, ProductsEngineViewSet,
     LeafCategoryViewSet, AdvertisementViewSet,
     StoreEngineViewSet, ProductMediaViewSet, MessageViewSet,
     RegisterView, ProfileView,
@@ -10,7 +10,9 @@ from api.views import (
     ProductVariationViewSet, 
     # 🔥 ONGEZA HIZI ZOTE! (Zilizokosekana)
     ChangePasswordView, DeleteAccountView,
-    ChangeEmailView, PasswordResetView
+    ChangeEmailView, PasswordResetView,
+   OrderViewSet
+
 )
 
 router = DefaultRouter()
@@ -26,6 +28,8 @@ router.register(r'shipping-methods', ShippingMethodViewSet)
 router.register(r'brands', BrandViewSet)
 router.register(r'leads', LeadViewSet)
 router.register(r'product-variations', ProductVariationViewSet)
+router.register(r'orders', OrderViewSet)
+router.register(r'order-items', OrderItemViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

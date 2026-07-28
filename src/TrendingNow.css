@@ -1,30 +1,23 @@
 /* ============================================ */
-/* TRENDING NOW - CONTAINER & WRAPPER           */
+/* CONTAINER & WRAPPER                           */
 /* ============================================ */
 
 .trending-main-wrapper {
   position: relative;
   width: 100%;
-  background-color: #eceef1;
+  background-color: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  border-left: none;
+  border-right: none;
   box-sizing: border-box;
 }
 
-/* Mobile container */
 @media (max-width: 768px) {
-  .trending-main-wrapper {
-    padding: 4px 0;
-    border-radius: 8px;
-    margin: 2px 0;
-  }
+  .trending-main-wrapper { padding: 12px 8px; border-radius: 8px; margin: 2px 0; }
 }
-
-/* Desktop container */
 @media (min-width: 769px) {
-  .trending-main-wrapper {
-    padding: 0;
-    border-radius: 16px;
-    margin: 10px 0;
-  }
+  .trending-main-wrapper { padding: 16px 0; border-radius: 16px; margin: 10px 0; }
 }
 
 /* ============================================ */
@@ -33,177 +26,33 @@
 
 .trend-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start; /* Kitufe kimeondolewa, hivyo sasa inakaa kushoto */
   align-items: center;
   flex-wrap: wrap;
   width: 100%;
 }
+@media (max-width: 768px) { .trend-header { padding: 0 8px; margin-bottom: 12px; gap: 6px; } }
+@media (min-width: 769px) { .trend-header { padding: 0; margin-bottom: 20px; gap: 10px; } }
 
-/* Mobile header */
-@media (max-width: 768px) {
-  .trend-header {
-    padding: 0 8px;
-    margin-bottom: 12px;
-    gap: 6px;
-  }
-}
+.trend-header-left { display: flex; flex-direction: column; }
+.trend-title-group { display: flex; align-items: center; gap: 8px; }
+@media (max-width: 768px) { .trend-title-group { gap: 4px; margin-bottom: 2px; } }
+@media (min-width: 769px) { .trend-title-group { gap: 8px; margin-bottom: 8px; } }
 
-/* Desktop header */
-@media (min-width: 769px) {
-  .trend-header {
-    padding: 0;
-    margin-bottom: 20px;
-    gap: 10px;
-  }
-}
+.trend-icon { color: #8b5cf6; }
+@media (max-width: 768px) { .trend-icon { width: 12px; height: 12px; } }
+@media (min-width: 769px) { .trend-icon { width: 24px; height: 24px; } }
 
-.trend-header-left {
-  display: flex;
-  flex-direction: column;
-}
+.trend-title { font-weight: 600; margin: 0; }
+@media (max-width: 768px) { .trend-title { font-size: 13px; line-height: 1.2; } }
+@media (min-width: 769px) { .trend-title { font-size: 24px; line-height: 1.4; } }
 
-.trend-title-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Mobile title gap */
-@media (max-width: 768px) {
-  .trend-title-group {
-    gap: 4px;
-    margin-bottom: 2px;
-  }
-}
-
-/* Desktop title gap */
-@media (min-width: 769px) {
-  .trend-title-group {
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-}
-
-.trend-icon {
-  color: #8b5cf6;
-}
-
-@media (max-width: 768px) {
-  .trend-icon { width: 12px; height: 12px; }
-}
-@media (min-width: 769px) {
-  .trend-icon { width: 24px; height: 24px; }
-}
-
-.trend-title {
-  font-weight: 600;
-  margin: 0;
-}
-
-/* Mobile title */
-@media (max-width: 768px) {
-  .trend-title {
-    font-size: 13px;
-    line-height: 1.3;
-  }
-}
-
-/* Desktop title */
-@media (min-width: 769px) {
-  .trend-title {
-    font-size: 24px;
-    line-height: 1.4;
-  }
-}
-
-.trend-subtitle {
-  margin: 0;
-  color: #888;
-  font-weight: 400;
-}
-
-/* Mobile subtitle */
-@media (max-width: 768px) {
-  .trend-subtitle {
-    font-size: 9px;
-    line-height: 1.2;
-  }
-}
-
-/* Desktop subtitle */
-@media (min-width: 769px) {
-  .trend-subtitle {
-    font-size: 16px;
-    line-height: 1.5;
-  }
-}
+.trend-subtitle { margin: 0; color: #888; font-weight: 400; }
+@media (max-width: 768px) { .trend-subtitle { font-size: 9px; line-height: 1.2; } }
+@media (min-width: 769px) { .trend-subtitle { font-size: 16px; line-height: 1.5; } }
 
 /* ============================================ */
-/* VIEW MORE BUTTON (Purple Gradient)           */
-/* ============================================ */
-
-.trend-view-more-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
-  white-space: nowrap;
-}
-
-.trend-view-more-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
-}
-
-@media (max-width: 768px) {
-  .trend-view-more-btn {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 9px;
-    gap: 4px;
-  }
-}
-
-@media (min-width: 769px) {
-  .trend-view-more-btn {
-    padding: 8px 20px;
-    border-radius: 10px;
-    font-size: 16px;
-    gap: 8px;
-  }
-}
-
-/* ============================================ */
-/* MOBILE SCROLL WRAPPER                         */
-/* ============================================ */
-
-.trend-mobile-scroll {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  gap: 12px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  padding: 10px 0 20px 0;
-  width: 100%;
-}
-
-.trend-mobile-card-wrapper {
-  flex: 0 0 auto;
-  width: 140px;
-  min-width: 140px;
-}
-
-/* ============================================ */
-/* DESKTOP SCROLL WRAPPER & ARROWS              */
+/* SCROLL WRAPPER - FLUID WIDTHS                 */
 /* ============================================ */
 
 .trend-desktop-wrapper {
@@ -212,23 +61,51 @@
   align-items: center;
 }
 
-.trend-desktop-scroll {
+.trend-scroll-wrapper {
   display: flex;
-  gap: 20px;
-  overflow-x: auto;
+  flex-wrap: nowrap !important; /* Hii inalazimisha kadi zisishuke chini (Scroll) */
+  overflow-x: auto !important;
   overflow-y: hidden;
   scroll-behavior: smooth;
-  padding: 10px 5px 20px 5px;
+  padding: 10px 0 20px 0;
   width: 100%;
 }
 
-.trend-desktop-card-wrapper {
-  flex: 0 0 auto;
-  width: 200px;
-  min-width: 200px;
+.trend-card-wrapper {
+  flex: 0 0 auto; /* Inazuia kadi kukua/kupungua ovyo kwenye scroll */
 }
 
-/* ARROWS */
+/* 🔥 FLUID MEDIA QUERIES ZA SCROLL */
+
+/* Desktop Kubwa (≥1025px): Kadi pana zaidi */
+@media (min-width: 1025px) {
+  .trend-scroll-wrapper { gap: 20px; }
+  .trend-card-wrapper { width: 220px; max-width: 220px; }
+}
+
+/* Tablet (769px - 1024px): Kadi za ukubwa wa kati */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .trend-scroll-wrapper { gap: 16px; }
+  .trend-card-wrapper { width: 160px; max-width: 160px; }
+}
+
+/* Mobile (≤768px): Kadi 2 kwa mstari (Ukubwa 180px) */
+@media (max-width: 768px) {
+  .trend-scroll-wrapper { 
+    gap: 12px !important;         /* 🔥 Nafasi kati ya kadi (12px) */
+  }
+  .trend-card-wrapper { 
+    width: 180px !important;      /* 🔥 Upana wa kadi 2 kwa mstari (kutoka 120px hadi 180px) */
+    max-width: 180px !important; 
+  }
+  
+  /* Ficha mishale kwenye simu */
+  .trend-arrow-btn { display: none !important; }
+}
+/* ============================================ */
+/* ARROWS (Desktop na Tablet tu)                */
+/* ============================================ */
+
 .trend-arrow-btn {
   position: absolute;
   z-index: 10;
@@ -245,72 +122,13 @@
   transition: all 0.2s ease;
   outline: none;
 }
-
-.trend-arrow-btn:hover {
-  background-color: #f7f9fc;
-  transform: scale(1.05);
-}
-
+.trend-arrow-btn:hover { background-color: #f7f9fc; transform: scale(1.05); }
 .trend-arrow-left { left: -15px; }
 .trend-arrow-right { right: -15px; }
-
-/* ============================================ */
-/* ✅ RESPONSIVE ARROWS - FIX GAP AND POSITION  */
-/* ============================================ */
-
-@media (max-width: 768px) {
-  /* 1. Punguza ukubwa wa mishale */
-  .ts-arrow-btn {
-    width: 30px;
-    height: 30px;
-    /* 2. Fanya mishale ionekane kama vitufe vya overlay nyeupe */
-    background: rgba(255, 255, 255, 0.95) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-    border: 1px solid #eee !important;
-  }
-
-  /* 3. Sogeza mishale kwenye kingo za skrini */
-  .ts-arrow-left {
-    left: 4px !important;
-  }
-  .ts-arrow-right {
-    right: 4px !important;
-  }
-
-  /* 4. Punguza padding ya pande (Ondoa 45px, weka 12px) */
-  .ts-desktop-scroll {
-    padding: 10px 12px 20px 12px !important;
-  }
-}
 
 /* ============================================ */
 /* UTILITY: HIDE SCROLLBAR                      */
 /* ============================================ */
 
-.hide-scrollbar-mobile::-webkit-scrollbar,
-.hide-scrollbar-desktop::-webkit-scrollbar {
-  display: none;
-}
-.hide-scrollbar-mobile,
-.hide-scrollbar-desktop {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* ============================================ */
-/* SKELETON LOADER                               */
-/* ============================================ */
-
-.skeleton-loader-h {
-  height: 280px;
-  margin: 20px;
-  border-radius: 15px;
-  background: #e0e0e0;
-  animation: pulse 1.5s infinite ease-in-out;
-}
-
-@keyframes pulse {
-  0% { background-color: #e0e0e0; }
-  50% { background-color: #f0f0f0; }
-  100% { background-color: #e0e0e0; }
-}
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

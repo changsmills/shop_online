@@ -98,13 +98,125 @@
 }
 
 /* ============================================ */
-/* LAYER 3: MAIN CONTENT & RESULTS BAR          */
+/* LAYER 3: MAIN LAYOUT (SIDEBAR + CONTENT)     */
 /* ============================================ */
 
-.alibaba-main {
+/* 🔥 Muundo wa 2 Column (Sidebar kushoto, Bidhaa kulia) */
+.search-main-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 24px;
   max-width: 1400px;
   margin: 0 auto;
   padding: 20px;
+}
+
+/* ============================================ */
+/* LAYER 4: FILTER SIDEBAR (Kushoto)            */
+/* ============================================ */
+
+.search-filter-sidebar {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 20px;
+  position: sticky;
+  top: 90px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+.filter-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+}
+
+.filter-section {
+  margin-bottom: 24px;
+}
+
+.filter-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.filter-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.filter-item {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 2px;
+}
+.filter-item:hover {
+  background: #f3f4f6;
+}
+.filter-item.active {
+  background: #fff5f0;
+  color: #ff6a00;
+  font-weight: 600;
+  border-left: 3px solid #ff6a00;
+}
+
+/* PRICE FILTER */
+.price-filter-wrapper, .moq-filter-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.price-input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 70px;
+  outline: none;
+}
+.price-input:focus {
+  border-color: #ff6a00;
+}
+.price-sep {
+  color: #999;
+  font-weight: bold;
+}
+.price-ok-btn {
+  padding: 6px 14px;
+  border: 1px solid #333;
+  background: transparent;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.price-ok-btn:hover {
+  background: #1a1a1a;
+  color: white;
+}
+
+/* ============================================ */
+/* LAYER 5: CONTENT YA KULIA & RESULTS BAR      */
+/* ============================================ */
+
+.search-products-content {
+  width: 100%;
 }
 
 .results-info-bar {
@@ -137,65 +249,20 @@
   border-radius: 20px;
 }
 
-@media (max-width: 600px) {
-  .alibaba-main { padding: 15px; }
-  .results-info-bar { flex-direction: column; align-items: flex-start; margin-bottom: 16px; }
-  .deep-search-label { font-size: 13px; }
-  .results-count { font-size: 12px; }
-}
-
 /* ============================================ */
-/* LAYER 4: PRODUCT GRID - RESPONSIVE           */
+/* LAYER 6: PRODUCTS GRID (FLUID FLOW)          */
 /* ============================================ */
 
-.alibaba-grid {
+/* 🔥 Hii ndio Fluid Flow Grid (Inajaza nafasi kwa auto-fill) */
+.search-products-grid {
   display: grid;
-  gap: 20px;
-  padding: 20px 0;
-}
-
-/* Desktop: 5 columns */
-.alibaba-grid {
-  grid-template-columns: repeat(5, 1fr);
-}
-
-/* Large Desktop (≥1600px): 6 columns */
-@media (min-width: 1600px) {
-  .alibaba-grid { grid-template-columns: repeat(6, 1fr); gap: 24px; }
-}
-
-/* Desktop (1200px - 1599px): 5 columns */
-@media (min-width: 1200px) and (max-width: 1599px) {
-  .alibaba-grid { grid-template-columns: repeat(5, 1fr); gap: 18px; }
-}
-
-/* Laptop (992px - 1199px): 4 columns */
-@media (min-width: 992px) and (max-width: 1199px) {
-  .alibaba-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
-}
-
-/* Tablet (768px - 991px): 3 columns */
-@media (min-width: 768px) and (max-width: 991px) {
-  .alibaba-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
-}
-
-/* Simu (480px - 767px): 2 columns */
-@media (min-width: 480px) and (max-width: 767px) {
-  .alibaba-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px 0; }
-}
-
-/* Simu ndogo (≤479px): 2 columns with smaller gap */
-@media (max-width: 479px) {
-  .alibaba-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px 0; }
-}
-
-/* Simu ndogo sana (≤360px): 1 column */
-@media (max-width: 360px) {
-  .alibaba-grid { grid-template-columns: 1fr; gap: 12px; }
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  padding: 0;
 }
 
 /* ============================================ */
-/* LAYER 5: PRODUCT CARD                         */
+/* LAYER 7: PRODUCT CARD (Alibaba Style)        */
 /* ============================================ */
 
 .alibaba-card {
@@ -299,7 +366,40 @@
   color: #666;
 }
 
+/* ============================================ */
+/* LAYER 8: RESPONSIVE MEDIA QUERIES            */
+/* ============================================ */
+
+/* Tablet (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .search-main-layout {
+    grid-template-columns: 220px 1fr;
+    gap: 16px;
+  }
+  .search-products-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Mobile (≤768px) - Ficha Sidebar! */
 @media (max-width: 768px) {
+  .search-main-layout {
+    display: block !important;
+  }
+  .search-filter-sidebar {
+    display: none !important;
+  }
+  
+  .search-products-grid {
+    grid-template-columns: repeat(2, 1fr) !important; /* 2 kwa mstari kama Alibaba */
+    gap: 8px !important;
+  }
+
+  .alibaba-main { padding: 15px; }
+  .results-info-bar { flex-direction: column; align-items: flex-start; margin-bottom: 16px; }
+  .deep-search-label { font-size: 13px; }
+  .results-count { font-size: 12px; }
+  
   .card-body { padding: 10px; }
   .product-title { font-size: 12px; margin-bottom: 6px; }
   .price-tag .amount { font-size: 14px; }
@@ -308,13 +408,18 @@
   .category-tag { font-size: 9px; padding: 3px 8px; }
 }
 
-@media (max-width: 480px) {
+/* Simu ndogo sana (≤400px) */
+@media (max-width: 400px) {
+  .search-products-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 4px !important;
+  }
   .product-title { font-size: 11px; -webkit-line-clamp: 2; }
   .price-tag .amount { font-size: 13px; }
 }
 
 /* ============================================ */
-/* LAYER 6: LOADING, INFINITE SCROLL, END       */
+/* LAYER 9: LOADING, INFINITE SCROLL, END       */
 /* ============================================ */
 
 .loading-state {
@@ -368,7 +473,7 @@
 }
 
 /* ============================================ */
-/* LAYER 7: NOT FOUND STATE                     */
+/* LAYER 10: NOT FOUND STATE                    */
 /* ============================================ */
 
 .not-found {
@@ -416,7 +521,7 @@
 }
 
 /* ============================================ */
-/* LAYER 8: SKELETON LOADING                    */
+/* LAYER 11: SKELETON LOADING                   */
 /* ============================================ */
 
 .alibaba-container.skeleton {
@@ -518,7 +623,7 @@
 }
 
 /* ============================================ */
-/* LAYER 9: TOUCH OPTIMIZATIONS                 */
+/* LAYER 12: TOUCH OPTIMIZATIONS                */
 /* ============================================ */
 
 @media (hover: none) and (pointer: coarse) {
@@ -532,11 +637,12 @@
 }
 
 /* ============================================ */
-/* LAYER 10: PRINT STYLES                       */
+/* LAYER 13: PRINT STYLES                       */
 /* ============================================ */
 
 @media print {
-  .alibaba-header, .loading-more, .end-of-results { display: none; }
-  .alibaba-grid { grid-template-columns: repeat(3, 1fr); }
+  .alibaba-header, .loading-more, .end-of-results, .search-filter-sidebar { display: none; }
+  .search-main-layout { display: block; }
+  .search-products-grid { grid-template-columns: repeat(3, 1fr); }
   .alibaba-card { break-inside: avoid; border: 1px solid #ddd; box-shadow: none; }
 }

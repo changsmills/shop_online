@@ -5,33 +5,32 @@
 .just-for-you-container {
   position: relative;
   width: 100%;
-  background-color: #ffffff; /* ← Badilisha kutoka #eceef1 hadi #ffffff */
+  background-color: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  border-left: none;
+  border-right: none;
   box-sizing: border-box;
   overflow-x: hidden;
 }
 
-/* Mobile (<768px) */
 @media (max-width: 768px) {
   .just-for-you-container {
-    padding: 4px 0;
+    padding: 12px 8px;
     border-radius: 8px;
     margin: 2px 0;
-    padding-bottom: 45px;
-    margin-bottom: 65px;
+    padding-bottom: 55px; /* Safisha ziada */
+    margin-bottom: 0;  /* Safisha ziada */
   }
 }
 
-/* Desktop (≥769px) */
 @media (min-width: 769px) {
   .just-for-you-container {
-    padding: 0;
+    padding: 16px 0;
     border-radius: 16px;
     margin: 10px 0;
-    padding-bottom: 30px;
-    margin-bottom: 10px;
   }
 }
-
 
 /* ============================================ */
 /* LAYER 2: SECTION HEADER                      */
@@ -39,21 +38,19 @@
 
 .section-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start; /* Kitufe kimeondolewa, sasa inakaa kushoto */
   align-items: flex-start;
   gap: 8px;
   margin: 0;
   width: 100%;
 }
 
-/* Mobile header padding */
 @media (max-width: 768px) {
   .section-header {
     padding: 0 8px 12px 8px;
   }
 }
 
-/* Desktop header padding */
 @media (min-width: 769px) {
   .section-header {
     padding: 0 16px 16px 16px;
@@ -72,7 +69,6 @@
   width: 100%;
 }
 
-
 /* ============================================ */
 /* LAYER 3: TYPOGRAPHY (Titles & Subtitles)     */
 /* ============================================ */
@@ -84,7 +80,6 @@
   line-height: 1.2;
 }
 
-/* Mobile title */
 @media (max-width: 768px) {
   .just-title {
     font-size: 14px;
@@ -92,7 +87,6 @@
   }
 }
 
-/* Desktop title */
 @media (min-width: 769px) {
   .just-title {
     font-size: 24px;
@@ -106,7 +100,6 @@
   line-height: 1.2;
 }
 
-/* Mobile subtitle */
 @media (max-width: 768px) {
   .just-subtitle {
     font-size: 9px;
@@ -115,7 +108,6 @@
   }
 }
 
-/* Desktop subtitle */
 @media (min-width: 769px) {
   .just-subtitle {
     font-size: 14px;
@@ -124,51 +116,8 @@
   }
 }
 
-
 /* ============================================ */
-/* LAYER 4: VIEW ALL BUTTON                     */
-/* ============================================ */
-
-.view-all-just {
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  white-space: nowrap;
-  color: #7a380c;
-  transition: all 0.2s ease;
-}
-
-.view-all-just:hover {
-  opacity: 0.8;
-}
-
-/* Mobile button */
-@media (max-width: 768px) {
-  .view-all-just {
-    font-size: 9px;
-    font-weight: 500;
-    background: rgba(255, 102, 0, 0.1);
-    border-radius: 16px;
-    padding: 4px 10px;
-  }
-}
-
-/* Desktop button */
-@media (min-width: 769px) {
-  .view-all-just {
-    font-size: 14px;
-    font-weight: normal;
-    background: none;
-    border-radius: 0;
-    padding: 0;
-  }
-}
-
-
-/* ============================================ */
-/* LAYER 5: PRODUCT GRID (Mobile, Tablet, Desktop) */
+/* LAYER 4: PRODUCT GRID (Responsive Media Queries) */
 /* ============================================ */
 
 .product-grid {
@@ -179,42 +128,42 @@
   padding: 0; 
 }
 
-/* ✅ MOBILE: 2 Columns – minmax huzuia cards isipanuke sana */
+/* Mobile (≤768px): Safu 4 */
 @media (max-width: 768px) {
   .product-grid { 
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
-    gap: 8px; 
-    padding: 0; 
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important; 
+    padding: 0 !important; 
+
   }
 }
 
-/* TABLET: 3 Columns */
+/* Tablet (769px - 1024px): Safu 4 */
 @media (min-width: 769px) and (max-width: 1024px) {
   .product-grid { 
-    grid-template-columns: repeat(3, 1fr); 
+    grid-template-columns: repeat(5, 1fr); 
     gap: 12px; 
     padding: 0 8px; 
   }
 }
 
-/* LARGE TABLET / SMALL DESKTOP: 4 Columns */
+/* Large Tablet / Small Desktop (1025px - 1280px): Safu 5 */
 @media (min-width: 1025px) and (max-width: 1280px) {
   .product-grid { 
-    grid-template-columns: repeat(4, 1fr); 
+    grid-template-columns: repeat(5, 1fr); 
     gap: 16px; 
     padding: 0 16px; 
   }
 }
 
-/* DESKTOP: 5 Columns */
+/* Large Desktop (≥1281px): Safu 6 (Ili kujaza nafasi!) */
 @media (min-width: 1281px) {
   .product-grid { 
-    grid-template-columns: repeat(5, 1fr); 
+    grid-template-columns: repeat(6, 1fr); 
     gap: 20px; 
     padding: 0 16px; 
   }
 }
-
 
 /* ============================================ */
 /* LAYER 6: ERROR & LOADING STATES              */
@@ -248,9 +197,8 @@
   margin: 20px;
 }
 
-
 /* ============================================ */
-/* LAYER 7: EMPTY STATE CARD (Iga DashboardCard) */
+/* LAYER 7: EMPTY STATE CARD                    */
 /* ============================================ */
 
 .empty-state-card {
@@ -266,7 +214,7 @@
   padding: 20px;
   box-sizing: border-box;
   transition: all 0.3s ease;
-  grid-column: 1 / -1; /* Inajaza nafasi zote za grid */
+  grid-column: 1 / -1;
   min-height: 300px;
 }
 
@@ -319,7 +267,6 @@
   transform: scale(0.95);
 }
 
-/* Mobile adjustments for Empty State */
 @media (max-width: 768px) {
   .empty-state-card {
     min-height: 200px;
@@ -337,37 +284,8 @@
   }
 }
 
-
 /* ============================================ */
-/* LAYER 8: SKELETON CATEGORY SLIDER (Mobile)   */
-/* ============================================ */
-
-.skeleton-category-slider {
-  display: flex;
-  overflow-x: auto;
-  gap: 12px;
-  padding: 12px 16px;
-  background: white;
-  border-bottom: 1px solid #eee;
-  scrollbar-width: none;
-}
-.skeleton-category-slider::-webkit-scrollbar { display: none; }
-
-.skeleton-cat-item {
-  width: 90px;
-  height: 32px;
-  background: #e0e0e0;
-  border-radius: 20px;
-  flex-shrink: 0;
-  animation: pulse 1.5s infinite ease-in-out;
-}
-.skeleton-cat-item.active {
-  width: 40px;
-}
-
-
-/* ============================================ */
-/* LAYER 9: ANIMATION                           */
+/* LAYER 8: ANIMATION                           */
 /* ============================================ */
 
 @keyframes pulse {

@@ -1,4 +1,3 @@
-// src/components/DashboardCard.jsx
 import React from 'react';
 import { Eye, Trophy, MapPin } from "lucide-react";
 import "../DashboardCard.css";
@@ -18,7 +17,6 @@ export default function DashboardCard({
   isStore, 
   isTopDeal,
   isLocation, 
-  isMobile,
   onClick 
 }) {
   const numPrice = Number(price);
@@ -26,9 +24,8 @@ export default function DashboardCard({
   const numOriginal = Number(originalPrice);
   const hasValidPrice = price !== undefined && price !== null && !isNaN(numPrice);
 
-  const displayTitle = isMobile && title?.length > 30 
-    ? title.substring(0, 25) + '...' 
-    : title;
+  // 🔥 Sasa truncation ya title inafanyika kupitia CSS, lakini tumebakiza hii kwa usalama
+  const displayTitle = title?.length > 30 ? title.substring(0, 25) + '...' : title;
 
   return (
     <div 
@@ -42,7 +39,7 @@ export default function DashboardCard({
         
         {rank && Number(rank) > 0 ? (
           <div className={`rank-indicator rank-level-${rank}`}>
-            <Trophy size={isMobile ? 8 : 10} fill="currentColor" />
+            <Trophy size={10} fill="currentColor" /> {/* 🔥 Imebadilishwa kuwa statically 10px */}
             <span>{rank}</span>
           </div>
         ) : null}
@@ -64,7 +61,7 @@ export default function DashboardCard({
 
         {overlay && (
           <div className="product-card-location">
-            <MapPin size={isMobile ? 8 : 9} />
+            <MapPin size={10} /> {/* 🔥 Imebadilishwa kuwa statically 10px */}
             <span>{overlay}</span>
           </div>
         )}
@@ -114,7 +111,7 @@ export default function DashboardCard({
         {/* Subtitle (Location) */}
         {subtitle && (
           <div className="product-card-subtitle-row">
-            <MapPin size={isMobile ? 8 : 10} className="subtitle-icon" />
+            <MapPin size={10} className="subtitle-icon" /> {/* 🔥 Imebadilishwa kuwa statically 10px */}
             <span className="product-card-subtitle">{subtitle}</span>
           </div>
         )}

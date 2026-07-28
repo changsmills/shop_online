@@ -362,6 +362,7 @@ const ComponentFallback = () => (
   }
 
   return (
+    
     <div key={i18n.language} className="dashboard-wrapper">
       
       <div className="sticky-header">
@@ -486,6 +487,7 @@ const ComponentFallback = () => (
 <div className="components-wrapper">
   <Suspense fallback={<ComponentFallback />}>
     <RecentlyViewed key={i18n.language} navigate={navigate} />
+    
   </Suspense>
 
   <Suspense fallback={<ComponentFallback />}>

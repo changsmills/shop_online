@@ -1,30 +1,23 @@
 /* ============================================ */
-/* TOP STORES - CONTAINER & WRAPPER             */
+/* CONTAINER & WRAPPER                           */
 /* ============================================ */
 
 .top-stores-main-wrapper {
   position: relative;
   width: 100%;
-  background-color: white;
+  background-color: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  border-left: none;
+  border-right: none;
   box-sizing: border-box;
 }
 
-/* Mobile container */
 @media (max-width: 768px) {
-  .top-stores-main-wrapper {
-    padding: 4px 0;
-    border-radius: 8px;
-    margin: 2px 0;
-  }
+  .top-stores-main-wrapper { padding: 12px 8px; border-radius: 8px; margin: 2px 0; }
 }
-
-/* Desktop container */
 @media (min-width: 769px) {
-  .top-stores-main-wrapper {
-    padding: 0;
-    border-radius: 16px;
-    margin: 10px 0;
-  }
+  .top-stores-main-wrapper { padding: 16px 0; border-radius: 16px; margin: 10px 0; }
 }
 
 /* ============================================ */
@@ -33,175 +26,33 @@
 
 .ts-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start; /* Kitufe kimeondolewa, hivyo sasa inakaa kushoto */
   align-items: center;
   flex-wrap: wrap;
   width: 100%;
 }
+@media (max-width: 768px) { .ts-header { padding: 0 8px; margin-bottom: 12px; gap: 6px; } }
+@media (min-width: 769px) { .ts-header { padding: 0; margin-bottom: 20px; gap: 10px; } }
 
-/* Mobile header */
-@media (max-width: 768px) {
-  .ts-header {
-    padding: 0 8px;
-    margin-bottom: 12px;
-    gap: 6px;
-  }
-}
+.ts-header-left { display: flex; flex-direction: column; }
+.ts-title-group { display: flex; align-items: center; gap: 8px; }
+@media (max-width: 768px) { .ts-title-group { gap: 4px; margin-bottom: 2px; } }
+@media (min-width: 769px) { .ts-title-group { gap: 8px; margin-bottom: 8px; } }
 
-/* Desktop header */
-@media (min-width: 769px) {
-  .ts-header {
-    padding: 0;
-    margin-bottom: 20px;
-    gap: 10px;
-  }
-}
+.ts-factory-icon { color: #f97316; }
+@media (max-width: 768px) { .ts-factory-icon { width: 12px; height: 12px; } }
+@media (min-width: 769px) { .ts-factory-icon { width: 24px; height: 24px; } }
 
-.ts-header-left {
-  display: flex;
-  flex-direction: column;
-}
+.ts-title { font-weight: 600; margin: 0; }
+@media (max-width: 768px) { .ts-title { font-size: 13px; line-height: 1.2; } }
+@media (min-width: 769px) { .ts-title { font-size: 24px; line-height: 1.4; } }
 
-.ts-title-group {
-  display: flex;
-  align-items: center;
-  gap: 4px; /* ✅ Punguza gap kwenye mobile */
-}
-
-/* Mobile title gap */
-@media (max-width: 768px) {
-  .ts-title-group {
-    gap: 4px;
-    margin-bottom: 2px;
-  }
-}
-
-/* Desktop title gap */
-@media (min-width: 769px) {
-  .ts-title-group {
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-}
-
-.ts-factory-icon {
-  color: #f97316;
-}
-
-@media (max-width: 768px) {
-  .ts-factory-icon { width: 12px; height: 12px; }
-}
-@media (min-width: 769px) {
-  .ts-factory-icon { width: 24px; height: 24px; }
-}
-
-.ts-title {
-  font-weight: 600; /* ✅ Punguza uzito wa font: bold → 600 */
-  margin: 0;
-}
-
-/* Mobile title (Sawa na NewArrivals) */
-@media (max-width: 768px) {
-  .ts-title {
-    font-size: 13px;
-    line-height: 1.2;
-  }
-}
-
-/* Desktop title */
-@media (min-width: 769px) {
-  .ts-title {
-    font-size: 24px;
-    line-height: 1.4;
-  }
-}
-
-.ts-subtitle {
-  margin: 0;
-  color: #888;
-  font-weight: 400; /* ✅ Hakuna uzito wa ziada */
-}
-
-/* Mobile subtitle */
-@media (max-width: 768px) {
-  .ts-subtitle {
-    font-size: 9px;
-    line-height: 1.2;
-  }
-}
-
-/* Desktop subtitle */
-@media (min-width: 769px) {
-  .ts-subtitle {
-    font-size: 16px;
-    line-height: 1.5;
-  }
-}
+.ts-subtitle { margin: 0; color: #888; font-weight: 400; }
+@media (max-width: 768px) { .ts-subtitle { font-size: 9px; line-height: 1.2; } }
+@media (min-width: 769px) { .ts-subtitle { font-size: 16px; line-height: 1.5; } }
 
 /* ============================================ */
-/* VIEW MORE BUTTON (Orange Text)               */
-/* ============================================ */
-
-.ts-view-more-btn {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: transparent;
-  color: #f97316;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  white-space: nowrap;
-  flex-shrink: 0;
-  padding: 0;
-  transition: all 0.2s ease;
-}
-
-.ts-view-more-btn:hover {
-  opacity: 0.8;
-}
-
-/* Mobile button */
-@media (max-width: 768px) {
-  .ts-view-more-btn {
-    font-size: 9px;
-    gap: 4px;
-  }
-}
-
-/* Desktop button */
-@media (min-width: 769px) {
-  .ts-view-more-btn {
-    font-size: 14px;
-    gap: 4px;
-  }
-}
-
-/* ============================================ */
-/* MOBILE SCROLL WRAPPER                         */
-/* ============================================ */
-
-.ts-mobile-scroll {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  gap: 12px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  padding: 10px 0 20px 0;
-  width: 100%;
-}
-
-.ts-mobile-card-wrapper {
-  flex: 0 0 auto;
-  width: 140px;
-  min-width: 140px;
-}
-
-/* ============================================ */
-/* DESKTOP SCROLL WRAPPER & ARROWS              */
+/* SCROLL WRAPPER - FLUID WIDTHS                 */
 /* ============================================ */
 
 .ts-desktop-wrapper {
@@ -210,23 +61,52 @@
   align-items: center;
 }
 
-.ts-desktop-scroll {
+.ts-scroll-wrapper {
   display: flex;
-  gap: 20px;
-  overflow-x: auto;
+  flex-wrap: nowrap !important; /* Hii inalazimisha kadi zisishuke chini (Scroll) */
+  overflow-x: auto !important;
   overflow-y: hidden;
   scroll-behavior: smooth;
-  padding: 10px 5px 20px 5px;
+  padding: 10px 0 20px 0;
   width: 100%;
 }
 
-.ts-desktop-card-wrapper {
+.ts-card-wrapper {
   flex: 0 0 auto;
-  width: 200px;
-  min-width: 200px;
 }
 
-/* ARROWS */
+/* 🔥 FLUID MEDIA QUERIES ZA SCROLL */
+
+/* Desktop Kubwa (≥1025px): Kadi pana zaidi */
+@media (min-width: 1025px) {
+  .ts-scroll-wrapper { gap: 24px; } /* Pengo pana zaidi kwa Store */
+  .ts-card-wrapper { width: 220px; max-width: 220px; }
+}
+
+/* Tablet (769px - 1024px): Kadi za ukubwa wa kati */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .ts-scroll-wrapper { gap: 16px; }
+  .ts-card-wrapper { width: 160px; max-width: 160px; }
+}
+
+/* Mobile (≤768px): Kadi 2 kwa mstari (Ukubwa 180px) */
+@media (max-width: 768px) {
+  .ts-scroll-wrapper { 
+    gap: 12px !important;         /* 🔥 Nafasi kati ya kadi (kutoka 8px hadi 12px) */
+  }
+  .ts-card-wrapper { 
+    width: 180px !important;      /* 🔥 Upana wa kadi 2 kwa mstari (kutoka 120px hadi 180px) */
+    max-width: 180px !important; 
+  }
+  
+  /* Ficha mishale kwenye simu */
+  .ts-arrow-btn { display: none !important; }
+}
+
+/* ============================================ */
+/* ARROWS (Desktop na Tablet tu)                */
+/* ============================================ */
+
 .ts-arrow-btn {
   position: absolute;
   z-index: 10;
@@ -243,54 +123,13 @@
   transition: all 0.2s ease;
   outline: none;
 }
-
-.ts-arrow-btn:hover {
-  background-color: #f7f9fc;
-  transform: scale(1.05);
-}
-
+.ts-arrow-btn:hover { background-color: #f7f9fc; transform: scale(1.05); }
 .ts-arrow-left { left: -15px; }
 .ts-arrow-right { right: -15px; }
-
-/* ============================================ */
-/* ✅ RESPONSIVE ARROWS - FIX GAP AND POSITION  */
-/* ============================================ */
-
-@media (max-width: 768px) {
-  /* 1. Punguza ukubwa wa mishale */
-  .ts-arrow-btn {
-    width: 30px;
-    height: 30px;
-    /* 2. Fanya mishale ionekane kama vitufe vya overlay nyeupe */
-    background: rgba(255, 255, 255, 0.95) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-    border: 1px solid #eee !important;
-  }
-
-  /* 3. Sogeza mishale kwenye kingo za skrini */
-  .ts-arrow-left {
-    left: 4px !important;
-  }
-  .ts-arrow-right {
-    right: 4px !important;
-  }
-
-  /* 4. Punguza padding ya pande (Ondoa 45px, weka 12px) */
-  .ts-desktop-scroll {
-    padding: 10px 12px 20px 12px !important;
-  }
-}
 
 /* ============================================ */
 /* UTILITY: HIDE SCROLLBAR                      */
 /* ============================================ */
 
-.hide-scrollbar-mobile::-webkit-scrollbar,
-.hide-scrollbar-desktop::-webkit-scrollbar {
-  display: none;
-}
-.hide-scrollbar-mobile,
-.hide-scrollbar-desktop {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-//import { supabase } from "../supabaseClient";
 import { useNavigate } from "react-router-dom";
+import api from "../axiosConfig"; // 🔥 Badilisha: Import api kutoka axiosConfig!
 import "../AdvertisePage.css"; 
 import { 
   Send, CheckCircle, UploadCloud, Loader2, AlertCircle, 
@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import toast from 'react-hot-toast';
 
-export default function AdvertisePage({ session }) {
+export default function AdvertisePage() { // 🔥 Imeondolewa { session }
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [loadingStores, setLoadingStores] = useState(true);
@@ -18,8 +18,8 @@ export default function AdvertisePage({ session }) {
   const [stores, setStores] = useState([]);
   const [selectedStore, setSelectedStore] = useState(null);
   const [cachedAds, setCachedAds] = useState([]);
+  const [currentUserId, setCurrentUserId] = useState(null);
 
-  
   const [formData, setFormData] = useState({
     store_id: "",
     business_name: "",
@@ -27,95 +27,88 @@ export default function AdvertisePage({ session }) {
     description: "",
   });
 
-  // 1. FETCH STORES ZA USER
+  // 🔥 1. PATA USER ID NA STORES ZAKE
   useEffect(() => {
-    const fetchUserStores = async () => {
-      if (!session?.user?.id) {
-        setLoadingStores(false);
-        return;
-      }
-
+    const fetchUserAndStores = async () => {
       try {
         setLoadingStores(true);
-        const { data, error } = await supabase
-          .from("stores_engine")
-          .select("id, store_name, store_logo, is_active")
-          .eq("owner_id", session.user.id)
-          .eq("is_active", true); // Active stores tu
 
-        if (error) throw error;
+        // 1. Pata profile ID
+        console.log("🔍 [Fetch] Fetching user profile...");
+        const profileRes = await api.get('/profile/');
+        const profile = profileRes.data;
+        setCurrentUserId(profile.id);
+        console.log("✅ [Fetch] Profile ID:", profile.id);
 
-        if (!data || data.length === 0) {
+        // 2. Pata stores za mmiliki huyu
+        console.log("🔍 [Fetch] Fetching stores for owner:", profile.id);
+        const storesRes = await api.get('/stores/', {
+          params: { owner: profile.id, is_active: true }
+        });
+        const storesData = storesRes.data.results || storesRes.data || [];
+        console.log("✅ [Fetch] Stores found:", storesData.length);
+
+        if (storesData.length === 0) {
           toast.error("Huna duka lolote. Tafadhali unda duka kwanza kabla ya kutangaza!");
           setTimeout(() => navigate("/create-store"), 3000);
         } else {
-          setStores(data);
-          
+          setStores(storesData);
           // Auto-select first store if only one
-          if (data.length === 1) {
-            setSelectedStore(data[0]);
+          if (storesData.length === 1) {
+            setSelectedStore(storesData[0]);
             setFormData(prev => ({
               ...prev,
-              store_id: data[0].id,
-              business_name: data[0].store_name
+              store_id: storesData[0].id,
+              business_name: storesData[0].store_name
             }));
           }
         }
       } catch (error) {
-        console.error("Error fetching stores:", error);
+        console.error("❌ [Fetch] Error fetching user/stores:", error);
         toast.error("Hitilafu kupata store zako");
       } finally {
         setLoadingStores(false);
       }
     };
 
-    fetchUserStores();
-  }, [session, navigate]);
+    fetchUserAndStores();
+  }, [navigate]);
 
-
+  // 🔥 2. FETCH ADS (Active)
   useEffect(() => {
-  const fetchAds = async () => {
-    try {
-      // ✅ Tumia table 'advertisements'
-      const { data, error } = await supabase
-        .from('advertisements')
-        .select('*')
-        .eq('status', 'active');
-
-      if (error) {
-        console.error("Ad fetch error:", error);
-        return;
+    const fetchAds = async () => {
+      try {
+        console.log("🔍 [Ads] Fetching active advertisements...");
+        const res = await api.get('/advertisements/', {
+          params: { status: 'active' }
+        });
+        const data = res.data.results || res.data || [];
+        console.log("✅ [Ads] Active ads found:", data.length);
+        
+        if (data.length > 0) {
+          setCachedAds(data);
+          localStorage.setItem('skyfall_ads', JSON.stringify(data));
+          localStorage.setItem('skyfall_ads_time', String(Date.now()));
+        } else {
+          setCachedAds([]);
+          localStorage.removeItem('skyfall_ads');
+          localStorage.removeItem('skyfall_ads_time');
+        }
+      } catch (err) {
+        console.error("❌ [Ads] Failed to fetch ads:", err);
       }
+    };
 
-      if (data && data.length > 0) {
-        setCachedAds(data);
-        localStorage.setItem('skyfall_ads', JSON.stringify(data));
-        localStorage.setItem('skyfall_ads_time', String(Date.now()));
-      } else {
-        setCachedAds([]);
-        localStorage.removeItem('skyfall_ads');
-        localStorage.removeItem('skyfall_ads_time');
-      }
-    } catch (err) {
-      console.error("Failed to fetch ads:", err);
-    }
+    fetchAds();
+  }, []);
+
+  // ✅ Helper kuamua kama ni video (kutoka URL)
+  const isVideoAd = (ad) => {
+    if (!ad?.media_url) return false;
+    return ad.media_url.match(/\.(mp4|webm|mov)$/i) !== null;
   };
 
-  fetchAds();
-}, []);
-
-// ✅ Tumia extension ya URL kuamua kama ni video
-const isVideoAd = (ad) => {
-  if (!ad?.media_url) return false;
-  return ad.media_url.match(/\.(mp4|webm|mov)$/i) !== null;
-};
-
-// ✅ Ikiwa cachedAds ipo, chagua ad ya sasa
-const activeAd = cachedAds.length > 0 
-  ? cachedAds[currentAdIndex % cachedAds.length] 
-  : null;
-
-  // 2. HANDLE STORE SELECTION
+  // ✅ 3. HANDLE STORE SELECTION
   const handleStoreChange = (storeId) => {
     const store = stores.find(s => s.id === storeId);
     if (store) {
@@ -128,7 +121,7 @@ const activeAd = cachedAds.length > 0
     }
   };
 
-  // 3. Handle File Selection
+  // 4. Handle File Selection
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
@@ -154,12 +147,12 @@ const activeAd = cachedAds.length > 0
     }
   };
 
-  // 4. SUBMIT ADVERTISEMENT
+  // 🔥 5. SUBMIT ADVERTISEMENT (Django API) - Iliyoboreshwa kwa debugging
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Validations
-    if (!session?.user?.id) {
+    if (!currentUserId) {
       toast.error("Tafadhali ingia kwenye akaunti kwanza!");
       return;
     }
@@ -183,72 +176,97 @@ const activeAd = cachedAds.length > 0
     setStatus({ type: "info", msg: "Inapakia tangazo lako..." });
 
     try {
-      // 1. Upload Media to Storage
-      const fileExt = file.name.split('.').pop();
-      const mediaType = file.type.startsWith('video') ? 'video' : 'image';
-      const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-      const filePath = `ads/${formData.store_id}/${fileName}`;
+      console.log("📤 [Submit] Starting advertisement submission...");
+      console.log("📤 [Submit] Form data:", formData);
+      console.log("📤 [Submit] File info:", file ? { name: file.name, type: file.type, size: file.size } : null);
 
-      const { error: uploadError } = await supabase.storage
-        .from('ad-media')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
+      const formDataObj = new FormData();
+      formDataObj.append('store_id', formData.store_id);
+      formDataObj.append('business_name', formData.business_name);
+      formDataObj.append('ad_type', formData.ad_type);
+      formDataObj.append('description', formData.description);
+      formDataObj.append('media_type', file.type.startsWith('video') ? 'video' : 'image');
+      formDataObj.append('media_file', file); // 🔥 Hapa tunatuma file halisi; backend inapaswa kuhifadhi kwa Cloudinary
 
-      if (uploadError) throw uploadError;
-
-      // 2. Get Public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('ad-media')
-        .getPublicUrl(filePath);
-
-      // 3. Save to database (include store_id)
-      const { error: dbError } = await supabase
-        .from('advertisements')
-        .insert([
-          {
-            user_id: session.user.id,
-            store_id: formData.store_id, // 🔥 MUHIMU: Hii inaunganisha tangazo na duka
-            business_name: formData.business_name,
-            ad_type: formData.ad_type,
-            description: formData.description,
-            media_url: publicUrl,
-            media_type: mediaType,   // ← ONGEZA HAPA
-            status: 'pending',
-            created_at: new Date().toISOString()
-          }
-        ]);
-
-      if (dbError) throw dbError;
-
-      // Success
-      toast.success("Tangazo lako limepokelewa! Litasubiri kuhakikiwa na Admin.");
-      setStatus({ type: "success", msg: "Hongera! Tangazo lako limepokelewa na linasubiri kuhakikiwa na Admin." });
-      
-      // Reset form (keep store selection)
-      setFormData({
-        store_id: selectedStore?.id || "",
-        business_name: selectedStore?.store_name || "",
-        ad_type: "banner",
-        description: "",
-      });
-      setFile(null);
-      if (preview) {
-        URL.revokeObjectURL(preview);
-        setPreview(null);
+      // Debug: Angalia payload ya FormData
+      for (let [key, value] of formDataObj.entries()) {
+        console.log(`📦 [FormData] ${key}:`, value instanceof File ? `File: ${value.name}` : value);
       }
 
+      // Tuma kwa endpoint ya Django
+      console.log("📤 [Submit] Sending POST to /advertisements/...");
+      const response = await api.post('/advertisements/', formDataObj, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      console.log("✅ [Submit] Response status:", response.status);
+      console.log("✅ [Submit] Response data:", response.data);
+
+      if (response.status === 201) {
+        toast.success("Tangazo lako limepokelewa! Litasubiri kuhakikiwa na Admin.");
+        setStatus({ type: "success", msg: "Hongera! Tangazo lako limepokelewa na linasubiri kuhakikiwa na Admin." });
+        
+        // Reset form (keep store selection)
+        setFormData({
+          store_id: selectedStore?.id || "",
+          business_name: selectedStore?.store_name || "",
+          ad_type: "banner",
+          description: "",
+        });
+        setFile(null);
+        if (preview) {
+          URL.revokeObjectURL(preview);
+          setPreview(null);
+        }
+      }
     } catch (error) {
-      console.error("Submission error:", error);
-      toast.error("Hitilafu: " + error.message);
-      setStatus({ type: "error", msg: "Hitilafu: " + error.message });
+      console.error("❌ [Submit] Submission error details:", error);
+      
+      // 🔥 Debug: Angalia response ya error kwa undani
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        console.error("❌ [Error] Status:", error.response.status);
+        console.error("❌ [Error] Headers:", error.response.headers);
+        console.error("❌ [Error] Data (Backend error details):", error.response.data);
+        
+        // 🔥 Tuma ujumbe kamili wa error (unaweza kuwa Object au String)
+        const errorData = error.response.data;
+        let errorMessage = "";
+        
+        if (typeof errorData === 'string') {
+          errorMessage = errorData;
+        } else if (typeof errorData === 'object') {
+          // Kama ni object ya Django validation errors
+          const firstKey = Object.keys(errorData)[0];
+          if (firstKey && Array.isArray(errorData[firstKey])) {
+            errorMessage = `${firstKey}: ${errorData[firstKey].join(', ')}`;
+          } else if (errorData.detail) {
+            errorMessage = errorData.detail;
+          } else {
+            // Jaribu kuwa JSON string
+            errorMessage = JSON.stringify(errorData, null, 2);
+          }
+        }
+        
+        toast.error("Hitilafu ya Backend: " + errorMessage);
+        setStatus({ type: "error", msg: "Backend Error: " + errorMessage });
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error("❌ [Error] No response received. Request:", error.request);
+        toast.error("Hakuna majibu kutoka Server. Angalia mtandao.");
+        setStatus({ type: "error", msg: "No response from server." });
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error("❌ [Error] Request setup error:", error.message);
+        toast.error("Hitilafu ya mfumo: " + error.message);
+        setStatus({ type: "error", msg: "Error: " + error.message });
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // 5. Cleanup preview on unmount
+  // 6. Cleanup preview on unmount
   useEffect(() => {
     return () => {
       if (preview) URL.revokeObjectURL(preview);

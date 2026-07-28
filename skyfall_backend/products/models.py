@@ -323,7 +323,7 @@ class Advertisement(models.Model):
     business_name = models.CharField(max_length=255)
     ad_type = models.CharField(max_length=50)
     description = models.TextField(blank=True, null=True)
-    media_url = models.URLField(max_length=500)
+    media_url = models.URLField(max_length=500, null=True, blank=True)
     media_type = models.CharField(max_length=50)
     status = models.CharField(max_length=50, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)

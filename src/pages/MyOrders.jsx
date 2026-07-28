@@ -1,19 +1,19 @@
+// src/pages/MyOrders.jsx
 import React, { useEffect, useState } from 'react';
-//import { supabase } from '../supabaseClient';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, MessageSquare, ClipboardList, 
   Settings, BarChart3, Bell, Search, CheckCircle2, Menu 
 } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
+import api from '../axiosConfig'; // 🔥 Badilisha: tumia api!
 import UserTools from '../components/UserTools';
 import '../MyOrders.css';
-import { useNavigate } from 'react-router-dom';
 import messageImage from "../images/orderAhead.svg"; 
 
-const MyOrders = ({ session }) => {
+const MyOrders = () => { // 🔥 Imeondolewa { session }
   const [orders, setOrders] = useState([]);
-  const [expandedOrders, setExpandedOrders] = useState({}); // ✅ Kufungua/kufunga bidhaa za order
+  const [expandedOrders, setExpandedOrders] = useState({});
   const [loading, setLoading] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
   const location = useLocation();
@@ -21,111 +21,148 @@ const MyOrders = ({ session }) => {
   const [ratings, setRatings] = useState({}); 
   const navigate = useNavigate();  
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [currentUserId, setCurrentUserId] = useState(null);
 
-
+  // Detect mobile resize
   useEffect(() => {
-  const handleResize = () => {
-    setIsMobile(window.innerWidth <= 768);
-  };
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-  window.addEventListener('resize', handleResize);
-  return () => window.removeEventListener('resize', handleResize);
-}, []);
+  // 🔥 Pata ID ya mtumiaji kwanza
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+          navigate('/dashboard/login');
+          return;
+        }
+        const res = await api.get('/profile/');
+        setCurrentUserId(res.data.id);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        toast.error("Imeshindwa kupata data za mtumiaji.");
+      }
+    };
+    fetchProfile();
+  }, [navigate]);
 
+  // ==========================================
+  // 🔥 FETCH ORDERS KUTOKA DJANGO
+  // ==========================================
   const fetchOrders = async () => {
-    if (!session) return;
+    if (!currentUserId) return;
     setLoading(true);
 
     try {
-      const { data, error } = await supabase
-        .from('orders')
-        .select(`
-          *,
-          order_items (*) 
-        `)
-        .eq('customer_id', session.user.id)
-        .order('created_at', { ascending: false });
+      // 1. Pata orders za mtumiaji huyu
+      const ordersRes = await api.get('/orders/', {
+        params: { customer: currentUserId, ordering: '-created_at' }
+      });
+      const ordersData = ordersRes.data.results || ordersRes.data || [];
 
-      if (error) throw error;
+      // 2. Kwa kila order, pata order_items
+      const ordersWithItems = [];
+      for (const order of ordersData) {
+        const itemsRes = await api.get('/order-items/', {
+          params: { order: order.id }
+        });
+        ordersWithItems.push({
+          ...order,
+          order_items: itemsRes.data.results || itemsRes.data || []
+        });
+      }
 
-      setOrders(data);
-      
+      setOrders(ordersWithItems);
     } catch (error) {
-      console.error("Error fetching orders:", error.message);
+      console.error("Error fetching orders:", error.response?.data || error.message);
       toast.error("Imeshindwa kupata oda zako.");
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    if (currentUserId) fetchOrders();
+  }, [currentUserId]);
+
+  // ==========================================
+  // 🔥 HANDLE REPORT ISSUE (Django API)
+  // ==========================================
   const handleReportIssue = async (orderId, storeId, orderItems) => {
-  if (!orderId || !storeId) {
-    toast.error("Taarifa za duka hazijapatikana.");
-    return;
-  }
+    if (!orderId || !storeId) {
+      toast.error("Taarifa za duka hazijapatikana.");
+      return;
+    }
 
-  // Chukua bidhaa ya kwanza kwa ajili ya maelezo
-  const firstItem = orderItems?.[0];
-  const productName = firstItem?.product_name || "Bidhaa isiyojulikana";
-  const productId = firstItem?.product_id || "";
+    const firstItem = orderItems?.[0];
+    const productName = firstItem?.product_name || "Bidhaa isiyojulikana";
+    const productId = firstItem?.product_id || "";
+    const messageText = `Habari, nina tatizo na oda #${orderId.slice(0, 8)}: Bidhaa "${productName}" haijafika kama ilivyotarajiwa. Tafadhali nisaidie.`;
 
-  const messageText = `Habari, nina tatizo na oda #${orderId.slice(0, 8)}: Bidhaa "${productName}" haijafika kama ilivyotarajiwa. Tafadhali nisaidie.`;
+    try {
+      // 1. Tafuta maelezo ya duka (owner_id na whatsapp_number)
+      const storeRes = await api.get(`/stores/${storeId}/`);
+      const store = storeRes.data;
 
-  try {
-    // 1. Tafuta maelezo ya duka (whatsapp na owner_id)
-    const { data: store, error: storeErr } = await supabase
-      .from('stores_engine')
-      .select('owner_id, whatsapp_number')
-      .eq('id', storeId)
-      .single();
+      // 2. Fungua WhatsApp
+      const whatsapp = store.whatsapp_number?.replace(/\s+/g, '');
+      if (whatsapp) {
+        window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(messageText)}`, '_blank');
+      }
 
-    if (storeErr || !store) throw new Error("Duka halikupatikana");
-
-    // 2. Fungua WhatsApp (kwa muuzaji)
-    const whatsapp = store.whatsapp_number.replace(/\s+/g, '');
-    window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(messageText)}`, '_blank');
-
-    // 3. Weka dispute kwenye database (table `disputes`)
-    const { error: disputeError } = await supabase
-      .from('disputes')
-      .insert([{
+      // 3. Weka dispute kwenye database (POST /api/disputes/)
+      await api.post('/disputes/', {
         order_id: orderId,
         store_id: storeId,
-        customer_id: session.user.id,
+        customer: currentUserId,
         product_name: productName,
         product_id: productId,
-        reason: 'Bidhaa haijafika',  // Unaweza kubadilisha sababu baadaye
+        reason: 'Bidhaa haijafika',
         description: messageText,
         status: 'open'
-      }]);
+      });
 
-    if (disputeError) throw disputeError;
+      // 4. Tuma ujumbe kwenye mfumo wa messages
+      await api.post('/messages/', {
+        sender: currentUserId,
+        receiver: store.owner_id,
+        order: orderId,
+        content: messageText
+      });
 
-    // 4. Tuma ujumbe kwenye mfumo wa messages (kama ulivyokuwa)
-    const { error: msgError } = await supabase
-      .from('messages')
-      .insert([{
-        sender_id: session.user.id,
-        receiver_id: store.owner_id,
-        order_id: orderId,
-        content: messageText,
-      }]);
+      toast.success("Ripoti imetumwa kwa muuzaji na kurekodiwa kwenye mfumo!");
+      navigate('/dashboard/messages');
 
-    if (msgError) console.error("Message insert error:", msgError);
+    } catch (err) {
+      toast.error("Kuna tatizo: " + (err.response?.data?.detail || err.message));
+      console.error(err);
+    }
+  };
 
-    toast.success("Ripoti imetumwa kwa muuzaji na kurekodiwa kwenye mfumo!");
-    navigate('/dashboard/messages'); // au uwaachie wabaki kwenye ukurasa wa orders
+  // ==========================================
+  // 🔥 CONFIRM DELIVERY
+  // ==========================================
+  const handleConfirmDelivery = async (orderId) => {
+    const confirmBox = window.confirm("Je, unathibitisha kuwa umepokea bidhaa hii?");
+    if (!confirmBox) return;
 
-  } catch (err) {
-    toast.error("Kuna tatizo: " + err.message);
-    console.error(err);
-  }
-};
+    try {
+      await api.patch(`/orders/${orderId}/`, { status: 'delivered' });
+      toast.success("Oda imethibitishwa!");
+      fetchOrders();
+    } catch (err) {
+      toast.error("Imeshindwa kuthibitisha: " + (err.response?.data?.detail || err.message));
+    }
+  };
 
-  useEffect(() => {
-    fetchOrders();
-  }, [session]);
-
+  // ==========================================
+  // 🔥 SUBMIT FEEDBACK
+  // ==========================================
   const handleSubmitFeedback = async (orderId) => {
     const comment = feedback[orderId];
     const rating = ratings[orderId] || 5;
@@ -136,38 +173,15 @@ const MyOrders = ({ session }) => {
     }
 
     try {
-      const { error } = await supabase
-        .from('orders')
-        .update({ 
-          customer_feedback: comment, 
-          customer_rating: rating,
-          feedback_date: new Date().toISOString()
-        })
-        .eq('id', orderId);
-
-      if (error) throw error;
+      await api.patch(`/orders/${orderId}/`, { 
+        customer_feedback: comment, 
+        customer_rating: rating,
+        feedback_date: new Date().toISOString()
+      });
       toast.success("Asante kwa maoni yako!");
       fetchOrders(); 
     } catch (err) {
       toast.error("Imeshindwa kutuma maoni.");
-    }
-  };
-
-  const handleConfirmDelivery = async (orderId) => {
-    const confirmBox = window.confirm("Je, unathibitisha kuwa umepokea bidhaa hii?");
-    if (!confirmBox) return;
-
-    try {
-      const { error } = await supabase
-        .from('orders')
-        .update({ status: 'delivered' })
-        .eq('id', orderId);
-
-      if (error) throw error;
-      toast.success("Oda imethibitishwa!");
-      fetchOrders();
-    } catch (err) {
-      toast.error("Imeshindwa kuthibitisha.");
     }
   };
 
@@ -193,101 +207,95 @@ const MyOrders = ({ session }) => {
     <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <Toaster position="top-center" />
       
-     <header className="dashboard-header" style={{ 
-  display: 'flex', 
-  justifyContent: 'space-between', 
-  alignItems: 'center', // Hakikisha vitu viko katikati mstari mmoja
-  padding: isMobile ? '10px 15px' : '10px 24px', 
-  borderBottom: '1px solid #eee', 
-  backgroundColor: '#fff' 
-}}>
-  <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-    {/* 1. Menu icon ionekane Desktop tu */}
-    {!isMobile && (
-      <Menu size={22} style={{ cursor: 'pointer', color: '#666' }} onClick={() => setIsExpanded(!isExpanded)} />
-    )}
-    
-    <Link to="/dashboard" style={{ 
-      fontSize: isMobile ? '18px' : '20px', 
-      fontWeight: '800', 
-      color: '#ff6a00', 
-      textDecoration: 'none' 
-    }}>
-      Skyfall.com
-    </Link>
-
-    {/* 2. Search bar ionekane Desktop tu */}
-    {!isMobile && (
-      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', backgroundColor: '#f4f4f4', padding: '6px 12px', borderRadius: '8px' }}>
-        <Search size={16} color="#999" />
-        <input type="text" placeholder="Search orders..." style={{ border: 'none', background: 'none', outline: 'none', marginLeft: '8px', fontSize: '14px' }} />
-      </div>
-    )}
-  </div>
-
-  <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-    {/* 3. Icon za kulia (Bell & UserTools) zionekane Desktop TU */}
-    {!isMobile && (
-      <>
-        <Bell size={20} style={{ cursor: 'pointer', color: '#666' }} />
-        <UserTools session={session} />
-      </>
-    )}
-  </div>
-</header>
+      <header className="dashboard-header" style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        padding: isMobile ? '10px 15px' : '10px 24px', 
+        borderBottom: '1px solid #eee', 
+        backgroundColor: '#fff' 
+      }}>
+        <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          {!isMobile && (
+            <Menu size={22} style={{ cursor: 'pointer', color: '#666' }} onClick={() => setIsExpanded(!isExpanded)} />
+          )}
+          <Link to="/dashboard" style={{ 
+            fontSize: isMobile ? '18px' : '20px', 
+            fontWeight: '800', 
+            color: '#ff6a00', 
+            textDecoration: 'none' 
+          }}>
+            Skyfall.com
+          </Link>
+          {!isMobile && (
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', backgroundColor: '#f4f4f4', padding: '6px 12px', borderRadius: '8px' }}>
+              <Search size={16} color="#999" />
+              <input type="text" placeholder="Search orders..." style={{ border: 'none', background: 'none', outline: 'none', marginLeft: '8px', fontSize: '14px' }} />
+            </div>
+          )}
+        </div>
+        <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          {!isMobile && (
+            <>
+              <Bell size={20} style={{ cursor: 'pointer', color: '#666' }} />
+              <UserTools /> {/* 🔥 Imeondolewa { session } */}
+            </>
+          )}
+        </div>
+      </header>
 
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         
-        {/* Ionyeshe Sidebar TU kama SIYO mobile */}
-{!isMobile && (
-  <aside 
-    onMouseEnter={() => setIsExpanded(true)}
-    onMouseLeave={() => setIsExpanded(false)}
-    style={{ 
-      width: isExpanded ? '240px' : '70px', 
-      borderRight: '1px solid #eee', 
-      display: 'flex', 
-      flexDirection: 'column', 
-      paddingTop: '20px', 
-      backgroundColor: '#fff',
-      transition: 'width 0.3s ease',
-      overflow: 'hidden',
-      whiteSpace: 'nowrap',
-      zIndex: 10
-    }}
-  >
-    {sidebarItems.map((item) => (
-      <Link 
-        key={item.path} 
-        to={item.path} 
-        style={{ 
-          display: 'flex',
-          alignItems: 'center',
-          padding: '12px 24px',
-          textDecoration: 'none',
-          color: location.pathname === item.path ? '#ff6a00' : '#666',
-          backgroundColor: location.pathname === item.path ? '#fff5ed' : 'transparent',
-          margin: '4px 8px',
-          borderRadius: '8px',
-          transition: '0.2s'
-        }}
-      >
-        <div style={{ minWidth: '22px', display: 'flex', justifyContent: 'center' }}>
-          {item.icon}
-        </div>
-        <span style={{ 
-          marginLeft: '15px', 
-          fontSize: '14px', 
-          fontWeight: '600',
-          opacity: isExpanded ? 1 : 0,
-          transition: 'opacity 0.2s'
-        }}>
-          {item.label}
-        </span>
-      </Link>
-    ))}
-  </aside>
-)}
+        {/* Sidebar */}
+        {!isMobile && (
+          <aside 
+            onMouseEnter={() => setIsExpanded(true)}
+            onMouseLeave={() => setIsExpanded(false)}
+            style={{ 
+              width: isExpanded ? '240px' : '70px', 
+              borderRight: '1px solid #eee', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              paddingTop: '20px', 
+              backgroundColor: '#fff',
+              transition: 'width 0.3s ease',
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              zIndex: 10
+            }}
+          >
+            {sidebarItems.map((item) => (
+              <Link 
+                key={item.path} 
+                to={item.path} 
+                style={{ 
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '12px 24px',
+                  textDecoration: 'none',
+                  color: location.pathname === item.path ? '#ff6a00' : '#666',
+                  backgroundColor: location.pathname === item.path ? '#fff5ed' : 'transparent',
+                  margin: '4px 8px',
+                  borderRadius: '8px',
+                  transition: '0.2s'
+                }}
+              >
+                <div style={{ minWidth: '22px', display: 'flex', justifyContent: 'center' }}>
+                  {item.icon}
+                </div>
+                <span style={{ 
+                  marginLeft: '15px', 
+                  fontSize: '14px', 
+                  fontWeight: '600',
+                  opacity: isExpanded ? 1 : 0,
+                  transition: 'opacity 0.2s'
+                }}>
+                  {item.label}
+                </span>
+              </Link>
+            ))}
+          </aside>
+        )}
 
         <main style={{ flex: 1, padding: isMobile ? '15px' : '24px', backgroundColor: '#f7f8fa', overflowY: 'auto' }}>
           <div className="orders-content-wrapper" style={{ maxWidth: '1100px', margin: '0 auto' }}>
@@ -364,7 +372,6 @@ const MyOrders = ({ session }) => {
                       {/* ORDER ITEMS - LIST YA BIDHAA ZOTE KATIKA ODA HII */}
                       <div style={{ padding: '20px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                          {/* ✅ ONYESHA BIDHAA ZOTE, SI MOJA TU */}
                           {orderItems.map((item, idx) => (
                             <div 
                               key={item.id || idx} 
@@ -385,7 +392,7 @@ const MyOrders = ({ session }) => {
                                 <p style={{ margin: '5px 0', fontSize: '13px', color: '#666' }}>
                                   Rangi: <strong>{item.selected_color || 'N/A'}</strong> | 
                                   Size: <strong>{item.selected_size || 'N/A'}</strong> | 
-                                  Quantity: <strong>{item.quantity || item.qty_ordered || 1}</strong>
+                                  Quantity: <strong>{item.quantity || 1}</strong>
                                 </p>
                                 <p style={{ margin: 0, fontSize: '14px', fontWeight: '700', color: '#ff6a00' }}>
                                   TZS {(item.unit_price || item.price)?.toLocaleString()}
@@ -395,7 +402,7 @@ const MyOrders = ({ session }) => {
                           ))}
                         </div>
 
-                        {/* BUTTONS ZA ORDER (Zinaonekana mara moja tu kwa order nzima) */}
+                        {/* BUTTONS ZA ORDER */}
                         <div style={{ marginTop: '20px', paddingTop: '15px', borderTop: '1px solid #f5f5f5', display: 'flex', gap: '10px' }}>
                           {order.status !== 'delivered' && (
                             <button 
@@ -406,11 +413,11 @@ const MyOrders = ({ session }) => {
                             </button>
                           )}
                           <button 
-  onClick={() => handleReportIssue(order.id, order.store_id, orderItems)}
-  style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #ddd', backgroundColor: '#fff', color: '#666', fontWeight: '600', cursor: 'pointer', fontSize: '13px' }}
->
-  ⚠️ Ripoti Tatizo
-</button>
+                            onClick={() => handleReportIssue(order.id, order.store_id, orderItems)}
+                            style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #ddd', backgroundColor: '#fff', color: '#666', fontWeight: '600', cursor: 'pointer', fontSize: '13px' }}
+                          >
+                            ⚠️ Ripoti Tatizo
+                          </button>
                         </div>
                       </div>
                     </div>

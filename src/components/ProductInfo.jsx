@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import axios from 'axios'; // ✅ Badilisha kutoka supabase
-const API_BASE_URL = 'http://127.0.0.1:8000/api'; // ✅ URL ya Backend yako
+import axios from 'axios';
+const API_BASE_URL = 'http://127.0.0.1:8000/api';
 
 import ProductSelectionDrawer from '../pages/ProductSelectionDrawer';
 import { MessageSquare, Star, ChevronRight, ShoppingCart, Zap } from 'lucide-react';

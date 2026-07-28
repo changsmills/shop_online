@@ -1,209 +1,81 @@
 /* ============================================ */
-/* RECENTLY VIEWED - CONTAINER & WRAPPER        */
+/* CONTAINER & WRAPPER                           */
 /* ============================================ */
 
 .recently-viewed-main-wrapper {
   position: relative;
   width: 100%;
-  background-color: #eceef1;
+  background-color: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  border-left: none;
+  border-right: none;
   box-sizing: border-box;
 }
 
-/* Mobile container */
 @media (max-width: 768px) {
-  .recently-viewed-main-wrapper {
-    padding: 4px 0;
-    border-radius: 8px;
-    margin: 2px 0;
-  }
+  .recently-viewed-main-wrapper { padding: 12px 8px; border-radius: 8px; margin: 2px 0; }
 }
-
-/* Desktop container */
 @media (min-width: 769px) {
-  .recently-viewed-main-wrapper {
-    padding: 0;
-    border-radius: 16px;
-    margin: 10px 0;
-  }
+  .recently-viewed-main-wrapper { padding: 16px 0; border-radius: 16px; margin: 10px 0; }
 }
 
 /* ============================================ */
-/* HEADER SECTION                                */
+/* HEADER SECTION (Na Mshale Upande wa Kulia!)  */
 /* ============================================ */
 
 .rv-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* 🔥 Inatuma Title kushoto na Mshale kulia */
   align-items: center;
   flex-wrap: wrap;
   width: 100%;
 }
+@media (max-width: 768px) { .rv-header { padding: 0 8px; margin-bottom: 12px; gap: 6px; } }
+@media (min-width: 769px) { .rv-header { padding: 0; margin-bottom: 20px; gap: 10px; } }
 
-/* Mobile header */
-@media (max-width: 768px) {
-  .rv-header {
-    padding: 0 8px;
-    margin-bottom: 12px;
-    gap: 2px;
-  }
-}
+.rv-header-left { display: flex; flex-direction: column; }
+.rv-title-group { display: flex; align-items: center; gap: 8px; }
+@media (max-width: 768px) { .rv-title-group { gap: 4px; margin-bottom: 2px; } }
+@media (min-width: 769px) { .rv-title-group { gap: 8px; margin-bottom: 8px; } }
 
-/* Desktop header */
-@media (min-width: 769px) {
-  .rv-header {
-    padding: 0;
-    margin-bottom: 20px;
-    gap: 3px;
-  }
-}
+.rv-history-icon { color: #10b981; }
+@media (max-width: 768px) { .rv-history-icon { width: 12px; height: 12px; } }
+@media (min-width: 769px) { .rv-history-icon { width: 24px; height: 24px; } }
 
-.rv-header-left {
-  display: flex;
-  flex-direction: column;
-}
+.rv-title { font-weight: 600; margin: 0; }
+@media (max-width: 768px) { .rv-title { font-size: 13px; line-height: 1.2; } }
+@media (min-width: 769px) { .rv-title { font-size: 24px; line-height: 1.4; } }
 
-.rv-title-group {
+.rv-subtitle { margin: 0; color: #888; font-weight: 400; }
+@media (max-width: 768px) { .rv-subtitle { font-size: 9px; line-height: 1.2; } }
+@media (min-width: 769px) { .rv-subtitle { font-size: 16px; line-height: 1.5; } }
+
+/* 🔥 Standalone Arrow Styles */
+.rv-arrow-only {
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-
-/* Mobile title gap */
-@media (max-width: 768px) {
-  .rv-title-group {
-    gap: 4px;
-    margin-bottom: 2px;
-  }
-}
-
-/* Desktop title gap */
-@media (min-width: 769px) {
-  .rv-title-group {
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-}
-
-.rv-history-icon {
-  color: #10b981;
-}
-
-@media (max-width: 768px) {
-  .rv-history-icon { width: 12px; height: 12px; }
-}
-@media (min-width: 769px) {
-  .rv-history-icon { width: 24px; height: 24px; }
-}
-
-.rv-title {
-  font-weight: 600; /* ✅ Punguza uzito: bold → 600 */
-  margin: 0;
-}
-
-/* Mobile title */
-@media (max-width: 768px) {
-  .rv-title {
-    font-size: 13px;
-    line-height: 1.3;
-  }
-}
-
-/* Desktop title */
-@media (min-width: 769px) {
-  .rv-title {
-    font-size: 24px;
-    line-height: 1.4;
-  }
-}
-
-.rv-subtitle {
-  margin: 0;
-  color: #888;
-  font-weight: 400;
-}
-
-/* Mobile subtitle */
-@media (max-width: 768px) {
-  .rv-subtitle {
-    font-size: 9px;
-    line-height: 1.2;
-  }
-}
-
-/* Desktop subtitle */
-@media (min-width: 769px) {
-  .rv-subtitle {
-    font-size: 16px;
-    line-height: 1.5;
-  }
-}
-
-/* ============================================ */
-/* VIEW MORE BUTTON (Green Gradient)            */
-/* ============================================ */
-
-.rv-view-more-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-  border: none;
+  justify-content: center;
+  color: #9ca3af;
   cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-  white-space: nowrap;
+  transition: all 0.2s ease;
+  padding: 8px;
+  border-radius: 50%;
 }
-
-.rv-view-more-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+.rv-arrow-only:hover {
+  color: #10b981;
+  background-color: #f0fdf4;
+  transform: translateX(4px);
 }
-
-@media (max-width: 768px) {
-  .rv-view-more-btn {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 9px;
-    gap: 4px;
-  }
-}
-
-@media (min-width: 769px) {
-  .rv-view-more-btn {
-    padding: 8px 20px;
-    border-radius: 10px;
-    font-size: 16px;
-    gap: 8px;
-  }
+.real-arrow {
+  display: block;
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 1;
 }
 
 /* ============================================ */
-/* MOBILE SCROLL WRAPPER                         */
-/* ============================================ */
-
-.rv-mobile-scroll {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  gap: 12px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  padding: 10px 0 20px 0;
-  width: 100%;
-}
-
-.rv-mobile-card-wrapper {
-  flex: 0 0 auto;
-  width: 140px;
-  min-width: 140px;
-}
-
-/* ============================================ */
-/* DESKTOP SCROLL WRAPPER & ARROWS              */
+/* SCROLL WRAPPER - FLUID WIDTHS                 */
 /* ============================================ */
 
 .rv-desktop-wrapper {
@@ -212,23 +84,52 @@
   align-items: center;
 }
 
-.rv-desktop-scroll {
+.rv-scroll-wrapper {
   display: flex;
-  gap: 20px;
-  overflow-x: auto;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
   overflow-y: hidden;
   scroll-behavior: smooth;
-  padding: 10px 5px 20px 5px;
+  padding: 10px 0 20px 0;
   width: 100%;
 }
 
-.rv-desktop-card-wrapper {
+.rv-card-wrapper {
   flex: 0 0 auto;
-  width: 200px;
-  min-width: 200px;
 }
 
-/* ARROWS */
+/* 🔥 FLUID MEDIA QUERIES ZA SCROLL */
+
+/* Desktop (≥1025px): Kadi pana zaidi */
+@media (min-width: 1025px) {
+  .rv-scroll-wrapper { gap: 20px; }
+  .rv-card-wrapper { width: 220px; max-width: 220px; }
+}
+
+/* Tablet (769px - 1024px): Kadi za ukubwa wa kati */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .rv-scroll-wrapper { gap: 16px; }
+  .rv-card-wrapper { width: 160px; max-width: 160px; }
+}
+
+/* Mobile (≤768px): Kadi 2 kwa mstari (Ukubwa 180px) */
+@media (max-width: 768px) {
+  .rv-scroll-wrapper { 
+    gap: 12px !important;         /* 🔥 Nafasi kati ya kadi (kutoka 8px hadi 12px) */
+  }
+  .rv-card-wrapper { 
+    width: 180px !important;      /* 🔥 Upana wa kadi 2 kwa mstari (kutoka 120px hadi 180px) */
+    max-width: 180px !important; 
+  }
+  
+  /* Ficha mishale kwenye simu */
+  .rv-arrow-btn { display: none !important; }
+}
+
+/* ============================================ */
+/* ARROWS (Desktop na Tablet tu)                */
+/* ============================================ */
+
 .rv-arrow-btn {
   position: absolute;
   z-index: 10;
@@ -245,54 +146,13 @@
   transition: all 0.2s ease;
   outline: none;
 }
-
-.rv-arrow-btn:hover {
-  background-color: #f7f9fc;
-  transform: scale(1.05);
-}
-
+.rv-arrow-btn:hover { background-color: #f7f9fc; transform: scale(1.05); }
 .rv-arrow-left { left: -15px; }
 .rv-arrow-right { right: -15px; }
-
-/* ============================================ */
-/* ✅ RESPONSIVE ARROWS - FIX GAP AND POSITION  */
-/* ============================================ */
-
-@media (max-width: 768px) {
-  /* 1. Punguza ukubwa wa mishale */
-  .rv-arrow-btn {
-    width: 30px;
-    height: 30px;
-    /* 2. Fanya mishale ionekane kama vitufe vya overlay nyeupe */
-    background: rgba(255, 255, 255, 0.95) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-    border: 1px solid #eee !important;
-  }
-
-  /* 3. Sogeza mishale kwenye kingo (sio katikati) */
-  .rv-arrow-left {
-    left: 4px !important;
-  }
-  .rv-arrow-right {
-    right: 4px !important;
-  }
-
-  /* 4. Punguza padding ya pande (Ondoa 45px, weka 12px) */
-  .rv-desktop-scroll {
-    padding: 10px 12px 20px 12px !important;
-  }
-}
 
 /* ============================================ */
 /* UTILITY: HIDE SCROLLBAR                      */
 /* ============================================ */
 
-.hide-scrollbar-mobile::-webkit-scrollbar,
-.hide-scrollbar-desktop::-webkit-scrollbar {
-  display: none;
-}
-.hide-scrollbar-mobile,
-.hide-scrollbar-desktop {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

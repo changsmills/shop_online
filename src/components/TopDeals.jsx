@@ -1,14 +1,11 @@
-// src/components/TopDeals.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, Flame } from "lucide-react";
-import api from "../axiosConfig"; // 🔥 BADILISHA: Tumia api badala ya axios!
+import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
 import { useTranslation } from 'react-i18next';
 import '../TopDeals.css';
 
-// 🔥 ONDOA API_BASE_URL – ipo kwenye api config!
-
-export default function TopDeals({ navigate, selectedCategory, isMobile }) {
+export default function TopDeals({ navigate, selectedCategory }) {
   const { t, i18n } = useTranslation();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,17 +23,11 @@ export default function TopDeals({ navigate, selectedCategory, isMobile }) {
       setLoading(true);
       try {
         const params = {};
-        if (selectedCategory?.id) {
-          params.parent_category = selectedCategory.id;
-        }
+        if (selectedCategory?.id) params.parent_category = selectedCategory.id;
 
-        // 🔥 BADILISHA: Tumia api.get, sio axios.get!
         const response = await api.get('/products/', { params });
-        
-        // 🔥 KAGUA PAGINATION – DRF inarudisha { results: [...] }
         const data = response.data.results || response.data || [];
 
-        // Mantiki ya kukokotoa na kupanga ofa imebaki sawa kabisa!
         const calculatedDeals = data.map(product => {
           const beiYaKawaida = parseFloat(product.price) || 0;
           const beiYaOfa = parseFloat(product.original_price) || 0;
@@ -60,7 +51,6 @@ export default function TopDeals({ navigate, selectedCategory, isMobile }) {
         setLoading(false);
       }
     };
-
     fetchDeals();
   }, [selectedCategory, i18n.language]);
 
@@ -85,34 +75,26 @@ export default function TopDeals({ navigate, selectedCategory, isMobile }) {
   const scroll = (direction) => {
     if (scrollContainerRef.current) {
       const scrollAmount = direction === 'left' ? -300 : 300;
-      scrollContainerRef.current.scrollBy({
-        left: scrollAmount,
-        behavior: 'smooth'
-      });
+      scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
   useEffect(() => {
     const container = scrollContainerRef.current;
-    if (container && !isMobile) {
+    if (container) {
       container.addEventListener('scroll', checkScrollPosition);
       setTimeout(checkScrollPosition, 100);
-      return () => {
-        container.removeEventListener('scroll', checkScrollPosition);
-      };
+      return () => container.removeEventListener('scroll', checkScrollPosition);
     }
-  }, [products, isMobile]);
+  }, [products]);
 
-  if (loading) return (
-    <div className="skeleton-loader-h" />
-  );
-  
+  if (loading) return <div className="skeleton-loader-h" />;
   if (products.length === 0) return null;
 
   return (
     <div className="top-deals-main-wrapper">
       
-      {/* Header Section */}
+      {/* Header Section - Kitufe kimeondolewa! */}
       <div className="td-header">
         <div className="td-header-left">
           <div className="td-title-group">
@@ -126,28 +108,21 @@ export default function TopDeals({ navigate, selectedCategory, isMobile }) {
             {selectedCategory && ` ${t('in')} ${getCategoryDisplayName(selectedCategory)}`}
           </p>
         </div>
-
-        <button 
-          className="td-view-more-btn"
-          onClick={() => navigate('/products', { 
-            state: { 
-              sectionName: t('top_deals'),
-              categoryId: selectedCategory?.id
-            } 
-          })}
-        >
-          <span>{t('view_more')}</span>
-          <ChevronRight size={isMobile ? 10 : 16} />
-        </button>
       </div>
 
-      {/* ========== MOBILE VIEW ========== */}
-      {isMobile ? (
-        <div className="td-mobile-scroll hide-scrollbar-mobile">
+      {/* ✅ Layout Moja - Inabadilika automatically kwa CSS Media Queries! */}
+      <div className="td-desktop-wrapper">
+        {showLeftArrow && (
+          <button className="td-arrow-btn td-arrow-left" onClick={() => scroll('left')}>
+            <ChevronLeft size={24} />
+          </button>
+        )}
+        
+        <div ref={scrollContainerRef} className="td-scroll-wrapper hide-scrollbar">
           {products.map((product) => {
             const discountPercent = getDiscountPercentage(product.price, product.original_price);
             return (
-              <div key={product.id} className="td-mobile-card-wrapper">
+              <div key={product.id} className="td-card-wrapper">
                 <DashboardCard
                   image={product.cover_image}
                   title={product.name}
@@ -156,64 +131,26 @@ export default function TopDeals({ navigate, selectedCategory, isMobile }) {
                   moq={product.moq}
                   discountBadge={discountPercent > 0 ? `-${discountPercent}%` : null}
                   showProgress={true}
-                  isMobile={isMobile}
-                  onClick={() => navigate('/products', { 
-                    state: { 
-                      priorityId: product.id, 
-                      sectionName: `Top Deals ${selectedCategory ? `in ${selectedCategory.name}` : ''}`,
-                      categoryId: selectedCategory?.id
-                    } 
-                  })}
+                  /* 🔥 TUMEONDOA KABISA `isMobile={isMobile}` HAPA! */
+                  onClick={() => {
+                    const priorityId = product.id;
+                    const sectionName = encodeURIComponent(`Top Deals ${selectedCategory ? `in ${selectedCategory.name}` : ''}`);
+                    const categoryId = selectedCategory?.id || '';
+                    const url = `/products?priorityId=${priorityId}&sectionName=${sectionName}${categoryId ? `&categoryId=${categoryId}` : ''}`;
+                    window.open(url, '_blank');
+                  }}
                 />
               </div>
             );
           })}
         </div>
-      ) : (
-        /* ========== DESKTOP VIEW ========== */
-        <div className="td-desktop-wrapper">
-          {showLeftArrow && (
-            <button className="td-arrow-btn td-arrow-left" onClick={() => scroll('left')}>
-              <ChevronLeft size={24} />
-            </button>
-          )}
-          
-          <div ref={scrollContainerRef} className="td-desktop-scroll hide-scrollbar-desktop">
-            {products.map((product) => {
-              const discountPercent = getDiscountPercentage(product.price, product.original_price);
-              
-              return (
-                <div key={product.id} className="td-desktop-card-wrapper">
-                  <DashboardCard
-                    image={product.cover_image}
-                    title={product.name}
-                    price={product.original_price} 
-                    originalPrice={product.price}  
-                    moq={product.moq}
-                    isTopDeal={true}
-                    discountBadge={discountPercent > 0 ? `-${discountPercent}%` : null}
-                    showProgress={true}
-                    isMobile={isMobile}
-                    onClick={() => {
-                      const priorityId = product.id;
-                      const sectionName = encodeURIComponent(`Top Deals ${selectedCategory ? `in ${selectedCategory.name}` : ''}`);
-                      const categoryId = selectedCategory?.id || '';
-                      const url = `/products?priorityId=${priorityId}&sectionName=${sectionName}${categoryId ? `&categoryId=${categoryId}` : ''}`;
-                      window.open(url, '_blank');
-                    }}
-                  />
-                </div>
-              );
-            })}
-          </div>
-          
-          {showRightArrow && (
-            <button className="td-arrow-btn td-arrow-right" onClick={() => scroll('right')}>
-              <ChevronRight size={24} />
-            </button>
-          )}
-        </div>
-      )}
+        
+        {showRightArrow && (
+          <button className="td-arrow-btn td-arrow-right" onClick={() => scroll('right')}>
+            <ChevronRight size={24} />
+          </button>
+        )}
+      </div>
     </div>
   );
 }

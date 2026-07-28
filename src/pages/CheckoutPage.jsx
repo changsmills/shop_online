@@ -5,12 +5,12 @@ import {
   Bell, Search, MapPin, ChevronLeft, Lock
 } from 'lucide-react';
 import UserTools from '../components/UserTools';
-//import { supabase } from '../supabaseClient';
+import api from '../axiosConfig'; // 🔥 BADILISHA: Tumia api badala ya supabase!
 import { toast, Toaster } from 'react-hot-toast'; 
 import '../CheckoutPage.css';
 import { useCart } from '../context/CartContext';
 
-const CheckoutPage = ({ session }) => {
+const CheckoutPage = () => { // 🔥 IMEONDOLEShA { session }
   const navigate = useNavigate();
   const location = useLocation();
   const { cartItems, clearCart } = useCart();
@@ -19,6 +19,9 @@ const CheckoutPage = ({ session }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isWhatsAppOrder, setIsWhatsAppOrder] = useState(false);
   
+  // 🔥 MPYA: Pata ID ya mtumiaji aliyelogin
+  const [currentUserId, setCurrentUserId] = useState(null);
+
   // State za shipping - dynamic kutoka database
   const [shippingMethods, setShippingMethods] = useState([]);
   const [selectedShipping, setSelectedShipping] = useState(null);
@@ -42,27 +45,43 @@ const CheckoutPage = ({ session }) => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // ========== 2. Fetch shipping methods from Supabase ==========
+  // ========== 2. Pata USER ID kutoka Backend ==========
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await api.get('/profile/');
+        setCurrentUserId(res.data.id);
+      } catch (error) {
+        console.error("Error fetching profile for checkout:", error);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  // ========== 3. Fetch shipping methods kutoka Django ==========
   useEffect(() => {
     const fetchShipping = async () => {
       const storeId = orderItems[0]?.store_id;
       if (!storeId || orderItems.length === 0) return;
 
-      const { data, error } = await supabase
-        .from('shipping_methods')
-        .select('*')
-        .eq('store_id', storeId)
-        .eq('is_active', true);
-
-      if (!error && data && data.length > 0) {
+      try {
+        const res = await api.get('/shipping-methods/', {
+          params: { store_id: storeId }
+        });
+        // DRF inarudisha { results: [...] } ikiwa pagination imewashwa
+        const data = res.data.results || res.data || [];
+        
         setShippingMethods(data);
-        setSelectedShipping(data[0]); // auto-select first method
+        if (data.length > 0) setSelectedShipping(data[0]); // auto-select first method
+      } catch (error) {
+        console.error("Error fetching shipping methods:", error);
+        setShippingMethods([]);
       }
     };
     fetchShipping();
   }, [orderItems]);
 
-  // ========== 3. Helper: Get price based on city ==========
+  // ========== 4. Helper: Get price based on city ==========
   const getPrice = (method) => {
     if (!method) return 0;
     const isLocal = customerInfo.city === 'Dar es Salaam';
@@ -70,12 +89,12 @@ const CheckoutPage = ({ session }) => {
     return isLocal ? (method.price_local || 0) : (method.price_national || 0);
   };
 
-  // ========== 4. Calculate totals (ONE TIME, CORRECT ORDER) ==========
+  // ========== 5. Calculate totals ==========
   const subtotal = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const currentShippingPrice = selectedShipping ? getPrice(selectedShipping) : 0;
-  const totalAmount = subtotal + currentShippingPrice; // ✅ only one declaration
+  const totalAmount = subtotal + currentShippingPrice;
 
-  // ========== 5. Handle Place Order ==========
+  // ========== 6. Handle Place Order (Django API) ==========
   const handlePlaceOrder = async () => {
     if (orderItems.length === 0) {
       toast.error("Huna bidhaa yoyote ya kuagiza");
@@ -93,49 +112,47 @@ const CheckoutPage = ({ session }) => {
     try {
       orderNumber = `ORD-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
-      const { data: mainOrder, error: orderError } = await supabase
-        .from('orders')
-        .insert([{
-          order_number: orderNumber,
-          customer_id: session?.user?.id,
-          grand_total: totalAmount,
-          shipping_fee: currentShippingPrice, // ✅ correct
-          shipping_method: selectedShipping?.method_name || selectedShipping?.label,
-          customer_location: `${customerInfo.fullName} | ${customerInfo.address} | Simu: ${customerInfo.phone}`,
-          status: 'received',
-          payment_method: 'mobile_money',
-          total_items: orderItems.length,
-          store_id: orderItems[0]?.store_id
-        }])
-        .select()
-        .single();
+      // 1. UNDA ORDER
+      const orderPayload = {
+        order_number: orderNumber,
+        customer_id: currentUserId,
+        store_id: orderItems[0]?.store_id,
+        grand_total: totalAmount,
+        shipping_fee: currentShippingPrice,
+        shipping_method: selectedShipping?.method_name || selectedShipping?.label,
+        customer_location: `${customerInfo.fullName} | ${customerInfo.address} | Simu: ${customerInfo.phone}`,
+        status: 'received',
+        payment_method: 'mobile_money',
+        total_items: orderItems.length,
+      };
 
-      if (orderError) throw orderError;
+      const orderRes = await api.post('/orders/', orderPayload);
+      const mainOrder = orderRes.data;
 
-      const itemsToInsert = orderItems.map(item => ({
-        order_id: mainOrder.id,
-        product_id: item.productId || item.id,
-        variant_id: item.variant_id,
-        product_name: item.product_name || item.name,
-        product_image: item.image,
-        selected_color: item.selected_color,
-        selected_size: item.selected_size,
-        quantity: item.quantity,
-        unit_price: item.price,
-        subtotal: item.price * item.quantity
+      // 🔥 BADILISHA HAPA: Ondoa '_id' ili ilingane na Django models!
+       const itemsToInsert = orderItems.map(item => ({
+      order: mainOrder.id,                // Badilisha order_id kuwa order
+      product: item.productId || item.id, // Badilisha product_id kuwa product
+      variant: item.variant_id,           // Badilisha variant_id kuwa variant
+      product_name: item.product_name || item.name,
+      product_image: item.image,
+      selected_color: item.selected_color,
+      selected_size: item.selected_size,
+      quantity: item.quantity,
+      unit_price: item.price,            // Inapaswa kuwa number (Decimal)
+      subtotal: item.price * item.quantity // Inapaswa kuwa number (Decimal)
       }));
 
-      const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(itemsToInsert);
-
-      if (itemsError) throw itemsError;
+      // Tuma order items moja moja (au tumia endpoint ya bulk create kama ipo)
+      for (const item of itemsToInsert) {
+        await api.post('/order-items/', item);
+      }
 
       toast.dismiss(loadingToast);
       clearCart();
       toast.success("Hongera! Oda yako imepokelewa vyema!");
 
-      // ========== WhatsApp Message (using currentShippingPrice) ==========
+      // ========== WhatsApp Message ==========
       let whatsappMessage = `*ORDER CONFIRMATION - SKYFALL.COM*%0A%0A`;
       whatsappMessage += `*ORDER NUMBER:* ${orderNumber}%0A`;
       whatsappMessage += `*DATE:* ${new Date().toLocaleString()}%0A%0A`;
@@ -173,14 +190,14 @@ const CheckoutPage = ({ session }) => {
 
     } catch (error) {
       toast.dismiss(loadingToast);
-      console.error("Order Error:", error);
-      toast.error("Imeshindwa kuweka oda: " + error.message);
+      console.error("Order Error:", error.response?.data || error.message);
+      toast.error("Imeshindwa kuweka oda: " + (error.response?.data?.detail || error.message));
     } finally {
       setLoading(false);
     }
   };
 
-  // Sidebar items (same as before)
+  // Sidebar items
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} />, path: '/dashboard', label: 'Dashboard' },
     { icon: <MessageSquare size={20} />, path: '/dashboard/messages', label: 'Messages' },
@@ -193,7 +210,7 @@ const CheckoutPage = ({ session }) => {
     <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#fff' }}>
       <Toaster position="top-center" />
 
-      {/* HEADER (same as before) */}
+      {/* HEADER */}
       <header className="dashboard-header" style={{ 
         display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
         padding: isMobile ? '10px 16px' : '10px 24px', borderBottom: '1px solid #eee', 
@@ -214,14 +231,14 @@ const CheckoutPage = ({ session }) => {
           {!isMobile && (
             <>
               <Bell size={20} style={{ cursor: 'pointer', color: '#666' }} />
-              <UserTools session={session} />
+              <UserTools /> {/* 🔥 Imeondolewa { session } */}
             </>
           )}
         </div>
       </header>
 
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        {/* SIDEBAR (same as before) */}
+        {/* SIDEBAR */}
         {!isMobile && (
           <aside 
             onMouseEnter={() => setIsSidebarHovered(true)}
@@ -292,7 +309,7 @@ const CheckoutPage = ({ session }) => {
                       style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '10px', fontSize: '14px' }} />
                   </div>
 
-                  {/* City Selector - NEW */}
+                  {/* City Selector */}
                   <div style={{ marginTop: '16px' }}>
                     <label style={{ fontSize: '13px', fontWeight: '600', color: '#444', display: 'block', marginBottom: '6px' }}>City / Region *</label>
                     <select

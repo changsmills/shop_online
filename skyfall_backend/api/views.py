@@ -13,7 +13,7 @@ from django.contrib.auth import authenticate, update_session_auth_hash
 # 🔥 MODELS IMPORTS:
 from products.models import (
     Category, SubCategory, ProductsEngine, LeafCategory, Advertisement, 
-    StoreEngine, ProductMedia, Message, ShippingMethod, Brand, Lead
+    StoreEngine, ProductMedia, Message, ShippingMethod, Brand, Lead, Order, OrderItem
 )
 
 # 🔥 ONGEZA HII IMPORT MUHIMU KABISA (Inaingiza ViewSet kutoka products.views):
@@ -24,7 +24,7 @@ from .serializers import (
     CategorySerializer, SubCategorySerializer, ProductsEngineSerializer,
     LeafCategorySerializer, AdvertisementSerializer, StoreEngineSerializer,
     ProductMediaSerializer, MessageSerializer, ProfileSerializer,
-    ShippingMethodSerializer, BrandSerializer, LeadSerializer
+    ShippingMethodSerializer, BrandSerializer, LeadSerializer, OrderSerializer, OrderItemSerializer 
 )
 
 User = get_user_model()
@@ -149,7 +149,7 @@ class StoreEngineViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_authenticated:
             return StoreEngine.objects.filter(owner__user=user)
-        return StoreEngine.objects.none()
+        return StoreEngine.objects.none()  
 
 class ProductMediaViewSet(viewsets.ModelViewSet):
     queryset = ProductMedia.objects.all()
@@ -240,9 +240,9 @@ class ProfileView(APIView):
         serializer = ProfileSerializer(profile)
         return Response(serializer.data)
 
-# ==========================================
-# 4. 🔥 VIEWS ZA MIPANGILIO (ZIWE NJE YA ProfileView!)
-# ==========================================
+    # ==========================================
+    # 4. 🔥 VIEWS ZA MIPANGILIO (ZIWE NJE YA ProfileView!)
+    # ==========================================
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -294,3 +294,25 @@ class PasswordResetView(APIView):
         # send_mail('Reset Password', 'Link yako...', 'from@example.com', [email])
         
         return Response({'status': 'reset_link_sent'}, status=200)
+    
+       # ==========================================
+       # 5. 🔥 VIEWS ZA ORDERS NA ORDER ITEMS
+       # ==========================================
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def perform_create(self, serializer):
+        # Hakikisha customer ni profile ya mtumiaji aliyeingia
+        serializer.save(customer=self.request.user.profile)
+
+
+class OrderItemViewSet(viewsets.ModelViewSet):
+    queryset = OrderItem.objects.all()
+    serializer_class = OrderItemSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+

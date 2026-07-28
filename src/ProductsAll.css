@@ -194,7 +194,7 @@
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 20px;
-  padding: 0 20px;
+  padding: 16px 20px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -216,7 +216,7 @@
 
 /* Tablet: 4 columns */
 @media (min-width: 768px) and (max-width: 1024px) {
-  .products-grid { grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .products-grid { grid-template-columns: repeat(4, 1fr); gap: 18px; padding: 16px; }
 }
 
 /* Extra large: 6 columns */
@@ -229,60 +229,20 @@
 }
 
 /* ============================================ */
-/* LAYER 5: MOBILE HORIZONTAL SCROLL            */
+/* 🔥 LAYER 5: MOBILE ONLY - 2 COLUMNS GRID    */
 /* ============================================ */
 
+/* Hapa ndipo mabadiliko muhimu yapo! */
 @media (max-width: 768px) {
-  .products-grid { display: none !important; }
-  
-  .products-grid-horizontal {
-    display: flex !important;
-    gap: 12px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding: 8px 12px 20px 12px;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
+  .products-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important; /* 🔥 Sasa ni 2 kwa mstari! */
+    gap: 8px !important;
+    padding: 0 8px 8px 8px !important;
     width: 100%;
     box-sizing: border-box;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    justify-items: stretch !important; /* Inalazimisha kadi zijaze nafasi */
   }
-  .products-grid-horizontal::-webkit-scrollbar { display: none !important; }
-
-  .products-horizontal-item {
-    flex-shrink: 0;
-    scroll-snap-align: start;
-    width: 160px;
-  }
-
-  @media (min-width: 480px) {
-    .products-horizontal-item { width: 190px; }
-    .products-grid-horizontal { gap: 14px; }
-  }
-
-  @media (max-width: 380px) {
-    .products-horizontal-item { width: 145px; }
-    .products-grid-horizontal { gap: 10px; padding: 8px 8px 20px 8px; }
-  }
-
-  .products-horizontal-item .product-card-item {
-    width: 100% !important;
-    margin: 0 !important;
-    height: 100% !important;
-  }
-
-  .products-horizontal-item .product-card-img { height: 120px !important; object-fit: cover !important; }
-  .products-horizontal-item .product-card-info { padding: 10px 8px !important; }
-  .products-horizontal-item .product-card-title { font-size: 11px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
-  .products-horizontal-item .price-amount { font-size: 12px !important; }
-  .products-horizontal-item .price-currency { font-size: 9px !important; }
-  .products-horizontal-item .price-original-strikethrough { font-size: 9px !important; }
-}
-
-/* Desktop: Show grid, hide horizontal scroll */
-@media (min-width: 769px) {
-  .products-grid-horizontal { display: none !important; }
 }
 
 /* ============================================ */

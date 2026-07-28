@@ -1,19 +1,27 @@
-// src/components/JustForYou.jsx (Refactored - Fixed DRF Pagination)
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import api from "../axiosConfig"; // ✅ Tumia api pekee
+import api from "../axiosConfig";
 import { Loader2, ChevronRight, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import DashboardCard from "./DashboardCard";
 import "../JustForYou.css"; 
 
-export default function JustForYou({ handleAction, search = "", selectedCategory, isMobile }) {
+export default function JustForYou({ search = "", selectedCategory }) {
   const { t, i18n } = useTranslation();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const isMounted = useRef(true);
   const navigate = useNavigate();
+
+  // 🔥 Jitambulisha kama simu au desktop (kwa ajili ya DashboardCard pekee)
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const fetchJustForYou = async () => {
     try {
@@ -32,7 +40,6 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
       const response = await api.get('/products/', { params });
 
       if (isMounted.current) {
-        // 🔥 MABADILIKO MUHIMU: Kagua kama data ina 'results' (DRF Pagination)
         const data = response.data.results || response.data || [];
         setProducts(data);
       }
@@ -127,23 +134,10 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
           </div>
         </div>
         
-        {filteredProducts.length > 3 && (
-          <button 
-            className="view-all-just" 
-            onClick={() => navigate("/products", { 
-              state: { 
-                sectionName: t('just_for_you'),
-                categoryId: selectedCategory?.id 
-              } 
-            })}
-          >
-            <span>{t('view_all')}</span>
-            <ChevronRight size={isMobile ? 12 : 16} />
-          </button>
-        )}
+        {/* 🔥 KITUFE KIMEONDOLIWA KABISA HAPA */}
       </div>
 
-      {/* ✅ GRID YA BIDHAA */}
+      {/* ✅ GRID YA BIDHAA (Inajibu kwa CSS Media Queries pekee) */}
       <div className="product-grid">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((item) => (
@@ -153,7 +147,7 @@ export default function JustForYou({ handleAction, search = "", selectedCategory
               title={item.name}
               price={item.price}
               originalPrice={item.original_price}
-              isMobile={isMobile}
+              isMobile={isMobile} // 🔥 DashboardCard pekee ndiyo inapokea isMobile!
               moq={item.moq}
               subtitle={item.store_address}
               categoryName={item.category_name}
