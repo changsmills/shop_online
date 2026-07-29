@@ -4,7 +4,7 @@ import { Loader2, ChevronRight, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import DashboardCard from "./DashboardCard";
-import SkeletonCard from "./SkeletonCardz"; // 🔥 IMPORT SKELETON
+import SkeletonCardz from "./SkeletonCardz"; // 🔥 IMPORT SAHIHI (SkeletonCardz)
 import "../JustForYou.css"; 
 
 export default function JustForYou({ search = "", selectedCategory }) {
@@ -116,7 +116,7 @@ export default function JustForYou({ search = "", selectedCategory }) {
         {/* 🔥 SKELETON GRID - Inaonyesha skeleton 8 kwanza */}
         <div className="product-grid">
           {Array.from({ length: 8 }).map((_, index) => (
-            <SkeletonCard key={`skeleton-${index}`} />
+            <SkeletonCardz key={`skeleton-${index}`} /> 
           ))}
         </div>
       </section>

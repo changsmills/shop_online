@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, Flame } from "lucide-react";
 import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
-import SkeletonCard from "./SkeletonCardz"; // 🔥 IMPORT SKELETON
+import SkeletonCardz from "./SkeletonCardz"; // ✅ IMPORT SAHIHI
 import { useTranslation } from 'react-i18next';
 import '../TopDeals.css';
 
@@ -116,7 +116,7 @@ export default function TopDeals({ navigate, selectedCategory }) {
           <div className="td-scroll-wrapper hide-scrollbar">
             {Array.from({ length: 5 }).map((_, index) => (
               <div key={`skeleton-${index}`} className="td-card-wrapper">
-                <SkeletonCard />
+                <SkeletonCardz /> {/* ✅ SkeletonCardz */}
               </div>
             ))}
           </div>

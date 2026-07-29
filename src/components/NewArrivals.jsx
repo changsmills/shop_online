@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, Sparkles } from "lucide-react";
 import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
-import SkeletonCard from "./SkeletonCardz"; // 🔥 IMPORT SKELETON
+import SkeletonCardz from "./SkeletonCardz"; // ✅ IMPORT SAHIHI
 import { useTranslation } from 'react-i18next';
 import '../NewArrivals.css';
 
@@ -99,7 +99,7 @@ export default function NewArrivals({ navigate, selectedCategory }) {
           <div className="na-scroll-wrapper hide-scrollbar">
             {Array.from({ length: 5 }).map((_, index) => (
               <div key={`skeleton-${index}`} className="na-card-wrapper">
-                <SkeletonCard />
+                <SkeletonCardz /> {/* ✅ SkeletonCardz */}
               </div>
             ))}
           </div>

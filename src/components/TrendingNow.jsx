@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, TrendingUp } from "lucide-react";
 import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
-import SkeletonCard from "./SkeletonCardz"; // 🔥 IMPORT SKELETON
+import SkeletonCardz from "./SkeletonCardz"; // 🔥 IMPORT SAHIHI (SkeletonCardz)
 import { useTranslation } from 'react-i18next';
 import '../TrendingNow.css';
 
@@ -88,7 +88,7 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
           <div className="trend-scroll-wrapper hide-scrollbar">
             {Array.from({ length: 5 }).map((_, index) => (
               <div key={`skeleton-${index}`} className="trend-card-wrapper">
-                <SkeletonCard />
+                <SkeletonCardz /> {/* ✅ SkeletonCardz */}
               </div>
             ))}
           </div>
