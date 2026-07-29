@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, MapPin } from "lucide-react";
 import api from "../axiosConfig"; 
 import DashboardCard from "./DashboardCard";
+import SkeletonCardz from "./SkeletonCardz"; // 🔥 IMPORT SKELETON
 import { useTranslation } from 'react-i18next';
 import '../LocationFilter.css';
 
@@ -79,13 +80,49 @@ export default function LocationFilter({ navigate }) {
     }
   }, [locations]);
 
-  if (loading) return <div className="skeleton-loader-h" />;
+  // ============================================================
+  // 🔥 SKELETON LOADING - Inaonyesha skeleton cards wakati data inapakia
+  // ============================================================
+  if (loading) {
+    return (
+      <div className="location-main-wrapper">
+        {/* Header Section */}
+        <div className="loc-header">
+          <div className="loc-header-left">
+            <div className="loc-title-group">
+              <MapPin className="loc-map-icon" />
+              <h2 className="loc-title">{t('shop_by_location')}</h2>
+            </div>
+            <p className="loc-subtitle">{t('find_best_deals_near_you')}</p>
+          </div>
+        </div>
+
+        {/* 🔥 SKELETON SCROLL - Inaonyesha skeleton 5 kwa horizontal scroll */}
+        <div className="loc-desktop-wrapper">
+          <div className="loc-scroll-wrapper hide-scrollbar">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={`skeleton-${index}`} className="loc-card-wrapper">
+                <SkeletonCardz />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ============================================================
+  // EMPTY STATE - Hakuna locations
+  // ============================================================
   if (locations.length === 0) return null;
 
+  // ============================================================
+  // SUCCESS STATE - Onyesha locations
+  // ============================================================
   return (
     <div className="location-main-wrapper">
       
-      {/* Header Section - Kitufe kimeondolewa! */}
+      {/* Header Section */}
       <div className="loc-header">
         <div className="loc-header-left">
           <div className="loc-title-group">
@@ -96,7 +133,7 @@ export default function LocationFilter({ navigate }) {
         </div>
       </div>
 
-      {/* ✅ Layout Moja - Inabadilika automatically kwa CSS Media Queries! */}
+      {/* Horizontal Scroll */}
       <div className="loc-desktop-wrapper">
         {showLeftArrow && (
           <button className="loc-arrow-btn loc-arrow-left" onClick={() => scroll('left')}>
@@ -113,7 +150,6 @@ export default function LocationFilter({ navigate }) {
                 subtitle={loc.address?.split(',')[0]}
                 price={loc.price}
                 isLocation={true}
-                /* 🔥 TUMEONDOA KABISA `isMobile={isMobile}` HAPA! */
                 onClick={() => {
                   const locationName = encodeURIComponent(loc.name);
                   const sectionTitle = `${t('products_in')} ${loc.name}`;
