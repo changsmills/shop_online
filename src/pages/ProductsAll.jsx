@@ -1,14 +1,11 @@
-// src/components/ProductsAll.jsx
 import React, { useState, useEffect, useRef, useMemo, useCallback, Suspense } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { ArrowUp, ChevronLeft, ChevronRight } from "lucide-react";
+import api from "../axiosConfig";
 import "../ProductsAll.css";
-import axios from 'axios'; // 🔥 ONGEZA HII
-const API_BASE_URL = 'http://127.0.0.1:8000/api'; // 🔥 ONGEZA HII URL ya Backend
-
 import ProductList from "./ProductList";
 
-// ✅ MUHIMU: LAZY IMPORT YA SKELETON (Haipaki mpaka inahitajika!)
+// ✅ LAZY IMPORT YA SKELETON
 const SkeletonProductsAll = React.lazy(() => import("../components/SkeletonProductsAll"));
 
 export default function ProductsAll() {
@@ -99,7 +96,7 @@ export default function ProductsAll() {
   }, [activeCategory.name, activeSection]);
 
   // ============================================
-  // 7. FETCH CATEGORIES (🔥 MABADILIKO HAPA: AXIOS + DJANGO)
+  // 7. FETCH CATEGORIES
   // ============================================
   
   useEffect(() => {
@@ -108,8 +105,8 @@ export default function ProductsAll() {
         setLoading(true);
         setError(null);
         
-        // 🔥 Badilisha Supabase kuwa Axios + Django Endpoint
-        const response = await axios.get(`${API_BASE_URL}/categories/`);
+        // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
+        const response = await api.get('/categories/');
         const data = response.data;
 
         if (Array.isArray(data) && data.length > 0) {
