@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
-const API_BASE_URL = "http://127.0.0.1:8000/api";
-const BACKEND_URL = "http://127.0.0.1:8000"; // 🔥 ONGEZA HII KWA AJILI YA PICHA!
+import api from "../axiosConfig"; // 🔥 Tumia api
+const BACKEND_URL = "https://shop-online-r9z4.onrender.com"; // 🔥 URL ya Render
 import QuickInventoryManager from '../components/QuickInventoryManager';
 import BusinessAnalytics from '../components/BusinessAnalytics';
 import TopDealsSection from "../components/TopDealsSection"
@@ -73,7 +72,6 @@ export default function PhysicalDashboard() {
 
   useEffect(() => { fetchDashboardData(); }, [paramId]);
 
-  // 🔥 RESIZE: Haina 'isMobile' state tena, inatumia window.innerWidth direct
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) setIsSidebarOpen(false);
@@ -89,7 +87,7 @@ export default function PhysicalDashboard() {
       try {
         const token = localStorage.getItem("access_token");
         if (!token) return;
-        const response = await axios.get(`${API_BASE_URL}/messages/`, {
+        const response = await api.get('/messages/', {
           params: { receiver_id: myStore.id, is_read: false },
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -119,35 +117,33 @@ export default function PhysicalDashboard() {
       if (!token) { navigate('/dashboard/login'); return; }
       const headers = { Authorization: `Bearer ${token}` };
 
-      try { const bRes = await axios.get(`${API_BASE_URL}/brands/`, { headers }); if (bRes.data) setBrands(bRes.data); } catch (brandErr) { setBrands([]); }
+      try { const bRes = await api.get('/brands/', { headers }); if (bRes.data) setBrands(bRes.data); } catch (brandErr) { setBrands([]); }
 
-      const catRes = await axios.get(`${API_BASE_URL}/subcategories/`, { headers });
+      const catRes = await api.get('/subcategories/', { headers });
       if (catRes.data) setAllSubCategories(catRes.data);
 
       let store = null;
       if (paramId) {
-        try { const storeRes = await axios.get(`${API_BASE_URL}/stores/${paramId}/`, { headers }); store = storeRes.data; } catch (err) {
-          const profileRes = await axios.get(`${API_BASE_URL}/profile/`, { headers });
+        try { const storeRes = await api.get(`/stores/${paramId}/`, { headers }); store = storeRes.data; } catch (err) {
+          const profileRes = await api.get('/profile/', { headers });
           const ownerId = profileRes.data.id;
-          const storesRes = await axios.get(`${API_BASE_URL}/stores/?owner=${ownerId}`, { headers });
+          const storesRes = await api.get('/stores/?owner=${ownerId}', { headers });
           const results = storesRes.data.results || storesRes.data;
           if (Array.isArray(results) && results.length > 0) store = results[0];
         }
       } else {
-        const profileRes = await axios.get(`${API_BASE_URL}/profile/`, { headers });
+        const profileRes = await api.get('/profile/', { headers });
         const ownerId = profileRes.data.id;
-        const storesRes = await axios.get(`${API_BASE_URL}/stores/?owner=${ownerId}`, { headers });
+        const storesRes = await api.get('/stores/?owner=${ownerId}', { headers });
         const results = storesRes.data.results || storesRes.data;
         if (Array.isArray(results) && results.length > 0) store = results[0];
       }
 
       if (store) {
         setMyStore(store);
-        // 🔥 FIX: Ongeza BACKEND_URL mbele ya picha zote!
         setLogoPreview(store.store_logo ? `${BACKEND_URL}/${store.store_logo}` : null);
         setBannerPreview(store.store_banner ? `${BACKEND_URL}/${store.store_banner}` : null);
         
-        // 🔥 MABADILIKO HAPA: ONGEZA category_id na sub_category_ids!
         setStoreMeta({
           store_name: store.store_name || "", 
           phone_number: store.phone_number || "", 
@@ -161,12 +157,10 @@ export default function PhysicalDashboard() {
           description: store.description || "", 
           city: store.city || "",
           
-          // ✅ HIZI NDIO ZINAZOKOSEA KABISA! (Zinafanya kategoria zionekane)
           category_id: store.category_id || null,
           sub_category_ids: store.sub_category_ids || []
         });
 
-        // 🔥 FIX: Ongeza BACKEND_URL kwa picha za Ofisi
         setOfficePreviews([
           store.office_image_1 ? `${BACKEND_URL}/${store.office_image_1}` : null,
           store.office_image_2 ? `${BACKEND_URL}/${store.office_image_2}` : null,
@@ -174,12 +168,12 @@ export default function PhysicalDashboard() {
         ]);
 
         if (store.sub_category_ids?.length > 0) {
-          const subDataRes = await axios.get(`${API_BASE_URL}/subcategories/`, {
+          const subDataRes = await api.get('/subcategories/', {
             params: { id__in: store.sub_category_ids.join(',') }, headers
           });
           if (subDataRes.data) setMyStoreSubCats(subDataRes.data);
         }
-        const prodsRes = await axios.get(`${API_BASE_URL}/products/`, {
+        const prodsRes = await api.get('/products/', {
           params: { store_id: store.id, ordering: '-created_at' }, headers
         });
         if (prodsRes.data) setMyProducts(prodsRes.data);
@@ -197,7 +191,7 @@ export default function PhysicalDashboard() {
       const token = localStorage.getItem("access_token");
       if (!token) return alert("Token haipo!");
       const updatedIds = (myStore.sub_category_ids || []).filter(cid => cid !== catId);
-      await axios.patch(`${API_BASE_URL}/stores/${myStore.id}/`, { sub_category_ids: updatedIds }, { headers: { Authorization: `Bearer ${token}` } });
+      await api.patch(`/stores/${myStore.id}/`, { sub_category_ids: updatedIds }, { headers: { Authorization: `Bearer ${token}` } });
       fetchDashboardData();
     } catch (err) { console.error(err); alert("Imeshindikana: " + (err.response?.data?.detail || err.message)); }
   };
@@ -214,7 +208,7 @@ export default function PhysicalDashboard() {
       if (bannerFile) formData.append("store_banner", bannerFile);
       officeFiles.forEach((file, i) => { if (file) formData.append("office_images", file); });
 
-      const response = await axios.put(`${API_BASE_URL}/stores/${myStore.id}/`, formData, {
+      const response = await api.put(`/stores/${myStore.id}/`, formData, {
         headers: { "Authorization": `Bearer ${token}`, "Content-Type": "multipart/form-data" }
       });
       if (response.status === 200) { alert("Duka limesasishwa!"); fetchDashboardData(); }
@@ -254,7 +248,7 @@ export default function PhysicalDashboard() {
           if (p.video_file) formData.append("video_file", p.video_file);
           if (p.gallery && p.gallery.length > 0) p.gallery.forEach((file) => formData.append("gallery_images", file));
 
-          const response = await axios.post(`${API_BASE_URL}/products/`, formData, {
+          const response = await api.post('/products/', formData, {
             headers: { "Authorization": `Bearer ${token}`, "Content-Type": "multipart/form-data" }
           });
           if (response.status === 201) {
@@ -300,7 +294,7 @@ export default function PhysicalDashboard() {
       const currentIds = myStore.sub_category_ids || [];
       if (currentIds.includes(cat.id)) { alert("Kategoria hii tayari ipo dukan kwako!"); return; }
       const updatedIds = [...currentIds, cat.id];
-      await axios.patch(`${API_BASE_URL}/stores/${myStore.id}/`, { sub_category_ids: updatedIds }, { headers: { Authorization: `Bearer ${token}` } });
+      await api.patch(`/stores/${myStore.id}/`, { sub_category_ids: updatedIds }, { headers: { Authorization: `Bearer ${token}` } });
       await fetchDashboardData();
       alert(`✅ ${cat.name} imeongezwa!`);
     } catch (err) { console.error(err); alert("Hitilafu: " + (err.response?.data?.detail || err.message)); }
@@ -492,7 +486,6 @@ export default function PhysicalDashboard() {
                   {myProducts.map((p) => (
                     <div key={p.id} className="product-card">
                       <div className="product-card-img-wrap">
-                        {/* 🔥 FIX: Ongeza BACKEND_URL ili picha zionekane! */}
                         <img 
                           src={p.cover_image ? `${BACKEND_URL}/${p.cover_image}` : "https://via.placeholder.com/150"} 
                           alt={p.name} 
@@ -543,7 +536,7 @@ export default function PhysicalDashboard() {
           </div>
         </main>
       </div>
-                  {/* MODAL YA KATEGORIA */}
+      {/* MODAL YA KATEGORIA */}
       {showCategoryManager && ReactDOM.createPortal(
         <div className="modal-overlay">
           <div className="modal-backdrop" onClick={() => setShowCategoryManager(false)} />
@@ -558,11 +551,10 @@ export default function PhysicalDashboard() {
                 <X size={18} />
               </button>
             </div>
-                      <div className="modal-body">
+            <div className="modal-body">
               <div className="modal-cat-list">
                 {allSubCategories
                   .filter(cat => {
-                    // 🔥 FIX KUU: Sasa tunasoma 'cat.category', sio 'cat.category_id'!
                     const storeCatId = String((myStore?.category_id || myStore?.category) || "").replace(/-/g, '').trim();
                     const subCatId = String(cat.category || "").replace(/-/g, '').trim(); 
                     
@@ -591,7 +583,6 @@ export default function PhysicalDashboard() {
                     );
                   })}
                 
-                {/* 🔥 Hakikisha ujumbe wa tupu pia unatumia 'cat.category'! */}
                 {allSubCategories.filter(cat => {
                    const storeCatId = String((myStore?.category_id || myStore?.category) || "").replace(/-/g, '').trim();
                    const subCatId = String(cat.category || "").replace(/-/g, '').trim();
