@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, Sparkles } from "lucide-react";
 import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
+import SkeletonCard from "./SkeletonCardz"; // 🔥 IMPORT SKELETON
 import { useTranslation } from 'react-i18next';
 import '../NewArrivals.css';
 
@@ -13,7 +14,6 @@ export default function NewArrivals({ navigate, selectedCategory }) {
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
 
-  // 🔥 Tumeacha `isMobile` kabisa. Sasa itadhibitiwa na CSS tu! (Kwa Scroll)
   useEffect(() => {
     const fetchNewArrivals = async () => {
       setLoading(true);
@@ -65,9 +65,57 @@ export default function NewArrivals({ navigate, selectedCategory }) {
     }
   }, [products]);
 
-  if (loading) return <div className="skeleton-loader-h" />;
+  // ============================================================
+  // 🔥 SKELETON LOADING - Inaonyesha skeleton cards wakati data inapakia
+  // ============================================================
+  if (loading) {
+    return (
+      <div className="new-arrivals-main-wrapper">
+        {/* Header Section */}
+        <div className="na-header">
+          <div className="na-header-left">
+            <div className="na-title-group">
+              <Sparkles className="na-sparkle-icon" />
+              <h2 className="na-title">
+                {selectedCategory && selectedCategory.id !== null ? (
+                  `${t('new_arrivals')} ${t('in')} ${getCategoryDisplayName(selectedCategory)}`
+                ) : (
+                  t('new_arrivals')
+                )}
+              </h2>
+            </div>
+            <p className="na-subtitle">
+              {selectedCategory && selectedCategory.id !== null ? (
+                `${t('discover_latest_arrivals')} ${t('in')} ${getCategoryDisplayName(selectedCategory)}`
+              ) : (
+                t('discover_latest_arrivals')
+              )}
+            </p>
+          </div>
+        </div>
+
+        {/* 🔥 SKELETON SCROLL - Inaonyesha skeleton 5 kwa horizontal scroll */}
+        <div className="na-desktop-wrapper">
+          <div className="na-scroll-wrapper hide-scrollbar">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={`skeleton-${index}`} className="na-card-wrapper">
+                <SkeletonCard />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ============================================================
+  // EMPTY STATE - Hakuna bidhaa
+  // ============================================================
   if (products.length === 0) return null;
 
+  // ============================================================
+  // SUCCESS STATE - Onyesha bidhaa
+  // ============================================================
   return (
     <div className="new-arrivals-main-wrapper">
       
@@ -94,7 +142,7 @@ export default function NewArrivals({ navigate, selectedCategory }) {
         </div>
       </div>
 
-      {/* ✅ Horizontal Scroll - Fluid kwa ukubwa wa skrini! */}
+      {/* Horizontal Scroll */}
       <div className="na-desktop-wrapper">
         {showLeftArrow && (
           <button className="na-arrow-btn na-arrow-left" onClick={() => scroll('left')}>
@@ -111,7 +159,6 @@ export default function NewArrivals({ navigate, selectedCategory }) {
                 price={product.price}
                 originalPrice={product.original_price}
                 views={product.views}
-                // 🔥 HAPA: TUMEONDOA `isMobile={isMobile}`
                 onClick={() => {
                   const priorityId = product.id;
                   const sectionName = encodeURIComponent(`${t('new_arrivals')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`);

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, Factory } from "lucide-react";
 import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
+import SkeletonCard from "./SkeletonCardz"; // 🔥 IMPORT SKELETON
 import { useTranslation } from 'react-i18next';
 import '../TopStores.css';
 
@@ -53,13 +54,49 @@ export default function TopStores({ navigate }) {
     }
   }, [stores]);
 
-  if (loading) return null;
+  // ============================================================
+  // 🔥 SKELETON LOADING - Inaonyesha skeleton cards wakati data inapakia
+  // ============================================================
+  if (loading) {
+    return (
+      <div className="top-stores-main-wrapper">
+        {/* Header Section */}
+        <div className="ts-header">
+          <div className="ts-header-left">
+            <div className="ts-title-group">
+              <Factory className="ts-factory-icon" />
+              <h2 className="ts-title">{t('top_suppliers')}</h2>
+            </div>
+            <p className="ts-subtitle">{t('verified_wholesale_stores')}</p>
+          </div>
+        </div>
+
+        {/* 🔥 SKELETON SCROLL - Inaonyesha skeleton 5 kwa horizontal scroll */}
+        <div className="ts-desktop-wrapper">
+          <div className="ts-scroll-wrapper hide-scrollbar">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={`skeleton-${index}`} className="ts-card-wrapper">
+                <SkeletonCard />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ============================================================
+  // EMPTY STATE - Hakuna stores
+  // ============================================================
   if (stores.length === 0) return null;
 
+  // ============================================================
+  // SUCCESS STATE - Onyesha stores
+  // ============================================================
   return (
     <div className="top-stores-main-wrapper">
       
-      {/* Header Section - Kitufe kimeondolewa! */}
+      {/* Header Section */}
       <div className="ts-header">
         <div className="ts-header-left">
           <div className="ts-title-group">
@@ -70,7 +107,7 @@ export default function TopStores({ navigate }) {
         </div>
       </div>
 
-      {/* ✅ Layout Moja - Inabadilika automatically kwa CSS (Media Queries)! */}
+      {/* Horizontal Scroll */}
       <div className="ts-desktop-wrapper">
         {showLeftArrow && (
           <button className="ts-arrow-btn ts-arrow-left" onClick={() => scroll('left')}>
@@ -104,7 +141,6 @@ export default function TopStores({ navigate }) {
                   moq={store.moq}
                   rating={store.average_rating}
                   isStore={true}
-                  /* 🔥 TUMEONDOA KABISA `isMobile={isMobile}` HAPA! */
                   onClick={() => {
                     const storeData = {
                       id: store.id,

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, Flame } from "lucide-react";
 import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
+import SkeletonCard from "./SkeletonCardz"; // 🔥 IMPORT SKELETON
 import { useTranslation } from 'react-i18next';
 import '../TopDeals.css';
 
@@ -88,13 +89,54 @@ export default function TopDeals({ navigate, selectedCategory }) {
     }
   }, [products]);
 
-  if (loading) return <div className="skeleton-loader-h" />;
+  // ============================================================
+  // 🔥 SKELETON LOADING - Inaonyesha skeleton cards wakati data inapakia
+  // ============================================================
+  if (loading) {
+    return (
+      <div className="top-deals-main-wrapper">
+        {/* Header Section */}
+        <div className="td-header">
+          <div className="td-header-left">
+            <div className="td-title-group">
+              <Flame className="td-flame-icon" />
+              <h2 className="td-title">
+                {t('top_deals')} {selectedCategory && `${t('in')} ${getCategoryDisplayName(selectedCategory)}`}
+              </h2>
+            </div>
+            <p className="td-subtitle">
+              {t('score_lowest_price')}
+              {selectedCategory && ` ${t('in')} ${getCategoryDisplayName(selectedCategory)}`}
+            </p>
+          </div>
+        </div>
+
+        {/* 🔥 SKELETON SCROLL - Inaonyesha skeleton 5 kwa horizontal scroll */}
+        <div className="td-desktop-wrapper">
+          <div className="td-scroll-wrapper hide-scrollbar">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={`skeleton-${index}`} className="td-card-wrapper">
+                <SkeletonCard />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ============================================================
+  // EMPTY STATE - Hakuna deals
+  // ============================================================
   if (products.length === 0) return null;
 
+  // ============================================================
+  // SUCCESS STATE - Onyesha deals
+  // ============================================================
   return (
     <div className="top-deals-main-wrapper">
       
-      {/* Header Section - Kitufe kimeondolewa! */}
+      {/* Header Section */}
       <div className="td-header">
         <div className="td-header-left">
           <div className="td-title-group">
@@ -110,7 +152,7 @@ export default function TopDeals({ navigate, selectedCategory }) {
         </div>
       </div>
 
-      {/* ✅ Layout Moja - Inabadilika automatically kwa CSS Media Queries! */}
+      {/* Horizontal Scroll */}
       <div className="td-desktop-wrapper">
         {showLeftArrow && (
           <button className="td-arrow-btn td-arrow-left" onClick={() => scroll('left')}>
@@ -131,7 +173,6 @@ export default function TopDeals({ navigate, selectedCategory }) {
                   moq={product.moq}
                   discountBadge={discountPercent > 0 ? `-${discountPercent}%` : null}
                   showProgress={true}
-                  /* 🔥 TUMEONDOA KABISA `isMobile={isMobile}` HAPA! */
                   onClick={() => {
                     const priorityId = product.id;
                     const sectionName = encodeURIComponent(`Top Deals ${selectedCategory ? `in ${selectedCategory.name}` : ''}`);

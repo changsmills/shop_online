@@ -4,6 +4,7 @@ import { Loader2, ChevronRight, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import DashboardCard from "./DashboardCard";
+import SkeletonCard from "./SkeletonCardz"; // 🔥 IMPORT SKELETON
 import "../JustForYou.css"; 
 
 export default function JustForYou({ search = "", selectedCategory }) {
@@ -14,7 +15,7 @@ export default function JustForYou({ search = "", selectedCategory }) {
   const isMounted = useRef(true);
   const navigate = useNavigate();
 
-  // 🔥 Jitambulisha kama simu au desktop (kwa ajili ya DashboardCard pekee)
+  // 🔥 Jitambulisha kama simu au desktop
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
@@ -69,14 +70,62 @@ export default function JustForYou({ search = "", selectedCategory }) {
     );
   }, [products, search]);
 
+  const getCategoryName = () => {
+    if (!selectedCategory) return '';
+    return i18n.language === 'sw' 
+      ? (selectedCategory.name_sw || selectedCategory.name) 
+      : selectedCategory.name;
+  };
+
+  const handleCardClick = (item) => {
+    const priorityId = item.id;
+    const sectionName = encodeURIComponent(`${t('just_for_you')} ${selectedCategory && selectedCategory.id !== null ? `${t('in')} ${getCategoryName()}` : ''}`);
+    const categoryId = selectedCategory?.id || '';
+    const categoryName = encodeURIComponent(getCategoryName() || 'All');
+    const url = `/products?priorityId=${priorityId}&sectionName=${sectionName}&categoryId=${categoryId}&categoryName=${categoryName}`;
+    window.open(url, '_blank');
+  };
+
+  // ============================================================
+  // 🔥 SKELETON LOADING - Inaonyesha skeleton cards wakati data inapakia
+  // ============================================================
   if (loading) {
     return (
-      <div className="loading-container">
-        <Loader2 className="animate-spin" size={40} color="#ff6600" />
-      </div>
+      <section className="just-for-you-container">
+        <div className="section-header">
+          <div className="header-main">
+            <div className="header-text-group">
+              <h2 className="just-title">
+                {selectedCategory && selectedCategory.id !== null ? (
+                  `${t('just_for_you')} ${t('in')} ${getCategoryName()}`
+                ) : (
+                  t('just_for_you')
+                )}
+              </h2>
+              <p className="just-subtitle">
+                {selectedCategory && selectedCategory.id !== null ? (
+                  `${t('curated_picks')} ${t('in')} ${getCategoryName()}`
+                ) : (
+                  t('curated_picks')
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* 🔥 SKELETON GRID - Inaonyesha skeleton 8 kwanza */}
+        <div className="product-grid">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <SkeletonCard key={`skeleton-${index}`} />
+          ))}
+        </div>
+      </section>
     );
   }
 
+  // ============================================================
+  // ERROR STATE
+  // ============================================================
   if (error) {
     return (
       <div className="error-container">
@@ -94,23 +143,10 @@ export default function JustForYou({ search = "", selectedCategory }) {
       </div>
     );
   }
-  
-  const getCategoryName = () => {
-    if (!selectedCategory) return '';
-    return i18n.language === 'sw' 
-      ? (selectedCategory.name_sw || selectedCategory.name) 
-      : selectedCategory.name;
-  };
 
-  const handleCardClick = (item) => {
-    const priorityId = item.id;
-    const sectionName = encodeURIComponent(`${t('just_for_you')} ${selectedCategory && selectedCategory.id !== null ? `${t('in')} ${getCategoryName()}` : ''}`);
-    const categoryId = selectedCategory?.id || '';
-    const categoryName = encodeURIComponent(getCategoryName() || 'All');
-    const url = `/products?priorityId=${priorityId}&sectionName=${sectionName}&categoryId=${categoryId}&categoryName=${categoryName}`;
-    window.open(url, '_blank');
-  };
-
+  // ============================================================
+  // SUCCESS STATE - Onyesha bidhaa
+  // ============================================================
   return (
     <section className="just-for-you-container">
       
@@ -133,11 +169,8 @@ export default function JustForYou({ search = "", selectedCategory }) {
             </p>
           </div>
         </div>
-        
-        {/* 🔥 KITUFE KIMEONDOLIWA KABISA HAPA */}
       </div>
 
-      {/* ✅ GRID YA BIDHAA (Inajibu kwa CSS Media Queries pekee) */}
       <div className="product-grid">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((item) => (
@@ -147,7 +180,7 @@ export default function JustForYou({ search = "", selectedCategory }) {
               title={item.name}
               price={item.price}
               originalPrice={item.original_price}
-              isMobile={isMobile} // 🔥 DashboardCard pekee ndiyo inapokea isMobile!
+              isMobile={isMobile}
               moq={item.moq}
               subtitle={item.store_address}
               categoryName={item.category_name}
