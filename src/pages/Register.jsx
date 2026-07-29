@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // ✅ Badilisha: Axios badala ya Supabase
+import api from '../axiosConfig'; // 🔥 Tumia api kutoka axiosConfig
 import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
-
-const API_BASE_URL = "http://127.0.0.1:8000/api";
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -13,7 +11,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [isSuccess, setIsSuccess] = useState(false); // 🔥 ONGEZA HII (Njia ya 2)
+  const [isSuccess, setIsSuccess] = useState(false);
   
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 900);
@@ -24,17 +22,13 @@ const Register = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // 🔥 ONGEZA HII useEffect (Kwa ajili ya Navigation isiyoshindwa)
   useEffect(() => {
     if (isSuccess) {
       const timer = setTimeout(() => {
-        // Futa token ili Login isimrudishe kiotomatiki
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        // Peleka kwenye Login
         navigate("/dashboard/login");
       }, 1500);
-      // Safisha timer ikiwa mtumiaji ataondoka kwenye ukurasa kabla ya muda kuisha
       return () => clearTimeout(timer);
     }
   }, [isSuccess, navigate]);
@@ -56,12 +50,10 @@ const Register = () => {
     return name;
   };
 
-  // ✅ BADILISHA: Handle Signup kwa Django API
   const handleSignup = async (e) => {
     e.preventDefault();
     setErrorMessage('');
     
-    // Validations (zimebaki sawa)
     if (!email.trim()) {
       toast.error('Tafadhali weka barua pepe');
       setErrorMessage('Barua pepe inahitajika');
@@ -96,29 +88,23 @@ const Register = () => {
     setLoading(true);
     
     try {
-      // 1. Tuma data kwenye endpoint ya Django (Backend itaunda User na Profile kwa pamoja)
-      const response = await axios.post(`${API_BASE_URL}/register/`, {
+      const response = await api.post('/register/', {
         email: email.trim(),
         password: password,
-        full_name: generateDefaultNameFromEmail(email) // Tumia hii kujaza full_name kwenye Profile
+        full_name: generateDefaultNameFromEmail(email)
       });
 
-      // 2. Ikiwa backend inarudisha tokens moja kwa moja (inashauriwa), zihifadhi
       if (response.data.access && response.data.refresh) {
         localStorage.setItem('access_token', response.data.access);
         localStorage.setItem('refresh_token', response.data.refresh);
       }
 
-      // 3. Ujumbe wa mafanikio
       toast.success(`🎉 Karibu ${generateDefaultNameFromEmail(email)}! Akaunti yako imeundwa.`, { duration: 4000 });
-      
-      // 4. 🔥 MABADILIKO HAPA: Badala ya setTimeout, tumia setIsSuccess
       setIsSuccess(true);
       
     } catch (err) {
       console.error("Registration error:", err.response?.data || err.message);
       
-      // Kama kuna makosa kutoka backend
       const backendError = err.response?.data;
       let errorMsg = "Hitilafu isiyotarajiwa. Tafadhali jaribu tena.";
       
@@ -139,14 +125,12 @@ const Register = () => {
     }
   };
   
-  // Social Login (Placeholder - Inahitaji usanidi wa Backend OAuth kama django-allauth)
   const handleSocialLogin = (provider) => {
     toast(`Inaanza ${provider} login... (OAuth inahitaji usanidi wa Backend)`, { icon: '⏳' });
     // Mfano wa redirect baadaye:
-    // window.location.href = `${API_BASE_URL}/auth/${provider.toLowerCase()}/`;
+    // window.location.href = 'https://shop-online-r9z4.onrender.com/api/auth/${provider.toLowerCase()}/';
   };
 
-  // Styles za Layout (Split Screen - Sawa na Login) - HAZIJABADILISHWA
   const styles = {
     container: {
       display: 'flex',
@@ -192,7 +176,6 @@ const Register = () => {
     <div style={styles.container}>
       <Toaster position="top-center" reverseOrder={false} />
 
-      {/* SEHEMU YA KUSHOTO: PICHA NA MAANDISHI (Desktop tu) */}
       <div style={styles.leftPanel}>
         <div style={styles.testimonialBox}>
           <p style={{ margin: '0 0 10px 0', fontSize: '16px', fontStyle: 'italic', fontWeight: '500', color: '#1a1a1a', lineHeight: '1.5' }}>
@@ -205,10 +188,8 @@ const Register = () => {
         </div>
       </div>
 
-      {/* SEHEMU YA KULIA: FOMU YA REGISTER */}
       <div style={styles.rightPanel}>
         
-        {/* Kichwa cha Fomu */}
         <div style={{ marginBottom: '30px' }}>
           <h2 style={{ fontSize: '32px', fontWeight: '700', color: '#1a1a1a', marginBottom: '8px' }}>
             Create your account
@@ -218,7 +199,6 @@ const Register = () => {
           </p>
         </div>
 
-        {/* Vifungo vya Social Login (Sawa na Login) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '25px' }}>
           <SocialButton 
             onClick={() => handleSocialLogin('Google')}
@@ -246,14 +226,12 @@ const Register = () => {
           />
         </div>
 
-        {/* Divider */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '25px', color: '#999', fontSize: '14px' }}>
           <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #e5e7eb' }} />
           <span style={{ padding: '0 15px' }}>Or</span>
           <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #e5e7eb' }} />
         </div>
 
-        {/* Error Message Area */}
         {errorMessage && (
           <div style={{
             backgroundColor: '#fee',
@@ -268,10 +246,8 @@ const Register = () => {
           </div>
         )}
 
-        {/* Fomu ya Register */}
         <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           
-          {/* Email */}
           <div>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#333' }}>Email Address</label>
             <input 
@@ -292,7 +268,6 @@ const Register = () => {
             </div>
           </div>
 
-          {/* Password */}
           <div>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#333' }}>Password</label>
             <div style={{ position: 'relative' }}>
@@ -320,7 +295,6 @@ const Register = () => {
             </div>
           </div>
 
-          {/* Confirm Password */}
           <div>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#333' }}>Confirm Password</label>
             <div style={{ position: 'relative' }}>
@@ -363,7 +337,6 @@ const Register = () => {
           </button>
         </form>
 
-        {/* Footer - Ingia */}
         <div style={{ textAlign: 'center', marginTop: '20px', fontSize: '15px', color: '#333' }}>
           Already have an account? 
           <span 
@@ -378,7 +351,6 @@ const Register = () => {
   );
 };
 
-// === Helper Component for Social Buttons ===
 const SocialButton = ({ bg, border, color, icon, text, onClick }) => (
   <button 
     type="button" 
@@ -395,7 +367,6 @@ const SocialButton = ({ bg, border, color, icon, text, onClick }) => (
   </button>
 );
 
-// === SVGs for Social Icons ===
 const GoogleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -413,7 +384,7 @@ const FacebookIcon = () => (
 
 const LinkedInIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
   </svg>
 );
 

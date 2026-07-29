@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // ✅ Badilisha: Axios badala ya Supabase
+import api from '../axiosConfig'; // 🔥 Tumia api kutoka axiosConfig
 import { useNavigate } from 'react-router-dom';
 import { toast, Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-
-const API_BASE_URL = "http://127.0.0.1:8000/api"; // ✅ Ongeza hii
 
 const Login = () => {
   const { t } = useTranslation();
@@ -12,7 +10,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 900);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true); // 🔥 Ongeza hii
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,7 +19,6 @@ const Login = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // 🔥 ONGEZA HII useEffect: Angalia kama user tayari ameingia
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("access_token");
@@ -31,17 +28,15 @@ const Login = () => {
       }
 
       try {
-        // Thibitisha kama token ni halali kwa kutuma ombi la profile
-        const profileRes = await axios.get(`${API_BASE_URL}/profile/`, {
+        const profileRes = await api.get('/profile/', {
           headers: { Authorization: `Bearer ${token}` }
         });
         
         const userProfile = profileRes.data;
         const role = userProfile.role;
 
-        // Tuma kwenye dashboard sahihi kama token ni halali
         if (role === 'supplier') {
-          const storeRes = await axios.get(`${API_BASE_URL}/stores/`, {
+          const storeRes = await api.get('/stores/', {
             params: { owner_id: userProfile.id },
             headers: { Authorization: `Bearer ${token}` }
           });
@@ -54,7 +49,6 @@ const Login = () => {
           navigate('/dashboard', { replace: true });
         }
       } catch (err) {
-        // Token ni batili au imekwisha muda -> futa token na uache user aingie
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         setIsCheckingAuth(false);
@@ -64,64 +58,46 @@ const Login = () => {
     checkAuth();
   }, [navigate]);
 
-  // ✅ BADILISHA: Handle Login kwa Django JWT
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // 1. Pata Token (JWT) kutoka endpoint ya /api/token/
-      // Kumbuka: Kwa sababu USERNAME_FIELD = 'email', SimpleJWT inatarajia 'email' hapa
-      const tokenRes = await axios.post(`${API_BASE_URL}/token/`, {
+      const tokenRes = await api.post('/token/', {
         email: email.trim(),
         password: password
       });
 
       const { access, refresh } = tokenRes.data;
       
-      // 2. Hifadhi token kwenye localStorage
       localStorage.setItem('access_token', access);
       localStorage.setItem('refresh_token', refresh);
 
-      // 3. Pata Profile ya mtumiaji (Kujua role) kwa kutumia token
-      const profileRes = await axios.get(`${API_BASE_URL}/profile/`, {
+      const profileRes = await api.get('/profile/', {
         headers: { Authorization: `Bearer ${access}` }
       });
       
       const userProfile = profileRes.data;
       const role = userProfile.role;
 
-      console.log("✅ Role found:", role);
-
-      // 4. Kama ni Supplier, tafuta Store ID yake
       if (role === 'supplier') {
-        console.log("⏳ Searching for supplier's store...");
-        const storeRes = await axios.get(`${API_BASE_URL}/stores/`, {
+        const storeRes = await api.get('/stores/', {
           params: { owner_id: userProfile.id },
           headers: { Authorization: `Bearer ${access}` }
         });
 
-        // 5. Kama store ipo, peleka na ID; Kama haipo, peleka kuunda store
         if (storeRes.data && storeRes.data.length > 0) {
-          console.log("✅ Store ID found:", storeRes.data[0].id);
           toast.success("Karibu Muuzaji! Inaelekeza kwenye Dashboard yako...");
           navigate(`/dashboard/sellerboard/${storeRes.data[0].id}`, { replace: true });
         } else {
-          console.warn("⚠️ Supplier has no store yet. Redirecting to create store.");
           toast.success("Karibu Muuzaji! Tafadhali unda duka lako kwanza.");
           navigate('/create-store', { replace: true });
         }
-      } 
-      // 6. Kama ni Customer, peleka kwenye dashboard ya kawaida
-      else {
-        console.log("✅ Customer detected. Redirecting to customer dashboard.");
+      } else {
         toast.success("Karibu Mteja!");
         navigate('/dashboard', { replace: true });
       }
     } catch (err) {
-      console.error("❌ Login error:", err.response?.data || err.message);
-      
-      // 🔥 Boresha ujumbe wa makosa: Angalia ikiwa ni 401 (User haipo / password ni mbaya)
       if (err.response?.status === 401) {
         toast.error("Barua pepe au nenosiri si sahihi. Tafadhali jaribu tena.");
       } else {
@@ -132,14 +108,10 @@ const Login = () => {
     }
   };
 
-  // Social Login (Placeholder kwa sasa - Utahitaji backend kwa OAuth)
   const handleSocialLogin = (provider) => {
     toast(`Inaanza ${provider} login... (OAuth inahitaji usanidi upande wa Backend)`, { icon: '⏳' });
-    // Mfano: baadaye unaweza ku-redirect kwa backend OAuth URL
-    // window.location.href = `${API_BASE_URL}/auth/${provider.toLowerCase()}/`;
   };
 
-  // Styles za Layout (Split Screen) - HAZIJABADILISHWA
   const styles = {
     container: {
       display: 'flex',
@@ -177,7 +149,6 @@ const Login = () => {
     },
   };
 
-  // Ikiwa bado inakagua token, onyesha skrini ya kupakia
   if (isCheckingAuth) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
@@ -190,7 +161,6 @@ const Login = () => {
     <div style={styles.container}>
       <Toaster position="top-center" reverseOrder={false} />
 
-      {/* SEHEMU YA KUSHOTO: PICHA NA MAANDISHI */}
       <div style={styles.leftPanel}>
         <div style={styles.testimonialBox}>
           <p style={{ margin: '0 0 10px 0', fontSize: '16px', fontStyle: 'italic', fontWeight: '500', color: '#1a1a1a', lineHeight: '1.5' }}>
@@ -203,10 +173,8 @@ const Login = () => {
         </div>
       </div>
 
-      {/* SEHEMU YA KULIA: FOMU YA LOGIN */}
       <div style={styles.rightPanel}>
         
-        {/* Kichwa cha Fomu */}
         <div style={{ marginBottom: '30px' }}>
           <h2 style={{ fontSize: '32px', fontWeight: '700', color: '#1a1a1a', marginBottom: '8px' }}>
             Sign in to your account
@@ -216,7 +184,6 @@ const Login = () => {
           </p>
         </div>
 
-        {/* Vifungo vya Social Login (Kama kwenye picha) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '25px' }}>
           <SocialButton 
             onClick={() => handleSocialLogin('Google')}
@@ -238,14 +205,12 @@ const Login = () => {
           />
         </div>
 
-        {/* Divider */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '25px', color: '#999', fontSize: '14px' }}>
           <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #e5e7eb' }} />
           <span style={{ padding: '0 15px' }}>Or</span>
           <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #e5e7eb' }} />
         </div>
 
-        {/* Fomu ya Email & Password */}
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#333' }}>Email</label>
@@ -294,7 +259,6 @@ const Login = () => {
           </button>
         </form>
 
-        {/* Footer - Jisajili */}
         <div style={{ textAlign: 'center', marginTop: '20px', fontSize: '15px', color: '#333' }}>
           Don't have an account? 
           <span 
@@ -309,7 +273,6 @@ const Login = () => {
   );
 };
 
-// === Helper Components for Social Buttons ===
 const SocialButton = ({ bg, border, color, icon, text, onClick }) => (
   <button 
     type="button" 
@@ -326,7 +289,6 @@ const SocialButton = ({ bg, border, color, icon, text, onClick }) => (
   </button>
 );
 
-// === SVGs for social icons ===
 const GoogleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
