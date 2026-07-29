@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import api from '../axiosConfig'; // 🔥 Tumia api
 import { 
   LayoutDashboard, MessageSquare, ClipboardList, 
   Settings, Bell, Search, User, LogOut, ChevronRight, Menu, X, Eye, EyeOff,
@@ -9,20 +9,15 @@ import {
 import toast from 'react-hot-toast';
 import '../AccountSettings.css';
 
-// 🔥 ONGEZA HII KWA AJILI YA BACKEND!
-const API_BASE_URL = "http://127.0.0.1:8000/api";
-
 const SupplierAccountSettings = ({ session }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // --- STATE ZA SIDEBAR NA DATA ---
   const [isExpanded, setIsExpanded] = useState(false);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Detect mobile screen
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
@@ -30,19 +25,16 @@ const SupplierAccountSettings = ({ session }) => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // --- STATE ZA EDIT PROFILE MODAL ---
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
   const [profileSaving, setProfileSaving] = useState(false);
 
-  // --- STATE ZA EMAIL UPDATE (ZIMEZIMWA KWA SASA) ---
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [emailLoading, setEmailLoading] = useState(false);
 
-  // --- STATE ZA PASSWORD UPDATE (ZIMEZIMWA KWA SASA) ---
   const [isEditingPassword, setIsEditingPassword] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -51,19 +43,18 @@ const SupplierAccountSettings = ({ session }) => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
 
-  // 🔥 1. VUTA DATA KUTOKA DJANGO API (Badala ya Supabase)
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem("access_token");
         if (!token) {
-          // Redirect login ikiwa token haipo
           navigate('/dashboard/login');
           return;
         }
 
         const headers = { Authorization: `Bearer ${token}` };
-        const response = await axios.get(`${API_BASE_URL}/profile/`, { headers });
+        // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
+        const response = await api.get('/profile/', { headers });
         
         setProfile(response.data);
         setFullName(response.data?.full_name || '');
@@ -80,7 +71,6 @@ const SupplierAccountSettings = ({ session }) => {
     fetchProfile();
   }, [navigate]);
 
-  // --- 2. HANDLE UPDATE PROFILE (Hii ndio "ivute / weka" data kwenye backend) ---
   const handleUpdateProfile = async () => {
     if (!fullName.trim()) {
       toast.error('Tafadhali weka jina lako kamili');
@@ -98,9 +88,9 @@ const SupplierAccountSettings = ({ session }) => {
 
       const headers = { Authorization: `Bearer ${token}` };
       
-      // 🔥 Tuma data kwenye Django PATCH /api/profile/
-      const response = await axios.patch(
-        `${API_BASE_URL}/profile/`, 
+      // 🔥 MABADILIKO: api.patch na kuondoa API_BASE_URL
+      const response = await api.patch(
+        '/profile/', 
         { 
           full_name: fullName, 
           username: username || null, 
@@ -121,27 +111,22 @@ const SupplierAccountSettings = ({ session }) => {
     }
   };
 
-  // ⛔ UPDATE EMAIL (ZIMWA - Inahitaji endpoint ya ziada kwa Django)
   const handleUpdateEmail = async () => {
     toast.error("Kubadilisha Email bado haijakamilika kwenye Backend.");
   };
 
-  // ⛔ UPDATE PASSWORD (ZIMWA - Inahitaji endpoint ya ziada kwa Django)
   const handleUpdatePassword = async () => {
     toast.error("Kubadilisha Password inahitaji endpoint ya ziada kwenye Backend.");
   };
 
-  // ⛔ RESET PASSWORD (ZIMWA kwa sasa)
   const handlePasswordReset = async () => {
     toast.error("Huduma ya Password Reset bado haijakamilika kwenye Backend.");
   };
 
-  // --- 8. DELETE ACCOUNT (ZIMWA) ---
   const handleDeleteAccount = async () => {
     toast.error("Kufuta akaunti bado haijakamilika kwenye Backend.");
   };
 
-  // ========== 🔥 SIDEBAR KWA MUUZAJI (Supplier) ==========
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} />, path: '/dashboard/sellerboard', label: 'Duka Lako' },
     { icon: <MessageSquare size={20} />, path: '/dashboard/supplier-messages', label: 'Ujumbe' },
@@ -149,7 +134,6 @@ const SupplierAccountSettings = ({ session }) => {
     { icon: <Settings size={20} />, path: '/dashboard/supplier-settings', label: 'Mipangilio' },
   ];
 
-  // ========== HELPFUL LINKS ==========
   const helpfulLinks = [
     { icon: <HelpCircle size={18} />, title: 'Help Center', path: '/help-center' },
     { icon: <FileText size={18} />, title: 'Tutorials', path: '/tutorials' },
@@ -162,7 +146,6 @@ const SupplierAccountSettings = ({ session }) => {
     { icon: <Globe size={18} />, title: 'About Skyfall', path: '/about-skyfall' },
   ];
 
-  // 🔥 9. SIGN OUT (Sasa ni kufuta Token na redirect)
   const handleSignOut = async () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
@@ -173,7 +156,6 @@ const SupplierAccountSettings = ({ session }) => {
   return (
     <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       
-      {/* HEADER */}
       <header className="dashboard-header" style={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
@@ -215,7 +197,6 @@ const SupplierAccountSettings = ({ session }) => {
 
       <div className="dashboard-main" style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         
-        {/* SIDEBAR */}
         {!isMobile && (
           <aside 
             onMouseEnter={() => setIsExpanded(true)} 
@@ -267,11 +248,9 @@ const SupplierAccountSettings = ({ session }) => {
           </aside>
         )}
 
-        {/* SETTINGS CONTENT */}
         <div className="settings-container" style={{ flex: 1, padding: isMobile ? '16px' : '24px', backgroundColor: '#f7f8fa', overflowY: 'auto' }}>
           <div className="settings-wrapper" style={{ maxWidth: '1000px', margin: '0 auto' }}>
             
-            {/* PROFILE CARD */}
             <div className="settings-card profile-header-card" style={{ background: '#fff', padding: isMobile ? '16px' : '24px', borderRadius: '12px', border: '1px solid #eee', marginBottom: '20px' }}>
               <div className="profile-info-main" style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
                 <div className="avatar-circle" style={{ width: '70px', height: '70px', borderRadius: '50%', backgroundColor: '#ff6a00', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', fontWeight: 'bold', overflow: 'hidden' }}>
@@ -300,7 +279,6 @@ const SupplierAccountSettings = ({ session }) => {
 
             <div className="settings-grid" style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
               
-              {/* ACCOUNT INFORMATION */}
               <div className="settings-card" style={{ background: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid #eee' }}>
                 <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '16px', borderBottom: '1px solid #f5f5f5', paddingBottom: '12px', marginBottom: '12px' }}>
                   <User size={18} /> Account information
@@ -335,7 +313,6 @@ const SupplierAccountSettings = ({ session }) => {
                 </ul>
               </div>
 
-              {/* ACCOUNT SECURITY */}
               <div className="settings-card" style={{ background: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid #eee' }}>
                 <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '16px', borderBottom: '1px solid #f5f5f5', paddingBottom: '12px', marginBottom: '12px' }}>
                   <Settings size={18} /> Account security
@@ -387,7 +364,6 @@ const SupplierAccountSettings = ({ session }) => {
               </div>
             </div>
 
-            {/* 🔥 STORE SECTION - RUDI KWENYE DUKA */}
             <div className="store-section" style={{ marginTop: '32px' }}>
               <div 
                 onClick={() => navigate('/dashboard/sellerboard')}
@@ -418,7 +394,6 @@ const SupplierAccountSettings = ({ session }) => {
               </div>
             </div>
 
-            {/* HELP & INFORMATION */}
             <div className="helpful-links-section" style={{ marginTop: '32px' }}>
               <h3 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '16px', color: '#333', paddingLeft: '4px' }}>
                 Help & Information
@@ -461,7 +436,6 @@ const SupplierAccountSettings = ({ session }) => {
                 ))}
               </div>
 
-              {/* 🔥 SIGN OUT BUTTON - SASA INAFUTA TOKEN! */}
               <div style={{ marginTop: '24px' }}>
                 <button
                   onClick={handleSignOut}
@@ -495,7 +469,6 @@ const SupplierAccountSettings = ({ session }) => {
                 </button>
               </div>
               
-              {/* Simple footer */}
               <div style={{ textAlign: 'center', marginTop: '24px', padding: '16px' }}>
                 <p style={{ fontSize: '11px', color: '#999' }}>
                   Skyfall.com © 2024 • All rights reserved
@@ -506,7 +479,6 @@ const SupplierAccountSettings = ({ session }) => {
         </div>
       </div>
 
-      {/* 🔥 MOBILE BOTTOM NAV - SUPPLIER VERSION */}
       {isMobile && (
         <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'white', display: 'flex', justifyContent: 'space-around', alignItems: 'center', padding: '10px 0 20px', borderTop: '1px solid #eee', zIndex: 1000 }}>
           <button onClick={() => navigate('/dashboard/sellerboard')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', flex: 1 }}>
@@ -528,7 +500,6 @@ const SupplierAccountSettings = ({ session }) => {
         </nav>
       )}
 
-      {/* EDIT PROFILE MODAL (Imeondoa Camera icon - kutokana na model ya URLField) */}
       {isEditingProfile && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ backgroundColor: '#fff', borderRadius: '16px', width: '90%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' }}>
@@ -538,7 +509,6 @@ const SupplierAccountSettings = ({ session }) => {
                 style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
             </div>
             <div style={{ padding: '20px' }}>
-              {/* 🔥 Picha bado inaweza kuonyeshwa, lakini Upload imezimwa kwa sababu Model ni URLField */}
               <div style={{ textAlign: 'center', marginBottom: '20px', opacity: 0.5 }}>
                 <div style={{ position: 'relative', display: 'inline-block' }}>
                   <div style={{ width: '100px', height: '100px', borderRadius: '50%', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>

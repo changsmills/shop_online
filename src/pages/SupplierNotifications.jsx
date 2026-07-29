@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios"; // ✅ Badilisha: Axios badala ya Supabase
+import api from "../axiosConfig"; // 🔥 Tumia api
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
   Bell, ShoppingBag, Home, ChevronRight, 
@@ -8,8 +8,6 @@ import {
 } from "lucide-react";
 import toast from 'react-hot-toast';
 import "../NotificationsPage.css"; 
-
-const API_BASE_URL = "http://127.0.0.1:8000/api"; // ✅ Ongeza hii
 
 export default function SupplierNotifications({ session }) {
   const navigate = useNavigate();
@@ -21,7 +19,6 @@ export default function SupplierNotifications({ session }) {
   const [myStoreId, setMyStoreId] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   
-  // Detect mobile screen
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
@@ -29,7 +26,6 @@ export default function SupplierNotifications({ session }) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // 🔥 SIDEBAR KWA MUUZAJI PEKEE (SAHIHI)
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} />, path: '/dashboard/sellerboard', label: 'Duka Lako' },
     { icon: <MessageSquare size={20} />, path: '/dashboard/supplier-messages', label: 'Ujumbe' },
@@ -37,10 +33,8 @@ export default function SupplierNotifications({ session }) {
     { icon: <Settings size={20} />, path: '/dashboard/supplier-settings', label: 'Mipangilio' },
   ];
 
-  // ✅ FETCH SUPPLIER ORDERS (Kupitia Django API)
   useEffect(() => {
     const fetchSellerOrders = async () => {
-      // Check token
       const token = localStorage.getItem("access_token");
       if (!token) {
         setLoading(false);
@@ -50,9 +44,9 @@ export default function SupplierNotifications({ session }) {
       const headers = { Authorization: `Bearer ${token}` };
       
       try {
-        // 1. Pata store ya mtumiaji
-        const storeRes = await axios.get(`${API_BASE_URL}/stores/`, {
-          params: { owner_id: session?.user?.id }, // endpoint inabidi ichuje kwa owner_id
+        // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
+        const storeRes = await api.get('/stores/', {
+          params: { owner_id: session?.user?.id },
           headers
         });
         const store = storeRes.data?.[0];
@@ -60,20 +54,14 @@ export default function SupplierNotifications({ session }) {
         if (store) {
           setMyStoreId(store.id);
 
-          // 2. Pata orders za store hii
-          const ordersRes = await axios.get(`${API_BASE_URL}/orders/`, {
+          // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
+          const ordersRes = await api.get('/orders/', {
             params: { store_id: store.id, ordering: '-created_at' },
             headers
           });
 
-          // 3. Chukua data na uishughulikie
           const orders = ordersRes.data || [];
-          
-          // Kama Django inarudisha customer profile kwa nested serializer, hii inatosha.
-          // Ikiwa haijajumuishwa, unaweza ku-map kwa kutumia `customer_id` na kupiga `/api/profile/{id}/`
-          // Lakini kwa mfano huu, tunachukulia kuwa `customer` (au `profiles`) iko kwenye response.
           const ordersWithCustomers = orders.map(order => {
-            // Tunaweka profile dummy kama haijajumuishwa
             const customerData = order.customer || { full_name: 'Mteja Mpya' };
             return { ...order, profiles: customerData };
           });
@@ -94,7 +82,6 @@ export default function SupplierNotifications({ session }) {
     fetchSellerOrders();
   }, [session?.user?.id]);
 
-  // ✅ POLLING (Kwa sababu Django bado haina Realtime WebSocket)
   useEffect(() => {
     if (!session?.user?.id || !myStoreId) return;
     
@@ -116,13 +103,13 @@ export default function SupplierNotifications({ session }) {
             ordering: '-created_at'
           };
 
-          const { data: orders, status } = await axios.get(`${API_BASE_URL}/orders/`, { params, headers });
+          // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
+          const { data: orders, status } = await api.get('/orders/', { params, headers });
 
           if (status === 200 && orders && orders.length > 0) {
             console.log(`📦 Found ${orders.length} new order(s) via polling`);
             lastCheckTime = new Date().toISOString();
             
-            // Map customer data
             const ordersWithCustomers = orders.map(order => ({
               ...order,
               profiles: order.customer || { full_name: 'Mteja Mpya' }
@@ -154,7 +141,6 @@ export default function SupplierNotifications({ session }) {
         }
       };
       
-      // Check immediately then every 10 seconds
       checkForNewOrders();
       pollingInterval = setInterval(checkForNewOrders, 10000);
     };
@@ -189,7 +175,6 @@ export default function SupplierNotifications({ session }) {
   return (
     <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#f7f8fa' }}>
       
-      {/* HEADER YA SUPPLIER */}
       <header className="dashboard-header" style={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
@@ -223,7 +208,6 @@ export default function SupplierNotifications({ session }) {
 
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         
-        {/* SIDEBAR - Supplier Version */}
         {!isMobile && (
           <aside 
             onMouseEnter={() => setIsExpanded(true)}
@@ -274,7 +258,6 @@ export default function SupplierNotifications({ session }) {
           </aside>
         )}
 
-        {/* MAIN CONTENT - SUPPLIER ORDERS ONLY */}
         <main style={{ 
           flex: 1, 
           padding: isMobile ? '16px' : '24px', 
@@ -356,7 +339,6 @@ export default function SupplierNotifications({ session }) {
         </main>
       </div>
       
-      {/* MOBILE BOTTOM NAV - SUPPLIER VERSION (SAHIHI) */}
       {isMobile && (
         <nav className="mobile-bottom-nav" style={{
           position: 'fixed',
@@ -372,25 +354,21 @@ export default function SupplierNotifications({ session }) {
           zIndex: 1000,
           boxShadow: '0 -2px 10px rgba(0,0,0,0.05)'
         }}>
-          {/* Duka - Inaelekeza kwenye Supplier Dashboard */}
           <button onClick={() => navigate('/dashboard/sellerboard')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', cursor: 'pointer', background: 'none', border: 'none', flex: 1 }}>
             <Home size={22} color={location.pathname.startsWith('/dashboard/sellerboard') ? '#ff6a00' : '#666'} />
             <span style={{ fontSize: '10px', color: location.pathname.startsWith('/dashboard/sellerboard') ? '#ff6a00' : '#666' }}>Duka</span>
           </button>
 
-          {/* 🔥 Oda - Inaelekeza kwenye Supplier Orders (sio notifications!) */}
           <button onClick={() => navigate('/dashboard/supplier-orders')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', cursor: 'pointer', background: 'none', border: 'none', flex: 1 }}>
             <ClipboardList size={22} color={location.pathname === '/dashboard/supplier-orders' ? '#ff6a00' : '#666'} />
             <span style={{ fontSize: '10px', color: location.pathname === '/dashboard/supplier-orders' ? '#ff6a00' : '#666' }}>Oda</span>
           </button>
 
-          {/* Ads - Inabaki sawa */}
           <button onClick={() => navigate('/advertise')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', cursor: 'pointer', background: 'none', border: 'none', flex: 1 }}>
             <Megaphone size={22} color={location.pathname === '/advertise' ? '#ff6a00' : '#666'} />
             <span style={{ fontSize: '10px', color: location.pathname === '/advertise' ? '#ff6a00' : '#666' }}>Ads</span>
           </button>
 
-          {/* 🔥 Arifa - Inaelekeza kwenye Supplier Notifications */}
           <button onClick={() => navigate('/dashboard/supplier-notifications')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', cursor: 'pointer', background: 'none', border: 'none', flex: 1 }}>
             <Bell size={22} color={location.pathname === '/dashboard/supplier-notifications' ? '#ff6a00' : '#666'} />
             <span style={{ fontSize: '10px', color: location.pathname === '/dashboard/supplier-notifications' ? '#ff6a00' : '#666' }}>Arifa</span>
@@ -398,7 +376,6 @@ export default function SupplierNotifications({ session }) {
         </nav>
       )}
 
-      {/* Add padding bottom for mobile */}
       {isMobile && <div style={{ height: '70px' }} />}
       
       <style>{`

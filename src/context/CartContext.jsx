@@ -1,26 +1,36 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useRef } from "react";
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
+  // Tumia useRef kuhifadhi cartItems kwa haraka, kuepuka asynchronous delay
+  const cartRef = useRef([]);
+  
   const [cartItems, setCartItems] = useState(() => {
     const savedCart = localStorage.getItem("alibaba_cart");
-    return savedCart ? JSON.parse(savedCart) : [];
+    const initialData = savedCart ? JSON.parse(savedCart) : [];
+    cartRef.current = initialData; // Set ref immediately
+    return initialData;
   });
 
-  // ✅ Save to localStorage whenever cart changes
+  // Update localStorage whenever cart changes
   useEffect(() => {
     localStorage.setItem("alibaba_cart", JSON.stringify(cartItems));
+    cartRef.current = cartItems; // Keep ref in sync
     console.log("💾 Cart saved to localStorage:", cartItems);
   }, [cartItems]);
 
-  // ✅ Listen for storage changes across tabs/windows
+  // Listen for storage changes across tabs (to keep them in sync)
   useEffect(() => {
     const handleStorageChange = (e) => {
-      if (e.key === 'alibaba_cart') {
+      if (e.key === 'alibaba_cart' && e.newValue !== null) {
         const newCart = e.newValue ? JSON.parse(e.newValue) : [];
-        setCartItems(newCart);
-        console.log("🔄 Cart updated from another tab:", newCart);
+        // Tumia strict equality ili kuepuka upotoshaji usiohitajika
+        if (JSON.stringify(newCart) !== JSON.stringify(cartRef.current)) {
+          cartRef.current = newCart;
+          setCartItems(newCart);
+          console.log("🔄 Cart updated from another tab:", newCart);
+        }
       }
     };
     
@@ -28,26 +38,17 @@ export const CartProvider = ({ children }) => {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // ✅ Listen for custom cartUpdated event (for same tab updates)
-  useEffect(() => {
-    const handleCartUpdate = (e) => {
-      if (e.detail) {
-        setCartItems(e.detail);
-        console.log("🔄 Cart updated via event:", e.detail);
-      }
-    };
-    
-    window.addEventListener('cartUpdated', handleCartUpdate);
-    return () => window.removeEventListener('cartUpdated', handleCartUpdate);
-  }, []);
-
   const addToCart = (newItem) => {
     console.log("🛒 addToCart called:", newItem);
     
+    // Let's generate a reliable unique ID for the cart item
+    // It combines product_id, variant_id, selected_color, selected_size
+    const uniqueId = `${newItem.id}-${newItem.variant_id || 'novar'}-${newItem.selected_color || 'nocolor'}-${newItem.selected_size || 'nosize'}`;
+    const itemWithUniqueId = { ...newItem, uniqueCartId: uniqueId };
+    
     setCartItems((prev) => {
-      const existingIndex = prev.findIndex(item => item.uniqueCartId === newItem.uniqueCartId);
-      
-      console.log("Existing index:", existingIndex);
+      // Generate a reliable unique ID for the cart item (same as above)
+      const existingIndex = prev.findIndex(item => item.uniqueCartId === uniqueId);
       
       if (existingIndex !== -1) {
         const updated = [...prev];
@@ -56,14 +57,10 @@ export const CartProvider = ({ children }) => {
           quantity: updated[existingIndex].quantity + newItem.quantity
         };
         console.log("✅ Updated existing item:", updated[existingIndex]);
-        // Dispatch event for other components
-        window.dispatchEvent(new CustomEvent('cartUpdated', { detail: updated }));
         return updated;
       } else {
-        const newCart = [...prev, newItem];
-        console.log("✅ Added new item:", newItem);
-        // Dispatch event for other components
-        window.dispatchEvent(new CustomEvent('cartUpdated', { detail: newCart }));
+        const newCart = [...prev, itemWithUniqueId];
+        console.log("✅ Added new item:", itemWithUniqueId);
         return newCart;
       }
     });
@@ -71,7 +68,6 @@ export const CartProvider = ({ children }) => {
 
   const updateQuantity = (uniqueCartId, newQuantity) => {
     console.log("🔄 updateQuantity called with:", { uniqueCartId, newQuantity });
-    console.log("Current cartItems before update:", cartItems);
     
     if (!uniqueCartId) {
       console.error("❌ updateQuantity: uniqueCartId is missing!");
@@ -91,15 +87,12 @@ export const CartProvider = ({ children }) => {
           : item
       );
       console.log("✅ Quantity updated:", updated.find(item => item.uniqueCartId === uniqueCartId));
-      // Dispatch event for other components
-      window.dispatchEvent(new CustomEvent('cartUpdated', { detail: updated }));
       return updated;
     });
   };
 
   const removeFromCart = (uniqueCartId) => {
     console.log("🗑️ removeFromCart called with:", uniqueCartId);
-    console.log("Current cartItems before removal:", cartItems);
     
     if (!uniqueCartId) {
       console.error("❌ removeFromCart: uniqueCartId is missing!");
@@ -107,32 +100,25 @@ export const CartProvider = ({ children }) => {
     }
     
     setCartItems(prev => {
-      const itemToRemove = prev.find(item => item.uniqueCartId === uniqueCartId);
-      if (!itemToRemove) {
-        console.error("❌ Item not found with uniqueCartId:", uniqueCartId);
-        return prev;
+      const newCart = prev.filter(item => item.uniqueCartId !== uniqueCartId);
+      if (newCart.length === prev.length) {
+        console.warn("⚠️ Item not found with uniqueCartId:", uniqueCartId);
+      } else {
+        console.log(`✅ Removed item (${prev.length - newCart.length} item removed)`);
       }
-      
-      const filtered = prev.filter(item => item.uniqueCartId !== uniqueCartId);
-      console.log("✅ Removed item:", itemToRemove);
-      console.log("Remaining items:", filtered);
-      // Dispatch event for other components
-      window.dispatchEvent(new CustomEvent('cartUpdated', { detail: filtered }));
-      return filtered;
+      return newCart;
     });
   };
 
   const clearCart = () => {
     console.log("🗑️ clearCart called");
     setCartItems([]);
+    cartRef.current = [];
     localStorage.removeItem("alibaba_cart");
-    // Dispatch event for other components
-    window.dispatchEvent(new CustomEvent('cartUpdated', { detail: [] }));
   };
 
   const getCartTotal = () => {
     const total = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-    console.log("💰 Cart total:", total);
     return total;
   };
 

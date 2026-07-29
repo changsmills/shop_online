@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios'; // ✅ Badilisha: Axios badala ya Supabase
+import api from '../axiosConfig'; // 🔥 Tumia api
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, MessageSquare, ClipboardList, 
@@ -7,8 +7,6 @@ import {
 } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
 import '../MyOrders.css';
-
-const API_BASE_URL = "http://127.0.0.1:8000/api"; // ✅ Ongeza hii
 
 const SupplierOrders = ({ session }) => {
   const [orders, setOrders] = useState([]);
@@ -26,7 +24,6 @@ const SupplierOrders = ({ session }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // ✅ FETCH SUPPLIER ORDERS (Kupitia Django API)
   const fetchSupplierOrders = async () => {
     if (!session) return;
     setLoading(true);
@@ -40,12 +37,12 @@ const SupplierOrders = ({ session }) => {
       }
       const headers = { Authorization: `Bearer ${token}` };
 
-      // 1. Pata duka la muuzaji (owner_id = session.user.id)
-      const storeRes = await axios.get(`${API_BASE_URL}/stores/`, {
+      // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
+      const storeRes = await api.get('/stores/', {
         params: { owner_id: session.user.id },
         headers
       });
-      const storeData = storeRes.data?.[0]; // Chukua duka la kwanza (kwa wauzaji walio na duka moja)
+      const storeData = storeRes.data?.[0];
 
       if (!storeData) {
         toast.error("Hujasajili duka bado");
@@ -55,8 +52,8 @@ const SupplierOrders = ({ session }) => {
 
       const storeId = storeData.id;
 
-      // 2. Pata oda zote za duka hili (Nested items na profiles zitajumuishwa na serializer)
-      const ordersRes = await axios.get(`${API_BASE_URL}/orders/`, {
+      // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
+      const ordersRes = await api.get('/orders/', {
         params: { store_id: storeId, ordering: '-created_at' },
         headers
       });
@@ -75,7 +72,6 @@ const SupplierOrders = ({ session }) => {
     fetchSupplierOrders();
   }, [session]);
 
-  // Toggle kufungua/kufunga bidhaa
   const toggleExpandOrder = (orderId) => {
     setExpandedOrders(prev => ({
       ...prev,
@@ -83,7 +79,6 @@ const SupplierOrders = ({ session }) => {
     }));
   };
 
-  // 🔥 SIDEBAR KWA MUUZAJI
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} />, path: '/dashboard/sellerboard', label: 'Duka Lako' },
     { icon: <MessageSquare size={20} />, path: '/dashboard/supplier-messages', label: 'Ujumbe' },
@@ -119,7 +114,6 @@ const SupplierOrders = ({ session }) => {
     <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#f7f8fa' }}>
       <Toaster position="top-center" />
       
-      {/* HEADER YA SUPPLIER (IMEOndoa UserTools) */}
       <header className="dashboard-header" style={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
@@ -150,7 +144,6 @@ const SupplierOrders = ({ session }) => {
           )}
         </div>
 
-        {/* Usertools IMEONDOLWA kabisa */}
         <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
           {!isMobile && (
             <Bell size={20} style={{ cursor: 'pointer', color: '#666' }} />
@@ -160,7 +153,6 @@ const SupplierOrders = ({ session }) => {
 
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         
-        {/* SIDEBAR - Supplier Version */}
         {!isMobile && (
           <aside 
             onMouseEnter={() => setIsExpanded(true)}
@@ -244,7 +236,6 @@ const SupplierOrders = ({ session }) => {
 
                   return (
                     <div key={order.id} style={{ backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #eee', overflow: 'hidden' }}>
-                      {/* ORDER HEADER */}
                       <div style={{ padding: '20px', borderBottom: '1px solid #eee', backgroundColor: '#fafafa' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                           <div>
@@ -287,7 +278,6 @@ const SupplierOrders = ({ session }) => {
                         </div>
                       </div>
 
-                      {/* ORDER ITEMS */}
                       <div style={{ padding: '20px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                           {orderItems.map((item, idx) => (
@@ -329,7 +319,6 @@ const SupplierOrders = ({ session }) => {
         </main>
       </div>
 
-      {/* MOBILE BOTTOM NAV - SUPPLIER VERSION */}
       {isMobile && (
         <nav style={{
           position: 'fixed',

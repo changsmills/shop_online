@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import api from '../axiosConfig'; // 🔥 Tumia api
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, MessageSquare, ClipboardList, 
@@ -10,9 +10,7 @@ import '../Messages.css';
 import '../AccountSettings.css';
 import messageImage from "../images/messageSent.svg"; 
 
-const API_BASE_URL = "http://127.0.0.1:8000/api";
-
-const SupplierMessages = () => { // 🔥 IMEONDOLEShA { session }!
+const SupplierMessages = () => { 
   const navigate = useNavigate();
   const location = useLocation();
   const messagesEndRef = useRef(null);
@@ -26,7 +24,6 @@ const SupplierMessages = () => { // 🔥 IMEONDOLEShA { session }!
   const [isMobile, setIsMobile] = useState(false);
   const [showMobileChat, setShowMobileChat] = useState(false);
   
-  // 🔥 MPYA: Pata ID ya mtumiaji kutoka Backend
   const [currentUserId, setCurrentUserId] = useState(null);
 
   useEffect(() => {
@@ -44,7 +41,6 @@ const SupplierMessages = () => { // 🔥 IMEONDOLEShA { session }!
     scrollToBottom();
   }, [messages]);
 
-  // 🔥 FETCH MTUMIAJI (Profile ID) kutoka Backend
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -53,10 +49,11 @@ const SupplierMessages = () => { // 🔥 IMEONDOLEShA { session }!
           navigate('/dashboard/login');
           return;
         }
-        const res = await axios.get(`${API_BASE_URL}/profile/`, {
+        // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
+        const res = await api.get('/profile/', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        setCurrentUserId(res.data.id); // Hapa tunapata ID ya Profile
+        setCurrentUserId(res.data.id);
       } catch (err) {
         console.error("Failed to get profile ID:", err);
       }
@@ -64,14 +61,14 @@ const SupplierMessages = () => { // 🔥 IMEONDOLEShA { session }!
     fetchProfile();
   }, [navigate]);
 
-  // ✅ FETCH MESSAGES FOR A SPECIFIC CHAT
   const fetchMessages = async (partnerId) => {
     if (!partnerId || !currentUserId) return;
     try {
       const token = localStorage.getItem("access_token");
       const headers = { Authorization: `Bearer ${token}` };
 
-      const response = await axios.get(`${API_BASE_URL}/messages/`, {
+      // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
+      const response = await api.get('/messages/', {
         params: {
           sender: currentUserId,
           receiver: partnerId
@@ -86,7 +83,6 @@ const SupplierMessages = () => { // 🔥 IMEONDOLEShA { session }!
     }
   };
 
-  // ✅ FETCH INBOX (ALL CHATS)
   const fetchInbox = async () => {
     if (!currentUserId) return;
     setLoading(true);
@@ -94,7 +90,8 @@ const SupplierMessages = () => { // 🔥 IMEONDOLEShA { session }!
       const token = localStorage.getItem("access_token");
       const headers = { Authorization: `Bearer ${token}` };
 
-      const response = await axios.get(`${API_BASE_URL}/messages/`, {
+      // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
+      const response = await api.get('/messages/', {
         params: {
           user_id: currentUserId,
           ordering: '-created_at'
@@ -135,7 +132,6 @@ const SupplierMessages = () => { // 🔥 IMEONDOLEShA { session }!
     if (currentUserId) fetchInbox(); 
   }, [currentUserId]);
 
-  // ✅ HANDLE SEND MESSAGE
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim() || !activeChat || !currentUserId) return;
@@ -156,8 +152,9 @@ const SupplierMessages = () => { // 🔥 IMEONDOLEShA { session }!
       const token = localStorage.getItem("access_token");
       const headers = { Authorization: `Bearer ${token}` };
 
-      await axios.post(
-        `${API_BASE_URL}/messages/`,
+      // 🔥 MABADILIKO: api.post na kuondoa API_BASE_URL
+      await api.post(
+        '/messages/',
         {
           sender_id: currentUserId,
           receiver_id: activeChat.id,
@@ -182,7 +179,6 @@ const SupplierMessages = () => { // 🔥 IMEONDOLEShA { session }!
 
   const handleBackToChatList = () => setShowMobileChat(false);
 
-  // 🔥 SIDEBAR LINKS
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} />, path: '/dashboard/sellerboard', label: 'Duka Lako' },
     { icon: <MessageSquare size={20} />, path: '/dashboard/supplier-messages', label: 'Ujumbe' },
@@ -239,7 +235,6 @@ const SupplierMessages = () => { // 🔥 IMEONDOLEShA { session }!
             </div>
           )}
 
-          {/* CHAT WINDOW */}
           <div className="chat-window" style={{ flex: 1, display: 'flex', flexDirection: 'column', width: isMobile && showMobileChat ? '100%' : 'auto' }}>
             {!activeChat ? (
               <div className="chat-empty-state" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', color: '#999' }}>
@@ -274,7 +269,6 @@ const SupplierMessages = () => { // 🔥 IMEONDOLEShA { session }!
         </div>
       </div>
 
-      {/* MOBILE BOTTOM NAV */}
       {isMobile && (
         <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'white', display: 'flex', justifyContent: 'space-around', alignItems: 'center', padding: '10px 0 20px', borderTop: '1px solid #eee', zIndex: 1000 }}>
           <button onClick={() => navigate('/dashboard/sellerboard')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', flex: 1 }}>

@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'; // ✅ Badilisha: Axios badala ya Supabase
+import api from '../axiosConfig'; // 🔥 Tumia api
 import { ChevronDown } from 'lucide-react';
 import toast from 'react-hot-toast';
-
-const API_BASE_URL = "http://127.0.0.1:8000/api"; // ✅ Ongeza hii
 
 const SupplierAuth = () => {
   const navigate = useNavigate();
@@ -14,7 +12,6 @@ const SupplierAuth = () => {
   const [loading, setLoading] = useState(false);
   const [country, setCountry] = useState('TZ');
 
-  // Responsive Logic
   const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth <= 900 : false);
 
   useEffect(() => {
@@ -23,7 +20,6 @@ const SupplierAuth = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // ✅ BADILISHA: Handle submit kwa Django API
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -31,7 +27,8 @@ const SupplierAuth = () => {
     try {
       if (isLogin) {
         // ===== LOGIN =====
-        const response = await axios.post(`${API_BASE_URL}/token/`, {
+        // 🔥 MABADILIKO: api.post na kuondoa API_BASE_URL
+        const response = await api.post('/token/', {
           email: email.trim(),
           password: password
         });
@@ -40,8 +37,8 @@ const SupplierAuth = () => {
         localStorage.setItem('access_token', access);
         localStorage.setItem('refresh_token', refresh);
 
-        // Pata profile kujua role
-        const profileRes = await axios.get(`${API_BASE_URL}/profile/`, {
+        // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
+        const profileRes = await api.get('/profile/', {
           headers: { Authorization: `Bearer ${access}` }
         });
 
@@ -55,21 +52,20 @@ const SupplierAuth = () => {
         }
       } else {
         // ===== SIGNUP (Supplier) =====
-        // Tuma data kwenye endpoint ya register
-        const response = await axios.post(`${API_BASE_URL}/register/`, {
+        // 🔥 MABADILIKO: api.post na kuondoa API_BASE_URL
+        const response = await api.post('/register/', {
           email: email.trim(),
           password: password,
-          role: 'supplier' // Hii itaambia backend kuunda Profile yenye role supplier
+          role: 'supplier'
         });
 
-        // Ikiwa backend inarudisha tokens, zihifadhi
         if (response.data.access && response.data.refresh) {
           localStorage.setItem('access_token', response.data.access);
           localStorage.setItem('refresh_token', response.data.refresh);
         }
 
         toast.success('Akaunti ya supplier imeundwa!');
-        navigate('/create-store'); // Peleka kuunda duka
+        navigate('/create-store');
       }
     } catch (err) {
       console.error('Auth error:', err.response?.data || err.message);
@@ -80,7 +76,6 @@ const SupplierAuth = () => {
     }
   };
 
-  // Styles constants (zimebaki sawa)
   const styles = {
     container: {
       display: 'flex',
@@ -120,7 +115,6 @@ const SupplierAuth = () => {
   return (
     <div style={styles.container}>
       
-      {/* SEHEMU YA KUSHOTO: PICHA NA MAANDISHI */}
       <div style={styles.leftPanel}>
         <div style={styles.overlayBox}>
           <p style={{ margin: '0 0 10px 0', fontSize: '16px', fontStyle: 'italic', fontWeight: '500', color: '#1a1a1a', lineHeight: '1.5' }}>
@@ -133,13 +127,11 @@ const SupplierAuth = () => {
         </div>
       </div>
 
-      {/* SEHEMU YA KULIA: FOMU YA LOGIN / SIGNUP */}
       <div style={styles.rightPanel}>
         <h2 style={{ fontSize: '32px', fontWeight: '700', color: '#1a1a1a', marginBottom: '8px' }}>
           {isLogin ? 'Sign in as a supplier' : 'Sign up as a supplier'}
         </h2>
         
-        {/* Location Dropdown */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '30px', color: '#555', fontSize: '14px' }}>
           <span>Company location:</span>
           <select 
@@ -156,7 +148,6 @@ const SupplierAuth = () => {
           </select>
         </div>
 
-        {/* Social Buttons */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '30px' }}>
           <SocialButton 
             bg="#fff" border="1px solid #ddd" color="#333" 
@@ -175,14 +166,12 @@ const SupplierAuth = () => {
           />
         </div>
 
-        {/* Divider */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '30px', color: '#999', fontSize: '14px' }}>
           <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #e5e7eb' }} />
           <span style={{ padding: '0 15px' }}>Or</span>
           <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #e5e7eb' }} />
         </div>
 
-        {/* Email Input & Form */}
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#333' }}>Email</label>
@@ -231,7 +220,6 @@ const SupplierAuth = () => {
           </button>
         </form>
 
-        {/* Toggle Footer */}
         <div style={{ textAlign: 'center', marginTop: '20px', fontSize: '15px', color: '#333' }}>
           {isLogin ? "Don't have an account? " : "Already have an account? "}
           <span 
@@ -246,9 +234,6 @@ const SupplierAuth = () => {
   );
 };
 
-// ---------------------------------------------------------------
-// KUTUMIA HIVI SOCIAL BUTTONS (Vipande vidogo vilivyotengwa)
-// ---------------------------------------------------------------
 const SocialButton = ({ bg, border, color, icon, text }) => (
   <button type="button" style={{
     width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -261,9 +246,6 @@ const SocialButton = ({ bg, border, color, icon, text }) => (
   </button>
 );
 
-// ---------------------------------------------------------------
-// ICONS (SVGs Zilizoruhusiwa kwa Google, Facebook, LinkedIn)
-// ---------------------------------------------------------------
 const GoogleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>

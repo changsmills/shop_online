@@ -1,9 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import axios from 'axios';
-const API_BASE_URL = 'http://127.0.0.1:8000/api';
-
+import api from '../axiosConfig'; // 🔥 Tumia api
 import ProductSelectionDrawer from '../pages/ProductSelectionDrawer';
 import { MessageSquare, Star, ChevronRight, ShoppingCart, Zap } from 'lucide-react';
 import '../ProductInfo.css';
@@ -25,10 +23,9 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
   const [purchaseQty, setPurchaseQty] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  // ✅ 1. State sahihi (Hakikisha majina yanaendana)
   const [activeColor, setActiveColor] = useState(null);
   const [activeSize, setActiveSize] = useState(null);
-  const [isSelectionOpen, setIsSelectionOpen] = useState(false); // Hii ndio state ya drawer yako
+  const [isSelectionOpen, setIsSelectionOpen] = useState(false);
 
   const moq = product?.moq || 1;
   const productImage = product?.cover_image || "https://via.placeholder.com/150";
@@ -61,11 +58,10 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
     return grouped;
   }, [productVariations]);
 
-  // ✅ 2. Update function ya kufungua drawer
   const openDrawer = (color, size) => {
     setActiveColor(color);
     setActiveSize(size);
-    setIsSelectionOpen(true); // Badilisha kutoka setDrawerOpen kwenda setIsSelectionOpen
+    setIsSelectionOpen(true);
   };
 
   const availableSizesForColor = useMemo(() => {
@@ -152,7 +148,6 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
   const selectVariationAndOpenDrawer = (variation, action = 'order') => {
     if (!variation) return;
 
-    // Sasa tunaruhusu mtumiaji kuchagua bila kukaguliwa kama ameingia (login)
     setSelectedVariationObj(variation);
     setSelectedColor(variation.color_name);
     setSelectedSize(variation.size_value || "");
@@ -163,18 +158,15 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
     setPurchaseQty(1);
     setIsSelectionOpen(true);
 
-    // Ujumbe wa mafanikio (optional)
     toast.success(`${variation.color_name}${variation.size_value ? ` - ${variation.size_value}` : ''} imechaguliwa`);
   };
 
-  // ✅ 3. Update handleColorSelect ili i-trigger drawer na initial values
   const handleColorSelect = async (color) => {
     const colorData = variationsByColor[color];
     if (colorData) {
       const sizes = Object.keys(colorData.size_stock || {});
       const firstSize = sizes.length > 0 ? sizes[0] : "";
       
-      // Tunaset hizi ili drawer izipokee kama "Initial State"
       setActiveColor(color);
       setActiveSize(firstSize);
       
@@ -183,7 +175,6 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
     }
   };
 
-  // ✅ 4. Update handleSizeSelect
   const handleSizeSelect = async (size) => {
     if (selectedColor) {
       const stockQty = getStockForSize(selectedColor, size);
@@ -203,19 +194,16 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
   };
 
   const handleOpenDrawer = (action) => {
-    // ✅ Angalia kama rangi imechaguliwa
     if (!selectedColor) {
       toast.error("Tafadhali chagua rangi kwanza!");
       return;
     }
     
-    // ✅ Angalia kama ukubwa umechaguliwa (kama bidhaa ina sizes)
     if (availableSizesForColor.length > 0 && !selectedSize) {
       toast.error("Tafadhali chagua ukubwa kwanza!");
       return;
     }
     
-    // ✅ Hakikisha variation ipo
     let targetVariation = selectedVariationObj;
     if (!targetVariation) {
       const variation = getCurrentVariation(selectedColor, selectedSize);
@@ -228,7 +216,6 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
       }
     }
     
-    // Umeondoa block ya Supabase session ili drawer ifunguke bila login
     setDrawerAction(action);
     
     const itemKey = selectedSize 
@@ -269,7 +256,6 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
   };
 
   const handleDrawerConfirm = async () => {
-    // 1. Zuia double submission
     if (loading) return; 
     setLoading(true);
 
@@ -281,9 +267,8 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
       return;
     }
 
-    // ✅ 2. Kagua Login (Badilisha Supabase Session -> Django JWT Token)
     if (drawerAction === 'order') {
-      const token = localStorage.getItem('access_token'); // Hii ndio token ya Django JWT
+      const token = localStorage.getItem('access_token');
       if (!token) {
         toast.dismiss();
         toast.error("Tafadhali ingia kwanza!");
@@ -293,7 +278,6 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
       }
     }
 
-    // 3. Andaa vitu vya ku-process
     const itemsToProcess = [];
     Object.entries(selectedItems).forEach(([itemKey, qty]) => {
       if (qty <= 0) return;
@@ -323,11 +307,10 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
       return;
     }
 
-    // 4. Mwisho: Safisha na Navigate
-    setIsSelectionOpen(false); // Funga drawer
-    setSelectedItems({});      // Futa selection
-    setPurchaseQty(1);         // Rudisha idadi 1
-    setLoading(false);         // Zima loading
+    setIsSelectionOpen(false);
+    setSelectedItems({});
+    setPurchaseQty(1);
+    setLoading(false);
 
     if (drawerAction === 'cart') {
       itemsToProcess.forEach(item => addToCart(item));
@@ -339,42 +322,32 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
   };
 
   const handleWhatsAppOrder = async () => {
-    // 1. Badili action iwe WhatsApp
     setDrawerAction('whatsapp');
 
-    // 2. Angalia kama kuna rangi na saizi tayari imechaguliwa nje
     if (selectedColor && selectedVariationObj) {
-      // Tunatumia logic ile ile ya kutengeneza Item Key
       const itemKey = selectedSize 
         ? `${selectedVariationObj.id}::${selectedSize}` 
         : selectedVariationObj.id;
 
-      // Set machaguo ya sasa hivi ili drawer isifunguke ikiwa tupu (0)
       setSelectedItems({ [itemKey]: 1 });
-      
-      // Hakikisha state za drawer (initial states) nazo ziko up-to-date
       setActiveColor(selectedColor);
       setActiveSize(selectedSize);
     } else {
-      // Kama hajachagua chochote, anza upya
       setSelectedItems({});
     }
 
-    // 3. Fungua drawer
     setIsSelectionOpen(true);
   };
 
   const handleChatWithSeller = () => {
-    // 1. Angalia kama muuzaji yupo (Tumia owner_id sasa, siyo user_id)
     if (!product?.stores?.owner_id) {
       toast.error("Samahani, muuzaji huyu hajapatikana.");
       return; 
     }
 
-    // 2. Endelea kwa navigation kwa kutumia owner_id sahihi
     navigate('/dashboard/messages', {
       state: {
-        sellerId: product.stores.owner_id,     // 🔥 SASA IMEBADILISHWA KUWA owner_id!
+        sellerId: product.stores.owner_id,
         sellerName: product.stores.store_name || "Mmuuzaji",
         productContext: product.name || "Bidhaa",
       },
@@ -385,20 +358,17 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
     await handleOpenDrawer('cart');
   };
 
-  // ==========================================================
-  // ✅ TUMEBADILISHA HAPA: FETCH DATA KWA KUTUMIA AXIOS + DJANGO
-  // ==========================================================
   useEffect(() => {
     const fetchProductData = async () => {
       if (!product?.id) return;
 
       try {
-        // 1. Pata Media (Picha na Video)
-        const mediaRes = await axios.get(`${API_BASE_URL}/product-media/?product_id=${product.id}`);
+        // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
+        const mediaRes = await api.get(`/product-media/?product_id=${product.id}`);
         const mediaData = mediaRes.data.results || mediaRes.data;
 
-        // 2. Pata Variations (Rangi, Sizes, Bei)
-        const varRes = await axios.get(`${API_BASE_URL}/product-variations/?product_id=${product.id}`);
+        // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
+        const varRes = await api.get(`/product-variations/?product_id=${product.id}`);
         const varData = varRes.data.results || varRes.data;
         
         if (mediaData) setProductMedia(mediaData);
@@ -406,19 +376,14 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
         if (varData && varData.length > 0) {
           setProductVariations(varData);
           
-          // 1. Tafuta variation ya kwanza yenye mzigo (stock)
           const defaultVar = varData.find(v => v.stock_quantity > 0) || varData[0];
-          
-          // 2. Set hiyo rangi ya kwanza
           setSelectedColor(defaultVar.color_name);
           
-          // 3. Tafuta size ya kwanza inayopatikana kwenye hiyo rangi
           const sizes = Object.keys(defaultVar.size_stock || {});
           const firstSize = sizes.length > 0 ? sizes[0] : "";
           
           setSelectedSize(firstSize);
 
-          // 4. Set object nzima ya variation kwa ajili ya bei na specifications
           setSelectedVariationObj({
             ...defaultVar,
             size_value: firstSize || null,
@@ -435,11 +400,9 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
 
   return (
     <div className="info-main-container" style={{ height: 'auto', minHeight: '100%' }}>
-      {/* //<Toaster position="top-center" /> */}
-
       <ProductSelectionDrawer
         isOpen={isSelectionOpen}
-        initialColor={activeColor} // Hii itafanya drawer ijue rangi
+        initialColor={activeColor}
         initialSize={activeSize}
         onClose={() => { setIsSelectionOpen(false); setSelectedItems({}); }}
         product={product}
@@ -462,7 +425,6 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
         isLoading={loading}
       />
 
-      {/* ========== MOBILE: BOTTOM FIXED NAVIGATION - Ongeza tu hii ========== */}
       {isMobile && (
         <div className="mobile-bottom-order-nav">
           <button onClick={handleWhatsAppOrder} disabled={!selectedVariationObj || loading} className="mobile-whatsapp-btn">
@@ -484,10 +446,8 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
         </div>
       )}
 
-      {/* ========== CONTENT - HAIBADILIKI KABISA KAMA AWALI ========== */}
       <div className="info-content-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
         
-        {/* CARD 1: JINA NA RATING */}
         <div className="info-card" style={{ padding: '15px', background: '#fff', borderRadius: '12px' }}>
           <h1 className="product-title-main" style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' }}>
             {product?.name}
@@ -501,10 +461,8 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
           </div>
         </div>
 
-        {/* CARD 2: COLOR & SIZE SELECTION */}
         <div className="info-card" style={{ padding: '15px', background: '#fff', borderRadius: '12px' }}>
           
-          {/* RANGI ZINAZOPATIKANA */}
           {Object.keys(variationsByColor).length > 0 && (
             <div className="attribute-group" style={{ marginBottom: '20px' }}>
               <span className="attribute-label" style={{ fontSize: '14px', color: '#333', display: 'block', marginBottom: '12px', fontWeight: '600' }}>Rangi zinazopatikana:</span>
@@ -528,7 +486,6 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
             </div>
           )}
 
-          {/* SIZE ZINAZOPATIKANA */}
           {availableSizesForColor.length > 0 && (
             <div className="attribute-group" style={{ marginBottom: '20px' }}>
               <span className="attribute-label" style={{ fontSize: '14px', color: '#333', display: 'block', marginBottom: '12px', fontWeight: '600' }}>Ukubwa (Bonyeza kuchagua):</span>
@@ -549,7 +506,6 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
             </div>
           )}
 
-          {/* STOCK STATUS */}
           <div className="stock-status-row" style={{ marginBottom: '15px', padding: '10px 0', borderTop: '1px solid #eee', borderBottom: '1px solid #eee' }}>
             <span className="stock-label" style={{ fontSize: '13px', color: '#666' }}>Hali ya Stoo:</span>
             <span className={`stock-badge ${currentStock > 0 ? 'in-stock' : 'out-of-stock'}`} style={{ marginLeft: '8px', fontWeight: 'bold' }}>
@@ -557,7 +513,6 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
             </span>
           </div>
 
-          {/* DYNAMIC SPECIFICATIONS */}
           {Object.keys(currentSpecs).length > 0 && (
             <div className="specs-container" style={{ marginTop: '15px', border: '1px solid #f0f0f0', borderRadius: '8px', overflow: 'hidden' }}>
               <div style={{ padding: '10px 12px', backgroundColor: '#fafafa', borderBottom: '1px solid #f0f0f0' }}><strong style={{ fontSize: '13px', color: '#333' }}>📋 Specifications</strong></div>
@@ -574,7 +529,6 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
             </div>
           )}
 
-          {/* BEI */}
           <div className="price-section" style={{ marginTop: '15px', padding: '12px', backgroundColor: '#f9fafb', borderRadius: '8px' }}>
             <span style={{ color: '#666', fontSize: '13px' }}>Bei:</span>
             <span style={{ fontSize: '24px', fontWeight: '800', color: '#ff4e00', marginLeft: '8px' }}>TSH {formatPrice(currentUnitPrice)}</span>
@@ -582,7 +536,6 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
           </div>
         </div>
 
-        {/* CARD 3: TARGET AUDIENCE */}
         {audience && audience.length > 0 && (
           <div className="info-card" style={{ padding: '15px', background: '#fff', borderRadius: '12px' }}>
             <span className="attribute-label" style={{ fontSize: '13px', color: '#666', display: 'block', marginBottom: '8px' }}>👥 Inafaa kwa:</span>
@@ -592,7 +545,6 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
           </div>
         )}
 
-        {/* FOOTER BUTTONS - HII INAONESHA KABISA KWA PC NA SIMU (ila simu itafichwa na CSS) */}
         <div className="footer-buttons-group" style={{ marginTop: '10px', padding: '15px', backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 -2px 10px rgba(0,0,0,0.05)' }}>
           <button onClick={handleWhatsAppOrder} disabled={!selectedVariationObj || loading}
             style={{ backgroundColor: '#25D366', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', fontWeight: '600', padding: '14px', borderRadius: '10px', border: 'none', cursor: selectedVariationObj && !loading ? 'pointer' : 'not-allowed', width: '100%', marginBottom: '12px', opacity: selectedVariationObj && !loading ? 1 : 0.6 }}>
@@ -613,7 +565,6 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
           </div>
         </div>
 
-        {/* Extra padding for mobile to avoid content hiding under bottom nav */}
         {isMobile && <div style={{ height: '80px' }} />}
       </div>
     </div>
