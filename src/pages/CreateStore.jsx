@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../axiosConfig"; // 🔥 Tumia api
 import StoreForm from "./StoreForm"; 
 import "../CreateStore.css";
 
@@ -10,7 +10,6 @@ export default function CreateStore() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // ✅ Imepanuliwa kuendana na StoreForm na Backend model
   const [formData, setFormData] = useState({
     name: "",
     category_id: "",
@@ -61,9 +60,8 @@ export default function CreateStore() {
     }
   };
 
-  // ✅ Msimbo uliosahihishwa wa kutuma data
   const handleSubmitToDjango = async (e) => {
-    if (e) e.preventDefault(); // Ongezeko la usalama
+    if (e) e.preventDefault();
     setIsLoading(true);
     try {
       const token = localStorage.getItem("access_token");
@@ -75,12 +73,9 @@ export default function CreateStore() {
 
       const submissionData = new FormData();
       
-      // --- Data za maandishi ---
       submissionData.append("store_name", formData.name);
-      // ✅ Hapa ndio muhimu: Inakagua kama category_id ipo kabla ya kutuma!
       if (formData.category_id) submissionData.append("category", formData.category_id);
       
-      // JSON fields zinapaswa kubadilishwa kuwa string kwa Django
       submissionData.append("sub_category_ids", JSON.stringify(formData.sub_category_ids || []));
       submissionData.append("business_type", formData.business_type || "");
       submissionData.append("phone_number", formData.phone);
@@ -96,28 +91,24 @@ export default function CreateStore() {
       submissionData.append("supply_capacity", formData.supply_capacity || "");
       submissionData.append("packaging_type", formData.packaging_type || "");
 
-      // --- Mitandao ya Kijamii ---
       submissionData.append("whatsapp_number", formData.whatsapp || formData.phone);
       submissionData.append("instagram_handle", formData.instagram || "");
       submissionData.append("tiktok_handle", formData.tiktok || "");
       submissionData.append("twitter_handle", formData.twitter || "");
       submissionData.append("youtube_link", formData.youtube || "");
 
-      // --- Picha (Files) ---
       if (formData.logo) submissionData.append("store_logo", formData.logo);
       if (formData.banner) submissionData.append("store_banner", formData.banner);
       if (formData.tin_image) submissionData.append("tin_image", formData.tin_image);
       
-      // ✅ Picha 3 za Ofisi (majina yanalingana na Backend)
       if (formData.image1) submissionData.append("office_image_1", formData.image1);
       if (formData.image2) submissionData.append("office_image_2", formData.image2);
       if (formData.image3) submissionData.append("office_image_3", formData.image3);
 
-      // --- Tuma ---
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/stores/",
+      const response = await api.post(
+        "/stores/",
         submissionData,
-        { headers: { "Authorization": `Bearer ${token}` } } // Content-Type imeachwa kwa Axios
+        { headers: { "Authorization": `Bearer ${token}` } }
       );
 
       if (response.status === 201) {

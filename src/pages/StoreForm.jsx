@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import "../StoreForm.css"; // Import CSS faili hapa
+import api from "../axiosConfig"; // ✅ Tumia api
+import "../StoreForm.css";
 
 const StoreForm = ({
   storeType,
@@ -16,7 +16,6 @@ const StoreForm = ({
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
 
-  // State kwa ajili ya Data kutoka Database
   const [dbCategories, setDbCategories] = useState([]);
   const [dbSubCategories, setDbSubCategories] = useState([]);
   const [filteredSubs, setFilteredSubs] = useState([]);
@@ -25,7 +24,6 @@ const StoreForm = ({
     image1: null, image2: null, image3: null, logo: null, banner: null,
   });
 
-  // ================= LOGIC ZOTE =================
   const nextStep = () => {
     setError(""); 
 
@@ -96,8 +94,8 @@ const StoreForm = ({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const catsRes = await axios.get("http://127.0.0.1:8000/api/categories/");
-        const subsRes = await axios.get("http://127.0.0.1:8000/api/subcategories/");
+        const catsRes = await api.get("/categories/");
+        const subsRes = await api.get("/subcategories/");
         
         setDbCategories(catsRes.data.results || catsRes.data);
         setDbSubCategories(subsRes.data.results || subsRes.data);
@@ -108,7 +106,6 @@ const StoreForm = ({
     fetchData();
   }, []);
 
-  // Filter sub-categories wakati category_id inapobadilika
   useEffect(() => {
     if (formData.category_id) {
       const filtered = dbSubCategories.filter(
@@ -120,7 +117,7 @@ const StoreForm = ({
     }
   }, [formData.category_id, dbSubCategories]);
 
-    const handleSubmitInternal = async (e) => {
+  const handleSubmitInternal = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
@@ -135,7 +132,6 @@ const StoreForm = ({
 
       const formDataObj = new FormData();
 
-      // ---- Maandishi ----
       formDataObj.append("store_name", formData.name);
       formDataObj.append("store_slug", createSlug(formData.name));
       formDataObj.append("business_type", formData.business_type);
@@ -169,7 +165,6 @@ const StoreForm = ({
       formDataObj.append("store_type", storeType);
       formDataObj.append("agreed_to_terms", formData.agreed_to_terms ? "true" : "false");
 
-      // ---- Picha (Files) ----
       if (formData.logo) formDataObj.append("store_logo", formData.logo[0]);
       if (formData.banner) formDataObj.append("store_banner", formData.banner[0]);
       if (formData.tin_image) formDataObj.append("tin_image", formData.tin_image[0]);
@@ -177,27 +172,23 @@ const StoreForm = ({
       if (formData.image2) formDataObj.append("office_image_2", formData.image2[0]);
       if (formData.image3) formDataObj.append("office_image_3", formData.image3[0]);
 
-      // 1. UNDA DUKA (STORE)
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/stores/",
+      const response = await api.post(
+        "/stores/",
         formDataObj,
         { headers: { "Authorization": `Bearer ${token}` } }
       );
 
-      // ✅ 2. ONGEZA HAPA: Badilisha role ya mtumiaji kuwa 'supplier'!
       try {
-        await axios.patch(
-          "http://127.0.0.1:8000/api/profile/", // Endpoint ya kusasisha profile yako
-          { role: "supplier" },                  // Badilisha thamani hii kama backend inataka 'seller' au 'supplier'
+        await api.patch(
+          "/profile/",
+          { role: "supplier" },
           { headers: { "Authorization": `Bearer ${token}` } }
         );
         console.log("✅ Role imebadilishwa kuwa supplier!");
       } catch (roleError) {
-        // Hata kama haibadiliki, duka limeundwa - tunaweza kuendelea, lakini tuonye console
         console.warn("⚠️ Imeshindwa kubadilisha role, lakini duka limeundwa:", roleError);
       }
 
-      // 3. PELEKA KWENYE DASHBOARD
       setIsSuccess(true);
       if (response.data && response.data.id) {
         setTimeout(() => navigate(`/dashboard/sellerboard/${response.data.id}`), 2000);
@@ -236,10 +227,8 @@ const StoreForm = ({
     }
   };
 
-  // ================= HTML / JSX =================
   return (
     <div className="form-wrapper-premium">
-      {/* SIDEBAR YA HATUA */}
       <div className="form-sidebar">
         <button
           type="button"
@@ -266,11 +255,9 @@ const StoreForm = ({
         </div>
       </div>
 
-      {/* FOMU YENYEWE */}
       <div className="form-content">
         <form onSubmit={handleSubmitInternal} className="premium-form">
           
-          {/* ============ STEP 1: Basic Info & Business Identity ============ */}
           {step === 1 && (
             <div className="step-fade">
               <div className="grid-2-col">
@@ -318,7 +305,6 @@ const StoreForm = ({
                 </div>
               </div>
 
-              {/* Sub-categories Section */}
               {formData.category_id && (
                 <div className="premium-group">
                   <label className="group-label">Bobezi (Sub-categories)</label>
@@ -345,7 +331,6 @@ const StoreForm = ({
                 </div>
               )}
 
-              {/* Specialist Tags Section */}
               <div className="premium-group mt-6">
                 <label className="group-label">Tags za Ubobezi (Andika kisha bonyeza Enter)</label>
                 <div className="tags-container">
@@ -416,7 +401,6 @@ const StoreForm = ({
             </div>
           )}
 
-          {/* ============ STEP 2: Location, Operation & Description ============ */}
           {step === 2 && (
             <div className="step-fade">
               <div className="location-section">
@@ -523,7 +507,6 @@ const StoreForm = ({
             </div>
           )}
 
-          {/* ============ STEP 3: Images, Branding & Verification ============ */}
           {step === 3 && (
             <div className="step-fade">
               <div className="verification-section">
@@ -587,7 +570,6 @@ const StoreForm = ({
             </div>
           )}
 
-          {/* ============ STEP 4: Social Media & Finalize ============ */}
           {step === 4 && (
             <div className="step-fade">
               <h3 className="title-orange-border-icon">🌐 Mitandao ya Jamii & Mawasiliano</h3>
