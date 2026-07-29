@@ -96,7 +96,7 @@ export default function ProductsAll() {
   }, [activeCategory.name, activeSection]);
 
   // ============================================
-  // 7. FETCH CATEGORIES
+  // 7. FETCH CATEGORIES (Imepangwa Alphabetically)
   // ============================================
   
   useEffect(() => {
@@ -105,14 +105,16 @@ export default function ProductsAll() {
         setLoading(true);
         setError(null);
         
-        // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
         const response = await api.get('/categories/');
         const data = response.data;
 
         if (Array.isArray(data) && data.length > 0) {
+          // 🔥 ONGEZA HAPA: Panga kategoria kwa jina (A-Z)
+          const sortedData = [...data].sort((a, b) => a.name.localeCompare(b.name));
+
           setCategories([
             { id: null, name: "All" },
-            ...data.map((cat) => ({ id: cat.id, name: cat.name }))
+            ...sortedData.map((cat) => ({ id: cat.id, name: cat.name }))
           ]);
         } else {
           setCategories([{ id: null, name: "All" }]);
