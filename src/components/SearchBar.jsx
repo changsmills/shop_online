@@ -1,10 +1,8 @@
 import { useRef, useState, useEffect } from "react";
-import axios from "axios"; // ✅ Badilisha: Axios badala ya Supabase
+import api from "../axiosConfig"; // 🔥 Tumia api
 import { useNavigate } from "react-router-dom";
 import { createPortal } from 'react-dom'; 
 import { useTranslation } from 'react-i18next';
-
-const API_BASE_URL = "http://127.0.0.1:8000/api"; // ✅ Ongeza hii
 
 export default function SearchBar({ search = "", setSearch }) {
   const { t } = useTranslation();
@@ -17,7 +15,6 @@ export default function SearchBar({ search = "", setSearch }) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
-  // Responsive Screen detection
   const [screenSize, setScreenSize] = useState({
     isMobile: typeof window !== 'undefined' ? window.innerWidth <= 768 : false,
     isSmallMobile: typeof window !== 'undefined' ? window.innerWidth <= 480 : false,
@@ -40,9 +37,6 @@ export default function SearchBar({ search = "", setSearch }) {
 
   const { isMobile, isSmallMobile, isDesktopLarge, isDarkMode } = screenSize;
 
-  // =================================================================
-  // CSS INJECTED (Pseudo-classes & Animations zilizobaki kwenye style tag)
-  // =================================================================
   const injectedCss = `
     .search-portal-item { transition: background 0.2s ease; }
     .search-portal-item:hover { background: ${isDarkMode ? '#334155' : '#fff5ed'} !important; }
@@ -64,9 +58,6 @@ export default function SearchBar({ search = "", setSearch }) {
     }
   `;
 
-  // =================================================================
-  // INLINE CSS RESPONSIVE OBJECTS (Layout, Fonts, Spacing)
-  // =================================================================
   const styles = {
      wrapper: {
       position: 'relative',
@@ -181,11 +172,11 @@ export default function SearchBar({ search = "", setSearch }) {
     }
   };
 
-  // ✅ BADILISHA: Fetch placeholders kutoka Django API
   useEffect(() => {
     const fetchLeafCategoryNames = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/leaf-categories/`, {
+        // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
+        const response = await api.get('/leaf-categories/', {
           params: { limit: 15 }
         });
         if (response.data) {
@@ -199,7 +190,6 @@ export default function SearchBar({ search = "", setSearch }) {
     fetchLeafCategoryNames();
   }, []);
 
-  // Rotate placeholder every 3 seconds
   useEffect(() => {
     if (placeholders.length <= 1) return;
     const timer = setInterval(() => {
@@ -210,7 +200,6 @@ export default function SearchBar({ search = "", setSearch }) {
     return () => clearInterval(timer);
   }, [placeholders]);
 
-  // ✅ BADILISHA: Fetch suggestions (categories + products) with debounce
   useEffect(() => {
     const getCombinedSuggestions = async () => {
       if (!search || typeof search !== "string" || search.trim().length < 2) {
@@ -222,12 +211,12 @@ export default function SearchBar({ search = "", setSearch }) {
       const query = search.trim();
       
       try {
-        // Tumia endpoints za Django + SearchFilter (Lazima backend isaidie 'search' parameter)
+        // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
         const [catRes, prodRes] = await Promise.all([
-          axios.get(`${API_BASE_URL}/leaf-categories/`, {
+          api.get('/leaf-categories/', {
             params: { search: query, limit: 4 }
           }),
-          axios.get(`${API_BASE_URL}/products/`, {
+          api.get('/products/', {
             params: { search: query, limit: 4 }
           })
         ]);
@@ -307,11 +296,6 @@ export default function SearchBar({ search = "", setSearch }) {
           />
 
           <div className="search-tools" style={styles.tools}>
-            {/* Kamera imebaki ikiwa imekatwa kama ilivyokuwa */}
-            {/* <button className="search-camera-btn" style={styles.cameraBtn} onClick={handleImageSearch}>
-              <svg xmlns="http://www.w3.org/2000/svg" width={isMobile ? "16" : "22"} height={isMobile ? "16" : "22"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-            </button> */}
-            
             <button className="search-submit-btn" style={styles.submitBtn} onClick={handleSearchSubmit}>
               <svg xmlns="http://www.w3.org/2000/svg" width={isMobile ? "14" : "20"} height={isMobile ? "14" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
               {!isMobile && <span>Search</span>}

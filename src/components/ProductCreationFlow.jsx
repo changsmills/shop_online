@@ -3,8 +3,7 @@ import {
   Edit3, CheckCircle, ArrowLeft, Camera, 
   PlayCircle, Plus, X, PlusCircle, Trash2 
 } from 'lucide-react';
-import axios from "axios";
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+import api from "../axiosConfig"; // 🔥 Tumia api
 import ProductAttributes from '../pages/ProductAttribute';
 import '../ProductCreationFlow.css';
 import speedDashboardImg from "../images/SpeedDashboard.svg";
@@ -12,7 +11,7 @@ import speedDashboardImg from "../images/SpeedDashboard.svg";
 const ProductCreationFlow = ({ 
   storeId,      
   myStoreSubCats,
-  storeSubCategoryIds = [], // 🔥 HAPA NDIYO MABADILIKO!
+  storeSubCategoryIds = [], 
   onComplete 
 }) => {
   console.log("🚀 [INIT] ProductCreationFlow Loaded!");
@@ -89,7 +88,6 @@ const ProductCreationFlow = ({
   const videoInputRef = React.useRef(null);
   const galleryInputRef = React.useRef(null);
 
-  // 🔥 1. LOG YA KUCHAGUA NA KUPATA LEAF CATEGORIES
   React.useEffect(() => {
     const fetchLeafCategories = async () => {
       console.log("🌿 [USE_EFFECT] Checking for sub_category_id change:", attributes.sub_category_id);
@@ -103,7 +101,8 @@ const ProductCreationFlow = ({
         const token = localStorage.getItem("access_token");
         console.log("  - Fetching leaf categories for sub_category:", attributes.sub_category_id);
         
-        const res = await axios.get(`${API_BASE_URL}/leaf-categories/`, {
+        // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
+        const res = await api.get('/leaf-categories/', {
           params: { sub_category: attributes.sub_category_id },
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -144,7 +143,6 @@ const ProductCreationFlow = ({
     setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
   };
 
-  // 🔥 HELPER YA KUTENGENEZA UUID
   const formatUUID = (id) => {
     console.log("  🔧 [formatUUID] Input received:", id, "Type:", typeof id);
     if (!id) {
@@ -163,13 +161,11 @@ const ProductCreationFlow = ({
     return id;
   };
 
-  // 🔥 2. CHUJA KATEGORIA KWA KUTUMIA storeSubCategoryIds!
   const filteredStoreSubCats = React.useMemo(() => {
     if (!storeSubCategoryIds || storeSubCategoryIds.length === 0 || !myStoreSubCats) return [];
     return myStoreSubCats.filter(sub => storeSubCategoryIds.includes(sub.id));
   }, [myStoreSubCats, storeSubCategoryIds]);
 
-   // 🔥 3. MAKULI YA DEBUGGING KATIKA PUBLISH
   const handleFinalPublishAll = async () => {
     console.log("📦 [PUBLISH_BTN] ===== STARTING PUBLISH PROCESS =====");
     if (addedProducts.length === 0) return alert("Hakuna bidhaa ya kurusha!");
@@ -181,7 +177,8 @@ const ProductCreationFlow = ({
       if (!storeId) throw new Error("Store ID haipo!");
 
       console.log("  🔹 [STEP 1] Fetching Store data for Parent Category ID...");
-      const storeRes = await axios.get(`${API_BASE_URL}/stores/${storeId}/`, { headers: { Authorization: `Bearer ${token}` } });
+      // 🔥 MABADILIKO: api.get
+      const storeRes = await api.get(`/stores/${storeId}/`, { headers: { Authorization: `Bearer ${token}` } });
       console.log("  🔹 [STEP 1] Store data response:", storeRes.data);
       
       const rawParentId = storeRes.data.category; 
@@ -259,19 +256,16 @@ const ProductCreationFlow = ({
           if (p.cover_file) formData.append("cover_image", p.cover_file);
           if (p.video_file) formData.append("video_file", p.video_file);
 
-          console.log(`  📤 SENDING Axios POST to ${API_BASE_URL}/products/`);
-          const response = await axios.post(`${API_BASE_URL}/products/`, formData, {
+          console.log(`  📤 SENDING Axios POST to /products/`);
+          // 🔥 MABADILIKO: api.post (umeondoa API_BASE_URL)
+          const response = await api.post('/products/', formData, {
             headers: { "Authorization": `Bearer ${token}` }
           });
 
-          // ============================================================
-          // 🔥 HAPA NDIYO MABADILIKO: VARIATIONS NA MEDIA ZIMEONGEWA!
-          // ============================================================
           if (response.status === 201) {
             console.log(`  ✅ SUCCESS! Product created. Response:`, response.data);
-            const newProductId = response.data.id; // ✅ Pata ID ya bidhaa mpya!
+            const newProductId = response.data.id;
 
-            // 1. Tuma VARIATIONS kwenye /api/product-variations/
             if (p.variations && p.variations.length > 0) {
               console.log(`  📤 SENDING ${p.variations.length} variations to /product-variations/`);
               for (const variant of p.variations) {
@@ -285,13 +279,12 @@ const ProductCreationFlow = ({
                 if (variant.attributes) {
                   varFormData.append("attributes", JSON.stringify(variant.attributes));
                 }
-                // Tuma picha ya rangi kama ipo kwenye state
                 if (variant.color_image_file) {
                   varFormData.append("color_image", variant.color_image_file);
                 }
 
                 try {
-                  await axios.post(`${API_BASE_URL}/product-variations/`, varFormData, {
+                  await api.post('/product-variations/', varFormData, {
                     headers: { "Authorization": `Bearer ${token}` }
                   });
                   console.log(`    ✅ Variation saved: ${variant.color_name} ${variant.size_value || 'Standard'}`);
@@ -301,14 +294,9 @@ const ProductCreationFlow = ({
               }
             }
 
-            // 2. Tuma picha za rangi (color_images) kama media – hiari
-            // (Hapa unaweza kuongeza kutuma cover image au gallery kwenye /api/product-media/)
-
             successCount++;
             setAddedProducts(prev => prev.filter(item => item.id !== p.id));
           }
-          // ============================================================
-
         } catch (productError) {
           let errorMessage = `Tatizo kwenye bidhaa "${p.name}"`;
           if (productError.response) {
@@ -355,7 +343,6 @@ const ProductCreationFlow = ({
 
   return (
     <section className="product-creation-flow">
-      {/* --- HEADER YA STEPS --- */}
       <div className="flow-steps-header">
         {[
           { id: 1, label: "Kategoria" },
@@ -372,7 +359,6 @@ const ProductCreationFlow = ({
         ))}
       </div>
 
-      {/* --- STEP 1: CATEGORY SELECTION --- */}
       {currentStep === 1 && (
         <div className="category-selection-step">
           <div className="step-title-area">
@@ -380,7 +366,6 @@ const ProductCreationFlow = ({
             <p className="sub-title">Gusa kategoria moja ili kuendelea kuweka bidhaa</p>
           </div>
           <div className="category-grid">
-            {/* 🔥 BADILISHA myStoreSubCats kuwa filteredStoreSubCats! */}
             {filteredStoreSubCats.map((sub) => (
               <div 
                 key={sub.id}
@@ -412,7 +397,6 @@ const ProductCreationFlow = ({
         </div>
       )}
 
-      {/* --- STEP 2: MEDIA --- */}
       {currentStep === 2 && (
         <div className="media-upload-step">
           <div className="step-navigation">
@@ -452,7 +436,6 @@ const ProductCreationFlow = ({
         </div>
       )}
 
-      {/* --- STEP 3: ATTRIBUTES & PUBLISH --- */}
       {currentStep === 3 && (
         <div className="attributes-step">
           <div className="step-navigation">

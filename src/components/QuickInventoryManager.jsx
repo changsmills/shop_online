@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { PackageSearch, Settings, TrendingUp, AlertTriangle, Save } from 'lucide-react';
-import axios from 'axios';
-import '../QuickInventory.css'; // ✅ Import CSS
-
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+import api from '../axiosConfig'; // 🔥 Badilisha hii
+import '../QuickInventory.css';
 
 const QuickInventoryManager = ({ products, setProducts }) => {
   const [updatingId, setUpdatingId] = useState(null);
@@ -34,8 +32,9 @@ const QuickInventoryManager = ({ products, setProducts }) => {
         return;
       }
 
-      await axios.patch(
-        `${API_BASE_URL}/products/${productId}/`,
+      // 🔥 MABADILIKO: Tumia api.patch na uondoe API_BASE_URL
+      await api.patch(
+        `/products/${productId}/`,
         updates,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -59,7 +58,6 @@ const QuickInventoryManager = ({ products, setProducts }) => {
     }
   };
 
-  // Loading state
   if (!products) {
     return (
       <div className="loading-state">
@@ -74,14 +72,12 @@ const QuickInventoryManager = ({ products, setProducts }) => {
   return (
     <div className="quick-inventory-wrapper">
       
-      {/* Toast Notification */}
       {toast.show && (
         <div className={`toast-container ${toast.type === 'success' ? 'toast-success' : 'toast-error'}`}>
           {toast.text}
         </div>
       )}
 
-      {/* Analytics Cards */}
       <div className="analytics-grid">
         <div className="analytics-card orange">
           <PackageSearch size={20} className="analytics-icon" />
@@ -96,7 +92,6 @@ const QuickInventoryManager = ({ products, setProducts }) => {
         </div>
       </div>
 
-      {/* Inventory Grid Panel */}
       <div className="inventory-panel">
         <div className="panel-header">
           <h3 className="panel-title">
@@ -109,16 +104,14 @@ const QuickInventoryManager = ({ products, setProducts }) => {
           <div className="inventory-grid">
             {products.map((p, index) => {
               const hasChanged = localChanges[p.id] !== undefined;
-              // Animation delay based on index (optional)
               const delay = (index % 10) * 0.05;
               
               return (
                 <div 
                   key={p.id} 
                   className="inv-card"
-                  style={{ animationDelay: `${delay}s` }} // Staggered animation
+                  style={{ animationDelay: `${delay}s` }}
                 >
-                  {/* Image */}
                   <div className="inv-img-wrap">
                     {p.cover_image ? (
                       <img src={p.cover_image} alt={p.name} className="inv-img" />
@@ -127,7 +120,6 @@ const QuickInventoryManager = ({ products, setProducts }) => {
                     )}
                   </div>
 
-                  {/* Title & Status */}
                   <div>
                     <h4 className="inv-title">{p.name}</h4>
                     <span className={`inv-status ${p.is_approved ? 'live' : 'pending'}`}>
@@ -135,7 +127,6 @@ const QuickInventoryManager = ({ products, setProducts }) => {
                     </span>
                   </div>
 
-                  {/* Inputs */}
                   <div className="inv-inputs-row">
                     <div className="inv-input-group">
                       <span className="inv-label">Stock</span>
@@ -157,7 +148,6 @@ const QuickInventoryManager = ({ products, setProducts }) => {
                     </div>
                   </div>
 
-                  {/* Save Button */}
                   <div className="inv-save-wrap">
                     {hasChanged && (
                       <button 

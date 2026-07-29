@@ -1,15 +1,12 @@
 import React, { useState } from "react";
-import axios from "axios";
-import "../TopDealsection.css"; // ✅ Import CSS
-
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+import api from "../axiosConfig"; // 🔥 Tumia api
+import "../TopDealsection.css";
 
 const TopDealsSection = ({ products, onUpdate }) => {
   const myProducts = products || [];
 
   return (
     <section className="top-deals-section">
-      {/* Header ya Section */}
       <div className="top-deals-header">
         <div className="top-deals-title-group">
           <div className="top-deals-pulse" />
@@ -20,7 +17,6 @@ const TopDealsSection = ({ products, onUpdate }) => {
         </span>
       </div>
 
-      {/* Grid ya Bidhaa */}
       <div className="top-deals-grid">
         {myProducts.length > 0 ? (
           myProducts.map((product) => (
@@ -82,8 +78,9 @@ const FlashSaleCard = ({ product, onUpdate }) => {
       const token = localStorage.getItem("access_token");
       if (!token) throw new Error("Tafadhali ingia tena.");
 
-      await axios.patch(
-        `${API_BASE_URL}/products/${product.id}/`,
+      // 🔥 MABADILIKO: api.patch na kuondoa API_BASE_URL
+      await api.patch(
+        `/products/${product.id}/`,
         {
           original_price: Math.round(beiMpyaYaOfa),
           offer_started_at: new Date().toISOString(),
@@ -106,7 +103,6 @@ const FlashSaleCard = ({ product, onUpdate }) => {
 
   return (
     <div className="flash-card">
-      {/* Picha ya Bidhaa - Juu */}
       <div className="flash-card-img-wrap">
         <img 
           src={product.cover_image || "https://placehold.co/400x400?text=No+Image"} 
@@ -121,7 +117,6 @@ const FlashSaleCard = ({ product, onUpdate }) => {
         )}
       </div>
 
-      {/* Maelezo ya Bidhaa - Chini */}
       <div className="flash-card-body">
         <h3 className="flash-card-title">
           {product.name}
@@ -138,7 +133,6 @@ const FlashSaleCard = ({ product, onUpdate }) => {
           )}
         </div>
 
-        {/* Sehemu ya Input */}
         <div className="flash-card-input-area">
           <label className={`flash-card-label ${isLocked ? 'locked' : ''}`}>
             {isLocked ? `🔒 FUNGWA (${masaaYaliyobaki}h)` : "Punguza %"}

@@ -1,9 +1,7 @@
 import React from 'react';
 import { CheckCircle, Loader2, Settings, Camera } from 'lucide-react';
-import axios from 'axios';
-import '../StoreHeader.css'; // ✅ Import CSS class
-
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+import api from '../axiosConfig'; // 🔥 Tumia api
+import '../StoreHeader.css';
 
 const StoreHeader = ({ 
   myStore, 
@@ -31,8 +29,9 @@ const StoreHeader = ({
       const fieldName = type === 'banner' ? 'store_banner' : 'store_logo';
       formData.append(fieldName, file);
 
-      const response = await axios.patch(
-        `${API_BASE_URL}/stores/${myStore.id}/`,
+      // 🔥 MABADILIKO: api.patch na kuondoa API_BASE_URL
+      const response = await api.patch(
+        `/stores/${myStore.id}/`,
         formData,
         {
           headers: {
@@ -60,13 +59,11 @@ const StoreHeader = ({
     <header 
       className="store-header-wrapper"
       style={{
-        // 🔥 Exception: Hapa tunatumia inline kwa dynamic URL pekee.
         backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url(${bannerPreview || myStore?.store_banner || "https://via.placeholder.com/1200x400"})`
       }}
     >
       <div className="store-header-inner">
         
-        {/* MAELEZO YA DUKA */}
         <div className="store-info-content">
           <div className="store-title-group">
             <h1 className="store-title">
@@ -97,7 +94,6 @@ const StoreHeader = ({
               <span>{myStore?.city || "Location"}, Tanzania</span>
             </div>
 
-            {/* 📌 DESKTOP STATS (Inaonekana PC tu) */}
             <div className="desktop-stats-row">
               <div className="desktop-stats-item">
                 <span className="stats-text-light">Sales:</span>
@@ -111,7 +107,6 @@ const StoreHeader = ({
             </div>
           </div>
           
-          {/* 📱 MOBILE STATS (Inaonekana Simu tu) */}
           <div className="mobile-stats-row">
             <div className="mobile-stats-item">
               <span className="stats-text-light">📊 Sales:</span>
@@ -125,10 +120,8 @@ const StoreHeader = ({
           </div>
         </div>
 
-        {/* KITUFE CHA BANNER */}
         <label className="store-header-btn">
           <Camera size={16} />
-          {/* Badili maandishi kulingana na skrini kwa CSS Class */}
           <span className="btn-label-desktop">Badili Banner</span>
           <span className="btn-label-mobile">Banner</span>
           <input type="file" hidden onChange={(e) => handleImageChange(e, 'banner')} />

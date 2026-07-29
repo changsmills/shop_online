@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { Settings, CheckCircle, X, Plus, Phone, Instagram, Truck, Edit2, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
-import axios from 'axios';
+import api from "../axiosConfig"; // 🔥 Tumia api
 import '../StoreManagement.css';
 
-// ✅ 1. Tumia hii URL kwa Backend (Media files)
-const API_BASE_URL = "http://127.0.0.1:8000/api";
-const BACKEND_BASE_URL = "http://127.0.0.1:8000";
+// 🔥 URL ya Backend ya Render kwa ajili ya picha
+const BACKEND_BASE_URL = "https://shop-online-r9z4.onrender.com";
 
 const StoreManagement = ({
   isManageMode,
@@ -39,7 +38,8 @@ const StoreManagement = ({
         setStoreUuid(paramId);
       } else {
         try {
-          const response = await axios.get(`${API_BASE_URL}/stores/`, {
+          // 🔥 MABADILIKO: api.get
+          const response = await api.get('/stores/', {
             params: { store_index: parseInt(paramId) },
             headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
           });
@@ -62,7 +62,8 @@ const StoreManagement = ({
     const fetchShippingMethods = async () => {
       try {
         const token = localStorage.getItem("access_token");
-        const response = await axios.get(`${API_BASE_URL}/shipping-methods/`, {
+        // 🔥 MABADILIKO: api.get
+        const response = await api.get('/shipping-methods/', {
           params: { store_id: storeUuid },
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -77,7 +78,8 @@ const StoreManagement = ({
     if (!newShipping.label.trim()) return alert('Tafadhali jaza jina la njia');
     try {
       const token = localStorage.getItem("access_token");
-      const response = await axios.post(`${API_BASE_URL}/shipping-methods/`, {
+      // 🔥 MABADILIKO: api.post
+      const response = await api.post('/shipping-methods/', {
           store_id: storeUuid, label: newShipping.label, description: newShipping.description || null,
           price_local: parseFloat(newShipping.price_local) || 0, price_national: parseFloat(newShipping.price_national) || 0, is_active: true
         }, { headers: { Authorization: `Bearer ${token}` } }
@@ -91,7 +93,8 @@ const StoreManagement = ({
   const handleUpdateShipping = async (id, updatedFields) => {
     try {
       const token = localStorage.getItem("access_token");
-      await axios.patch(`${API_BASE_URL}/shipping-methods/${id}/`, updatedFields, { headers: { Authorization: `Bearer ${token}` } });
+      // 🔥 MABADILIKO: api.patch
+      await api.patch(`/shipping-methods/${id}/`, updatedFields, { headers: { Authorization: `Bearer ${token}` } });
       setShippingMethods(shippingMethods.map(m => m.id === id ? { ...m, ...updatedFields } : m));
       setEditingShippingId(null);
     } catch (error) { alert('Imeshindwa kusasisha: ' + (error.response?.data?.detail || error.message)); }
@@ -101,7 +104,8 @@ const StoreManagement = ({
     if (!window.confirm('Je, una uhakika unataka kufuta njia hii?')) return;
     try {
       const token = localStorage.getItem("access_token");
-      await axios.delete(`${API_BASE_URL}/shipping-methods/${id}/`, { headers: { Authorization: `Bearer ${token}` } });
+      // 🔥 MABADILIKO: api.delete
+      await api.delete(`/shipping-methods/${id}/`, { headers: { Authorization: `Bearer ${token}` } });
       setShippingMethods(shippingMethods.filter(m => m.id !== id));
     } catch (error) { alert('Imeshindwa kufuta: ' + (error.response?.data?.detail || error.message)); }
   };
@@ -110,13 +114,10 @@ const StoreManagement = ({
     await handleUpdateShipping(id, { is_active: !currentStatus });
   };
 
-  // ✅ 2. Hapa ndio magic ya kutatua kategoria nyingi: 
-  // Tunafanya filter tu zile zilizopo kwenye storeMeta.sub_category_ids
   const actualStoreSubCats = useMemo(() => {
     if (!storeMeta || !storeMeta.sub_category_ids) return [];
     
     let storeSubIds = [];
-    // Tunaangalia kama ni string ya JSON au array tayari
     if (typeof storeMeta.sub_category_ids === 'string') {
       try {
         storeSubIds = JSON.parse(storeMeta.sub_category_ids);
@@ -128,17 +129,14 @@ const StoreManagement = ({
       storeSubIds = storeMeta.sub_category_ids;
     }
 
-    // Filter categories based on the store's IDs
     return myStoreSubCats.filter(subCat => storeSubIds.includes(subCat.id));
   }, [myStoreSubCats, storeMeta]);
 
-  // ✅ 3. Helper kwa ajili ya kuweka Backend URL mbele ya picha
   const getFullImageUrl = (url) => {
     if (!url) return null;
     if (url.startsWith('http') || url.startsWith('data:') || url.startsWith('blob:')) {
       return url;
     }
-    // Hakikisha hakuna forward slash mbili
     const cleanUrl = url.startsWith('/') ? url.slice(1) : url;
     return `${BACKEND_BASE_URL}/${cleanUrl}`;
   };
@@ -147,7 +145,6 @@ const StoreManagement = ({
     <section className="sm-section">
       <div className="sm-card">
         
-        {/* Kategoria */}
         <div className="sm-header">
           <div>
             <h3 className="sm-header-title">🏷️ Kategoria za Duka Lako</h3>
@@ -162,7 +159,6 @@ const StoreManagement = ({
         </div>
 
         <div className="sm-cat-wrapper">
-          {/* ✅ Tumia actualStoreSubCats badala ya myStoreSubCats */}
           {actualStoreSubCats.length > 0 ? (
             actualStoreSubCats.map((sub) => (
               <div key={sub.id} className="sm-cat-item-wrap">
@@ -197,7 +193,6 @@ const StoreManagement = ({
           </button>
         </div>
 
-        {/* SEHEMU YA SHIPPING METHODS */}
         <div className="sm-shipping-section">
           <div className="sm-shipping-header">
             <div className="sm-shipping-title-wrap">
@@ -215,7 +210,6 @@ const StoreManagement = ({
             </button>
           </div>
 
-          {/* Grid ya shipping methods */}
           <div className="sm-shipping-grid">
             {shippingMethods.length === 0 ? (
               <div className="sm-shipping-empty">
@@ -229,7 +223,6 @@ const StoreManagement = ({
               shippingMethods.map((method) => (
                 <div key={method.id} className="sm-shipping-item">
                   {editingShippingId === method.id ? (
-                    // Edit mode
                     <div className="sm-shipping-edit">
                       <input type="text" className="sm-input-full" value={method.label}
                         onChange={(e) => {
@@ -262,7 +255,6 @@ const StoreManagement = ({
                       </div>
                     </div>
                   ) : (
-                    // View mode
                     <div className="sm-shipping-view">
                       <div className="sm-shipping-view-content">
                         <div className="sm-shipping-label-row">
@@ -295,7 +287,6 @@ const StoreManagement = ({
             )}
           </div>
 
-          {/* Form ya kuongeza (toggle) */}
           {showAddForm && (
             <div className="sm-shipping-form-wrap">
               <h4 className="sm-shipping-form-title">➕ Njia mpya</h4>
@@ -312,7 +303,6 @@ const StoreManagement = ({
           )}
         </div>
 
-        {/* SEHEMU YA OFFICE IMAGES & STORE DETAILS */}
         <div className="sm-details-section">
           <div className="sm-office-grid">
             {officePreviews.map((url, index) => (
@@ -322,7 +312,6 @@ const StoreManagement = ({
                 onClick={() => officeInputRefs.current[index]?.click()}
               >
                 {url ? (
-                  // ✅ 4. Tumia getFullImageUrl kwa image src
                   <img src={getFullImageUrl(url)} alt="Office" />
                 ) : (
                   <div className="sm-office-box-placeholder">📸 Picha {index + 1}</div>
@@ -334,7 +323,6 @@ const StoreManagement = ({
                   onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
-                      // ✅ 5. Kuepusha kuvunjika kwa revokeObjectURL kama sio blob
                       if (officePreviews[index] && officePreviews[index].startsWith('blob:')) {
                         try {
                           URL.revokeObjectURL(officePreviews[index]);
@@ -355,7 +343,6 @@ const StoreManagement = ({
           </div>
 
           <div className="sm-details-form">
-            {/* Input 1 - Grid 2 columns */}
             <div className="sm-form-row">
               <div className="sm-input-group">
                 <label className="sm-label">Jina la Duka</label>
@@ -367,7 +354,6 @@ const StoreManagement = ({
               </div>
             </div>
             
-            {/* Input 2 - Grid 2 columns */}
             <div className="sm-form-row">
               <div className="sm-input-group">
                 <label className="sm-label"><Phone size={14} className="sm-icon" /> WhatsApp</label>
@@ -379,7 +365,6 @@ const StoreManagement = ({
               </div>
             </div>
             
-            {/* Input 3 - Full width */}
             <div className="sm-form-row full">
               <div className="sm-input-group">
                 <label className="sm-label">Physical Address</label>
@@ -387,7 +372,6 @@ const StoreManagement = ({
               </div>
             </div>
             
-            {/* Input 4 - Grid 2 columns */}
             <div className="sm-form-row">
               <div className="sm-input-group">
                 <label className="sm-label">TIN Number 🔒</label>
@@ -399,7 +383,6 @@ const StoreManagement = ({
               </div>
             </div>
             
-            {/* Textarea - Full width */}
             <div className="sm-form-row full">
               <div className="sm-input-group">
                 <label className="sm-label" style={{ fontSize: '14px', fontWeight: '500' }}>Maelezo ya Duka</label>
