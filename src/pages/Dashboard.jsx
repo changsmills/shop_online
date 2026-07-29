@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "../App.css";
-// 🔥 TUMIA API (Sio axios moja kwa moja)
 import api from "../axiosConfig"; 
 import DashboardCard from "../components/DashboardCard";
 
@@ -65,8 +64,7 @@ export default function Dashboard() {
   const timeoutRef = useRef(null);
   const [cachedAds, setCachedAds] = useState([]);
 
-  // 🔥 BADILISHA: Tumia `api.get` badala ya `axios.get`
-   useEffect(() => {
+  useEffect(() => {
     const fetchAdsWithCache = async () => {
       const storedAds = localStorage.getItem('skyfall_ads');
       const storedTime = localStorage.getItem('skyfall_ads_time');
@@ -77,7 +75,6 @@ export default function Dashboard() {
       }
 
       try {
-        // ✅ Badilisha axios.get kuwa api.get
         const response = await api.get('/advertisements/', {
           params: { status: 'active' }
         });
@@ -106,7 +103,7 @@ export default function Dashboard() {
     return ad.media_url.match(/\.(mp4|webm|mov)$/i) !== null;
   };
 
-  // 1. Fetch Featured Leafs
+  // 1. Fetch Featured Leafs (SORTED ALPHABETICALLY)
   const fetchFeaturedLeafs = async (categoryId) => {
     if (!categoryId) return;
     try {
@@ -125,7 +122,8 @@ export default function Dashboard() {
             cover_image: item.cover_image,
             leaf_categories: item.leaf_categories || { name: 'Unknown', name_sw: 'Haijulikani' }
           };
-        });
+        })
+        .sort((a, b) => a.leaf_categories.name.localeCompare(b.leaf_categories.name));
         
       setFeaturedProducts(uniqueLeafs.slice(0, 17));
     } catch (error) {
@@ -134,23 +132,24 @@ export default function Dashboard() {
     }
   };
 
-  // 2. Fetch Subcategories
+  // 2. Fetch Subcategories (SORTED ALPHABETICALLY)
   const fetchSubCategories = async (categoryId) => {
     try {
       const response = await api.get('/subcategories/', {
         params: { category_id: categoryId }
       });
-      setSubCategories(response.data);
-      if (response.data.length > 0) {
-        setSelectedSubCategory(response.data[0]);
-        await fetchLeafsForSub(response.data[0].id);
+      const sortedData = (response.data || []).sort((a, b) => a.name.localeCompare(b.name));
+      setSubCategories(sortedData);
+      if (sortedData.length > 0) {
+        setSelectedSubCategory(sortedData[0]);
+        await fetchLeafsForSub(sortedData[0].id);
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  // 3. Fetch Leafs for Subcategory
+  // 3. Fetch Leafs for Subcategory (SORTED ALPHABETICALLY)
   const fetchLeafsForSub = async (subCategoryId) => {
     try {
       const response = await api.get('/products/', {
@@ -168,7 +167,8 @@ export default function Dashboard() {
             name_sw: item.leaf_categories?.name_sw || 'Haijulikani',
             cover_image: item.cover_image
           };
-        });
+        })
+        .sort((a, b) => a.name.localeCompare(b.name));
         
       setLeafsForSub(uniqueLeafs);
     } catch (error) {
@@ -194,7 +194,9 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (initialSubCategories.length > 0) {
-      setSubCategories(initialSubCategories);
+      // 🔥 Panga initial subcategories pia kwa alfabeti
+      const sortedInitial = [...initialSubCategories].sort((a, b) => a.name.localeCompare(b.name));
+      setSubCategories(sortedInitial);
     }
   }, [initialSubCategories]);
 
