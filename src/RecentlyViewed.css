@@ -4,14 +4,16 @@
 
 .recently-viewed-main-wrapper {
   position: relative;
-  width: 100%;
+  width: calc(100% - 16px);
+  max-width: 1400px;
+  margin: 8px auto;
   background-color: #ffffff;
-  border-top: 1px solid #e5e7eb;
-  border-bottom: 1px solid #e5e7eb;
-  border-left: none;
-  border-right: none;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   box-sizing: border-box;
   padding: 16px 0;
+  overflow: hidden;
 }
 
 /* ============================================ */
@@ -124,7 +126,6 @@
     gap: 12px;
     padding: 8px 4px 20px 4px;
   }
-  /* Kadi ya mwisho inaonyesha nusu */
   .rv-card-wrapper:last-child {
     flex: 0 0 calc(((100% - (6.5 * 12px)) / 6.5) * 0.5);
     min-width: calc(((100% - (6.5 * 12px)) / 6.5) * 0.5);
@@ -159,6 +160,15 @@
 /* ============================================ */
 
 @media (max-width: 768px) {
+  .recently-viewed-main-wrapper {
+    width: calc(100% - 12px);
+    margin: 6px auto;
+    border-radius: 12px;
+    padding: 12px 0;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
+  }
+
   .rv-card-wrapper {
     flex: 0 0 calc((100% - (3.5 * 10px)) / 3.5) !important;
     min-width: calc((100% - (3.5 * 10px)) / 3.5) !important;
@@ -195,7 +205,6 @@
     gap: 6px !important;
   }
   
-  /* ✅ MISHALE INAONEKANA MOBILE */
   .rv-arrow-btn {
     display: flex !important;
     width: 28px !important;
@@ -211,8 +220,6 @@
   .rv-arrow-right {
     right: 0px !important;
   }
-
-  /* 🔥 FICHA STANDALONE ARROW KWENYE MOBILE */
   .rv-arrow-only {
     display: none !important;
   }
@@ -223,6 +230,13 @@
 /* ============================================ */
 
 @media (max-width: 480px) {
+  .recently-viewed-main-wrapper {
+    width: calc(100% - 8px);
+    margin: 4px auto;
+    border-radius: 10px;
+    padding: 10px 0;
+  }
+
   .rv-card-wrapper {
     flex: 0 0 calc((100% - (2 * 8px)) / 2) !important;
     min-width: calc((100% - (2 * 8px)) / 2) !important;

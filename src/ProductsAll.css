@@ -104,6 +104,12 @@
   width: 100%;
   height: 60px;
   overflow: hidden;
+  padding: 0 4px;
+  
+  /* ✅ PEMBE ZA DUARA CHINI - KAMA ALIBABA */
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 4px;
 }
 
 .category-tabs-scroll {
@@ -113,9 +119,10 @@
   scroll-behavior: smooth;
   white-space: nowrap;
   width: 100%;
-  padding: 0 50px;
+  padding: 0 48px;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  gap: 4px;
 }
 .category-tabs-scroll::-webkit-scrollbar { display: none; }
 
@@ -125,59 +132,95 @@
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid #ddd;
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   top: 50%;
   transform: translateY(-50%);
+  transition: all 0.2s ease;
+  color: #666;
 }
-.nav-arrow:hover { background: #f7f9fc; }
-
-.nav-arrow.left { left: 10px; }
-.nav-arrow.right { right: 10px; }
+.nav-arrow:hover { 
+  background: #f7f9fc; 
+  border-color: #ff6a00;
+  color: #ff6a00;
+}
+.nav-arrow.left { left: 6px; }
+.nav-arrow.right { right: 6px; }
 
 .tab-item {
   display: inline-block;
-  padding: 15px 20px;
+  padding: 10px 18px;
   font-size: 14px;
-  color: #333;
+  color: #555;
   background: none;
   border: none;
   cursor: pointer;
   font-weight: 500;
-  border-bottom: 2px solid transparent;
+  border-radius: 20px;
   transition: all 0.2s ease;
   position: relative;
+  white-space: nowrap;
 }
+
+.tab-item:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
 .tab-item.active {
   color: #ff6600;
-  border-bottom: 2px solid #000000;
-  font-weight: bold;
+  background: #fff0e8;
+  font-weight: 600;
+  border-radius: 20px;
 }
-.tab-item.loading-tab { color: #999; }
 
-/* Mobile Tabs */
+.tab-item.loading-tab { 
+  color: #999; 
+  background: transparent;
+}
+
+/* Mobile Tabs - PEMBE ZA DUARA PIA */
 @media (max-width: 768px) {
   .category-tabs-wrapper {
     top: 0;
-    height: 50px;
+    height: 46px;
+    padding: 0 2px;
+    border-radius: 0 0 14px 14px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   }
-  .category-tabs-scroll { padding: 0 40px; }
-  .nav-arrow { width: 30px; height: 30px; }
-  .nav-arrow svg { width: 16px; height: 16px; }
-  .tab-item { padding: 12px 16px; font-size: 12px; }
-  .category-tabs-wrapper .nav-arrow { display: none !important; }
+  .category-tabs-scroll { 
+    padding: 0 38px;
+    gap: 2px;
+  }
+  .nav-arrow { 
+    width: 26px; 
+    height: 26px;
+    display: none !important;
+  }
+  .nav-arrow svg { width: 14px; height: 14px; }
+  .tab-item { 
+    padding: 8px 14px; 
+    font-size: 12px;
+    border-radius: 16px;
+  }
 }
 
 @media (max-width: 480px) {
-  .category-tabs-wrapper { height: 45px; }
-  .category-tabs-scroll { padding: 0 35px; }
-  .nav-arrow { width: 26px; height: 26px; }
-  .tab-item { padding: 10px 14px; font-size: 11px; }
+  .category-tabs-wrapper { 
+    height: 42px;
+    border-radius: 0 0 12px 12px;
+  }
+  .category-tabs-scroll { padding: 0 32px; }
+  .tab-item { 
+    padding: 6px 12px; 
+    font-size: 11px;
+    border-radius: 14px;
+  }
 }
 
 /* ============================================ */

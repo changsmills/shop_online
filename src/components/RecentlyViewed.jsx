@@ -1,7 +1,9 @@
+// src/components/RecentlyViewed.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, History } from "lucide-react";
 import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
+import SkeletonCardz from "./SkeletonCardz"; // ✅ ONGEZA SKELETON
 import { useTranslation } from 'react-i18next';
 import '../RecentlyViewed.css';
 
@@ -65,9 +67,43 @@ export default function RecentlyViewed({ navigate }) {
     }
   }, [products]);
 
-  if (loading) return null;
+  // ============================================================
+  // 🔥 SKELETON LOADING - KAMA NEWARRIVALS
+  // ============================================================
+  if (loading) {
+    return (
+      <div className="recently-viewed-main-wrapper">
+        <div className="rv-header">
+          <div className="rv-header-left">
+            <div className="rv-title-group">
+              <History className="rv-history-icon" />
+              <h2 className="rv-title">{t('recently_viewed')}</h2>
+            </div>
+            <p className="rv-subtitle">{t('items_you_recently_viewed')}</p>
+          </div>
+        </div>
+
+        <div className="rv-desktop-wrapper">
+          <div className="rv-scroll-wrapper hide-scrollbar">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={`skeleton-${index}`} className="rv-card-wrapper">
+                <SkeletonCardz />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ============================================================
+  // EMPTY STATE
+  // ============================================================
   if (products.length === 0) return null;
 
+  // ============================================================
+  // SUCCESS STATE
+  // ============================================================
   return (
     <div className="recently-viewed-main-wrapper">
       
@@ -81,7 +117,7 @@ export default function RecentlyViewed({ navigate }) {
           <p className="rv-subtitle">{t('items_you_recently_viewed')}</p>
         </div>
 
-        {/* 🔥 Mshale upande wa kulia unabaki! */}
+        {/* Mshale upande wa kulia */}
         {products.length > 6 && (
           <div 
             className="rv-arrow-only"
@@ -96,7 +132,7 @@ export default function RecentlyViewed({ navigate }) {
         )}
       </div>
 
-      {/* ✅ Layout Moja - Inabadilika automatically kwa CSS Media Queries! */}
+      {/* Horizontal Scroll */}
       <div className="rv-desktop-wrapper">
         {showLeftArrow && (
           <button className="rv-arrow-btn rv-arrow-left" onClick={() => scroll('left')}>
@@ -108,11 +144,14 @@ export default function RecentlyViewed({ navigate }) {
           {products.map((product) => (
             <div key={product.id} className="rv-card-wrapper">
               <DashboardCard
-                image={product.cover_image}
-                price={product.price}
-                originalPrice={product.original_price}
-                views={product.views}
-                /* 🔥 TUMEONDOA `isMobile={isMobile}` KABISA! */
+                image={product.cover_image || ''}
+                title={product.name || ''}
+                price={product.price || 'TSh 0'}
+                originalPrice={product.original_price || ''}
+                moq={product.moq || ''}
+                rating={product.rating || ''}
+                verified={product.is_verified || product.store?.is_verified || false}
+                years={product.years || ''}
                 onClick={() => {
                   const priorityId = product.id;
                   const sectionName = encodeURIComponent(t('recently_viewed'));

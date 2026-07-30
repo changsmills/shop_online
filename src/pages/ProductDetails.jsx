@@ -220,11 +220,7 @@ export default function ProductDetails() {
       </div>
 
       <div className="product-details-container">
-        <nav className="breadcrumb-nav">
-          <span>Home</span> <span className="sep">/</span> 
-          <span>Products</span> <span className="sep">/</span> 
-          <span className="active-path">{product?.name}</span>
-        </nav>
+        {/* ✅ BREADCRUMB IMEONDOLIWA KABISA */}
 
         <main className="product-main-layout">
           <div className="main-grid-container">
@@ -259,8 +255,7 @@ export default function ProductDetails() {
           </div>
         </main>
 
-        {/* 🔥 SEHEMU YA STORE DETAILS - IKO KABISA HAPA! */}
-        {/* Ikiwa bado haijapata store, itaonyesha ujumbe mdogo badala ya kuondoka kabisa */}
+        {/* 🔥 SEHEMU YA STORE DETAILS */}
         {product.stores ? (
           <section className="product-bottom-details">
             <div className="verification-header-box">
@@ -379,7 +374,6 @@ export default function ProductDetails() {
             </div>
           </section>
         ) : (
-          // 🔥 FALLBACK - Ikiwa store bado haijapata data
           <div className="text-center py-4 text-gray-400 text-sm border-t mt-8">
             (Taarifa za duka zinapakuliwa...)
           </div>
