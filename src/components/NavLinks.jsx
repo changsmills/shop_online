@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import api from "../axiosConfig"; // 🔥 MUHIMU: Tumia api badala ya axios
+import api from "../axiosConfig";
 import { createPortal } from "react-dom";
-import * as LucideIcons from "lucide-react"; 
+import * as LucideIcons from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import "../NavLinks.css";
 import { useTranslation } from 'react-i18next';
@@ -10,55 +10,36 @@ import { useLanguage } from '../context/LanguageContext.jsx';
 export default function NavLinks({ isMobile }) {
   const { t, i18n } = useTranslation();
   const { language } = useLanguage();
-  const [forceUpdate, setForceUpdate] = useState(0);
   const navigate = useNavigate();
+
+  // ========== STATE ==========
   const [user, setUser] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
   const [categories, setCategories] = useState([]);
   const [selectedParent, setSelectedParent] = useState(null);
-  
-  const [featuredProducts, setFeaturedProducts] = useState([]); 
-  const [subCategories, setSubCategories] = useState([]); 
-  const [leafsForSub, setLeafsForSub] = useState([]); 
-  
-  const [selectedSubForLeaf, setSelectedSubForLeaf] = useState(null); 
-  const [viewMode, setViewMode] = useState('products'); 
-  
-  const timeoutRef = useRef(null);
-
-  const placeholderImg = "https://via.placeholder.com/150?text=Skyfall+Product";
-
-  const categoriesRef = useRef(null);
-  const exposeRef = useRef(null);
-  const protectionsRef = useRef(null);
-  const buyerRef = useRef(null);
-  const helpRef = useRef(null);
-
-  const [categoriesPos, setCategoriesPos] = useState({ top: 0, left: 0, width: 0 });
-  const [exposePos, setExposePos] = useState({ top: 0, left: 0, width: 0 });
-  const [protectionsPos, setProtectionsPos] = useState({ top: 0, left: 0, width: 0 });
-  const [buyerPos, setBuyerPos] = useState({ top: 0, left: 0, width: 0 });
-  const [helpPos, setHelpPos] = useState({ top: 0, left: 0, width: 0 });
-
-  const [buyerMenuPos, setBuyerMenuPos] = useState({ top: 0, left: 0 });
-  const [helpMenuPos, setHelpMenuPos] = useState({ top: 0, left: 0 });
-  const [exposeMenuPos, setExposeMenuPos] = useState({ top: 0, left: 0 });
-  const [protectionsMenuPos, setProtectionsMenuPos] = useState({ top: 0, left: 0 });
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
+  const [leafsForSub, setLeafsForSub] = useState([]);
+  const [selectedSubForLeaf, setSelectedSubForLeaf] = useState(null);
+  const [viewMode, setViewMode] = useState('products');
   const [activeNav, setActiveNav] = useState(null);
   const [hasStore, setHasStore] = useState(false);
   const [checkingStore, setCheckingStore] = useState(true);
   const [hasSupplierProfile, setHasSupplierProfile] = useState(false);
   const [checkingSupplier, setCheckingSupplier] = useState(true);
 
-  useEffect(() => {
-    setForceUpdate(prev => prev + 1);
-  }, [language]);
+  const [buyerMenuPos, setBuyerMenuPos] = useState({ top: 0, left: 0 });
+  const [helpMenuPos, setHelpMenuPos] = useState({ top: 0, left: 0 });
+  const [protectionsMenuPos, setProtectionsMenuPos] = useState({ top: 0, left: 0 });
 
-  useEffect(() => {
-    setForceUpdate(prev => prev + 1);
-    console.log("Language changed to:", language, i18n.language);
-  }, [language, i18n.language]);
+  const timeoutRef = useRef(null);
+  const placeholderImg = "https://via.placeholder.com/150?text=Skyfall+Product";
 
+  const protectionsRef = useRef(null);
+  const buyerRef = useRef(null);
+  const helpRef = useRef(null);
+
+  // ========== EFFECTS ==========
   useEffect(() => {
     const checkUser = async () => {
       const token = localStorage.getItem("access_token");
@@ -71,7 +52,6 @@ export default function NavLinks({ isMobile }) {
     checkUser();
   }, []);
 
-  // 🔥 BADILISHA: Kagua kama user ni supplier (Tumia api)
   useEffect(() => {
     const checkUserSupplierAndStore = async () => {
       const token = localStorage.getItem("access_token");
@@ -100,7 +80,6 @@ export default function NavLinks({ isMobile }) {
         } else {
           setHasStore(false);
         }
-
       } catch (err) {
         console.error("❌ Error checking user data:", err.response?.data || err.message);
       } finally {
@@ -112,7 +91,6 @@ export default function NavLinks({ isMobile }) {
     checkUserSupplierAndStore();
   }, [user]);
 
-  // 🔥 BADILISHA: Fetch categories kutoka Django (Tumia api)
   useEffect(() => {
     async function fetchCategories() {
       try {
@@ -133,59 +111,12 @@ export default function NavLinks({ isMobile }) {
 
   useEffect(() => {
     if (selectedParent) {
-      setViewMode('products'); 
+      setViewMode('products');
       fetchSubCategories(selectedParent.id);
       fetchFeaturedLeafs(selectedParent.id);
     }
   }, [selectedParent]);
 
-  // 🔥 BADILISHA: Fetch subcategories (Tumia api)
-  async function fetchSubCategories(parentId) {
-    try {
-      const response = await api.get('/subcategories/', {
-        params: { category_id: parentId }
-      });
-      const data = response.data;
-      if (data) {
-        setSubCategories(data);
-        if (data.length > 0) setSelectedSubForLeaf(data[0]);
-      }
-    } catch (error) {
-      console.error("Error fetching subcategories:", error);
-    }
-  }
-
-  // 🔥 BADILISHA: Fetch featured leafs (Tumia api)
-  async function fetchFeaturedLeafs(parentId) {
-    try {
-      const response = await api.get('/products/', {
-        params: { parent_category: parentId }
-      });
-      const data = response.data || [];
-
-      const uniqueCategories = [];
-      const seenIds = new Set();
-
-      data.forEach(item => {
-        if (!seenIds.has(item.leaf_category_id)) {
-          seenIds.add(item.leaf_category_id);
-          uniqueCategories.push({
-            id: item.leaf_category_id,
-            leaf_category_id: item.leaf_category_id,
-            cover_image: item.cover_image,
-            leaf_categories: item.leaf_categories
-          });
-        }
-      });
-
-      setFeaturedProducts(uniqueCategories.slice(0, 17));
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      setFeaturedProducts([]);
-    }
-  }
-
-  // 🔥 BADILISHA: Fetch leafs for subcategory (Tumia api)
   useEffect(() => {
     async function fetchLeafsBySub() {
       if (viewMode === 'subcategories' && selectedSubForLeaf) {
@@ -218,11 +149,58 @@ export default function NavLinks({ isMobile }) {
     fetchLeafsBySub();
   }, [selectedSubForLeaf, viewMode]);
 
+  // ========== FETCH FUNCTIONS ==========
+  async function fetchSubCategories(parentId) {
+    try {
+      const response = await api.get('/subcategories/', {
+        params: { category_id: parentId }
+      });
+      const data = response.data;
+      if (data) {
+        setSubCategories(data);
+        if (data.length > 0) setSelectedSubForLeaf(data[0]);
+      }
+    } catch (error) {
+      console.error("Error fetching subcategories:", error);
+    }
+  }
+
+  async function fetchFeaturedLeafs(parentId) {
+    try {
+      const response = await api.get('/products/', {
+        params: { parent_category: parentId }
+      });
+      const data = response.data || [];
+
+      const uniqueCategories = [];
+      const seenIds = new Set();
+
+      data.forEach(item => {
+        if (!seenIds.has(item.leaf_category_id)) {
+          seenIds.add(item.leaf_category_id);
+          uniqueCategories.push({
+            id: item.leaf_category_id,
+            leaf_category_id: item.leaf_category_id,
+            cover_image: item.cover_image,
+            leaf_categories: item.leaf_categories
+          });
+        }
+      });
+
+      setFeaturedProducts(uniqueCategories.slice(0, 17));
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      setFeaturedProducts([]);
+    }
+  }
+
+  // ========== HANDLERS ==========
   const getDisplayName = (item) => {
     if (!item) return '';
     return i18n.language === 'sw' ? (item.name_sw || item.name) : item.name;
   };
 
+  // ✅ HANDLE MOUSE ENTER
   const handleMouseEnter = (menuName, e) => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setActiveMenu(menuName);
@@ -242,9 +220,11 @@ export default function NavLinks({ isMobile }) {
     }
   };
 
+  // ✅ HANDLE MOUSE LEAVE (ILIKUWA IMEPOTEKA)
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
       setActiveMenu(null);
+      setActiveNav(null);
     }, 200);
   };
 
@@ -253,42 +233,29 @@ export default function NavLinks({ isMobile }) {
     return <IconComponent size={size} />;
   };
 
-  const headerStyle = { fontSize: '16px', fontWeight: '600', marginBottom: '15px', color: '#111', borderLeft: '3px solid #ff6a00', paddingLeft: '12px' };
-  const ulStyle = { listStyle: 'none', padding: 0, margin: 0 };
-  const liStyle = { marginBottom: '12px', fontSize: '13px' };
-  const linkStyle = { textDecoration: 'none', color: '#555', transition: 'color 0.2s ease' };
-
-  // 🔥 BADILISHA: handleSellNavigation (Tumia api)
   const handleSellNavigation = async () => {
     try {
-      console.log("🔍 1. Inaangalia token...");
       const token = localStorage.getItem("access_token");
-      
+
       if (token) {
-        console.log("✅ 2. Token imepatikana. Inakagua kama ni Supplier...");
         const profileRes = await api.get('/profile/');
         const profileData = profileRes.data;
 
         if (profileData?.role === 'supplier') {
-          console.log("📦 3. Ni Supplier, inatafuta Store ID...");
           const storeRes = await api.get('/stores/', {
             params: { owner_id: profileData.id }
           });
           const storeData = storeRes.data;
           if (storeData && storeData.length > 0) {
-            console.log("✅ 4. Store ID imepatikana:", storeData[0].id);
             navigate(`/dashboard/sellerboard/${storeData[0].id}`);
             return;
           } else {
-            console.warn("⚠️ 5. Supplier lakini hana store iliyosajiliwa bado");
             navigate('/create-store');
             return;
           }
         }
-        console.log("🚀 User ameingia! Inapeleka kwenye /dashboard/seller...");
         navigate('/dashboard/seller');
       } else {
-        console.log("🚶 Ni Mgeni. Inapeleka kwenye /dashboard/register-supplier...");
         navigate('/dashboard/register-supplier');
       }
     } catch (err) {
@@ -297,232 +264,361 @@ export default function NavLinks({ isMobile }) {
     }
   };
 
-  const updatePosition = (ref) => {
-    if (ref && ref.current) {
-      const rect = ref.current.getBoundingClientRect();
-      return { top: rect.bottom + window.scrollY, left: rect.left + window.scrollX, width: rect.width };
-    }
-    return { top: 0, left: 0, width: 0 };
-  };
-
-  useEffect(() => {
-    console.log("=== NAVLINKS MOUNTED/RE-RENDERED ===");
-    console.log("Current language:", i18n.language);
-  }, [i18n.language, categories]);
-
-  // Mobile Bottom Nav (Inabaki sawa)
+  // ========== MOBILE BOTTOM NAV ==========
   if (isMobile) {
     return (
-      <div style={{ position: 'fixed', bottom: 0, left: 0, width: '100%', height: '60px', background: '#fff', borderTop: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-around', alignItems: 'center', zIndex: 99999, paddingBottom: 'env(safe-area-inset-bottom)' }}>
-        <Link to="/" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#666', textDecoration: 'none', fontSize: '10px' }}><LucideIcons.Home size={24} /><span>{t('home')}</span></Link>
-        <Link to="/categories" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#666', textDecoration: 'none', fontSize: '10px' }}><LucideIcons.Grid size={24} /><span>{t('categories')}</span></Link>
-        <Link to="/cart" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#666', textDecoration: 'none', fontSize: '10px' }}><LucideIcons.ShoppingCart size={24} /><span>{t('cart')}</span></Link>
-        <Link to="/dashboard/login" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#666', textDecoration: 'none', fontSize: '10px' }}><LucideIcons.User size={24} /><span>{t('account')}</span></Link>
+      <div className="mobile-bottom-nav">
+        <Link to="/" className="mobile-nav-item">
+          <LucideIcons.Home size={24} />
+          <span>{t('home')}</span>
+        </Link>
+        <Link to="/categories" className="mobile-nav-item">
+          <LucideIcons.Grid size={24} />
+          <span>{t('categories')}</span>
+        </Link>
+        <Link to="/cart" className="mobile-nav-item">
+          <LucideIcons.ShoppingCart size={24} />
+          <span>{t('cart')}</span>
+        </Link>
+        <Link to="/dashboard/login" className="mobile-nav-item">
+          <LucideIcons.User size={24} />
+          <span>{t('account')}</span>
+        </Link>
       </div>
     );
   }
 
-  // DESKTOP NAVIGATION
+  // ========== DESKTOP NAVIGATION ==========
   return (
     <nav className="nav-links-container">
+      {/* GROUP LEFT */}
       <div className="nav-group-left">
-        <div className="nav-wrapper" onMouseEnter={(e) => handleMouseEnter('categories', e)} onMouseLeave={handleMouseLeave} style={{ position: 'relative', paddingBottom: '8px' }}>
-          <span className="category-toggle" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}><LucideIcons.Menu size={20} strokeWidth={2.5} /> {t('all_categories')}</span>
-          {activeNav === 'categories' && (<div style={{ position: 'absolute', bottom: '-8px', left: '0', right: '0', height: '3px', backgroundColor: '#ff6a00', borderRadius: '2px', transition: 'all 0.2s ease' }} />)}
+        {/* ALL CATEGORIES */}
+        <div
+          className="category-toggle-wrapper"
+          onMouseEnter={(e) => handleMouseEnter('categories', e)}
+          onMouseLeave={handleMouseLeave}
+        >
+          <span className="category-toggle">
+            <LucideIcons.Menu size={20} strokeWidth={2.5} />
+            {t('all_categories')}
+          </span>
+          {activeNav === 'categories' && <div className="nav-underline" />}
+
           {activeMenu === 'categories' && createPortal(
-            <div className="mega-menu-container" onMouseEnter={() => handleMouseEnter('categories')} onMouseLeave={handleMouseLeave} style={{ position: 'fixed', top: '100px', left: '0', right: '0', height: '520px', zIndex: 9999, backgroundColor: 'white', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-              <div className="mega-menu-inner" style={{ display: 'flex', height: '100%' }}>
-                <aside className="mega-menu-sidebar" style={{ width: '280px', borderRight: '1px solid #eee', overflowY: 'auto' }}>
+            <div
+              className="mega-menu-container"
+              onMouseEnter={() => handleMouseEnter('categories')}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div className="mega-menu-inner">
+                <aside className="mega-menu-sidebar">
                   {viewMode === 'products' ? (
                     categories.map((cat) => (
-                      <div key={cat.id} className={`sidebar-item ${selectedParent?.id === cat.id ? 'active' : ''}`} onMouseEnter={() => setSelectedParent(cat)} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 20px', cursor: 'pointer' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><DynamicIcon name={cat.icon_name} /><span>{getDisplayName(cat)}</span></div>
-                        <LucideIcons.ChevronRight size={16} />
+                      <div
+                        key={cat.id}
+                        className={`sidebar-item ${selectedParent?.id === cat.id ? 'active' : ''}`}
+                        onMouseEnter={() => setSelectedParent(cat)}
+                      >
+                        <div className="sidebar-item-content">
+                          <DynamicIcon name={cat.icon_name} />
+                          <span className="sidebar-item-text">{getDisplayName(cat)}</span>
+                        </div>
+                        <LucideIcons.ChevronRight className="sidebar-item-arrow" size={16} />
                       </div>
                     ))
                   ) : (
                     <>
-                      <div onClick={() => setViewMode('products')} className="sidebar-back-header" style={{ padding: '15px 20px', cursor: 'pointer', fontWeight: 'bold', color: '#ff6a00', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <LucideIcons.ChevronLeft size={18} /> {t('back')}
+                      <div onClick={() => setViewMode('products')} className="sidebar-back-header">
+                        <LucideIcons.ChevronLeft size={18} />
+                        {t('back')}
                       </div>
                       {subCategories.map((sub) => (
-                        <div key={sub.id} onMouseEnter={() => setSelectedSubForLeaf(sub)} className={`sidebar-item ${selectedSubForLeaf?.id === sub.id ? 'active' : ''}`} style={{ padding: '12px 25px', cursor: 'pointer', fontSize: '14px' }}>
-                          {getDisplayName(sub)}
+                        <div
+                          key={sub.id}
+                          onMouseEnter={() => setSelectedSubForLeaf(sub)}
+                          className={`sidebar-item ${selectedSubForLeaf?.id === sub.id ? 'active' : ''}`}
+                        >
+                          <span className="sidebar-item-text">{getDisplayName(sub)}</span>
                         </div>
                       ))}
                     </>
                   )}
                 </aside>
-                <main className="mega-menu-content" style={{ flex: 1, padding: '20px', overflowY: 'auto' }}>
-                  <div className="content-header" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-                    <h3 style={{ fontSize: '18px', fontWeight: '600', margin: 0 }}>{viewMode === 'products' ? `Top Categories: ${getDisplayName(selectedParent)}` : getDisplayName(selectedSubForLeaf)}</h3>
-                    {viewMode === 'products' && (<button onClick={() => setViewMode('subcategories')} className="view-all-btn" style={{ color: '#ff6a00', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>{t('view_all')} <LucideIcons.ChevronRight size={14} /></button>)}
+
+                <main className="mega-menu-content">
+                  <div className="content-header">
+                    <h3>
+                      {viewMode === 'products'
+                        ? `Top Categories: ${getDisplayName(selectedParent)}`
+                        : getDisplayName(selectedSubForLeaf)}
+                    </h3>
+                    {viewMode === 'products' && (
+                      <button onClick={() => setViewMode('subcategories')} className="view-all-btn">
+                        {t('view_all')} <LucideIcons.ChevronRight size={14} />
+                      </button>
+                    )}
                   </div>
-                  <div className="category-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '20px' }}>
+
+                  <div className="category-grid">
                     {viewMode === 'products' ? (
                       <>
                         {featuredProducts.map((leaf) => (
-                          <Link to={`/category/${leaf.leaf_category_id}`} key={leaf.id} className="grid-item" style={{ textDecoration: 'none', color: 'inherit', textAlign: 'center' }}>
-                            <div className="image-circle" style={{ width: '90px', height: '90px', borderRadius: '50%', backgroundColor: '#f5f5f5', margin: '0 auto 10px', overflow: 'hidden', border: '1px solid #eee' }}><img src={leaf.cover_image || placeholderImg} alt={getDisplayName(leaf.leaf_categories)} onError={(e) => { e.target.src = placeholderImg; }} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>
-                            <p className="grid-text" style={{ fontSize: '12px', margin: 0 }}>{getDisplayName(leaf.leaf_categories) || "Kategoria"}</p>
+                          <Link to={`/category/${leaf.leaf_category_id}`} key={leaf.id} className="grid-item">
+                            <div className="image-circle">
+                              <img
+                                src={leaf.cover_image || placeholderImg}
+                                alt={getDisplayName(leaf.leaf_categories)}
+                                onError={(e) => { e.target.src = placeholderImg; }}
+                              />
+                            </div>
+                            <p className="grid-text">{getDisplayName(leaf.leaf_categories) || "Kategoria"}</p>
                           </Link>
                         ))}
-                        <div onClick={() => setViewMode('subcategories')} className="grid-item see-all-card" style={{ textAlign: 'center', cursor: 'pointer' }}>
-                          <div className="image-circle see-all-circle" style={{ width: '90px', height: '90px', borderRadius: '50%', border: '2px dashed #ff6a00', margin: '0 auto 10px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.3s ease' }}><LucideIcons.Plus size={30} color="#ff6a00" /></div>
-                          <p style={{ color: '#ff6a00', fontWeight: 'bold', fontSize: '12px' }}>{t('see_all')}</p>
+                        <div onClick={() => setViewMode('subcategories')} className="grid-item see-all-card">
+                          <div className="image-circle see-all-circle">
+                            <LucideIcons.Plus size={30} color="#ff6a00" />
+                          </div>
+                          <p className="see-all-text">{t('see_all')}</p>
                         </div>
                       </>
                     ) : (
                       leafsForSub.map((leaf) => (
-                        <Link to={`/category/${leaf.id}`} key={leaf.id} className="grid-item" style={{ textDecoration: 'none', color: 'inherit', textAlign: 'center' }}>
-                          <div className="image-circle" style={{ width: '90px', height: '90px', borderRadius: '50%', backgroundColor: '#f9f9f9', margin: '0 auto 10px', overflow: 'hidden', border: '1px solid #eee' }}><img src={leaf.image_url || placeholderImg} alt={getDisplayName(leaf)} onError={(e) => { e.target.src = placeholderImg; }} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>
-                          <p className="grid-text" style={{ fontSize: '12px', margin: 0 }}>{getDisplayName(leaf)}</p>
+                        <Link to={`/category/${leaf.id}`} key={leaf.id} className="grid-item">
+                          <div className="image-circle">
+                            <img
+                              src={leaf.image_url || placeholderImg}
+                              alt={getDisplayName(leaf)}
+                              onError={(e) => { e.target.src = placeholderImg; }}
+                            />
+                          </div>
+                          <p className="grid-text">{getDisplayName(leaf)}</p>
                         </Link>
                       ))
                     )}
                   </div>
                 </main>
               </div>
-            </div>, document.body
+            </div>,
+            document.body
           )}
         </div>
 
-        <Link to="/advertise" className="nav-item" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#111', padding: '0 10px' }}><span style={{ fontSize: '15px', fontWeight: '600', whiteSpace: 'nowrap', lineHeight: 'normal' }}>{t('skyfall_ads')}</span></Link>
+        {/* SKYFALL ADS */}
+        <Link to="/advertise" className="nav-item">
+          <span>{t('skyfall_ads')}</span>
+        </Link>
 
-        <div ref={protectionsRef} className="nav-wrapper" onMouseEnter={(e) => handleMouseEnter('protections', e)} onMouseLeave={handleMouseLeave} style={{ position: 'relative', paddingBottom: '8px' }}>
-          <Link className="nav-item" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#111' }}><span style={{ fontSize: '15px' }}>{t('order_protections')}</span></Link>
-          {activeMenu === 'protections' && (<div style={{ position: 'absolute', bottom: '-8px', left: '0', right: '0', height: '3px', backgroundColor: '#ff6a00', borderRadius: '2px', transition: 'all 0.2s ease' }} />)}
+        {/* ORDER PROTECTIONS */}
+        <div
+          ref={protectionsRef}
+          className="category-toggle-wrapper"
+          onMouseEnter={(e) => handleMouseEnter('protections', e)}
+          onMouseLeave={handleMouseLeave}
+        >
+          <Link className="nav-item">
+            <span>{t('order_protections')}</span>
+          </Link>
+          {activeMenu === 'protections' && <div className="nav-underline" />}
+
           {activeMenu === 'protections' && createPortal(
-            <div onMouseEnter={() => handleMouseEnter('protections')} onMouseLeave={handleMouseLeave} style={{ position: 'fixed', top: `${protectionsMenuPos.top}px`, left: 0, right: 0, width: '100vw', backgroundColor: 'white', boxShadow: '0 15px 35px rgba(0,0,0,0.2)', zIndex: 11000, borderBottom: '1px solid #ddd' }}>
-              <div style={{ maxWidth: '1250px', margin: '0 auto', padding: '30px 20px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '40px' }}>
+            <div
+              className="dropdown-menu-portal"
+              onMouseEnter={() => handleMouseEnter('protections')}
+              onMouseLeave={handleMouseLeave}
+              style={{ top: `${protectionsMenuPos.top}px` }}
+            >
+              <div className="dropdown-menu-inner dropdown-grid-3">
                 <div>
-                  <h4 style={headerStyle}>{t('payment_protection')}</h4>
-                  <ul style={ulStyle}>
-                    <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.Lock size={16} color="#27ae60" /><Link to="/payment-protection" style={linkStyle}>{t('your_payment_protected')}</Link></li>
-                    <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.CreditCard size={16} color="#27ae60" /><Link to="/refund-policy" style={linkStyle}>{t('refund_policy')}</Link></li>
-                    <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.ShieldCheck size={16} color="#27ae60" /><Link to="/buyer-protection" style={linkStyle}>{t('buyer_protection')}</Link></li>
+                  <h4 className="dropdown-header-title">{t('payment_protection')}</h4>
+                  <ul className="dropdown-list">
+                    <li className="dropdown-list-item">
+                      <LucideIcons.Lock size={16} color="#27ae60" />
+                      <Link to="/payment-protection">{t('your_payment_protected')}</Link>
+                    </li>
+                    <li className="dropdown-list-item">
+                      <LucideIcons.CreditCard size={16} color="#27ae60" />
+                      <Link to="/refund-policy">{t('refund_policy')}</Link>
+                    </li>
+                    <li className="dropdown-list-item">
+                      <LucideIcons.ShieldCheck size={16} color="#27ae60" />
+                      <Link to="/buyer-protection">{t('buyer_protection')}</Link>
+                    </li>
                   </ul>
                 </div>
                 <div>
-                  <h4 style={headerStyle}>{t('product_issues')}</h4>
-                  <ul style={ulStyle}>
-                    <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.FileWarning size={16} color="#dc2626" /><Link to="/dispute" style={linkStyle}>{t('file_dispute')}</Link></li>
-                    <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.Flag size={16} color="#dc2626" /><Link to="/report-product" style={linkStyle}>{t('report_bad_product')}</Link></li>
-                    <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.MessageCircle size={16} color="#dc2626" /><Link to="/contact-support" style={linkStyle}>{t('contact_support')}</Link></li>
+                  <h4 className="dropdown-header-title">{t('product_issues')}</h4>
+                  <ul className="dropdown-list">
+                    <li className="dropdown-list-item">
+                      <LucideIcons.FileWarning size={16} color="#dc2626" />
+                      <Link to="/dispute">{t('file_dispute')}</Link>
+                    </li>
+                    <li className="dropdown-list-item">
+                      <LucideIcons.Flag size={16} color="#dc2626" />
+                      <Link to="/report-product">{t('report_bad_product')}</Link>
+                    </li>
+                    <li className="dropdown-list-item">
+                      <LucideIcons.MessageCircle size={16} color="#dc2626" />
+                      <Link to="/contact-support">{t('contact_support')}</Link>
+                    </li>
                   </ul>
                 </div>
                 <div>
-                  <h4 style={headerStyle}>{t('verified_products')}</h4>
-                  <ul style={ulStyle}>
-                    <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.CheckCircle size={16} color="#0071dc" /><Link to="/verification" style={linkStyle}>{t('product_verification')}</Link></li>
-                    <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.Star size={16} color="#0071dc" /><Link to="/reviews" style={linkStyle}>{t('buyer_reviews')}</Link></li>
-                    <li style={{ ...liStyle, display: 'flex', alignItems: 'center', gap: '10px' }}><LucideIcons.Truck size={16} color="#0071dc" /><Link to="/shipping-protection" style={linkStyle}>{t('shipping_protection')}</Link></li>
+                  <h4 className="dropdown-header-title">{t('verified_products')}</h4>
+                  <ul className="dropdown-list">
+                    <li className="dropdown-list-item">
+                      <LucideIcons.CheckCircle size={16} color="#0071dc" />
+                      <Link to="/verification">{t('product_verification')}</Link>
+                    </li>
+                    <li className="dropdown-list-item">
+                      <LucideIcons.Star size={16} color="#0071dc" />
+                      <Link to="/reviews">{t('buyer_reviews')}</Link>
+                    </li>
+                    <li className="dropdown-list-item">
+                      <LucideIcons.Truck size={16} color="#0071dc" />
+                      <Link to="/shipping-protection">{t('shipping_protection')}</Link>
+                    </li>
                   </ul>
                 </div>
               </div>
-            </div>, document.body
+            </div>,
+            document.body
           )}
         </div>
       </div>
 
-      <div className="nav-group-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-        <span ref={buyerRef} className="nav-item" onMouseEnter={(e) => handleMouseEnter('buyerCentral', e)} onMouseLeave={handleMouseLeave} style={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap', cursor: 'pointer', position: 'relative', paddingBottom: '8px' }}>
-          <span style={{ fontSize: '15px' }}>{t('buyer_central')}</span>
-          {activeMenu === 'buyerCentral' && ( <div style={{ position: 'absolute', bottom: '-8px', left: '0', right: '0', height: '3px', backgroundColor: '#ff6a00', borderRadius: '2px', transition: 'all 0.2s ease' }} /> )}
+      {/* GROUP RIGHT */}
+      <div className="nav-group-right">
+        {/* BUYER CENTRAL */}
+        <span
+          ref={buyerRef}
+          className="nav-item category-toggle-wrapper"
+          onMouseEnter={(e) => handleMouseEnter('buyerCentral', e)}
+          onMouseLeave={handleMouseLeave}
+        >
+          <span>{t('buyer_central')}</span>
+          {activeMenu === 'buyerCentral' && <div className="nav-underline" />}
         </span>
         {activeMenu === 'buyerCentral' && createPortal(
-          <div onMouseEnter={() => handleMouseEnter('buyerCentral')} onMouseLeave={handleMouseLeave} style={{ position: 'fixed', top: `${buyerMenuPos.top}px`, left: 0, right: 0, width: '100vw', backgroundColor: 'white', boxShadow: '0 15px 35px rgba(0,0,0,0.2)', zIndex: 11000, borderBottom: '1px solid #ddd' }}>
-            <div style={{ maxWidth: '1250px', margin: '0 auto', padding: '20px 20px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1.2fr', gap: '30px' }}>
+          <div
+            className="dropdown-menu-portal"
+            onMouseEnter={() => handleMouseEnter('buyerCentral')}
+            onMouseLeave={handleMouseLeave}
+            style={{ top: `${buyerMenuPos.top}px` }}
+          >
+            <div className="dropdown-menu-inner dropdown-grid-4">
               <div>
-                <h4 style={headerStyle}>{t('why_skyfall')}</h4>
-                <ul style={ulStyle}>
-                  <li style={liStyle}><Link to="/about-skyfall" style={linkStyle}>{t('what_is_skyfall')}</Link></li>
-                  <li style={liStyle}><Link to="/how-to-buy" style={linkStyle}>{t('how_to_buy')}</Link></li>
-                  <li style={liStyle}><Link to="/wholesale-benefits" style={linkStyle}>{t('wholesale_benefits')}</Link></li>
-                  <li style={liStyle}><Link to="/blogs" style={linkStyle}>{t('business_articles')}</Link></li>
+                <h4 className="dropdown-header-title">{t('why_skyfall')}</h4>
+                <ul className="dropdown-list">
+                  <li className="dropdown-list-item"><Link to="/about-skyfall">{t('what_is_skyfall')}</Link></li>
+                  <li className="dropdown-list-item"><Link to="/how-to-buy">{t('how_to_buy')}</Link></li>
+                  <li className="dropdown-list-item"><Link to="/wholesale-benefits">{t('wholesale_benefits')}</Link></li>
+                  <li className="dropdown-list-item"><Link to="/blogs">{t('business_articles')}</Link></li>
                 </ul>
               </div>
               <div>
-                <h4 style={headerStyle}>{t('business_services')}</h4>
-                <ul style={ulStyle}>
-                  <li style={liStyle}><Link to="/protections" style={linkStyle}>{t('payment_protection')}</Link></li>
-                  <li style={liStyle}><Link to="/logistics" style={linkStyle}>{t('track_logistics')}</Link></li>
-                  <li style={liStyle}><Link to="/quotes" style={linkStyle}>{t('invoice_requests')}</Link></li>
-                  <li style={liStyle}><Link to="/verification" style={linkStyle}>{t('product_verification')}</Link></li>
+                <h4 className="dropdown-header-title">{t('business_services')}</h4>
+                <ul className="dropdown-list">
+                  <li className="dropdown-list-item"><Link to="/protections">{t('payment_protection')}</Link></li>
+                  <li className="dropdown-list-item"><Link to="/logistics">{t('track_logistics')}</Link></li>
+                  <li className="dropdown-list-item"><Link to="/quotes">{t('invoice_requests')}</Link></li>
+                  <li className="dropdown-list-item"><Link to="/verification">{t('product_verification')}</Link></li>
                 </ul>
               </div>
               <div>
-                <h4 style={headerStyle}>{t('support_help')}</h4>
-                <ul style={ulStyle}>
-                  <li style={liStyle}><Link to="/help-center" style={linkStyle}>{t('for_buyers')}</Link></li>
-                  <li style={liStyle}><Link to="/dispute" style={linkStyle}>{t('open_dispute')}</Link></li>
-                  <li style={liStyle}><Link to="/report" style={linkStyle}>{t('report_issue')}</Link></li>
-                  <li style={liStyle}><a href="https://wa.me/255..." style={linkStyle}>{t('chat_whatsapp')}</a></li>
+                <h4 className="dropdown-header-title">{t('support_help')}</h4>
+                <ul className="dropdown-list">
+                  <li className="dropdown-list-item"><Link to="/help-center">{t('for_buyers')}</Link></li>
+                  <li className="dropdown-list-item"><Link to="/dispute">{t('open_dispute')}</Link></li>
+                  <li className="dropdown-list-item"><Link to="/report">{t('report_issue')}</Link></li>
+                  <li className="dropdown-list-item"><a href="https://wa.me/255...">{t('chat_whatsapp')}</a></li>
                 </ul>
               </div>
-              <div style={{ borderLeft: '1px solid #eee', paddingLeft: '30px' }}>
-                <h4 style={headerStyle}>{t('our_partners')}</h4>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', padding: '15px', border: '1px solid #eee', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
-                  <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ff6a00' }}>SF</div>
+              <div>
+                <h4 className="dropdown-header-title">{t('our_partners')}</h4>
+                <div className="partner-card">
+                  <div className="partner-logo">SF</div>
                   <div>
-                    <div style={{ fontWeight: '600', fontSize: '14px' }}>{t('connect_your_store')}</div>
-                    <p style={{ fontSize: '12px', color: '#666', margin: '4px 0' }}>{t('register_store_description')}</p>
-                    <Link to="/create-store" style={{ color: '#ff6a00', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>{t('start_now')}</Link>
+                    <div className="partner-title">{t('connect_your_store')}</div>
+                    <p className="partner-description">{t('register_store_description')}</p>
+                    <Link to="/create-store" className="partner-link">{t('start_now')}</Link>
                   </div>
                 </div>
               </div>
             </div>
-          </div>, document.body
+          </div>,
+          document.body
         )}
-        
-        <span ref={helpRef} className="nav-item" onMouseEnter={(e) => handleMouseEnter('helpCenter', e)} onMouseLeave={handleMouseLeave} style={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap', cursor: 'pointer', position: 'relative', paddingBottom: '8px' }}>
-          <span style={{ fontSize: '15px' }}>{t('help_center')}</span>
-          {activeMenu === 'helpCenter' && (<div style={{ position: 'absolute', bottom: '-8px', left: '0', right: '0', height: '3px', backgroundColor: '#ff6a00', borderRadius: '2px', transition: 'all 0.2s ease' }} />)}
+
+        {/* HELP CENTER */}
+        <span
+          ref={helpRef}
+          className="nav-item category-toggle-wrapper"
+          onMouseEnter={(e) => handleMouseEnter('helpCenter', e)}
+          onMouseLeave={handleMouseLeave}
+        >
+          <span>{t('help_center')}</span>
+          {activeMenu === 'helpCenter' && <div className="nav-underline" />}
         </span>
         {activeMenu === 'helpCenter' && createPortal(
-          <div onMouseEnter={() => handleMouseEnter('helpCenter')} onMouseLeave={handleMouseLeave} style={{ position: 'fixed', top: `${helpMenuPos.top}px`, left: 0, right: 0, width: '100vw', backgroundColor: 'white', boxShadow: '0 15px 35px rgba(0,0,0,0.2)', zIndex: 11000, borderBottom: '1px solid #ddd' }}>
-            <div style={{ maxWidth: '1250px', margin: '0 auto', padding: '30px 20px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1.2fr', gap: '40px' }}>
+          <div
+            className="dropdown-menu-portal"
+            onMouseEnter={() => handleMouseEnter('helpCenter')}
+            onMouseLeave={handleMouseLeave}
+            style={{ top: `${helpMenuPos.top}px` }}
+          >
+            <div className="dropdown-menu-inner dropdown-grid-4">
               <div>
-                <h4 style={headerStyle}>{t('buyer_help')}</h4>
-                <ul style={ulStyle}>
-                  <li style={liStyle}><Link to="/help-center" style={linkStyle}>{t('help_center_desc')}</Link></li>
-                  <li style={liStyle}><Link to="/how-to-buy" style={linkStyle}>{t('how_to_buy')}</Link></li>
-                  <li style={liStyle}><Link to="/shipping-info" style={linkStyle}>{t('shipping_info')}</Link></li>
-                  <li style={liStyle}><Link to="/refund-policy" style={linkStyle}>{t('refund_policy')}</Link></li>
+                <h4 className="dropdown-header-title">{t('buyer_help')}</h4>
+                <ul className="dropdown-list">
+                  <li className="dropdown-list-item"><Link to="/help-center">{t('help_center_desc')}</Link></li>
+                  <li className="dropdown-list-item"><Link to="/how-to-buy">{t('how_to_buy')}</Link></li>
+                  <li className="dropdown-list-item"><Link to="/shipping-info">{t('shipping_info')}</Link></li>
+                  <li className="dropdown-list-item"><Link to="/refund-policy">{t('refund_policy')}</Link></li>
                 </ul>
               </div>
               <div>
-                <h4 style={headerStyle}>{t('security_policies')}</h4>
-                <ul style={ulStyle}>
-                  <li style={liStyle}><Link to="/dispute" style={linkStyle}>{t('open_dispute')}</Link></li>
-                  <li style={liStyle}><Link to="/report-abuse" style={linkStyle}>{t('report_scam')}</Link></li>
-                  <li style={liStyle}><Link to="/terms" style={linkStyle}>{t('terms_conditions')}</Link></li>
-                  <li style={liStyle}><Link to="/privacy" style={linkStyle}>{t('privacy_policy')}</Link></li>
+                <h4 className="dropdown-header-title">{t('security_policies')}</h4>
+                <ul className="dropdown-list">
+                  <li className="dropdown-list-item"><Link to="/dispute">{t('open_dispute')}</Link></li>
+                  <li className="dropdown-list-item"><Link to="/report-abuse">{t('report_scam')}</Link></li>
+                  <li className="dropdown-list-item"><Link to="/terms">{t('terms_conditions')}</Link></li>
+                  <li className="dropdown-list-item"><Link to="/privacy">{t('privacy_policy')}</Link></li>
                 </ul>
               </div>
               <div>
-                <h4 style={headerStyle}>{t('contact_us')}</h4>
-                <ul style={ulStyle}>
-                  <li style={liStyle}><a href="https://wa.me/255..." style={linkStyle}>{t('chat_whatsapp')}</a></li>
-                  <li style={liStyle}><Link to="/contact-us" style={linkStyle}>{t('email_us')}</Link></li>
-                  <li style={liStyle}><Link to="/office-location" style={linkStyle}>{t('our_offices')}</Link></li>
+                <h4 className="dropdown-header-title">{t('contact_us')}</h4>
+                <ul className="dropdown-list">
+                  <li className="dropdown-list-item"><a href="https://wa.me/255...">{t('chat_whatsapp')}</a></li>
+                  <li className="dropdown-list-item"><Link to="/contact-us">{t('email_us')}</Link></li>
+                  <li className="dropdown-list-item"><Link to="/office-location">{t('our_offices')}</Link></li>
                 </ul>
               </div>
-              <div style={{ borderLeft: '1px solid #eee', paddingLeft: '30px' }}>
-                <h4 style={headerStyle}>{t('learn_more')}</h4>
-                <div style={{ padding: '15px', border: '1px solid #eef2ff', borderRadius: '8px', backgroundColor: '#f8faff' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}><LucideIcons.PlayCircle size={24} color="#0071dc" /><span style={{ fontWeight: '600', fontSize: '14px' }}>{t('video_tutorials')}</span></div>
-                  <p style={{ fontSize: '12px', color: '#666', lineHeight: '1.5' }}>{t('video_description')}</p>
-                  <Link to="/tutorials" style={{ color: '#0071dc', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none', display: 'block', marginTop: '10px' }}>{t('watch_videos')}</Link>
+              <div>
+                <h4 className="dropdown-header-title">{t('learn_more')}</h4>
+                <div className="learn-more-card">
+                  <div className="learn-more-header">
+                    <LucideIcons.PlayCircle size={24} color="#0071dc" />
+                    <span>{t('video_tutorials')}</span>
+                  </div>
+                  <p className="learn-more-text">{t('video_description')}</p>
+                  <Link to="/tutorials" className="learn-more-link">{t('watch_videos')}</Link>
                 </div>
               </div>
             </div>
-          </div>, document.body
+          </div>,
+          document.body
         )}
 
-        <div onClick={handleSellNavigation} className="nav-sell-link" onMouseEnter={() => setActiveNav('sell')} onMouseLeave={() => setActiveNav(null)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', whiteSpace: 'nowrap', flexShrink: 0, padding: '8px 12px', border: '1px solid #eee', borderRadius: '4px', textDecoration: 'none', color: 'inherit', backgroundColor: user ? 'transparent' : '#fff7f2', position: 'relative', cursor: 'pointer' }}>
-          <span style={{ fontWeight: '500', fontSize: '14px' }}>{t('sell_on_skyfall')}</span>
-          {activeNav === 'sell' && (<div style={{ position: 'absolute', bottom: '-8px', left: '0', right: '0', height: '3px', backgroundColor: '#ff6a00', borderRadius: '2px', transition: 'all 0.2s ease' }} />)}
+        {/* SELL ON SKYFALL */}
+        <div
+          onClick={handleSellNavigation}
+          className={`nav-sell-link ${user ? 'nav-sell-link-transparent' : ''}`}
+          onMouseEnter={() => setActiveNav('sell')}
+          onMouseLeave={() => setActiveNav(null)}
+        >
+          <span>{t('sell_on_skyfall')}</span>
+          {activeNav === 'sell' && <div className="nav-underline" />}
         </div>
       </div>
     </nav>

@@ -13,18 +13,41 @@ html, body {
   padding: 0 !important;
   overflow-x: hidden;
   font-family: 'Roboto', Helvetica, Arial, sans-serif;
-  background-color: rgb(49, 29, 29);
+  background-color: white;
 }
 
 /* ============================================
-   LAYER 2: DASHBOARD WRAPPER
+   DASHBOARD WRAPPER - PUNGUZA PADDING KWA MOBILE
    ============================================ */
 .dashboard-wrapper {
-  background: white;  /* 🔥 BADILISHA: Weka kijivu chepesi cha background ya ukurasa mzima */
-  min-height: 100vh;
-  position: relative;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    min-height: 100vh;
+    position: relative;
+    padding-top: 110px; /* ✅ DESKTOP: 80px */
 }
 
+/* ============================================
+   MOBILE & TABLET - PUNGUZA PADDING
+   ============================================ */
+@media (max-width: 1024px) {
+    .dashboard-wrapper {
+        padding-top: 60px !important; /* ✅ MOBILE: 60px (punguza) */
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-wrapper {
+        padding-top: 62px !important; /* ✅ MOBILE NDOGO: 56px */
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-wrapper {
+        padding-top: 56px !important; /* ✅ SIMU NDOGO SANA: 52px */
+    }
+}
 /* ============================================
    LAYER 3: HEADER - STICKY
    ============================================ */
@@ -33,31 +56,24 @@ html, body {
   top: 0;
   width: 100%;
   z-index: 1000;
-  background: rgb(243, 240, 240);
+  background: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  padding-top: 80px;
-}
-
-/* ============================================
-   FIX: ONDOA PENGO LA HEADER KWA MOBILE & TABLET
-   ============================================ */
-@media (max-width: 1024px) {
-  .sticky-header {
-    padding-top: 60px;
-  }
+  padding-top: 0;
+  margin-bottom: 0; /* ✅ ONDOA NAFASI CHINI YA HEADER */
 }
 
 /* ============================================
    LAYER 4: MAIN CONTENT
    ============================================ */
 .main-content {
-  background-color: transparent; /* 🔥 BADILISHA: white -> transparent (Ili urithi background ya wrapper) */
+  flex: 1;
+  background-color: transparent;
   min-height: 100vh;
   padding-top: 0;
+  padding-bottom: 0; /* ✅ ITAONGEZWA KWENYE MEDIA QUERY */
   width: 100%;
   overflow-x: hidden;
 }
-
 
 /* ============================================
    LAYER 5: CONTENT CONTAINER - FLUID
@@ -66,7 +82,8 @@ html, body {
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0;
+  padding: 0; /* ✅ PADDING KUSHOTO NA KULIA (16px) */
+  
 }
 
 /* Tablet+ */
@@ -79,7 +96,7 @@ html, body {
 /* Desktop */
 @media (min-width: 1025px) {
   .content-container-simple {
-    padding: 0 24px;
+    padding: 0 11px;
   }
 }
 
@@ -89,8 +106,8 @@ html, body {
 .category-slider-wrapper {
   display: block;
   background: white;
-  /* 🔥 BORDER IMEONDOLIWA HAPA. Sasa inaenda kwenye components zenyewe */
-  padding: 8px 0;
+  padding: 0; /* ✅ ONDOA PADDING */
+  margin: 0; /* ✅ ONDOA MARGIN */
 }
 
 @media (min-width: 1025px) {
@@ -102,7 +119,7 @@ html, body {
 .mobile-category-slider-container {
   position: relative;
   background: white;
-  padding: 16px 0 12px 0;
+  padding: 8px 0 4px 0; /* ✅ PUNGUZA PADDING */
 }
 
 .mobile-category-slider {
@@ -179,20 +196,28 @@ html, body {
 .alibaba-top-layout {
   display: block;
   width: 100%;
-  margin: 12px 0;
+  margin: 0 !important; /* ✅ ONDOA MARGIN KABISA */
+   margin-bottom: 20px !important; /* ✅ ONGEZA NAFASI CHINI YA BANNER */
+
 }
 
 @media (min-width: 600px) and (max-width: 1024px) {
-  .alibaba-top-layout { margin: 20px 0; }
+  .alibaba-top-layout { 
+    margin: 0 !important; 
+  }
 }
 
 @media (min-width: 1025px) {
   .alibaba-top-layout {
     display: grid;
     grid-template-columns: 260px 1fr;
-    gap: 24px;
-    margin: 30px 0;
-    align-items: start;
+    gap: 0; /* ✅ ONDOA GAP - LINE ITACHUKUA NAFASI YA GAP */
+    margin: 0 !important;
+    align-items: stretch; /* ✅ NYOOSHA SIDEBAR NA BANNER */
+    background: white;
+    border: 1px solid #e5e7eb; /* ✅ BORDER NYEMBAMBA INAYOZUNGUKA YOTE */
+    border-radius: 12px;
+    overflow: hidden;
   }
 }
 
@@ -200,16 +225,20 @@ html, body {
 .side-categories {
   display: none;
   background: white;
-  border-radius: 16px;
-  border: 1px solid #f0f0f0;
+  border-radius: 0; /* ✅ ONDOA ROUNDED CORNERS */
+  border: none; /* ✅ ONDOA BORDER YA SIDEBAR */
   overflow: hidden;
   max-height: 480px;
   flex-direction: column;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  box-shadow: none; /* ✅ ONDOA SHADOW */
 }
 
 @media (min-width: 1025px) {
-  .side-categories { display: flex; }
+  .side-categories { 
+    display: flex;
+    border-right: 1px solid #e5e7eb; /* ✅ LINE NYEMBAMBA KATI YA SIDEBAR NA BANNER */
+    border-radius: 0;
+  }
 }
 
 .side-header {
@@ -282,10 +311,10 @@ html, body {
 .hot-picks-banner {
   position: relative;
   width: 100%;
-  aspect-ratio: 16/9;  /* 🔥 Uwiano wa kawaida wa video (Hii ni nzuri) */
+  aspect-ratio: 16/9;
   background: linear-gradient(135deg, #1a1a2e, #16213e);
   overflow: hidden;
-  border-radius: 0;
+  border-radius: 0; /* ✅ ONDOA ROUNDED CORNERS */
 }
 
 @media (min-width: 600px) {
@@ -296,7 +325,7 @@ html, body {
   .hot-picks-banner {
     aspect-ratio: auto;
     height: 480px;
-    border-radius: 12px;
+    border-radius: 0; /* ✅ ONDOA ROUNDED CORNERS */
   }
 }
 
@@ -374,18 +403,62 @@ html, body {
 .banner-overlay-text .view-more-banner:hover { background: #e55a00; }
 
 /* ============================================
+   RESPONSIVE - MOBILE (≤1024px)
+   ============================================ */
+@media (max-width: 1024px) {
+  .alibaba-top-layout {
+    display: block !important;
+    margin: 0 !important;
+    gap: 0;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+  }
+
+  .side-categories {
+    display: none !important;
+  }
+
+  .hero-banners-container {
+    height: auto;
+    padding: 0;
+    margin: 0;
+  }
+
+  .hot-picks-banner {
+    min-height: 180px !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    aspect-ratio: 16/6 !important;
+  }
+
+  .banner-overlay-text { padding: 16px !important; }
+  .banner-title { font-size: 1rem !important; }
+  .banner-desc { font-size: 0.7rem !important; max-width: 100% !important; }
+  .ad-tag { font-size: 0.6rem !important; padding: 2px 8px !important; }
+  .view-more-banner { padding: 6px 16px !important; font-size: 0.7rem !important; }
+}
+
+/* ============================================
    LAYER 8: COMPONENTS WRAPPER
    ============================================ */
 .components-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 0; /* ✅ ONDOA GAP KABISA */
+  margin-top: 0;
 }
 
-/* 🔥 UPDATED: Tablet na skrini kubwa sasa zina gap ndogo sawa na mobile (8px) */
+/* ✅ HAKIKISHA COMPONENT ZOTE ZINA MARGIN: 0 JUU */
+.components-wrapper > * {
+  margin-top: 0 !important;
+}
+
 @media (min-width: 600px) {
-  .components-wrapper { gap: 8px; margin-top: 8px; }
+  .components-wrapper { 
+    gap: 0; /* ✅ ONDOA GAP KABISA */
+    margin-top: 0; 
+  }
 }
 
 /* ============================================
@@ -395,6 +468,7 @@ html, body {
 /* FOOTER - Inaonekana Desktop pekee (≥1025px) */
 .footer-wrapper {
   display: block;
+  margin-top: 0; /* ✅ ONDOA MARGIN */
 }
 
 @media (max-width: 1024px) {
@@ -418,9 +492,20 @@ html, body {
     width: 100%;
     z-index: 999;
   }
+
+  /* ✅ ONGEZA PADDING KWA MAUDHUI ILI BOTTOM NAV ISIFUNIKE */
+  .dashboard-wrapper {
+    padding-bottom: 70px !important;
+  }
+  
+  .main-content {
+    padding-bottom: 70px !important;
+  }
 }
 
-/* GRIDS & CARDS (Basic Overrides) */
+/* ============================================
+   LAYER 10: GRIDS & CARDS
+   ============================================ */
 .alibaba-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
@@ -459,13 +544,14 @@ html, body {
 }
 
 /* ============================================
-   LAYER 12: SECTION HEADERS
+   LAYER 11: SECTION HEADERS
    ============================================ */
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 30px 0 20px 0;
+  margin: 0 !important;
+  padding: 8px 0 !important;
 }
 .section-header h3 {
   font-size: 1.25rem;
@@ -489,7 +575,9 @@ html, body {
   color: white;
 }
 
-/* SEARCH, ERROR & LOADING */
+/* ============================================
+   LAYER 12: SEARCH, ERROR & LOADING
+   ============================================ */
 .search-results-wrapper { padding: 16px 0; }
 .search-heading { margin-bottom: 16px; font-size: 1.1rem; }
 
@@ -512,13 +600,14 @@ html, body {
 
 
 /* ============================================
-   LAYER 15: MEGA MENU - DESKTOP HOVER (PORTAL)
+   LAYER 13: MEGA MENU - DESKTOP HOVER (PORTAL)
    ============================================ */
 .mega-menu-container {
   position: fixed;
-  top: 70px;
+  top: 0; /* ✅ BADILISHA KUTOKA 70px HADI 0 */
   left: 0;
   right: 0;
+  margin-top: 60px; /* ✅ UREFU WA HEADER YAKO */
   background: white;
   box-shadow: 0 20px 40px rgba(0,0,0,0.15);
   z-index: 9999;
@@ -664,7 +753,7 @@ html, body {
 
 
 /* ============================================
-   LAYER 16: MOBILE MENU (PORTAL OVERLAY) - SCROLL FIX & TABLET 4 COLUMNS
+   LAYER 14: MOBILE MENU (PORTAL OVERLAY)
    ============================================ */
 
 .mobile-menu-overlay {
@@ -869,7 +958,7 @@ html, body {
 }
 
 /* ============================================
-   LAYER 17: ANIMATIONS
+   LAYER 15: ANIMATIONS
    ============================================ */
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -900,7 +989,7 @@ html, body {
 }
 
 /* ============================================
-   LAYER 18: RESPONSIVE FIXES (ZERO PADDING LEFT/RIGHT)
+   LAYER 16: RESPONSIVE FIXES (Mobile/Tablet)
    ============================================ */
 @media (max-width: 1024px) {
   .content-container-simple { 
@@ -912,29 +1001,54 @@ html, body {
     padding: 0 !important;
   }
 
-  .main-content { padding-top: 0; }
+  .main-content { 
+    padding-top: 0; 
+    padding-bottom: 70px !important; /* ✅ NAFASI KWA BOTTOM NAV */
+  }
+
   .side-categories { display: none !important; }
-  .alibaba-top-layout { display: block !important; margin-top: 0 !important; gap: 0; }
-  .hero-banners-container { height: auto; padding: 0; margin: 0; }
-  .hot-picks-banner { min-height: 200px !important; border-radius: 0 !important; margin: 0; }
+  
+  .alibaba-top-layout { 
+    display: block !important; 
+    margin: 0 !important; /* ✅ ONDOA MARGIN KABISA */
+    gap: 0; 
+  }
+  
+  .hero-banners-container { 
+    height: auto; 
+    padding: 0; 
+    margin: 0; 
+  }
+  
+  .hot-picks-banner { 
+    min-height: 180px !important; 
+    border-radius: 0 !important; 
+    margin: 0 !important;
+    aspect-ratio: 16/6 !important;
+  }
+  
   .banner-overlay-text { padding: 16px !important; }
   .banner-title { font-size: 1rem !important; }
   .banner-desc { font-size: 0.7rem !important; max-width: 100% !important; }
   .ad-tag { font-size: 0.6rem !important; padding: 2px 8px !important; }
   .view-more-banner { padding: 6px 16px !important; font-size: 0.7rem !important; }
   
-  /* 🔥 MABADILIKO HAPA: Kutoka safu 2 hadi safu 4 + justify-items stretch */
+  /* ✅ GRIDS ZA MOBILE */
   .alibaba-grid, .just-for-you-grid, .summary-grid {
     grid-template-columns: repeat(4, 1fr) !important; 
     gap: 5px !important;
     padding: 0 !important;
-    justify-items: stretch !important; /* Inalazimisha kadi kujaza nafasi iliyoachiwa */
+    justify-items: stretch !important;
   }
   
   .compact-card img { height: 120px !important; }
   .compact-card .name { font-size: 12px !important; }
   .compact-card .price { font-size: 13px !important; }
-  .section-header { margin: 8px 0 !important; padding: 0 8px; }
+  
+  .section-header { 
+    margin: 0 !important; 
+    padding: 8px 0 !important; 
+  }
   .section-header h3 { font-size: 1rem !important; }
   .view-more-btn { padding: 4px 12px !important; font-size: 0.7rem !important; }
   
@@ -950,6 +1064,7 @@ html, body {
     z-index: 1000 !important;
     justify-content: space-around !important;
   }
+  
   .mobile-bottom-nav .nav-item {
     flex: 1 !important;
     display: flex !important;
@@ -958,19 +1073,21 @@ html, body {
     gap: 4px !important;
     cursor: pointer;
   }
+  
   .mobile-bottom-nav .nav-item span {
     font-size: 10px !important;
     color: #666 !important;
   }
 }
+
 /* ============================================
-   LAYER 19: DASHBOARD CARD (GLOBAL FALLBACK)
+   LAYER 17: DASHBOARD CARD (GLOBAL FALLBACK)
    ============================================ */
 .dashboard-card {
-  background: #f6f6f7;  /* 🔥 BADILISHA: white -> f8f9fa (Kijivu chepesi kama cards zako) */
+  background: #f6f6f7;
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid #d1d5db; /* 🔥 BADILISHA: #f0f0f0 -> d1d5db (Ili mstari uwiane) */
+  border: 1px solid #d1d5db;
   transition: all 0.3s ease;
   cursor: pointer;
 }

@@ -11,13 +11,7 @@
   border-left: none;
   border-right: none;
   box-sizing: border-box;
-}
-
-@media (max-width: 768px) {
-  .top-stores-main-wrapper { padding: 12px 8px; border-radius: 8px; margin: 2px 0; }
-}
-@media (min-width: 769px) {
-  .top-stores-main-wrapper { padding: 16px 0; border-radius: 16px; margin: 10px 0; }
+  padding: 16px 0;
 }
 
 /* ============================================ */
@@ -26,85 +20,191 @@
 
 .ts-header {
   display: flex;
-  justify-content: flex-start; /* Kitufe kimeondolewa, hivyo sasa inakaa kushoto */
+  justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  width: 100%;
+  padding: 0 16px;
+  margin-bottom: 16px;
 }
-@media (max-width: 768px) { .ts-header { padding: 0 8px; margin-bottom: 12px; gap: 6px; } }
-@media (min-width: 769px) { .ts-header { padding: 0; margin-bottom: 20px; gap: 10px; } }
 
-.ts-header-left { display: flex; flex-direction: column; }
-.ts-title-group { display: flex; align-items: center; gap: 8px; }
-@media (max-width: 768px) { .ts-title-group { gap: 4px; margin-bottom: 2px; } }
-@media (min-width: 769px) { .ts-title-group { gap: 8px; margin-bottom: 8px; } }
+.ts-header-left {
+  display: flex;
+  flex-direction: column;
+}
 
-.ts-factory-icon { color: #f97316; }
-@media (max-width: 768px) { .ts-factory-icon { width: 12px; height: 12px; } }
-@media (min-width: 769px) { .ts-factory-icon { width: 24px; height: 24px; } }
+.ts-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-.ts-title { font-weight: 600; margin: 0; }
-@media (max-width: 768px) { .ts-title { font-size: 13px; line-height: 1.2; } }
-@media (min-width: 769px) { .ts-title { font-size: 24px; line-height: 1.4; } }
+.ts-factory-icon {
+  color: #f97316;
+  width: 24px;
+  height: 24px;
+}
 
-.ts-subtitle { margin: 0; color: #888; font-weight: 400; }
-@media (max-width: 768px) { .ts-subtitle { font-size: 9px; line-height: 1.2; } }
-@media (min-width: 769px) { .ts-subtitle { font-size: 16px; line-height: 1.5; } }
+.ts-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.ts-subtitle {
+  font-size: 14px;
+  color: #888;
+  margin: 0;
+  padding-left: 34px;
+}
 
 /* ============================================ */
-/* SCROLL WRAPPER - FLUID WIDTHS                 */
+/* SCROLL WRAPPER - "PEEK" EFFECT               */
 /* ============================================ */
 
 .ts-desktop-wrapper {
   position: relative;
   display: flex;
   align-items: center;
+  padding: 0 8px;
 }
 
 .ts-scroll-wrapper {
   display: flex;
-  flex-wrap: nowrap !important; /* Hii inalazimisha kadi zisishuke chini (Scroll) */
+  flex-wrap: nowrap !important;
   overflow-x: auto !important;
   overflow-y: hidden;
   scroll-behavior: smooth;
-  padding: 10px 0 20px 0;
+  padding: 8px 4px 20px 4px;
   width: 100%;
-}
-
-.ts-card-wrapper {
-  flex: 0 0 auto;
-}
-
-/* 🔥 FLUID MEDIA QUERIES ZA SCROLL */
-
-/* Desktop Kubwa (≥1025px): Kadi pana zaidi */
-@media (min-width: 1025px) {
-  .ts-scroll-wrapper { gap: 24px; } /* Pengo pana zaidi kwa Store */
-  .ts-card-wrapper { width: 220px; max-width: 220px; }
-}
-
-/* Tablet (769px - 1024px): Kadi za ukubwa wa kati */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .ts-scroll-wrapper { gap: 16px; }
-  .ts-card-wrapper { width: 160px; max-width: 160px; }
-}
-
-/* Mobile (≤768px): Kadi 2 kwa mstari (Ukubwa 180px) */
-@media (max-width: 768px) {
-  .ts-scroll-wrapper { 
-    gap: 12px !important;         /* 🔥 Nafasi kati ya kadi (kutoka 8px hadi 12px) */
-  }
-  .ts-card-wrapper { 
-    width: 180px !important;      /* 🔥 Upana wa kadi 2 kwa mstari (kutoka 120px hadi 180px) */
-    max-width: 180px !important; 
-  }
-  
-  /* Ficha mishale kwenye simu */
-  .ts-arrow-btn { display: none !important; }
+  gap: 12px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ============================================ */
-/* ARROWS (Desktop na Tablet tu)                */
+/* 🔥 DESKTOP: KADI 6.5 (6 + NUSU)             */
+/* ============================================ */
+
+@media (min-width: 1025px) {
+  .ts-card-wrapper {
+    flex: 0 0 calc((100% - (6.5 * 12px)) / 6.5);
+    min-width: calc((100% - (6.5 * 12px)) / 6.5);
+    max-width: calc((100% - (6.5 * 12px)) / 6.5);
+    scroll-snap-align: start;
+  }
+  .ts-scroll-wrapper {
+    gap: 12px;
+    padding: 8px 4px 20px 4px;
+  }
+}
+
+/* ============================================ */
+/* 🔥 TABLET: KADI 4.5 (4 + NUSU)              */
+/* ============================================ */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .ts-card-wrapper {
+    flex: 0 0 calc((100% - (4.5 * 12px)) / 4.5);
+    min-width: calc((100% - (4.5 * 12px)) / 4.5);
+    max-width: calc((100% - (4.5 * 12px)) / 4.5);
+    scroll-snap-align: start;
+  }
+  .ts-scroll-wrapper {
+    gap: 12px;
+    padding: 8px 4px 20px 4px;
+  }
+}
+
+/* ============================================ */
+/* 🔥 MOBILE: KADI 3.5 (3 + NUSU)              */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .ts-card-wrapper {
+    flex: 0 0 calc((100% - (3.5 * 10px)) / 3.5) !important;
+    min-width: calc((100% - (3.5 * 10px)) / 3.5) !important;
+    max-width: calc((100% - (3.5 * 10px)) / 3.5) !important;
+    scroll-snap-align: start;
+  }
+  .ts-scroll-wrapper {
+    gap: 10px !important;
+    padding: 8px 4px 16px 4px;
+  }
+  .ts-header {
+    padding: 0 12px;
+    margin-bottom: 12px;
+  }
+  .ts-title {
+    font-size: 18px !important;
+    font-weight: 700;
+  }
+  .ts-subtitle {
+    font-size: 13px !important;
+    padding-left: 0;
+    color: #888;
+  }
+  .ts-factory-icon {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  .ts-title-group {
+    gap: 6px !important;
+  }
+  
+  /* ✅ MISHALE INAONEKANA MOBILE */
+  .ts-arrow-btn {
+    display: flex !important;
+    width: 28px !important;
+    height: 28px !important;
+  }
+  .ts-arrow-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  .ts-arrow-left {
+    left: 0px !important;
+  }
+  .ts-arrow-right {
+    right: 0px !important;
+  }
+}
+
+/* ============================================ */
+/* 🔥 SMALL MOBILE: KADI 2 (NDOGO ZAIDI)       */
+/* ============================================ */
+
+@media (max-width: 480px) {
+  .ts-card-wrapper {
+    flex: 0 0 calc((100% - (2 * 8px)) / 2) !important;
+    min-width: calc((100% - (2 * 8px)) / 2) !important;
+    max-width: calc((100% - (2 * 8px)) / 2) !important;
+  }
+  .ts-scroll-wrapper {
+    gap: 8px !important;
+  }
+  .ts-title {
+    font-size: 16px !important;
+    font-weight: 700;
+  }
+  .ts-subtitle {
+    font-size: 12px !important;
+  }
+  .ts-factory-icon {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  .ts-arrow-btn {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  .ts-arrow-btn svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
+
+/* ============================================ */
+/* ARROWS - KUSHOTO NA KULIA                    */
 /* ============================================ */
 
 .ts-arrow-btn {
@@ -113,23 +213,87 @@
   background-color: white;
   border: 1px solid #e2e8f0;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   transition: all 0.2s ease;
   outline: none;
+  color: #333;
+  top: 50%;
+  transform: translateY(-50%);
 }
-.ts-arrow-btn:hover { background-color: #f7f9fc; transform: scale(1.05); }
-.ts-arrow-left { left: -15px; }
-.ts-arrow-right { right: -15px; }
+
+.ts-arrow-btn:hover {
+  background-color: #f97316;
+  color: white;
+  border-color: #f97316;
+  transform: translateY(-50%) scale(1.05);
+}
+
+.ts-arrow-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.ts-arrow-btn.hidden {
+  display: none !important;
+}
+
+.ts-arrow-left {
+  left: -4px;
+}
+
+.ts-arrow-right {
+  right: -4px;
+}
 
 /* ============================================ */
 /* UTILITY: HIDE SCROLLBAR                      */
 /* ============================================ */
 
-.hide-scrollbar::-webkit-scrollbar { display: none; }
-.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ============================================ */
+/* DARK MODE SUPPORT                            */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .top-stores-main-wrapper {
+    background-color: #1a1a2e;
+    border-color: #334155;
+  }
+
+  .ts-title {
+    color: #e2e8f0;
+  }
+
+  .ts-subtitle {
+    color: #94a3b8;
+  }
+
+  .ts-factory-icon {
+    color: #fb923c;
+  }
+
+  .ts-arrow-btn {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+  }
+
+  .ts-arrow-btn:hover {
+    background-color: #f97316;
+    color: white;
+    border-color: #f97316;
+  }
+}

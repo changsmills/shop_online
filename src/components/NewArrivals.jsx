@@ -1,8 +1,9 @@
+// src/components/NewArrivals.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, Sparkles } from "lucide-react";
 import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
-import SkeletonCardz from "./SkeletonCardz"; // ✅ IMPORT SAHIHI
+import SkeletonCardz from "./SkeletonCardz";
 import { useTranslation } from 'react-i18next';
 import '../NewArrivals.css';
 
@@ -66,12 +67,11 @@ export default function NewArrivals({ navigate, selectedCategory }) {
   }, [products]);
 
   // ============================================================
-  // 🔥 SKELETON LOADING - Inaonyesha skeleton cards wakati data inapakia
+  // SKELETON LOADING
   // ============================================================
   if (loading) {
     return (
       <div className="new-arrivals-main-wrapper">
-        {/* Header Section */}
         <div className="na-header">
           <div className="na-header-left">
             <div className="na-title-group">
@@ -94,12 +94,11 @@ export default function NewArrivals({ navigate, selectedCategory }) {
           </div>
         </div>
 
-        {/* 🔥 SKELETON SCROLL - Inaonyesha skeleton 5 kwa horizontal scroll */}
         <div className="na-desktop-wrapper">
           <div className="na-scroll-wrapper hide-scrollbar">
             {Array.from({ length: 5 }).map((_, index) => (
               <div key={`skeleton-${index}`} className="na-card-wrapper">
-                <SkeletonCardz /> {/* ✅ SkeletonCardz */}
+                <SkeletonCardz />
               </div>
             ))}
           </div>
@@ -109,12 +108,12 @@ export default function NewArrivals({ navigate, selectedCategory }) {
   }
 
   // ============================================================
-  // EMPTY STATE - Hakuna bidhaa
+  // EMPTY STATE
   // ============================================================
   if (products.length === 0) return null;
 
   // ============================================================
-  // SUCCESS STATE - Onyesha bidhaa
+  // SUCCESS STATE
   // ============================================================
   return (
     <div className="new-arrivals-main-wrapper">
@@ -154,11 +153,14 @@ export default function NewArrivals({ navigate, selectedCategory }) {
           {products.map((product) => (
             <div key={product.id} className="na-card-wrapper">
               <DashboardCard
-                image={product.cover_image}
-                title={product.name}
-                price={product.price}
-                originalPrice={product.original_price}
-                views={product.views}
+                image={product.cover_image || ''}
+                title={product.name || ''}
+                price={product.price || 'TSh 0'}
+                originalPrice={product.original_price || ''}
+                moq={product.moq || ''}
+                rating={product.rating || ''}
+                verified={product.is_verified || product.store?.is_verified || false}
+                years={product.years || ''}
                 onClick={() => {
                   const priorityId = product.id;
                   const sectionName = encodeURIComponent(`${t('new_arrivals')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`);

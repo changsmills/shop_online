@@ -1,8 +1,9 @@
+// src/components/TopDeals.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, Flame } from "lucide-react";
 import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
-import SkeletonCardz from "./SkeletonCardz"; // ✅ IMPORT SAHIHI
+import SkeletonCardz from "./SkeletonCardz";
 import { useTranslation } from 'react-i18next';
 import '../TopDeals.css';
 
@@ -90,12 +91,11 @@ export default function TopDeals({ navigate, selectedCategory }) {
   }, [products]);
 
   // ============================================================
-  // 🔥 SKELETON LOADING - Inaonyesha skeleton cards wakati data inapakia
+  // SKELETON LOADING
   // ============================================================
   if (loading) {
     return (
       <div className="top-deals-main-wrapper">
-        {/* Header Section */}
         <div className="td-header">
           <div className="td-header-left">
             <div className="td-title-group">
@@ -111,12 +111,11 @@ export default function TopDeals({ navigate, selectedCategory }) {
           </div>
         </div>
 
-        {/* 🔥 SKELETON SCROLL - Inaonyesha skeleton 5 kwa horizontal scroll */}
         <div className="td-desktop-wrapper">
           <div className="td-scroll-wrapper hide-scrollbar">
             {Array.from({ length: 5 }).map((_, index) => (
               <div key={`skeleton-${index}`} className="td-card-wrapper">
-                <SkeletonCardz /> {/* ✅ SkeletonCardz */}
+                <SkeletonCardz />
               </div>
             ))}
           </div>
@@ -126,12 +125,12 @@ export default function TopDeals({ navigate, selectedCategory }) {
   }
 
   // ============================================================
-  // EMPTY STATE - Hakuna deals
+  // EMPTY STATE
   // ============================================================
   if (products.length === 0) return null;
 
   // ============================================================
-  // SUCCESS STATE - Onyesha deals
+  // SUCCESS STATE - Onyesha deals na DashboardCard
   // ============================================================
   return (
     <div className="top-deals-main-wrapper">
@@ -168,11 +167,13 @@ export default function TopDeals({ navigate, selectedCategory }) {
                 <DashboardCard
                   image={product.cover_image}
                   title={product.name}
-                  price={product.original_price} 
-                  originalPrice={product.price}  
+                  price={product.original_price || product.price}
+                  originalPrice={product.price}
                   moq={product.moq}
-                  discountBadge={discountPercent > 0 ? `-${discountPercent}%` : null}
-                  showProgress={true}
+                  rating={product.rating}
+                  verified={product.verified || product.store?.is_verified}
+                  years={product.years}
+                  // ✅ ONDOA discountBadge na showProgress - Hazipo kwenye DashboardCard
                   onClick={() => {
                     const priorityId = product.id;
                     const sectionName = encodeURIComponent(`Top Deals ${selectedCategory ? `in ${selectedCategory.name}` : ''}`);

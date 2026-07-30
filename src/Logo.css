@@ -1,61 +1,149 @@
-/* Container kuu ya Logo */
+/* ============================================
+   LOGO - WRAPPER
+   ============================================ */
 .logo-wrapper {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-shrink: 0;
   cursor: pointer;
+  text-decoration: none;
 }
 
-/* Box la logo - Tumebadilisha kuwa duara */
-.icon-crop {
-  width: 40px;  
-  height: 40px; 
+/* ============================================
+   LOGO - ICON BOX (Duara)
+   ============================================ */
+.logo-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  
-  /* Hizi ndizo zinazounda duara */
-  border-radius: 50%; 
-  overflow: hidden; 
-  
-  /* Hiari: Ongeza border kama unataka nembo iwe na mzunguko wa rangi */
-  border: 1px solid rgba(255, 255, 255, 0.1); 
-  background-color: #0B132B; /* Iwe na rangi ya background ya logo yako */
+  background-color: #0B132B;
+  border: 2px solid #ff4e00;
+  box-shadow: 0 3px 6px rgba(255, 78, 0, 0.25);
+  flex-shrink: 0;
 }
 
-/* Style ya SVG yenyewe */
-.logo-img {
-  width: 120%; /* Nimeiongeza kidogo ili ijaze vizuri ndani ya duara */
+.logo-image {
+  width: 120%;
   height: 120%;
-  object-fit: cover; /* Inahakikisha picha inajaza eneo bila kupoteza umbo */
+  object-fit: cover;
+  display: block;
 }
 
-/* Maandishi ya Skyfall */
+/* ============================================
+   LOGO - TEXT (Skyfall.com)
+   ============================================ */
 .logo-text {
-  display: flex;
-  flex-direction: column;
-  /* margin-left: -10px; Hii unaweza kuiondoa kama unataka nafasi ya kawaida */
-  color: #ff4e00 !important; /* Rangi uliyotumia kwenye checkout button yako */
-  font-weight: 200px;
-  font-size: 12px;
-  line-height: 1;
-  font-family: 'Inter', sans-serif, Arial;
+  color: #ff4e00;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 1.5px; /* ✅ NAFASI KATI YA HERUFI - SPACING */
+  font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(255, 78, 0, 0.1);
 }
 
-/* Rangi ya .com pekee */
-.dot-com {
-  color: #e45a0a;
-  font-size: 16px; /* .com huwa ndogo kidogo kuliko neno kuu */
-}
-/* Ongeza hii chini kabisa ya Logo.css yako */
-@media (max-width: 768px) {
-  .icon-crop {
-    width: 50px;  /* Imeongezeka kutoka 40px */
-    height: 50px;
-  }
-  
+/* ============================================
+   RESPONSIVE - TABLET (≤1024px)
+   ============================================ */
+@media (max-width: 1024px) {
   .logo-text {
-    font-size: 18px; /* Punguza kidogo maandishi ili logo ipate nafasi zaidi */
+    font-size: 22px;
+    letter-spacing: 1.2px;
+  }
+
+  .logo-icon-box {
+    width: 36px;
+    height: 36px;
+  }
+
+  .logo-wrapper {
+    gap: 8px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE - MOBILE (≤768px)
+   ============================================ */
+@media (max-width: 768px) {
+  .logo-wrapper {
+    gap: 6px;
+  }
+
+  .logo-text {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.8px; /* ✅ SPACING NDOGO KWA MOBILE */
+  }
+
+  .logo-icon-box {
+    width: 30px;
+    height: 30px;
+    border-width: 1.5px;
+  }
+
+  .logo-image {
+    width: 130%;
+    height: 130%;
+  }
+}
+
+/* ============================================
+   RESPONSIVE - SMALL MOBILE (≤480px)
+   ============================================ */
+@media (max-width: 480px) {
+  .logo-text {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+  }
+
+  .logo-icon-box {
+    width: 26px;
+    height: 26px;
+    border-width: 1.5px;
+  }
+
+  .logo-wrapper {
+    gap: 4px;
+  }
+}
+
+/* ============================================
+   DARK MODE SUPPORT
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  .logo-text {
+    color: #ff6a00;
+  }
+
+  .logo-icon-box {
+    background-color: #1a1a2e;
+    border-color: #ff6a00;
+  }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+@media print {
+  .logo-wrapper {
+    gap: 8px;
+  }
+
+  .logo-text {
+    color: #000 !important;
+    font-size: 20px !important;
+    font-weight: 800 !important;
+    letter-spacing: 1px !important;
+  }
+
+  .logo-icon-box {
+    border-color: #333 !important;
   }
 }
