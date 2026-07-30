@@ -333,3 +333,228 @@
 @media (min-width: 769px) {
   .back-to-top-icon { width: 24px; height: 24px; }
 }
+
+
+
+/* ============================================ */
+/* LAYER 8: BACK TO TOP BUTTON - ONGEZA HIZI    */
+/* ============================================ */
+
+/* ✅ BACK TO TOP - FLOATING BUTTON (Kuongeza tu) */
+.back-to-top-btn {
+  position: fixed;
+  bottom: 120px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #ff6a00;
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255, 106, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  
+  /* ✅ HAIONEKANI MWANZO */
+  opacity: 0;
+  transform: translateY(20px) scale(0.8);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* ✅ INAONEKANA TU MTUMIAJI AKIWA CHINI */
+.back-to-top-btn.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  visibility: visible;
+  animation: bounceIn 0.4s ease forwards;
+}
+
+.back-to-top-btn:hover {
+  background: #e55a00;
+  transform: scale(1.1);
+  box-shadow: 0 6px 24px rgba(255, 106, 0, 0.5);
+}
+
+.back-to-top-btn:active {
+  transform: scale(0.95);
+}
+
+.back-to-top-icon {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2.5;
+}
+
+/* Mobile back to top */
+@media (max-width: 768px) {
+  .back-to-top-btn {
+    bottom: 90px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+  }
+  .back-to-top-icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-to-top-btn {
+    bottom: 80px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+  }
+  .back-to-top-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* ============================================ */
+/* ANIMATION - BOUNCE IN                        */
+/* ============================================ */
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-6px) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ============================================ */
+/* BANNER BACK BUTTON - MSHALE WA KUREJEA       */
+/* ============================================ */
+
+.banner-back-btn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+  z-index: 10;
+}
+
+.banner-back-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.banner-back-btn:active {
+  transform: scale(0.95);
+}
+
+/* ✅ Mobile */
+@media (max-width: 768px) {
+  .banner-back-btn {
+    top: 12px;
+    left: 12px;
+    width: 36px;
+    height: 36px;
+  }
+  .banner-back-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* ✅ Small Mobile */
+@media (max-width: 480px) {
+  .banner-back-btn {
+    top: 10px;
+    left: 10px;
+    width: 32px;
+    height: 32px;
+  }
+  .banner-back-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* ============================================ */
+/* BANNER SEARCH BUTTON                         */
+/* ============================================ */
+
+.banner-search-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+  z-index: 10;
+}
+
+.banner-search-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.banner-search-btn:active {
+  transform: scale(0.95);
+}
+
+/* ✅ Mobile */
+@media (max-width: 768px) {
+  .banner-search-btn {
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+  }
+  .banner-search-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* ✅ Small Mobile */
+@media (max-width: 480px) {
+  .banner-search-btn {
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+  }
+  .banner-search-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+}

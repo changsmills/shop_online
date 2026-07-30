@@ -1,15 +1,17 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback, Suspense } from "react";
-import { useLocation, useSearchParams } from "react-router-dom";
-import { ArrowUp, ChevronLeft, ChevronRight } from "lucide-react";
+import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
+import { ArrowUp, ChevronLeft, ChevronRight, ArrowLeft, Search } from "lucide-react";
 import api from "../axiosConfig";
 import "../ProductsAll.css";
 import ProductList from "./ProductList";
+import SearchDialog from "../components/SearchDialog";
 
 // ✅ LAZY IMPORT YA SKELETON
 const SkeletonProductsAll = React.lazy(() => import("../components/SkeletonProductsAll"));
 
 export default function ProductsAll() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const scrollRef = useRef(null);
 
@@ -43,6 +45,7 @@ export default function ProductsAll() {
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [error, setError] = useState(null);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // ============================================
   // 3. MOBILE DETECTION
@@ -109,7 +112,6 @@ export default function ProductsAll() {
         const data = response.data;
 
         if (Array.isArray(data) && data.length > 0) {
-          // 🔥 ONGEZA HAPA: Panga kategoria kwa jina (A-Z)
           const sortedData = [...data].sort((a, b) => a.name.localeCompare(b.name));
 
           setCategories([
@@ -170,17 +172,47 @@ export default function ProductsAll() {
   }, []);
 
   // ============================================
-  // 11. BACK TO TOP
+  // 11. BACK TO TOP - FLOATING BOTTOM BUTTON
   // ============================================
   
   useEffect(() => {
-    const handleScroll = () => setShowBackToTop(window.scrollY > 1000);
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 500);
+    };
+    
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // ============================================
-  // 12. HANDLE CATEGORY CLICK
+  // 12. SCROLL TO TOP FUNCTION
+  // ============================================
+
+  const scrollToTop = useCallback(() => {
+    window.scrollTo({ 
+      top: 0, 
+      behavior: "smooth" 
+    });
+  }, []);
+
+  // ============================================
+  // 13. HANDLE BACK TO DASHBOARD
+  // ============================================
+
+  const handleBackToDashboard = useCallback(() => {
+    navigate('/dashboard');
+  }, [navigate]);
+
+  // ============================================
+  // 14. HANDLE SEARCH
+  // ============================================
+  
+  const handleSearchSubmit = useCallback((query) => {
+    navigate(`/products?search=${encodeURIComponent(query)}`);
+  }, [navigate]);
+
+  // ============================================
+  // 15. HANDLE CATEGORY CLICK
   // ============================================
   
   const handleCategoryClick = useCallback((cat) => {
@@ -198,15 +230,7 @@ export default function ProductsAll() {
   }, []);
 
   // ============================================
-  // 13. HANDLE SEARCH
-  // ============================================
-  
-  const handleSearch = useCallback((e) => {
-    setSearch(e.target.value);
-  }, []);
-
-  // ============================================
-  // 14. RENDER
+  // 16. RENDER
   // ============================================
 
   if (error) {
@@ -221,7 +245,6 @@ export default function ProductsAll() {
     );
   }
 
-  // ✅ MUHIMU: Lazy Load + Suspense kwa skeleton
   if (loading) {
     return (
       <Suspense fallback={<div className="loading-placeholder">Inapakia...</div>}>
@@ -235,9 +258,34 @@ export default function ProductsAll() {
       
       {/* ========== BANNER ========== */}
       <div className="alibaba-style-banner">
+        {/* ✅ BACK ARROW - KUREJEA DASHBOARD */}
+        <button 
+          className="banner-back-btn" 
+          onClick={handleBackToDashboard}
+          aria-label="Rudi Dashboard"
+        >
+          <ArrowLeft size={24} />
+        </button>
+        
+        {/* ✅ SEARCH BUTTON - KULIA */}
+        <button 
+          className="banner-search-btn" 
+          onClick={() => setIsSearchOpen(true)}
+          aria-label="Tafuta"
+        >
+          <Search size={22} />
+        </button>
+        
         <h1 className="banner-title">{bannerTitle}</h1>
         <p className="banner-desc">{bannerDesc}</p>
       </div>
+
+      {/* ========== SEARCH DIALOG ========== */}
+      <SearchDialog 
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        onSearch={handleSearchSubmit}
+      />
 
       {/* ========== CATEGORY TABS ========== */}
       <div className="category-tabs-wrapper">
@@ -288,12 +336,14 @@ export default function ProductsAll() {
         </main>
       </div>
 
-      {/* ========== BACK TO TOP BUTTON ========== */}
-      {showBackToTop && (
-        <button className="back-to-top-btn" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
-          <ArrowUp className="back-to-top-icon" />
-        </button>
-      )}
+      {/* ========== BACK TO TOP - FLOATING BUTTON ========== */}
+      <button 
+        className={`back-to-top-btn ${showBackToTop ? 'visible' : ''}`} 
+        onClick={scrollToTop}
+        aria-label="Rudi Juu"
+      >
+        <ArrowUp className="back-to-top-icon" />
+      </button>
     </div>
   );
 }

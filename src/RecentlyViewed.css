@@ -11,47 +11,56 @@
   border-left: none;
   border-right: none;
   box-sizing: border-box;
-}
-
-@media (max-width: 768px) {
-  .recently-viewed-main-wrapper { padding: 12px 8px; border-radius: 8px; margin: 2px 0; }
-}
-@media (min-width: 769px) {
-  .recently-viewed-main-wrapper { padding: 16px 0; border-radius: 16px; margin: 10px 0; }
+  padding: 16px 0;
 }
 
 /* ============================================ */
-/* HEADER SECTION (Na Mshale Upande wa Kulia!)  */
+/* HEADER SECTION                                */
 /* ============================================ */
 
 .rv-header {
   display: flex;
-  justify-content: space-between; /* 🔥 Inatuma Title kushoto na Mshale kulia */
+  justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  width: 100%;
+  padding: 0 16px;
+  margin-bottom: 16px;
 }
-@media (max-width: 768px) { .rv-header { padding: 0 8px; margin-bottom: 12px; gap: 6px; } }
-@media (min-width: 769px) { .rv-header { padding: 0; margin-bottom: 20px; gap: 10px; } }
 
-.rv-header-left { display: flex; flex-direction: column; }
-.rv-title-group { display: flex; align-items: center; gap: 8px; }
-@media (max-width: 768px) { .rv-title-group { gap: 4px; margin-bottom: 2px; } }
-@media (min-width: 769px) { .rv-title-group { gap: 8px; margin-bottom: 8px; } }
+.rv-header-left {
+  display: flex;
+  flex-direction: column;
+}
 
-.rv-history-icon { color: #10b981; }
-@media (max-width: 768px) { .rv-history-icon { width: 12px; height: 12px; } }
-@media (min-width: 769px) { .rv-history-icon { width: 24px; height: 24px; } }
+.rv-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-.rv-title { font-weight: 600; margin: 0; }
-@media (max-width: 768px) { .rv-title { font-size: 13px; line-height: 1.2; } }
-@media (min-width: 769px) { .rv-title { font-size: 24px; line-height: 1.4; } }
+.rv-history-icon {
+  color: #10b981;
+  width: 24px;
+  height: 24px;
+}
 
-.rv-subtitle { margin: 0; color: #888; font-weight: 400; }
-@media (max-width: 768px) { .rv-subtitle { font-size: 9px; line-height: 1.2; } }
-@media (min-width: 769px) { .rv-subtitle { font-size: 16px; line-height: 1.5; } }
+.rv-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
 
-/* 🔥 Standalone Arrow Styles */
+.rv-subtitle {
+  font-size: 14px;
+  color: #888;
+  margin: 0;
+  padding-left: 34px;
+}
+
+/* ============================================ */
+/* STANDALONE ARROW                             */
+/* ============================================ */
+
 .rv-arrow-only {
   display: flex;
   align-items: center;
@@ -62,11 +71,13 @@
   padding: 8px;
   border-radius: 50%;
 }
+
 .rv-arrow-only:hover {
   color: #10b981;
   background-color: #f0fdf4;
   transform: translateX(4px);
 }
+
 .real-arrow {
   display: block;
   font-size: 22px;
@@ -75,13 +86,14 @@
 }
 
 /* ============================================ */
-/* SCROLL WRAPPER - FLUID WIDTHS                 */
+/* SCROLL WRAPPER - "PEEK" EFFECT               */
 /* ============================================ */
 
 .rv-desktop-wrapper {
   position: relative;
   display: flex;
   align-items: center;
+  padding: 0 8px;
 }
 
 .rv-scroll-wrapper {
@@ -90,44 +102,163 @@
   overflow-x: auto !important;
   overflow-y: hidden;
   scroll-behavior: smooth;
-  padding: 10px 0 20px 0;
+  padding: 8px 4px 20px 4px;
   width: 100%;
-}
-
-.rv-card-wrapper {
-  flex: 0 0 auto;
-}
-
-/* 🔥 FLUID MEDIA QUERIES ZA SCROLL */
-
-/* Desktop (≥1025px): Kadi pana zaidi */
-@media (min-width: 1025px) {
-  .rv-scroll-wrapper { gap: 20px; }
-  .rv-card-wrapper { width: 220px; max-width: 220px; }
-}
-
-/* Tablet (769px - 1024px): Kadi za ukubwa wa kati */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .rv-scroll-wrapper { gap: 16px; }
-  .rv-card-wrapper { width: 160px; max-width: 160px; }
-}
-
-/* Mobile (≤768px): Kadi 2 kwa mstari (Ukubwa 180px) */
-@media (max-width: 768px) {
-  .rv-scroll-wrapper { 
-    gap: 12px !important;         /* 🔥 Nafasi kati ya kadi (kutoka 8px hadi 12px) */
-  }
-  .rv-card-wrapper { 
-    width: 180px !important;      /* 🔥 Upana wa kadi 2 kwa mstari (kutoka 120px hadi 180px) */
-    max-width: 180px !important; 
-  }
-  
-  /* Ficha mishale kwenye simu */
-  .rv-arrow-btn { display: none !important; }
+  gap: 12px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ============================================ */
-/* ARROWS (Desktop na Tablet tu)                */
+/* 🔥 DESKTOP: KADI 6.5 (6 + NUSU)             */
+/* ============================================ */
+
+@media (min-width: 1025px) {
+  .rv-card-wrapper {
+    flex: 0 0 calc((100% - (6.5 * 12px)) / 6.5);
+    min-width: calc((100% - (6.5 * 12px)) / 6.5);
+    max-width: calc((100% - (6.5 * 12px)) / 6.5);
+    scroll-snap-align: start;
+  }
+  .rv-scroll-wrapper {
+    gap: 12px;
+    padding: 8px 4px 20px 4px;
+  }
+  /* Kadi ya mwisho inaonyesha nusu */
+  .rv-card-wrapper:last-child {
+    flex: 0 0 calc(((100% - (6.5 * 12px)) / 6.5) * 0.5);
+    min-width: calc(((100% - (6.5 * 12px)) / 6.5) * 0.5);
+    max-width: calc(((100% - (6.5 * 12px)) / 6.5) * 0.5);
+  }
+}
+
+/* ============================================ */
+/* 🔥 TABLET: KADI 4.5 (4 + NUSU)              */
+/* ============================================ */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .rv-card-wrapper {
+    flex: 0 0 calc((100% - (4.5 * 12px)) / 4.5);
+    min-width: calc((100% - (4.5 * 12px)) / 4.5);
+    max-width: calc((100% - (4.5 * 12px)) / 4.5);
+    scroll-snap-align: start;
+  }
+  .rv-scroll-wrapper {
+    gap: 12px;
+    padding: 8px 4px 20px 4px;
+  }
+  .rv-card-wrapper:last-child {
+    flex: 0 0 calc(((100% - (4.5 * 12px)) / 4.5) * 0.5);
+    min-width: calc(((100% - (4.5 * 12px)) / 4.5) * 0.5);
+    max-width: calc(((100% - (4.5 * 12px)) / 4.5) * 0.5);
+  }
+}
+
+/* ============================================ */
+/* 🔥 MOBILE: KADI 3.5 (3 + NUSU)              */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .rv-card-wrapper {
+    flex: 0 0 calc((100% - (3.5 * 10px)) / 3.5) !important;
+    min-width: calc((100% - (3.5 * 10px)) / 3.5) !important;
+    max-width: calc((100% - (3.5 * 10px)) / 3.5) !important;
+    scroll-snap-align: start;
+  }
+  .rv-scroll-wrapper {
+    gap: 10px !important;
+    padding: 8px 4px 16px 4px;
+  }
+  .rv-card-wrapper:last-child {
+    flex: 0 0 calc(((100% - (3.5 * 10px)) / 3.5) * 0.5) !important;
+    min-width: calc(((100% - (3.5 * 10px)) / 3.5) * 0.5) !important;
+    max-width: calc(((100% - (3.5 * 10px)) / 3.5) * 0.5) !important;
+  }
+  .rv-header {
+    padding: 0 12px;
+    margin-bottom: 12px;
+  }
+  .rv-title {
+    font-size: 18px !important;
+    font-weight: 700;
+  }
+  .rv-subtitle {
+    font-size: 13px !important;
+    padding-left: 0;
+    color: #888;
+  }
+  .rv-history-icon {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  .rv-title-group {
+    gap: 6px !important;
+  }
+  
+  /* ✅ MISHALE INAONEKANA MOBILE */
+  .rv-arrow-btn {
+    display: flex !important;
+    width: 28px !important;
+    height: 28px !important;
+  }
+  .rv-arrow-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  .rv-arrow-left {
+    left: 0px !important;
+  }
+  .rv-arrow-right {
+    right: 0px !important;
+  }
+
+  /* 🔥 FICHA STANDALONE ARROW KWENYE MOBILE */
+  .rv-arrow-only {
+    display: none !important;
+  }
+}
+
+/* ============================================ */
+/* 🔥 SMALL MOBILE: KADI 2 (NDOGO ZAIDI)       */
+/* ============================================ */
+
+@media (max-width: 480px) {
+  .rv-card-wrapper {
+    flex: 0 0 calc((100% - (2 * 8px)) / 2) !important;
+    min-width: calc((100% - (2 * 8px)) / 2) !important;
+    max-width: calc((100% - (2 * 8px)) / 2) !important;
+  }
+  .rv-scroll-wrapper {
+    gap: 8px !important;
+  }
+  .rv-card-wrapper:last-child {
+    flex: 0 0 calc(((100% - (2 * 8px)) / 2) * 0.5) !important;
+    min-width: calc(((100% - (2 * 8px)) / 2) * 0.5) !important;
+    max-width: calc(((100% - (2 * 8px)) / 2) * 0.5) !important;
+  }
+  .rv-title {
+    font-size: 16px !important;
+    font-weight: 700;
+  }
+  .rv-subtitle {
+    font-size: 12px !important;
+  }
+  .rv-history-icon {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  .rv-arrow-btn {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  .rv-arrow-btn svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
+
+/* ============================================ */
+/* ARROWS - KUSHOTO NA KULIA                    */
 /* ============================================ */
 
 .rv-arrow-btn {
@@ -136,23 +267,96 @@
   background-color: white;
   border: 1px solid #e2e8f0;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   transition: all 0.2s ease;
   outline: none;
+  color: #333;
+  top: 50%;
+  transform: translateY(-50%);
 }
-.rv-arrow-btn:hover { background-color: #f7f9fc; transform: scale(1.05); }
-.rv-arrow-left { left: -15px; }
-.rv-arrow-right { right: -15px; }
+
+.rv-arrow-btn:hover {
+  background-color: #10b981;
+  color: white;
+  border-color: #10b981;
+  transform: translateY(-50%) scale(1.05);
+}
+
+.rv-arrow-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.rv-arrow-btn.hidden {
+  display: none !important;
+}
+
+.rv-arrow-left {
+  left: -4px;
+}
+
+.rv-arrow-right {
+  right: -4px;
+}
 
 /* ============================================ */
 /* UTILITY: HIDE SCROLLBAR                      */
 /* ============================================ */
 
-.hide-scrollbar::-webkit-scrollbar { display: none; }
-.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ============================================ */
+/* DARK MODE SUPPORT                            */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .recently-viewed-main-wrapper {
+    background-color: #1a1a2e;
+    border-color: #334155;
+  }
+
+  .rv-title {
+    color: #e2e8f0;
+  }
+
+  .rv-subtitle {
+    color: #94a3b8;
+  }
+
+  .rv-history-icon {
+    color: #34d399;
+  }
+
+  .rv-arrow-btn {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+  }
+
+  .rv-arrow-btn:hover {
+    background-color: #10b981;
+    color: white;
+    border-color: #10b981;
+  }
+
+  .rv-arrow-only {
+    color: #94a3b8;
+  }
+
+  .rv-arrow-only:hover {
+    color: #34d399;
+    background-color: #1a3a2a;
+  }
+}
