@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronRight, ChevronLeft, MapPin } from "lucide-react";
+import { ChevronRight, ChevronLeft, MapPin, ArrowRight } from "lucide-react";
 import api from "../axiosConfig"; 
 import DashboardCard from "./DashboardCard";
 import SkeletonCardz from "./SkeletonCardz"; // 🔥 IMPORT SKELETON
@@ -81,6 +81,32 @@ export default function LocationFilter({ navigate }) {
   }, [locations]);
 
   // ============================================================
+  // 🔥 RENDER HEADER (Imejumuishwa kwa pande zote)
+  // ============================================================
+  const renderHeader = () => (
+    <div className="loc-header">
+      <div className="loc-header-left">
+        <div className="loc-title-group">
+          <MapPin className="loc-map-icon" />
+          <h2 className="loc-title">{t('shop_by_location')}</h2>
+        </div>
+      </div>
+      
+      <div className="loc-header-right">
+        <button 
+          className="loc-arrow-link-btn"
+          onClick={() => {
+            const url = '/products?section=location'; 
+            window.location.href = url; 
+          }}
+        >
+          <ArrowRight size={24} />
+        </button>
+      </div>
+    </div>
+  );
+
+  // ============================================================
   // 🔥 SKELETON LOADING - Inaonyesha skeleton cards wakati data inapakia
   // ============================================================
   if (loading) {
@@ -122,16 +148,8 @@ export default function LocationFilter({ navigate }) {
   return (
     <div className="location-main-wrapper">
       
-      {/* Header Section */}
-      <div className="loc-header">
-        <div className="loc-header-left">
-          <div className="loc-title-group">
-            <MapPin className="loc-map-icon" />
-            <h2 className="loc-title">{t('shop_by_location')}</h2>
-          </div>
-          <p className="loc-subtitle">{t('find_best_deals_near_you')}</p>
-        </div>
-      </div>
+            {renderHeader()}
+
 
       {/* Horizontal Scroll */}
       <div className="loc-desktop-wrapper">

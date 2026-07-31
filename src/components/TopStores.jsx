@@ -1,6 +1,6 @@
 // src/components/TopStores.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronRight, ChevronLeft, Factory } from "lucide-react";
+import { ChevronRight, ChevronLeft, Factory, ArrowRight } from "lucide-react";
 import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
 import SkeletonCardz from "./SkeletonCardz";
@@ -60,6 +60,33 @@ export default function TopStores({ navigate }) {
     }
   }, [stores]);
 
+
+  // ============================================================
+  // 🔥 RENDER HEADER (Imejumuishwa kwa pande zote)
+  // ============================================================
+  const renderHeader = () => (
+    <div className="ts-header">
+      <div className="ts-header-left">
+        <div className="ts-title-group">
+          <Factory className="ts-factory-icon" />
+          <h2 className="ts-title">{t('top_suppliers')}</h2>
+        </div>
+      </div>
+      
+      <div className="ts-header-right">
+        <button 
+          className="ts-arrow-link-btn"
+          onClick={() => {
+            const url = '/stores?section=top-suppliers'; 
+            window.location.href = url; 
+          }}
+        >
+          <ArrowRight size={24} />
+        </button>
+      </div>
+    </div>
+  );
+
   // ============================================================
   // SKELETON LOADING
   // ============================================================
@@ -100,16 +127,8 @@ export default function TopStores({ navigate }) {
   return (
     <div className="top-stores-main-wrapper">
       
-      {/* Header Section */}
-      <div className="ts-header">
-        <div className="ts-header-left">
-          <div className="ts-title-group">
-            <Factory className="ts-factory-icon" />
-            <h2 className="ts-title">{t('top_suppliers')}</h2>
-          </div>
-          <p className="ts-subtitle">{t('verified_wholesale_stores')}</p>
-        </div>
-      </div>
+            {renderHeader()}
+
 
       {/* Horizontal Scroll */}
       <div className="ts-desktop-wrapper">

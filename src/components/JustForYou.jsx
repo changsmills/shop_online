@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import api from "../axiosConfig";
-import { Loader2, ChevronRight, RefreshCw } from "lucide-react";
+import { Loader2, ChevronRight, RefreshCw, ArrowRight } from "lucide-react"; // 🔥 Ongeza ArrowRight!
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import DashboardCard from "./DashboardCard";
@@ -86,6 +86,36 @@ export default function JustForYou({ search = "", selectedCategory }) {
     window.open(url, '_blank');
   };
 
+
+
+   // ============================================================
+  // 🔥 RENDER HEADER (Imejumuishwa kwa pande zote)
+  // ============================================================
+  const renderHeader = () => (
+    <div className="section-header">
+      <div className="header-main">
+        <div className="header-text-group">
+          <h2 className="just-title">
+            {t('just_for_you')}
+          </h2>
+        </div>
+        
+        {/* 🔥 MSHALE WA KULIA */}
+        <div className="header-right-arrow">
+          <button 
+            className="jfy-arrow-link-btn"
+            onClick={() => {
+              const url = '/products?section=just-for-you'; 
+              window.location.href = url; 
+            }}
+          >
+            <ArrowRight size={24} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   // ============================================================
   // 🔥 SKELETON LOADING - Inaonyesha skeleton cards wakati data inapakia
   // ============================================================
@@ -150,26 +180,7 @@ export default function JustForYou({ search = "", selectedCategory }) {
   return (
     <section className="just-for-you-container">
       
-      <div className="section-header">
-        <div className="header-main">
-          <div className="header-text-group">
-            <h2 className="just-title">
-              {selectedCategory && selectedCategory.id !== null ? (
-                `${t('just_for_you')} ${t('in')} ${getCategoryName()}`
-              ) : (
-                t('just_for_you')
-              )}
-            </h2>
-            <p className="just-subtitle">
-              {selectedCategory && selectedCategory.id !== null ? (
-                `${t('curated_picks')} ${t('in')} ${getCategoryName()}`
-              ) : (
-                t('curated_picks')
-              )}
-            </p>
-          </div>
-        </div>
-      </div>
+           {renderHeader()}
 
       <div className="product-grid">
         {filteredProducts.length > 0 ? (

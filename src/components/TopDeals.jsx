@@ -1,6 +1,6 @@
 // src/components/TopDeals.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronRight, ChevronLeft, Flame } from "lucide-react";
+import { ChevronRight, ChevronLeft, Flame, ArrowRight } from "lucide-react";
 import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
 import SkeletonCardz from "./SkeletonCardz";
@@ -90,37 +90,59 @@ export default function TopDeals({ navigate, selectedCategory }) {
     }
   }, [products]);
 
+
+
+
+   // ============================================================
+  // 🔥 RENDER HEADER (Imejumuishwa kwa pande zote)
+  // ============================================================
+  const renderHeader = () => (
+    <div className="td-header">
+      <div className="td-header-left">
+        <div className="td-title-group">
+          <Flame className="td-flame-icon" />
+          <h2 className="td-title">
+            {t('top_deals')}
+          </h2>
+        </div>
+      </div>
+      
+      <div className="td-header-right">
+        <button 
+          className="td-arrow-link-btn"
+          onClick={() => {
+            const dealsUrl = '/products?section=top-deals'; 
+            window.location.href = dealsUrl; 
+          }}
+        >
+          <ArrowRight size={24} />
+        </button>
+      </div>
+    </div>
+  );
+
   // ============================================================
   // SKELETON LOADING
   // ============================================================
   if (loading) {
     return (
-      <div className="top-deals-main-wrapper">
-        <div className="td-header">
-          <div className="td-header-left">
-            <div className="td-title-group">
-              <Flame className="td-flame-icon" />
-              <h2 className="td-title">
-                {t('top_deals')} {selectedCategory && `${t('in')} ${getCategoryDisplayName(selectedCategory)}`}
-              </h2>
-            </div>
-            <p className="td-subtitle">
-              {t('score_lowest_price')}
-              {selectedCategory && ` ${t('in')} ${getCategoryDisplayName(selectedCategory)}`}
-            </p>
-          </div>
-        </div>
 
-        <div className="td-desktop-wrapper">
-          <div className="td-scroll-wrapper hide-scrollbar">
-            {Array.from({ length: 5 }).map((_, index) => (
-              <div key={`skeleton-${index}`} className="td-card-wrapper">
-                <SkeletonCardz />
-              </div>
-            ))}
-          </div>
+          <div className="top-deals-main-wrapper">
+      
+            {renderHeader()}
+
+
+      {/* SCROLL WRAPPER */}
+      <div className="td-desktop-wrapper">
+        <div className="td-scroll-wrapper hide-scrollbar">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <div key={`skeleton-${index}`} className="td-card-wrapper">
+              <SkeletonCardz />
+            </div>
+          ))}
         </div>
       </div>
+    </div>
     );
   }
 

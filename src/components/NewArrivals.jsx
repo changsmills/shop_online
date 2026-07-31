@@ -1,6 +1,6 @@
 // src/components/NewArrivals.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronRight, ChevronLeft, Sparkles } from "lucide-react";
+import { ChevronRight, ChevronLeft, Sparkles, ArrowRight } from "lucide-react";
 import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
 import SkeletonCardz from "./SkeletonCardz";
@@ -66,6 +66,35 @@ export default function NewArrivals({ navigate, selectedCategory }) {
     }
   }, [products]);
 
+   // ============================================================
+  // 🔥 RENDER HEADER (Inajumuisha mshale na peach background)
+  // ============================================================
+  const renderHeader = () => (
+    <div className="na-header">
+      <div className="na-header-left">
+        <div className="na-title-group">
+          <Sparkles className="na-sparkle-icon" />
+          <h2 className="na-title">
+            {t('new_arrivals')}
+          </h2>
+        </div>
+      </div>
+      
+      {/* 🔥 UPANDE WA KULIA: MSHALE TU */}
+      <div className="na-header-right">
+        <button 
+          className="na-arrow-link-btn"
+          onClick={() => {
+            const url = '/products?section=new-arrivals'; 
+            window.location.href = url; 
+          }}
+        >
+          <ArrowRight size={24} />
+        </button>
+      </div>
+    </div>
+  );
+
   // ============================================================
   // SKELETON LOADING
   // ============================================================
@@ -118,28 +147,8 @@ export default function NewArrivals({ navigate, selectedCategory }) {
   return (
     <div className="new-arrivals-main-wrapper">
       
-      {/* Header Section */}
-      <div className="na-header">
-        <div className="na-header-left">
-          <div className="na-title-group">
-            <Sparkles className="na-sparkle-icon" />
-            <h2 className="na-title">
-              {selectedCategory && selectedCategory.id !== null ? (
-                `${t('new_arrivals')} ${t('in')} ${getCategoryDisplayName(selectedCategory)}`
-              ) : (
-                t('new_arrivals')
-              )}
-            </h2>
-          </div>
-          <p className="na-subtitle">
-            {selectedCategory && selectedCategory.id !== null ? (
-              `${t('discover_latest_arrivals')} ${t('in')} ${getCategoryDisplayName(selectedCategory)}`
-            ) : (
-              t('discover_latest_arrivals')
-            )}
-          </p>
-        </div>
-      </div>
+            {renderHeader()}
+
 
       {/* Horizontal Scroll */}
       <div className="na-desktop-wrapper">

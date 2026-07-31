@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronRight, ChevronLeft, TrendingUp } from "lucide-react";
+import { ChevronRight, ChevronLeft, TrendingUp, ArrowRight } from "lucide-react";
 import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
 import SkeletonCardz from "./SkeletonCardz"; // 🔥 IMPORT SAHIHI (SkeletonCardz)
@@ -60,28 +60,44 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
     }
   }, [products]);
 
+
+   // ============================================================
+  // 🔥 RENDER HEADER (Imejumuishwa kwa pande zote)
+  // ============================================================
+  const renderHeader = () => (
+    <div className="trend-header">
+      <div className="trend-header-left">
+        <div className="trend-title-group">
+          <TrendingUp className="trend-icon" />
+          <h2 className="trend-title">
+            {t('hot_picks')}
+          </h2>
+        </div>
+      </div>
+      
+      <div className="trend-header-right">
+        <button 
+          className="trend-arrow-link-btn"
+          onClick={() => {
+            const url = '/products?section=hot-picks'; 
+            window.location.href = url; 
+          }}
+        >
+          <ArrowRight size={24} />
+        </button>
+      </div>
+    </div>
+  );
+
   // ============================================================
   // 🔥 SKELETON LOADING - Inaonyesha skeleton cards wakati data inapakia
   // ============================================================
   if (loading) {
     return (
       <div className="trending-main-wrapper">
-        {/* Header Section */}
-        <div className="trend-header">
-          <div className="trend-header-left">
-            <div className="trend-title-group">
-              <TrendingUp className="trend-icon" />
-              <h2 className="trend-title">
-                {selectedCategory && selectedCategory.id !== null ? (
-                  `${t('hot_picks')} ${t('in')} ${getCategoryDisplayName(selectedCategory)}`
-                ) : (
-                  t('hot_picks')
-                )}
-              </h2>
-            </div>
-            <p className="trend-subtitle">{t('check_popular_items')}</p>
-          </div>
-        </div>
+        
+              {renderHeader()}
+
 
         {/* 🔥 SKELETON SCROLL - Inaonyesha skeleton 5 kwa horizontal scroll */}
         <div className="trend-desktop-wrapper">

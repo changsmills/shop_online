@@ -1,6 +1,6 @@
 // src/components/RecentlyViewed.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronRight, ChevronLeft, History } from "lucide-react";
+import { ChevronRight, ChevronLeft, History, ArrowRight } from "lucide-react"; // 🔥 Ongeza ArrowRight!
 import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
 import SkeletonCardz from "./SkeletonCardz";
@@ -67,21 +67,43 @@ export default function RecentlyViewed({ navigate }) {
     }
   }, [products]);
 
+
+   // ============================================================
+  // 🔥 RENDER HEADER (Imejumuishwa kwa pande zote)
+  // ============================================================
+  const renderHeader = () => (
+    <div className="rv-header">
+      <div className="rv-header-left">
+        <div className="rv-title-group">
+          <History className="rv-history-icon" />
+          <h2 className="rv-title">{t('recently_viewed')}</h2>
+        </div>
+      </div>
+      
+      <div className="rv-header-right">
+        <button 
+          className="rv-arrow-link-btn"
+          onClick={() => {
+            const url = '/products?section=recently-viewed'; 
+            window.location.href = url; 
+          }}
+        >
+          <ArrowRight size={24} />
+        </button>
+      </div>
+    </div>
+  );
+
+
   // ============================================================
   // SKELETON LOADING
   // ============================================================
   if (loading) {
     return (
       <div className="recently-viewed-main-wrapper">
-        <div className="rv-header">
-          <div className="rv-header-left">
-            <div className="rv-title-group">
-              <History className="rv-history-icon" />
-              <h2 className="rv-title">{t('recently_viewed')}</h2>
-            </div>
-            <p className="rv-subtitle">{t('items_you_recently_viewed')}</p>
-          </div>
-        </div>
+
+              {renderHeader()}
+
 
         <div className="rv-desktop-wrapper">
           <div className="rv-scroll-wrapper hide-scrollbar">
