@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, History } from "lucide-react";
 import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
-import SkeletonCardz from "./SkeletonCardz"; // ✅ ONGEZA SKELETON
+import SkeletonCardz from "./SkeletonCardz";
 import { useTranslation } from 'react-i18next';
 import '../RecentlyViewed.css';
 
@@ -68,7 +68,7 @@ export default function RecentlyViewed({ navigate }) {
   }, [products]);
 
   // ============================================================
-  // 🔥 SKELETON LOADING - KAMA NEWARRIVALS
+  // SKELETON LOADING
   // ============================================================
   if (loading) {
     return (
@@ -152,6 +152,7 @@ export default function RecentlyViewed({ navigate }) {
                 rating={product.rating || ''}
                 verified={product.is_verified || product.store?.is_verified || false}
                 years={product.years || ''}
+                views={product.views || 0}
                 onClick={() => {
                   const priorityId = product.id;
                   const sectionName = encodeURIComponent(t('recently_viewed'));

@@ -88,32 +88,74 @@ const ProductCreationFlow = ({
   const videoInputRef = React.useRef(null);
   const galleryInputRef = React.useRef(null);
 
-  React.useEffect(() => {
+    React.useEffect(() => {
     const fetchLeafCategories = async () => {
-      console.log("🌿 [USE_EFFECT] Checking for sub_category_id change:", attributes.sub_category_id);
+      console.log("🌿 [USE_EFFECT] sub_category_id imebadilika kuwa:", attributes.sub_category_id);
       
+      // 1. Kama hakuna sub_category, futa data
       if (!attributes.sub_category_id) {
-        console.log("  - No sub_category_id, clearing Leaf Categories.");
+        console.log("  - Hakuna sub_category_id, nafuta leaf categories.");
         setAllLeafCategories([]);
         return;
       }
+
+      // 2. Set loading state (muhimu kwa UI) na futa data za zamani
+      setAllLeafCategories([]); // Safisha UI ili isionyeshe data za zamani
+      
       try {
         const token = localStorage.getItem("access_token");
-        console.log("  - Fetching leaf categories for sub_category:", attributes.sub_category_id);
         
-        // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
+        // 3. Angalia kama Token ipo kabla ya kutuma request
+        if (!token) {
+          console.error("❌ [ERROR] Hakuna access_token kwenye localStorage!");
+          return;
+        }
+
+        console.log(`  📤 [REQUEST] Inatuma GET kwa /leaf-categories/ kwa sub_category: ${attributes.sub_category_id}`);
+        
+        // 4. Tuma Request
         const res = await api.get('/leaf-categories/', {
           params: { sub_category: attributes.sub_category_id },
           headers: { Authorization: `Bearer ${token}` }
         });
-        console.log("  - Leaf Categories fetched successfully:", res.data);
-        setAllLeafCategories(res.data || []);
+
+        // 5. Angalia Response kutoka Backend
+        console.log("  ✅ [RESPONSE] Backend imejibu kwa mafanikio!");
+        console.log("  📦 [RESPONSE_DATA] Data zilizopokelewa:", res.data);
+        
+        // 6. Hakikisha data ni Array kabla ya kuweka kwenye state
+        if (res.data && Array.isArray(res.data)) {
+            if (res.data.length === 0) {
+                console.warn("  ⚠️ [WARNING] Backend imerudisha array tupu ([]). Hakuna leaf categories kwenye DB kwa sub_category hii.");
+            }
+            setAllLeafCategories(res.data);
+        } else {
+            console.warn("  ⚠️ [WARNING] Data kutoka Backend si Array:", res.data);
+            setAllLeafCategories([]);
+        }
+
       } catch (err) {
-        console.error("  ❌ Failed to fetch leaf categories:", err);
+        // 7. 🚨 HAPA NDIO TUTAPATA TATIZO HALISI!
+        console.error("  ❌ [ERROR] Imeshindwa kupata leaf categories:");
+        
+        if (err.response) {
+            // Backend imejibu lakini kwa error (400, 404, 500, n.k.)
+            console.error("  🔴 [BACKEND_ERROR] Status:", err.response.status);
+            console.error("  🔴 [BACKEND_ERROR] Data:", err.response.data);
+            console.error("  🔴 [BACKEND_ERROR] Headers:", err.response.headers);
+        } else if (err.request) {
+            // Request ilituma, lakini Backend haikujibu (Network error, server off)
+            console.error("  🟡 [NETWORK_ERROR] Hakuna response kutoka Backend! Angalia Network tab.");
+            console.error("  🟡 [REQUEST_OBJECT]:", err.request);
+        } else {
+            // Tatizo katika kuandaa request (axios config error)
+            console.error("  🔵 [SETUP_ERROR] Tatizo katika kuandaa request:", err.message);
+        }
       }
     };
+    
     fetchLeafCategories();
-  }, [attributes.sub_category_id]);
+  }, [attributes.sub_category_id]); // 🔥 Hii inahakikisha inakimbia kila sub_category_id inapobadilika
 
   const handleCoverChange = (e) => {
     const file = e.target.files[0];
@@ -166,7 +208,7 @@ const ProductCreationFlow = ({
     return myStoreSubCats.filter(sub => storeSubCategoryIds.includes(sub.id));
   }, [myStoreSubCats, storeSubCategoryIds]);
 
-  const handleFinalPublishAll = async () => {
+     const handleFinalPublishAll = async () => {
     console.log("📦 [PUBLISH_BTN] ===== STARTING PUBLISH PROCESS =====");
     if (addedProducts.length === 0) return alert("Hakuna bidhaa ya kurusha!");
     setLoading(true);
@@ -177,7 +219,6 @@ const ProductCreationFlow = ({
       if (!storeId) throw new Error("Store ID haipo!");
 
       console.log("  🔹 [STEP 1] Fetching Store data for Parent Category ID...");
-      // 🔥 MABADILIKO: api.get
       const storeRes = await api.get(`/stores/${storeId}/`, { headers: { Authorization: `Bearer ${token}` } });
       console.log("  🔹 [STEP 1] Store data response:", storeRes.data);
       
@@ -196,6 +237,15 @@ const ProductCreationFlow = ({
         console.log("  - p.category_id (initial):", p.category_id);
         console.log("  - p.leaf_category_id:", p.leaf_category_id);
 
+        // 🔥 DEBUG 1: Angalia kama picha zipo kwenye Object ya Product kabla ya kutuma
+        console.log("  🔍 [DEBUG] Checking product media files:");
+        console.log("    - cover_file:", p.cover_file ? `✅ Exists (${p.cover_file.name})` : "❌ Missing");
+        console.log("    - video_file:", p.video_file ? `✅ Exists (${p.video_file.name})` : "❌ Missing");
+        console.log("    - gallery_files count:", p.gallery_files ? p.gallery_files.length : 0);
+        if (p.gallery_files && p.gallery_files.length > 0) {
+          p.gallery_files.forEach((f, i) => console.log(`      Gallery ${i+1}:`, f.name));
+        }
+
         console.log("  🔍 Looking up subCategory in myStoreSubCats list...");
         const subCatObj = myStoreSubCats.find(sub => sub.id === p.sub_category_id);
         
@@ -209,15 +259,16 @@ const ProductCreationFlow = ({
         }
 
         try {
+          // 🔥 TENGENEZA FORMDATA
           const formData = new FormData();
           formData.append("store_id", storeId);
           formData.append("name", p.name);
           formData.append("price", parseFloat(p.price) || 0);
           formData.append("original_price", parseFloat(p.compare_at_price) || 0);
 
+          // Kategoria
           const formattedCategoryId = formatUUID(realCategoryId);
           console.log(`  ✨ Final formatted category: "${formattedCategoryId}"`);
-          
           if (formattedCategoryId) formData.append("category", formattedCategoryId);
           if (parentCategoryId) formData.append("parent_category", parentCategoryId); 
           
@@ -227,6 +278,7 @@ const ProductCreationFlow = ({
 
           if (p.brand_id) formData.append("brand_id", p.brand_id);
 
+          // Taarifa za msingi
           formData.append("stock_quantity", parseInt(p.stock) || 0);
           formData.append("description", p.description || "");
           formData.append("is_retail", p.is_retail ? "true" : "false");
@@ -243,6 +295,7 @@ const ProductCreationFlow = ({
           formData.append("warranty_months", parseInt(p.warranty_months) || 0);
           formData.append("weight", parseFloat(p.weight) || 0);
 
+          // JSON fields (Specs, Tiers, n.k.)
           formData.append("specifications", JSON.stringify(p.specifications || {}));
           formData.append("price_tiers", JSON.stringify(p.price_tiers || []));
           formData.append("colors", JSON.stringify(p.colors || []));
@@ -253,11 +306,33 @@ const ProductCreationFlow = ({
           formData.append("gender", JSON.stringify(p.gender || []));
           formData.append("color_images", JSON.stringify(p.color_images || {}));
 
-          if (p.cover_file) formData.append("cover_image", p.cover_file);
-          if (p.video_file) formData.append("video_file", p.video_file);
+          // 🔥 DEBUG 2: Kuweka Media kwenye formData
+          console.log("  📸 [DEBUG] Appending media files to FormData...");
+
+          if (p.cover_file) {
+            formData.append("cover_image", p.cover_file);
+            console.log("    ✅ Appended cover_image");
+          } else {
+            console.warn("    ⚠️ No cover_file found.");
+          }
+
+          if (p.video_file) {
+            formData.append("video_file", p.video_file);
+            console.log("    ✅ Appended video_file");
+          } else {
+            console.log("    ℹ️ No video_file.");
+          }
+
+          if (p.gallery_files && p.gallery_files.length > 0) {
+            p.gallery_files.forEach((file) => {
+              formData.append("gallery_images", file);
+            });
+            console.log(`    ✅ Appended ${p.gallery_files.length} gallery_images`);
+          } else {
+            console.log("    ℹ️ No gallery_files.");
+          }
 
           console.log(`  📤 SENDING Axios POST to /products/`);
-          // 🔥 MABADILIKO: api.post (umeondoa API_BASE_URL)
           const response = await api.post('/products/', formData, {
             headers: { "Authorization": `Bearer ${token}` }
           });
@@ -266,6 +341,7 @@ const ProductCreationFlow = ({
             console.log(`  ✅ SUCCESS! Product created. Response:`, response.data);
             const newProductId = response.data.id;
 
+            // Tuma variations
             if (p.variations && p.variations.length > 0) {
               console.log(`  📤 SENDING ${p.variations.length} variations to /product-variations/`);
               for (const variant of p.variations) {

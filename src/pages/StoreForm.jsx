@@ -117,7 +117,7 @@ const StoreForm = ({
     }
   }, [formData.category_id, dbSubCategories]);
 
-  const handleSubmitInternal = async (e) => {
+const handleSubmitInternal = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
@@ -130,6 +130,9 @@ const StoreForm = ({
         return;
       }
 
+      // ============================================
+      // 1. UNDA FORM DATA
+      // ============================================
       const formDataObj = new FormData();
 
       formDataObj.append("store_name", formData.name);
@@ -172,37 +175,58 @@ const StoreForm = ({
       if (formData.image2) formDataObj.append("office_image_2", formData.image2[0]);
       if (formData.image3) formDataObj.append("office_image_3", formData.image3[0]);
 
+      // ============================================
+      // 2. TENGENEZA STORE
+      // ============================================
       const response = await api.post(
         "/stores/",
         formDataObj,
         { headers: { "Authorization": `Bearer ${token}` } }
       );
 
+      console.log("✅ Store imeundwa:", response.data);
+
+      // ============================================
+      // 3. 🔥 BADILISHA ROLE YA USER KUWA SUPPLIER
+      // ============================================
       try {
-        await api.patch(
+        const roleResponse = await api.patch(
           "/profile/",
           { role: "supplier" },
           { headers: { "Authorization": `Bearer ${token}` } }
         );
-        console.log("✅ Role imebadilishwa kuwa supplier!");
+        console.log("✅ Role imebadilishwa kuwa supplier!", roleResponse.data);
       } catch (roleError) {
         console.warn("⚠️ Imeshindwa kubadilisha role, lakini duka limeundwa:", roleError);
+        console.warn("Tafadhali badilisha role manually kwenye database.");
+        // Tunaendelea hata kama role haijabadilika
       }
 
+      // ============================================
+      // 4. ONYESHA SUCCESS NA REDIRECT
+      // ============================================
       setIsSuccess(true);
       if (response.data && response.data.id) {
-        setTimeout(() => navigate(`/dashboard/sellerboard/${response.data.id}`), 2000);
+        // 🔥 Subiri kidogo ili mtumiaji aone ujumbe wa success
+        setTimeout(() => {
+          navigate(`/dashboard/sellerboard/${response.data.id}`, { replace: true });
+        }, 2000);
       }
 
     } catch (err) {
-      console.error("Critical Error:", err);
+      // ============================================
+      // 5. ERROR HANDLING
+      // ============================================
+      console.error("❌ Critical Error:", err);
       console.log("SERVER RESPONSE DATA (Error details):", err.response?.data);
       console.log("HTTP STATUS:", err.response?.status);
 
       let errorMsg = "Hitilafu isiyojulikana.";
+
       if (err.response?.data) {
         const data = err.response.data;
         if (typeof data === 'object') {
+          // Kama data ni object, chukua ujumbe wa kwanza
           const firstKey = Object.keys(data)[0];
           if (firstKey && Array.isArray(data[firstKey])) {
             errorMsg = `${firstKey}: ${data[firstKey][0]}`;
@@ -221,12 +245,12 @@ const StoreForm = ({
       }
 
       setError(errorMsg);
-      setStep(1);
+      setStep(1); // Rudisha kwenye hatua ya kwanza
     } finally {
       setIsLoading(false);
     }
   };
-
+  
   return (
     <div className="form-wrapper-premium">
       <div className="form-sidebar">

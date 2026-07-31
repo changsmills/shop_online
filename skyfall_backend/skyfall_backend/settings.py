@@ -20,7 +20,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-default-key-change-this')
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-DEBUG = False
+# 🔥 BADILISHA KUWA TRUE ILI UONE ERRORS KWENYE RENDER LOGS!
+DEBUG = True 
 
 #ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
@@ -128,6 +129,8 @@ CORS_ALLOWED_ORIGINS = [
     'https://shop-online-tan.vercel.app', 
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True
+
 CORS_ALLOW_CREDENTIALS = True
 
 # ==================== REST FRAMEWORK CONFIGURATION ====================
@@ -174,4 +177,4 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
 }
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.CloudinaryStorage'

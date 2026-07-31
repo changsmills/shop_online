@@ -22,13 +22,113 @@ class LeafCategorySerializer(serializers.ModelSerializer):
         model = LeafCategory
         fields = '__all__'
 
+# ============================================================
+# 🔥 PRODUCTS ENGINE SERIALIZER (Imetengenezwa na Debug logs)
+# ============================================================
 class ProductsEngineSerializer(serializers.ModelSerializer):
     leaf_categories = LeafCategorySerializer(source='leaf_category', read_only=True)
+    
+    # 🔥 Hizi ndizo zinakubali faili kutoka Frontend
+    cover_image = serializers.ImageField(write_only=True, required=False)
+    gallery_images = serializers.ListField(
+        child=serializers.ImageField(allow_empty_file=False),
+        write_only=True,
+        required=False
+    )
+    video_file = serializers.FileField(write_only=True, required=False)
 
     class Meta:
         model = ProductsEngine
         fields = '__all__'
         read_only_fields = ['user', 'created_at']
+
+    def create(self, validated_data):
+        import traceback  # 🔥 Kwa debugging
+
+        print("📦 [DEBUG] Starting Product Creation...")
+
+        # 1. Toa data za picha/video kabla ya kuunda bidhaa
+        cover_image = validated_data.pop('cover_image', None)
+        gallery_images = validated_data.pop('gallery_images', [])
+        video_file = validated_data.pop('video_file', None)
+
+        # 2. Unda bidhaa (ProductsEngine)
+        try:
+            print("  🔧 [DEBUG] Creating ProductsEngine instance...")
+            product = super().create(validated_data)
+            print(f"  ✅ [DEBUG] Product created with ID: {product.id}")
+        except Exception as e:
+            print("❌ [CRITICAL ERROR] Failed to create ProductsEngine!")
+            print(traceback.format_exc())
+            raise e
+
+        # 3. Hifadhi Cover Image
+        if cover_image:
+            print(f"  📸 [DEBUG] Attempting to upload Cover Image...")
+            try:
+                result = cloudinary.uploader.upload(cover_image, folder="product_covers")
+                ProductMedia.objects.create(
+                    product=product,
+                    media_type='cover',
+                    media_url=result['secure_url'],
+                    display_order=0
+                )
+                print("  ✅ [DEBUG] Cover Image uploaded and saved to ProductMedia.")
+            except cloudinary.api.Error as e:
+                print(f"❌ [CLOUDINARY ERROR] Cover Image upload failed: {e}")
+            except Exception as e:
+                print(f"❌ [UNKNOWN ERROR] Cover Image processing failed: {e}")
+                print(traceback.format_exc())
+
+        # 4. Hifadhi Gallery Images
+        if gallery_images:
+            print(f"  🖼️ [DEBUG] Attempting to upload {len(gallery_images)} Gallery Images...")
+            for idx, img in enumerate(gallery_images):
+                try:
+                    print(f"    - Uploading gallery image {idx+1}...")
+                    result = cloudinary.uploader.upload(img, folder="product_gallery")
+                    ProductMedia.objects.create(
+                        product=product,
+                        media_type='gallery',
+                        media_url=result['secure_url'],
+                        display_order=idx + 1
+                    )
+                    print(f"      ✅ Gallery image {idx+1} saved.")
+                except cloudinary.api.Error as e:
+                    print(f"❌ [CLOUDINARY ERROR] Gallery image {idx+1} failed: {e}")
+                except Exception as e:
+                    print(f"❌ [UNKNOWN ERROR] Gallery image {idx+1} failed: {e}")
+
+        # 5. Hifadhi Video (Kwenye Cloudinary)
+        if video_file:
+            print(f"  🎬 [DEBUG] Attempting to upload Video...")
+            try:
+                result = cloudinary.uploader.upload(video_file, resource_type="video", folder="product_videos")
+                ProductMedia.objects.create(
+                    product=product,
+                    media_type='video',
+                    media_url=result['secure_url'],
+                    is_promo_video=True
+                )
+                print("  ✅ [DEBUG] Video uploaded and saved to ProductMedia.")
+            except cloudinary.api.Error as e:
+                print(f"❌ [CLOUDINARY ERROR] Video upload failed: {e}")
+            except Exception as e:
+                print(f"❌ [UNKNOWN ERROR] Video processing failed: {e}")
+                print(traceback.format_exc())
+
+        print("🏁 [DEBUG] Product Creation Finished.")
+        return product
+
+# ============================================================
+# 🔥 PRODUCT MEDIA SERIALIZER (MUHIMU: Ondoa read_only kwenye media_url!)
+# ============================================================
+class ProductMediaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductMedia
+        fields = ['id', 'media_type', 'media_url', 'display_order', 'is_promo_video']
+        # 🔥 MUHIMU: Tunaondoa read_only_fields kabisa ili media_url iweze kujazwa na Cloudinary!
+        read_only_fields = [] 
 
 
 class StoreEngineSerializer(serializers.ModelSerializer):
@@ -65,11 +165,7 @@ class StoreEngineSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"owner": "Mtumiaji hana Profile. Tafadhali unda profile kwanza."})
         validated_data['owner'] = profile
         return super().create(validated_data)
-
-class ProductMediaSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductMedia
-        fields = '__all__'
+    
 
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,19 +1,17 @@
 /* ============================================ */
-/* CONTAINER & WRAPPER                           */
+/* CONTAINER & WRAPPER - SAWA NA TOPDEALS       */
 /* ============================================ */
 
 .recently-viewed-main-wrapper {
   position: relative;
-  width: calc(100% - 16px);
-  max-width: 1400px;
-  margin: 8px auto;
+  width: 100%;
   background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  border-left: none;
+  border-right: none;
   box-sizing: border-box;
   padding: 16px 0;
-  overflow: hidden;
 }
 
 /* ============================================ */
@@ -126,11 +124,6 @@
     gap: 12px;
     padding: 8px 4px 20px 4px;
   }
-  .rv-card-wrapper:last-child {
-    flex: 0 0 calc(((100% - (6.5 * 12px)) / 6.5) * 0.5);
-    min-width: calc(((100% - (6.5 * 12px)) / 6.5) * 0.5);
-    max-width: calc(((100% - (6.5 * 12px)) / 6.5) * 0.5);
-  }
 }
 
 /* ============================================ */
@@ -148,11 +141,6 @@
     gap: 12px;
     padding: 8px 4px 20px 4px;
   }
-  .rv-card-wrapper:last-child {
-    flex: 0 0 calc(((100% - (4.5 * 12px)) / 4.5) * 0.5);
-    min-width: calc(((100% - (4.5 * 12px)) / 4.5) * 0.5);
-    max-width: calc(((100% - (4.5 * 12px)) / 4.5) * 0.5);
-  }
 }
 
 /* ============================================ */
@@ -160,15 +148,6 @@
 /* ============================================ */
 
 @media (max-width: 768px) {
-  .recently-viewed-main-wrapper {
-    width: calc(100% - 12px);
-    margin: 6px auto;
-    border-radius: 12px;
-    padding: 12px 0;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
-  }
-
   .rv-card-wrapper {
     flex: 0 0 calc((100% - (3.5 * 10px)) / 3.5) !important;
     min-width: calc((100% - (3.5 * 10px)) / 3.5) !important;
@@ -178,11 +157,6 @@
   .rv-scroll-wrapper {
     gap: 10px !important;
     padding: 8px 4px 16px 4px;
-  }
-  .rv-card-wrapper:last-child {
-    flex: 0 0 calc(((100% - (3.5 * 10px)) / 3.5) * 0.5) !important;
-    min-width: calc(((100% - (3.5 * 10px)) / 3.5) * 0.5) !important;
-    max-width: calc(((100% - (3.5 * 10px)) / 3.5) * 0.5) !important;
   }
   .rv-header {
     padding: 0 12px;
@@ -230,13 +204,6 @@
 /* ============================================ */
 
 @media (max-width: 480px) {
-  .recently-viewed-main-wrapper {
-    width: calc(100% - 8px);
-    margin: 4px auto;
-    border-radius: 10px;
-    padding: 10px 0;
-  }
-
   .rv-card-wrapper {
     flex: 0 0 calc((100% - (2 * 8px)) / 2) !important;
     min-width: calc((100% - (2 * 8px)) / 2) !important;
@@ -244,11 +211,6 @@
   }
   .rv-scroll-wrapper {
     gap: 8px !important;
-  }
-  .rv-card-wrapper:last-child {
-    flex: 0 0 calc(((100% - (2 * 8px)) / 2) * 0.5) !important;
-    min-width: calc(((100% - (2 * 8px)) / 2) * 0.5) !important;
-    max-width: calc(((100% - (2 * 8px)) / 2) * 0.5) !important;
   }
   .rv-title {
     font-size: 16px !important;

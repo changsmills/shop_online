@@ -1,8 +1,8 @@
 /* ============================================ */
-/* LOGIN PAGE - CONTAINERS                      */
+/* REGISTER PAGE - CONTAINERS                   */
 /* ============================================ */
 
-.login-container {
+.register-container {
   display: flex;
   min-height: 100vh;
   background-color: #ffffff;
@@ -13,7 +13,7 @@
 /* LEFT PANEL - Picha (Desktop tu)              */
 /* ============================================ */
 
-.login-left-panel {
+.register-left-panel {
   flex: 1;
   background-image: url('https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1000&auto=format&fit=crop');
   background-size: cover;
@@ -24,9 +24,9 @@
   padding: 40px;
 }
 
-/* ✅ HAPA: FICHA Picha Kwenye Mobile na Tablets */
+/* ✅ FICHA Picha Kwenye Mobile na Tablets */
 @media (max-width: 1024px) {
-  .login-left-panel {
+  .register-left-panel {
     display: none !important;
   }
 }
@@ -35,7 +35,7 @@
 /* TESTIMONIAL BOX (Juu ya Picha)               */
 /* ============================================ */
 
-.login-testimonial-box {
+.register-testimonial-box {
   background-color: rgba(255, 255, 255, 0.92);
   padding: 24px 32px;
   border-radius: 16px;
@@ -45,7 +45,7 @@
   max-width: 500px;
 }
 
-.login-testimonial-text {
+.register-testimonial-text {
   margin: 0 0 12px 0;
   font-size: 16px;
   font-style: italic;
@@ -54,7 +54,7 @@
   line-height: 1.6;
 }
 
-.login-testimonial-footer {
+.register-testimonial-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -62,23 +62,23 @@
   padding-top: 12px;
 }
 
-.login-testimonial-author {
+.register-testimonial-author {
   font-weight: 600;
   font-size: 14px;
   color: #333;
 }
 
-.login-testimonial-brand {
+.register-testimonial-brand {
   font-weight: 700;
   font-size: 12px;
   color: #FF6600;
 }
 
 /* ============================================ */
-/* RIGHT PANEL - Login Form                     */
+/* RIGHT PANEL - Register Form                  */
 /* ============================================ */
 
-.login-right-panel {
+.register-right-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -91,14 +91,14 @@
 }
 
 @media (max-width: 1024px) {
-  .login-right-panel {
+  .register-right-panel {
     padding: 40px 30px;
     max-width: 100%;
   }
 }
 
 @media (max-width: 768px) {
-  .login-right-panel {
+  .register-right-panel {
     padding: 30px 20px;
   }
 }
@@ -107,28 +107,28 @@
 /* HEADER                                       */
 /* ============================================ */
 
-.login-header {
+.register-header {
   margin-bottom: 30px;
 }
 
-.login-title {
+.register-title {
   font-size: 32px;
   font-weight: 700;
   color: #1a1a1a;
   margin: 0 0 8px 0;
 }
 
-.login-subtitle {
+.register-subtitle {
   margin: 0;
   font-size: 14px;
   color: #666;
 }
 
 @media (max-width: 768px) {
-  .login-title {
+  .register-title {
     font-size: 26px;
   }
-  .login-subtitle {
+  .register-subtitle {
     font-size: 13px;
   }
 }
@@ -137,14 +137,14 @@
 /* SOCIAL BUTTONS                               */
 /* ============================================ */
 
-.login-social-buttons {
+.register-social-buttons {
   display: flex;
   flex-direction: column;
   gap: 12px;
   margin-bottom: 25px;
 }
 
-.login-social-btn {
+.register-social-btn {
   width: 100%;
   display: flex;
   align-items: center;
@@ -159,12 +159,12 @@
   border: none;
 }
 
-.login-social-btn:hover {
+.register-social-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.login-social-btn:active {
+.register-social-btn:active {
   transform: scale(0.97);
 }
 
@@ -202,11 +202,22 @@
   background-color: #0069a3;
 }
 
+/* Apple Button */
+.apple-btn {
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+}
+
+.apple-btn:hover {
+  background-color: #1a1a1a;
+}
+
 /* ============================================ */
 /* DIVIDER                                      */
 /* ============================================ */
 
-.login-divider {
+.register-divider {
   display: flex;
   align-items: center;
   margin-bottom: 25px;
@@ -214,33 +225,48 @@
   font-size: 14px;
 }
 
-.login-divider-line {
+.register-divider-line {
   flex: 1;
   border: none;
   border-top: 1px solid #e5e7eb;
 }
 
-.login-divider-text {
+.register-divider-text {
   padding: 0 15px;
   color: #999;
 }
 
 /* ============================================ */
-/* LOGIN FORM                                   */
+/* ERROR MESSAGE                                */
 /* ============================================ */
 
-.login-form {
+.register-error-message {
+  background-color: #fee;
+  color: #c00;
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  text-align: center;
+  border: 1px solid #fcc;
+}
+
+/* ============================================ */
+/* REGISTER FORM                                */
+/* ============================================ */
+
+.register-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.login-form-group {
+.register-form-group {
   display: flex;
   flex-direction: column;
 }
 
-.login-label {
+.register-label {
   display: block;
   font-size: 14px;
   font-weight: 500;
@@ -248,7 +274,7 @@
   color: #333;
 }
 
-.login-input {
+.register-input {
   width: 100%;
   padding: 14px 16px;
   border-radius: 10px;
@@ -260,20 +286,70 @@
   color: #333;
 }
 
-.login-input:focus {
+.register-input:focus {
   border-color: #FF6600;
   box-shadow: 0 0 0 4px rgba(255, 102, 0, 0.08);
 }
 
-.login-input::placeholder {
+.register-input::placeholder {
   color: #aaa;
+}
+
+.register-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ============================================ */
+/* PASSWORD TOGGLE                             */
+/* ============================================ */
+
+.register-password-wrapper {
+  position: relative;
+}
+
+.register-password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  padding: 4px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.register-password-toggle:hover {
+  opacity: 1;
+}
+
+.register-password-toggle:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ============================================ */
+/* NAME PREVIEW                                 */
+/* ============================================ */
+
+.register-name-preview {
+  font-size: 12px;
+  color: #999;
+  margin-top: 6px;
+}
+
+.register-name-preview strong {
+  color: #333;
 }
 
 /* ============================================ */
 /* SUBMIT BUTTON                                */
 /* ============================================ */
 
-.login-submit-btn {
+.register-submit-btn {
   width: 100%;
   padding: 14px;
   background-color: #FF6600;
@@ -287,17 +363,17 @@
   margin-top: 10px;
 }
 
-.login-submit-btn:hover:not(:disabled) {
+.register-submit-btn:hover:not(:disabled) {
   background-color: #e55a00;
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(255, 102, 0, 0.3);
 }
 
-.login-submit-btn:active:not(:disabled) {
+.register-submit-btn:active:not(:disabled) {
   transform: scale(0.97);
 }
 
-.login-submit-btn:disabled {
+.register-submit-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -306,14 +382,14 @@
 /* FOOTER                                       */
 /* ============================================ */
 
-.login-footer {
+.register-footer {
   text-align: center;
   margin-top: 20px;
   font-size: 15px;
   color: #333;
 }
 
-.login-register-link {
+.register-login-link {
   font-weight: 700;
   color: #FF6600;
   cursor: pointer;
@@ -322,32 +398,8 @@
   transition: color 0.2s;
 }
 
-.login-register-link:hover {
+.register-login-link:hover {
   color: #e55a00;
-}
-
-/* ============================================ */
-/* LOADING STATE                                */
-/* ============================================ */
-
-.login-loading-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-}
-
-.login-spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid #e5e7eb;
-  border-top-color: #FF6600;
-  border-radius: 50%;
-  animation: login-spin 0.8s linear infinite;
-}
-
-@keyframes login-spin {
-  to { transform: rotate(360deg); }
 }
 
 /* ============================================ */
@@ -355,70 +407,84 @@
 /* ============================================ */
 
 @media (prefers-color-scheme: dark) {
-  .login-container {
+  .register-container {
     background-color: #1a1a2e;
   }
   
-  .login-right-panel {
+  .register-right-panel {
     background-color: #1a1a2e;
   }
   
-  .login-title {
+  .register-title {
     color: #e2e8f0;
   }
   
-  .login-subtitle {
+  .register-subtitle {
     color: #94a3b8;
   }
   
-  .login-label {
+  .register-label {
     color: #e2e8f0;
   }
   
-  .login-input {
+  .register-input {
     background-color: #1e293b;
     border-color: #334155;
     color: #e2e8f0;
   }
   
-  .login-input:focus {
+  .register-input:focus {
     border-color: #FF6600;
   }
   
-  .login-input::placeholder {
+  .register-input::placeholder {
     color: #64748b;
   }
   
-  .login-testimonial-box {
+  .register-testimonial-box {
     background-color: rgba(30, 41, 59, 0.92);
   }
   
-  .login-testimonial-text {
+  .register-testimonial-text {
     color: #e2e8f0;
   }
   
-  .login-testimonial-author {
+  .register-testimonial-author {
     color: #f1f5f9;
   }
   
-  .login-testimonial-brand {
+  .register-testimonial-brand {
     color: #FF6600;
   }
   
-  .login-testimonial-footer {
+  .register-testimonial-footer {
     border-top-color: #334155;
   }
   
-  .login-divider-text {
+  .register-divider-text {
     color: #64748b;
   }
   
-  .login-divider-line {
+  .register-divider-line {
     border-top-color: #334155;
   }
   
-  .login-footer {
+  .register-footer {
     color: #e2e8f0;
+  }
+  
+  .register-name-preview {
+    color: #94a3b8;
+  }
+  
+  .register-name-preview strong {
+    color: #e2e8f0;
+  }
+  
+  .register-error-message {
+    background-color: #2d1a1a;
+    color: #f87171;
+    border-color: #4a1a1a;
   }
 }
 
@@ -427,24 +493,24 @@
 /* ============================================ */
 
 @media print {
-  .login-left-panel {
+  .register-left-panel {
     display: none !important;
   }
   
-  .login-container {
+  .register-container {
     display: block !important;
   }
   
-  .login-right-panel {
+  .register-right-panel {
     max-width: 100% !important;
     padding: 20px !important;
   }
   
-  .login-social-buttons {
+  .register-social-buttons {
     display: none !important;
   }
   
-  .login-submit-btn {
+  .register-submit-btn {
     background-color: #333 !important;
     color: white !important;
   }

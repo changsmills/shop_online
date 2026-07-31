@@ -211,8 +211,18 @@ class ProductVariation(models.Model):
 class ProductMedia(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     product = models.ForeignKey(ProductsEngine, on_delete=models.CASCADE, related_name='media')
-    media_type = models.CharField(max_length=20)
-    media_url = models.URLField(max_length=500)
+    media_type = models.CharField(max_length=20)  # 'cover', 'gallery', 'video'
+    
+    # 🔥 BADILISHA HII: Badala ya URLField, tumia FileField kwa faili zote
+    media_file = models.FileField(upload_to='product_media/', blank=True, null=True) 
+    
+    # 🔥 AU (Chaguo jingine): Tumia ImageField kwa picha na FileField kwa video
+    # image_file = models.ImageField(upload_to='product_images/', blank=True, null=True)
+    # video_file = models.FileField(upload_to='product_videos/', blank=True, null=True)
+    
+    # Unaweza kuacha media_url ikiwa unahitaji URL baadaye (kwa Cloudinary), lakini sio lazima kwa sasa
+    media_url = models.URLField(max_length=500, blank=True, null=True) 
+    
     display_order = models.IntegerField(default=0)
     is_promo_video = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

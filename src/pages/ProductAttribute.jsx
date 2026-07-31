@@ -12,11 +12,14 @@ import axios from 'axios';
 //import { supabase } from "../supabaseClient";
 import '../ProductAttributes.css';
 
-function ProductAttributes({ attributes, setAttributes, subCategoryId }) {
+function ProductAttributes({ attributes, setAttributes, subCategoryId, leafCategories = [] }) {
 
   const [productVariations, setProductVariations] = useState([]);
   const [currentColor, setCurrentColor] = useState("#2563eb");
-  const [leafCategories, setLeafCategories] = useState([]);
+  // Badala ya state, tumia props moja kwa moja:
+// const leafCategories = props.leafCategories || []; // Huu ni mstari sahihi
+// 🔥 Weka hii chini ya useState zako (Mstari wa 17 badala ya lile linalosababisha tatizo)
+
   const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedLeaf, setSelectedLeaf] = useState(null);
@@ -63,7 +66,11 @@ useEffect(() => {
     fetchBrands();
   }, []);
 
-    // 2. Fetch Leaf Categories kutoka Django
+  // 🔥 TOA MAELEZO (COMMENT) AU Futa kabisa useEffect hili!
+// Hii request imeshafanywa na ProductCreationFlow. 
+// Data tayari zinapita kupitia props 'leafCategories'.
+
+/*
   useEffect(() => {
     const fetchFilteredLeafs = async () => {
       if (!subCategoryId) {
@@ -75,7 +82,7 @@ useEffect(() => {
       try {
         const token = localStorage.getItem("access_token");
         const { data } = await axios.get(`${API_BASE_URL}/leaf-categories/`, {
-          params: { sub_category_id: subCategoryId }, // 🔥 Hii ndiyo filter muhimu!
+          params: { sub_category_id: subCategoryId },
           headers: { Authorization: `Bearer ${token}` }
         });
         setLeafCategories(data.results || data || []);
@@ -89,6 +96,7 @@ useEffect(() => {
 
     fetchFilteredLeafs();
   }, [subCategoryId]);
+*/
 
 const handleLeafChange = (e) => {
   const leafId = e.target.value;
@@ -377,11 +385,19 @@ useEffect(() => {
 // 🔥 MUHIMU: Ongeza attributes.has_colors kwenye dependency!
 
 
-
-// ========== USEFFECT 1: GENERATE VARIATIONS (KWA RANGI NA UKUBWA) ==========
+// ============================================================
+// 🔥 USEFFECT 1: GENERATE VARIATIONS (KWA RANGI NA UKUBWA)
+// ============================================================
 useEffect(() => {
+  console.log("🔄 [VARIATIONS] Generating variations...");
+  console.log("  - has_colors:", attributes.has_colors);
+  console.log("  - colors:", attributes.colors);
+  console.log("  - sizes:", attributes.sizes);
+  console.log("  - current variations count:", productVariations.length);
+
   // KAMA BIDHAA HINA RANGI, USIFANYE VARIATIONS!
   if (!attributes.has_colors) {
+    console.log("  ⚠️ Bidhaa haina rangi, clearing variations...");
     if (productVariations.length !== 0) {
       setProductVariations([]);
       setAttributes(prev => ({ ...prev, variations: [] }));
@@ -394,6 +410,7 @@ useEffect(() => {
 
   // IKIWA HAKUNA RANGI, SAFISHA VARIATIONS
   if (selectedColors.length === 0) {
+    console.log("  ⚠️ Hakuna rangi zilizochaguliwa, clearing variations...");
     if (productVariations.length !== 0) {
       setProductVariations([]);
       setAttributes(prev => ({ ...prev, variations: [] }));
@@ -403,6 +420,7 @@ useEffect(() => {
 
   // IKIWA HAKUNA SIZES, TUMIA NULL (STANDARD)
   const sizesToUse = selectedSizes.length > 0 ? selectedSizes : [null];
+  console.log(`  📏 Sizes to use:`, sizesToUse);
 
   const newVariations = [];
 
@@ -453,16 +471,25 @@ useEffect(() => {
   if (currentStr !== newStr) {
     console.log(`📊 Updating variations: ${productVariations.length} -> ${newVariations.length}`);
     setProductVariations(newVariations);
-    if (JSON.stringify(attributes.variations) !== newStr) {
-      setAttributes(prev => ({ ...prev, variations: newVariations }));
-    }
+    
+    // ✅ ONGEZA HII - Weka variations kwenye attributes
+    setAttributes(prev => ({ 
+      ...prev, 
+      variations: newVariations,
+      has_colors: newVariations.length > 0 ? true : prev.has_colors
+    }));
+    
+    console.log(`✅ Variations saved to attributes: ${newVariations.length}`);
+  } else {
+    console.log(`  ℹ️ Variations unchanged: ${productVariations.length}`);
   }
   
 }, [attributes.has_colors, attributes.colors, attributes.sizes, attributes.price, attributes.specifications]);
-// 🔥 Ongeza attributes.sizes kwenye dependency!
-// 🔥 SIZE HAIPO HAPA! Hivyo size haitagusa variations
+// 🔥 MUHIMU: attributes.sizes imeongezwa kwenye dependency!
 
-// ========== USEFFECT 2: UPDATE SIZE STOCK (KWA BIDHAA ZISIZO NA RANGI) ==========
+// ============================================================
+// 🔥 USEFFECT 2: UPDATE SIZE STOCK (KWA BIDHAA ZISIZO NA RANGI)
+// ============================================================
 useEffect(() => {
   // KAMA BIDHAA INA RANGI, USIFANYE CHOMBOCHOTE HAPA
   if (attributes.has_colors) return;
@@ -473,32 +500,40 @@ useEffect(() => {
   // Update total stock from size_stock
   const totalStock = Object.values(attributes.size_stock || {}).reduce((acc, val) => acc + (Number(val) || 0), 0);
   if (totalStock !== Number(attributes.stock)) {
+    console.log(`📊 [STOCK] Updating total stock to: ${totalStock}`);
     setAttributes(prev => ({ ...prev, stock: totalStock }));
   }
   
 }, [attributes.has_colors, attributes.enable_sizes, attributes.sizes, attributes.size_stock]);
 
-// ========== USEFFECT 3: UPDATE TOTAL STOCK KWA BIDHAA ZENYE RANGI ==========
+// ============================================================
+// 🔥 USEFFECT 3: UPDATE TOTAL STOCK KWA BIDHAA ZENYE RANGI
+// ============================================================
 useEffect(() => {
   if (!attributes.has_colors) return;
   
   if (productVariations.length > 0) {
     const total = productVariations.reduce((acc, curr) => acc + (Number(curr.stock_quantity) || 0), 0);
     if (total !== Number(attributes.stock)) {
+      console.log(`📊 [COLOR STOCK] Updating total stock to: ${total}`);
       setAttributes(prev => ({ ...prev, stock: total }));
     }
   }
 }, [productVariations, attributes.has_colors]);
 
-  // Update total stock
-  useEffect(() => {
-    if (productVariations.length > 0) {
-      const total = productVariations.reduce((acc, curr) => acc + (Number(curr.stock_quantity) || 0), 0);
-      if (total !== Number(attributes.stock)) {
-        setAttributes(prev => ({ ...prev, stock: total }));
-      }
+// ============================================================
+// 🔥 USEFFECT 4: UPDATE TOTAL STOCK (GENERAL)
+// ============================================================
+useEffect(() => {
+  if (productVariations.length > 0) {
+    const total = productVariations.reduce((acc, curr) => acc + (Number(curr.stock_quantity) || 0), 0);
+    if (total !== Number(attributes.stock)) {
+      console.log(`📊 [GENERAL STOCK] Updating total stock to: ${total}`);
+      setAttributes(prev => ({ ...prev, stock: total }));
     }
-  }, [productVariations, setAttributes, attributes.stock]);
+  }
+}, [productVariations, setAttributes, attributes.stock]);
+
 
   // Helper function - Weka hii kwenye component yako (karibu na states)
 const capitalizeFirstLetter = (str) => {

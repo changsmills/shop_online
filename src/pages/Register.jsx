@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import api from '../axiosConfig'; // 🔥 Tumia api kutoka axiosConfig
+import api from '../axiosConfig';
 import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
+import '../Register.css'; // ✅ CSS IMEHAMISHIWA HAPA
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -127,195 +128,134 @@ const Register = () => {
   
   const handleSocialLogin = (provider) => {
     toast(`Inaanza ${provider} login... (OAuth inahitaji usanidi wa Backend)`, { icon: '⏳' });
-    // Mfano wa redirect baadaye:
-    // window.location.href = 'https://shop-online-r9z4.onrender.com/api/auth/${provider.toLowerCase()}/';
-  };
-
-  const styles = {
-    container: {
-      display: 'flex',
-      minHeight: '100vh',
-      backgroundColor: '#fff',
-      fontFamily: "'Inter', sans-serif",
-      flexDirection: isMobile ? 'column' : 'row',
-      overflowX: 'hidden'
-    },
-    leftPanel: {
-      flex: 1,
-      display: isMobile ? 'none' : 'block',
-      backgroundImage: 'url("https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1000&auto=format&fit=crop")',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-      position: 'relative',
-      height: '100vh',
-    },
-    testimonialBox: {
-      position: 'absolute',
-      bottom: '40px',
-      left: '40px',
-      right: '40px',
-      backgroundColor: 'rgba(255, 255, 255, 0.9)',
-      padding: '20px 30px',
-      borderRadius: '12px',
-      boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-      backdropFilter: 'blur(10px)',
-    },
-    rightPanel: {
-      flex: 1,
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      padding: isMobile ? '40px 20px' : '40px 60px',
-      backgroundColor: '#fff',
-      width: isMobile ? '100%' : 'auto',
-    },
   };
 
   return (
-    <div style={styles.container}>
+    <div className="register-container">
       <Toaster position="top-center" reverseOrder={false} />
 
-      <div style={styles.leftPanel}>
-        <div style={styles.testimonialBox}>
-          <p style={{ margin: '0 0 10px 0', fontSize: '16px', fontStyle: 'italic', fontWeight: '500', color: '#1a1a1a', lineHeight: '1.5' }}>
+      {/* LEFT PANEL - Picha inaonekana Desktop tu */}
+      <div className="register-left-panel">
+        <div className="register-testimonial-box">
+          <p className="register-testimonial-text">
             “In just 1 year, LTA International generated 14 new customers with new sales growth totaling $1.5 million.”
           </p>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #eee', paddingTop: '12px' }}>
-            <span style={{ fontWeight: '600', fontSize: '14px', color: '#333' }}>Andrea Vitello</span>
-            <span style={{ fontWeight: 'bold', fontSize: '12px', color: '#FF6600' }}>Skyfall.com</span>
+          <div className="register-testimonial-footer">
+            <span className="register-testimonial-author">Andrea Vitello</span>
+            <span className="register-testimonial-brand">Skyfall.com</span>
           </div>
         </div>
       </div>
 
-      <div style={styles.rightPanel}>
+      {/* RIGHT PANEL - Register Form */}
+      <div className="register-right-panel">
         
-        <div style={{ marginBottom: '30px' }}>
-          <h2 style={{ fontSize: '32px', fontWeight: '700', color: '#1a1a1a', marginBottom: '8px' }}>
-            Create your account
-          </h2>
-          <p style={{ margin: 0, fontSize: '14px', color: '#666' }}>
-            Join Skyfall today! Enter your details below.
-          </p>
+        <div className="register-header">
+          <h2 className="register-title">Create your account</h2>
+          <p className="register-subtitle">Join Skyfall today! Enter your details below.</p>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '25px' }}>
+        {/* Social Login Buttons */}
+        <div className="register-social-buttons">
           <SocialButton 
             onClick={() => handleSocialLogin('Google')}
-            bg="#fff" border="1px solid #ddd" color="#333" 
+            className="register-social-btn google-btn"
             icon={<GoogleIcon />} 
             text="Continue with Google" 
           />
           <SocialButton 
             onClick={() => handleSocialLogin('Facebook')}
-            bg="#1877F2" border="none" color="#fff" 
+            className="register-social-btn facebook-btn"
             icon={<FacebookIcon />} 
             text="Continue with Facebook" 
           />
           <SocialButton 
             onClick={() => handleSocialLogin('LinkedIn')}
-            bg="#0077B5" border="none" color="#fff" 
+            className="register-social-btn linkedin-btn"
             icon={<LinkedInIcon />} 
             text="Continue with LinkedIn" 
           />
           <SocialButton 
             onClick={() => handleSocialLogin('Apple')}
-            bg="#000" border="none" color="#fff" 
+            className="register-social-btn apple-btn"
             icon={<AppleIcon />} 
             text="Continue with Apple" 
           />
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '25px', color: '#999', fontSize: '14px' }}>
-          <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #e5e7eb' }} />
-          <span style={{ padding: '0 15px' }}>Or</span>
-          <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #e5e7eb' }} />
+        {/* Divider */}
+        <div className="register-divider">
+          <hr className="register-divider-line" />
+          <span className="register-divider-text">Or</span>
+          <hr className="register-divider-line" />
         </div>
 
+        {/* Error Message */}
         {errorMessage && (
-          <div style={{
-            backgroundColor: '#fee',
-            color: '#c00',
-            padding: '12px',
-            borderRadius: '8px',
-            marginBottom: '20px',
-            fontSize: '14px',
-            textAlign: 'center'
-          }}>
+          <div className="register-error-message">
             ⚠️ {errorMessage}
           </div>
         )}
 
-        <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        {/* Register Form */}
+        <form onSubmit={handleSignup} className="register-form">
           
-          <div>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#333' }}>Email Address</label>
+          <div className="register-form-group">
+            <label className="register-label">Email Address</label>
             <input 
               type="email" 
               required 
               value={email}
               onChange={(e) => setEmail(e.target.value)} 
               disabled={loading}
-              style={{
-                width: '100%', padding: '14px 16px', borderRadius: '8px', border: '1px solid #d1d5db',
-                fontSize: '15px', outline: 'none', transition: '0.2s'
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#FF6600'}
-              onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+              className="register-input"
+              placeholder="Enter your email"
             />
-            <div style={{ fontSize: '12px', color: '#999', marginTop: '6px' }}>
+            <div className="register-name-preview">
               Your default name will be: <strong>{email ? generateDefaultNameFromEmail(email) : '...'}</strong>
             </div>
           </div>
 
-          <div>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#333' }}>Password</label>
-            <div style={{ position: 'relative' }}>
+          <div className="register-form-group">
+            <label className="register-label">Password</label>
+            <div className="register-password-wrapper">
               <input 
                 type={showPassword ? "text" : "password"} 
                 required 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)} 
                 disabled={loading}
-                style={{
-                  width: '100%', padding: '14px 16px', borderRadius: '8px', border: '1px solid #d1d5db',
-                  fontSize: '15px', outline: 'none', transition: '0.2s', paddingRight: '40px'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#FF6600'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                className="register-input"
+                placeholder="Enter your password"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 disabled={loading}
-                style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px' }}
+                className="register-password-toggle"
               >
                 {showPassword ? '🙈' : '👁️'}
               </button>
             </div>
           </div>
 
-          <div>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#333' }}>Confirm Password</label>
-            <div style={{ position: 'relative' }}>
+          <div className="register-form-group">
+            <label className="register-label">Confirm Password</label>
+            <div className="register-password-wrapper">
               <input 
                 type={showConfirmPassword ? "text" : "password"} 
                 required 
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)} 
                 disabled={loading}
-                style={{
-                  width: '100%', padding: '14px 16px', borderRadius: '8px', border: '1px solid #d1d5db',
-                  fontSize: '15px', outline: 'none', transition: '0.2s', paddingRight: '40px'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#FF6600'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                className="register-input"
+                placeholder="Confirm your password"
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 disabled={loading}
-                style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px' }}
+                className="register-password-toggle"
               >
                 {showConfirmPassword ? '🙈' : '👁️'}
               </button>
@@ -325,23 +265,17 @@ const Register = () => {
           <button 
             type="submit" 
             disabled={loading}
-            style={{
-              width: '100%', padding: '14px', backgroundColor: '#FF6600', color: 'white', border: 'none',
-              borderRadius: '40px', fontSize: '16px', fontWeight: '700', cursor: 'pointer',
-              transition: '0.2s', marginTop: '10px'
-            }}
-            onMouseOver={(e) => !loading && (e.target.style.backgroundColor = '#e55a00')}
-            onMouseOut={(e) => !loading && (e.target.style.backgroundColor = '#FF6600')}
+            className="register-submit-btn"
           >
             {loading ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
 
-        <div style={{ textAlign: 'center', marginTop: '20px', fontSize: '15px', color: '#333' }}>
+        <div className="register-footer">
           Already have an account? 
           <span 
             onClick={() => navigate("/dashboard/login")}
-            style={{ fontWeight: '700', color: '#FF6600', cursor: 'pointer', textDecoration: 'underline', marginLeft: '4px' }}
+            className="register-login-link"
           >
             Sign in here
           </span>
@@ -351,22 +285,19 @@ const Register = () => {
   );
 };
 
-const SocialButton = ({ bg, border, color, icon, text, onClick }) => (
+// Social Button Component
+const SocialButton = ({ className, icon, text, onClick }) => (
   <button 
     type="button" 
     onClick={onClick}
-    style={{
-      width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      gap: '12px', padding: '12px 16px', backgroundColor: bg, border: border || 'none',
-      borderRadius: '8px', color: color, fontSize: '15px', fontWeight: '500', cursor: 'pointer',
-      transition: '0.2s'
-    }}
+    className={`register-social-btn ${className}`}
   >
     {icon}
     {text}
   </button>
 );
 
+// Social Icons
 const GoogleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -384,7 +315,7 @@ const FacebookIcon = () => (
 
 const LinkedInIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
   </svg>
 );
 
