@@ -224,3 +224,9 @@ class StoreEngineSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"owner": "Mtumiaji hana Profile. Tafadhali unda profile kwanza."})
         validated_data['owner'] = profile
         return super().create(validated_data)
+
+    # 🔥 ONGEZA HII MWISHONI KABISA KWA products/serializers.py
+class ProductVariationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductVariation
+        fields = '__all__'
