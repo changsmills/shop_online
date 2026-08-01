@@ -115,16 +115,8 @@ export default function LocationFilter({ navigate }) {
   if (loading) {
     return (
       <div className="location-main-wrapper">
-        {/* Header Section */}
-        <div className="loc-header">
-          <div className="loc-header-left">
-            <div className="loc-title-group">
-              <MapPin className="loc-map-icon" />
-              <h2 className="loc-title">{t('shop_by_location')}</h2>
-            </div>
-            <p className="loc-subtitle">{t('find_best_deals_near_you')}</p>
-          </div>
-        </div>
+        
+        {renderHeader()}
 
         {/* 🔥 SKELETON SCROLL - Inaonyesha skeleton 5 kwa horizontal scroll */}
         <div className="loc-desktop-wrapper">
