@@ -297,3 +297,53 @@
     border-color: #f97316;
   }
 }
+/* ============================================ */
+/* 🔥 VIEW ALL ARROW (MSHALE WA KUONYESHA ZAIDI) */
+/* ============================================ */
+
+.ts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: #fff7ed; /* 🔥 Rangi ya peach background */
+  border-radius: 12px 12px 0 0;
+  margin-bottom: 16px;
+}
+
+.ts-header-right {
+  display: flex;
+  align-items: center;
+}
+
+.ts-arrow-link-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #374151;
+  padding: 4px;
+  transition: transform 0.2s ease;
+}
+
+.ts-arrow-link-btn:hover {
+  transform: translateX(4px); /* Mshale unasogea kulia inapoelewa */
+  color: #f97316;
+}
+
+.ts-arrow-link-btn:active {
+  transform: scale(0.95);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .ts-header {
+    padding: 10px 16px;
+  }
+  .ts-arrow-link-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+}

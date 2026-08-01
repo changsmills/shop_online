@@ -52,13 +52,11 @@
   margin: 0;
 }
 
-/* 🔥 Subtitle iko sawa chini ya title */
 .na-subtitle {
-  font-size: 14px;
-  color: #6b7280;
-  margin: 0;
-  padding-left: 34px;
-}
+    font-size: 13px;
+    padding-left: 0;
+    margin-top: 4px;    /* 🔥 ONGEZA HII */
+  }
 
 /* ============================================ */
 /* HEADER RIGHT ARROW (MSHALE WA KULIA)          */
