@@ -49,13 +49,16 @@ export default function DashboardCard({
           </div>
         )}
         
+        {/* 🔥 BADILISHA HAPA: Picha halisi, placeholder ya ndani kwa usalama */}
         <img 
-          src={image || 'https://via.placeholder.com/200'} 
+          src={image || ''} 
           alt={title} 
           className="product-card-img"
           draggable="false"
           onContextMenu={(e) => e.preventDefault()}
-          onError={(e) => { e.target.src = 'https://via.placeholder.com/200'; }}
+          onError={(e) => { 
+            e.target.style.display = 'none'; // 🔥 Ficha picha ikiwa imevunjika
+          }}
         />
 
         {overlay && (
