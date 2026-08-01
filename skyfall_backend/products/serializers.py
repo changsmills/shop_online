@@ -254,8 +254,25 @@ class StoreEngineSerializer(serializers.ModelSerializer):
         validated_data['owner'] = profile
         return super().create(validated_data)
 
-    # 🔥 ONGEZA HII MWISHONI KABISA KWA products/serializers.py
+# 🔥 BADILISHA HII SEHEMU (Katika products/serializers.py)
 class ProductVariationSerializer(serializers.ModelSerializer):
+    # 🔥 ONGEZA HII: Inageuza 'color_image' kutoka URLField (read-only)
+    color_image_url = serializers.SerializerMethodField()
+
     class Meta:
         model = ProductVariation
         fields = '__all__'
+        read_only_fields = ['id', 'created_at']  # Weka fields zisizobadilishwa
+
+    # 🔥 METHOD YA KUONYESHA PICHA KWA FRONTEND
+    def get_color_image_url(self, obj):
+        if not obj.color_image:
+            return None
+        # Tumia mfumo uliopo kwa Cloudinary
+        CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
+        if not CLOUD_NAME:
+            return None
+        # Hakikisha unatumia full_path kama ulivyofanya kwa products
+        full_path = f"media/{obj.color_image}"  # 🔥 (Kama picha imehifadhiwa hivyo)
+        safe_path = urllib.parse.quote(full_path)
+        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{safe_path}"

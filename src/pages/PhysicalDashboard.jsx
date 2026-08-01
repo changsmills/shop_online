@@ -225,49 +225,95 @@ export default function PhysicalDashboard() {
     alert("Bidhaa imeongezwa kwenye list!");
   };
 
-  const handleFinalPublishAll = async () => {
+    const handleFinalPublishAll = async () => {
     if (addedProducts.length === 0) return alert("Hakuna bidhaa ya kurusha!");
     setIsLoading(true);
     try {
       const token = localStorage.getItem("access_token");
-      if (!token) { alert("Session imeisha. Tafadhali login tena."); setIsLoading(false); return; }
+      if (!token) { 
+        alert("Session imeisha. Tafadhali login tena."); 
+        setIsLoading(false); 
+        return; 
+      }
+      
       let successCount = 0;
       let remainingProducts = [...addedProducts];
+      
       for (const p of addedProducts) {
         try {
           const formData = new FormData();
+          
+          // 🔥 Taarifa za msingi
           formData.append("name", p.name);
           formData.append("price", parseFloat(p.price));
           formData.append("original_price", parseFloat(p.compare_at_price) || 0);
-          formData.append("category_id", p.category_id);
+          
+          // 🔥 BADILISHA HAPA: category (sio category_id)
+          if (p.category_id) formData.append("category", p.category_id);
+          
           if (p.brand_id) formData.append("brand_id", p.brand_id);
           formData.append("stock_quantity", parseInt(p.stock) || 0);
           formData.append("description", p.description || "");
           if (p.specifications) formData.append("specifications", JSON.stringify(p.specifications));
-          if (p.cover_file) formData.append("cover_image", p.cover_file);
-          if (p.video_file) formData.append("video_file", p.video_file);
-          if (p.gallery && p.gallery.length > 0) p.gallery.forEach((file) => formData.append("gallery_images", file));
+          
+          // 🔥 DEBUG: Angalia kama picha zipo
+          console.log(`📸 [Debug] Inatuma cover_image kwa ${p.name}:`, p.cover_file ? "✅ Ipo" : "❌ Haipo");
+          
+          if (p.cover_file) {
+            formData.append("cover_image", p.cover_file);
+            console.log(`  ✅ cover_image imeambatishwa: ${p.cover_file.name}`);
+          }
+          
+          if (p.video_file) {
+            formData.append("video_file", p.video_file);
+            console.log(`  ✅ video_file imeambatishwa: ${p.video_file.name}`);
+          }
+          
+          // 🔥 BADILISHA HAPA: gallery_files (sio gallery)
+          if (p.gallery_files && p.gallery_files.length > 0) {
+            console.log(`  🖼️ Inatuma ${p.gallery_files.length} gallery images...`);
+            p.gallery_files.forEach((file, index) => {
+              formData.append("gallery_images", file);
+              console.log(`    ✅ Gallery image ${index+1}: ${file.name}`);
+            });
+          } else {
+            console.log("  ℹ️ Hakuna gallery images.");
+          }
 
           const response = await api.post('/products/', formData, {
-            headers: { "Authorization": `Bearer ${token}`, "Content-Type": "multipart/form-data" }
+            headers: { 
+              "Authorization": `Bearer ${token}`, 
+              "Content-Type": "multipart/form-data" 
+            }
           });
+          
           if (response.status === 201) {
+            console.log(`✅ ${p.name} imehifadhiwa kikamilifu!`);
             successCount++;
             remainingProducts = remainingProducts.filter(item => item !== p);
             setAddedProducts([...remainingProducts]);
           }
-        } catch (productError) { continue; }
+        } catch (productError) { 
+          console.error("❌ Error creating product:", productError);
+          continue; 
+        }
       }
+      
       if (successCount > 0) {
         alert(`✅ Bidhaa ${successCount} zimehifadhiwa kikamilifu!`);
         fetchDashboardData();
         if (remainingProducts.length === 0 && typeof setCurrentStep === 'function') setCurrentStep(1);
       }
-      if (remainingProducts.length > 0) alert(`⚠️ Bidhaa ${remainingProducts.length} zimefeli kurushwa. Tafadhali jaribu tena.`);
+      
+      if (remainingProducts.length > 0) {
+        alert(`⚠️ Bidhaa ${remainingProducts.length} zimefeli kurushwa. Tafadhali jaribu tena.`);
+      }
     } catch (err) {
       console.error("Hitilafu Kubwa:", err);
       alert("Hitilafu Kubwa: " + (err.response?.data?.detail || err.message));
-    } finally { setIsLoading(false); }
+    } finally { 
+      setIsLoading(false); 
+    }
   };
 
   const handleCoverChange = (e) => { const file = e.target.files[0]; if (file) { setCoverFile(file); setCoverPreview(URL.createObjectURL(file)); } };
@@ -465,16 +511,30 @@ export default function PhysicalDashboard() {
             <div className={`tab-content ${activeTab === 'products' ? 'active' : ''}`}>
               <div className="product-creation-wrapper">
                 <h2 className="product-section-title">✨ Ongeza Bidhaa Mpya</h2>
-                <ProductCreationFlow
+                                <ProductCreationFlow
                   storeId={myStore?.id} 
                   storeSubCategoryIds={myStore?.sub_category_ids || []} 
                   currentStep={currentStep} setCurrentStep={setCurrentStep}
                   myStoreSubCats={myStoreSubCats}
                   attributes={attributes} setAttributes={setAttributes}
                   selectedCategoryName={selectedCategoryName}
+                  
+                  // ✅ PREVIEWS NA UI (Zinabaki kama zilivyo kwa kuonyesha)
                   coverPreview={coverPreview} coverInputRef={coverInputRef} handleCoverChange={handleCoverChange}
                   videoPreview={videoPreview} videoInputRef={videoInputRef} handleVideoChange={handleVideoChange}
                   galleryPreviews={galleryPreviews} galleryInputRef={galleryInputRef} handleGalleryChange={handleGalleryChange} removeGalleryImage={removeGalleryImage}
+                  
+                  // 🔥 MPYA: HII NDIYO ITAKUSANYA FAILI HALISI ZA MEDIA KUTOKA FLOW
+                  onMediaChange={(mediaFiles) => {
+                    // mediaFiles ni object: { coverFile, videoFile, galleryFiles }
+                    if (mediaFiles.coverFile) setCoverFile(mediaFiles.coverFile);
+                    if (mediaFiles.videoFile) setVideoFile(mediaFiles.videoFile);
+                    if (mediaFiles.galleryFiles && mediaFiles.galleryFiles.length > 0) {
+                      setGalleryFiles(mediaFiles.galleryFiles);
+                    }
+                  }}
+
+                  // ✅ HIZI ZINABAKI KWA AJILI YA QUEUE NA PUBLISH
                   addedProducts={addedProducts} setAddedProducts={setAddedProducts}
                   addToQueue={addToQueue} resetProductForm={resetProductForm} handleFinalPublishAll={handleFinalPublishAll}
                   isLoading={isLoading} editingProductId={editingProductId}
