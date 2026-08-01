@@ -1,6 +1,7 @@
 from rest_framework import serializers
 import cloudinary.uploader 
 import os
+import urllib.parse
 
 
 from products.models import (
@@ -23,6 +24,7 @@ class LeafCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = LeafCategory
         fields = '__all__'
+        
 # ============================================================
 # 🔥 PRODUCTS ENGINE SERIALIZER (Imetengenezwa na Debug logs)
 # ============================================================
@@ -46,7 +48,7 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['user', 'created_at']
 
-    # 🔥 ONGEZA METHOD HII (Inajenga URL ya Cloudinary kwa kutumia CLOUD_NAME)
+       # 🔥 ONGEZA METHOD HII (Inajenga URL ya Cloudinary kwa kutumia CLOUD_NAME)
     def get_cover_image_url(self, obj):
         if not obj.cover_image:
             return None
@@ -54,7 +56,12 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
         CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
         if not CLOUD_NAME:
             return None  # Kama hakuna Cloud Name, rudisha None
-        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{obj.cover_image}"
+        
+        # 🔥 ONGEZA 'media/' MWANZONI NA USAFISHE NAFASI
+        full_path = f"media/{obj.cover_image}"
+        safe_path = urllib.parse.quote(full_path)
+        
+        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{safe_path}"
 
     def create(self, validated_data):
         import traceback  # 🔥 Kwa debugging
@@ -174,14 +181,18 @@ class StoreEngineSerializer(serializers.ModelSerializer):
         except Category.DoesNotExist:
             return None
 
-    # 🔥 ONGEZA METHODS HIZI CHINI (Zinajenga URL za Cloudinary)
+    # ------------------------------------------------------------------
+    # 🔥 Methods za URL (Zote zimesahihishwa kuwa na media/ + urllib.parse.quote)
+    # ------------------------------------------------------------------
     def get_store_logo_url(self, obj):
         if not obj.store_logo:
             return None
         CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
         if not CLOUD_NAME:
             return None
-        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{obj.store_logo}"
+        full_path = f"media/{obj.store_logo}"
+        safe_path = urllib.parse.quote(full_path)
+        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{safe_path}"
 
     def get_store_banner_url(self, obj):
         if not obj.store_banner:
@@ -189,7 +200,9 @@ class StoreEngineSerializer(serializers.ModelSerializer):
         CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
         if not CLOUD_NAME:
             return None
-        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{obj.store_banner}"
+        full_path = f"media/{obj.store_banner}"
+        safe_path = urllib.parse.quote(full_path)
+        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{safe_path}"
 
     def get_tin_image_url(self, obj):
         if not obj.tin_image:
@@ -197,7 +210,9 @@ class StoreEngineSerializer(serializers.ModelSerializer):
         CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
         if not CLOUD_NAME:
             return None
-        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{obj.tin_image}"
+        full_path = f"media/{obj.tin_image}"
+        safe_path = urllib.parse.quote(full_path)
+        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{safe_path}"
 
     def get_office_image_1_url(self, obj):
         if not obj.office_image_1:
@@ -205,7 +220,9 @@ class StoreEngineSerializer(serializers.ModelSerializer):
         CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
         if not CLOUD_NAME:
             return None
-        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{obj.office_image_1}"
+        full_path = f"media/{obj.office_image_1}"
+        safe_path = urllib.parse.quote(full_path)
+        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{safe_path}"
 
     def get_office_image_2_url(self, obj):
         if not obj.office_image_2:
@@ -213,8 +230,13 @@ class StoreEngineSerializer(serializers.ModelSerializer):
         CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
         if not CLOUD_NAME:
             return None
-        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{obj.office_image_2}"
+        full_path = f"media/{obj.office_image_2}"
+        safe_path = urllib.parse.quote(full_path)
+        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{safe_path}"
 
+    # ------------------------------------------------------------------
+    # 🔥 Create method (Iko sawa, usibadilishe)
+    # ------------------------------------------------------------------
     def create(self, validated_data):
         request = self.context.get('request')
         user = request.user
