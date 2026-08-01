@@ -63,7 +63,7 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
         
         return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{safe_path}"
 
-       def create(self, validated_data):
+    def create(self, validated_data):
         import traceback
 
         print("📦 [DEBUG] Starting Product Creation...")
