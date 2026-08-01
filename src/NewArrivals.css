@@ -15,14 +15,16 @@
 }
 
 /* ============================================ */
-/* HEADER SECTION                                */
+/* HEADER SECTION (PEACH BACKGROUND + SUBTITLE)  */
 /* ============================================ */
 
 .na-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 16px;
+  padding: 12px 20px;
+  background-color: #fff7ed; /* 🔥 Rangi ya peach background */
+  border-radius: 12px 12px 0 0;
   margin-bottom: 16px;
 }
 
@@ -38,7 +40,7 @@
 }
 
 .na-sparkle-icon {
-  color: #eab308;
+  color: #f97316;
   width: 24px;
   height: 24px;
 }
@@ -46,15 +48,46 @@
 .na-title {
   font-size: 20px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #1f2937;
   margin: 0;
 }
 
+/* 🔥 Subtitle iko sawa chini ya title */
 .na-subtitle {
   font-size: 14px;
-  color: #888;
+  color: #6b7280;
   margin: 0;
   padding-left: 34px;
+}
+
+/* ============================================ */
+/* HEADER RIGHT ARROW (MSHALE WA KULIA)          */
+/* ============================================ */
+
+.na-header-right {
+  display: flex;
+  align-items: center;
+}
+
+.na-arrow-link-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #374151;
+  padding: 4px;
+  transition: transform 0.2s ease;
+}
+
+.na-arrow-link-btn:hover {
+  transform: translateX(4px);
+  color: #f97316;
+}
+
+.na-arrow-link-btn:active {
+  transform: scale(0.95);
 }
 
 /* ============================================ */
@@ -130,36 +163,25 @@
     gap: 10px !important;
     padding: 8px 4px 16px 4px;
   }
+  
   .na-header {
-    padding: 0 12px;
-    margin-bottom: 12px;
+    padding: 10px 16px;
   }
   .na-title {
-    font-size: 16px;
+    font-size: 18px;
   }
   .na-subtitle {
-    font-size: 12px;
+    font-size: 13px;
     padding-left: 0;
+    margin-top: 4px;
   }
   .na-sparkle-icon {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
   }
-  /* ✅ MISHALE INAONEKANA MOBILE */
-  .na-arrow-btn {
-    display: flex !important;
-    width: 28px !important;
-    height: 28px !important;
-  }
-  .na-arrow-btn svg {
-    width: 16px !important;
-    height: 16px !important;
-  }
-  .na-arrow-left {
-    left: 0px !important;
-  }
-  .na-arrow-right {
-    right: 0px !important;
+  .na-arrow-link-btn svg {
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -177,23 +199,21 @@
     gap: 8px !important;
   }
   .na-title {
-    font-size: 14px;
+    font-size: 16px;
   }
   .na-subtitle {
-    font-size: 10px;
+    font-size: 12px;
+    padding-left: 0;
+    margin-top: 2px;
   }
-  .na-arrow-btn {
-    width: 24px !important;
-    height: 24px !important;
-  }
-  .na-arrow-btn svg {
-    width: 14px !important;
-    height: 14px !important;
+  .na-arrow-link-btn svg {
+    width: 18px;
+    height: 18px;
   }
 }
 
 /* ============================================ */
-/* ARROWS - KUSHOTO NA KULIA                    */
+/* ARROWS - KUSHOTO NA KULIA (SCROLL)            */
 /* ============================================ */
 
 .na-arrow-btn {
@@ -261,106 +281,23 @@
     background-color: #1a1a2e;
     border-color: #334155;
   }
-
   .na-title {
     color: #e2e8f0;
   }
-
   .na-subtitle {
     color: #94a3b8;
   }
-
   .na-sparkle-icon {
     color: #fbbf24;
   }
-
   .na-arrow-btn {
     background-color: #1e293b;
     border-color: #334155;
     color: #e2e8f0;
   }
-
   .na-arrow-btn:hover {
     background-color: #eab308;
     color: white;
     border-color: #eab308;
-  }
-}
-
-/* ============================================ */
-/* 🔥 NEW ARRIVALS HEADER - PEACH BACKGROUND & ARROW */
-/* ============================================ */
-
-.na-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 20px;
-  background-color: #fff7ed; /* 🔥 Rangi ya peach background */
-  border-radius: 12px 12px 0 0;
-  margin-bottom: 16px;
-}
-
-.na-header-left {
-  display: flex;
-  flex-direction: column;
-}
-
-.na-title-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.na-sparkle-icon {
-  color: #f97316;
-  width: 24px;
-  height: 24px;
-}
-
-.na-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-}
-
-.na-header-right {
-  display: flex;
-  align-items: center;
-}
-
-.na-arrow-link-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #374151;
-  padding: 4px;
-  transition: transform 0.2s ease;
-}
-
-.na-arrow-link-btn:hover {
-  transform: translateX(4px); /* Mshale unasogea kulia inapoelewa */
-  color: #f97316;
-}
-
-.na-arrow-link-btn:active {
-  transform: scale(0.95);
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  .na-header {
-    padding: 10px 16px;
-  }
-  .na-title {
-    font-size: 18px;
-  }
-  .na-arrow-link-btn svg {
-    width: 20px;
-    height: 20px;
   }
 }
