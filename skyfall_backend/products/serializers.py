@@ -1,10 +1,12 @@
 from rest_framework import serializers
-import cloudinary.uploader  # 🔥 ONGEZA MSTARI HUU HAPA (Chini ya import ya rest_framework)!
+import cloudinary.uploader 
+import os
+
 
 from products.models import (
     Category, SubCategory, ProductsEngine, LeafCategory, Advertisement, 
     StoreEngine, ProductMedia, Message, Profile,
-    ShippingMethod, Brand, Lead, ProductVariation  # 🔥 ONGEZA ProductVariation hapa!
+    ShippingMethod, Brand, Lead, ProductVariation  
 )
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -21,12 +23,14 @@ class LeafCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = LeafCategory
         fields = '__all__'
-
 # ============================================================
 # 🔥 PRODUCTS ENGINE SERIALIZER (Imetengenezwa na Debug logs)
 # ============================================================
 class ProductsEngineSerializer(serializers.ModelSerializer):
     leaf_categories = LeafCategorySerializer(source='leaf_category', read_only=True)
+    
+    # 🔥 ONGEZA HII FIELD MPYA (Inatuma URL kamili ya Cloudinary kwa Frontend)
+    cover_image_url = serializers.SerializerMethodField()
     
     # 🔥 Hizi ndizo zinakubali faili kutoka Frontend
     cover_image = serializers.ImageField(write_only=True, required=False)
@@ -41,6 +45,16 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
         model = ProductsEngine
         fields = '__all__'
         read_only_fields = ['user', 'created_at']
+
+    # 🔥 ONGEZA METHOD HII (Inajenga URL ya Cloudinary kwa kutumia CLOUD_NAME)
+    def get_cover_image_url(self, obj):
+        if not obj.cover_image:
+            return None
+        # 🔥 Chukua Cloud Name kutoka Environment Variables
+        CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
+        if not CLOUD_NAME:
+            return None  # Kama hakuna Cloud Name, rudisha None
+        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{obj.cover_image}"
 
     def create(self, validated_data):
         import traceback  # 🔥 Kwa debugging
@@ -119,7 +133,7 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
 
         print("🏁 [DEBUG] Product Creation Finished.")
         return product
-
+    
 # ============================================================
 # 🔥 PRODUCT MEDIA SERIALIZER (MUHIMU: Ondoa read_only kwenye media_url!)
 # ============================================================
@@ -129,11 +143,16 @@ class ProductMediaSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['media_url']  # 🔥 MUHIMU: Usiruhusu mteja kuweka URL, mfumo wa Cloudinary ndio uweke.
 
-
 class StoreEngineSerializer(serializers.ModelSerializer):
     sub_categories = serializers.SerializerMethodField()
     category_name = serializers.SerializerMethodField()
 
+    # 🔥 ONGEZA FIELD HIZI MPYA ZA URL (Zitatumwa kwa Frontend)
+    store_logo_url = serializers.SerializerMethodField()
+    store_banner_url = serializers.SerializerMethodField()
+    tin_image_url = serializers.SerializerMethodField()
+    office_image_1_url = serializers.SerializerMethodField()
+    office_image_2_url = serializers.SerializerMethodField()
 
     class Meta:
         model = StoreEngine
@@ -155,6 +174,47 @@ class StoreEngineSerializer(serializers.ModelSerializer):
         except Category.DoesNotExist:
             return None
 
+    # 🔥 ONGEZA METHODS HIZI CHINI (Zinajenga URL za Cloudinary)
+    def get_store_logo_url(self, obj):
+        if not obj.store_logo:
+            return None
+        CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
+        if not CLOUD_NAME:
+            return None
+        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{obj.store_logo}"
+
+    def get_store_banner_url(self, obj):
+        if not obj.store_banner:
+            return None
+        CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
+        if not CLOUD_NAME:
+            return None
+        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{obj.store_banner}"
+
+    def get_tin_image_url(self, obj):
+        if not obj.tin_image:
+            return None
+        CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
+        if not CLOUD_NAME:
+            return None
+        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{obj.tin_image}"
+
+    def get_office_image_1_url(self, obj):
+        if not obj.office_image_1:
+            return None
+        CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
+        if not CLOUD_NAME:
+            return None
+        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{obj.office_image_1}"
+
+    def get_office_image_2_url(self, obj):
+        if not obj.office_image_2:
+            return None
+        CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
+        if not CLOUD_NAME:
+            return None
+        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{obj.office_image_2}"
+
     def create(self, validated_data):
         request = self.context.get('request')
         user = request.user
@@ -163,80 +223,4 @@ class StoreEngineSerializer(serializers.ModelSerializer):
         except Profile.DoesNotExist:
             raise serializers.ValidationError({"owner": "Mtumiaji hana Profile. Tafadhali unda profile kwanza."})
         validated_data['owner'] = profile
-        return super().create(validated_data)
-    
-
-class MessageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Message
-        fields = '__all__'
-
-class ProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Profile
-        fields = '__all__'
-
-class ShippingMethodSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ShippingMethod
-        fields = '__all__'
-
-class BrandSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Brand
-        fields = '__all__'
-
-class LeadSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Lead
-        fields = '__all__'
-
-# 🔥 HAPA MWISHONI (MARA MOJA TU!):
-class ProductVariationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductVariation
-        fields = '__all__'
-
-class AdvertisementSerializer(serializers.ModelSerializer):
-    media_file = serializers.FileField(write_only=True, required=False)
-
-    class Meta:
-        model = Advertisement
-        # 🔥 ONGEZA HII: Tumia 'exclude' ili DRF asikague 'user' kabisa!
-        exclude = ['user']
-        read_only_fields = ['media_url', 'status', 'created_at', 'approved_at', 'rejected_at']
-
-    def create(self, validated_data):
-        # 🔥 1. Chukua mtumiaji aliyeingia (Profile) kutoka request
-        request = self.context.get('request')
-        user = request.user
-        try:
-            profile = Profile.objects.get(user=user)
-        except Profile.DoesNotExist:
-            raise serializers.ValidationError({"user": "Mtumiaji hana Profile. Tafadhali unda profile kwanza."})
-        
-        # Weka profile kwenye validated_data (sasa hii itakubalika kwa sababu hatujaijumuishwa kwenye validation!)
-        validated_data['user'] = profile
-
-        # 2. Toa file kutoka validated data
-        media_file = validated_data.pop('media_file', None)
-        
-        # 3. Upload kwenye Cloudinary
-        if media_file:
-            try:
-                
-                # Upload file kwenye folder ya 'ads' kwenye Cloudinary
-                result = cloudinary.uploader.upload(media_file, folder="ads")
-                validated_data['media_url'] = result['secure_url']
-                
-                # 4. Weka media_type kulingana na aina ya faili
-                if not validated_data.get('media_type'):
-                    if media_file.content_type and media_file.content_type.startswith('video'):
-                        validated_data['media_type'] = 'video'
-                    else:
-                        validated_data['media_type'] = 'image'
-            except Exception as e:
-                raise serializers.ValidationError({"media_file": f"Imeshindwa kupakia faili: {str(e)}"})
-        
-        # 5. Endelea kuunda record kama kawaida
         return super().create(validated_data)
