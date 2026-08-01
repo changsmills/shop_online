@@ -23,7 +23,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 20px;
-  background-color: #fff7ed; /* 🔥 Rangi ya peach background */
+  background-color: #fff7ed;
   border-radius: 12px 12px 0 0;
   margin-bottom: 16px;
 }
@@ -52,11 +52,13 @@
   margin: 0;
 }
 
+/* 🔥 BADILISHA HII SEHEMU KUWA HIVI (Sawa na TopStores) */
 .na-subtitle {
-    font-size: 13px;
-    padding-left: 0;
-    margin-top: 4px;    /* 🔥 ONGEZA HII */
-  }
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  padding-left: 34px;  /* Hii ndiyo inasukuma subtitle chini ya title */
+}
 
 /* ============================================ */
 /* HEADER RIGHT ARROW (MSHALE WA KULIA)          */

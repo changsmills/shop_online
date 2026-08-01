@@ -66,23 +66,26 @@ export default function NewArrivals({ navigate, selectedCategory }) {
     }
   }, [products]);
 
-   // ============================================================
+    // ============================================================
   // 🔥 RENDER HEADER (Inajumuisha mshale na peach background)
   // ============================================================
   const renderHeader = () => (
     <div className="na-header">
       <div className="na-header-left">
+        
+        {/* 🔥 1. Title na Icon ziko kwenye kikundi chake (zitakaa upande kwa upande) */}
         <div className="na-title-group">
           <Sparkles className="na-sparkle-icon" />
           <h2 className="na-title">
             {t('new_arrivals')}
           </h2>
-          
-          {/* ✅ ONGEZA SUBTITLE HAPA CHINI YA TITLE */}
-          <p className="na-subtitle">
-            {t('discover_latest_arrivals')}
-          </p>
         </div>
+        
+        {/* 🔥 2. Subtitle sasa iko NJE ya kikundi hicho, kwa hiyo itakaa CHINI ya title! */}
+        <p className="na-subtitle">
+          {t('discover_latest_arrivals')}
+        </p>
+        
       </div>
       
       {/* 🔥 UPANDE WA KULIA: MSHALE TU */}
