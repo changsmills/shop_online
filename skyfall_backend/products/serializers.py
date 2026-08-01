@@ -126,9 +126,8 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
 class ProductMediaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductMedia
-        fields = ['id', 'media_type', 'media_url', 'display_order', 'is_promo_video']
-        # 🔥 MUHIMU: Tunaondoa read_only_fields kabisa ili media_url iweze kujazwa na Cloudinary!
-        read_only_fields = [] 
+        fields = '__all__'
+        read_only_fields = ['media_url']  # 🔥 MUHIMU: Usiruhusu mteja kuweka URL, mfumo wa Cloudinary ndio uweke.
 
 
 class StoreEngineSerializer(serializers.ModelSerializer):

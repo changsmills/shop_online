@@ -43,7 +43,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_filters',  
     'cloudinary',
-    'cloudinary_storage',
+     # 'cloudinary_storage', # 🔥 FUTE HII KABISA!
+
+    
     
     # Our apps
     'api',
@@ -176,5 +178,3 @@ CLOUDINARY_STORAGE = {
     'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
     'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
 }
-
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.CloudinaryStorage'
