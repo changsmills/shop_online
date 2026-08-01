@@ -68,7 +68,7 @@ export default function RecentlyViewed({ navigate }) {
   }, [products]);
 
 
-   // ============================================================
+  // ============================================================
   // 🔥 RENDER HEADER (Imejumuishwa kwa pande zote)
   // ============================================================
   const renderHeader = () => (
@@ -78,6 +78,9 @@ export default function RecentlyViewed({ navigate }) {
           <History className="rv-history-icon" />
           <h2 className="rv-title">{t('recently_viewed')}</h2>
         </div>
+        
+        {/* ✅ ONGEZA SUBTITLE HAPA CHINI YA TITLE */}
+        <p className="rv-subtitle">{t('items_you_recently_viewed')}</p>
       </div>
       
       <div className="rv-header-right">
@@ -129,30 +132,8 @@ export default function RecentlyViewed({ navigate }) {
   return (
     <div className="recently-viewed-main-wrapper">
       
-      {/* Header Section */}
-      <div className="rv-header">
-        <div className="rv-header-left">
-          <div className="rv-title-group">
-            <History className="rv-history-icon" />
-            <h2 className="rv-title">{t('recently_viewed')}</h2>
-          </div>
-          <p className="rv-subtitle">{t('items_you_recently_viewed')}</p>
-        </div>
-
-        {/* Mshale upande wa kulia */}
-        {products.length > 6 && (
-          <div 
-            className="rv-arrow-only"
-            onClick={() => navigate('/products', { 
-              state: { 
-                sectionName: t('recently_viewed')
-              } 
-            })}
-          >
-            <span className="real-arrow">→</span>
-          </div>
-        )}
-      </div>
+      {/* ✅ SASA HAPA TUNATAJA renderHeader() ILI IPATE MSHALE WAKO WA ArrowRight */}
+      {renderHeader()}
 
       {/* Horizontal Scroll */}
       <div className="rv-desktop-wrapper">

@@ -90,6 +90,9 @@ export default function LocationFilter({ navigate }) {
           <MapPin className="loc-map-icon" />
           <h2 className="loc-title">{t('shop_by_location')}</h2>
         </div>
+        
+        {/* ✅ ONGEZA SUBTITLE HAPA CHINI YA TITLE */}
+        <p className="loc-subtitle">{t('find_best_deals_near_you')}</p>
       </div>
       
       <div className="loc-header-right">

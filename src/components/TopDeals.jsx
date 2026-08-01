@@ -92,8 +92,7 @@ export default function TopDeals({ navigate, selectedCategory }) {
 
 
 
-
-   // ============================================================
+  // ============================================================
   // 🔥 RENDER HEADER (Imejumuishwa kwa pande zote)
   // ============================================================
   const renderHeader = () => (
@@ -105,6 +104,11 @@ export default function TopDeals({ navigate, selectedCategory }) {
             {t('top_deals')}
           </h2>
         </div>
+        
+        {/* ✅ ONGEZA SUBTITLE HAPA CHINI YA TITLE */}
+        <p className="td-subtitle">
+          {t('score_lowest_price')}
+        </p>
       </div>
       
       <div className="td-header-right">
@@ -120,29 +124,27 @@ export default function TopDeals({ navigate, selectedCategory }) {
       </div>
     </div>
   );
+  
 
-  // ============================================================
+   // ============================================================
   // SKELETON LOADING
   // ============================================================
   if (loading) {
     return (
-
-          <div className="top-deals-main-wrapper">
-      
-            {renderHeader()}
-
-
-      {/* SCROLL WRAPPER */}
-      <div className="td-desktop-wrapper">
-        <div className="td-scroll-wrapper hide-scrollbar">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <div key={`skeleton-${index}`} className="td-card-wrapper">
-              <SkeletonCardz />
-            </div>
-          ))}
+      <div className="top-deals-main-wrapper">
+        {renderHeader()}  {/* ✅ ONGEZA HII ILI HEADER IONEKANE WAKATI INAPOPAKIA */}
+        
+        {/* SCROLL WRAPPER */}
+        <div className="td-desktop-wrapper">
+          <div className="td-scroll-wrapper hide-scrollbar">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={`skeleton-${index}`} className="td-card-wrapper">
+                <SkeletonCardz />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
     );
   }
 
@@ -157,21 +159,7 @@ export default function TopDeals({ navigate, selectedCategory }) {
   return (
     <div className="top-deals-main-wrapper">
       
-      {/* Header Section */}
-      <div className="td-header">
-        <div className="td-header-left">
-          <div className="td-title-group">
-            <Flame className="td-flame-icon" />
-            <h2 className="td-title">
-              {t('top_deals')} {selectedCategory && `${t('in')} ${getCategoryDisplayName(selectedCategory)}`}
-            </h2>
-          </div>
-          <p className="td-subtitle">
-            {t('score_lowest_price')}
-            {selectedCategory && ` ${t('in')} ${getCategoryDisplayName(selectedCategory)}`}
-          </p>
-        </div>
-      </div>
+         {renderHeader()}
 
       {/* Horizontal Scroll */}
       <div className="td-desktop-wrapper">

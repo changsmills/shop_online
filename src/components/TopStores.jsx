@@ -61,7 +61,7 @@ export default function TopStores({ navigate }) {
   }, [stores]);
 
 
-  // ============================================================
+    // ============================================================
   // 🔥 RENDER HEADER (Imejumuishwa kwa pande zote)
   // ============================================================
   const renderHeader = () => (
@@ -71,6 +71,11 @@ export default function TopStores({ navigate }) {
           <Factory className="ts-factory-icon" />
           <h2 className="ts-title">{t('top_suppliers')}</h2>
         </div>
+        
+        {/* ✅ ONGEZA SUBTITLE HAPA CHINI YA TITLE */}
+        <p className="ts-subtitle">
+          {t('verified_wholesale_stores')}
+        </p>
       </div>
       
       <div className="ts-header-right">
@@ -86,22 +91,15 @@ export default function TopStores({ navigate }) {
       </div>
     </div>
   );
-
+  
   // ============================================================
   // SKELETON LOADING
   // ============================================================
   if (loading) {
     return (
       <div className="top-stores-main-wrapper">
-        <div className="ts-header">
-          <div className="ts-header-left">
-            <div className="ts-title-group">
-              <Factory className="ts-factory-icon" />
-              <h2 className="ts-title">{t('top_suppliers')}</h2>
-            </div>
-            <p className="ts-subtitle">{t('verified_wholesale_stores')}</p>
-          </div>
-        </div>
+        
+        {renderHeader()}
 
         <div className="ts-desktop-wrapper">
           <div className="ts-scroll-wrapper hide-scrollbar">

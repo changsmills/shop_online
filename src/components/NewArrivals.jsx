@@ -77,6 +77,11 @@ export default function NewArrivals({ navigate, selectedCategory }) {
           <h2 className="na-title">
             {t('new_arrivals')}
           </h2>
+          
+          {/* ✅ ONGEZA SUBTITLE HAPA CHINI YA TITLE */}
+          <p className="na-subtitle">
+            {t('discover_latest_arrivals')}
+          </p>
         </div>
       </div>
       
@@ -101,27 +106,8 @@ export default function NewArrivals({ navigate, selectedCategory }) {
   if (loading) {
     return (
       <div className="new-arrivals-main-wrapper">
-        <div className="na-header">
-          <div className="na-header-left">
-            <div className="na-title-group">
-              <Sparkles className="na-sparkle-icon" />
-              <h2 className="na-title">
-                {selectedCategory && selectedCategory.id !== null ? (
-                  `${t('new_arrivals')} ${t('in')} ${getCategoryDisplayName(selectedCategory)}`
-                ) : (
-                  t('new_arrivals')
-                )}
-              </h2>
-            </div>
-            <p className="na-subtitle">
-              {selectedCategory && selectedCategory.id !== null ? (
-                `${t('discover_latest_arrivals')} ${t('in')} ${getCategoryDisplayName(selectedCategory)}`
-              ) : (
-                t('discover_latest_arrivals')
-              )}
-            </p>
-          </div>
-        </div>
+
+        {renderHeader()}
 
         <div className="na-desktop-wrapper">
           <div className="na-scroll-wrapper hide-scrollbar">

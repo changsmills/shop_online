@@ -61,7 +61,7 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
   }, [products]);
 
 
-   // ============================================================
+    // ============================================================
   // 🔥 RENDER HEADER (Imejumuishwa kwa pande zote)
   // ============================================================
   const renderHeader = () => (
@@ -73,6 +73,11 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
             {t('hot_picks')}
           </h2>
         </div>
+        
+        {/* ✅ ONGEZA SUBTITLE HAPA CHINI YA TITLE */}
+        <p className="trend-subtitle">
+          {t('check_popular_items')}
+        </p>
       </div>
       
       <div className="trend-header-right">
@@ -124,22 +129,7 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
   return (
     <div className="trending-main-wrapper">
       
-      {/* Header Section */}
-      <div className="trend-header">
-        <div className="trend-header-left">
-          <div className="trend-title-group">
-            <TrendingUp className="trend-icon" />
-            <h2 className="trend-title">
-              {selectedCategory && selectedCategory.id !== null ? (
-                `${t('hot_picks')} ${t('in')} ${getCategoryDisplayName(selectedCategory)}`
-              ) : (
-                t('hot_picks')
-              )}
-            </h2>
-          </div>
-          <p className="trend-subtitle">{t('check_popular_items')}</p>
-        </div>
-      </div>
+     {renderHeader()}
 
       {/* Horizontal Scroll */}
       <div className="trend-desktop-wrapper">

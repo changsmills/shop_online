@@ -88,7 +88,7 @@ export default function JustForYou({ search = "", selectedCategory }) {
 
 
 
-   // ============================================================
+     // ============================================================
   // 🔥 RENDER HEADER (Imejumuishwa kwa pande zote)
   // ============================================================
   const renderHeader = () => (
@@ -98,6 +98,11 @@ export default function JustForYou({ search = "", selectedCategory }) {
           <h2 className="just-title">
             {t('just_for_you')}
           </h2>
+          
+          {/* ✅ ONGEZA SUBTITLE HAPA CHINI YA TITLE */}
+          <p className="just-subtitle">
+            {t('curated_picks')}
+          </p>
         </div>
         
         {/* 🔥 MSHALE WA KULIA */}
@@ -122,26 +127,8 @@ export default function JustForYou({ search = "", selectedCategory }) {
   if (loading) {
     return (
       <section className="just-for-you-container">
-        <div className="section-header">
-          <div className="header-main">
-            <div className="header-text-group">
-              <h2 className="just-title">
-                {selectedCategory && selectedCategory.id !== null ? (
-                  `${t('just_for_you')} ${t('in')} ${getCategoryName()}`
-                ) : (
-                  t('just_for_you')
-                )}
-              </h2>
-              <p className="just-subtitle">
-                {selectedCategory && selectedCategory.id !== null ? (
-                  `${t('curated_picks')} ${t('in')} ${getCategoryName()}`
-                ) : (
-                  t('curated_picks')
-                )}
-              </p>
-            </div>
-          </div>
-        </div>
+        
+        {renderHeader()}
 
         {/* 🔥 SKELETON GRID - Inaonyesha skeleton 8 kwanza */}
         <div className="product-grid">
