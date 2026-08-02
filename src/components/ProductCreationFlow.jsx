@@ -304,7 +304,32 @@ const ProductCreationFlow = ({
           formData.append("target_audience", JSON.stringify(p.target_audience || []));
           formData.append("dimensions", JSON.stringify(p.dimensions || {}));
           formData.append("gender", JSON.stringify(p.gender || []));
-          formData.append("color_images", JSON.stringify(p.color_images || {}));
+
+          // ============================================================
+// 🔥 1. Tuma data ya color_images kama JSON (la muhimu: weka URLs tu za blob)
+// ============================================================
+const colorImagesData = {};
+if (p.color_images) {
+  Object.keys(p.color_images).forEach(color => {
+    // Tunaweza kuweka URL kama placeholder lakini hii haitapakiwa kwenye DB
+    // tunatumia p.color_image_files kwa picha halisi
+    colorImagesData[color] = p.color_images[color]; 
+  });
+}
+formData.append("color_images", JSON.stringify(colorImagesData));
+
+
+// ============================================================
+// 🔥 2. Tuma kila picha ya rangi kama FILE halisi (Muhimu Sana!)
+// ============================================================
+// Backend lazima iwe na logic ya kukubali multiple files kwa 'color_images'
+if (p.color_image_files && Object.keys(p.color_image_files).length > 0) {
+  Object.entries(p.color_image_files).forEach(([color, file]) => {
+    // Tuna append file moja kwa moja. 
+    // USITUMIE JSON.stringify hapa!
+    formData.append("color_image_files", file); 
+  });
+}
 
           // 🔥 DEBUG 2: Kuweka Media kwenye formData
           console.log("  📸 [DEBUG] Appending media files to FormData...");
@@ -356,8 +381,8 @@ const ProductCreationFlow = ({
                   varFormData.append("attributes", JSON.stringify(variant.attributes));
                 }
                 if (variant.color_image_file) {
-                  varFormData.append("color_image", variant.color_image_file);
-                }
+                   varFormData.append("color_image_file", variant.color_image_file); // ✅ SASA NI SAHIHI!
+                      }
 
                 try {
                   await api.post('/product-variations/', varFormData, {

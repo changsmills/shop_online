@@ -43,6 +43,13 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
     )
     video_file = serializers.FileField(write_only=True, required=False)
 
+    # 🔥 ONGEZA HII (Ili kupokea files za rangi kutoka Frontend)
+    color_image_files = serializers.ListField(
+        child=serializers.ImageField(allow_empty_file=False),
+        write_only=True,
+        required=False
+    )
+
     class Meta:
         model = ProductsEngine
         fields = '__all__'
@@ -72,6 +79,7 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
         cover_image = validated_data.pop('cover_image', None)
         gallery_images = validated_data.pop('gallery_images', [])
         video_file = validated_data.pop('video_file', None)
+        color_image_files = validated_data.pop('color_image_files', [])
 
         # 2. Unda bidhaa
         try:
@@ -144,6 +152,23 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
             except Exception as e:
                 print(f"❌ [UNKNOWN ERROR] Video processing failed: {e}")
                 print(traceback.format_exc())
+
+        # 6. Hifadhi Color Images (Rangi za bidhaa)
+        if color_image_files:
+            print(f"  🎨 [DEBUG] Uploading {len(color_image_files)} Color Images...")
+            for file in color_image_files:
+                try:
+                    result = cloudinary.uploader.upload(file)
+                    # Hifadhi kwenye ProductMedia kama media_type='color_image'
+                    ProductMedia.objects.create(
+                        product=product,
+                        media_type='color_image',   # 🔥 Tumia hii kuainisha
+                        media_url=result['secure_url'],
+                        display_order=10  # Au weka order sahihi
+                    )
+                    print(f"    ✅ Color image uploaded and saved.")
+                except Exception as e:
+                    print(f"❌ [ERROR] Failed to upload color image: {e}")
 
         print("🏁 [DEBUG] Product Creation Finished.")
         return product
@@ -254,25 +279,67 @@ class StoreEngineSerializer(serializers.ModelSerializer):
         validated_data['owner'] = profile
         return super().create(validated_data)
 
-# 🔥 BADILISHA HII SEHEMU (Katika products/serializers.py)
+# ============================================================
+# 🔥 PRODUCT VARIATION SERIALIZER (Imerekebishwa Sana!)
+# ============================================================
 class ProductVariationSerializer(serializers.ModelSerializer):
-    # 🔥 ONGEZA HII: Inageuza 'color_image' kutoka URLField (read-only)
+    # 🔥 1. Hii ndiyo itatumwa kwa Frontend (URL kamili ya Cloudinary)
     color_image_url = serializers.SerializerMethodField()
+    
+    # 🔥 2. Hii inakubali File kutoka Frontend na kuihifadhi kwenye Cloudinary
+    color_image_file = serializers.ImageField(write_only=True, required=False)
 
     class Meta:
         model = ProductVariation
         fields = '__all__'
-        read_only_fields = ['id', 'created_at']  # Weka fields zisizobadilishwa
+        read_only_fields = ['id', 'created_at', 'color_image'] # 🔥 'color_image' sasa ni read-only kwa sababu tunapakia kwa Cloudinary
 
-    # 🔥 METHOD YA KUONYESHA PICHA KWA FRONTEND
     def get_color_image_url(self, obj):
+        """Inatengeneza URL ya Cloudinary kutoka public_id iliyohifadhiwa"""
         if not obj.color_image:
             return None
-        # Tumia mfumo uliopo kwa Cloudinary
         CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
         if not CLOUD_NAME:
             return None
-        # Hakikisha unatumia full_path kama ulivyofanya kwa products
-        full_path = f"media/{obj.color_image}"  # 🔥 (Kama picha imehifadhiwa hivyo)
+        # 🔥 Hakikisha path inaanza na 'media/' kama ilivyo kwenye ProductsEngine
+        full_path = f"media/{obj.color_image}"
         safe_path = urllib.parse.quote(full_path)
         return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{safe_path}"
+
+    def create(self, validated_data):
+        import traceback
+        print("🎨 [DEBUG] Creating ProductVariation...")
+
+        # 🔥 1. Toa picha kutoka validated_data
+        color_image_file = validated_data.pop('color_image_file', None)
+        
+        # 🔥 2. Unda variation (bila picha kwanza)
+        try:
+            variation = super().create(validated_data)
+            print(f"  ✅ [DEBUG] Variation created with ID: {variation.id}")
+        except Exception as e:
+            print("❌ [CRITICAL ERROR] Failed to create ProductVariation!")
+            print(traceback.format_exc())
+            raise e
+
+        # 🔥 3. Ikiwa picha ipo, ipakie Cloudinary
+        if color_image_file:
+            print(f"  📸 [DEBUG] Uploading color_image for {variation.color_name}...")
+            try:
+                # 🔥 Upload kwenye Cloudinary (Folder inaweza kuwa 'variation_colors')
+                result = cloudinary.uploader.upload(color_image_file) # 🔥 ONDOA folder parameter ukitaka
+                
+                # 🔥 4. Hifadhi public_id kwenye field ya 'color_image' kwenye DB
+                variation.color_image = result['public_id'] 
+                variation.save(update_fields=['color_image'])
+                
+                print(f"  ✅ [DEBUG] Color Image uploaded! Public ID: {result['public_id']}")
+                
+            except cloudinary.api.Error as e:
+                print(f"❌ [CLOUDINARY ERROR] Color Image upload failed: {e}")
+            except Exception as e:
+                print(f"❌ [UNKNOWN ERROR] Color Image processing failed: {e}")
+                print(traceback.format_exc())
+
+        print("🏁 [DEBUG] ProductVariation creation finished.")
+        return variation
