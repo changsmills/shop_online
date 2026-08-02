@@ -208,7 +208,7 @@ const ProductCreationFlow = ({
     return myStoreSubCats.filter(sub => storeSubCategoryIds.includes(sub.id));
   }, [myStoreSubCats, storeSubCategoryIds]);
 
-     const handleFinalPublishAll = async () => {
+    const handleFinalPublishAll = async () => {
     console.log("📦 [PUBLISH_BTN] ===== STARTING PUBLISH PROCESS =====");
     if (addedProducts.length === 0) return alert("Hakuna bidhaa ya kurusha!");
     setLoading(true);
@@ -306,30 +306,18 @@ const ProductCreationFlow = ({
           formData.append("gender", JSON.stringify(p.gender || []));
 
           // ============================================================
-// 🔥 1. Tuma data ya color_images kama JSON (la muhimu: weka URLs tu za blob)
-// ============================================================
-const colorImagesData = {};
-if (p.color_images) {
-  Object.keys(p.color_images).forEach(color => {
-    // Tunaweza kuweka URL kama placeholder lakini hii haitapakiwa kwenye DB
-    // tunatumia p.color_image_files kwa picha halisi
-    colorImagesData[color] = p.color_images[color]; 
-  });
-}
-formData.append("color_images", JSON.stringify(colorImagesData));
+          // 🔥 1. Tuma data ya color_images kama JSON (la muhimu: weka URLs tu za blob)
+          // ============================================================
+          const colorImagesData = {};
+          if (p.color_images) {
+            Object.keys(p.color_images).forEach(color => {
+              colorImagesData[color] = p.color_images[color]; 
+            });
+          }
+          formData.append("color_images", JSON.stringify(colorImagesData));
 
-
-// ============================================================
-// 🔥 2. Tuma kila picha ya rangi kama FILE halisi (Muhimu Sana!)
-// ============================================================
-// Backend lazima iwe na logic ya kukubali multiple files kwa 'color_images'
-if (p.color_image_files && Object.keys(p.color_image_files).length > 0) {
-  Object.entries(p.color_image_files).forEach(([color, file]) => {
-    // Tuna append file moja kwa moja. 
-    // USITUMIE JSON.stringify hapa!
-    formData.append("color_image_files", file); 
-  });
-}
+          // 🔥 2. ONDOA KABISA (Usitume files hapa! Zinatuma kwenye variations)
+          // if (p.color_image_files && Object.keys(p.color_image_files).length > 0) { ... }
 
           // 🔥 DEBUG 2: Kuweka Media kwenye formData
           console.log("  📸 [DEBUG] Appending media files to FormData...");
@@ -366,7 +354,9 @@ if (p.color_image_files && Object.keys(p.color_image_files).length > 0) {
             console.log(`  ✅ SUCCESS! Product created. Response:`, response.data);
             const newProductId = response.data.id;
 
-            // Tuma variations
+            // ============================================================
+            // 🔥 2. TUMA VARIATIONS (HAPA NDIO PAKUNA PICHA ZA RANGI!)
+            // ============================================================
             if (p.variations && p.variations.length > 0) {
               console.log(`  📤 SENDING ${p.variations.length} variations to /product-variations/`);
               for (const variant of p.variations) {
@@ -380,9 +370,16 @@ if (p.color_image_files && Object.keys(p.color_image_files).length > 0) {
                 if (variant.attributes) {
                   varFormData.append("attributes", JSON.stringify(variant.attributes));
                 }
-                if (variant.color_image_file) {
-                   varFormData.append("color_image_file", variant.color_image_file); // ✅ SASA NI SAHIHI!
-                      }
+                
+                // 🔥 MUHIMU SANA: Angalia kama faili lipo kwenye variant au kwenye map ya p.color_image_files
+                let fileToSend = variant.color_image_file;
+                if (!fileToSend && p.color_image_files && p.color_image_files[variant.color_name]) {
+                    fileToSend = p.color_image_files[variant.color_name];
+                }
+
+                if (fileToSend) {
+                  varFormData.append("color_image_file", fileToSend);
+                }
 
                 try {
                   await api.post('/product-variations/', varFormData, {
