@@ -77,15 +77,14 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
         # 1. Toa data za picha/video na rangi
         cover_image = validated_data.pop('cover_image', None)
         
-        # 🔥 MUHIMU: Toa gallery_images na uhakikishe ni LIST halisi (sio ListField object)
+        # 🔥 MUHIMU SANA: Toa gallery_images na uhakikishe ni LIST halisi!
         gallery_images = validated_data.pop('gallery_images', [])
-        print(f"  🔍 [DEBUG] gallery_images type: {type(gallery_images)}") # Ongeza hii kuona aina ya data
         if not isinstance(gallery_images, list):
-            gallery_images = [gallery_images]
+            gallery_images = [gallery_images]  # Ikiwa ni file moja, ibadilishe kuwa list
 
         video_file = validated_data.pop('video_file', None)
         
-        # 🔥 COLOR IMAGE HAIJAGUSWA (IMEBaki Kama Ilivyo)
+        # 🔥 COLOR IMAGE HAIJAGUSWA
         color_image_files = validated_data.pop('color_image_files', []) 
 
         # 2. Unda bidhaa
@@ -141,7 +140,6 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
         if video_file:
             print(f"  🎬 [DEBUG] Attempting to upload Video...")
             try:
-                # Cloudinary inahitaji resource_type="video" kwa video
                 result = cloudinary.uploader.upload(video_file, resource_type="video")
                 ProductMedia.objects.create(
                     product=product,
@@ -156,7 +154,7 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
                 print(f"❌ [UNKNOWN ERROR] Video processing failed: {e}")
                 print(traceback.format_exc())
 
-        # 6. Hifadhi Color Images (Rangi za bidhaa) - 🔥 IMEBAKI SAWA KABISA!
+        # 6. Hifadhi Color Images
         if color_image_files:
             print(f"  🎨 [DEBUG] Uploading {len(color_image_files)} Color Images...")
             for file in color_image_files:
