@@ -72,14 +72,13 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         import traceback
-
         print("📦 [DEBUG] Starting Product Creation...")
 
-        # 1. Toa data za picha/video
+        # 1. Toa data za picha/video na rangi
         cover_image = validated_data.pop('cover_image', None)
         gallery_images = validated_data.pop('gallery_images', [])
         video_file = validated_data.pop('video_file', None)
-        color_image_files = validated_data.pop('color_image_files', [])
+        color_image_files = validated_data.pop('color_image_files', [])  # 🔥 MUHIMU: Toa files kabla ya ku-iterate
 
         # 2. Unda bidhaa
         try:
@@ -95,9 +94,7 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
         if cover_image:
             print(f"  📸 [DEBUG] Attempting to upload Cover Image...")
             try:
-                result = cloudinary.uploader.upload(cover_image)  # 🔥 ONDOA folder="product_covers"
-                
-                # 🔥 1. Hifadhi URL kwenye ProductMedia
+                result = cloudinary.uploader.upload(cover_image)
                 ProductMedia.objects.create(
                     product=product,
                     media_type='cover',
@@ -105,11 +102,8 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
                     display_order=0
                 )
                 print("  ✅ [DEBUG] Cover Image uploaded and saved to ProductMedia.")
-                
-                # 🔥 2. MUHIMU SANA: Sasisha product.cover_image ili ipatikane na serializer!
-                product.cover_image = result['public_id']  # Hii inahifadhi jina la picha (kama media/product_covers/chacha)
+                product.cover_image = result['public_id']
                 product.save(update_fields=['cover_image'])
-                
             except cloudinary.api.Error as e:
                 print(f"❌ [CLOUDINARY ERROR] Cover Image upload failed: {e}")
             except Exception as e:
@@ -122,7 +116,7 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
             for idx, img in enumerate(gallery_images):
                 try:
                     print(f"    - Uploading gallery image {idx+1}...")
-                    result = cloudinary.uploader.upload(img)  # 🔥 ONDOA folder="product_gallery"
+                    result = cloudinary.uploader.upload(img)
                     ProductMedia.objects.create(
                         product=product,
                         media_type='gallery',
@@ -139,7 +133,7 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
         if video_file:
             print(f"  🎬 [DEBUG] Attempting to upload Video...")
             try:
-                result = cloudinary.uploader.upload(video_file, resource_type="video")  # 🔥 ONDOA folder="product_videos"
+                result = cloudinary.uploader.upload(video_file, resource_type="video")
                 ProductMedia.objects.create(
                     product=product,
                     media_type='video',
@@ -153,18 +147,17 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
                 print(f"❌ [UNKNOWN ERROR] Video processing failed: {e}")
                 print(traceback.format_exc())
 
-        # 6. Hifadhi Color Images (Rangi za bidhaa)
+        # 6. Hifadhi Color Images (Rangi za bidhaa) - 🔥 SASA IKO SAHIHI!
         if color_image_files:
             print(f"  🎨 [DEBUG] Uploading {len(color_image_files)} Color Images...")
             for file in color_image_files:
                 try:
                     result = cloudinary.uploader.upload(file)
-                    # Hifadhi kwenye ProductMedia kama media_type='color_image'
                     ProductMedia.objects.create(
                         product=product,
-                        media_type='color_image',   # 🔥 Tumia hii kuainisha
+                        media_type='color_image',
                         media_url=result['secure_url'],
-                        display_order=10  # Au weka order sahihi
+                        display_order=10
                     )
                     print(f"    ✅ Color image uploaded and saved.")
                 except Exception as e:
