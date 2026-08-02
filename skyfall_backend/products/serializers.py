@@ -79,8 +79,9 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
         
         # 🔥 MUHIMU: Toa gallery_images na uhakikishe ni LIST halisi (sio ListField object)
         gallery_images = validated_data.pop('gallery_images', [])
+        print(f"  🔍 [DEBUG] gallery_images type: {type(gallery_images)}") # Ongeza hii kuona aina ya data
         if not isinstance(gallery_images, list):
-            gallery_images = [gallery_images]  # Ikiwa ni file moja tu, ibadilishe kuwa list
+            gallery_images = [gallery_images]
 
         video_file = validated_data.pop('video_file', None)
         
