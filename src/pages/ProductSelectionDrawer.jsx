@@ -17,7 +17,7 @@ const ProductSelectionDrawer = ({
     actionType,
     addToCart,
     onConfirm,
-    initialColor, // <-- Ongeza hii
+    initialColor, 
     initialSize
 }) => {
     const navigate = useNavigate();
@@ -25,6 +25,9 @@ const ProductSelectionDrawer = ({
     const [currentImgIndex, setCurrentImgIndex] = useState(0);
     const [selectedColor, setSelectedColor] = useState(null);
     const [isMobile, setIsMobile] = useState(false);
+
+    // 🔥 BADILISHA HAPA NA JINA LAKO HALISI LA CLOUDINARY
+    const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/YOUR_CLOUD_NAME/image/upload";
 
     // Detect mobile screen
     useEffect(() => {
@@ -58,20 +61,32 @@ const ProductSelectionDrawer = ({
         return sizeStock[size] || 0;
     };
 
+    // 🔥 1. Badilisha colorVariations ili kutengeneza URL kamili
     const colorVariations = useMemo(() => {
         const grouped = {};
         variations.forEach(v => {
             if (v.color_name && !grouped[v.color_name]) {
-                grouped[v.color_name] = v;
+                let fullImageUrl = v.color_image;
+                // Kama ni public_id (haina http), tunaongeza Cloudinary URL
+                if (fullImageUrl && !fullImageUrl.startsWith('http')) {
+                    fullImageUrl = `${CLOUDINARY_BASE_URL}/${fullImageUrl}`;
+                }
+                
+                grouped[v.color_name] = {
+                    ...v,
+                    color_image: fullImageUrl // Sasa hii ni URL kamili
+                };
             }
         });
         return grouped;
     }, [variations]);
 
+    // 🔥 2. Badilisha allImages ili kukusanya URLs kamili kwa ajili ya slider
     const allImages = useMemo(() => {
         const images = [];
         Object.values(colorVariations).forEach(v => {
             if (v.color_image) {
+                // Hakikisha hatuna picha mara mbili (duplicates)
                 const isDuplicate = images.some(img => img.url === v.color_image);
                 if (!isDuplicate) {
                     images.push({ url: v.color_image, color: v.color_name });
@@ -119,31 +134,31 @@ const ProductSelectionDrawer = ({
     const sizes = currentColorVar ? getSizesFromVariation(currentColorVar) : [];
     const hasSizes = sizes.length > 0;
 
- // ✅ Hii itahakikisha rangi na saizi uliyobonyeza kule nje inachaguliwa hapa ndani
-useEffect(() => {
-    if (isOpen && variations.length > 0) {
-        // 1. Kama kuna initialColor, itumie hiyo, la sivyo chukua ya kwanza
-        const colorToSelect = initialColor || Object.keys(colorVariations)[0];
-        
-        if (colorToSelect) {
-            handleColorSelect(colorToSelect);
+    // ✅ Hii itahakikisha rangi na saizi uliyobonyeza kule nje inachaguliwa hapa ndani
+    useEffect(() => {
+        if (isOpen && variations.length > 0) {
+            // 1. Kama kuna initialColor, itumie hiyo, la sivyo chukua ya kwanza
+            const colorToSelect = initialColor || Object.keys(colorVariations)[0];
             
-            // 2. Kama kuna initialSize, ongeza quantity ya 1 moja kwa moja
-            if (initialSize) {
-                const colorData = colorVariations[colorToSelect];
-                if (colorData) {
-                    const stockQty = getStockForSize(colorData, initialSize);
-                    const itemKey = `${colorData.id}::${initialSize}`;
-                    
-                    // Ongeza 1 kama haijachaguliwa bado
-                    if (!selectedItems[itemKey] || selectedItems[itemKey] === 0) {
-                        handleQtyChange({ id: itemKey, stock_quantity: stockQty }, 1);
+            if (colorToSelect) {
+                handleColorSelect(colorToSelect);
+                
+                // 2. Kama kuna initialSize, ongeza quantity ya 1 moja kwa moja
+                if (initialSize) {
+                    const colorData = colorVariations[colorToSelect];
+                    if (colorData) {
+                        const stockQty = getStockForSize(colorData, initialSize);
+                        const itemKey = `${colorData.id}::${initialSize}`;
+                        
+                        // Ongeza 1 kama haijachaguliwa bado
+                        if (!selectedItems[itemKey] || selectedItems[itemKey] === 0) {
+                            handleQtyChange({ id: itemKey, stock_quantity: stockQty }, 1);
+                        }
                     }
                 }
             }
         }
-    }
-}, [isOpen, initialColor, initialSize, variations]);
+    }, [isOpen, initialColor, initialSize, variations]);
 
     useEffect(() => {
         document.body.style.overflow = isOpen ? 'hidden' : 'unset';
@@ -188,6 +203,13 @@ useEffect(() => {
             const selectedColorValue = variant.color_name || selectedColor || 'Standard';
             const unitPrice = Number(variant?.price ?? product?.price ?? 0);
             const finalSize = selectedSize || 'Free Size';
+            
+            // 🔥 Tumia URL kamili kwa product_image
+            let fullImageUrl = variant.color_image;
+            if (fullImageUrl && !fullImageUrl.startsWith('http')) {
+                fullImageUrl = `${CLOUDINARY_BASE_URL}/${fullImageUrl}`;
+            }
+
             itemsToOrder.push({
                 product_id: product.id,
                 product_name: product.name,
@@ -197,7 +219,7 @@ useEffect(() => {
                 selected_size: finalSize,
                 qty_ordered: Number(qty),
                 price: unitPrice,
-                product_image: variant?.color_image || productImage,
+                product_image: fullImageUrl || productImage,
                 discount_amount: 0,
                 variant_id: variant.id
             });
@@ -222,53 +244,56 @@ useEffect(() => {
     };
 
     const handleWhatsAppConfirm = () => {
-  const finalQty = Object.values(selectedItems).reduce((sum, qty) => sum + qty, 0);
-  if (finalQty === 0) {
-    toast.error("Tafadhali chagua angalau bidhaa moja");
-    return;
-  }
-  
-  // Build order items same as normal order
-  const itemsToProcess = [];
-  Object.entries(selectedItems).forEach(([itemKey, qty]) => {
-    if (qty <= 0) return;
-    const parts = itemKey.split('::');
-    const searchId = parts[0];
-    const selectedSize = parts[1] || null;
-    let variant = variations.find(v => String(v.id) === String(searchId));
-    if (!variant) return;
-    
-    const selectedColorValue = variant.color_name || selectedColor || 'Standard';
-    const unitPrice = Number(variant?.price ?? product?.price ?? 0);
-    const finalSize = selectedSize || 'Free Size';
-    const productImageUrl = variant?.color_image || productImage;
-    
-    itemsToProcess.push({
-      id: product.id,
-      productId: product.id,
-      variant_id: variant.id,
-      name: product.name,
-      product_name: product.name,
-      selected_color: selectedColorValue,
-      selected_size: finalSize,
-      quantity: qty,
-      price: unitPrice,
-      image: productImageUrl,
-      store_id: product.store_id,
-              store_phone: product.stores?.whatsapp_number, // ← Badilisha kutoka phone_number
-      sku: variant.sku || product.sku || ''
-    });
-  });
-  
-  if (itemsToProcess.length === 0) {
-    toast.error("Hakuna bidhaa zilizochaguliwa");
-    return;
-  }
-  
-  // Navigate to checkout with order items (same as normal order)
-  onClose();
-  navigate('/checkout', { state: { orderItems: itemsToProcess } });
-};
+        const finalQty = Object.values(selectedItems).reduce((sum, qty) => sum + qty, 0);
+        if (finalQty === 0) {
+            toast.error("Tafadhali chagua angalau bidhaa moja");
+            return;
+        }
+        
+        const itemsToProcess = [];
+        Object.entries(selectedItems).forEach(([itemKey, qty]) => {
+            if (qty <= 0) return;
+            const parts = itemKey.split('::');
+            const searchId = parts[0];
+            const selectedSize = parts[1] || null;
+            let variant = variations.find(v => String(v.id) === String(searchId));
+            if (!variant) return;
+            
+            const selectedColorValue = variant.color_name || selectedColor || 'Standard';
+            const unitPrice = Number(variant?.price ?? product?.price ?? 0);
+            const finalSize = selectedSize || 'Free Size';
+            
+            // 🔥 Tumia URL kamili kwa image
+            let fullImageUrl = variant.color_image;
+            if (fullImageUrl && !fullImageUrl.startsWith('http')) {
+                fullImageUrl = `${CLOUDINARY_BASE_URL}/${fullImageUrl}`;
+            }
+
+            itemsToProcess.push({
+                id: product.id,
+                productId: product.id,
+                variant_id: variant.id,
+                name: product.name,
+                product_name: product.name,
+                selected_color: selectedColorValue,
+                selected_size: finalSize,
+                quantity: qty,
+                price: unitPrice,
+                image: fullImageUrl || productImage,
+                store_id: product.store_id,
+                store_phone: product.stores?.whatsapp_number,
+                sku: variant.sku || product.sku || ''
+            });
+        });
+        
+        if (itemsToProcess.length === 0) {
+            toast.error("Hakuna bidhaa zilizochaguliwa");
+            return;
+        }
+        
+        onClose();
+        navigate('/checkout', { state: { orderItems: itemsToProcess } });
+    };
 
     const handleAddToCart = () => {
         const itemsToCart = [];
@@ -286,6 +311,13 @@ useEffect(() => {
             const unitPrice = Number(variant?.price ?? product?.price ?? 0);
             const finalSize = selectedSize || 'Free Size';
             const uniqueCartId = `${variant.id}_${finalSize}_${selectedColorValue}`.replace(/\s/g, '_');
+
+            // 🔥 Tumia URL kamili kwa image
+            let fullImageUrl = variant.color_image;
+            if (fullImageUrl && !fullImageUrl.startsWith('http')) {
+                fullImageUrl = `${CLOUDINARY_BASE_URL}/${fullImageUrl}`;
+            }
+
             itemsToCart.push({
                 id: product.id,
                 productId: product.id,
@@ -298,8 +330,8 @@ useEffect(() => {
                 selected_size: finalSize,
                 quantity: Number(qty),
                 price: unitPrice,
-                image: variant?.color_image || productImage,
-                product_image: variant?.color_image || productImage,
+                image: fullImageUrl || productImage,
+                product_image: fullImageUrl || productImage,
                 variant_id: variant.id,
                 store_id: product.store_id,
                 uniqueCartId: uniqueCartId,
@@ -318,10 +350,7 @@ useEffect(() => {
             });
             localStorage.setItem('alibaba_cart', JSON.stringify(existingCart));
             window.dispatchEvent(new CustomEvent('cartUpdated', { detail: existingCart }));
-// Au kwa sekunde 2 (2000 milliseconds)
-toast.success(`Bidhaa ${itemsToCart.length} zimeongezwa kwenye kikapu!`, {
-  duration: 2000,
-});
+            toast.success(`Bidhaa ${itemsToCart.length} zimeongezwa kwenye kikapu!`, { duration: 2000 });
             onClose();
             navigate('/cart');
         } else {
@@ -353,7 +382,7 @@ toast.success(`Bidhaa ${itemsToCart.length} zimeongezwa kwenye kikapu!`, {
             {/* ========== DESKTOP: RIGHT SIDE DRAWER + FLOATING IMAGE ========== */}
             {!isMobile && (
                 <>
-                    {/* FLOATING IMAGE - Upande wa kushoto (IME RUDISHWA) */}
+                    {/* FLOATING IMAGE - Upande wa kushoto */}
                     <div style={{
                         position: 'fixed',
                         left: '50%',
@@ -527,6 +556,7 @@ toast.success(`Bidhaa ${itemsToCart.length} zimeongezwa kwenye kikapu!`, {
                                                 padding: '8px',
                                                 backgroundColor: selectedColor === color ? '#fff4f0' : '#fff'
                                             }}>
+                                                {/* 🔥 SASA PICHA INAONESHA KWA SABABU YA URL KAMILI */}
                                                 <img src={colorVariations[color].color_image || productImage} alt={color}
                                                     style={{ width: '50px', height: '50px', borderRadius: '8px', objectFit: 'cover' }} />
                                                 <div style={{ fontSize: '11px', marginTop: '4px' }}>{color}</div>
@@ -613,55 +643,55 @@ toast.success(`Bidhaa ${itemsToCart.length} zimeongezwa kwenye kikapu!`, {
                             )}
                         </div>
 
-                      {/* Footer */}
-<div style={{
-    borderTop: '1px solid #eee',
-    padding: '20px 24px',
-    backgroundColor: '#fff'
-}}>
-    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-        <span>Subtotal</span>
-        <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#ff4e00' }}>TSH {formatPrice(totals.totalPrice)}</span>
-    </div>
-    <div style={{ display: 'flex', gap: '12px' }}>
-        <button onClick={handleConfirmOrder} disabled={totals.totalQty === 0}
-            style={{ flex: 1, backgroundColor: '#ff4e00', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold' }}>
-            Order Now
-        </button>
-        <button onClick={handleAddToCart} disabled={totals.totalQty === 0}
-            style={{ flex: 1, backgroundColor: '#fff', color: '#ff4e00', border: '2px solid #ff4e00', padding: '14px', borderRadius: '8px', fontWeight: 'bold' }}>
-            Add to Cart
-        </button>
-    </div>
-    {/* ✅ ORDER VIA WHATSAPP BUTTON - Ipo chini ya zote */}
-    <button 
-        onClick={handleWhatsAppConfirm} 
-        disabled={totals.totalQty === 0}
-        style={{ 
-            width: '100%', 
-            marginTop: '12px',
-            backgroundColor: '#25D366', 
-            color: 'white', 
-            border: 'none', 
-            padding: '12px', 
-            borderRadius: '8px', 
-            fontWeight: 'bold',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            cursor: totals.totalQty === 0 ? 'not-allowed' : 'pointer',
-            opacity: totals.totalQty === 0 ? 0.6 : 1
-        }}
-    >
-        <MessageSquare size={18} /> Order via WhatsApp
-    </button>
-</div>
+                        {/* Footer */}
+                        <div style={{
+                            borderTop: '1px solid #eee',
+                            padding: '20px 24px',
+                            backgroundColor: '#fff'
+                        }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+                                <span>Subtotal</span>
+                                <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#ff4e00' }}>TSH {formatPrice(totals.totalPrice)}</span>
+                            </div>
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                                <button onClick={handleConfirmOrder} disabled={totals.totalQty === 0}
+                                    style={{ flex: 1, backgroundColor: '#ff4e00', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold' }}>
+                                    Order Now
+                                </button>
+                                <button onClick={handleAddToCart} disabled={totals.totalQty === 0}
+                                    style={{ flex: 1, backgroundColor: '#fff', color: '#ff4e00', border: '2px solid #ff4e00', padding: '14px', borderRadius: '8px', fontWeight: 'bold' }}>
+                                    Add to Cart
+                                </button>
+                            </div>
+                            {/* ORDER VIA WHATSAPP BUTTON */}
+                            <button 
+                                onClick={handleWhatsAppConfirm} 
+                                disabled={totals.totalQty === 0}
+                                style={{ 
+                                    width: '100%', 
+                                    marginTop: '12px',
+                                    backgroundColor: '#25D366', 
+                                    color: 'white', 
+                                    border: 'none', 
+                                    padding: '12px', 
+                                    borderRadius: '8px', 
+                                    fontWeight: 'bold',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '8px',
+                                    cursor: totals.totalQty === 0 ? 'not-allowed' : 'pointer',
+                                    opacity: totals.totalQty === 0 ? 0.6 : 1
+                                }}
+                            >
+                                <MessageSquare size={18} /> Order via WhatsApp
+                            </button>
+                        </div>
                     </div>
                 </>
             )}
 
-            {/* ========== MOBILE: BOTTOM SHEET (NO BOTTOM NAV) ========== */}
+            {/* ========== MOBILE: BOTTOM SHEET ========== */}
             {isMobile && (
                 <div className="mobile-bottom-sheet" style={{
                     position: 'fixed',
@@ -697,14 +727,14 @@ toast.success(`Bidhaa ${itemsToCart.length} zimeongezwa kwenye kikapu!`, {
                     }}>
                         <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 600 }}>Select Options</h3>
                         <button onClick={onClose} style={{
-                                background: '#f5f5f5',       // Rangi ya kijivu nyepesi (inafanya ionekane kama kitufe)
+                                background: '#f5f5f5',
                                border: 'none',
                                fontSize: '16px',
                                    fontWeight: 500,
                                     cursor: 'pointer',
-                                 minWidth: '50px',            // 🔥 Upana wa kutosha (si duara, bali umbo la mviringo)
+                                 minWidth: '50px',
                                 height: '32px',
-                                     borderRadius: '16px',        // 🔥 Pembe za mviringo kama "Pill" / Kidonge
+                                     borderRadius: '16px',
                                  display: 'flex',
                                alignItems: 'center',
                                justifyContent: 'center',
@@ -740,6 +770,7 @@ toast.success(`Bidhaa ${itemsToCart.length} zimeongezwa kwenye kikapu!`, {
                                             padding: '6px',
                                             backgroundColor: selectedColor === color ? '#fff4f0' : '#fff'
                                         }}>
+                                            {/* 🔥 SASA PICHA INAONESHA KWA SABABU YA URL KAMILI */}
                                             <img src={colorVariations[color].color_image || productImage} alt={color}
                                                 style={{ width: '45px', height: '45px', borderRadius: '8px', objectFit: 'cover' }} />
                                             <div style={{ fontSize: '10px', marginTop: '4px' }}>{color}</div>
@@ -749,89 +780,88 @@ toast.success(`Bidhaa ${itemsToCart.length} zimeongezwa kwenye kikapu!`, {
                             </div>
                         )}
 
-                       {/* Size Selection */}
-                 {hasSizes && currentColorVar && (
-               <div style={{ marginBottom: '20px' }}>
-                     <div style={{ fontWeight: 600, marginBottom: '12px', fontSize: '14px' }}>Size</div>
-               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {sizes.map(size => {
-                const stockQty = getStockForSize(currentColorVar, size);
-                const variantId = `${currentColorVar.id}::${size}`;
-                const qty = getQuantityForSize(size);
-                const isOutOfStock = stockQty === 0;
-                const unitPrice = currentColorVar.price || product?.price || 0;
-                return (
-                    <div key={size} style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '12px',
-                        backgroundColor: '#fafafa',
-                        borderRadius: '8px',
-                        border: qty > 0 ? '1px solid #ff4e00' : '1px solid #eee'
-                    }}>
-                        <div style={{ flex: 1 }}>
-                            <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{size}</div>
-                            <div style={{ fontSize: '11px', color: '#666' }}>TSH {formatPrice(unitPrice)}</div>
-                            <small style={{ color: isOutOfStock ? '#ff4444' : '#4caf50' }}>
-                                {isOutOfStock ? 'Out of stock' : `${stockQty} available`}
-                            </small>
-                        </div>
-                        
-                        {/* 🔥 MAZISHI YALIYOSAHIHISHWA: VIFUNGO NA INPUT VIMEPANULIWA NA KUTENGENEZWA */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <button
-                                onClick={() => { if (qty > 0) handleQtyChange({ id: variantId, stock_quantity: stockQty }, -1); }}
-                                disabled={qty === 0 || isOutOfStock}
-                                style={{
-                                    width: '36px', height: '36px',
-                                    borderRadius: '8px', border: '1px solid #ddd',
-                                    backgroundColor: '#fff',
-                                    color: qty > 0 && !isOutOfStock ? '#333' : '#ccc',
-                                    cursor: qty > 0 && !isOutOfStock ? 'pointer' : 'not-allowed',
-                                    fontWeight: 'bold', fontSize: '16px',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    transition: 'background 0.2s'
-                                }}
-                            >−</button>
-                            <input
-                                type="number"
-                                value={qty}
-                                onChange={(e) => {
-                                    const val = e.target.value === '' ? 0 : parseInt(e.target.value);
-                                    if (!isNaN(val) && val >= 0 && !isOutOfStock) {
-                                        handleQtyChange({ id: variantId, stock_quantity: stockQty }, val - qty);
-                                    }
-                                }}
-                                disabled={isOutOfStock}
-                                style={{
-                                    width: '50px', height: '36px',
-                                    textAlign: 'center', border: '1px solid #ccc',
-                                    borderRadius: '8px', padding: '0 4px', fontSize: '15px',
-                                    backgroundColor: '#fff', outline: 'none'
-                                }}
-                            />
-                            <button
-                                onClick={() => { if (!isOutOfStock && qty < stockQty) handleQtyChange({ id: variantId, stock_quantity: stockQty }, 1); }}
-                                disabled={isOutOfStock || qty >= stockQty}
-                                style={{
-                                    width: '36px', height: '36px',
-                                    borderRadius: '8px', border: '1px solid #ddd',
-                                    backgroundColor: '#fff',
-                                    color: !isOutOfStock && qty < stockQty ? '#333' : '#ccc',
-                                    cursor: !isOutOfStock && qty < stockQty ? 'pointer' : 'not-allowed',
-                                    fontWeight: 'bold', fontSize: '16px',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    transition: 'background 0.2s'
-                                }}
-                            >+</button>
-                        </div>
-                    </div>
-                );
-            })}
-        </div>
-    </div>
-)}
+                        {/* Size Selection */}
+                        {hasSizes && currentColorVar && (
+                            <div style={{ marginBottom: '20px' }}>
+                                <div style={{ fontWeight: 600, marginBottom: '12px', fontSize: '14px' }}>Size</div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                    {sizes.map(size => {
+                                        const stockQty = getStockForSize(currentColorVar, size);
+                                        const variantId = `${currentColorVar.id}::${size}`;
+                                        const qty = getQuantityForSize(size);
+                                        const isOutOfStock = stockQty === 0;
+                                        const unitPrice = currentColorVar.price || product?.price || 0;
+                                        return (
+                                            <div key={size} style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                                padding: '12px',
+                                                backgroundColor: '#fafafa',
+                                                borderRadius: '8px',
+                                                border: qty > 0 ? '1px solid #ff4e00' : '1px solid #eee'
+                                            }}>
+                                                <div style={{ flex: 1 }}>
+                                                    <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{size}</div>
+                                                    <div style={{ fontSize: '11px', color: '#666' }}>TSH {formatPrice(unitPrice)}</div>
+                                                    <small style={{ color: isOutOfStock ? '#ff4444' : '#4caf50' }}>
+                                                        {isOutOfStock ? 'Out of stock' : `${stockQty} available`}
+                                                    </small>
+                                                </div>
+                                                
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                    <button
+                                                        onClick={() => { if (qty > 0) handleQtyChange({ id: variantId, stock_quantity: stockQty }, -1); }}
+                                                        disabled={qty === 0 || isOutOfStock}
+                                                        style={{
+                                                            width: '36px', height: '36px',
+                                                            borderRadius: '8px', border: '1px solid #ddd',
+                                                            backgroundColor: '#fff',
+                                                            color: qty > 0 && !isOutOfStock ? '#333' : '#ccc',
+                                                            cursor: qty > 0 && !isOutOfStock ? 'pointer' : 'not-allowed',
+                                                            fontWeight: 'bold', fontSize: '16px',
+                                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                            transition: 'background 0.2s'
+                                                        }}
+                                                    >−</button>
+                                                    <input
+                                                        type="number"
+                                                        value={qty}
+                                                        onChange={(e) => {
+                                                            const val = e.target.value === '' ? 0 : parseInt(e.target.value);
+                                                            if (!isNaN(val) && val >= 0 && !isOutOfStock) {
+                                                                handleQtyChange({ id: variantId, stock_quantity: stockQty }, val - qty);
+                                                            }
+                                                        }}
+                                                        disabled={isOutOfStock}
+                                                        style={{
+                                                            width: '50px', height: '36px',
+                                                            textAlign: 'center', border: '1px solid #ccc',
+                                                            borderRadius: '8px', padding: '0 4px', fontSize: '15px',
+                                                            backgroundColor: '#fff', outline: 'none'
+                                                        }}
+                                                    />
+                                                    <button
+                                                        onClick={() => { if (!isOutOfStock && qty < stockQty) handleQtyChange({ id: variantId, stock_quantity: stockQty }, 1); }}
+                                                        disabled={isOutOfStock || qty >= stockQty}
+                                                        style={{
+                                                            width: '36px', height: '36px',
+                                                            borderRadius: '8px', border: '1px solid #ddd',
+                                                            backgroundColor: '#fff',
+                                                            color: !isOutOfStock && qty < stockQty ? '#333' : '#ccc',
+                                                            cursor: !isOutOfStock && qty < stockQty ? 'pointer' : 'not-allowed',
+                                                            fontWeight: 'bold', fontSize: '16px',
+                                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                            transition: 'background 0.2s'
+                                                        }}
+                                                    >+</button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Free size */}
                         {!hasSizes && currentColorVar && (
@@ -862,51 +892,51 @@ toast.success(`Bidhaa ${itemsToCart.length} zimeongezwa kwenye kikapu!`, {
                     </div>
 
                     {/* Footer */}
-<div style={{
-    borderTop: '1px solid #eee',
-    padding: '16px 20px',
-    backgroundColor: '#fff',
-    paddingBottom: 'calc(16px + env(safe-area-inset-bottom, 0px))'
-}}>
-    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-        <span>Total</span>
-        <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#ff4e00' }}>TSH {formatPrice(totals.totalPrice)}</span>
-    </div>
-    <div style={{ display: 'flex', gap: '12px' }}>
-        <button onClick={handleConfirmOrder} disabled={totals.totalQty === 0}
-            style={{ flex: 1, backgroundColor: '#ff4e00', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold' }}>
-            Order Now
-        </button>
-        <button onClick={handleAddToCart} disabled={totals.totalQty === 0}
-            style={{ flex: 1, backgroundColor: '#fff', color: '#ff4e00', border: '2px solid #ff4e00', padding: '12px', borderRadius: '8px', fontWeight: 'bold' }}>
-            Add to Cart
-        </button>
-    </div>
-    {/* ✅ ORDER VIA WHATSAPP BUTTON - Ipo chini ya zote */}
-    <button 
-        onClick={handleWhatsAppConfirm} 
-        disabled={totals.totalQty === 0}
-        style={{ 
-            width: '100%', 
-            marginTop: '10px',
-            backgroundColor: '#25D366', 
-            color: 'white', 
-            border: 'none', 
-            padding: '10px', 
-            borderRadius: '8px', 
-            fontWeight: 'bold',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '6px',
-            cursor: totals.totalQty === 0 ? 'not-allowed' : 'pointer',
-            opacity: totals.totalQty === 0 ? 0.6 : 1,
-            fontSize: '14px'
-        }}
-    >
-        <MessageSquare size={16} /> Order via WhatsApp
-    </button>
-</div>
+                    <div style={{
+                        borderTop: '1px solid #eee',
+                        padding: '16px 20px',
+                        backgroundColor: '#fff',
+                        paddingBottom: 'calc(16px + env(safe-area-inset-bottom, 0px))'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                            <span>Total</span>
+                            <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#ff4e00' }}>TSH {formatPrice(totals.totalPrice)}</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                            <button onClick={handleConfirmOrder} disabled={totals.totalQty === 0}
+                                style={{ flex: 1, backgroundColor: '#ff4e00', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold' }}>
+                                Order Now
+                            </button>
+                            <button onClick={handleAddToCart} disabled={totals.totalQty === 0}
+                                style={{ flex: 1, backgroundColor: '#fff', color: '#ff4e00', border: '2px solid #ff4e00', padding: '12px', borderRadius: '8px', fontWeight: 'bold' }}>
+                                Add to Cart
+                            </button>
+                        </div>
+                        {/* ORDER VIA WHATSAPP BUTTON */}
+                        <button 
+                            onClick={handleWhatsAppConfirm} 
+                            disabled={totals.totalQty === 0}
+                            style={{ 
+                                width: '100%', 
+                                marginTop: '10px',
+                                backgroundColor: '#25D366', 
+                                color: 'white', 
+                                border: 'none', 
+                                padding: '10px', 
+                                borderRadius: '8px', 
+                                fontWeight: 'bold',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '6px',
+                                cursor: totals.totalQty === 0 ? 'not-allowed' : 'pointer',
+                                opacity: totals.totalQty === 0 ? 0.6 : 1,
+                                fontSize: '14px'
+                            }}
+                        >
+                            <MessageSquare size={16} /> Order via WhatsApp
+                        </button>
+                    </div>
                 </div>
             )}
 

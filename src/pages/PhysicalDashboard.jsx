@@ -127,14 +127,14 @@ export default function PhysicalDashboard() {
         try { const storeRes = await api.get(`/stores/${paramId}/`, { headers }); store = storeRes.data; } catch (err) {
           const profileRes = await api.get('/profile/', { headers });
           const ownerId = profileRes.data.id;
-          const storesRes = await api.get('/stores/?owner=${ownerId}', { headers });
+          const storesRes = await api.get(`/stores/?owner=${ownerId}`, { headers });
           const results = storesRes.data.results || storesRes.data;
           if (Array.isArray(results) && results.length > 0) store = results[0];
         }
       } else {
         const profileRes = await api.get('/profile/', { headers });
         const ownerId = profileRes.data.id;
-        const storesRes = await api.get('/stores/?owner=${ownerId}', { headers });
+        const storesRes = await api.get(`/stores/?owner=${ownerId}`, { headers });
         const results = storesRes.data.results || storesRes.data;
         if (Array.isArray(results) && results.length > 0) store = results[0];
       }
@@ -219,13 +219,21 @@ export default function PhysicalDashboard() {
   const addToQueue = () => {
     if (!attributes.name || !attributes.price) return alert("Jaza jina na bei!");
     if (!coverFile) return alert("Weka picha kuu!");
-    const newProductEntry = { ...attributes, cover_file: coverFile, video_file: videoFile, gallery: [...galleryFiles], cover_preview: coverPreview };
+    
+    // 🔥 MUHIMU: Tuma gallery_files (sio gallery) kwenye newEntry
+    const newProductEntry = { 
+      ...attributes, 
+      cover_file: coverFile, 
+      video_file: videoFile, 
+      gallery_files: [...galleryFiles], // ✅ SASA HII NDIO SAHIHI!
+      cover_preview: coverPreview 
+    };
     setAddedProducts(prev => [...prev, newProductEntry]);
     resetProductForm();
     alert("Bidhaa imeongezwa kwenye list!");
   };
 
-    const handleFinalPublishAll = async () => {
+  const handleFinalPublishAll = async () => {
     if (addedProducts.length === 0) return alert("Hakuna bidhaa ya kurusha!");
     setIsLoading(true);
     try {
@@ -248,7 +256,6 @@ export default function PhysicalDashboard() {
           formData.append("price", parseFloat(p.price));
           formData.append("original_price", parseFloat(p.compare_at_price) || 0);
           
-          // 🔥 BADILISHA HAPA: category (sio category_id)
           if (p.category_id) formData.append("category", p.category_id);
           
           if (p.brand_id) formData.append("brand_id", p.brand_id);
@@ -256,7 +263,6 @@ export default function PhysicalDashboard() {
           formData.append("description", p.description || "");
           if (p.specifications) formData.append("specifications", JSON.stringify(p.specifications));
           
-          // 🔥 DEBUG: Angalia kama picha zipo
           console.log(`📸 [Debug] Inatuma cover_image kwa ${p.name}:`, p.cover_file ? "✅ Ipo" : "❌ Haipo");
           
           if (p.cover_file) {
@@ -269,7 +275,7 @@ export default function PhysicalDashboard() {
             console.log(`  ✅ video_file imeambatishwa: ${p.video_file.name}`);
           }
           
-          // 🔥 BADILISHA HAPA: gallery_files (sio gallery)
+          // 🔥 MUHIMU: Tuma gallery_files (sio gallery)
           if (p.gallery_files && p.gallery_files.length > 0) {
             console.log(`  🖼️ Inatuma ${p.gallery_files.length} gallery images...`);
             p.gallery_files.forEach((file, index) => {
@@ -511,7 +517,7 @@ export default function PhysicalDashboard() {
             <div className={`tab-content ${activeTab === 'products' ? 'active' : ''}`}>
               <div className="product-creation-wrapper">
                 <h2 className="product-section-title">✨ Ongeza Bidhaa Mpya</h2>
-                                <ProductCreationFlow
+                <ProductCreationFlow
                   storeId={myStore?.id} 
                   storeSubCategoryIds={myStore?.sub_category_ids || []} 
                   currentStep={currentStep} setCurrentStep={setCurrentStep}

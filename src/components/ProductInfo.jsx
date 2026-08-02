@@ -28,6 +28,9 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
   const [activeSize, setActiveSize] = useState(null);
   const [isSelectionOpen, setIsSelectionOpen] = useState(false);
 
+  // 🔥 BADILISHA HAPA NA JINA LAKO HALISI LA CLOUDINARY
+  const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/YOUR_CLOUD_NAME/image/upload";
+
   const moq = product?.moq || 1;
   const productImage = product?.cover_image || "https://via.placeholder.com/150";
 
@@ -45,11 +48,19 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
   const variationsByColor = useMemo(() => {
     const grouped = {};
     productVariations.forEach(v => {
+      // 🔥 KINGA YA MWISHO: Hakikisha variation hii ni ya bidhaa hii tu!
+      if (String(v.product) !== String(product?.id)) return; 
+
       const colorName = v.color_name;
       if (!grouped[colorName]) {
+        let fullImageUrl = v.color_image_url;
+        if (!fullImageUrl && v.color_image) {
+            fullImageUrl = `${CLOUDINARY_BASE_URL}/${v.color_image}`;
+        }
+
         grouped[colorName] = {
           variation: v,
-          color_image: v.color_image,
+          color_image: fullImageUrl || v.color_image, 
           size_stock: v.size_stock || {},
           price: v.price,
           stock_quantity: v.stock_quantity
@@ -57,7 +68,7 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
       }
     });
     return grouped;
-  }, [productVariations]);
+  }, [productVariations, product?.id]);
 
   const openDrawer = (color, size) => {
     setActiveColor(color);
@@ -86,6 +97,7 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
 
   const getCurrentVariation = (color, size) => {
     const found = productVariations.find(v => 
+      String(v.product) === String(product?.id) && // 🔥 KINGA YA MWISHO!
       v.color_name === color && 
       (size ? (v.size_stock && v.size_stock[size] !== undefined) : true)
     );
@@ -289,6 +301,11 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
       let variant = productVariations.find(v => String(v.id) === String(variantIdFromKey));
       if (!variant) return;
 
+      let fullImageUrl = variant.color_image_url;
+      if (!fullImageUrl && variant.color_image) {
+          fullImageUrl = `${CLOUDINARY_BASE_URL}/${variant.color_image}`;
+      }
+
       itemsToProcess.push({
         id: product.id,
         variant_id: variant.id,
@@ -297,7 +314,7 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
         selected_size: selectedSizeFromKey || 'Free Size',
         quantity: qty,
         price: Number(variant.price) || Number(product?.price) || 0,
-        image: variant.color_image || product?.cover_image,
+        image: fullImageUrl || product?.cover_image_url || product?.cover_image,
         store_id: product.store_id
       });
     });
@@ -363,19 +380,31 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
     const fetchProductData = async () => {
       if (!product?.id) return;
 
+      // 🔥 KINGA YA 1: Safisha kabisa data za zamani kabla ya kupakia mpya!
+      setProductVariations([]);
+      setSelectedColor("");
+      setSelectedSize("");
+      setSelectedVariationObj(null);
+      setActiveColor(null);
+      setActiveSize(null);
+
       try {
         const mediaRes = await api.get(`/product-media/?product_id=${product.id}`);
         const mediaData = mediaRes.data.results || mediaRes.data;
 
-        const varRes = await api.get(`/product-variations/?product_id=${product.id}`);
+        const varRes = await api.get(`/product-variations/`, {
+            params: { product_id: product.id } 
+        });
         const varData = varRes.data.results || varRes.data;
         
         if (mediaData) setProductMedia(mediaData);
         
         if (varData && varData.length > 0) {
-          setProductVariations(varData);
+          // 🔥 KINGA YA 2: Chuja tena upande wa Frontend kwa usalama
+          const filteredData = varData.filter(v => String(v.product) === String(product.id));
+          setProductVariations(filteredData);
           
-          const defaultVar = varData.find(v => v.stock_quantity > 0) || varData[0];
+          const defaultVar = filteredData.find(v => v.stock_quantity > 0) || filteredData[0];
           setSelectedColor(defaultVar.color_name);
           
           const sizes = Object.keys(defaultVar.size_stock || {});
