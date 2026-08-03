@@ -19,9 +19,13 @@ from products.models import (
 # 🔥 ONGEZA HII IMPORT MUHIMU KABISA (Inaingiza ViewSet kutoka products.views):
 from products.views import ProductVariationViewSet
 
+
+from products.serializers import ProductsEngineSerializer
+
+
 # 🔥 SERIALIZERS IMPORTS:
 from .serializers import (
-    CategorySerializer, SubCategorySerializer, ProductsEngineSerializer,
+    CategorySerializer, SubCategorySerializer,
     LeafCategorySerializer, AdvertisementSerializer, StoreEngineSerializer,
     ProductMediaSerializer, MessageSerializer, ProfileSerializer,
     ShippingMethodSerializer, BrandSerializer, LeadSerializer, OrderSerializer, OrderItemSerializer 

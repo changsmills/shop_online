@@ -1,4 +1,5 @@
-from rest_framework import viewsets, filters, status
+# Ongeza serializers hapa juu kabisa kwenye views.py:
+from rest_framework import viewsets, filters, status, serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
@@ -26,7 +27,7 @@ class SubCategoryViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
 # ==========================================================
-# 🔥 ProductsEngineViewSet – Inahitaji JWTAuthentication
+# 🔥 ProductsEngineViewSet – Imerekebishwa (Real Fix)
 # ==========================================================
 class ProductsEngineViewSet(viewsets.ModelViewSet):
     queryset = ProductsEngine.objects.all()
@@ -42,11 +43,28 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
         try:
             profile = Profile.objects.get(user=self.request.user)
         except Profile.DoesNotExist:
-            raise serializers.ValidationError({"user": "Mtumiaji hana Profile."})
-        serializer.save(
-            user=profile,
-            store_id=self.request.data.get('store_id')
-        )
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({"user": "Mtumiaji hana Profile."})
+        
+        # 🔥 Chukua store_id kutoka kwenye request
+        raw_store_id = self.request.data.get('store_id')
+        
+        # Pata StoreEngine object ikiwa store_id ipo (kama model yako inatumia FK kwa StoreEngine)
+        store_instance = None
+        if raw_store_id:
+            # Hakikisha tunaondoa hyphens kama ni UUID String
+            clean_store_id = str(raw_store_id).replace('-', '')
+            try:
+                store_instance = StoreEngine.objects.get(id=clean_store_id)
+            except StoreEngine.DoesNotExist:
+                # Kama store_id ni CharField au UUID simple kwenye ProductsEngine model:
+                store_instance = raw_store_id
+
+        # 🔥 Save serializer ikiwa na profile na store
+        if store_instance:
+            serializer.save(user=profile, store_id=store_instance)
+        else:
+            serializer.save(user=profile)
 
     @action(detail=True, methods=['post'])
     def increment_views(self, request, pk=None):
@@ -69,7 +87,7 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
             product.save()
             return Response({'status': 'rated', 'new_average': new_avg}, status=status.HTTP_200_OK)
         return Response({'error': 'Rating not provided'}, status=status.HTTP_400_BAD_REQUEST)
-
+    
 # ==========================================================
 # ✅ StoreEngineViewSet – Inahitaji JWTAuthentication pia
 # ==========================================================
