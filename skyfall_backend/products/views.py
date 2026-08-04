@@ -10,10 +10,12 @@ from products.models import (
     Category, SubCategory, ProductsEngine, LeafCategory, StoreEngine,
     ProductMedia, ProductVariation, Profile
 )
+
+from products.serializers import ProductVariationSerializer  # ✅ ONGEZA HII!
+
 from .serializers import (
     CategorySerializer, SubCategorySerializer, ProductsEngineSerializer,
-    StoreEngineSerializer, LeafCategorySerializer, ProductMediaSerializer,
-    ProductVariationSerializer
+    StoreEngineSerializer, LeafCategorySerializer, ProductMediaSerializer
 )
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -134,6 +136,16 @@ class ProductMediaViewSet(viewsets.ModelViewSet):
     queryset = ProductMedia.objects.all()
     serializer_class = ProductMediaSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+
+    # 🔥 ONGEZA HII METHOD (Inachuja kwa product_id kutoka URL)
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        product_id = self.request.query_params.get('product_id')
+        if product_id:
+            # Futa hyphens kama ni UUID string (kwa usalama)
+            clean_id = str(product_id).replace('-', '')
+            queryset = queryset.filter(product=clean_id)
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save()

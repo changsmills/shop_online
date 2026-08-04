@@ -171,9 +171,14 @@ const handleSubmitInternal = async (e) => {
       if (formData.logo) formDataObj.append("store_logo", formData.logo[0]);
       if (formData.banner) formDataObj.append("store_banner", formData.banner[0]);
       if (formData.tin_image) formDataObj.append("tin_image", formData.tin_image[0]);
-      if (formData.image1) formDataObj.append("office_image_1", formData.image1[0]);
-      if (formData.image2) formDataObj.append("office_image_2", formData.image2[0]);
-      if (formData.image3) formDataObj.append("office_image_3", formData.image3[0]);
+
+      // 🔥 BADILISHA HAPA: Tumia 'office_images' kama list
+      const officeImages = [formData.image1, formData.image2, formData.image3].filter(Boolean);
+         officeImages.forEach((file) => {
+           if (file && file[0]) {
+         formDataObj.append("office_images", file[0]);
+          }
+           });
 
       // ============================================
       // 2. TENGENEZA STORE

@@ -37,23 +37,52 @@ const ProductSelectionDrawer = ({
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    const getSizeStockFromVariation = (variation) => {
-        if (variation.size_stock && typeof variation.size_stock === 'object') {
-            return variation.size_stock;
+       const getSizeStockFromVariation = (variation) => {
+        // 1. Jaribu kusoma size_stock kwa usalama
+        let sizeStock = safeParseJSON(variation.size_stock);
+        if (sizeStock && typeof sizeStock === 'object') return sizeStock;
+        
+        // 2. Kama haipo, tafuta kwenye attributes
+        let attributes = safeParseJSON(variation.attributes);
+        if (attributes && typeof attributes === 'object') {
+            if (attributes.size_stock) return attributes.size_stock;
         }
-        if (variation.attributes && typeof variation.attributes === 'object') {
-            if (variation.attributes.size_stock) return variation.attributes.size_stock;
+        
+        // 3. Tafuta kwenye variant_specifications
+        let specs = safeParseJSON(variation.variant_specifications);
+        if (specs && typeof specs === 'object') {
+            if (specs.size_stock) return specs.size_stock;
         }
-        if (variation.variant_specifications && typeof variation.variant_specifications === 'object') {
-            if (variation.variant_specifications.size_stock) return variation.variant_specifications.size_stock;
-        }
-        return {};
+        
+        return {}; // Kama hakuna chochote, rudisha tupu
     };
 
-    const getSizesFromVariation = (variation) => {
-        const sizeStock = getSizeStockFromVariation(variation);
+        const getSizesFromVariation = (variation) => {
+        let sizeStock = getSizeStockFromVariation(variation);
+        let sizes = Object.keys(sizeStock); // Pata ukubwa kutoka kwenye size_stock
+
+        // 🔥 Kama size_stock ni tupu, tafuta 'sizes' array kwenye attributes!
+        if (sizes.length === 0) {
+            let attributes = safeParseJSON(variation.attributes);
+            if (attributes && Array.isArray(attributes.sizes)) {
+                sizes = attributes.sizes;
+            }
+        }
+
         const order = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
-        return Object.keys(sizeStock).sort((a, b) => order.indexOf(a) - order.indexOf(b));
+        return sizes.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+    };
+
+
+        // 🔥 Helper: Inabadilisha JSON string kuwa Object kwa usalama
+    const safeParseJSON = (data) => {
+        if (!data) return null;
+        if (typeof data === 'object') return data; // Ikiwa tayari ni object
+        try {
+            return JSON.parse(data); // Badilisha string kuwa object
+        } catch (e) {
+            return null;
+        }
     };
 
     const getStockForSize = (variation, size) => {
@@ -61,15 +90,17 @@ const ProductSelectionDrawer = ({
         return sizeStock[size] || 0;
     };
 
-    // 🔥 1. Badilisha colorVariations ili kutengeneza URL kamili
+        // 🔥 1. Badilisha colorVariations ili kutengeneza URL kamili (Sasa inasoma color_image_url kwanza!)
     const colorVariations = useMemo(() => {
         const grouped = {};
         variations.forEach(v => {
             if (v.color_name && !grouped[v.color_name]) {
-                let fullImageUrl = v.color_image;
-                // Kama ni public_id (haina http), tunaongeza Cloudinary URL
-                if (fullImageUrl && !fullImageUrl.startsWith('http')) {
-                    fullImageUrl = `${CLOUDINARY_BASE_URL}/${fullImageUrl}`;
+                // 🔥 MUHIMU: Angalia kama color_image_url ipo kutoka Backend!
+                let fullImageUrl = v.color_image_url;
+                
+                // Kama haipo, jenga URL kwa kutumia public_id na Cloudinary URL
+                if (!fullImageUrl && v.color_image) {
+                    fullImageUrl = `${CLOUDINARY_BASE_URL}/${v.color_image}`;
                 }
                 
                 grouped[v.color_name] = {

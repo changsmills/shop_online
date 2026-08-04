@@ -1,4 +1,3 @@
-// src/components/ProductCard.jsx
 import { useNavigate } from "react-router-dom";
 import { MapPin, Star, ChevronRight } from "lucide-react";
 import "../ProductCard.css";
@@ -57,12 +56,28 @@ export default function ProductCard({ product, isMobile = false, isPriority = fa
     ? Math.round(((numericPrice - numericOriginal) / numericPrice) * 100) 
     : 0;
 
+  // ============================================================
+  // 🔥 MABADILIKO HAPA: Handler kuu ya kubonyeza (Click)
+  // ============================================================
+  const handleCardClick = () => {
+    const productUrl = `/product/${id}`;
+    
+    // Kama ni Mobile: Tumia navigate (SPA - tab moja)
+    if (isMobile) {
+      navigate(productUrl);
+    } 
+    // Kama ni Desktop: Fungua window/tab mpya
+    else {
+      window.open(productUrl, '_blank');
+    }
+  };
+
   // ========== MOBILE VERSION ==========
   if (isMobile) {
     return (
       <div 
         className="product-card-item mobile-card"
-        onClick={() => navigate(`/product/${id}`)}
+        onClick={handleCardClick} // 🔥 Tumia handler hii
         onContextMenu={(e) => e.preventDefault()}
       >
         {/* IMAGE CONTAINER - SQUARE */}
@@ -150,7 +165,7 @@ export default function ProductCard({ product, isMobile = false, isPriority = fa
   return (
     <div 
       className="product-card-item desktop-card"
-      onClick={() => navigate(`/product/${id}`)}
+      onClick={handleCardClick} // 🔥 Tumia handler hii
     >
       {/* IMAGE CONTAINER */}
       <div className="product-card-media">

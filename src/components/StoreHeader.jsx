@@ -42,10 +42,12 @@ const StoreHeader = ({
       );
 
       const updatedStore = response.data;
-      if (type === 'banner' && updatedStore.store_banner) {
-        setBannerPreview(updatedStore.store_banner);
-      } else if (type === 'logo' && updatedStore.store_logo) {
-        setLogoPreview(updatedStore.store_logo);
+      
+      // 🔥 BADILISHA HAPA: Tumia store_banner_url na store_logo_url!
+      if (type === 'banner' && updatedStore.store_banner_url) {
+        setBannerPreview(updatedStore.store_banner_url);
+      } else if (type === 'logo' && updatedStore.store_logo_url) {
+        setLogoPreview(updatedStore.store_logo_url);
       }
 
       alert('Imefanikiwa kubadilishwa!');
@@ -59,7 +61,8 @@ const StoreHeader = ({
     <header 
       className="store-header-wrapper"
       style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url(${bannerPreview || myStore?.store_banner || "https://via.placeholder.com/1200x400"})`
+        // 🔥 ONGEZA QUOTES ('') KWA URL YA BACKGROUND!
+        backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${bannerPreview || myStore?.store_banner_url || "https://via.placeholder.com/1200x400"}')`
       }}
     >
       <div className="store-header-inner">

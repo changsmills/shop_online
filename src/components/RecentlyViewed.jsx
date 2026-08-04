@@ -147,7 +147,7 @@ export default function RecentlyViewed({ navigate }) {
           {products.map((product) => (
             <div key={product.id} className="rv-card-wrapper">
               <DashboardCard
-                image={product.cover_image || ''}
+                image={product.cover_image_url || product.cover_image || ''}
                 title={product.name || ''}
                 price={product.price || 'TSh 0'}
                 originalPrice={product.original_price || ''}

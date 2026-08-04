@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../axiosConfig"; // 🔥 Tumia api
-const BACKEND_URL = "https://shop-online-r9z4.onrender.com"; // 🔥 URL ya Render
+//const BACKEND_URL = "https://shop-online-r9z4.onrender.com"; // 🔥 URL ya Render
+const BACKEND_URL = "http://127.0.0.1:8000"; // 🔥 Sio Render! 
 import QuickInventoryManager from '../components/QuickInventoryManager';
 import BusinessAnalytics from '../components/BusinessAnalytics';
 import TopDealsSection from "../components/TopDealsSection"
@@ -141,8 +142,9 @@ export default function PhysicalDashboard() {
 
       if (store) {
         setMyStore(store);
-        setLogoPreview(store.store_logo ? `${BACKEND_URL}/${store.store_logo}` : null);
-        setBannerPreview(store.store_banner ? `${BACKEND_URL}/${store.store_banner}` : null);
+
+        setLogoPreview(store.store_logo_url || null);
+        setBannerPreview(store.store_banner_url || null);
         
         setStoreMeta({
           store_name: store.store_name || "", 
@@ -161,11 +163,11 @@ export default function PhysicalDashboard() {
           sub_category_ids: store.sub_category_ids || []
         });
 
-        setOfficePreviews([
-          store.office_image_1 ? `${BACKEND_URL}/${store.office_image_1}` : null,
-          store.office_image_2 ? `${BACKEND_URL}/${store.office_image_2}` : null,
-          store.office_image_3 ? `${BACKEND_URL}/${store.office_image_3}` : null,
-        ]);
+         setOfficePreviews([
+               store.office_image_1_url || null,
+               store.office_image_2_url || null,
+               store.office_image_3_url || null,
+           ]);
 
         if (store.sub_category_ids?.length > 0) {
           const subDataRes = await api.get('/subcategories/', {
@@ -553,10 +555,14 @@ export default function PhysicalDashboard() {
                     <div key={p.id} className="product-card">
                       <div className="product-card-img-wrap">
                         <img 
-                          src={p.cover_image ? `${BACKEND_URL}/${p.cover_image}` : "https://via.placeholder.com/150"} 
-                          alt={p.name} 
-                          className="product-card-img" 
-                        />
+    src={`${p.cover_image_url || (p.cover_image ? `${BACKEND_URL}/${p.cover_image}` : "https://via.placeholder.com/150")}?t=${new Date().getTime()}`} 
+    alt={p.name} 
+    className="product-card-img"
+    onError={(e) => { 
+        e.target.onerror = null; 
+        e.target.src = "https://via.placeholder.com/150"; 
+    }}
+/>
                       </div>
                       <div className="product-card-body">
                         <h4 className="product-card-title">{p.name}</h4>

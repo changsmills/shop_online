@@ -10,23 +10,29 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth import authenticate, update_session_auth_hash
 
 
+
 # 🔥 MODELS IMPORTS:
 from products.models import (
-    Category, SubCategory, ProductsEngine, LeafCategory, Advertisement, 
+    Category, ProductVariation, SubCategory, ProductsEngine, LeafCategory, Advertisement, 
     StoreEngine, ProductMedia, Message, ShippingMethod, Brand, Lead, Order, OrderItem
 )
 
 # 🔥 ONGEZA HII IMPORT MUHIMU KABISA (Inaingiza ViewSet kutoka products.views):
 from products.views import ProductVariationViewSet
 
+from products.views import ProductVariationViewSet
+
 
 from products.serializers import ProductsEngineSerializer
+from products.serializers import StoreEngineSerializer
+
+
 
 
 # 🔥 SERIALIZERS IMPORTS:
 from .serializers import (
     CategorySerializer, SubCategorySerializer,
-    LeafCategorySerializer, AdvertisementSerializer, StoreEngineSerializer,
+    LeafCategorySerializer, AdvertisementSerializer,
     ProductMediaSerializer, MessageSerializer, ProfileSerializer,
     ShippingMethodSerializer, BrandSerializer, LeadSerializer, OrderSerializer, OrderItemSerializer 
 )
@@ -124,7 +130,27 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
 class AdvertisementViewSet(viewsets.ModelViewSet):
     queryset = Advertisement.objects.all()
     serializer_class = AdvertisementSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['store_id', 'status', 'ad_type']
+
+    def perform_create(self, serializer):
+        print("🔍 [DEBUG] Saving advertisement...")
+        print(f"  User: {self.request.user}")
+        print(f"  Profile: {self.request.user.profile}")
+        try:
+            serializer.save(user=self.request.user.profile)
+            print("✅ [DEBUG] Saved successfully!")
+        except Exception as e:
+            print(f"❌ [DEBUG] Error: {e}")
+            raise e
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff or user.is_superuser:
+            return Advertisement.objects.all()
+        return Advertisement.objects.filter(user=user.profile)
 
 class StoreEngineViewSet(viewsets.ModelViewSet):
     queryset = StoreEngine.objects.all()
@@ -318,5 +344,4 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     serializer_class = OrderItemSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
-
 

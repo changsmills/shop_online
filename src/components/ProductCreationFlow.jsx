@@ -204,241 +204,243 @@ const ProductCreationFlow = ({
   };
 
   const filteredStoreSubCats = React.useMemo(() => {
+
     if (!storeSubCategoryIds || storeSubCategoryIds.length === 0 || !myStoreSubCats) return [];
     return myStoreSubCats.filter(sub => storeSubCategoryIds.includes(sub.id));
   }, [myStoreSubCats, storeSubCategoryIds]);
 
-    const handleFinalPublishAll = async () => {
-    console.log("📦 [PUBLISH_BTN] ===== STARTING PUBLISH PROCESS =====");
-    if (addedProducts.length === 0) return alert("Hakuna bidhaa ya kurusha!");
-    setLoading(true);
+ const handleFinalPublishAll = async () => {
+  if (addedProducts.length === 0) return alert("Hakuna bidhaa ya kurusha!");
+  setLoading(true);
 
-    try {
-      const token = localStorage.getItem("access_token");
-      if (!token) throw new Error("Session imeisha. Tafadhali login tena.");
-      if (!storeId) throw new Error("Store ID haipo!");
+  try {
+    const token = localStorage.getItem("access_token");
+    if (!token) throw new Error("Session imeisha.");
+    if (!storeId) throw new Error("Store ID haipo!");
 
-      console.log("  🔹 [STEP 1] Fetching Store data for Parent Category ID...");
-      const storeRes = await api.get(`/stores/${storeId}/`, { headers: { Authorization: `Bearer ${token}` } });
-      console.log("  🔹 [STEP 1] Store data response:", storeRes.data);
-      
-      const rawParentId = storeRes.data.category; 
-      console.log("  🔹 [STEP 1] Raw Parent Category ID from DB:", rawParentId);
-      
-      const parentCategoryId = formatUUID(rawParentId);
-      console.log("  🔹 [STEP 1] Final Parent Category ID to send:", parentCategoryId);
+    console.log("🔍 [DEBUG] Fetching store data for parent category...");
+    const storeRes = await api.get(`/stores/${storeId}/`, { headers: { Authorization: `Bearer ${token}` } });
+    const parentCategoryId = formatUUID(storeRes.data.category);
+    console.log("🔍 [DEBUG] Parent Category ID:", parentCategoryId);
 
-      let successCount = 0;
-      const errors = [];
+    let successCount = 0;
+    const errors = [];
 
-      for (const p of addedProducts) {
-        console.log(`\n➡️ [PRODUCT LOOP] Processing product: "${p.name}"`);
-        console.log("  - p.sub_category_id:", p.sub_category_id);
-        console.log("  - p.category_id (initial):", p.category_id);
-        console.log("  - p.leaf_category_id:", p.leaf_category_id);
+    for (const p of addedProducts) {
+      console.log(`\n📦 [PRODUCT] Processing: "${p.name}"`);
+      console.log("  - p.sub_category_id:", p.sub_category_id);
+      console.log("  - p.category_id:", p.category_id);
+      console.log("  - p.leaf_category_id:", p.leaf_category_id);
+      console.log("  - p.has_colors:", p.has_colors);
+      console.log("  - p.colors:", p.colors);
+      console.log("  - p.sizes:", p.sizes);
+      console.log("  - p.size_stock:", p.size_stock);
+      console.log("  - p.color_images:", p.color_images);
+      console.log("  - p.color_image_files:", p.color_image_files);
+      console.log("  - p.variations length:", p.variations?.length || 0);
 
-        // 🔥 DEBUG 1: Angalia kama picha zipo kwenye Object ya Product kabla ya kutuma
-        console.log("  🔍 [DEBUG] Checking product media files:");
-        console.log("    - cover_file:", p.cover_file ? `✅ Exists (${p.cover_file.name})` : "❌ Missing");
-        console.log("    - video_file:", p.video_file ? `✅ Exists (${p.video_file.name})` : "❌ Missing");
-        console.log("    - gallery_files count:", p.gallery_files ? p.gallery_files.length : 0);
-        if (p.gallery_files && p.gallery_files.length > 0) {
-          p.gallery_files.forEach((f, i) => console.log(`      Gallery ${i+1}:`, f.name));
-        }
+      const subCatObj = myStoreSubCats.find(sub => sub.id === p.sub_category_id);
+      let realCategoryId = subCatObj?.category || p.category_id;
+      console.log("  - Real Category ID (from subcat):", realCategoryId);
 
-        console.log("  🔍 Looking up subCategory in myStoreSubCats list...");
-        const subCatObj = myStoreSubCats.find(sub => sub.id === p.sub_category_id);
+      try {
+        const formData = new FormData();
+        // === Taarifa za msingi ===
+        formData.append("store_id", storeId);
+        formData.append("name", p.name);
+        formData.append("price", parseFloat(p.price) || 0);
+        formData.append("original_price", parseFloat(p.compare_at_price) || 0);
+
+        // === Kategoria ===
+        const formattedCategoryId = formatUUID(realCategoryId);
+        if (formattedCategoryId) formData.append("category", formattedCategoryId);
+        else console.warn("⚠️ Category ID is missing or invalid!");
+        if (parentCategoryId) formData.append("parent_category", parentCategoryId);
         
-        let realCategoryId = p.category_id;
-        if (subCatObj && subCatObj.category) {
-          realCategoryId = subCatObj.category;
-          console.log("  ✅ SubCategory found! SubCatObj:", subCatObj);
-          console.log("  ✅ REAL Category ID extracted from SubCatObj:", realCategoryId);
-        } else {
-          console.warn("  ⚠️ SubCategory NOT found or missing 'category' field. Falling back to p.category_id:", p.category_id);
+        const formattedLeafId = formatUUID(p.leaf_category_id);
+        if (formattedLeafId) formData.append("leaf_category", formattedLeafId);
+        else console.warn("⚠️ Leaf category ID is missing or invalid!");
+
+        if (p.brand_id) formData.append("brand_id", p.brand_id);
+
+        formData.append("stock_quantity", parseInt(p.stock) || 0);
+        formData.append("description", p.description || "");
+        formData.append("is_retail", p.is_retail ? "true" : "false");
+        formData.append("is_wholesale", p.is_wholesale ? "true" : "false");
+        formData.append("has_colors", p.has_colors ? "true" : "false");
+        formData.append("enable_sizes", p.enable_sizes ? "true" : "false");
+        formData.append("moq", p.moq || 1);
+        formData.append("condition", p.condition || "new");
+        formData.append("shipping_method", p.shipping_method || "fixed");
+        formData.append("shipping_cost", parseFloat(p.shipping_cost) || 0);
+        formData.append("size_format", p.size_format || "standard");
+        formData.append("price_per_meter", parseFloat(p.price_per_meter) || 0);
+        formData.append("price_per_foot", parseFloat(p.price_per_foot) || 0);
+        formData.append("warranty_months", parseInt(p.warranty_months) || 0);
+        formData.append("weight", parseFloat(p.weight) || 0);
+
+        // === JSON fields ===
+        formData.append("specifications", JSON.stringify(p.specifications || {}));
+        formData.append("price_tiers", JSON.stringify(p.price_tiers || []));
+        formData.append("colors", JSON.stringify(p.colors || []));
+        formData.append("available_sizes", JSON.stringify(p.sizes || []));
+        formData.append("size_stock", JSON.stringify(p.size_stock || {}));
+        formData.append("target_audience", JSON.stringify(p.target_audience || []));
+        formData.append("dimensions", JSON.stringify(p.dimensions || {}));
+        formData.append("gender", JSON.stringify(p.gender || []));
+
+        const colorImagesData = {};
+        if (p.color_images) {
+          Object.keys(p.color_images).forEach(color => {
+            colorImagesData[color] = p.color_images[color];
+          });
+        }
+        formData.append("color_images", JSON.stringify(colorImagesData));
+
+        // === Marketplace fields ===
+        formData.append("marketplace_price", parseFloat(p.marketplace_base_price) || 0);
+        formData.append("marketplace_stock", parseInt(p.stock) || 0);
+        if (p.marketplace_main_image_file) {
+          formData.append("marketplace_image", p.marketplace_main_image_file);
+        } else if (p.cover_file) {
+          formData.append("marketplace_image", p.cover_file);
+        }
+        formData.append("variant_specifications", JSON.stringify(p.variant_specifications || {}));
+        formData.append("variant_images_array", JSON.stringify(p.variant_images_array || []));
+        formData.append("sku", p.sku || `SKU-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`);
+
+        // === Media files ===
+        if (p.cover_file) formData.append("cover_image", p.cover_file);
+        else console.warn("⚠️ cover_file is missing!");
+        if (p.video_file) formData.append("video_file", p.video_file);
+        if (Array.isArray(p.gallery_files) && p.gallery_files.length > 0) {
+          p.gallery_files.forEach(file => {
+            if (file instanceof File) formData.append("gallery_images", file);
+          });
         }
 
-        try {
-          // 🔥 TENGENEZA FORMDATA
-          const formData = new FormData();
-          formData.append("store_id", storeId);
-          formData.append("name", p.name);
-          formData.append("price", parseFloat(p.price) || 0);
-          formData.append("original_price", parseFloat(p.compare_at_price) || 0);
+        console.log("📤 Sending product to /products/ with formData...");
+        const response = await api.post('/products/', formData, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
 
-          // Kategoria
-          const formattedCategoryId = formatUUID(realCategoryId);
-          console.log(`  ✨ Final formatted category: "${formattedCategoryId}"`);
-          if (formattedCategoryId) formData.append("category", formattedCategoryId);
-          if (parentCategoryId) formData.append("parent_category", parentCategoryId); 
-          
-          const formattedLeafId = formatUUID(p.leaf_category_id);
-          console.log(`  ✨ Final formatted leaf_category: "${formattedLeafId}"`);
-          if (formattedLeafId) formData.append("leaf_category", formattedLeafId);
+        if (response.status === 201) {
+          const newProductId = response.data.id;
+          console.log(`✅ Product created with ID: ${newProductId}`);
 
-          if (p.brand_id) formData.append("brand_id", p.brand_id);
+          if (p.variations && p.variations.length > 0) {
+            console.log(`📤 Processing ${p.variations.length} variations...`);
+            for (let i = 0; i < p.variations.length; i++) {
+              const variant = p.variations[i];
+              console.log(`\n  🟡 Variation ${i+1}:`);
+              console.log("    - color_name:", variant.color_name);
+              console.log("    - size_value:", variant.size_value);
+              console.log("    - stock_quantity:", variant.stock_quantity);
+              console.log("    - price:", variant.price);
+              console.log("    - attributes:", variant.attributes);
+              console.log("    - color_image_file present?", !!variant.color_image_file);
+              console.log("    - p.color_image_files for this color:", p.color_image_files?.[variant.color_name]);
 
-          // Taarifa za msingi
-          formData.append("stock_quantity", parseInt(p.stock) || 0);
-          formData.append("description", p.description || "");
-          formData.append("is_retail", p.is_retail ? "true" : "false");
-          formData.append("is_wholesale", p.is_wholesale ? "true" : "false");
-          formData.append("has_colors", p.has_colors ? "true" : "false");
-          formData.append("enable_sizes", p.enable_sizes ? "true" : "false");
-          formData.append("moq", p.moq || 1);
-          formData.append("condition", p.condition || "new");
-          formData.append("shipping_method", p.shipping_method || "fixed");
-          formData.append("shipping_cost", parseFloat(p.shipping_cost) || 0);
-          formData.append("size_format", p.size_format || "standard");
-          formData.append("price_per_meter", parseFloat(p.price_per_meter) || 0);
-          formData.append("price_per_foot", parseFloat(p.price_per_foot) || 0);
-          formData.append("warranty_months", parseInt(p.warranty_months) || 0);
-          formData.append("weight", parseFloat(p.weight) || 0);
+              const varFormData = new FormData();
+              varFormData.append("product", newProductId);
+              
+              // 🔥 MUHIMU: Hapa ndio tunakagua kama data ipo!
+              if (!variant.color_name && !variant.color_name?.trim()) {
+                console.warn("⚠️ color_name is missing or empty, using 'N/A'");
+                varFormData.append("color_name", "N/A");
+              } else {
+                varFormData.append("color_name", variant.color_name);
+              }
 
-          // JSON fields (Specs, Tiers, n.k.)
-          formData.append("specifications", JSON.stringify(p.specifications || {}));
-          formData.append("price_tiers", JSON.stringify(p.price_tiers || []));
-          formData.append("colors", JSON.stringify(p.colors || []));
-          formData.append("available_sizes", JSON.stringify(p.sizes || []));
-          formData.append("size_stock", JSON.stringify(p.size_stock || {}));
-          formData.append("target_audience", JSON.stringify(p.target_audience || []));
-          formData.append("dimensions", JSON.stringify(p.dimensions || {}));
-          formData.append("gender", JSON.stringify(p.gender || []));
+              if (!variant.size_value && !variant.size_value?.trim()) {
+                console.warn("⚠️ size_value is missing or empty, using 'N/A'");
+                varFormData.append("size_value", "N/A");
+              } else {
+                varFormData.append("size_value", variant.size_value);
+              }
 
-          // ============================================================
-          // 🔥 1. Tuma data ya color_images kama JSON (la muhimu: weka URLs tu za blob)
-          // ============================================================
-          const colorImagesData = {};
-          if (p.color_images) {
-            Object.keys(p.color_images).forEach(color => {
-              colorImagesData[color] = p.color_images[color]; 
-            });
-          }
-          formData.append("color_images", JSON.stringify(colorImagesData));
+              varFormData.append("stock_quantity", variant.stock_quantity || 0);
+              varFormData.append("price", variant.price || 0);
+              
+              if (variant.attributes) {
+                varFormData.append("attributes", JSON.stringify(variant.attributes));
+              } else {
+                console.warn("⚠️ variant.attributes is missing, sending {}");
+                varFormData.append("attributes", JSON.stringify({}));
+              }
 
-          // 🔥 2. ONDOA KABISA (Usitume files hapa! Zinatuma kwenye variations)
-          // if (p.color_image_files && Object.keys(p.color_image_files).length > 0) { ... }
+              let fileToSend = variant.color_image_file;
+              if (!fileToSend && p.color_image_files && p.color_image_files[variant.color_name]) {
+                fileToSend = p.color_image_files[variant.color_name];
+              }
+              if (fileToSend) {
+                varFormData.append("color_image_file", fileToSend);
+                console.log("    ✅ color_image_file attached");
+              } else {
+                console.warn("    ⚠️ No color_image_file for this variation");
+              }
 
-          // 🔥 DEBUG 2: Kuweka Media kwenye formData
-          console.log("  📸 [DEBUG] Appending media files to FormData...");
+              // Marketplace fields
+              varFormData.append("marketplace_price", parseFloat(variant.marketplace_price) || 0);
+              varFormData.append("marketplace_stock", parseInt(variant.marketplace_stock) || 0);
+              varFormData.append("variant_specifications", JSON.stringify(variant.variant_specifications || variant.attributes || {}));
+              if (variant.variant_images_array && variant.variant_images_array.length > 0) {
+                varFormData.append("variant_images_array", JSON.stringify(variant.variant_images_array));
+              } else {
+                varFormData.append("variant_images_array", JSON.stringify([]));
+              }
 
-          if (p.cover_file) {
-            formData.append("cover_image", p.cover_file);
-            console.log("    ✅ Appended cover_image");
-          } else {
-            console.warn("    ⚠️ No cover_file found.");
-          }
-
-          if (p.video_file) {
-            formData.append("video_file", p.video_file);
-            console.log("    ✅ Appended video_file");
-          } else {
-            console.log("    ℹ️ No video_file.");
-          }
-
-          if (p.gallery_files && p.gallery_files.length > 0) {
-            p.gallery_files.forEach((file) => {
-              formData.append("gallery_images", file);
-            });
-            console.log(`    ✅ Appended ${p.gallery_files.length} gallery_images`);
-          } else {
-            console.log("    ℹ️ No gallery_files.");
-          }
-
-          console.log(`  📤 SENDING Axios POST to /products/`);
-          const response = await api.post('/products/', formData, {
-            headers: { "Authorization": `Bearer ${token}` }
-          });
-
-          if (response.status === 201) {
-            console.log(`  ✅ SUCCESS! Product created. Response:`, response.data);
-            const newProductId = response.data.id;
-
-            // ============================================================
-            // 🔥 2. TUMA VARIATIONS (HAPA NDIO PAKUNA PICHA ZA RANGI!)
-            // ============================================================
-            if (p.variations && p.variations.length > 0) {
-              console.log(`  📤 SENDING ${p.variations.length} variations to /product-variations/`);
-              for (const variant of p.variations) {
-                const varFormData = new FormData();
-                varFormData.append("product", newProductId);
-                varFormData.append("color_name", variant.color_name || "");
-                varFormData.append("size_value", variant.size_value || "");
-                varFormData.append("stock_quantity", variant.stock_quantity || 0);
-                varFormData.append("price", variant.price || 0);
-                
-                if (variant.attributes) {
-                  varFormData.append("attributes", JSON.stringify(variant.attributes));
-                }
-                
-                // 🔥 MUHIMU SANA: Angalia kama faili lipo kwenye variant au kwenye map ya p.color_image_files
-                let fileToSend = variant.color_image_file;
-                if (!fileToSend && p.color_image_files && p.color_image_files[variant.color_name]) {
-                    fileToSend = p.color_image_files[variant.color_name];
-                }
-
-                if (fileToSend) {
-                  varFormData.append("color_image_file", fileToSend);
-                }
-
-                try {
-                  await api.post('/product-variations/', varFormData, {
-                    headers: { "Authorization": `Bearer ${token}` }
-                  });
-                  console.log(`    ✅ Variation saved: ${variant.color_name} ${variant.size_value || 'Standard'}`);
-                } catch (varErr) {
-                  console.warn(`    ⚠️ Failed to save variation ${variant.color_name}:`, varErr.message);
-                }
+              try {
+                console.log(`    📤 Sending variation to /product-variations/...`);
+                await api.post('/product-variations/', varFormData, {
+                  headers: { "Authorization": `Bearer ${token}` }
+                });
+                console.log(`    ✅ Variation ${i+1} saved successfully!`);
+              } catch (varErr) {
+                console.error(`    ❌ Variation ${i+1} failed:`, varErr.response?.data || varErr.message);
+                // Kama unaweza, fanya hii iwe sehemu ya errors kwa usindikaji wa mwisho
+                errors.push({
+                  name: `${p.name} - Variation ${i+1}`,
+                  error: JSON.stringify(varErr.response?.data || varErr.message)
+                });
               }
             }
-
-            successCount++;
-            setAddedProducts(prev => prev.filter(item => item.id !== p.id));
           }
-        } catch (productError) {
-          let errorMessage = `Tatizo kwenye bidhaa "${p.name}"`;
-          if (productError.response) {
-            console.error("❌ [ERROR] Backend Response Status:", productError.response.status);
-            console.error("❌ [ERROR] Backend Response Data:", productError.response.data);
-            errorMessage = `Backend Error ${productError.response.status}:\n${JSON.stringify(productError.response.data, null, 2)}`;
-          } else if (productError.request) {
-            console.error("❌ [ERROR] No response from server. Request object:", productError.request);
-            errorMessage = "Hakuna majibu kutoka Server. Angalia network connection.";
-          } else {
-            console.error("❌ [ERROR] Request setup error:", productError.message);
-            errorMessage = productError.message;
-          }
-          errors.push({ name: p.name, error: errorMessage });
-        }
-      }
 
-      if (successCount > 0) {
-        let message = `✅ ${successCount} bidhaa zimehifadhiwa!`;
-        if (errors.length > 0) {
-          message += `\n\n⚠️ Lakini bidhaa ${errors.length} zimeshindwa.`;
-          alert(message + `\n\n${errors.map(e => `- ${e.name}:\n${e.error}`).join('\n\n')}`);
-        } else {
-          alert(message);
+          successCount++;
+          setAddedProducts(prev => prev.filter(item => item.id !== p.id));
         }
-        if (onComplete) onComplete();
-        setCurrentStep(1);
-        setAttributes(initialAttributes);
-        setCoverFile(null); setCoverPreview(null);
-        setVideoFile(null); setVideoPreview(null);
-        setGalleryFiles([]); setGalleryPreviews([]);
-      } else if (errors.length > 0) {
-        alert(`❌ Imeshindwa:\n\n${errors.map(e => `- ${e.name}:\n${e.error}`).join('\n\n')}`);
+      } catch (productError) {
+        console.error(`❌ Product "${p.name}" failed:`, productError.response?.data || productError.message);
+        errors.push({ name: p.name, error: JSON.stringify(productError.response?.data || productError.message) });
       }
-
-    } catch (err) {
-      console.error("🔥 [FATAL ERROR]:", err);
-      alert("Hitilafu ya mfumo: " + err.message);
-    } finally {
-      setLoading(false);
-      console.log("🏁 [PUBLISH_BTN] FINISHED PUBLISH PROCESS");
     }
-  };
 
+    if (successCount > 0) {
+      let message = `✅ ${successCount} bidhaa zimehifadhiwa!`;
+      if (errors.length > 0) {
+        message += `\n\n⚠️ Lakini ${errors.length} zimeshindwa.`;
+        alert(message + `\n\n${errors.map(e => `- ${e.name}:\n${e.error}`).join('\n\n')}`);
+      } else {
+        alert(message);
+      }
+      if (onComplete) onComplete();
+      setCurrentStep(1);
+      setAttributes(initialAttributes);
+      setCoverFile(null); setCoverPreview(null);
+      setVideoFile(null); setVideoPreview(null);
+      setGalleryFiles([]); setGalleryPreviews([]);
+    } else if (errors.length > 0) {
+      alert(`❌ Imeshindwa kabisa!\n\n${errors.map(e => `- ${e.name}:\n${e.error}`).join('\n\n')}`);
+    }
+  } catch (err) {
+    console.error("🔥 [FATAL ERROR]:", err);
+    alert("Hitilafu ya mfumo: " + err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+  
   return (
     <section className="product-creation-flow">
       <div className="flow-steps-header">
@@ -571,8 +573,7 @@ const ProductCreationFlow = ({
                     previewImg: coverPreview, 
                     cover_file: coverFile, 
                     video_file: videoFile, 
-                    gallery_files: galleryFiles,
-
+                    gallery_files: [...galleryFiles],
                     name: attributes.name.trim().toLowerCase(),
                     description: attributes.description,
                     price: attributes.price,

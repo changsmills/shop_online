@@ -8,7 +8,6 @@ from api.views import (
     RegisterView, ProfileView,
     ShippingMethodViewSet, BrandViewSet, LeadViewSet,
     ProductVariationViewSet, 
-    # 🔥 ONGEZA HIZI ZOTE! (Zilizokosekana)
     ChangePasswordView, DeleteAccountView,
     ChangeEmailView, PasswordResetView,
    OrderViewSet

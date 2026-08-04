@@ -61,7 +61,7 @@ export const useDashboardData = () => {
               featuredProducts.push({
                 id: item.leaf_category_id,
                 leaf_category_id: item.leaf_category_id,
-                cover_image: item.cover_image,
+                 cover_image_url: item.cover_image_url, // ✅ ONGEZA HII!
                 leaf_categories: item.leaf_categories || { name: 'Unknown', name_sw: 'Haijulikani' }
               });
             }

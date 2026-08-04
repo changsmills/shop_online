@@ -175,7 +175,7 @@ export default function TopDeals({ navigate, selectedCategory }) {
             return (
               <div key={product.id} className="td-card-wrapper">
                 <DashboardCard
-                  image={product.cover_image}
+                  image={product.cover_image_url || product.cover_image} // 🔥 BADILISHA HAPA!
                   title={product.name}
                   price={product.original_price || product.price}
                   originalPrice={product.price}

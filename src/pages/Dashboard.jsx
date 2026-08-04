@@ -64,21 +64,30 @@ export default function Dashboard() {
   const timeoutRef = useRef(null);
   const [cachedAds, setCachedAds] = useState([]);
 
-  useEffect(() => {
+   useEffect(() => {
     const fetchAdsWithCache = async () => {
       const storedAds = localStorage.getItem('skyfall_ads');
       const storedTime = localStorage.getItem('skyfall_ads_time');
 
+      // 1. Ikiwa cache ipo na bado ni mpya (chini ya dakika 5), tumia hiyo tu
       if (storedAds && storedTime && (Date.now() - Number(storedTime) < 5 * 60 * 1000)) {
         setCachedAds(JSON.parse(storedAds));
         return;
       }
 
+      // 2. Ikiwa hakuna token, USITUME ombi la 401! Tumia cache iliyopo au default banner.
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        if (storedAds) setCachedAds(JSON.parse(storedAds));
+        else setCachedAds([]); // Hakuna matangazo
+        return;
+      }
+
+      // 3. Ikiwa token ipo, ndipo tuma ombi la API
       try {
         const response = await api.get('/advertisements/', {
           params: { status: 'active' }
         });
-        
         const data = response.data;
         if (data) {
           setCachedAds(data);
@@ -87,6 +96,8 @@ export default function Dashboard() {
         }
       } catch (error) {
         console.error("Error fetching ads:", error);
+        // Kama imefeli, jaribu kutumia cache yoyote iliyopo
+        if (storedAds) setCachedAds(JSON.parse(storedAds));
       }
     };
     fetchAdsWithCache();
@@ -399,7 +410,7 @@ export default function Dashboard() {
                   .map(product => (
                     <DashboardCard 
                       key={product.id}
-                      image={product.cover_image}
+                     image={product.cover_image_url || product.cover_image}
                       title={product.name}
                       price={product.price}
                       onClick={() => handleProtectedAction(product.id, "direct")}
@@ -625,8 +636,11 @@ export default function Dashboard() {
                   leafsForSub.map((leaf) => (
                     <div key={leaf.id} className="grid-item" onClick={() => handleLeafClick(leaf.id)}>
                       <div className="image-circle">
-                        <img src={leaf.cover_image || placeholderImg} alt={leaf.name} />
-                      </div>
+                        <img 
+                          src={leaf.cover_image_url || leaf.cover_image || placeholderImg} // 🔥 BADILISHA HAPA!
+                              alt={leaf.leaf_categories?.name} 
+                                  />
+                             </div>
                       <p className="grid-text">
                         {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
                       </p>
@@ -727,8 +741,11 @@ export default function Dashboard() {
                           className="mobile-grid-item"
                         >
                           <div className="mobile-grid-image">
-                            <img src={leaf.cover_image || placeholderImg} alt={leaf.leaf_categories?.name} />
-                          </div>
+                                <img 
+                                 src={leaf.cover_image_url || leaf.cover_image || placeholderImg} // 🔥 BADILISHA HAPA!
+                              alt={leaf.leaf_categories?.name} 
+                                     />
+                            </div>
                           <p>{i18n.language === 'sw' ? (leaf.leaf_categories?.name_sw || leaf.leaf_categories?.name) : leaf.leaf_categories?.name}</p>
                         </div>
                       ))}

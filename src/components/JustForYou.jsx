@@ -174,7 +174,7 @@ export default function JustForYou({ search = "", selectedCategory }) {
           filteredProducts.map((item) => (
             <DashboardCard 
               key={item.id}
-              image={item.cover_image}
+              image={item.cover_image_url || item.cover_image} // 🔥 BADILISHA HAPA!
               title={item.name}
               price={item.price}
               originalPrice={item.original_price}

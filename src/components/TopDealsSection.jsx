@@ -78,7 +78,6 @@ const FlashSaleCard = ({ product, onUpdate }) => {
       const token = localStorage.getItem("access_token");
       if (!token) throw new Error("Tafadhali ingia tena.");
 
-      // 🔥 MABADILIKO: api.patch na kuondoa API_BASE_URL
       await api.patch(
         `/products/${product.id}/`,
         {
@@ -105,10 +104,22 @@ const FlashSaleCard = ({ product, onUpdate }) => {
     <div className="flash-card">
       <div className="flash-card-img-wrap">
         <img 
-          src={product.cover_image || "https://placehold.co/400x400?text=No+Image"} 
+          src={
+            // ✅ Hapa ndio suluhisho: Angalia cover_image_url kwanza!
+            product.cover_image_url 
+              ? product.cover_image_url 
+              : (product.cover_image 
+                  ? (product.cover_image.startsWith('http') 
+                      ? product.cover_image 
+                      : `https://shop-online-r9z4.onrender.com${product.cover_image}`) 
+                  : "https://placehold.co/400x400?text=No+Image")
+          } 
           alt={product.name}
           className="flash-card-img"
-          onError={(e) => { e.target.src = "https://placehold.co/400x400?text=No+Image"; }}
+          onError={(e) => { 
+            e.target.onerror = null; 
+            e.target.src = "https://placehold.co/400x400?text=No+Image"; 
+          }}
         />
         {percentage > 0 && (
           <div className="flash-card-badge">

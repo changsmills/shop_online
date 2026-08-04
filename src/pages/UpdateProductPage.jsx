@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import api from "../axiosConfig"; // 🔥 Tumia api yako!
-import { Camera, Trash2, Save, ArrowLeft, Loader2, Plus, X } from "lucide-react";
-import "../UpdateProduct.css";
+import api from "../axiosConfig";
+import { Camera, Trash2, Save, ArrowLeft, Loader2, Plus, X, Edit3, Palette } from "lucide-react";
+import "../UpdateProduct.css"; // <--- HAPA UNAINGIZA CSS
 
 const UpdateProductPage = () => {
   const { productId } = useParams();
@@ -14,13 +14,29 @@ const UpdateProductPage = () => {
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // ========== STATES ZA KATEGORIA ==========
-  const [storeSubCats, setStoreSubCats] = useState([]);      // Subcategories za duka (ili kuchagua)
-  const [leafCategories, setLeafCategories] = useState([]);  // Leaf categories kwa subcategory iliyochaguliwa
+  const [storeSubCats, setStoreSubCats] = useState([]);
+  const [leafCategories, setLeafCategories] = useState([]);
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [selectedLeafCategory, setSelectedLeafCategory] = useState("");
 
-  // ========== FETCH DATA ==========
+  const [variations, setVariations] = useState([]);
+  const [showVariationForm, setShowVariationForm] = useState(false);
+  const [editingVariationId, setEditingVariationId] = useState(null);
+  const [variationForm, setVariationForm] = useState({
+    color_name: "",
+    size_value: "",
+    stock_quantity: 0,
+    price: "",
+    attributes: {},
+    color_image_file: null,
+    color_image_preview: null,
+    marketplace_price: "",
+    marketplace_stock: 0,
+    marketplace_image_file: null,
+    marketplace_image_preview: null,
+  });
+
+  // ========== FETCH DATA (same as before) ==========
   useEffect(() => {
     if (productId) {
       fetchAllData();
@@ -34,44 +50,29 @@ const UpdateProductPage = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("access_token");
+      const headers = { Authorization: `Bearer ${token}` };
 
-      // 1. Pata bidhaa yenyewe
-      const prodRes = await api.get(`/products/${productId}/`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const prodRes = await api.get(`/products/${productId}/`, { headers });
       const productData = prodRes.data;
       setProduct(productData);
 
-      // 2. Pata gallery (media)
-      const mediaRes = await api.get(`/product-media/?product_id=${productId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const mediaRes = await api.get(`/product-media/?product_id=${productId}`, { headers });
       setGallery(mediaRes.data.results || mediaRes.data || []);
 
-      // 3. Pata subcategories za duka (kwa dropdown) - tunachukua kutoka store iliyopo
-      if (productData.store_id) {
-        const storeRes = await api.get(`/stores/${productData.store_id}/`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const storeData = storeRes.data;
-        // Subcategories zipo kwenye 'sub_categories' (kutoka serializer)
-        setStoreSubCats(storeData.sub_categories || []);
+      const varRes = await api.get(`/product-variations/?product_id=${productId}`, { headers });
+      setVariations(varRes.data.results || varRes.data || []);
 
-        // Set subcategory iliyopo sasa
-        if (productData.sub_category_id) {
-          setSelectedSubCategory(productData.sub_category_id);
-        }
-        // Set leaf category iliyopo
-        if (productData.leaf_category_id) {
-          setSelectedLeafCategory(productData.leaf_category_id);
-        }
+      if (productData.store_id) {
+        const storeRes = await api.get(`/stores/${productData.store_id}/`, { headers });
+        const storeData = storeRes.data;
+        setStoreSubCats(storeData.sub_categories || []);
+        if (productData.sub_category_id) setSelectedSubCategory(productData.sub_category_id);
+        if (productData.leaf_category_id) setSelectedLeafCategory(productData.leaf_category_id);
       }
 
-      // 4. Fetch leaf categories kulingana na subcategory iliyochaguliwa
       if (productData.sub_category_id) {
         fetchLeafCategories(productData.sub_category_id);
       }
-
     } catch (error) {
       console.error("Error fetching data:", error);
       alert("Imeshindwa kuvuta data za bidhaa.");
@@ -80,7 +81,6 @@ const UpdateProductPage = () => {
     }
   };
 
-  // ========== FETCH LEAF CATEGORIES KWA SUB ==========
   const fetchLeafCategories = async (subCatId) => {
     try {
       const token = localStorage.getItem("access_token");
@@ -94,63 +94,40 @@ const UpdateProductPage = () => {
     }
   };
 
-  // ========== HANDLE SUB CATEGORY CHANGE ==========
   const handleSubCategoryChange = (e) => {
     const newSubId = e.target.value;
     setSelectedSubCategory(newSubId);
-    setSelectedLeafCategory(""); // Reset leaf
-    setLeafCategories([]);       // Clear previous leafs
-    if (newSubId) {
-      fetchLeafCategories(newSubId);
-    }
-    // Update product state (kwa ajili ya save)
+    setSelectedLeafCategory("");
+    setLeafCategories([]);
+    if (newSubId) fetchLeafCategories(newSubId);
     setProduct(prev => ({ ...prev, sub_category_id: newSubId, leaf_category_id: null }));
   };
 
-  // ========== HANDLE LEAF CATEGORY CHANGE ==========
   const handleLeafChange = (e) => {
     const leafId = e.target.value;
     setSelectedLeafCategory(leafId);
     setProduct(prev => ({ ...prev, leaf_category_id: leafId }));
   };
 
-  // ========== FILE UPLOAD (COVER & GALLERY) ==========
   const handleFileUpload = async (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
-
     setUploading(true);
-    const formData = new FormData();
-    formData.append("product", productId);  // Kwa gallery, foreign key
-
     try {
       const token = localStorage.getItem("access_token");
-      const headers = { Authorization: `Bearer ${token}` };
+      const headers = { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" };
 
       if (type === "cover") {
-        // 1. Tuma cover image update kwenye products_engines
         const coverForm = new FormData();
         coverForm.append("cover_image", file);
-        const res = await api.patch(`/products/${productId}/`, coverForm, {
-          headers: { ...headers, "Content-Type": "multipart/form-data" }
-        });
+        const res = await api.patch(`/products/${productId}/`, coverForm, { headers });
         setProduct(prev => ({ ...prev, cover_image: res.data.cover_image }));
       } else {
-        // 2. Tuma gallery image kwenye product-media
-        formData.append("media_type", "image");
-        formData.append("media_url", file); // Backend inapaswa kushughulikia upload ya file kwa Cloudinary
-        // Kumbuka: Unaweza kutumia media_url kuwa file, na serializers zishughulikie.
-        // Kama backend inatarajia file, tumia 'media_file' au 'file'.
-        // Hapa nafikiri unatuma file kama 'media_url' – lakini angalia serializer yako.
-        // Kwa sasa natumia 'media_file' kama jina la field kwa file.
         const mediaForm = new FormData();
         mediaForm.append("product", productId);
         mediaForm.append("media_type", "image");
-        mediaForm.append("media_file", file); // 🔥 Badilisha jina kulingana na serializer yako!
-        
-        const res = await api.post(`/product-media/`, mediaForm, {
-          headers: { ...headers, "Content-Type": "multipart/form-data" }
-        });
+        mediaForm.append("media_file", file);
+        const res = await api.post(`/product-media/`, mediaForm, { headers });
         setGallery(prev => [...prev, res.data]);
       }
     } catch (err) {
@@ -160,21 +137,17 @@ const UpdateProductPage = () => {
     }
   };
 
-  // ========== DELETE MEDIA ==========
   const deleteMedia = async (id) => {
     if (!window.confirm("Una uhakika unataka kufuta picha hii?")) return;
     try {
       const token = localStorage.getItem("access_token");
-      await api.delete(`/product-media/${id}/`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/product-media/${id}/`, { headers: { Authorization: `Bearer ${token}` } });
       setGallery(gallery.filter((m) => m.id !== id));
     } catch (err) {
       alert("Imeshindwa kufuta picha.");
     }
   };
 
-  // ========== UPDATE BIDHAA (INAFANYA PATCH) ==========
   const handleUpdateInfo = async () => {
     setSaving(true);
     try {
@@ -188,14 +161,11 @@ const UpdateProductPage = () => {
         sub_category_id: product.sub_category_id,
         leaf_category_id: product.leaf_category_id,
       };
-
-      // Tumia PATCH badala ya PUT (kama unataka kubadilisha sehemu)
       await api.patch(`/products/${productId}/`, updateData, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
       alert("Taarifa zimehifadhiwa kikamilifu!");
-      fetchAllData(); // Refresh data
+      fetchAllData();
     } catch (err) {
       alert("Kuna tatizo limejitokeza: " + (err.response?.data?.detail || err.message));
     } finally {
@@ -203,76 +173,166 @@ const UpdateProductPage = () => {
     }
   };
 
+  // ========== VARIATION HANDLERS (same) ==========
+  const resetVariationForm = () => {
+    setVariationForm({
+      color_name: "",
+      size_value: "",
+      stock_quantity: 0,
+      price: "",
+      attributes: {},
+      color_image_file: null,
+      color_image_preview: null,
+      marketplace_price: "",
+      marketplace_stock: 0,
+      marketplace_image_file: null,
+      marketplace_image_preview: null,
+    });
+    setEditingVariationId(null);
+    setShowVariationForm(false);
+  };
+
+  const handleVariationImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setVariationForm(prev => ({
+        ...prev,
+        color_image_file: file,
+        color_image_preview: URL.createObjectURL(file)
+      }));
+    }
+  };
+
+  const handleVariationSubmit = async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+      const formData = new FormData();
+      formData.append("product", productId);
+      formData.append("color_name", variationForm.color_name || "N/A");
+      formData.append("size_value", variationForm.size_value || "N/A");
+      formData.append("stock_quantity", variationForm.stock_quantity || 0);
+      formData.append("price", variationForm.price || 0);
+      formData.append("attributes", JSON.stringify(variationForm.attributes || {}));
+      if (variationForm.color_image_file) {
+        formData.append("color_image_file", variationForm.color_image_file);
+      }
+      formData.append("marketplace_price", variationForm.marketplace_price || 0);
+      formData.append("marketplace_stock", variationForm.marketplace_stock || 0);
+      if (variationForm.marketplace_image_file) {
+        formData.append("marketplace_image_file", variationForm.marketplace_image_file);
+      }
+      formData.append("variant_specifications", JSON.stringify(variationForm.attributes || {}));
+
+      let response;
+      if (editingVariationId) {
+        response = await api.patch(`/product-variations/${editingVariationId}/`, formData, {
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" }
+        });
+        setVariations(variations.map(v => v.id === editingVariationId ? response.data : v));
+      } else {
+        response = await api.post(`/product-variations/`, formData, {
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" }
+        });
+        setVariations([...variations, response.data]);
+      }
+      resetVariationForm();
+      alert(editingVariationId ? "Variation imesasishwa!" : "Variation imeongezwa!");
+    } catch (err) {
+      alert("Kuna tatizo: " + (err.response?.data?.detail || err.message));
+    }
+  };
+
+  const handleDeleteVariation = async (id) => {
+    if (!window.confirm("Una uhakika unataka kufuta variation hii?")) return;
+    try {
+      const token = localStorage.getItem("access_token");
+      await api.delete(`/product-variations/${id}/`, { headers: { Authorization: `Bearer ${token}` } });
+      setVariations(variations.filter(v => v.id !== id));
+    } catch (err) {
+      alert("Imeshindwa kufuta variation.");
+    }
+  };
+
+  const openEditVariation = (variation) => {
+    setVariationForm({
+      color_name: variation.color_name || "",
+      size_value: variation.size_value || "",
+      stock_quantity: variation.stock_quantity || 0,
+      price: variation.price || "",
+      attributes: variation.attributes || {},
+      color_image_file: null,
+      color_image_preview: variation.color_image_url || null,
+      marketplace_price: variation.marketplace_price || "",
+      marketplace_stock: variation.marketplace_stock || 0,
+      marketplace_image_file: null,
+      marketplace_image_preview: variation.marketplace_image || null,
+    });
+    setEditingVariationId(variation.id);
+    setShowVariationForm(true);
+  };
+
   // ========== LOADING STATE ==========
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <Loader2 className="animate-spin text-blue-600" size={40} />
-        <p className="mt-2 text-gray-500">Inapakia taarifa za bidhaa...</p>
+      <div className="up-loading">
+        <Loader2 className="up-spinner" size={40} />
+        <p>Inapakia taarifa za bidhaa...</p>
       </div>
     );
   }
 
   return (
-    <div className="up-container animate-in fade-in duration-500">
+    <div className="up-container">
       {/* HEADER */}
       <div className="up-header">
         <button onClick={() => navigate(-1)} className="up-back-btn">
-          <ArrowLeft size={18}/> Rudi
+          <ArrowLeft size={18} /> Rudi
         </button>
-        <div className="text-center">
-          <h2 className="font-bold text-lg">Hariri Bidhaa</h2>
-          <p className="text-[10px] text-gray-400 uppercase tracking-tighter">ID: {productId}</p>
+        <div className="up-header-title">
+          <h2>Hariri Bidhaa</h2>
+          <p>ID: {productId}</p>
         </div>
         <button onClick={handleUpdateInfo} disabled={saving} className="up-save-btn">
-          {saving ? <Loader2 className="animate-spin" size={18} /> : "Hifadhi Zote"}
+          {saving ? <Loader2 className="up-spinner" size={18} /> : "Hifadhi Zote"}
         </button>
       </div>
 
       <div className="up-content">
-        {/* MKONO WA KUSHOTO: PICHA */}
+        {/* PICHA ZA BIDHAA */}
         <div className="up-card">
-          <h3 className="flex items-center gap-2 mb-4 text-sm font-semibold">
-            <Camera size={16} /> Picha za Bidhaa
-          </h3>
-          
-          <div className="space-y-6">
+          <h3><Camera size={16} /> Picha za Bidhaa</h3>
+          <div className="up-media-section">
             {/* Main Cover */}
-            <div>
-              <label className="text-xs text-gray-500 mb-2 block">Picha Kuu (Cover)</label>
-              <div className="up-main-img group relative overflow-hidden rounded-xl border-2 border-dashed border-gray-200">
-                <img 
-                  src={product?.cover_image || "https://via.placeholder.com/400x400?text=No+Image"} 
-                  alt="Main" 
-                  className="w-full h-64 object-cover"
+            <div className="up-main-img-wrapper">
+              <label className="up-main-img-label">Picha Kuu (Cover)</label>
+              <div className="up-main-img">
+                <img
+                  src={product?.cover_image_url || "https://via.placeholder.com/400x400?text=No+Image"}
+                  alt="Main"
                 />
-                <label className="up-edit-label absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                <label className="up-edit-label">
                   <Camera size={28} />
-                  <span className="text-xs mt-2">Badilisha Picha</span>
+                  <span>Badilisha Picha</span>
                   <input type="file" hidden onChange={(e) => handleFileUpload(e, "cover")} accept="image/*" />
                 </label>
               </div>
             </div>
 
             {/* Gallery */}
-            <div>
-              <label className="text-xs text-gray-500 mb-2 block">Picha za Nyongeza (Gallery)</label>
-              <div className="up-gallery-grid grid grid-cols-3 gap-3">
+            <div className="up-gallery-wrapper">
+              <label className="up-gallery-label">Picha za Nyongeza (Gallery)</label>
+              <div className="up-gallery-grid">
                 {gallery.map((m) => (
-                  <div key={m.id} className="up-gallery-item relative group rounded-lg overflow-hidden border border-gray-100">
-                    <img src={m.media_url} alt="Gallery" className="w-full h-24 object-cover" />
-                    <button 
-                      onClick={() => deleteMedia(m.id)} 
-                      className="up-del-btn absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
+                  <div key={m.id} className="up-gallery-item">
+                    <img src={m.media_url} alt="Gallery" />
+                    <button onClick={() => deleteMedia(m.id)} className="up-del-btn">
                       <X size={12} />
                     </button>
                   </div>
                 ))}
-                
                 {gallery.length < 5 && (
-                  <label className="up-add-box border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center h-24 cursor-pointer hover:bg-gray-50 transition-colors">
-                    {uploading ? <Loader2 className="animate-spin text-blue-500" /> : <Plus className="text-gray-400" />}
+                  <label className="up-add-box">
+                    {uploading ? <Loader2 className="up-spinner" /> : <Plus />}
                     <input type="file" hidden onChange={(e) => handleFileUpload(e, "gallery")} accept="image/*" />
                   </label>
                 )}
@@ -281,16 +341,15 @@ const UpdateProductPage = () => {
           </div>
         </div>
 
-        {/* MKONO WA KULIA: FOMU YA DATA */}
+        {/* MAELEZO YA BIDHAA */}
         <div className="up-card">
-          <h3 className="mb-4 text-sm font-semibold">Maelezo ya Bidhaa</h3>
-          <div className="up-form space-y-4">
-            {/* ========== KATEGORIA ZA BIDHAA ========== */}
-            <div className="grid grid-cols-2 gap-4">
+          <h3>Maelezo ya Bidhaa</h3>
+          <div className="up-form">
+            {/* Kategoria */}
+            <div className="up-form-row">
               <div className="up-input-group">
-                <label className="text-xs font-medium text-gray-600 block mb-1">Kategoria Ndogo (Sub-category)</label>
+                <label>Kategoria Ndogo (Sub-category)</label>
                 <select
-                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                   value={selectedSubCategory}
                   onChange={handleSubCategoryChange}
                 >
@@ -300,11 +359,9 @@ const UpdateProductPage = () => {
                   ))}
                 </select>
               </div>
-
               <div className="up-input-group">
-                <label className="text-xs font-medium text-gray-600 block mb-1">Aina Maalum (Leaf Category)</label>
+                <label>Aina Maalum (Leaf Category)</label>
                 <select
-                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                   value={selectedLeafCategory}
                   onChange={handleLeafChange}
                   disabled={!selectedSubCategory || leafCategories.length === 0}
@@ -315,59 +372,53 @@ const UpdateProductPage = () => {
                   ))}
                 </select>
                 {selectedSubCategory && leafCategories.length === 0 && (
-                  <p className="text-xs text-orange-500 mt-1">Hakuna aina maalum kwa kategoria hii.</p>
+                  <p className="up-warning">Hakuna aina maalum kwa kategoria hii.</p>
                 )}
               </div>
             </div>
 
-            {/* ========== DATA ZINGINE ========== */}
             <div className="up-input-group">
-              <label className="text-xs font-medium text-gray-600 block mb-1">Jina la Bidhaa</label>
-              <input 
-                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                value={product?.name || ""} 
-                onChange={(e) => setProduct({...product, name: e.target.value})} 
+              <label>Jina la Bidhaa</label>
+              <input
+                value={product?.name || ""}
+                onChange={(e) => setProduct({...product, name: e.target.value})}
                 placeholder="Mf: iPhone 15 Pro Max"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="up-form-row">
               <div className="up-input-group">
-                <label className="text-xs font-medium text-gray-600 block mb-1">Bei ya Ofa (TZS)</label>
-                <input 
-                  type="number" 
-                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  value={product?.original_price || ""} 
-                  onChange={(e) => setProduct({...product, original_price: e.target.value})} 
+                <label>Bei ya Ofa (TZS)</label>
+                <input
+                  type="number"
+                  value={product?.original_price || ""}
+                  onChange={(e) => setProduct({...product, original_price: e.target.value})}
                 />
               </div>
               <div className="up-input-group">
-                <label className="text-xs font-medium text-gray-600 block mb-1">Bei ya Zamani</label>
-                <input 
-                  type="number" 
-                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  value={product?.price || ""} 
-                  onChange={(e) => setProduct({...product, price: e.target.value})} 
+                <label>Bei ya Zamani</label>
+                <input
+                  type="number"
+                  value={product?.price || ""}
+                  onChange={(e) => setProduct({...product, price: e.target.value})}
                 />
               </div>
             </div>
 
             <div className="up-input-group">
-              <label className="text-xs font-medium text-gray-600 block mb-1">Stock (Idadi Iliyopo)</label>
-              <input 
-                type="number" 
-                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                value={product?.stock_quantity || ""} 
-                onChange={(e) => setProduct({...product, stock_quantity: e.target.value})} 
+              <label>Stock (Idadi Iliyopo)</label>
+              <input
+                type="number"
+                value={product?.stock_quantity || ""}
+                onChange={(e) => setProduct({...product, stock_quantity: e.target.value})}
               />
             </div>
 
             <div className="up-input-group">
-              <label className="text-xs font-medium text-gray-600 block mb-1">Maelezo Kamili</label>
-              <textarea 
-                rows="5" 
-                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none"
-                value={product?.description || ""} 
+              <label>Maelezo Kamili</label>
+              <textarea
+                rows="5"
+                value={product?.description || ""}
                 onChange={(e) => setProduct({...product, description: e.target.value})}
                 placeholder="Andika sifa za bidhaa..."
               />
@@ -375,6 +426,140 @@ const UpdateProductPage = () => {
           </div>
         </div>
       </div>
+
+      {/* ========== SEHEMU YA VARIATIONS ========== */}
+      <div className="up-card up-variations-card">
+        <div className="up-variations-header">
+          <h3><Palette size={16} /> Rangi na Ukubwa (Variations)</h3>
+          <button
+            onClick={() => { resetVariationForm(); setShowVariationForm(true); }}
+            className="up-add-variation-btn"
+          >
+            <Plus size={14} /> Ongeza Variation
+          </button>
+        </div>
+
+        {variations.length === 0 ? (
+          <p className="up-empty-text">Hakuna variations bado. Bonyeza "Ongeza Variation" kuweka rangi na ukubwa.</p>
+        ) : (
+          <div className="up-variations-list">
+            {variations.map((v) => (
+              <div key={v.id} className="up-variation-item">
+                <div className="up-variation-info">
+                  {v.color_image_url ? (
+                    <img src={v.color_image_url} alt={v.color_name} className="up-variation-image" />
+                  ) : (
+                    <div className="up-variation-noimg">No img</div>
+                  )}
+                  <div>
+                    <p className="up-variation-name">{v.color_name || "N/A"}</p>
+                    <p className="up-variation-details">Ukubwa: {v.size_value || "N/A"} | Stock: {v.stock_quantity} | Bei: TZS {v.price}</p>
+                  </div>
+                </div>
+                <div className="up-variation-actions">
+                  <button onClick={() => openEditVariation(v)} className="up-edit-variation-btn">
+                    <Edit3 size={16} />
+                  </button>
+                  <button onClick={() => handleDeleteVariation(v.id)} className="up-delete-variation-btn">
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ========== MODAL YA VARIATION FORM ========== */}
+      {showVariationForm && (
+        <div className="up-modal-overlay">
+          <div className="up-modal">
+            <div className="up-modal-header">
+              <h3>{editingVariationId ? "Hariri Variation" : "Ongeza Variation"}</h3>
+              <button onClick={resetVariationForm} className="up-modal-close">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="up-modal-body">
+              <div className="up-input-group">
+                <label>Jina la Rangi</label>
+                <input
+                  value={variationForm.color_name}
+                  onChange={(e) => setVariationForm({ ...variationForm, color_name: e.target.value })}
+                  placeholder="Mf: Red, Blue, White"
+                />
+              </div>
+              <div className="up-input-group">
+                <label>Ukubwa (Size)</label>
+                <input
+                  value={variationForm.size_value}
+                  onChange={(e) => setVariationForm({ ...variationForm, size_value: e.target.value })}
+                  placeholder="Mf: M, L, XL, 42, N/A"
+                />
+              </div>
+              <div className="up-form-row">
+                <div className="up-input-group">
+                  <label>Stock</label>
+                  <input
+                    type="number"
+                    value={variationForm.stock_quantity}
+                    onChange={(e) => setVariationForm({ ...variationForm, stock_quantity: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
+                <div className="up-input-group">
+                  <label>Bei (TZS)</label>
+                  <input
+                    type="number"
+                    value={variationForm.price}
+                    onChange={(e) => setVariationForm({ ...variationForm, price: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="up-input-group">
+                <label>Sifa za Ziada (JSON)</label>
+                <textarea
+                  rows="2"
+                  value={JSON.stringify(variationForm.attributes || {}, null, 2)}
+                  onChange={(e) => {
+                    try {
+                      setVariationForm({ ...variationForm, attributes: JSON.parse(e.target.value) });
+                    } catch {
+                      // ignore
+                    }
+                  }}
+                  placeholder='{"Material": "Cotton", "Style": "Sport"}'
+                />
+              </div>
+
+              <div className="up-input-group">
+                <label>Picha ya Rangi</label>
+                <div className="up-image-upload">
+                  {variationForm.color_image_preview ? (
+                    <img src={variationForm.color_image_preview} alt="Color" className="up-image-preview" />
+                  ) : (
+                    <div className="up-image-placeholder">No img</div>
+                  )}
+                  <label className="up-image-upload-btn">
+                    Chagua Picha
+                    <input type="file" hidden onChange={handleVariationImageChange} accept="image/*" />
+                  </label>
+                </div>
+              </div>
+
+              <div className="up-modal-actions">
+                <button onClick={handleVariationSubmit} className="up-modal-submit">
+                  {editingVariationId ? "Sasisha" : "Hifadhi"}
+                </button>
+                <button onClick={resetVariationForm} className="up-modal-cancel">
+                  Ghairi
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

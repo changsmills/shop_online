@@ -152,18 +152,19 @@ export default function ProductList({
       // 🔥 Inakagua 'results' kutoka Django REST Framework (pagination)!
       const data = response.data?.results || response.data || [];
 
-      let sanitizedData = data.map(p => {
-        const beiKubwa = parseFloat(p.price) || 0;
-        const beiYaOfa = parseFloat(p.original_price) || 0;
-        const discountPercent = (beiKubwa > beiYaOfa && beiYaOfa > 0) 
-          ? Math.round(((beiKubwa - beiYaOfa) / beiKubwa) * 100) 
+     let sanitizedData = data.map(p => {
+             const beiKubwa = parseFloat(p.price) || 0;
+            const beiYaOfa = parseFloat(p.original_price) || 0;
+                   const discountPercent = (beiKubwa > beiYaOfa && beiYaOfa > 0) 
+            ? Math.round(((beiKubwa - beiYaOfa) / beiKubwa) * 100) 
           : 0;
-        return {
-          ...p,
-          image: p.cover_image || "/images/placeholder.png",
-          discount: discountPercent
-        };
-      });
+             return {
+                 ...p,
+          // 🔥 REKEBISHA HAPA: Tanguliza cover_image_url!
+           image: p.cover_image_url || p.cover_image || "/images/placeholder.png",
+           discount: discountPercent
+         };
+            });
 
       if (currentSection === "Top Deals") {
         sanitizedData = sanitizedData.filter(p => {

@@ -72,18 +72,19 @@
    ============================================ */
 @media (max-width: 768px) {
   .logo-wrapper {
-    gap: 6px;
+    gap: 8px;
   }
 
   .logo-text {
-    font-size: 15px;
+    /* ✅ Saha hii imebadilishwa kuwa '22px' badala ya '55px' ili isipande juu ya icon */
+    font-size: 35px;
     font-weight: 800;
-    letter-spacing: 0.8px; /* ✅ SPACING NDOGO KWA MOBILE */
+    letter-spacing: 0.2px;
   }
 
   .logo-icon-box {
-    width: 30px;
-    height: 30px;
+    width: 34px;
+    height: 34px;
     border-width: 1.5px;
   }
 
@@ -98,19 +99,20 @@
    ============================================ */
 @media (max-width: 480px) {
   .logo-text {
-    font-size: 13px;
+    /* ✅ Saha hii imeongezwa kuwa '20px' ili isiwe dogo mno kwenye simu za matundu madogo */
+    font-size: 20px;
     font-weight: 800;
     letter-spacing: 0.5px;
   }
 
   .logo-icon-box {
-    width: 26px;
-    height: 26px;
+    width: 30px;
+    height: 30px;
     border-width: 1.5px;
   }
 
   .logo-wrapper {
-    gap: 4px;
+    gap: 6px;
   }
 }
 

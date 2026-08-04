@@ -4,8 +4,8 @@ import { Settings, CheckCircle, X, Plus, Phone, Instagram, Truck, Edit2, Trash2,
 import api from "../axiosConfig"; // 🔥 Tumia api
 import '../StoreManagement.css';
 
-// 🔥 URL ya Backend ya Render kwa ajili ya picha
-const BACKEND_BASE_URL = "https://shop-online-r9z4.onrender.com";
+// 🔥 FUTE HII LINE (haifai tena kwa Cloudinary):
+// const BACKEND_BASE_URL = "https://shop-online-r9z4.onrender.com";
 
 const StoreManagement = ({
   isManageMode,
@@ -132,13 +132,11 @@ const StoreManagement = ({
     return myStoreSubCats.filter(subCat => storeSubIds.includes(subCat.id));
   }, [myStoreSubCats, storeMeta]);
 
+  // 🔥 BADILISHA HAPA: Rudisha URL tu (imekuwa Cloudinary URL tayari)
   const getFullImageUrl = (url) => {
     if (!url) return null;
-    if (url.startsWith('http') || url.startsWith('data:') || url.startsWith('blob:')) {
-      return url;
-    }
-    const cleanUrl = url.startsWith('/') ? url.slice(1) : url;
-    return `${BACKEND_BASE_URL}/${cleanUrl}`;
+    // Kama url tayari ni Cloudinary URL, irudishe tu
+    return url;
   };
 
   return (

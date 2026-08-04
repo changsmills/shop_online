@@ -149,7 +149,7 @@ export default function TopStores({ navigate }) {
             return (
               <div key={store.id} className="ts-card-wrapper">
                 <DashboardCard
-                  image={officeImg}
+                   image={store.office_image_1_url || store.office_image_2_url || 'https://via.placeholder.com/300x150?text=Verified+Store'}
                   title={store.store_name}
                   subtitle={
                     store.category?.name 

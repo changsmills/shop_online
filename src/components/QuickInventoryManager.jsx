@@ -112,12 +112,25 @@ const QuickInventoryManager = ({ products, setProducts }) => {
                   className="inv-card"
                   style={{ animationDelay: `${delay}s` }}
                 >
+                  {/* ✅ SEHEMU YA PICHA IMESASISHWA KAMA TOPDEALS */}
                   <div className="inv-img-wrap">
-                    {p.cover_image ? (
-                      <img src={p.cover_image} alt={p.name} className="inv-img" />
-                    ) : (
-                      <div className="inv-img-placeholder">📷 No Img</div>
-                    )}
+                    <img 
+                      src={
+                        p.cover_image_url 
+                          ? p.cover_image_url 
+                          : (p.cover_image 
+                              ? (p.cover_image.startsWith('http') 
+                                  ? p.cover_image 
+                                  : `https://shop-online-r9z4.onrender.com${p.cover_image}`) 
+                              : "https://placehold.co/400x400?text=No+Image")
+                      } 
+                      alt={p.name} 
+                      className="inv-img"
+                      onError={(e) => { 
+                          e.target.onerror = null; 
+                          e.target.src = "https://placehold.co/400x400?text=No+Image"; 
+                      }}
+                    />
                   </div>
 
                   <div>

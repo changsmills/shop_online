@@ -392,9 +392,9 @@ class StoreEngine(models.Model):
     working_hours = models.CharField(max_length=255, blank=True, null=True)
     is_active = models.BooleanField(default=True)
 
-    office_image_1 = models.ImageField(upload_to='store_offices/', blank=True, null=True)
-    office_image_2 = models.ImageField(upload_to='store_offices/', blank=True, null=True)
-    office_image_3 = models.ImageField(upload_to='store_offices/', blank=True, null=True)
+    office_image_1 = models.CharField(max_length=500, blank=True, null=True) 
+    office_image_2 = models.CharField(max_length=500, blank=True, null=True)
+    office_image_3 = models.CharField(max_length=500, blank=True, null=True)
 
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='stores')
     sub_category_ids = models.JSONField(default=list, blank=True)

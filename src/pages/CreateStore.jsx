@@ -101,9 +101,13 @@ export default function CreateStore() {
       if (formData.banner) submissionData.append("store_banner", formData.banner);
       if (formData.tin_image) submissionData.append("tin_image", formData.tin_image);
       
-      if (formData.image1) submissionData.append("office_image_1", formData.image1);
-      if (formData.image2) submissionData.append("office_image_2", formData.image2);
-      if (formData.image3) submissionData.append("office_image_3", formData.image3);
+            // 🔥 BADILISHA HAPA: Tumia 'office_images' kama list
+      const officeImages = [formData.image1, formData.image2, formData.image3].filter(Boolean);
+      officeImages.forEach((file) => {
+          if (file) {
+              submissionData.append("office_images", file);
+          }
+      });
 
       const response = await api.post(
         "/stores/",
