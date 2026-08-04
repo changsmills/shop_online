@@ -359,8 +359,24 @@ const ProductCreationFlow = ({
                 varFormData.append("size_value", variant.size_value);
               }
 
-              varFormData.append("stock_quantity", variant.stock_quantity || 0);
-              varFormData.append("price", variant.price || 0);
+              // === 🔥 BADILISHA HAPA (KWA KILA VARIATION) ===
+
+                  // 1. Chukua tu size_stock inayolingana na rangi ya variation hii (p.size_stock[variant.color_name])
+              const specificSizeStock = (p.size_stock && p.size_stock[variant.color_name]) 
+                          ? p.size_stock[variant.color_name] 
+                          : {};
+
+                    // 2. Tuma size_stock sahihi kwa variation hii!
+                  varFormData.append("size_stock", JSON.stringify(specificSizeStock));
+
+                 // 3. Hesabu stock_quantity kwa rangi hii kwa kuunganisha sizes zake (Badala ya kutuma variant.stock_quantity)
+                   const totalStockForColor = Object.values(specificSizeStock).reduce((acc, val) => acc + (Number(val) || 0), 0);
+                       varFormData.append("stock_quantity", totalStockForColor || 0); // 📦 Hii ndiyo stock halisi kwa rangi hii!
+
+                       // 4. Endelea na bei (hii haibadiliki)
+                        varFormData.append("price", variant.price || 0);
+
+                            // === 🔥 ISHIA BADILISHA HAPA ===
               
               if (variant.attributes) {
                 varFormData.append("attributes", JSON.stringify(variant.attributes));
