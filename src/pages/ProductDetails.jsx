@@ -281,7 +281,7 @@ export default function ProductDetails() {
                   <Link key={item.id} to={`/product/${item.id}`} className="showroom-item"
                     onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
                     <div className={`showroom-item-img ${item.id === id ? 'active-border' : ''}`}>
-                      <img src={item.cover_image} alt={item.name} />
+                      <img src={item.cover_image_url} alt={item.name} /> // ✅ Hii ndiyo sahihi!
                       {item.id === id && (
                         <div className="showroom-item-badge">INATAZAMWA</div>
                       )}

@@ -18,7 +18,9 @@ const ProductSelectionDrawer = ({
     addToCart,
     onConfirm,
     initialColor, 
-    initialSize
+    initialSize,
+    currentUnitPrice // ✅ ONGEZA HAPA!
+
 }) => {
     const navigate = useNavigate();
     const [previewImage, setPreviewImage] = useState(productImage);
@@ -196,7 +198,7 @@ const ProductSelectionDrawer = ({
         return () => { document.body.style.overflow = 'unset'; };
     }, [isOpen]);
 
-    const totals = useMemo(() => {
+       const totals = useMemo(() => {
         let totalQty = 0;
         let totalPrice = 0;
         Object.entries(selectedItems).forEach(([itemKey, qty]) => {
@@ -205,13 +207,22 @@ const ProductSelectionDrawer = ({
                 const realVariantId = parts[0];
                 const variant = variations.find(v => String(v.id) === String(realVariantId)) 
                               || (String(currentColorVar?.id) === String(realVariantId) ? currentColorVar : null);
-                const unitPrice = Number(variant?.price ?? product?.price ?? 0);
+                
+                // 🔥 MUHIMU: Tumia currentUnitPrice kutoka Parent (ProductInfo) kama bei ya msingi!
+                let unitPrice = Number(currentUnitPrice) || 0; 
+                
+                // Kama variant ina bei halisi kubwa kuliko 0, itumie hiyo
+                const variantPrice = Number(variant?.price);
+                if (variantPrice > 0) {
+                    unitPrice = variantPrice;
+                }
+
                 totalQty += Number(qty);
                 totalPrice += Number(qty) * unitPrice;
             }
         });
         return { totalQty, totalPrice };
-    }, [selectedItems, variations, currentColorVar, product?.price]);
+    }, [selectedItems, variations, currentColorVar, currentUnitPrice, product?.price]); // 🔥 Ongeza currentUnitPrice kwenye dependencies!
 
     const getQuantityForSize = (size) => {
         if (!currentColorVar) return 0;

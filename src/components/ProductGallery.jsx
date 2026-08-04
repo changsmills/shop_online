@@ -18,7 +18,7 @@ const ProductGallery = ({ product, isMobile = false }) => {
   const [photoIndex, setPhotoIndex] = useState(0);
   const videoRef = useRef(null);
   
-  // ========== PREPARE MEDIA LIST (FIRST!) ==========
+ // ========== PREPARE MEDIA LIST (FIRST!) ==========
   const mediaList = React.useMemo(() => {
     if (!product?.media_list) return [];
     return [...product.media_list]
@@ -29,6 +29,7 @@ const ProductGallery = ({ product, isMobile = false }) => {
         return (a.display_order || 0) - (b.display_order || 0);
       });
   }, [product?.media_list]);
+  
   
   // ========== VIDEO DATA (Now after mediaList is defined) ==========
   const videoItem = mediaList.find(item => item.type === 'video');

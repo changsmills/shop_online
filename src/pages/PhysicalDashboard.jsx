@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../axiosConfig"; // 🔥 Tumia api
-//const BACKEND_URL = "https://shop-online-r9z4.onrender.com"; // 🔥 URL ya Render
-const BACKEND_URL = "http://127.0.0.1:8000"; // 🔥 Sio Render! 
+const BACKEND_URL = "https://shop-online-r9z4.onrender.com"; // 🔥 URL ya Render
+//const BACKEND_URL = "http://127.0.0.1:8000"; // 🔥 Sio Render! 
 import QuickInventoryManager from '../components/QuickInventoryManager';
 import BusinessAnalytics from '../components/BusinessAnalytics';
 import TopDealsSection from "../components/TopDealsSection"

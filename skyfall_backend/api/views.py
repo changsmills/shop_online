@@ -184,7 +184,20 @@ class StoreEngineViewSet(viewsets.ModelViewSet):
 class ProductMediaViewSet(viewsets.ModelViewSet):
     queryset = ProductMedia.objects.all()
     serializer_class = ProductMediaSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [AllowAny] # Unaweza kubadilisha kuwa IsAuthenticatedOrReadOnly kama unataka
+
+    # 🔥 MUHIMU SANA: ONGEZA HII METHOD HAPA (Sio kwenye products/views.py, bali HAPA!)
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        product_id = self.request.query_params.get('product_id')
+        if product_id:
+            # Futa hyphens kama ni UUID string (kwa usalama)
+            clean_id = str(product_id).replace('-', '')
+            queryset = queryset.filter(product=clean_id)
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save()
 
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()

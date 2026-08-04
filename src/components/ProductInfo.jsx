@@ -117,8 +117,14 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
     return selectedVariationObj?.stock_quantity || product?.stock_quantity || 0;
   }, [selectedVariationObj, product, selectedColor, selectedSize]);
 
-  const currentPrice = useMemo(() => {
-    return selectedVariationObj?.price || product?.price || 0;
+    const currentPrice = useMemo(() => {
+    // 🔥 SULUHISHO: Thibitisha kama variation ina bei halali (kubwa kuliko 0)
+    const variationPrice = parseFloat(selectedVariationObj?.price);
+    if (variationPrice > 0) {
+      return variationPrice;
+    }
+    // Kama variation haina bei, tumia bei ya bidhaa kuu
+    return parseFloat(product?.price) || 0;
   }, [selectedVariationObj, product]);
 
   const currentSpecs = useMemo(() => {
