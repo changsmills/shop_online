@@ -154,9 +154,9 @@
 
 @media (max-width: 768px) {
   .na-card-wrapper {
-    flex: 0 0 calc((100% - (3.5 * 10px)) / 3.5) !important;
-    min-width: calc((100% - (3.5 * 10px)) / 3.5) !important;
-    max-width: calc((100% - (3.5 * 10px)) / 3.5) !important;
+    flex: 0 0 calc((100% - (4.5 * 10px)) / 4.5) !important;
+    min-width: calc((100% - (4.5 * 10px)) / 4.5) !important;
+    max-width: calc((100% - (4.5 * 10px)) / 4.5) !important;
     scroll-snap-align: start;
   }
   .na-scroll-wrapper {
@@ -191,9 +191,9 @@
 
 @media (max-width: 480px) {
   .na-card-wrapper {
-    flex: 0 0 calc((100% - (2 * 8px)) / 2) !important;
-    min-width: calc((100% - (2 * 8px)) / 2) !important;
-    max-width: calc((100% - (2 * 8px)) / 2) !important;
+    flex: 0 0 calc((100% - (3 * 8px)) / 3) !important;
+    min-width: calc((100% - (3 * 8px)) / 3) !important;
+    max-width: calc((100% - (3 * 8px)) / 3) !important;
   }
   .na-scroll-wrapper {
     gap: 8px !important;
