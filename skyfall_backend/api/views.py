@@ -91,8 +91,7 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [JWTAuthentication]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ['store_id', 'leaf_category_id', 'parent_category', 'is_approved', 'sub_category_id']  # ✅ ONGEZA 'sub_category_id' hapa!
-    ordering_fields = ['views', 'price', 'created_at']
+    filterset_fields = ['store_id', 'leaf_category_id', 'parent_category', 'is_approved', 'sub_category']  # ✅ Tumia jina la field!    ordering_fields = ['views', 'price', 'created_at']
     pagination_class = LimitOffsetPagination
 
     def perform_create(self, serializer):

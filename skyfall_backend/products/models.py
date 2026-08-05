@@ -44,9 +44,33 @@ class ProductsEngine(models.Model):
 
     user = models.ForeignKey('Profile', on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
     store_id = models.UUIDField()
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
-    parent_category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='parent_products')
-    leaf_category = models.ForeignKey('LeafCategory', on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
+        # 🔥 1. Hii sasa inaenda kwenye SubCategory (category_id kwenye DB)
+    sub_category = models.ForeignKey(
+        SubCategory,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='products_subcategory',
+        db_column='category_id'  # 🔥 MUHIMU: Inahifadhi column ya DB kuwa 'category_id'
+    )
+
+    # 🔥 2. Hii inabaki kwenye Category (parent_category_id kwenye DB)
+    parent_category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='parent_products'
+    )
+
+    # 🔥 3. Hii inabaki kwenye LeafCategory (leaf_category_id kwenye DB)
+    leaf_category = models.ForeignKey(
+        'LeafCategory',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='products'
+    )
     brand_id = models.UUIDField(null=True, blank=True)
 
     name = models.CharField(max_length=255)
