@@ -19,10 +19,6 @@ from products.models import (
 
 # 🔥 ONGEZA HII IMPORT MUHIMU KABISA (Inaingiza ViewSet kutoka products.views):
 from products.views import ProductVariationViewSet
-
-from products.views import ProductVariationViewSet
-
-
 from products.serializers import ProductsEngineSerializer
 from products.serializers import StoreEngineSerializer
 
@@ -95,7 +91,7 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [JWTAuthentication]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ['store_id', 'leaf_category_id', 'parent_category', 'is_approved']
+    filterset_fields = ['store_id', 'leaf_category_id', 'parent_category', 'is_approved', 'sub_category_id']  # ✅ ONGEZA 'sub_category_id' hapa!
     ordering_fields = ['views', 'price', 'created_at']
     pagination_class = LimitOffsetPagination
 

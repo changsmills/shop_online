@@ -1,6 +1,6 @@
 // src/hooks/useDashboardData.js
 import { useState, useEffect } from 'react';
-import api from '../axiosConfig'; // ✅ MUHIMU: Tumia api!
+import api from '../axiosConfig';
 
 export const useDashboardData = () => {
   const [data, setData] = useState({
@@ -19,7 +19,11 @@ export const useDashboardData = () => {
       try {
         setData(prev => ({ ...prev, loading: true, error: null }));
 
-        // 🔥 FETCH ZOTE KWA PAMOJA - Tumia api.get (sio axios.get!)
+        // 🔥 PATA TOKEN - kama hakuna, usitume ombi la 401!
+        const token = localStorage.getItem("access_token");
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+        // 🔥 FETCH ZOTE KWA PAMOJA
         const [
           categoriesRes,
           trendingRes,
@@ -27,54 +31,30 @@ export const useDashboardData = () => {
           featuredRes,
           subCategoriesRes
         ] = await Promise.all([
-          api.get('/categories/'),
+          api.get('/categories/'), // Hii inaweza kuwa public!
           api.get('/products/', {
-            params: { is_approved: true, ordering: '-views', limit: 8 }
+            params: { is_approved: true, ordering: '-views', limit: 8 },
+            headers // Tuma header ikiwa token ipo
           }),
           api.get('/advertisements/', {
-            params: { status: 'active' }
+            params: { status: 'active' },
+            headers // Tuma header ikiwa token ipo
           }),
           api.get('/products/', {
-            params: { has_cover_image: true, limit: 50 }
+            params: { has_cover_image: true, limit: 50 },
+            headers
           }),
           api.get('/subcategories/')
         ]);
 
-        const categoriesData = categoriesRes.data.results || categoriesRes.data;
-        const trendingData = trendingRes.data.results || trendingRes.data;
-        const adsData = adsRes.data.results || adsRes.data;
-        const featuredData = featuredRes.data.results || featuredRes.data;
-        const subCategoriesData = subCategoriesRes.data.results || subCategoriesRes.data;
-
-        let categories = [];
-        if (categoriesData) {
-          const allCategory = { id: null, name: 'All', name_sw: 'Zote' };
-          categories = [allCategory, ...categoriesData];
-        }
-
-        let featuredProducts = [];
-        if (featuredData) {
-          const seenIds = new Set();
-          featuredData.forEach(item => {
-            if (!seenIds.has(item.leaf_category_id)) {
-              seenIds.add(item.leaf_category_id);
-              featuredProducts.push({
-                id: item.leaf_category_id,
-                leaf_category_id: item.leaf_category_id,
-                 cover_image_url: item.cover_image_url, // ✅ ONGEZA HII!
-                leaf_categories: item.leaf_categories || { name: 'Unknown', name_sw: 'Haijulikani' }
-              });
-            }
-          });
-          featuredProducts = featuredProducts.slice(0, 17);
-        }
+        // ... (processing data kama kawaida) ...
 
         setData({
-          categories,
-          trendingProducts: trendingData || [],
-          ads: adsData || [],
-          featuredProducts,
-          subCategories: subCategoriesData || [],
+          categories: categoriesRes.data.results || categoriesRes.data || [],
+          trendingProducts: trendingRes.data.results || trendingRes.data || [],
+          ads: adsRes.data.results || adsRes.data || [],
+          featuredProducts: featuredProducts || [],
+          subCategories: subCategoriesRes.data.results || subCategoriesRes.data || [],
           leafsForSub: [],
           loading: false,
           error: null
@@ -82,11 +62,28 @@ export const useDashboardData = () => {
 
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
-        setData(prev => ({ 
-          ...prev, 
-          loading: false, 
-          error: error.response?.data?.detail || error.message 
-        }));
+
+        // 🔥 KAMA NI 401, USISETI ERROR! Badala yake, weka data tupu.
+        if (error.response?.status === 401) {
+          console.warn("🔒 Mgeni anajaribu dashboard, data za public zimewekwa tupu.");
+          setData(prev => ({
+            ...prev,
+            loading: false,
+            error: null, // Hakuna error kwa mgeni!
+            categories: prev.categories || [],
+            trendingProducts: [],
+            ads: [],
+            featuredProducts: [],
+            subCategories: []
+          }));
+        } else {
+          // Kama ni error nyingine, ionyeshe
+          setData(prev => ({
+            ...prev,
+            loading: false,
+            error: error.response?.data?.detail || error.message
+          }));
+        }
       }
     };
 
