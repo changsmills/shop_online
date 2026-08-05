@@ -121,9 +121,10 @@ export default function NavLinks({ isMobile }) {
     async function fetchLeafsBySub() {
       if (viewMode === 'subcategories' && selectedSubForLeaf) {
         try {
-          const response = await api.get('/products/', {
-            params: { category: selectedSubForLeaf.id }
-          });
+          // ✅ Badilisha 'category' kuwa 'sub_category'
+        const response = await api.get('/products/', {
+         params: { sub_category: selectedSubForLeaf.id }
+              });
           const data = response.data || [];
 
           const uniqueLeafs = [];
@@ -136,7 +137,7 @@ export default function NavLinks({ isMobile }) {
                 id: item.leaf_category_id,
                 name: item.leaf_categories?.name,
                 name_sw: item.leaf_categories?.name_sw,
-                image_url: item.cover_image
+                image_url: item.cover_image_url // ✅ Tumia cover_image_url!
               });
             }
           });
@@ -149,21 +150,24 @@ export default function NavLinks({ isMobile }) {
     fetchLeafsBySub();
   }, [selectedSubForLeaf, viewMode]);
 
-  // ========== FETCH FUNCTIONS ==========
-  async function fetchSubCategories(parentId) {
-    try {
-      const response = await api.get('/subcategories/', {
-        params: { category_id: parentId }
-      });
-      const data = response.data;
-      if (data) {
-        setSubCategories(data);
-        if (data.length > 0) setSelectedSubForLeaf(data[0]);
-      }
-    } catch (error) {
-      console.error("Error fetching subcategories:", error);
+async function fetchSubCategories(parentId) {
+  try {
+    const response = await api.get('/subcategories/', {
+      params: { category_id: parentId }
+    });
+    const data = response.data;
+    if (data) {
+      setSubCategories(data);
+      // 🔥 ONDOA HII LINE: if (data.length > 0) setSelectedSubForLeaf(data[0]);
+      
+      // 🔥 SAFISHA DATA ZA ZAMANI (Ili zisionekane mpaka ubonyeze upande wa kushoto)
+      setSelectedSubForLeaf(null);
+      setLeafsForSub([]);
     }
+  } catch (error) {
+    console.error("Error fetching subcategories:", error);
   }
+}
 
   async function fetchFeaturedLeafs(parentId) {
     try {
@@ -181,7 +185,7 @@ export default function NavLinks({ isMobile }) {
           uniqueCategories.push({
             id: item.leaf_category_id,
             leaf_category_id: item.leaf_category_id,
-            cover_image: item.cover_image,
+            cover_image_url: item.cover_image_url, // ✅ Tumia cover_image_url!
             leaf_categories: item.leaf_categories
           });
         }
@@ -367,10 +371,10 @@ export default function NavLinks({ isMobile }) {
                           <Link to={`/category/${leaf.leaf_category_id}`} key={leaf.id} className="grid-item">
                             <div className="image-circle">
                               <img
-                                src={leaf.cover_image || placeholderImg}
-                                alt={getDisplayName(leaf.leaf_categories)}
-                                onError={(e) => { e.target.src = placeholderImg; }}
-                              />
+    src={leaf.cover_image_url || placeholderImg}  // ✅ Tumia cover_image_url!
+    alt={getDisplayName(leaf.leaf_categories)}
+    onError={(e) => { e.target.src = placeholderImg; }}
+/>
                             </div>
                             <p className="grid-text">{getDisplayName(leaf.leaf_categories) || "Kategoria"}</p>
                           </Link>
@@ -387,12 +391,12 @@ export default function NavLinks({ isMobile }) {
                         <Link to={`/category/${leaf.id}`} key={leaf.id} className="grid-item">
                           <div className="image-circle">
                             <img
-                              src={leaf.image_url || placeholderImg}
-                              alt={getDisplayName(leaf)}
-                              onError={(e) => { e.target.src = placeholderImg; }}
-                            />
+    src={leaf.image_url || placeholderImg}
+    alt={getDisplayName(leaf)}
+    onError={(e) => { e.target.src = placeholderImg; }}
+/>
                           </div>
-                          <p className="grid-text">{getDisplayName(leaf)}</p>
+                         <p className="grid-text">{getDisplayName(leaf)}</p>
                         </Link>
                       ))
                     )}

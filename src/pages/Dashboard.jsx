@@ -114,34 +114,38 @@ export default function Dashboard() {
     return ad.media_url.match(/\.(mp4|webm|mov)$/i) !== null;
   };
 
-  // 1. Fetch Featured Leafs (SORTED ALPHABETICALLY)
-  const fetchFeaturedLeafs = async (categoryId) => {
-    if (!categoryId) return;
-    try {
-      const response = await api.get('/products/', {
-        params: { parent_category: categoryId }
-      });
+ // 1. Fetch Featured Leafs (SORTED ALPHABETICALLY)
+const fetchFeaturedLeafs = async (categoryId) => {
+  if (!categoryId) return;
+  try {
+    const response = await api.get('/products/', {
+      params: { parent_category: categoryId }
+    });
 
-      const seenIds = new Set();
-      const uniqueLeafs = response.data
-        .filter(item => item.cover_image && !seenIds.has(item.leaf_category_id))
-        .map(item => {
-          seenIds.add(item.leaf_category_id);
-          return {
-            id: item.leaf_category_id,
-            leaf_category_id: item.leaf_category_id,
-            cover_image: item.cover_image,
-            leaf_categories: item.leaf_categories || { name: 'Unknown', name_sw: 'Haijulikani' }
-          };
-        })
-        .sort((a, b) => a.leaf_categories.name.localeCompare(b.leaf_categories.name));
-        
-      setFeaturedProducts(uniqueLeafs.slice(0, 17));
-    } catch (error) {
-      console.error(error);
-      setFeaturedProducts([]);
-    }
-  };
+    // 🔥 BADILISHA HAPA: Tumia 'results' kwa sababu backend ina pagination!
+    const data = response.data.results || response.data || [];
+
+    const uniqueCategories = [];
+    const seenIds = new Set();
+
+    data.forEach(item => {
+      if (!seenIds.has(item.leaf_category_id)) {
+        seenIds.add(item.leaf_category_id);
+        uniqueCategories.push({
+          id: item.leaf_category_id,
+          leaf_category_id: item.leaf_category_id,
+          cover_image_url: item.cover_image_url, // ✅ Tumia cover_image_url (URL kamili ya Cloudinary)!
+          leaf_categories: item.leaf_categories
+        });
+      }
+    });
+
+    setFeaturedProducts(uniqueCategories.slice(0, 17));
+  } catch (error) {
+    console.error(error);
+    setFeaturedProducts([]);
+  }
+};
 
   // 2. Fetch Subcategories (SORTED ALPHABETICALLY)
   const fetchSubCategories = async (categoryId) => {
@@ -161,32 +165,35 @@ export default function Dashboard() {
   };
 
   // 3. Fetch Leafs for Subcategory (SORTED ALPHABETICALLY)
-  const fetchLeafsForSub = async (subCategoryId) => {
-    try {
-      const response = await api.get('/products/', {
-        params: { category: subCategoryId }
-      });
+const fetchLeafsForSub = async (subCategoryId) => {
+  try {
+    const response = await api.get('/products/', {
+      params: { sub_category: subCategoryId }
+    });
 
-      const seenLeafIds = new Set();
-      const uniqueLeafs = response.data
-        .filter(item => item.cover_image && !seenLeafIds.has(item.leaf_category_id))
-        .map(item => {
-          seenLeafIds.add(item.leaf_category_id);
-          return {
-            id: item.leaf_category_id,
-            name: item.leaf_categories?.name || 'Unknown',
-            name_sw: item.leaf_categories?.name_sw || 'Haijulikani',
-            cover_image: item.cover_image
-          };
-        })
-        .sort((a, b) => a.name.localeCompare(b.name));
-        
-      setLeafsForSub(uniqueLeafs);
-    } catch (error) {
-      console.error(error);
-      setLeafsForSub([]);
-    }
-  };
+    // 🔥 BADILISHA HAPA: Tumia 'results'!
+    const data = response.data.results || response.data || [];
+
+    const seenLeafIds = new Set();
+    const uniqueLeafs = data
+      .filter(item => item.cover_image_url && !seenLeafIds.has(item.leaf_category_id))
+      .map(item => {
+        seenLeafIds.add(item.leaf_category_id);
+        return {
+          id: item.leaf_category_id,
+          name: item.leaf_categories?.name || 'Unknown',
+          name_sw: item.leaf_categories?.name_sw || 'Haijulikani',
+          cover_image_url: item.cover_image_url // ✅ Tumia cover_image_url!
+        };
+      })
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    setLeafsForSub(uniqueLeafs);
+  } catch (error) {
+    console.error(error);
+    setLeafsForSub([]);
+  }
+};
 
   // ========== EFFECTS ==========
   useEffect(() => {
@@ -616,7 +623,7 @@ export default function Dashboard() {
                         onClick={() => handleLeafClick(leaf.leaf_category_id)}
                       >
                         <div className="image-circle">
-                          <img src={leaf.cover_image || placeholderImg} alt={leaf.leaf_categories?.name} />
+                          <img src={leaf.cover_image_url || placeholderImg} alt={leaf.leaf_categories?.name} />
                         </div>
                         <p className="grid-text">
                           {i18n.language === 'sw' 

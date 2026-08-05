@@ -19,42 +19,90 @@ export const useDashboardData = () => {
       try {
         setData(prev => ({ ...prev, loading: true, error: null }));
 
-        // 🔥 PATA TOKEN - kama hakuna, usitume ombi la 401!
         const token = localStorage.getItem("access_token");
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-        // 🔥 FETCH ZOTE KWA PAMOJA
-        const [
-          categoriesRes,
-          trendingRes,
-          adsRes,
-          featuredRes,
-          subCategoriesRes
-        ] = await Promise.all([
-          api.get('/categories/'), // Hii inaweza kuwa public!
-          api.get('/products/', {
+        // 🔥 BADILISHA: TUMIA INDIVIDUAL try/catch badala ya Promise.all!
+        let categories = [];
+        let trendingProducts = [];
+        let ads = [];
+        let featuredProducts = [];
+        let subCategories = [];
+
+        // 1. Categories (Public)
+        try {
+          const res = await api.get('/categories/');
+          const rawData = res.data.results || res.data;
+          if (rawData) {
+            const allCategory = { id: null, name: 'All', name_sw: 'Zote' };
+            categories = [allCategory, ...rawData];
+          }
+        } catch (err) {
+          console.warn("Failed to fetch categories:", err);
+        }
+
+        // 2. Trending Products (IsApproved)
+        try {
+          const res = await api.get('/products/', {
             params: { is_approved: true, ordering: '-views', limit: 8 },
-            headers // Tuma header ikiwa token ipo
-          }),
-          api.get('/advertisements/', {
+            headers
+          });
+          trendingProducts = res.data.results || res.data || [];
+        } catch (err) {
+          console.warn("Failed to fetch trending products:", err);
+        }
+
+        // 3. Advertisements (Hata kama inatoa 401, haitavunja wengine!)
+        try {
+          const res = await api.get('/advertisements/', {
             params: { status: 'active' },
-            headers // Tuma header ikiwa token ipo
-          }),
-          api.get('/products/', {
+            headers
+          });
+          ads = res.data.results || res.data || [];
+        } catch (err) {
+          console.warn("Failed to fetch ads (likely 401):", err);
+        }
+
+        // 4. Featured Products (Leaf Categories)
+        try {
+          const res = await api.get('/products/', {
             params: { has_cover_image: true, limit: 50 },
             headers
-          }),
-          api.get('/subcategories/')
-        ]);
+          });
+          const rawFeatured = res.data.results || res.data || [];
+          const seenIds = new Set();
+          const featured = [];
+          rawFeatured.forEach(item => {
+            if (!seenIds.has(item.leaf_category_id)) {
+              seenIds.add(item.leaf_category_id);
+              featured.push({
+                id: item.leaf_category_id,
+                leaf_category_id: item.leaf_category_id,
+                cover_image_url: item.cover_image_url,
+                leaf_categories: item.leaf_categories || { name: 'Unknown', name_sw: 'Haijulikani' }
+              });
+            }
+          });
+          featuredProducts = featured.slice(0, 17);
+        } catch (err) {
+          console.warn("Failed to fetch featured products:", err);
+        }
 
-        // ... (processing data kama kawaida) ...
+        // 5. Subcategories
+        try {
+          const res = await api.get('/subcategories/');
+          subCategories = res.data.results || res.data || [];
+        } catch (err) {
+          console.warn("Failed to fetch subcategories:", err);
+        }
 
+        // 🔥 SET DATA (Hata kama ads imeshindwa, categories bado zitaonekana!)
         setData({
-          categories: categoriesRes.data.results || categoriesRes.data || [],
-          trendingProducts: trendingRes.data.results || trendingRes.data || [],
-          ads: adsRes.data.results || adsRes.data || [],
-          featuredProducts: featuredProducts || [],
-          subCategories: subCategoriesRes.data.results || subCategoriesRes.data || [],
+          categories,
+          trendingProducts,
+          ads,
+          featuredProducts,
+          subCategories,
           leafsForSub: [],
           loading: false,
           error: null
@@ -62,28 +110,11 @@ export const useDashboardData = () => {
 
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
-
-        // 🔥 KAMA NI 401, USISETI ERROR! Badala yake, weka data tupu.
-        if (error.response?.status === 401) {
-          console.warn("🔒 Mgeni anajaribu dashboard, data za public zimewekwa tupu.");
-          setData(prev => ({
-            ...prev,
-            loading: false,
-            error: null, // Hakuna error kwa mgeni!
-            categories: prev.categories || [],
-            trendingProducts: [],
-            ads: [],
-            featuredProducts: [],
-            subCategories: []
-          }));
-        } else {
-          // Kama ni error nyingine, ionyeshe
-          setData(prev => ({
-            ...prev,
-            loading: false,
-            error: error.response?.data?.detail || error.message
-          }));
-        }
+        setData(prev => ({
+          ...prev,
+          loading: false,
+          error: error.response?.data?.detail || error.message
+        }));
       }
     };
 

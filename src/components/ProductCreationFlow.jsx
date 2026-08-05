@@ -252,10 +252,20 @@ const ProductCreationFlow = ({
         formData.append("original_price", parseFloat(p.compare_at_price) || 0);
 
         // === Kategoria ===
-        const formattedCategoryId = formatUUID(realCategoryId);
-        if (formattedCategoryId) formData.append("category", formattedCategoryId);
-        else console.warn("⚠️ Category ID is missing or invalid!");
-        if (parentCategoryId) formData.append("parent_category", parentCategoryId);
+        // 🔥 1. Tuma Subcategory (kwa field ya 'sub_category')
+if (p.sub_category_id) {
+    const formattedSubCatId = formatUUID(p.sub_category_id);
+    if (formattedSubCatId) {
+        formData.append("sub_category", formattedSubCatId);  // ✅ Sasa ni 'sub_category'!
+    } else {
+        console.warn("⚠️ Sub-category ID is missing or invalid!");
+    }
+}
+
+// 🔥 2. Tuma Parent Category (hii ni sahihi kwa 'parent_category')
+if (parentCategoryId) {
+    formData.append("parent_category", parentCategoryId);
+}
         
         const formattedLeafId = formatUUID(p.leaf_category_id);
         if (formattedLeafId) formData.append("leaf_category", formattedLeafId);
