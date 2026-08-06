@@ -1,64 +1,67 @@
-/* ============================================ */
-/* LAYER 1: PAGE CONTAINER                      */
-/* ============================================ */
-
+/* ============ MAIN LAYOUT ============ */
 .cat-page {
-  background: #f7f8fa;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
-}
-
-.cat-page.skeleton {
-  background: #f7f8fa;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  background-color: #f8f9fa;
 }
 
-.cat-page.error {
-  background: #f7f8fa;
-  min-height: 100vh;
-}
-
-/* ============================================ */
-/* LAYER 2: MAIN LAYOUT (Sidebar + Content)     */
-/* ============================================ */
-
-.cat-main-layout {
-  display: grid;
-  grid-template-columns: 240px 1fr; /* Desktop: Sidebar 240px, Grid inabaki */
-  gap: 24px;
-  padding: 16px 0;
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   width: 100%;
-  box-sizing: border-box;
 }
 
-/* ============================================ */
-/* LAYER 3: FILTER SIDEBAR (DESKTOP ONLY)       */
-/* ============================================ */
+.main-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
 
+.content-container-simple {
+  width: 100%;
+  max-width: 1400px;
+}
+
+/* ============ FLEX LAYOUT: Sidebar 30% | Content 70% ============ */
+.cat-main-layout {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+/* Sidebar - 30% */
 .cat-filter-sidebar {
-  background: #ffffff;
+  flex: 0 0 30%;
+  max-width: 30%;
+  background: white;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  padding: 16px;
-  position: sticky; /* 🔥 Inabaki juu unaposcroll chini! */
-  top: 100px;
-  max-height: 80vh;
-  overflow-y: auto;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  height: fit-content;
+  position: sticky;
+  top: 90px;
 }
 
+/* Content - 70% */
+.cat-products-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ============ FILTER SIDEBAR ============ */
 .filter-header {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-weight: 700;
-  font-size: 16px;
-  border-bottom: 1px solid #f0f0f0;
-  padding-bottom: 12px;
-  margin-bottom: 12px;
-  color: #1a1a1a;
+  font-weight: 600;
+  font-size: 18px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e9ecef;
+  margin-bottom: 15px;
+  color: #2d3748;
 }
 
 .filter-list {
@@ -68,232 +71,214 @@
 }
 
 .filter-item {
-  padding: 10px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-  color: #4b5563;
+  padding: 12px 15px;
+  margin-bottom: 5px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  margin-bottom: 4px;
+  transition: all 0.3s ease;
+  color: #4a5568;
+  font-size: 15px;
 }
 
 .filter-item:hover {
-  background: #f3f4f6;
+  background: #f7fafc;
+  color: #2b6cb0;
 }
 
-/* Kategoria iliyochaguliwa */
 .filter-item.active {
-  background: #fff5f0;
-  color: #ff6a00;
+  background: #ebf8ff;
+  color: #2b6cb0;
   font-weight: 600;
-  border-left: 3px solid #ff6a00;
-  padding-left: 9px;
+  border-left: 3px solid #3182ce;
 }
 
-/* ============================================ */
-/* LAYER 4: CONTENT YA KULIA & BREADCRUMB       */
-/* ============================================ */
-
-.cat-products-content {
-  width: 100%;
+/* ============ PRODUCTS GRID ============ */
+.cat-products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 25px;
 }
 
+/* ============ BREADCRUMB ============ */
 .cat-breadcrumb {
-  margin-bottom: 16px;
+  margin-bottom: 25px;
+  padding: 15px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
 
 .cat-breadcrumb-items {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
   font-size: 14px;
-  color: #666;
+  color: #718096;
+  flex-wrap: wrap;
 }
 
-.cat-breadcrumb-link {
+.cat-breadcrumb-items span {
   cursor: pointer;
-  color: #333;
   transition: color 0.2s;
 }
-.cat-breadcrumb-link:hover {
-  color: #ff6a00;
+
+.cat-breadcrumb-items span:hover {
+  color: #2b6cb0;
 }
 
-.cat-breadcrumb-text {
-  color: #666;
+.cat-breadcrumb-items .current {
+  color: #2d3748;
+  font-weight: 600;
+  cursor: default;
 }
 
-.cat-breadcrumb-current {
-  color: #ff6a00;
-  font-weight: bold;
+/* ============ NO PRODUCTS ============ */
+.no-products-msg {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+  color: #718096;
+  font-size: 18px;
 }
 
-.cat-breadcrumb-icon {
-  color: #ccc;
-}
-
-/* ============================================ */
-/* LAYER 5: FLUID PRODUCTS GRID (NYAMBU!)       */
-/* ============================================ */
-
-.cat-products-grid {
-  display: grid;
-  width: 100%;
-  box-sizing: border-box;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); /* 🔥 FLUID FLOW! */
-  padding: 0;
-}
-
-/* ✅ Mobile: 2 columns (Alibaba style) */
-@media (max-width: 768px) {
-  .cat-products-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px !important;
-    padding: 0 !important;
-  }
-}
-
-/* ============================================ */
-/* LAYER 6: RESPONSIVE MEDIA QUERIES (Layout)   */
-/* ============================================ */
-
-/* 📱 MOBILE: Ficha Sidebar na badilisha Layout */
-@media (max-width: 768px) {
-  .cat-main-layout {
-    display: block !important;
-  }
-  .cat-filter-sidebar {
-    display: none !important;
-  }
-
-  .cat-breadcrumb-items {
-    font-size: 10px;
-    gap: 4px;
-  }
-  .cat-breadcrumb-icon { width: 10px; height: 10px; }
-}
-
-/* 💻 TABLET: Punguza Sidebar */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .cat-main-layout {
-    grid-template-columns: 200px 1fr;
-    gap: 16px;
-  }
-  .cat-breadcrumb-items { font-size: 13px; }
-  .cat-breadcrumb-icon { width: 14px; height: 14px; }
-}
-
-/* 🖥️ DESKTOP: Layout kamili */
-@media (min-width: 1025px) {
-  .cat-breadcrumb-items { font-size: 14px; }
-  .cat-breadcrumb-icon { width: 16px; height: 16px; }
-}
-
-/* ============================================ */
-/* LAYER 7: SKELETON LOADING                     */
-/* ============================================ */
-
-.cat-skeleton-wrapper {
-  padding: 20px;
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.cat-skeleton-breadcrumb {
-  width: 60%;
-  height: 20px;
-  background: #e0e0e0;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  animation: pulse 1.5s infinite ease-in-out;
-}
-
-.cat-skeleton-grid {
-  display: grid;
-  gap: 15px;
-}
-
-@media (max-width: 768px) {
-  .cat-skeleton-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    padding: 8px;
-  }
-}
-
-@media (min-width: 769px) {
-  .cat-skeleton-grid {
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  }
-}
-
-.cat-skeleton-card {
+/* ============ ERROR ============ */
+.cat-error-container {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-}
-
-.cat-skeleton-img {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  background: #e0e0e0;
-  border-radius: 12px;
-  animation: pulse 1.5s infinite ease-in-out;
-}
-
-.cat-skeleton-text {
-  height: 16px;
-  background: #e0e0e0;
-  border-radius: 4px;
-  animation: pulse 1.5s infinite ease-in-out;
-}
-
-.cat-skeleton-text.short {
-  width: 60%;
-}
-
-@keyframes pulse {
-  0% { background-color: #e0e0e0; }
-  50% { background-color: #f0f0f0; }
-  100% { background-color: #e0e0e0; }
-}
-
-/* ============================================ */
-/* LAYER 8: ERROR STATE                          */
-/* ============================================ */
-
-.cat-error-container {
-  text-align: center;
+  align-items: center;
+  justify-content: center;
   padding: 80px 20px;
+  background: white;
+  border-radius: 12px;
+  text-align: center;
 }
 
 .cat-error-msg {
-  color: #dc2626;
+  font-size: 20px;
+  color: #e53e3e;
+  margin-bottom: 20px;
 }
 
-.cat-error-btn {
-  margin-top: 16px;
-  padding: 8px 20px;
-  background: #ff6600;
+.error-back-btn {
+  padding: 12px 30px;
+  background: #3182ce;
   color: white;
   border: none;
   border-radius: 8px;
+  font-size: 16px;
   cursor: pointer;
+  transition: background 0.3s;
 }
 
-/* ============================================ */
-/* LAYER 9: FOOTER                               */
-/* ============================================ */
+.error-back-btn:hover {
+  background: #2c5282;
+}
 
-.cat-footer-wrapper {
-  display: block;
+/* ============ SKELETON LOADING ============ */
+.skeleton-sidebar {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.skeleton-header {
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e9ecef;
+  margin-bottom: 15px;
+}
+
+.skeleton-item {
+  padding: 12px 15px;
+  margin-bottom: 5px;
+}
+
+.skeleton-line {
+  background: linear-gradient(90deg, #e2e8f0 25%, #edf2f7 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-card {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.skeleton-image {
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(90deg, #e2e8f0 25%, #edf2f7 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.skeleton-text {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 1024px) {
+  .cat-main-layout {
+    flex-direction: column;
+  }
+  
+  .cat-filter-sidebar {
+    flex: 1;
+    max-width: 100%;
+    position: relative;
+    top: 0;
+    margin-bottom: 20px;
+  }
+  
+  .cat-products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
 }
 
 @media (max-width: 768px) {
-  .cat-footer-wrapper {
+  .main-content {
+    padding: 10px;
+  }
+  
+  .cat-filter-sidebar {
     display: none;
   }
+  
+  .cat-products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+  }
+  
+  .cat-breadcrumb {
+    padding: 10px 15px;
+  }
+  
+  .cat-breadcrumb-items {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cat-products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+}
+
+/* ============ FOOTER ============ */
+.footer-wrapper {
+  margin-top: auto;
 }

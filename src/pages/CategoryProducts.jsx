@@ -13,37 +13,43 @@ export default function CategoryProducts() {
   
   const [products, setProducts] = useState([]);
   const [hierarchy, setHierarchy] = useState({ category: "Marketplace", sub: "General", leaf: "Products" });
-  const [filters, setFilters] = useState([]); // 🔥 Kategoria za upande wa kushoto
-  const [activeFilterId, setActiveFilterId] = useState(null); // 🔥 Kategoria iliyochaguliwa kwenye Filter
-  
+  const [filters, setFilters] = useState([]);
+  const [activeFilterId, setActiveFilterId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  // ========== RESPONSIVE ==========
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-   // ============================================
-  // 1. PATA DATA (HIERARCHY, FILTERS, PRODUCTS)
-  // ============================================
+  // ========== CHECK LEAF ID ==========
+  useEffect(() => {
+    if (!leafId) {
+      console.error("❌ leafId is undefined! Redirecting to homepage...");
+      navigate('/');
+    }
+  }, [leafId, navigate]);
+
+  // ========== FETCH DATA ==========
   useEffect(() => {
     async function fetchPageData() {
       if (!leafId) {
-        setError("Leaf ID haipo");
+        setError("Leaf ID haipo - URL inahitaji ID ya category");
         setLoading(false);
         return;
       }
+      
       setLoading(true);
       setError(null);
       
       try {
-        console.log("📌 1. Inajarbu kupata Leaf Category kwa ID:", leafId);
+        // 1. Get Leaf Category
         const leafRes = await api.get(`/leaf-categories/${leafId}/`);
         const leaf = leafRes.data;
-        console.log("✅ Leaf category imepatikana:", leaf);
 
         let mainCatName = "Marketplace";
         let subName = "General";
@@ -51,18 +57,14 @@ export default function CategoryProducts() {
 
         if (leaf && leaf.sub_category_id) {
           subId = leaf.sub_category_id;
-          console.log("📌 2. Inajarbu kupata Subcategory kwa ID:", subId);
           const subRes = await api.get(`/subcategories/${subId}/`);
           const subData = subRes.data;
-          console.log("✅ Subcategory imepatikana:", subData);
           
           if (subData) {
             subName = subData.name;
             if (subData.category_id) {
-              console.log("📌 3. Inajarbu kupata Main Category kwa ID:", subData.category_id);
               const mainRes = await api.get(`/categories/${subData.category_id}/`);
               if (mainRes.data) mainCatName = mainRes.data.name;
-              console.log("✅ Main category imepatikana:", mainCatName);
             }
           }
         }
@@ -73,20 +75,17 @@ export default function CategoryProducts() {
           leaf: leaf?.name || "Products"
         });
 
-        // 🔥 2. Pata Filters
+        // 2. Get Filters (Leaf categories for this subId)
         if (subId) {
-          console.log("📌 4. Inajarbu kupata Filters (Leaf categories kwa subId):", subId);
           const filtersRes = await api.get('/leaf-categories/', {
             params: { sub_category_id: subId }
           });
           const allFilters = filtersRes.data.results || filtersRes.data || [];
           setFilters(allFilters);
-          console.log(`✅ ${allFilters.length} Filters zimepatikana.`);
         }
 
-        // 🔥 3. Pata Products
+        // 3. Get Products
         const currentFilterId = activeFilterId || leafId;
-        console.log("📌 5. Inajarbu kupata Products kwa leaf_category ID:", currentFilterId);
         const productsRes = await api.get('/products/', {
           params: { 
             leaf_category: currentFilterId, 
@@ -96,28 +95,19 @@ export default function CategoryProducts() {
 
         const productsData = productsRes.data.results || productsRes.data || [];
         setProducts(productsData);
-        console.log(`✅ ${productsData.length} Products zimepatikana.`);
 
       } catch (err) {
-        console.error("❌ ERROR IMEJITOKEZA! Tafadhali angalia hapa chini:");
-
-        // 🔥 Hapa ndipo tunapotambua chanzo halisi cha error!
+        console.error("❌ ERROR:", err);
         if (err.response) {
-          // Server ilijibu lakini na code ya error (404, 500, n.k)
-          console.error("📌 Server Status Code:", err.response.status);
-          console.error("📌 API Endpoint iliyoombwa:", err.config?.url);
-          console.error("📌 Error Message kutoka Backend:", err.response.data);
-          
-          setError(`Hitilafu kutoka server: ${err.response.status} - ${err.response.data?.detail || err.message}`);
+          if (err.response.status === 404) {
+            setError(`Category ${leafId} haipo kwenye mfumo.`);
+          } else {
+            setError(`Hitilafu kutoka server: ${err.response.status}`);
+          }
         } else if (err.request) {
-          // Ombi lilitumwa lakini hakuna jibu (Backend haijaanza / Network issue)
-          console.error("📌 Ombi lilitumwa, lakini hakuna jibu kutoka Backend.");
-          console.error("📌 Request object:", err.request);
-          setError("Imeshindwa kuungana na server. Hakikisha Django backend imewashwa (python manage.py runserver).");
+          setError("Imeshindwa kuungana na server. Hakikisha Django backend imewashwa.");
         } else {
-          // Kitu kingine (kama msimbo wa JS umepasuka kabla ya kuomba API)
-          console.error("📌 Error isiyojulikana (Labda logic):", err.message);
-          setError("Kuna tatizo la ndani la msimbo. Angalia console.");
+          setError("Kuna tatizo la ndani la msimbo.");
         }
       } finally {
         setLoading(false);
@@ -126,42 +116,96 @@ export default function CategoryProducts() {
     fetchPageData();
   }, [leafId, activeFilterId]);
 
+  // ========== GET IMAGE ==========
   const getProductImage = (item) => {
+    if (item.cover_image_url) return item.cover_image_url;
     if (item.cover_image) return item.cover_image;
     return "https://placehold.co/400x400?text=No+Image";
   };
 
+  // ========== SKELETON LOADING ==========
   if (loading) {
     return (
-      <div className="cat-page skeleton">
-        <div className="sticky-header"><Header search="" setSearch={() => {}} /></div>
-        <div className="cat-skeleton-wrapper"><div className="cat-skeleton-grid">...</div></div>
+      <div className="cat-page">
+        <div className="sticky-header">
+          <Header search="" setSearch={() => {}} />
+        </div>
+        <div className="main-content">
+          <div className="content-container-simple">
+            <main className="cat-main-layout">
+              {/* Skeleton Sidebar */}
+              <aside className="cat-filter-sidebar skeleton-sidebar">
+                <div className="filter-header skeleton-header">
+                  <div className="skeleton-line" style={{ width: '70%', height: '24px' }}></div>
+                </div>
+                <ul className="filter-list">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <li key={i} className="filter-item skeleton-item">
+                      <div className="skeleton-line" style={{ width: '80%', height: '20px' }}></div>
+                    </li>
+                  ))}
+                </ul>
+              </aside>
+
+              {/* Skeleton Content */}
+              <div className="cat-products-content">
+                <div className="cat-breadcrumb skeleton-breadcrumb">
+                  <div className="skeleton-line" style={{ width: '40%', height: '20px' }}></div>
+                </div>
+                <div className="cat-products-grid skeleton-grid">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <div key={i} className="skeleton-card">
+                      <div className="skeleton-image"></div>
+                      <div className="skeleton-text">
+                        <div className="skeleton-line" style={{ width: '70%' }}></div>
+                        <div className="skeleton-line" style={{ width: '50%' }}></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
       </div>
     );
   }
 
+  // ========== ERROR ==========
   if (error) {
     return (
       <div className="cat-page error">
-        <div className="sticky-header"><Header search="" setSearch={() => {}} /></div>
-        <div className="cat-error-container"><p className="cat-error-msg">{error}</p></div>
+        <div className="sticky-header">
+          <Header search="" setSearch={() => {}} />
+        </div>
+        <div className="main-content">
+          <div className="content-container-simple">
+            <div className="cat-error-container">
+              <p className="cat-error-msg">{error}</p>
+              <button onClick={() => navigate('/')} className="error-back-btn">
+                Rudi Nyumbani
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
+  // ========== RENDER ==========
   return (
     <div className="cat-page">
+      {/* HEADER - Full width */}
       <div className="sticky-header">
         <Header search="" setSearch={() => {}} />
       </div>
       
+      {/* MAIN CONTENT - Flexbox Layout */}
       <div className="main-content">
         <div className="content-container-simple">
-          
           <main className="cat-main-layout">
-            {/* ============================================ */}
-            {/* 🔥 SIDEBAR - FILTERS (Upande wa Kushoto)     */}
-            {/* ============================================ */}
+            
+            {/* SIDEBAR - 30% upande wa kushoto */}
             {!isMobile && (
               <aside className="cat-filter-sidebar">
                 <div className="filter-header">
@@ -169,7 +213,7 @@ export default function CategoryProducts() {
                   <span>Kategoria Zote</span>
                 </div>
                 <ul className="filter-list">
-                  {/* 🔥 Kategoria kuu (Iliyo mwanzo) */}
+                  {/* Current category */}
                   <li 
                     className={`filter-item ${!activeFilterId || activeFilterId === leafId ? 'active' : ''}`}
                     onClick={() => setActiveFilterId(leafId)}
@@ -177,7 +221,7 @@ export default function CategoryProducts() {
                     {hierarchy.leaf}
                   </li>
                   
-                  {/* 🔥 Kategoria nyingine zinazopatikana (Filters) */}
+                  {/* Other categories */}
                   {filters.map((filter) => (
                     filter.id !== leafId && (
                       <li 
@@ -193,9 +237,7 @@ export default function CategoryProducts() {
               </aside>
             )}
 
-            {/* ============================================ */}
-            {/* 🔥 CONTENT - GRID YA BIDHAA (Upande wa Kulia)*/}
-            {/* ============================================ */}
+            {/* CONTENT - 70% upande wa kulia */}
             <div className="cat-products-content">
               
               {/* Breadcrumb */}
@@ -211,22 +253,30 @@ export default function CategoryProducts() {
                 </div>
               </nav>
 
+              {/* Products Grid */}
               <div className="cat-products-grid">
-                {products.map((item) => (
-                  <DashboardCard
-                    key={item.id}
-                    image={getProductImage(item)}
-                    title={item.name}
-                    price={item.price}
-                    originalPrice={item.original_price}
-                    isMobile={isMobile}
-                    onClick={() => navigate(`/product/${item.id}`)}
-                  />
-                ))}
+                {products.length > 0 ? (
+                  products.map((item) => (
+                    <DashboardCard
+                      key={item.id}
+                      image={getProductImage(item)}
+                      title={item.name}
+                      price={item.price}
+                      originalPrice={item.original_price}
+                      isMobile={isMobile}
+                      onClick={() => navigate(`/product/${item.id}`)}
+                    />
+                  ))
+                ) : (
+                  <div className="no-products-msg">
+                    <p>Hakuna bidhaa katika kategoria hii.</p>
+                  </div>
+                )}
               </div>
             </div>
           </main>
 
+          {/* FOOTER - Full width */}
           <div className="footer-wrapper">
             <Footer />
           </div>

@@ -1,7 +1,7 @@
 // src/components/SearchResults.jsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import api from "../axiosConfig"; // ✅ TUMIA API (Sio Supabase!)
+import api from "../axiosConfig";
 import { Globe, ChevronRight, Filter } from 'lucide-react';
 
 import SearchBar from '../components/SearchBar';
@@ -12,16 +12,14 @@ export default function SearchResults({ session }) {
   const [searchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
   
-  // State
   const [search, setSearch] = useState(initialQuery);
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]); // 🔥 Kategoria za Sidebar
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   
-  // 🔥 Filter States
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
@@ -31,7 +29,38 @@ export default function SearchResults({ session }) {
   const PRODUCTS_PER_PAGE = 20;
 
   // ============================================
-  // 1. PATA KATEGORIA ZA SIDEBAR (Filters)
+  // 🔥 FUNCTION MPYA YA KUPATA IMAGE URL
+  // ============================================
+  const getProductImage = (product) => {
+    // 1. Kama kuna cover_image_url (URL kamili)
+    if (product.cover_image_url) return product.cover_image_url;
+    
+    // 2. Kama kuna cover_image
+    if (product.cover_image) {
+      // Kama tayari ni URL kamili
+      if (product.cover_image.startsWith('http')) {
+        return product.cover_image;
+      }
+      
+      // 🔥 TUMIA BASE_URL KUTOKA API (ondoa /api kwa ajili ya images)
+      const BASE_URL = api.defaults.baseURL.replace(/\/api$/, '');
+      
+      // Hakikisha image path inaanza na '/'
+      const imagePath = product.cover_image.startsWith('/') 
+        ? product.cover_image 
+        : '/' + product.cover_image;
+      
+      const fullUrl = `${BASE_URL}${imagePath}`;
+      console.log("🖼️ Image URL:", fullUrl); // Debug
+      return fullUrl;
+    }
+    
+    // 3. Default image
+    return '/placeholder-image.jpg';
+  };
+
+  // ============================================
+  // 1. PATA KATEGORIA ZA SIDEBAR
   // ============================================
   useEffect(() => {
     const fetchCategories = async () => {
@@ -61,17 +90,12 @@ export default function SearchResults({ session }) {
         ordering: '-created_at'
       };
 
-      // 1. Search Query
       if (initialQuery && initialQuery.trim()) {
         params.search = initialQuery.trim();
       }
-
-      // 2. Category Filter
       if (selectedCategoryId) {
         params.leaf_category = selectedCategoryId;
       }
-
-      // 3. Price Filters
       if (minPrice && !isNaN(minPrice)) {
         params.price__gte = minPrice;
       }
@@ -103,7 +127,7 @@ export default function SearchResults({ session }) {
   }, [initialQuery, selectedCategoryId, minPrice, maxPrice]);
 
   // ============================================
-  // 3. EFFECT: Ita `fetchProducts` wakati filters zinabadilika
+  // 3. EFFECTS
   // ============================================
   useEffect(() => {
     setProducts([]);
@@ -112,9 +136,6 @@ export default function SearchResults({ session }) {
     fetchProducts(1, true);
   }, [initialQuery, selectedCategoryId, minPrice, maxPrice, fetchProducts]);
 
-  // ============================================
-  // 4. INFINITE SCROLL (Observer)
-  // ============================================
   useEffect(() => {
     if (loading || loadingMore || !hasMore) return;
     
@@ -136,16 +157,14 @@ export default function SearchResults({ session }) {
     };
   }, [loading, loadingMore, hasMore, fetchProducts, page]);
 
-  // Update search state pindi URL inapobadilika
   useEffect(() => {
     setSearch(initialQuery);
   }, [initialQuery]);
 
-  // ========== SKELETON LOADING ==========
+  // ========== SKELETON ==========
   if (loading && products.length === 0) {
     return (
       <div className="alibaba-container skeleton">
-        {/* Header skeleton tu... */}
         <header className="alibaba-header skeleton-header">
           <div className="header-wrapper">
             <div className="skeleton-logo"></div>
@@ -161,6 +180,7 @@ export default function SearchResults({ session }) {
     );
   }
 
+  // ========== RENDER ==========
   return (
     <div className="alibaba-container">
       
@@ -183,19 +203,16 @@ export default function SearchResults({ session }) {
         </div>
       </header>
 
-      {/* 🔥 MAIN LAYOUT: SIDEBAR + GRID */}
+      {/* MAIN LAYOUT */}
       <main className="search-main-layout">
         
-        {/* ============================================
-            LEFT SIDEBAR - FILTERS (Alibaba Style)
-           ============================================ */}
+        {/* SIDEBAR */}
         <aside className="search-filter-sidebar">
           <div className="filter-header">
             <Filter size={16} />
             <span>Filters</span>
           </div>
 
-          {/* 1. Kategoria (Categories) */}
           <div className="filter-section">
             <h4 className="filter-section-title">Kategoria</h4>
             <ul className="filter-list">
@@ -217,7 +234,6 @@ export default function SearchResults({ session }) {
             </ul>
           </div>
 
-          {/* 2. Bei (Price Range) */}
           <div className="filter-section">
             <h4 className="filter-section-title">Bei (TSh)</h4>
             <div className="price-filter-wrapper">
@@ -241,24 +257,11 @@ export default function SearchResults({ session }) {
               </button>
             </div>
           </div>
-
-          {/* 3. Min Order (MOQ) - Optional, unaweza kuongeza hapa baadaye */}
-          <div className="filter-section">
-            <h4 className="filter-section-title">Min. Order</h4>
-            <div className="moq-filter-wrapper">
-              <input type="number" placeholder="Min pieces" className="price-input" />
-              <button className="price-ok-btn">OK</button>
-            </div>
-          </div>
-          
         </aside>
 
-        {/* ============================================
-            RIGHT SIDE - PRODUCTS CONTENT
-           ============================================ */}
+        {/* PRODUCTS CONTENT */}
         <div className="search-products-content">
           
-          {/* Results Info Bar */}
           <div className="results-info-bar">
             <div className="deep-search-label">
               <span className="sparkle">✦</span> 
@@ -273,7 +276,6 @@ export default function SearchResults({ session }) {
             </div>
           </div>
 
-          {/* Products Grid - Fluid Flow */}
           <div className="search-products-grid">
             {products.length > 0 ? (
               products.map((product, index) => (
@@ -284,10 +286,14 @@ export default function SearchResults({ session }) {
                 >
                   <Link to={`/product/${product.id}`} className="card-link">
                     <div className="card-image">
+                      {/* ✅ BADILISHA HII SEHEMU: Tumia getProductImage() */}
                       <img 
-                        src={product.cover_image || '/placeholder-image.jpg'} 
+                        src={getProductImage(product)} 
                         alt={product.name}
-                        onError={(e) => { e.target.src = '/placeholder-image.jpg'; }}
+                        onError={(e) => { 
+                          console.error("Image load error:", e.target.src);
+                          e.target.src = '/placeholder-image.jpg'; 
+                        }}
                       />
                     </div>
                     <div className="card-body">
@@ -310,7 +316,6 @@ export default function SearchResults({ session }) {
             )}
           </div>
           
-          {/* Loading more indicator */}
           {loadingMore && (
             <div className="loading-more">
               <div className="loader-small"></div>
@@ -318,7 +323,6 @@ export default function SearchResults({ session }) {
             </div>
           )}
           
-          {/* End of results message */}
           {!hasMore && products.length > 0 && (
             <div className="end-of-results">
               <p>✨ Umeifikia mwisho wa matokeo ✨</p>

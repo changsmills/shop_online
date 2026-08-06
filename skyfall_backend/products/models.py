@@ -141,6 +141,88 @@ class ProductsEngine(models.Model):
 
     class Meta:
         db_table = 'products_engines'
+        
+        # 🔥 ONGEZA HIZI INDEXES ZOTE!
+        indexes = [
+            # 1. Foreign Keys (Muhimu sana!)
+            models.Index(fields=['user']),
+            models.Index(fields=['store_id']),
+            models.Index(fields=['sub_category']),  # category_id kwenye DB
+            models.Index(fields=['parent_category']),
+            models.Index(fields=['leaf_category']),
+            models.Index(fields=['brand_id']),
+            
+            # 2. Filtering (Kwa queries za kawaida)
+            models.Index(fields=['is_approved']),
+            models.Index(fields=['is_featured']),
+            models.Index(fields=['is_flash_sale']),
+            models.Index(fields=['is_wholesale']),
+            models.Index(fields=['is_retail']),
+            models.Index(fields=['enable_sizes']),
+            models.Index(fields=['has_colors']),
+            models.Index(fields=['enable_pickup']),
+            
+            # 3. Sorting (Kwa trending, new arrivals)
+            models.Index(fields=['-views']),  # Descending
+            models.Index(fields=['-created_at']),  # Descending
+            models.Index(fields=['price']),
+            models.Index(fields=['average_rating']),
+            models.Index(fields=['order_count']),
+            
+            # 4. Search (Kwa name, sku, barcode)
+            models.Index(fields=['name']),
+            models.Index(fields=['sku']),
+            models.Index(fields=['barcode']),
+            
+            # 5. Composite Indexes (Muhimu sana kwa queries zenye filters nyingi!)
+            # Trending products (is_approved + views)
+            models.Index(fields=['is_approved', '-views']),
+            
+            # New arrivals (is_approved + created_at)
+            models.Index(fields=['is_approved', '-created_at']),
+            
+            # Products za store (store_id + is_approved)
+            models.Index(fields=['store_id', 'is_approved']),
+            
+            # Products za category (leaf_category + is_approved)
+            models.Index(fields=['leaf_category', 'is_approved']),
+            
+            # Products za subcategory (sub_category + is_approved)
+            models.Index(fields=['sub_category', 'is_approved']),
+            
+            # Products za parent category (parent_category + is_approved)
+            models.Index(fields=['parent_category', 'is_approved']),
+            
+            # Featured products (is_featured + is_approved)
+            models.Index(fields=['is_featured', 'is_approved']),
+            
+            # Flash sale products (is_flash_sale + is_approved)
+            models.Index(fields=['is_flash_sale', 'is_approved']),
+            
+            # Wholesale products (is_wholesale + is_approved)
+            models.Index(fields=['is_wholesale', 'is_approved']),
+            
+            # Retail products (is_retail + is_approved)
+            models.Index(fields=['is_retail', 'is_approved']),
+            
+            # Store + Category (Kwa store page)
+            models.Index(fields=['store_id', 'leaf_category', 'is_approved']),
+            
+            # Store + Subcategory
+            models.Index(fields=['store_id', 'sub_category', 'is_approved']),
+            
+            # Price range (is_approved + price)
+            models.Index(fields=['is_approved', 'price']),
+            
+            # Rating (is_approved + average_rating)
+            models.Index(fields=['is_approved', '-average_rating']),
+            
+            # Order count (is_approved + order_count)
+            models.Index(fields=['is_approved', '-order_count']),
+            
+            # 6. Partial Indexes (Kwa cover_image)
+            models.Index(fields=['cover_image'])  # Django handles NULL automatically
+        ]
 
     def __str__(self):
         return self.name

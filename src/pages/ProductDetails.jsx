@@ -31,6 +31,9 @@ export default function ProductDetails() {
   const headerRef = useRef(null);
   const [headerHeight, setHeaderHeight] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  // ========== RELATED PRODUCTS STATE ==========
+const [relatedProducts, setRelatedProducts] = useState([]);
+const [loadingRelated, setLoadingRelated] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
@@ -180,6 +183,44 @@ export default function ProductDetails() {
     window.addEventListener('resize', updateHeaderHeight);
     return () => window.removeEventListener('resize', updateHeaderHeight);
   }, []);
+
+
+
+  // ============================================================
+// 🔥 FETCH RELATED PRODUCTS (Kulingana na Leaf Category)
+// ============================================================
+useEffect(() => {
+  const fetchRelatedProducts = async () => {
+    if (!product?.leaf_category_id) return;
+    
+    setLoadingRelated(true);
+    try {
+      const response = await api.get('/products/', {
+        params: {
+          leaf_category_id: product.leaf_category_id,
+          ordering: '-views',  // Panga kwa bidhaa maarufu
+          limit: 8            // Chukua 8 tu
+        }
+      });
+      
+      // Chuja ili usionyeshe bidhaa hiyo yenyewe
+      const data = response.data.results || response.data || [];
+      const filtered = data.filter(p => p.id !== product.id);
+      setRelatedProducts(filtered.slice(0, 8));
+      
+      console.log("✅ [Related] Bidhaa zinazofanana zimepatikana:", filtered.length);
+    } catch (err) {
+      console.error("❌ [Related] Imeshindwa kupata bidhaa zinazofanana:", err.message);
+      setRelatedProducts([]);
+    } finally {
+      setLoadingRelated(false);
+    }
+  };
+
+  if (product?.id) {
+    fetchRelatedProducts();
+  }
+}, [product?.id, product?.leaf_category_id]);
 
   const handleRateProduct = async (stars) => {
     const loadingToast = toast.loading("Tunahifadhi rating yako...");
@@ -378,6 +419,60 @@ export default function ProductDetails() {
             (Taarifa za duka zinapakuliwa...)
           </div>
         )}
+
+
+
+{/* ============================================================ */}
+{/* 🔥 SEHEMU MPYA: BIDHAA ZINAZOFANANA (RELATED PRODUCTS) */}
+{/* ============================================================ */}
+{relatedProducts.length > 0 && (
+  <section className="related-products-section" style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px solid #e5e7eb' }}>
+    <div className="related-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+      <h3 className="text-xl font-bold text-gray-800">Bidhaa Zinazofanana</h3>
+      <Link to={`/category/${product.leaf_category_id}`} className="text-orange-500 font-semibold text-sm hover:underline">
+        Tazama zote →
+      </Link>
+    </div>
+
+    {/* Grid ya Related Products */}
+    <div className="related-products-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '20px' }}>
+      {relatedProducts.map((p) => (
+        <div key={p.id} className="related-product-card" style={{ border: '1px solid #e5e7eb', borderRadius: '12px', padding: '12px', textAlign: 'center', transition: 'all 0.2s ease', cursor: 'pointer' }}
+         onClick={() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            navigate(`/product/${p.id}`); // Hii inatumia react-router-dom navigation
+                  }}
+              >
+          <div className="related-img-wrap" style={{ width: '100%', height: '150px', overflow: 'hidden', borderRadius: '8px', marginBottom: '10px', backgroundColor: '#f9f9f9' }}>
+            <img 
+              src={p.cover_image_url || 'https://via.placeholder.com/200x200?text=No+Image'} 
+              alt={p.name} 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              onError={(e) => { e.target.src = 'https://via.placeholder.com/200x200?text=No+Image'; }}
+            />
+          </div>
+          <p className="related-product-name" style={{ fontSize: '14px', fontWeight: '600', color: '#333', margin: '0 0 5px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {p.name}
+          </p>
+          <div className="related-product-price" style={{ fontSize: '13px', fontWeight: '700', color: '#ff6a00' }}>
+            TSH {Number(p.price).toLocaleString()}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* Loading Skeleton */}
+    {loadingRelated && (
+      <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '10px' }}>
+        {[...Array(4)].map((_, i) => (
+          <div key={i} style={{ width: '180px', height: '220px', backgroundColor: '#f3f4f6', borderRadius: '12px', animation: 'pulse 1.5s ease-in-out infinite' }} />
+        ))}
+      </div>
+    )}
+  </section>
+)}
+
+
 
       </div>
 

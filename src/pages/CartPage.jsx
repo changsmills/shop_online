@@ -7,6 +7,7 @@ import {
   LayoutDashboard, MessageSquare, ClipboardList, BarChart3, Settings, Menu
 } from 'lucide-react';
 import UserTools from '../components/UserTools';
+import api from "../axiosConfig"; // 🔥 IMPORT API KWA AJILI YA BASE_URL
 
 export default function CartPage({ session }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -26,6 +27,51 @@ export default function CartPage({ session }) {
   const totalAmount = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
+  // ============================================
+  // 🔥 FUNCTION MPYA YA KUPATA IMAGE URL
+  // ============================================
+  const getProductImage = (item) => {
+    // 1. Kama kuna cover_image_url (URL kamili)
+    if (item.cover_image_url) return item.cover_image_url;
+    
+    // 2. Kama kuna cover_image
+    if (item.cover_image) {
+      // Kama tayari ni URL kamili
+      if (item.cover_image.startsWith('http')) {
+        return item.cover_image;
+      }
+      
+      // 🔥 TUMIA BASE_URL KUTOKA API (ondoa /api kwa ajili ya images)
+      const BASE_URL = api.defaults.baseURL.replace(/\/api$/, '');
+      
+      // Hakikisha image path inaanza na '/'
+      const imagePath = item.cover_image.startsWith('/') 
+        ? item.cover_image 
+        : '/' + item.cover_image;
+      
+      const fullUrl = `${BASE_URL}${imagePath}`;
+      console.log("🖼️ Cart Image URL:", fullUrl); // Debug
+      return fullUrl;
+    }
+    
+    // 3. Kama kuna 'image' property (kwa ajili ya CartContext)
+    if (item.image) {
+      if (item.image.startsWith('http')) {
+        return item.image;
+      }
+      
+      const BASE_URL = api.defaults.baseURL.replace(/\/api$/, '');
+      const imagePath = item.image.startsWith('/') 
+        ? item.image 
+        : '/' + item.image;
+      
+      return `${BASE_URL}${imagePath}`;
+    }
+    
+    // 4. Default image
+    return '/placeholder-image.jpg';
+  };
+
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} />, path: '/dashboard', label: 'Dashboard' },
     { icon: <MessageSquare size={20} />, path: '/dashboard/messages', label: 'Messages' },
@@ -35,69 +81,62 @@ export default function CartPage({ session }) {
   ];
 
   // Function ya kurahisisha Checkout
-const handleCheckout = () => {
-  if (cartItems.length === 0) {
-    alert("Kikapu chako kiko tupu!");
-    return;
-  }
-  
-  // HAPA: Unaweza kuongeza sharti la session (kama unataka lazima wawe wame-login)
-  if (!session) {
-    navigate('/login'); // Au redirect kwenye page ya kuingia
-    return;
-  }
+  const handleCheckout = () => {
+    if (cartItems.length === 0) {
+      alert("Kikapu chako kiko tupu!");
+      return;
+    }
+    
+    if (!session) {
+      navigate('/login');
+      return;
+    }
 
-  // Kama kila kitu kiko sawa, nenda checkout
-  navigate('/checkout');
-};
+    navigate('/checkout');
+  };
 
   return (
-    <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', 
-    //height: '100vh', 
-    minHeight: '100vh', // Badala ya height: 100vh
-    backgroundColor: '#fff' }}>
+    <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#fff' }}>
       
-     {/* HEADER */}
-<header className="dashboard-header" style={{ 
-  display: 'flex', 
-  justifyContent: 'space-between', 
-  alignItems: 'center', // Muhimu kwa mpangilio mzuri
-  padding: isMobile ? '10px 16px' : '10px 24px', 
-  borderBottom: '1px solid #eee', 
-  backgroundColor: '#fff',
-  zIndex: 100 
-}}>
-  <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '10px' : '15px' }}>
-    {!isMobile && (
-      <Menu 
-        size={22} 
-        style={{ cursor: 'pointer', color: '#666' }} 
-        onClick={() => setIsExpanded(!isExpanded)} 
-      />
-    )}
-    <Link to="/dashboard" style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: '800', color: '#ff6a00', textDecoration: 'none' }}>
-      Skyfall.com
-    </Link>
-    
-    {/* Search ya cart itatokea Desktop TU */}
-    {!isMobile && (
-      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', backgroundColor: '#f4f4f4', padding: '6px 12px', borderRadius: '8px', marginLeft: '10px' }}>
-        <Search size={16} color="#999" />
-        <input type="text" placeholder="Search in cart..." style={{ border: 'none', background: 'none', outline: 'none', marginLeft: '8px', fontSize: '14px' }} />
-      </div>
-    )}
-  </div>
+      {/* HEADER */}
+      <header className="dashboard-header" style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        padding: isMobile ? '10px 16px' : '10px 24px', 
+        borderBottom: '1px solid #eee', 
+        backgroundColor: '#fff',
+        zIndex: 100 
+      }}>
+        <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '10px' : '15px' }}>
+          {!isMobile && (
+            <Menu 
+              size={22} 
+              style={{ cursor: 'pointer', color: '#666' }} 
+              onClick={() => setIsExpanded(!isExpanded)} 
+            />
+          )}
+          <Link to="/dashboard" style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: '800', color: '#ff6a00', textDecoration: 'none' }}>
+            Skyfall.com
+          </Link>
+          
+          {!isMobile && (
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', backgroundColor: '#f4f4f4', padding: '6px 12px', borderRadius: '8px', marginLeft: '10px' }}>
+              <Search size={16} color="#999" />
+              <input type="text" placeholder="Search in cart..." style={{ border: 'none', background: 'none', outline: 'none', marginLeft: '8px', fontSize: '14px' }} />
+            </div>
+          )}
+        </div>
 
-  {/* HAPA NDIPO ULIPOTAKIWA KUWEKA SHARTI LA !isMobile */}
-  <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-    {!isMobile && (
-      <>
-        <Bell size={20} style={{ cursor: 'pointer', color: '#666' }} />
-        <UserTools session={session} />
-      </>
-    )}
-  </div>
-</header>
+        <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          {!isMobile && (
+            <>
+              <Bell size={20} style={{ cursor: 'pointer', color: '#666' }} />
+              <UserTools session={session} />
+            </>
+          )}
+        </div>
+      </header>
 
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         
@@ -218,13 +257,22 @@ const handleCheckout = () => {
                         padding: '20px', 
                         borderBottom: '1px solid #f5f5f5' 
                       }}>
-                        <img src={item.image} alt={item.name} style={{ 
-                          width: isMobile ? '80px' : '100px', 
-                          height: isMobile ? '80px' : '100px', 
-                          objectFit: 'cover', 
-                          borderRadius: '8px', 
-                          backgroundColor: '#f9f9f9' 
-                        }} />
+                        {/* 🔥 BADILISHA HAPA: Tumia getProductImage() */}
+                        <img 
+                          src={getProductImage(item)} 
+                          alt={item.name} 
+                          style={{ 
+                            width: isMobile ? '80px' : '100px', 
+                            height: isMobile ? '80px' : '100px', 
+                            objectFit: 'cover', 
+                            borderRadius: '8px', 
+                            backgroundColor: '#f9f9f9' 
+                          }}
+                          onError={(e) => { 
+                            console.error("Cart image error:", e.target.src);
+                            e.target.src = '/placeholder-image.jpg'; 
+                          }}
+                        />
                         
                         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                           <div>
@@ -311,7 +359,6 @@ const handleCheckout = () => {
                       </div>
                       <button 
                         onClick={handleCheckout}
-
                         style={{ width: '100%', padding: '14px', backgroundColor: '#ff6a00', color: '#fff', border: 'none', borderRadius: '30px', fontWeight: '800', fontSize: '16px', cursor: 'pointer', boxShadow: '0 4px 12px rgba(255,106,0,0.2)' }}
                       >
                         Checkout ({totalItems})
@@ -329,53 +376,53 @@ const handleCheckout = () => {
         </main>
       </div>
 
-     {/* MOBILE BOTTOM CHECKOUT BAR - Toleo Jipya Lenye Urefu Mdogo */}
-{isMobile && cartItems.length > 0 && (
-  <div className="mobile-checkout-bar" style={{
-    position: 'fixed',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    background: 'white',
-    padding: '8px 16px',                         // ← imepunguzwa kutoka 12px 20px
-    paddingBottom: 'calc(8px + env(safe-area-inset-bottom, 0px))', // ← imepunguzwa
-    borderTop: '1px solid #eee',
-    boxShadow: '0 -2px 10px rgba(0,0,0,0.05)',
-    zIndex: 1000,
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  }}>
-    <div>
-      <div style={{ fontSize: '10px', color: '#666' }}>Total</div>               {/* ← ilikuwa 12px */}
-      <div style={{ fontSize: '16px', fontWeight: '800', color: '#ff6a00' }}>    {/* ← ilikuwa 20px */}
-        TSH {totalAmount.toLocaleString()}
-      </div>
-      <div style={{ fontSize: '10px', color: '#999' }}>                          {/* ← ilikuwa 11px */}
-        {totalItems} item(s)
-      </div>
-    </div>
-    <button 
-      onClick={handleCheckout}
-      style={{
-        backgroundColor: '#ff6a00',
-        color: 'white',
-        border: 'none',
-        padding: '8px 20px',                     // ← ilikuwa 12px 28px
-        borderRadius: '30px',
-        fontWeight: '700',
-        fontSize: '14px',                        // ← ilikuwa 16px
-        cursor: 'pointer',
-        boxShadow: '0 2px 8px rgba(255,106,0,0.25)',
-        transition: 'transform 0.1s ease'
-      }}
-      onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.97)'}
-      onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
-    >
-      Checkout →
-    </button>
-  </div>
-)}
+      {/* MOBILE BOTTOM CHECKOUT BAR */}
+      {isMobile && cartItems.length > 0 && (
+        <div className="mobile-checkout-bar" style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          background: 'white',
+          padding: '8px 16px',
+          paddingBottom: 'calc(8px + env(safe-area-inset-bottom, 0px))',
+          borderTop: '1px solid #eee',
+          boxShadow: '0 -2px 10px rgba(0,0,0,0.05)',
+          zIndex: 1000,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <div>
+            <div style={{ fontSize: '10px', color: '#666' }}>Total</div>
+            <div style={{ fontSize: '16px', fontWeight: '800', color: '#ff6a00' }}>
+              TSH {totalAmount.toLocaleString()}
+            </div>
+            <div style={{ fontSize: '10px', color: '#999' }}>
+              {totalItems} item(s)
+            </div>
+          </div>
+          <button 
+            onClick={handleCheckout}
+            style={{
+              backgroundColor: '#ff6a00',
+              color: 'white',
+              border: 'none',
+              padding: '8px 20px',
+              borderRadius: '30px',
+              fontWeight: '700',
+              fontSize: '14px',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(255,106,0,0.25)',
+              transition: 'transform 0.1s ease'
+            }}
+            onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.97)'}
+            onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            Checkout →
+          </button>
+        </div>
+      )}
     </div>
   );
 }
