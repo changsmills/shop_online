@@ -205,9 +205,9 @@
 
 @media (max-width: 480px) {
   .rv-card-wrapper {
-    flex: 0 0 calc((100% - (2 * 8px)) / 2) !important;
-    min-width: calc((100% - (2 * 8px)) / 2) !important;
-    max-width: calc((100% - (2 * 8px)) / 2) !important;
+    flex: 0 0 calc((100% - (2.5 * 8px)) / 2.5) !important;
+    min-width: calc((100% - (2.5 * 8px)) / 2.5) !important;
+    max-width: calc((100% - (2.5 * 8px)) / 2.5) !important;
   }
   .rv-scroll-wrapper {
     gap: 8px !important;

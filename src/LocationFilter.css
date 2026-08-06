@@ -191,17 +191,17 @@
 
 @media (max-width: 480px) {
   .loc-card-wrapper {
-    flex: 0 0 calc((100% - (2 * 8px)) / 2) !important;
-    min-width: calc((100% - (2 * 8px)) / 2) !important;
-    max-width: calc((100% - (2 * 8px)) / 2) !important;
+    flex: 0 0 calc((100% - (2.5 * 8px)) / 2.5) !important;
+    min-width: calc((100% - (2.5 * 8px)) / 2.5) !important;
+    max-width: calc((100% - (2.5 * 8px)) / 2.5) !important;
   }
   .loc-scroll-wrapper {
     gap: 8px !important;
   }
   .loc-card-wrapper:last-child {
-    flex: 0 0 calc(((100% - (2 * 8px)) / 2) * 0.5) !important;
-    min-width: calc(((100% - (2 * 8px)) / 2) * 0.5) !important;
-    max-width: calc(((100% - (2 * 8px)) / 2) * 0.5) !important;
+    flex: 0 0 calc(((100% - (2.5 * 8px)) / 2.5) * 0.5) !important;
+    min-width: calc(((100% - (2.5 * 8px)) / 2.5) * 0.5) !important;
+    max-width: calc(((100% - (2.5 * 8px)) / 2.5) * 0.5) !important;
   }
   .loc-title {
     font-size: 16px !important;
