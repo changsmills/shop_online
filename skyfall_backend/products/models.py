@@ -16,6 +16,21 @@ class Category(models.Model):
 
     class Meta:
         db_table = 'categories'
+        
+        # 🔥 ONGEZA HIZI INDEXES!
+        indexes = [
+            # Search indexes
+            models.Index(fields=['name']),
+            models.Index(fields=['name_sw']),
+            models.Index(fields=['icon_name']),
+            
+            # Sorting
+            models.Index(fields=['-created_at']),  # Descending
+            
+            # Composite indexes
+            models.Index(fields=['name', 'name_sw']),
+            models.Index(fields=['icon_name', 'name']),
+        ]
 
     def __str__(self):
         return self.name
@@ -33,6 +48,24 @@ class SubCategory(models.Model):
 
     class Meta:
         db_table = 'sub_categories'
+        
+        # 🔥 ONGEZA HIZI INDEXES!
+        indexes = [
+            # Foreign key (Muhimu!)
+            models.Index(fields=['category']),
+            
+            # Search indexes
+            models.Index(fields=['name']),
+            models.Index(fields=['name_sw']),
+            
+            # Sorting
+            models.Index(fields=['-created_at']),  # Descending
+            
+            # Composite indexes
+            models.Index(fields=['name', 'name_sw']),
+            models.Index(fields=['category', 'name']),
+            models.Index(fields=['category', 'name_sw']),
+        ]
 
     def __str__(self):
         return self.name
@@ -260,6 +293,46 @@ class LeafCategory(models.Model):
 
     class Meta:
         db_table = 'leaf_categories'
+        
+        # 🔥 ONGEZA HIZI INDEXES!
+        indexes = [
+            # Foreign key (Muhimu!)
+            models.Index(fields=['sub_category']),
+            
+            # Search indexes
+            models.Index(fields=['name']),
+            models.Index(fields=['name_sw']),
+            models.Index(fields=['icon_name']),
+            models.Index(fields=['meta_title']),
+            models.Index(fields=['meta_description']),
+            
+            # Boolean indexes
+            models.Index(fields=['require_gender']),
+            models.Index(fields=['require_size']),
+            models.Index(fields=['color_required']),
+            models.Index(fields=['warranty_required']),
+            models.Index(fields=['weight_required']),
+            models.Index(fields=['dimensions_required']),
+            models.Index(fields=['bulk_pricing_tiers']),
+            
+            # Other field indexes
+            models.Index(fields=['min_stock_warning']),
+            models.Index(fields=['measurement_unit']),
+            models.Index(fields=['size_format']),
+            models.Index(fields=['material_type']),
+            models.Index(fields=['color_hex']),
+            
+            # Sorting
+            models.Index(fields=['-created_at']),  # Descending
+            
+            # Composite indexes
+            models.Index(fields=['name', 'name_sw']),
+            models.Index(fields=['sub_category', 'name']),
+            models.Index(fields=['sub_category', 'name_sw']),
+            models.Index(fields=['sub_category', 'require_gender']),
+            models.Index(fields=['sub_category', 'require_size']),
+            models.Index(fields=['sub_category', 'color_required']),
+        ]
 
     def __str__(self):
         return self.name
@@ -443,6 +516,35 @@ class Advertisement(models.Model):
 
     class Meta:
         db_table = 'advertisements'
+        
+        # 🔥 ONGEZA HIZI INDEXES!
+        indexes = [
+            # Foreign Keys
+            models.Index(fields=['user']),
+            models.Index(fields=['store_id']),
+            models.Index(fields=['approved_by']),
+            models.Index(fields=['rejected_by']),
+            
+            # Search indexes
+            models.Index(fields=['business_name']),
+            models.Index(fields=['ad_type']),
+            models.Index(fields=['status']),
+            models.Index(fields=['media_type']),
+            
+            # Sorting indexes
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['-approved_at']),
+            
+            # Composite indexes
+            models.Index(fields=['store_id', 'status']),
+            models.Index(fields=['store_id', 'ad_type']),
+            models.Index(fields=['status', '-created_at']),
+            models.Index(fields=['status', 'ad_type']),
+            models.Index(fields=['store_id', 'status', '-created_at']),
+            models.Index(fields=['user', 'status']),
+            models.Index(fields=['status', 'media_type']),
+            models.Index(fields=['approved_by', 'status']),
+        ]
 
     def __str__(self):
         return f"{self.business_name} - {self.ad_type}"
@@ -515,6 +617,53 @@ class StoreEngine(models.Model):
 
     class Meta:
         db_table = 'stores_engine'
+        
+        # 🔥 ONGEZA HIZI INDEXES!
+        indexes = [
+            # Foreign Keys
+            models.Index(fields=['owner']),
+            models.Index(fields=['category']),
+            
+            # Search indexes
+            models.Index(fields=['store_name']),
+            models.Index(fields=['store_slug']),
+            models.Index(fields=['phone_number']),
+            models.Index(fields=['email']),
+            models.Index(fields=['city']),
+            models.Index(fields=['physical_address']),
+            models.Index(fields=['instagram_handle']),
+            models.Index(fields=['whatsapp_number']),
+            models.Index(fields=['twitter_handle']),
+            models.Index(fields=['tiktok_handle']),
+            
+            # Boolean indexes
+            models.Index(fields=['is_verified']),
+            models.Index(fields=['is_active']),
+            
+            # Status indexes
+            models.Index(fields=['status']),
+            models.Index(fields=['verification_status']),
+            
+            # Sorting indexes
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['-total_sales']),
+            models.Index(fields=['-average_rating']),
+            models.Index(fields=['store_index']),
+            
+            # Business type
+            models.Index(fields=['business_type']),
+            
+            # Composite indexes
+            models.Index(fields=['category', 'is_active']),
+            models.Index(fields=['category', 'is_verified']),
+            models.Index(fields=['category', 'status']),
+            models.Index(fields=['is_active', 'is_verified']),
+            models.Index(fields=['is_active', 'verification_status']),
+            models.Index(fields=['store_name', 'city']),
+            models.Index(fields=['city', 'is_active']),
+            models.Index(fields=['category', '-average_rating']),
+            models.Index(fields=['is_verified', '-average_rating']),
+        ]
 
     def __str__(self):
         return self.store_name

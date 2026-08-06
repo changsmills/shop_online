@@ -99,12 +99,26 @@ export default function ProductsAll() {
   }, [activeCategory.name, activeSection]);
 
   // ============================================
-  // 7. FETCH CATEGORIES (Imepangwa Alphabetically)
+  // 7. FETCH CATEGORIES (Imepangwa Alphabetically + Cached)
   // ============================================
   
   useEffect(() => {
     const fetchCategories = async () => {
       try {
+        // 🔥 ONGEZA CACHE
+        const cachedCategories = localStorage.getItem('categories_cache');
+        const cachedTime = localStorage.getItem('categories_cache_time');
+        
+        if (cachedCategories && cachedTime && (Date.now() - Number(cachedTime) < 10 * 60 * 1000)) {
+          const data = JSON.parse(cachedCategories);
+          setCategories([
+            { id: null, name: "All" },
+            ...data.map((cat) => ({ id: cat.id, name: cat.name }))
+          ]);
+          setLoading(false);
+          return;
+        }
+        
         setLoading(true);
         setError(null);
         
@@ -113,6 +127,10 @@ export default function ProductsAll() {
 
         if (Array.isArray(data) && data.length > 0) {
           const sortedData = [...data].sort((a, b) => a.name.localeCompare(b.name));
+          
+          // 🔥 HIFADHI KWENYE CACHE
+          localStorage.setItem('categories_cache', JSON.stringify(sortedData));
+          localStorage.setItem('categories_cache_time', String(Date.now()));
 
           setCategories([
             { id: null, name: "All" },

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import api from "../axiosConfig"; // 🔥 MUHIMU: Tumia api pekee!
+import api from "../axiosConfig";
 import ProductCard from "../components/ProductCard";
 
 export default function ProductList({ 
@@ -31,6 +31,9 @@ export default function ProductList({
   const initialFetchDoneRef = useRef(false);
   const hasMoreRef = useRef(true);
   
+  // 🔥 ONGEZA CACHE
+  const cacheRef = useRef({});
+  
   const currentParamsRef = useRef({
     search, categoryId, section, sortBy, order, minPrice, maxPrice, filterType
   });
@@ -54,6 +57,16 @@ export default function ProductList({
     if (!mountedRef.current) return;
     if (!hasMoreRef.current && !isNewSearch && pageNum > 0) return;
 
+    // 🔥 ONGEZA CACHE CHECK
+    const cacheKey = `${categoryId || 'all'}-${search || ''}-${section || ''}-${sortBy}-${order}-${pageNum}`;
+    if (isNewSearch && cacheRef.current[cacheKey]) {
+      console.log('📦 Using cache for:', cacheKey);
+      setProducts(cacheRef.current[cacheKey]);
+      setLoading(false);
+      if (onLoad) onLoad(cacheRef.current[cacheKey].length);
+      return;
+    }
+
     fetchingRef.current = true;
     setError(null);
     
@@ -66,7 +79,6 @@ export default function ProductList({
     setLoading(true);
 
     try {
-      // 🔥 MABADILIKO: ONDOA FILTER KABISA! Sasa params ni tupu.
       const params = {};
 
       const currentCategoryId = currentParamsRef.current.categoryId;
@@ -149,23 +161,22 @@ export default function ProductList({
         return;
       }
       
-      // 🔥 Inakagua 'results' kutoka Django REST Framework (pagination)!
       const data = response.data?.results || response.data || [];
 
-     let sanitizedData = data.map(p => {
-             const beiKubwa = parseFloat(p.price) || 0;
-            const beiYaOfa = parseFloat(p.original_price) || 0;
-                   const discountPercent = (beiKubwa > beiYaOfa && beiYaOfa > 0) 
-            ? Math.round(((beiKubwa - beiYaOfa) / beiKubwa) * 100) 
+      let sanitizedData = data.map(p => {
+        const beiKubwa = parseFloat(p.price) || 0;
+        const beiYaOfa = parseFloat(p.original_price) || 0;
+        const discountPercent = (beiKubwa > beiYaOfa && beiYaOfa > 0) 
+          ? Math.round(((beiKubwa - beiYaOfa) / beiKubwa) * 100) 
           : 0;
-             return {
-                 ...p,
-          // 🔥 REKEBISHA HAPA: Tanguliza cover_image_url!
-           image: p.cover_image_url || p.cover_image || "/images/placeholder.png",
-           discount: discountPercent
-         };
-            });
+        return {
+          ...p,
+          image: p.cover_image_url || p.cover_image || "/images/placeholder.png",
+          discount: discountPercent
+        };
+      });
 
+      // 🔥 Top Deals filter
       if (currentSection === "Top Deals") {
         sanitizedData = sanitizedData.filter(p => {
           const p_price = parseFloat(p.price) || 0;
@@ -174,6 +185,7 @@ export default function ProductList({
         });
       }
 
+      // 🔥 Priority Item (kama ipo)
       if (priorityId && pageNum === 0) {
         const priorityItem = sanitizedData.find(p => p.id === priorityId);
         if (priorityItem) {
@@ -184,6 +196,13 @@ export default function ProductList({
 
       if (isNewSearch || pageNum === 0) {
         setProducts(sanitizedData);
+        // 🔥 HIFADHI KWENYE CACHE
+        cacheRef.current[cacheKey] = sanitizedData;
+        // Ondoa cache za zamani (limit cache size)
+        const keys = Object.keys(cacheRef.current);
+        if (keys.length > 20) {
+          delete cacheRef.current[keys[0]];
+        }
         if (onLoad) onLoad(sanitizedData.length);
         initialFetchDoneRef.current = true;
       } else {
