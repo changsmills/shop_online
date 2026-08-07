@@ -666,134 +666,103 @@ const fetchLeafsForSub = async (subCategoryId) => {
         document.body
       )}
 
-      {mobileMenuOpen && ReactDOM.createPortal(
+        {mobileMenuOpen && ReactDOM.createPortal(
         <div 
-          className="mobile-menu-overlay"
-          onClick={() => {
-            setMobileMenuOpen(false);
-            setViewMode('products');
-            setSelectedSubCategory(null);
-          }}
+          className="mobile-categories-overlay"
+          onClick={() => setMobileMenuOpen(false)}
         >
-          <div className="mobile-menu-sheet" onClick={(e) => e.stopPropagation()}>
-            <div className="mobile-menu-handle" />
-            <div className="mobile-menu-body">
-              <aside className="mobile-menu-sidebar">
-                {viewMode === 'products' ? (
-                  categories.map((cat) => (
-                    <div 
-                      key={cat.id} 
-                      onClick={() => {
-                        setSelectedCategory(cat);
+          <div className="mobile-categories-modal" onClick={(e) => e.stopPropagation()}>
+            
+            {/* 1. HEADER ya Juu */}
+            <div className="mc-header">
+              <button className="mc-back-btn" onClick={() => setMobileMenuOpen(false)}>
+                <ChevronLeft size={24} />
+              </button>
+              <h2 className="mc-title">{t('categories')}</h2>
+              <div className="mc-spacer"></div>
+            </div>
+
+            {/* 2. BODY (Sidebar + Content) */}
+            <div className="mc-body">
+              
+              {/* SIDEBAR (Kushoto) */}
+              <aside className="mc-sidebar">
+                {categories.map((cat) => (
+                  <div 
+                    key={cat.id} 
+                    className={`mc-sidebar-item ${selectedCategory?.id === cat.id ? 'active' : ''}`}
+                    onClick={() => {
+                      setSelectedCategory(cat);
+                      setSelectedCategoryForComponents(cat);
+                      // Tuma ombi la kupata data za kategoria hii
+                      if (cat.id) {
                         fetchFeaturedLeafs(cat.id);
                         fetchSubCategories(cat.id);
-                        if (viewMode !== 'products') setViewMode('products');
-                      }}
-                      className={`mobile-sidebar-item ${selectedCategory?.id === cat.id ? 'active' : ''}`}
-                    >
-                      <div className="mobile-sidebar-icon">{getIcon(cat.icon_name)}</div>
-                      <div className="mobile-sidebar-text">{getCategoryDisplayName(cat)}</div>
-                    </div>
-                  ))
-                ) : (
-                  <>
-                    <div 
-                      onClick={() => {
-                        setViewMode('products');
-                        setSelectedSubCategory(null);
-                      }}
-                      className="mobile-sidebar-back"
-                    >
-                      <ChevronLeft size={14} color="#ff6a00" />
-                      <span>Nyuma</span>
-                    </div>
-                    {subCategories.map((sub) => (
-                      <div 
-                        key={sub.id} 
-                        onClick={() => {
-                          setSelectedSubCategory(sub);
-                          fetchLeafsForSub(sub.id);
-                        }}
-                        className={`mobile-sidebar-item ${selectedSubCategory?.id === sub.id ? 'active' : ''}`}
-                      >
-                        {i18n.language === 'sw' ? (sub.name_sw || sub.name) : sub.name}
-                      </div>
-                    ))}
-                  </>
-                )}
+                      }
+                    }}
+                  >
+                    {getCategoryDisplayName(cat)}
+                  </div>
+                ))}
               </aside>
 
-              <main className="mobile-menu-content">
-                <div className="mobile-content-header">
-                  <h4>
-                    {viewMode === 'products' 
-                      ? getCategoryDisplayName(selectedCategory) || t('select_category')
-                      : (selectedSubCategory ? (i18n.language === 'sw' ? (selectedSubCategory.name_sw || selectedSubCategory.name) : selectedSubCategory.name) : '')
-                    }
-                  </h4>
-                  {viewMode === 'products' && (
-                    <button onClick={() => setViewMode('subcategories')} className="mobile-view-all-btn">
-                      {t('view_all')} <ChevronRight size={12} />
-                    </button>
-                  )}
-                </div>
-
-                {viewMode === 'products' ? (
-                  featuredProducts.length === 0 ? (
-                    <div className="mobile-empty-state">{t('no_products')}</div>
-                  ) : (
-                    <div className="mobile-grid-3">
-                      {featuredProducts.map((leaf) => (
+              {/* CONTENT (Kulia) */}
+              <main className="mc-content">
+                
+                {/* SEHEMU YA 1: RECOMMENDATIONS (Picha za Duara) */}
+                <div className="mc-section">
+                  <h3 className="mc-section-title">Selected Products</h3>
+                  <div className="mc-recommendations-grid">
+                    {featuredProducts && featuredProducts.length > 0 ? (
+                      featuredProducts.slice(0, 9).map((leaf) => (
                         <div 
                           key={leaf.id} 
+                          className="mc-recommendation-item"
                           onClick={() => {
                             handleLeafClick(leaf.leaf_category_id);
                             setMobileMenuOpen(false);
                           }}
-                          className="mobile-grid-item"
                         >
-                          <div className="mobile-grid-image">
-                                <img 
-                                 src={leaf.cover_image_url || leaf.cover_image || placeholderImg}
-                              alt={leaf.leaf_categories?.name} 
-                                     />
-                            </div>
+                          <div className="mc-rec-image">
+                            <img src={leaf.cover_image_url || placeholderImg} alt={leaf.leaf_categories?.name} />
+                          </div>
                           <p>{i18n.language === 'sw' ? (leaf.leaf_categories?.name_sw || leaf.leaf_categories?.name) : leaf.leaf_categories?.name}</p>
                         </div>
-                      ))}
-                      <div onClick={() => setViewMode('subcategories')} className="mobile-grid-item">
-                        <div className="mobile-grid-image view-all">
-                          <Plus size={28} color="#ff6a00" />
-                        </div>
-                        <p className="view-all-text">{t('see_all')}</p>
-                      </div>
-                    </div>
-                  )
-                ) : (
-                  leafsForSub.length === 0 ? (
-                    <div className="mobile-empty-state">Hakuna bidhaa katika kategoria hii</div>
-                  ) : (
-                    <div className="mobile-grid-3">
-                      {leafsForSub.map((leaf) => (
+                      ))
+                    ) : (
+                      <div className="mobile-empty-state" style={{gridColumn: '1 / -1'}}></div>
+                    )}
+                  </div>
+                </div>
+
+                {/* SEHEMU YA 2: GET PRODUCT INSPIRATION (Bidhaa 2x2) */}
+                <div className="mc-section">
+                  <div className="mc-inspiration-grid">
+                    {trendingProducts && trendingProducts.length > 0 ? (
+                      trendingProducts.slice(0, 4).map((product) => (
                         <div 
-                          key={leaf.id} 
+                          key={product.id} 
+                          className="mc-inspiration-card"
                           onClick={() => {
-                            handleLeafClick(leaf.id);
+                            navigate(`/product/${product.id}`);
                             setMobileMenuOpen(false);
                           }}
-                          className="mobile-grid-item"
                         >
-                          <div className="mobile-grid-image">
-                            <img src={leaf.cover_image || placeholderImg} alt={leaf.name} />
-                          </div>
-                          <p>{i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}</p>
+                          <img src={product.cover_image_url || product.cover_image || placeholderImg} alt={product.name} />
+                          <p className="mc-insp-title">{product.name}</p>
+                          <p className="mc-insp-price">TSh {product.price}</p>
+                          <p className="mc-insp-moq">Min. order: {product.moq || 1}</p>
                         </div>
-                      ))}
-                    </div>
-                  )
-                )}
+                      ))
+                    ) : (
+                      <div className="mobile-empty-state" style={{gridColumn: '1 / -1'}}></div>
+                    )}
+                  </div>
+                </div>
+
               </main>
             </div>
+
           </div>
         </div>,
         document.body

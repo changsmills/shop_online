@@ -1,6 +1,6 @@
 // src/components/ProductDetails.jsx
 import React, { useState, useEffect, useRef, Suspense } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom"; // ✅ Ongeza useNavigate
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "../ProductDetails.css";
@@ -8,7 +8,6 @@ import "../ProductDetails.css";
 import api from "../axiosConfig"; 
 
 import { toast } from 'react-hot-toast';
-import { Link } from "react-router-dom";
 import { 
   Package, Zap, Clock, Factory, MapPin, Phone, Instagram, 
   ShieldCheck, Box, Video, FileText, Store, X, ChevronRight, Eye
@@ -20,6 +19,7 @@ const SkeletonProductDetails = React.lazy(() => import("../components/SkeletonPr
 
 export default function ProductDetails() {
   const { id } = useParams();
+  const navigate = useNavigate(); // ✅ Imeongezwa kwa ajili ya navigation
   const [product, setProduct] = useState(null);
   const [storeProducts, setStoreProducts] = useState([]);
   const [storeCategories, setStoreCategories] = useState([]);
@@ -32,8 +32,8 @@ export default function ProductDetails() {
   const [headerHeight, setHeaderHeight] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   // ========== RELATED PRODUCTS STATE ==========
-const [relatedProducts, setRelatedProducts] = useState([]);
-const [loadingRelated, setLoadingRelated] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [loadingRelated, setLoadingRelated] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
@@ -82,77 +82,98 @@ const [loadingRelated, setLoadingRelated] = useState(false);
           return;
         }
 
-        let storeData = null;
-        let variationsData = [];
-        let mediaData = [];
+        // ==========================================================
+        // 🔥 BADILISHA HAPA: Tuma maombi yote yanayotegemea ID yake mara moja (Parallel)
+        // ==========================================================
+        const fetchPromises = [];
 
+        // 1. Pata bidhaa za duka hili (Store Products)
         let sList = [];
         if (productData?.store_id) {
-          try {
-            const sProductsRes = await api.get(`/products/?store_id=${productData.store_id}`);
-            sList = sProductsRes.data.results || sProductsRes.data || [];
-            sList = sList.filter(p => p.id !== id);
-            setStoreProducts(sList.slice(0, 10));
-            console.log("✅ [Fetch 2] Store products (bidhaa za duka) zimepatikana.");
-          } catch (err) {
-            console.error("❌ [Fetch 2] Imeshindwa kupata bidhaa za duka kwa store_id:", productData.store_id, err.message);
-          }
-
-          try {
-            const uniqueCats = [...new Set(sList.map(p => p.sub_category_name).filter(Boolean))];
-            setStoreCategories(uniqueCats);
-            setActiveCategory(productData.sub_category_name);
-          } catch (err) {
-            console.error("❌ [Processing] Imeshindwa kuchuja subcategories.", err.message);
-          }
+          fetchPromises.push(
+            api.get(`/products/?store_id=${productData.store_id}`)
+              .then(res => {
+                sList = (res.data.results || res.data || []).filter(p => p.id !== id);
+                return sList;
+              })
+              .catch(err => {
+                console.error("❌ [Fetch Store Products] Error:", err.message);
+                return [];
+              })
+          );
         }
 
+        // 2. Pata maelezo ya duka (Store Data)
+        let storeData = null;
+        if (productData.store_id) {
+          fetchPromises.push(
+            api.get(`/stores/${productData.store_id}/`)
+              .then(res => {
+                storeData = res.data;
+                return storeData;
+              })
+              .catch(err => {
+                console.error("❌ [Fetch Store Info] Error:", err.message);
+                return null;
+              })
+          );
+        }
+
+        // 3. Pata picha na video (Media)
+        let mediaData = [];
+        fetchPromises.push(
+          api.get(`/product-media/?product_id=${id}`)
+            .then(res => {
+              mediaData = res.data.results || res.data || [];
+              return mediaData;
+            })
+            .catch(err => {
+              console.error("❌ [Fetch Media] Error:", err.message);
+              return [];
+            })
+        );
+
+        // ==========================================================
+        // 🔥 Subiri yote yakamilike kwa wakati mmoja (Parallel)
+        // ==========================================================
+        console.log("⏳ [Parallel] Inasubiri maombi yote yakamilike...");
+        await Promise.all(fetchPromises);
+        console.log("✅ [Parallel] Maombi yote yamekamilika!");
+
+        // Panga bidhaa za duka (Store Products) na Kategoria zake
+        setStoreProducts(sList.slice(0, 10));
+        if (sList.length > 0) {
+          const uniqueCats = [...new Set(sList.map(p => p.sub_category_name).filter(Boolean))];
+          setStoreCategories(uniqueCats);
+          setActiveCategory(productData.sub_category_name);
+        }
+
+        // 4. Pata Variations (Bidhaa za kategoria hii) - Hii inaweza kufanywa baada ya mzigo mkuu
+        let variationsData = [];
         if (productData?.leaf_category_id) {
           try {
             const variationsRes = await api.get(`/products/?leaf_category_id=${productData.leaf_category_id}`);
             let vList = variationsRes.data.results || variationsRes.data || [];
-            vList = vList.filter(p => p.id !== id);
-            variationsData = vList.slice(0, 5);
-            console.log("✅ [Fetch 3] Variations (bidhaa za kategoria) zimepatikana.");
+            variationsData = vList.filter(p => p.id !== id).slice(0, 5);
           } catch (err) {
-            console.error("❌ [Fetch 3] Imeshindwa kupata variations kwa leaf_category_id:", productData.leaf_category_id, err.message);
+            console.error("❌ [Fetch Variations] Error:", err.message);
           }
         }
 
-        if (productData.store_id) {
-          try {
-            const storeRes = await api.get(`/stores/${productData.store_id}/`);
-            storeData = storeRes.data;
-            console.log("✅ [Fetch 4] Store data (maelezo ya duka) imepatikana.");
-          } catch (err) {
-            console.error("❌ [Fetch 4] Imeshindwa kabisa kupata store kwa ID:", productData.store_id, "Error:", err.message);
-          }
-        }
+        // Panga Bidhaa zote (Product)
+        setProduct({
+          ...productData,
+          stores: storeData,
+          variations: variationsData || [],
+          media_list: [
+            { url: productData.cover_image, type: 'image' }, 
+            ...(mediaData || []).map(m => ({ url: m.media_url, type: m.media_type })),
+            productData.promo_video_url ? { url: productData.promo_video_url, type: 'video' } : null
+          ].filter(Boolean)
+        });
+        console.log("✅ [State] Product state imewekwa sawa.");
 
-        try {
-          const mediaRes = await api.get(`/product-media/?product_id=${id}`);
-          mediaData = mediaRes.data.results || mediaRes.data || [];
-          console.log("✅ [Fetch 6] Media (picha/video) imepatikana.");
-        } catch (err) {
-          console.error("❌ [Fetch 6] Imeshindwa kupata media kwa product_id:", id, err.message);
-        }
-
-        try {
-          setProduct({
-            ...productData,
-            stores: storeData,
-            variations: variationsData || [],
-            media_list: [
-              { url: productData.cover_image, type: 'image' }, 
-              ...(mediaData || []).map(m => ({ url: m.media_url, type: m.media_type })),
-              productData.promo_video_url ? { url: productData.promo_video_url, type: 'video' } : null
-            ].filter(Boolean)
-          });
-          console.log("✅ [State] Product state imewekwa sawa.");
-        } catch (err) {
-          console.error("❌ [State] Imeshindwa kuweka product state.", err.message);
-        }
-
+        // Hifadhi kwenye Recently Viewed
         try {
           if (productData?.id) {
             const recentlyViewed = JSON.parse(localStorage.getItem("recentlyViewed") || "[]");
@@ -184,43 +205,41 @@ const [loadingRelated, setLoadingRelated] = useState(false);
     return () => window.removeEventListener('resize', updateHeaderHeight);
   }, []);
 
-
-
   // ============================================================
-// 🔥 FETCH RELATED PRODUCTS (Kulingana na Leaf Category)
-// ============================================================
-useEffect(() => {
-  const fetchRelatedProducts = async () => {
-    if (!product?.leaf_category_id) return;
-    
-    setLoadingRelated(true);
-    try {
-      const response = await api.get('/products/', {
-        params: {
-          leaf_category_id: product.leaf_category_id,
-          ordering: '-views',  // Panga kwa bidhaa maarufu
-          limit: 8            // Chukua 8 tu
-        }
-      });
+  // 🔥 FETCH RELATED PRODUCTS (Kulingana na Leaf Category)
+  // ============================================================
+  useEffect(() => {
+    const fetchRelatedProducts = async () => {
+      if (!product?.leaf_category_id) return;
       
-      // Chuja ili usionyeshe bidhaa hiyo yenyewe
-      const data = response.data.results || response.data || [];
-      const filtered = data.filter(p => p.id !== product.id);
-      setRelatedProducts(filtered.slice(0, 8));
-      
-      console.log("✅ [Related] Bidhaa zinazofanana zimepatikana:", filtered.length);
-    } catch (err) {
-      console.error("❌ [Related] Imeshindwa kupata bidhaa zinazofanana:", err.message);
-      setRelatedProducts([]);
-    } finally {
-      setLoadingRelated(false);
-    }
-  };
+      setLoadingRelated(true);
+      try {
+        const response = await api.get('/products/', {
+          params: {
+            leaf_category_id: product.leaf_category_id,
+            ordering: '-views',  // Panga kwa bidhaa maarufu
+            limit: 8            // Chukua 8 tu
+          }
+        });
+        
+        // Chuja ili usionyeshe bidhaa hiyo yenyewe
+        const data = response.data.results || response.data || [];
+        const filtered = data.filter(p => p.id !== product.id);
+        setRelatedProducts(filtered.slice(0, 8));
+        
+        console.log("✅ [Related] Bidhaa zinazofanana zimepatikana:", filtered.length);
+      } catch (err) {
+        console.error("❌ [Related] Imeshindwa kupata bidhaa zinazofanana:", err.message);
+        setRelatedProducts([]);
+      } finally {
+        setLoadingRelated(false);
+      }
+    };
 
-  if (product?.id) {
-    fetchRelatedProducts();
-  }
-}, [product?.id, product?.leaf_category_id]);
+    if (product?.id) {
+      fetchRelatedProducts();
+    }
+  }, [product?.id, product?.leaf_category_id]);
 
   const handleRateProduct = async (stars) => {
     const loadingToast = toast.loading("Tunahifadhi rating yako...");
@@ -322,7 +341,7 @@ useEffect(() => {
                   <Link key={item.id} to={`/product/${item.id}`} className="showroom-item"
                     onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
                     <div className={`showroom-item-img ${item.id === id ? 'active-border' : ''}`}>
-                      <img src={item.cover_image_url} alt={item.name} /> // ✅ Hii ndiyo sahihi!
+                      <img src={item.cover_image_url} alt={item.name} />
                       {item.id === id && (
                         <div className="showroom-item-badge">INATAZAMWA</div>
                       )}
@@ -420,60 +439,55 @@ useEffect(() => {
           </div>
         )}
 
+        {/* ============================================================ */}
+        {/* 🔥 SEHEMU MPYA: BIDHAA ZINAZOFANANA (RELATED PRODUCTS) */}
+        {/* ============================================================ */}
+        {relatedProducts.length > 0 && (
+          <section className="related-products-section" style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px solid #e5e7eb' }}>
+            <div className="related-header" style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', marginBottom: '20px' }}>
+              <h3 className="text-xl font-bold text-gray-800">Bidhaa Zinazofanana</h3>
+              <Link to={`/category/${product.leaf_category_id}`} className="text-orange-500 font-semibold text-sm hover:underline">
+                Tazama zote →
+              </Link>
+            </div>
 
+            {/* Grid ya Related Products */}
+            <div className="related-products-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '20px' }}>
+              {relatedProducts.map((p) => (
+                <div key={p.id} className="related-product-card" style={{ border: '1px solid #e5e7eb', borderRadius: '12px', padding: '12px', textAlign: 'center', transition: 'all 0.2s ease', cursor: 'pointer' }}
+                onClick={() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    navigate(`/product/${p.id}`); // ✅ Sasa inatumia navigate
+                          }}
+                      >
+                  <div className="related-img-wrap" style={{ width: '100%', height: '150px', overflow: 'hidden', borderRadius: '8px', marginBottom: '10px', backgroundColor: '#f9f9f9' }}>
+                    <img 
+                      src={p.cover_image_url || 'https://via.placeholder.com/200x200?text=No+Image'} 
+                      alt={p.name} 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e) => { e.target.src = 'https://via.placeholder.com/200x200?text=No+Image'; }}
+                    />
+                  </div>
+                  <p className="related-product-name" style={{ fontSize: '14px', fontWeight: '600', color: '#333', margin: '0 0 5px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {p.name}
+                  </p>
+                  <div className="related-product-price" style={{ fontSize: '13px', fontWeight: '700', color: '#ff6a00' }}>
+                    TSH {Number(p.price).toLocaleString()}
+                  </div>
+                </div>
+              ))}
+            </div>
 
-{/* ============================================================ */}
-{/* 🔥 SEHEMU MPYA: BIDHAA ZINAZOFANANA (RELATED PRODUCTS) */}
-{/* ============================================================ */}
-{relatedProducts.length > 0 && (
-  <section className="related-products-section" style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px solid #e5e7eb' }}>
-    <div className="related-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-      <h3 className="text-xl font-bold text-gray-800">Bidhaa Zinazofanana</h3>
-      <Link to={`/category/${product.leaf_category_id}`} className="text-orange-500 font-semibold text-sm hover:underline">
-        Tazama zote →
-      </Link>
-    </div>
-
-    {/* Grid ya Related Products */}
-    <div className="related-products-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '20px' }}>
-      {relatedProducts.map((p) => (
-        <div key={p.id} className="related-product-card" style={{ border: '1px solid #e5e7eb', borderRadius: '12px', padding: '12px', textAlign: 'center', transition: 'all 0.2s ease', cursor: 'pointer' }}
-         onClick={() => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            navigate(`/product/${p.id}`); // Hii inatumia react-router-dom navigation
-                  }}
-              >
-          <div className="related-img-wrap" style={{ width: '100%', height: '150px', overflow: 'hidden', borderRadius: '8px', marginBottom: '10px', backgroundColor: '#f9f9f9' }}>
-            <img 
-              src={p.cover_image_url || 'https://via.placeholder.com/200x200?text=No+Image'} 
-              alt={p.name} 
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              onError={(e) => { e.target.src = 'https://via.placeholder.com/200x200?text=No+Image'; }}
-            />
-          </div>
-          <p className="related-product-name" style={{ fontSize: '14px', fontWeight: '600', color: '#333', margin: '0 0 5px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {p.name}
-          </p>
-          <div className="related-product-price" style={{ fontSize: '13px', fontWeight: '700', color: '#ff6a00' }}>
-            TSH {Number(p.price).toLocaleString()}
-          </div>
-        </div>
-      ))}
-    </div>
-
-    {/* Loading Skeleton */}
-    {loadingRelated && (
-      <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '10px' }}>
-        {[...Array(4)].map((_, i) => (
-          <div key={i} style={{ width: '180px', height: '220px', backgroundColor: '#f3f4f6', borderRadius: '12px', animation: 'pulse 1.5s ease-in-out infinite' }} />
-        ))}
-      </div>
-    )}
-  </section>
-)}
-
-
-
+            {/* Loading Skeleton */}
+            {loadingRelated && (
+              <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '10px' }}>
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} style={{ width: '180px', height: '220px', backgroundColor: '#f3f4f6', borderRadius: '12px', animation: 'pulse 1.5s ease-in-out infinite' }} />
+                ))}
+              </div>
+            )}
+          </section>
+        )}
       </div>
 
       {!isMobile && <Footer />}
