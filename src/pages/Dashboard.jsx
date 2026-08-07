@@ -382,30 +382,6 @@ const fetchLeafsForSub = async (subCategoryId) => {
       
       <div className="main-content">
 
-        <div className="category-slider-wrapper">
-          {!search && categories.length > 0 && (
-            <MobileCategorySlider 
-              categories={categories}
-              selectedCategory={selectedCategoryForComponents}
-              onSelectCategory={(cat) => {
-                setSelectedCategoryForComponents(cat);
-                setSelectedCategory(cat);
-                if (cat.id === null) {
-                  setSelectedCategoryForComponents(null);
-                  setSelectedCategory(null);
-                } else {
-                  setSelectedCategoryForComponents(cat);
-                  setSelectedCategory(cat);
-                  fetchFeaturedLeafs(cat.id);
-                  fetchSubCategories(cat.id);
-                }
-              }}
-              getDisplayName={getCategoryDisplayName}
-              getIcon={getIcon}
-            />
-          )}
-        </div>
-
         <div className="content-container-simple">
 
           {search && (
@@ -430,6 +406,7 @@ const fetchLeafsForSub = async (subCategoryId) => {
           {!search && (
             <div className="alibaba-top-layout">
               
+              {/* ✅ SIDEBAR IMEFICHWA KABISA KWENYE MOBILE KWA KUONGEZA style */}
               <aside className="side-categories">
                 <div className="side-header">
                   <Star size={18} /> <span>{t('categories')}</span>
@@ -447,45 +424,73 @@ const fetchLeafsForSub = async (subCategoryId) => {
                 </ul>
               </aside>
 
-              <div className="hero-banners-container">
-                <div className="hot-picks-banner">
-                  {activeAd && isVideoAd(activeAd) ? (
-                    <video
-                      src={activeAd.media_url}
-                      autoPlay
-                      muted
-                      playsInline
-                      onEnded={() => {
-                        if (cachedAds.length) setCurrentAdIndex((prev) => (prev + 1) % cachedAds.length);
+              {/* ✅ SLIDER NA BANNER SASA ZIKO CHINI YA CONTAINER MOJA */}
+              <div className="alibaba-mobile-content">
+                
+                <div className="category-slider-wrapper">
+                  {!search && categories.length > 0 && (
+                    <MobileCategorySlider 
+                      categories={categories}
+                      selectedCategory={selectedCategoryForComponents}
+                      onSelectCategory={(cat) => {
+                        setSelectedCategoryForComponents(cat);
+                        setSelectedCategory(cat);
+                        if (cat.id === null) {
+                          setSelectedCategoryForComponents(null);
+                          setSelectedCategory(null);
+                        } else {
+                          setSelectedCategoryForComponents(cat);
+                          setSelectedCategory(cat);
+                          fetchFeaturedLeafs(cat.id);
+                          fetchSubCategories(cat.id);
+                        }
                       }}
-                      className="banner-media"
+                      getDisplayName={getCategoryDisplayName}
+                      getIcon={getIcon}
                     />
-                  ) : (
-                    activeAd && (
-                      <img
-                        src={activeAd.media_url}
-                        className="banner-media"
-                        alt="promo"
-                        loading="lazy"
-                      />
-                    )
-                  )}
-                  {activeAd && (
-                    <div className="banner-overlay-text">
-                      <span className="ad-tag">{t('sponsored')}</span>
-                      <h2 className="banner-title">{activeAd.business_name}</h2>
-                      <p className="banner-desc">{activeAd.description}</p>
-                      <button 
-                        className="view-more-banner" 
-                        onClick={() => navigate(`/store/${activeAd.store_id}`)}
-                      >
-                        {t('source_now')} →
-                      </button>
-                    </div>
                   )}
                 </div>
-              </div>
 
+                <div className="hero-banners-container">
+                  <div className="hot-picks-banner">
+                    {activeAd && isVideoAd(activeAd) ? (
+                      <video
+                        src={activeAd.media_url}
+                        autoPlay
+                        muted
+                        playsInline
+                        onEnded={() => {
+                          if (cachedAds.length) setCurrentAdIndex((prev) => (prev + 1) % cachedAds.length);
+                        }}
+                        className="banner-media"
+                      />
+                    ) : (
+                      activeAd && (
+                        <img
+                          src={activeAd.media_url}
+                          className="banner-media"
+                          alt="promo"
+                          loading="lazy"
+                        />
+                      )
+                    )}
+                    {activeAd && (
+                      <div className="banner-overlay-text">
+                        <span className="ad-tag">{t('sponsored')}</span>
+                        <h2 className="banner-title">{activeAd.business_name}</h2>
+                        <p className="banner-desc">{activeAd.description}</p>
+                        <button 
+                          className="view-more-banner" 
+                          onClick={() => navigate(`/store/${activeAd.store_id}`)}
+                        >
+                          {t('source_now')} →
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+              </div>
             </div>
           )}
 
@@ -644,7 +649,7 @@ const fetchLeafsForSub = async (subCategoryId) => {
                     <div key={leaf.id} className="grid-item" onClick={() => handleLeafClick(leaf.id)}>
                       <div className="image-circle">
                         <img 
-                          src={leaf.cover_image_url || leaf.cover_image || placeholderImg} // 🔥 BADILISHA HAPA!
+                          src={leaf.cover_image_url || leaf.cover_image || placeholderImg}
                               alt={leaf.leaf_categories?.name} 
                                   />
                              </div>
@@ -749,7 +754,7 @@ const fetchLeafsForSub = async (subCategoryId) => {
                         >
                           <div className="mobile-grid-image">
                                 <img 
-                                 src={leaf.cover_image_url || leaf.cover_image || placeholderImg} // 🔥 BADILISHA HAPA!
+                                 src={leaf.cover_image_url || leaf.cover_image || placeholderImg}
                               alt={leaf.leaf_categories?.name} 
                                      />
                             </div>

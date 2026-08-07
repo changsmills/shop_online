@@ -127,6 +127,7 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
   // SUCCESS STATE - Onyesha bidhaa
   // ============================================================
   return (
+  
     <div className="trending-main-wrapper">
       
      {renderHeader()}

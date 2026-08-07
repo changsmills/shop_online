@@ -17,12 +17,25 @@ export const useDashboardData = () => {
   useEffect(() => {
     const fetchAllData = async () => {
       try {
+        // 🔥 1. Angalia cache kwanza (dakika 5)
+        const cacheKey = 'dashboard_data';
+        const cachedData = localStorage.getItem(cacheKey);
+        const cachedTime = localStorage.getItem(`${cacheKey}_time`);
+        
+        if (cachedData && cachedTime && (Date.now() - Number(cachedTime) < 5 * 60 * 1000)) {
+          console.log('📦 Using cached dashboard data');
+          setData(JSON.parse(cachedData));
+          setData(prev => ({ ...prev, loading: false }));
+          return;
+        }
+
+        console.log('🔄 Fetching fresh dashboard data...');
         setData(prev => ({ ...prev, loading: true, error: null }));
 
         const token = localStorage.getItem("access_token");
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-        // 🔥 ZOTE ZINAKIMBIA SAMBAMBA - Promise.allSettled!
+        // 🔥 2. ZOTE ZINAKIMBIA SAMBAMBA - Promise.allSettled!
         const results = await Promise.allSettled([
           // 1. Categories
           api.get('/categories/'),
@@ -49,7 +62,7 @@ export const useDashboardData = () => {
           api.get('/subcategories/')
         ]);
 
-        // 🔥 PROCESS RESULTS - Hata kama moja imeshindwa!
+        // 🔥 3. PROCESS RESULTS - Hata kama moja imeshindwa!
         let categories = [];
         let trendingProducts = [];
         let ads = [];
@@ -109,8 +122,7 @@ export const useDashboardData = () => {
           console.warn("Failed to fetch subcategories:", results[4].reason);
         }
 
-        // 🔥 SET DATA
-        setData({
+        const newData = {
           categories,
           trendingProducts,
           ads,
@@ -119,7 +131,14 @@ export const useDashboardData = () => {
           leafsForSub: [],
           loading: false,
           error: null
-        });
+        };
+
+        // 🔥 4. HIFADHI KWENYE CACHE
+        localStorage.setItem(cacheKey, JSON.stringify(newData));
+        localStorage.setItem(`${cacheKey}_time`, String(Date.now()));
+        console.log('✅ Dashboard data cached successfully');
+
+        setData(newData);
 
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
