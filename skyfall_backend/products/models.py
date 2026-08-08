@@ -719,3 +719,31 @@ class Lead(models.Model):
 
     def __str__(self):
         return f"{self.customer_name} - {self.store}"
+
+# --- OTP MODEL (Kwa Forgot Password) ---
+class OTPModel(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    email = models.EmailField()
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+    
+    class Meta:
+        db_table = 'otp_codes'
+        indexes = [
+            models.Index(fields=['email']),
+            models.Index(fields=['otp']),
+            models.Index(fields=['email', 'otp']),
+            models.Index(fields=['created_at']),
+            models.Index(fields=['is_used']),
+            models.Index(fields=['email', 'is_used']),
+        ]
+    
+    def is_expired(self):
+        """Check if OTP is expired (5 minutes)"""
+        from django.utils import timezone
+        from datetime import timedelta
+        return timezone.now() > self.created_at + timedelta(minutes=5)
+    
+    def __str__(self):
+        return f"{self.email} - {self.otp}"

@@ -28,6 +28,15 @@ DEBUG = True
 ALLOWED_HOSTS = ['*'] 
 # Au baadaye: ALLOWED_HOSTS = ['skyfall.com', 'www.skyfall.com']
 
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # 🔥 Inatumia SMTP halisi (Gmail)
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@skyfall.com')
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -39,20 +48,45 @@ INSTALLED_APPS = [
     
     # Third-party apps
     'rest_framework',
+    'rest_framework.authtoken',   # 🔥 ONGEZA HII HAPA! (Iko chini ya 'rest_framework')
     'rest_framework_simplejwt',
     'corsheaders',
     'django_filters',  
     'cloudinary',
      # 'cloudinary_storage', # 🔥 FUTE HII KABISA!
 
-    
-    
+     'dj_rest_auth',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+
     # Our apps
     'api',
    'users',
     'products',
     'orders',
 ]
+
+
+SITE_ID = 1
+
+
+# ==================== DJ-REST-AUTH CONFIGURATION ====================
+REST_AUTH = {
+    'TOKEN_MODEL': None,          # 🔥 Sio lazima tupate token table
+    'USE_JWT': True,              # 🔥 Tumia JWT badala ya default token
+    'JWT_AUTH_COOKIE': 'access_token',
+    'JWT_AUTH_REFRESH_COOKIE': 'refresh_token',
+    'REGISTER_SERIALIZER': None,  # Au unaweza kuweka custom serializer
+}
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
 
 AUTH_USER_MODEL = 'users.User'  # Sio 'products.Profile'!
 
@@ -67,6 +101,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+     'allauth.account.middleware.AccountMiddleware',
+
 ]
 
 ROOT_URLCONF = 'skyfall_backend.urls'
@@ -132,8 +168,25 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
-
 CORS_ALLOW_CREDENTIALS = True
+
+# ==================== CSRF TRUSTED ORIGINS (ONGEZA HII!) ====================
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://shop-online-tan.vercel.app',
+]
+
+# ==================== SOCIALACCOUNT PROVIDERS ====================
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': os.getenv('GOOGLE_CLIENT_ID'),  # 🔥 Soma kutoka .env
+            'secret': os.getenv('GOOGLE_CLIENT_SECRET'),  # 🔥 Soma kutoka .env
+            'key': ''
+        }
+    }
+}
 
 # ==================== REST FRAMEWORK CONFIGURATION ====================
 REST_FRAMEWORK = {

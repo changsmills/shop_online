@@ -281,7 +281,8 @@ html, body {
   aspect-ratio: 16/9;
   background: linear-gradient(135deg, #1a1a2e, #16213e);
   overflow: hidden;
-  border-radius: 0;
+  border-radius: 12px !important; /* ✅ Imeongezwa kuwa 12px */
+
 }
 
 @media (min-width: 600px) {
@@ -292,7 +293,8 @@ html, body {
   .hot-picks-banner {
     aspect-ratio: auto;
     height: 480px;
-    border-radius: 0;
+     border-radius: 0 !important; 
+
   }
 }
 
@@ -984,7 +986,6 @@ html, body {
     background: #1a1a2e !important;
     position: relative !important;
     overflow: hidden !important;
-    border-radius: 0 !important;
   }
   
   .banner-media {

@@ -12,6 +12,8 @@ import StoreManagement from './components/StoreManagement';
 import SupplierMessages from './pages/SupplierMessages'; 
 import SupplierNotifications from './pages/SupplierNotifications'; 
 import SupplierOrders from './pages/SupplierOrders';
+import ForgotPassword from './pages/ForgotPassword';
+
 
 // Import Pages
 import Home from "./pages/Home"; 
@@ -180,6 +182,8 @@ function AppContent({ session }) {
 
         {/* AUTHENTICATION */}
         <Route path="/dashboard/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+
         <Route path="/dashboard/register" element={<Register />} />
         <Route path="/dashboard/register-supplier" element={<SupplierAuth />} />
         

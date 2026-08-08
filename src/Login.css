@@ -449,3 +449,28 @@
     color: white !important;
   }
 }
+
+/* Forgot password specific styles */
+.login-forgot-password {
+  text-align: right;
+  margin-bottom: 1.5rem;
+}
+
+.login-forgot-link {
+  color: #0056b3;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.login-forgot-link:hover {
+  color: #003d80;
+  text-decoration: underline;
+}
+
+/* OTP input special styling */
+.login-input[type="text"] {
+  letter-spacing: 4px;
+  font-size: 1.2rem;
+  text-align: center;
+}

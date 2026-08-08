@@ -8,13 +8,18 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth import authenticate, update_session_auth_hash
+from django.core.mail import send_mail  # 🔥 ONGEZA HII
+from django.conf import settings  # 🔥 ONGEZA HII
+import random  # 🔥 ONGEZA HII
+from django.utils import timezone  # 🔥 ONGEZA HII
+from datetime import timedelta  # 🔥 ONGEZA HII
 
 
 
 # 🔥 MODELS IMPORTS:
 from products.models import (
     Category, ProductVariation, SubCategory, ProductsEngine, LeafCategory, Advertisement, 
-    StoreEngine, ProductMedia, Message, ShippingMethod, Brand, Lead, Order, OrderItem
+    StoreEngine, ProductMedia, Message, ShippingMethod, Brand, Lead, Order, OrderItem,  OTPModel  
 )
 
 # 🔥 ONGEZA HII IMPORT MUHIMU KABISA (Inaingiza ViewSet kutoka products.views):
@@ -332,6 +337,184 @@ class PasswordResetView(APIView):
         # send_mail('Reset Password', 'Link yako...', 'from@example.com', [email])
         
         return Response({'status': 'reset_link_sent'}, status=200)
+    
+
+
+    # ==========================================
+# 4. 🔥 VIEWS ZA MIPANGILIO
+# ==========================================
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        old = request.data.get('old_password')
+        new = request.data.get('new_password')
+        
+        if not user.check_password(old):
+            return Response({'error': 'Password ya sasa si sahihi'}, status=400)
+        
+        user.set_password(new)
+        user.save()
+        update_session_auth_hash(request, user)
+        return Response({'status': 'password_updated'}, status=200)
+
+class DeleteAccountView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        user = request.user
+        user.delete()
+        return Response({'status': 'account_deleted'}, status=200)
+
+class ChangeEmailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        new_email = request.data.get('new_email')
+        if not new_email:
+            return Response({'error': 'Tafadhali weka email mpya'}, status=400)
+        
+        user = request.user
+        user.email = new_email
+        user.save()
+        return Response({'status': 'email_updated'}, status=200)
+
+class PasswordResetView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        if not email:
+            return Response({'error': 'Tafadhali weka email'}, status=400)
+        
+        # Hapa unatuma email ya reset (Logic inategemea mfumo wako)
+        return Response({'status': 'reset_link_sent'}, status=200)
+
+# ==========================================
+# 5. 🔥 PASSWORD RESET REQUEST & VERIFY VIEWS (MPYA)
+# ==========================================
+class PasswordResetRequestView(APIView):
+    """
+    Endpoint ya kutuma OTP kwa email ili kubadili password
+    POST: /api/password-reset/request/
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        
+        if not email:
+            return Response(
+                {'detail': 'Email is required'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            # Kwa usalama, tusimwambie mtumiaji kama email ipo au la
+            return Response(
+                {'detail': 'If this email exists, an OTP has been sent'}, 
+                status=status.HTTP_200_OK
+            )
+        
+        # Generate OTP (6-digit)
+        otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+        
+        # Save OTP kwenye database
+        OTPModel.objects.create(
+            email=email,
+            otp=otp,
+            created_at=timezone.now()
+        )
+        
+        # Tuma OTP kwa email
+        try:
+            send_mail(
+                subject='Password Reset OTP',
+                message=f'Your OTP for password reset is: {otp}\n\nThis OTP will expire in 5 minutes.',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            return Response(
+                {'detail': f'Failed to send email: {str(e)}'}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+        return Response(
+            {'detail': 'OTP sent to your email successfully'}, 
+            status=status.HTTP_200_OK
+        )
+
+
+class PasswordResetVerifyView(APIView):
+    """
+    Endpoint ya kuthibitisha OTP na kubadili password
+    POST: /api/password-reset/verify/
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        otp = request.data.get('otp')
+        new_password = request.data.get('new_password')
+        
+        # Check required fields
+        if not all([email, otp, new_password]):
+            return Response(
+                {'detail': 'Email, OTP, and new password are required'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Verify OTP
+        try:
+            otp_record = OTPModel.objects.filter(
+                email=email,
+                otp=otp,
+                is_used=False
+            ).latest('created_at')
+        except OTPModel.DoesNotExist:
+            return Response(
+                {'detail': 'Invalid OTP'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check if OTP is expired (5 minutes)
+        if otp_record.is_expired():
+            return Response(
+                {'detail': 'OTP has expired. Please request a new one.'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check password strength
+        if len(new_password) < 8:
+            return Response(
+                {'detail': 'Password must be at least 8 characters long'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Reset password
+        try:
+            user = User.objects.get(email=email)
+            user.set_password(new_password)
+            user.save()
+            
+            # Mark OTP as used
+            otp_record.is_used = True
+            otp_record.save()
+            
+            return Response(
+                {'detail': 'Password reset successfully'}, 
+                status=status.HTTP_200_OK
+            )
+        except User.DoesNotExist:
+            return Response(
+                {'detail': 'User not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
     
        # ==========================================
        # 5. 🔥 VIEWS ZA ORDERS NA ORDER ITEMS

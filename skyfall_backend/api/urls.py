@@ -10,7 +10,8 @@ from api.views import (
     ProductVariationViewSet, 
     ChangePasswordView, DeleteAccountView,
     ChangeEmailView, PasswordResetView,
-   OrderViewSet
+   OrderViewSet,
+    PasswordResetRequestView, PasswordResetVerifyView
 
 )
 
@@ -41,6 +42,13 @@ urlpatterns = [
     path('password-reset/', PasswordResetView.as_view(), name='password_reset'),
     path('change-password/', ChangePasswordView.as_view(), name='change_password'),
     path('delete-account/', DeleteAccountView.as_view(), name='delete_account'),
+      # 🔥 ENDPOINTS ZA FORGOT PASSWORD (MPYA):
+    path('password-reset/request/', PasswordResetRequestView.as_view(), name='password_reset_request'),
+    path('password-reset/verify/', PasswordResetVerifyView.as_view(), name='password_reset_verify'),
+     # 🔥 Google Login Endpoints
+    path('auth/', include('dj_rest_auth.urls')),  # Login, Logout, Password Reset
+    path('auth/registration/', include('dj_rest_auth.registration.urls')),  # Registration
+    path('auth/google/', include('allauth.socialaccount.urls')),  # Google OAuth
 ]
 
 from django.conf import settings
