@@ -28,49 +28,35 @@ export default function CartPage({ session }) {
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   // ============================================
-  // 🔥 FUNCTION MPYA YA KUPATA IMAGE URL
-  // ============================================
-  const getProductImage = (item) => {
-    // 1. Kama kuna cover_image_url (URL kamili)
-    if (item.cover_image_url) return item.cover_image_url;
+// 🔥 FUNCTION SAHIHI YA KUPATA IMAGE URL
+// ============================================
+const getProductImage = (item) => {
+  // 1. Kwanza angalia 'cover_image_url' (Hii ndiyo sahihi zaidi)
+  if (item.cover_image_url) {
+    return item.cover_image_url;
+  }
+  
+  // 2. Kama hakuna cover_image_url, angalia 'image' property
+  if (item.image) {
+    if (item.image.startsWith('http')) return item.image;
     
-    // 2. Kama kuna cover_image
-    if (item.cover_image) {
-      // Kama tayari ni URL kamili
-      if (item.cover_image.startsWith('http')) {
-        return item.cover_image;
-      }
-      
-      // 🔥 TUMIA BASE_URL KUTOKA API (ondoa /api kwa ajili ya images)
-      const BASE_URL = api.defaults.baseURL.replace(/\/api$/, '');
-      
-      // Hakikisha image path inaanza na '/'
-      const imagePath = item.cover_image.startsWith('/') 
-        ? item.cover_image 
-        : '/' + item.cover_image;
-      
-      const fullUrl = `${BASE_URL}${imagePath}`;
-      console.log("🖼️ Cart Image URL:", fullUrl); // Debug
-      return fullUrl;
-    }
-    
-    // 3. Kama kuna 'image' property (kwa ajili ya CartContext)
-    if (item.image) {
-      if (item.image.startsWith('http')) {
-        return item.image;
-      }
-      
-      const BASE_URL = api.defaults.baseURL.replace(/\/api$/, '');
-      const imagePath = item.image.startsWith('/') 
-        ? item.image 
-        : '/' + item.image;
-      
-      return `${BASE_URL}${imagePath}`;
-    }
-    
-    // 4. Default image
-    return '/placeholder-image.jpg';
-  };
+    // Tumia BASE_URL kwa picha za local
+    const BASE_URL = api.defaults.baseURL.replace(/\/api$/, '');
+    const imagePath = item.image.startsWith('/') ? item.image : '/' + item.image;
+    return `${BASE_URL}${imagePath}`;
+  }
+  
+  // 3. Kama hakuna kati ya hizo, angalia cover_image
+  if (item.cover_image) {
+    if (item.cover_image.startsWith('http')) return item.cover_image;
+    const BASE_URL = api.defaults.baseURL.replace(/\/api$/, '');
+    const imagePath = item.cover_image.startsWith('/') ? item.cover_image : '/' + item.cover_image;
+    return `${BASE_URL}${imagePath}`;
+  }
+  
+  // 4. Default placeholder
+  return '/placeholder-image.jpg';
+};
 
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} />, path: '/dashboard', label: 'Dashboard' },

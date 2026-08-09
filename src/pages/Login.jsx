@@ -179,7 +179,7 @@ const Login = () => {
 
   // 🔥 BADILISHA: GoogleOAuthProvider lazima ifunge component nzima!
   return (
-    <GoogleOAuthProvider clientId="897025267638-4uq34ithcduiblhn0qfb1cdspl2uovn6.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId="897025267638-ef196t913o7kt77dbgld9d7tmv01ftbp.apps.googleusercontent.com">
       
        {/* 🔥 BADILISHA HAPA NA CLIENT ID YAKO! */}
       <div className="login-container">

@@ -114,35 +114,47 @@ export default function Dashboard() {
     return ad.media_url.match(/\.(mp4|webm|mov)$/i) !== null;
   };
 
- // 1. Fetch Featured Leafs (SORTED ALPHABETICALLY)
 const fetchFeaturedLeafs = async (categoryId) => {
   if (!categoryId) return;
   try {
     const response = await api.get('/products/', {
-      params: { parent_category: categoryId }
+      params: { leaf_category: categoryId }
     });
 
-    // 🔥 BADILISHA HAPA: Tumia 'results' kwa sababu backend ina pagination!
-    const data = response.data.results || response.data || [];
+    // 🔥 1. Angalia kama data imefika
+    console.log("🔍 [DEBUG] Raw Response Data:", response.data);
 
+    // 🔥 2. Panga data kwa usalama (Ikiwa backend inatumia pagination)
+    const data = response.data.results || response.data || [];
+    
     const uniqueCategories = [];
     const seenIds = new Set();
 
+    // 🔥 3. Chuja na thibitisha ID ipo!
     data.forEach(item => {
-      if (!seenIds.has(item.leaf_category_id)) {
-        seenIds.add(item.leaf_category_id);
-        uniqueCategories.push({
-          id: item.leaf_category_id,
-          leaf_category_id: item.leaf_category_id,
-          cover_image_url: item.cover_image_url, // ✅ Tumia cover_image_url (URL kamili ya Cloudinary)!
-          leaf_categories: item.leaf_categories
-        });
+      // ANGALIA KAMA leaf_category_id IPO!
+      if (item.leaf_category_id) {
+        if (!seenIds.has(item.leaf_category_id)) {
+          seenIds.add(item.leaf_category_id);
+          uniqueCategories.push({
+            id: item.leaf_category_id,
+            leaf_category_id: item.leaf_category_id,
+            cover_image_url: item.cover_image_url,
+            leaf_categories: item.leaf_categories
+          });
+          console.log("✅ Added leaf ID:", item.leaf_category_id);
+        }
+      } else {
+        console.warn("⚠️ SKIPPED - No leaf_category_id found for product:", item.id);
       }
     });
 
+    // 🔥 4. Thibitisha kama zimeongezwa
+    console.log(`🏁 Final unique categories: ${uniqueCategories.length}`);
     setFeaturedProducts(uniqueCategories.slice(0, 17));
+
   } catch (error) {
-    console.error(error);
+    console.error("❌ [fetchFeaturedLeafs] Error:", error);
     setFeaturedProducts([]);
   }
 };
@@ -217,13 +229,16 @@ const fetchLeafsForSub = async (subCategoryId) => {
       setSubCategories(sortedInitial);
     }
   }, [initialSubCategories]);
-
-  useEffect(() => {
-    if (selectedCategory?.id && activeMenu === 'categories') {
-      fetchFeaturedLeafs(selectedCategory.id);
-      fetchSubCategories(selectedCategory.id);
-    }
-  }, [selectedCategory?.id, activeMenu]);
+useEffect(() => {
+  // 🔥 Hakikisha selectedCategory ipo na ina id halisi
+  if (selectedCategory && selectedCategory.id && activeMenu === 'categories') {
+    console.log("🔍 Fetching data for category:", selectedCategory.id);
+    fetchFeaturedLeafs(selectedCategory.id);
+    fetchSubCategories(selectedCategory.id);
+  } else {
+    console.warn("⚠️ selectedCategory ni null au haina id!");
+  }
+}, [selectedCategory, activeMenu]); // 🔥 Tumia 'selectedCategory' sio 'selectedCategory?.id'
 
   useEffect(() => {
     if (cachedAds.length === 0) return;
@@ -618,48 +633,120 @@ const fetchLeafsForSub = async (subCategoryId) => {
                   </button>
                 )}
               </div>
-              <div className="category-grid">
-                {viewMode === 'products' ? (
-                  <>
-                    {featuredProducts.map((leaf) => (
-                      <div 
-                        key={leaf.id} 
-                        className="grid-item" 
-                        onClick={() => handleLeafClick(leaf.leaf_category_id)}
-                      >
-                        <div className="image-circle">
-                          <img src={leaf.cover_image_url || placeholderImg} alt={leaf.leaf_categories?.name} />
-                        </div>
-                        <p className="grid-text">
-                          {i18n.language === 'sw' 
-                            ? (leaf.leaf_categories?.name_sw || leaf.leaf_categories?.name)
-                            : leaf.leaf_categories?.name}
-                        </p>
-                      </div>
-                    ))}
-                    <div onClick={handleViewAll} className="grid-item see-all-card">
-                      <div className="image-circle see-all-circle">
-                        <Plus size={30} color="#ff6a00" />
-                      </div>
-                      <p className="see-all-text">{t('see_all')}</p>
-                    </div>
-                  </>
-                ) : (
-                  leafsForSub.map((leaf) => (
-                    <div key={leaf.id} className="grid-item" onClick={() => handleLeafClick(leaf.id)}>
-                      <div className="image-circle">
-                        <img 
-                          src={leaf.cover_image_url || leaf.cover_image || placeholderImg}
-                              alt={leaf.leaf_categories?.name} 
-                                  />
-                             </div>
-                      <p className="grid-text">
-                        {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
-                      </p>
-                    </div>
-                  ))
-                )}
-              </div>
+              
+<div className="category-grid">
+  {viewMode === 'products' ? (
+    <>
+      {featuredProducts.map((leaf) => (
+        <div 
+          key={leaf.id} 
+          className="grid-item" 
+          onClick={() => {
+            try {
+              // 🔥 1. Pata ID halisi (kwa kipaumbele)
+              const targetId = leaf.leaf_category_id || leaf.id;
+              console.log(`🔍 [LeafClick] Attempting to navigate for leaf: ${leaf.leaf_categories?.name || leaf.name}, targetId: ${targetId}`);
+
+              // 🔥 2. Kagua kama ID ni sahihi (sio undefined, null, au 'undefined')
+              if (!targetId || targetId === 'undefined' || targetId === 'null' || targetId === '') {
+                console.error("❌ [LeafClick] Invalid target ID detected:", targetId);
+                return; // Simamisha hapa!
+              }
+
+              // 🔥 3. Amua Desktop au Mobile
+              if (window.innerWidth > 1024) {
+                // Desktop: Fungua tab mpya na ukague kama popup ilizuiwa
+                console.log(`🖥️ [LeafClick] Desktop: Opening new tab for ${targetId}`);
+                const newWindow = window.open(`/category/${targetId}`, '_blank');
+                
+                if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                  console.warn("⚠️ [LeafClick] Popup blocked by browser. Falling back to navigate.");
+                  handleLeafClick(targetId);
+                } else {
+                  console.log(`✅ [LeafClick] New tab opened successfully for ${targetId}`);
+                }
+              } else {
+                // Mobile: Tumia navigate
+                console.log(`📱 [LeafClick] Mobile: Navigating in same tab for ${targetId}`);
+                handleLeafClick(targetId);
+                console.log(`✅ [LeafClick] Navigation successful.`);
+              }
+            } catch (error) {
+              // 🔥 4. Catch ya mwisho kwa makosa yasiyotarajiwa
+              console.error("❌ [LeafClick] Unexpected error on featured leaf click:", error);
+            }
+          }}
+        >
+          <div className="image-circle">
+            <img src={leaf.cover_image_url || placeholderImg} alt={leaf.leaf_categories?.name} />
+          </div>
+          <p className="grid-text">
+            {i18n.language === 'sw' 
+              ? (leaf.leaf_categories?.name_sw || leaf.leaf_categories?.name)
+              : leaf.leaf_categories?.name}
+          </p>
+        </div>
+      ))}
+      {/* 🔥 See All */}
+      <div onClick={handleViewAll} className="grid-item see-all-card">
+        <div className="image-circle see-all-circle">
+          <Plus size={30} color="#ff6a00" />
+        </div>
+        <p className="see-all-text">{t('see_all')}</p>
+      </div>
+    </>
+  ) : (
+    leafsForSub.map((leaf) => (
+      <div 
+        key={leaf.id} 
+        className="grid-item" 
+        onClick={() => {
+          try {
+            // 🔥 1. Pata ID halisi
+            const targetId = leaf.id || leaf.leaf_category_id;
+            console.log(`🔍 [LeafClick] Attempting to navigate for sub-leaf: ${leaf.name}, targetId: ${targetId}`);
+
+            // 🔥 2. Kagua kama ID ni sahihi
+            if (!targetId || targetId === 'undefined' || targetId === 'null' || targetId === '') {
+              console.error("❌ [LeafClick] Invalid target ID detected:", targetId);
+              return;
+            }
+
+            // 🔥 3. Amua Desktop au Mobile
+            if (window.innerWidth > 1024) {
+              console.log(`🖥️ [LeafClick] Desktop: Opening new tab for ${targetId}`);
+              const newWindow = window.open(`/category/${targetId}`, '_blank');
+              
+              if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                console.warn("⚠️ [LeafClick] Popup blocked by browser. Falling back to navigate.");
+                handleLeafClick(targetId);
+              } else {
+                console.log(`✅ [LeafClick] New tab opened successfully for ${targetId}`);
+              }
+            } else {
+              console.log(`📱 [LeafClick] Mobile: Navigating in same tab for ${targetId}`);
+              handleLeafClick(targetId);
+              console.log(`✅ [LeafClick] Navigation successful.`);
+            }
+          } catch (error) {
+            // 🔥 4. Catch ya mwisho kwa makosa yasiyotarajiwa
+            console.error("❌ [LeafClick] Unexpected error on sub-leaf click:", error);
+          }
+        }}
+      >
+        <div className="image-circle">
+          <img 
+            src={leaf.cover_image_url || leaf.cover_image || placeholderImg}
+            alt={leaf.leaf_categories?.name} 
+          />
+        </div>
+        <p className="grid-text">
+          {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
+        </p>
+      </div>
+    ))
+  )}
+</div>
             </main>
           </div>
         </div>,

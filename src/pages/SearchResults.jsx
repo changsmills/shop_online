@@ -1,6 +1,6 @@
 // src/components/SearchResults.jsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom'; // 🔥 Link imeondolewa!
 import api from "../axiosConfig";
 import { Globe, ChevronRight, Filter } from 'lucide-react';
 
@@ -184,18 +184,19 @@ export default function SearchResults({ session }) {
   return (
     <div className="alibaba-container">
       
-      {/* HEADER */}
+            {/* HEADER */}
       <header className="alibaba-header">
         <div className="header-wrapper">
-          <Link to="/" className="skyfall-logo">
+          <div className="skyfall-logo" onClick={() => navigate('/')} style={{cursor: 'pointer'}}>
             Skyfall<span>.com</span>
-          </Link>
+          </div>
           
           <div className="main-search-area">
             <SearchBar search={search} setSearch={setSearch} />
           </div>
 
-          <div className="header-right-actions">
+          {/* 🔥 BADILISHA HAPA: Ongeza class 'hide-on-mobile' */}
+          <div className="header-right-actions hide-on-mobile">
             <div className="nav-action-item">
               <UserTools session={session} />
             </div>
@@ -284,9 +285,23 @@ export default function SearchResults({ session }) {
                   className="alibaba-card"
                   ref={index === products.length - 1 ? lastProductRef : null}
                 >
-                  <Link to={`/product/${product.id}`} className="card-link">
+                  {/* 🔥 BADILISHA HAPA: Ondoa <Link>, tumia onClick */}
+                  <div 
+                    className="card-link-container"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                      if (window.innerWidth > 1024) {
+                        // Desktop: Fungua kwenye tab mpya
+                        console.log("🖥️ Desktop: Opening new tab for product", product.id);
+                        window.open(`/product/${product.id}`, '_blank');
+                      } else {
+                        // Mobile: Tumia navigate
+                        console.log("📱 Mobile: Navigating to product", product.id);
+                        navigate(`/product/${product.id}`);
+                      }
+                    }}
+                  >
                     <div className="card-image">
-                      {/* ✅ BADILISHA HII SEHEMU: Tumia getProductImage() */}
                       <img 
                         src={getProductImage(product)} 
                         alt={product.name}
@@ -303,7 +318,7 @@ export default function SearchResults({ session }) {
                         <span className="amount">{Number(product.price).toLocaleString()}</span>
                       </div>
                     </div>
-                  </Link>
+                  </div>
                 </div>
               ))
             ) : (

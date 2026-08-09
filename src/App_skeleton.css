@@ -50,7 +50,7 @@
 @media (max-width: 768px) {
   .skeleton-layout-wrapper {
     padding: 0 !important;
-    padding-top: 0 !important; /* ✅ UREFU WA HEADER YA MOBILE */
+    padding-top: 56px !important;   /* 🔥 Hii ndiyo muhimu! Inasogeza chini */
     margin: 0 !important;
   }
 }
@@ -61,7 +61,7 @@
 @media (max-width: 480px) {
   .skeleton-layout-wrapper {
     padding: 0 !important;
-    padding-top: 1px !important; /* ✅ UREFU WA HEADER YA SMALL MOBILE */
+    padding-top: 56px !important; /* ✅ UREFU WA HEADER YA SMALL MOBILE */
     margin: 0 !important;
   }
   .skeleton-banner-mobile {

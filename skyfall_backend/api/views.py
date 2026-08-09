@@ -90,13 +90,29 @@ class LeafCategoryViewSet(viewsets.ModelViewSet):
             
         return queryset
 
+    # 🔥 ONGEZA HII METHOD ILI KUONA ID INAYOFIKA KUTOKA FRONTEND
+    def retrieve(self, request, *args, **kwargs):
+        leaf_id = kwargs.get('pk')
+        print(f"🔍 [BACKEND DEBUG] LeafCategory retrieve called with ID: {leaf_id}")
+        
+        try:
+            # Jaribu kupata leaf kwa ID
+            instance = self.get_object()
+            serializer = self.get_serializer(instance)
+            print(f"✅ [BACKEND] Leaf found: {instance.name} (ID: {instance.id})")
+            return Response(serializer.data)
+        except Exception as e:
+            print(f"❌ [BACKEND ERROR] Failed to retrieve Leaf with ID {leaf_id}: {e}")
+            # Ruhusu Django kushughulikia error (kama 404)
+            raise e
+
 class ProductsEngineViewSet(viewsets.ModelViewSet):
     queryset = ProductsEngine.objects.all()
     serializer_class = ProductsEngineSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [JWTAuthentication]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ['store_id', 'leaf_category_id', 'parent_category', 'is_approved', 'sub_category']  # ✅ Tumia jina la field!    ordering_fields = ['views', 'price', 'created_at']
+    filterset_fields = ['store_id', 'leaf_category', 'parent_category', 'is_approved', 'sub_category']  # ✅ Tumia jina la field!    ordering_fields = ['views', 'price', 'created_at']
     pagination_class = LimitOffsetPagination
 
     def perform_create(self, serializer):
@@ -535,4 +551,3 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     serializer_class = OrderItemSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
-

@@ -35,7 +35,8 @@ const CheckoutPage = () => { // 🔥 IMEONDOLEShA { session }
   });
 
   // Order items
-  const orderItems = location.state?.orderItems || cartItems || [];
+// 🔥 Tumia cartItems kwa sasa, lakini sahihisha picha na bei kupitia mapping
+const orderItems = cartItems.length > 0 ? cartItems : (location.state?.orderItems || []);
 
   // ========== 1. Detect mobile ==========
   useEffect(() => {
@@ -90,9 +91,12 @@ const CheckoutPage = () => { // 🔥 IMEONDOLEShA { session }
   };
 
   // ========== 5. Calculate totals ==========
-  const subtotal = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const currentShippingPrice = selectedShipping ? getPrice(selectedShipping) : 0;
-  const totalAmount = subtotal + currentShippingPrice;
+const subtotal = orderItems.reduce((sum, item) => {
+  const price = Number(item.price) || 0;
+  return sum + (price * item.quantity);
+}, 0);
+
+const currentShippingPrice = selectedShipping ? Number(getPrice(selectedShipping)) : 0;  const totalAmount = subtotal + currentShippingPrice;
 
   // ========== 6. Handle Place Order (Django API) ==========
   const handlePlaceOrder = async () => {
@@ -362,7 +366,7 @@ const CheckoutPage = () => { // 🔥 IMEONDOLEShA { session }
                 </form>
               </div>
 
-              {/* ORDER SUMMARY SECTION */}
+                            {/* ORDER SUMMARY SECTION */}
               <div style={{ flex: isMobile ? 'auto' : 1, width: isMobile ? '100%' : 'auto' }}>
                 <div style={{ background: '#fff', padding: isMobile ? '16px' : '24px', borderRadius: '16px', border: '1px solid #eee', position: isMobile ? 'relative' : 'sticky', top: '20px' }}>
                   <h3 style={{ fontWeight: '800', marginBottom: '20px', fontSize: isMobile ? '16px' : '18px' }}>Order Summary</h3>
@@ -371,12 +375,20 @@ const CheckoutPage = () => { // 🔥 IMEONDOLEShA { session }
                     <div style={{ marginBottom: '16px', maxHeight: '200px', overflowY: 'auto' }}>
                       {orderItems.slice(0, 3).map((item, idx) => (
                         <div key={idx} style={{ display: 'flex', gap: '10px', padding: '8px 0', borderBottom: '1px solid #f0f0f0' }}>
-                          <img src={item.image} alt={item.name} style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} />
+                          {/* 🔥 BADILISHA HAPA: Tumia cover_image_url kwanza, kisha image, kisha product_image */}
+                          <img 
+                            src={item.cover_image_url || item.image || item.product_image || '/placeholder-image.jpg'} 
+                            alt={item.name} 
+                            style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} 
+                          />
                           <div style={{ flex: 1 }}>
                             <p style={{ fontSize: '12px', fontWeight: '600', margin: 0 }}>{item.name?.slice(0, 30)}</p>
                             <p style={{ fontSize: '11px', color: '#666', margin: 0 }}>Qty: {item.quantity}</p>
                           </div>
-                          <span style={{ fontSize: '12px', fontWeight: '700', color: '#ff6a00' }}>TZS {(item.price * item.quantity).toLocaleString()}</span>
+                          {/* 🔥 BADILISHA HAPA: Tumia Number() kwa usalama */}
+                          <span style={{ fontSize: '12px', fontWeight: '700', color: '#ff6a00' }}>
+                            TZS {(Number(item.price) * item.quantity).toLocaleString()}
+                          </span>
                         </div>
                       ))}
                       {orderItems.length > 3 && <p style={{ fontSize: '11px', color: '#999', textAlign: 'center', marginTop: '8px' }}>+{orderItems.length - 3} more items</p>}

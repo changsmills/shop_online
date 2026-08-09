@@ -42,22 +42,29 @@ export default function ProductDetails() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  useEffect(() => {
-    const incrementView = async () => {
-      if (!id) return;
-      const viewedProducts = JSON.parse(localStorage.getItem("viewed_products") || "[]");
-      if (!viewedProducts.includes(id)) {
-        try {
-          await api.post(`/products/${id}/increment_views/`);
-          viewedProducts.push(id);
-          localStorage.setItem("viewed_products", JSON.stringify(viewedProducts));
-        } catch (error) {
-          console.error("❌ [incrementView] Imeshindwa kuongeza views kwa bidhaa:", id, error.message);
-        }
+ useEffect(() => {
+  const incrementView = async () => {
+    if (!id) return;
+    const viewedProducts = JSON.parse(localStorage.getItem("viewed_products") || "[]");
+    if (!viewedProducts.includes(id)) {
+      // 🔥 ANGALIA KAMA TOKEN IPO KABLA YA KUTUMA
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        console.log("⚠️ Token haipo, view haitaongezwa.");
+        return; // Usitume request kama hakuna token
       }
-    };
-    incrementView();
-  }, [id]);
+      
+      try {
+        await api.post(`/products/${id}/increment_views/`);
+        viewedProducts.push(id);
+        localStorage.setItem("viewed_products", JSON.stringify(viewedProducts));
+      } catch (error) {
+        console.error("❌ [incrementView] Imeshindwa kuongeza views kwa bidhaa:", id, error.message);
+      }
+    }
+  };
+  incrementView();
+}, [id]);
 
   useEffect(() => {
     async function getFullProductData() {

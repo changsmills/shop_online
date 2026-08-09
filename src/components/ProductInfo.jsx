@@ -29,7 +29,7 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
   const [isSelectionOpen, setIsSelectionOpen] = useState(false);
 
   // 🔥 BADILISHA HAPA NA JINA LAKO HALISI LA CLOUDINARY
-  const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/YOUR_CLOUD_NAME/image/upload";
+const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/rlgqgsnv/image/upload";
 
   const moq = product?.moq || 1;
   const productImage = product?.cover_image || "https://via.placeholder.com/150";
@@ -313,16 +313,21 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
       }
 
       itemsToProcess.push({
-        id: product.id,
-        variant_id: variant.id,
-        name: product.name,
-        selected_color: variant.color_name || 'Standard',
-        selected_size: selectedSizeFromKey || 'Free Size',
-        quantity: qty,
-        price: Number(variant.price) || Number(product?.price) || 0,
-        image: fullImageUrl || product?.cover_image_url || product?.cover_image,
-        store_id: product.store_id
-      });
+  id: product.id,
+  variant_id: variant.id,
+  name: product.name,
+  selected_color: variant.color_name || 'Standard',
+  selected_size: selectedSizeFromKey || 'Free Size',
+  quantity: qty,
+  
+  // 🔥 MUHIMU SANA: Hakikisha hizi zipo!
+  price: Number(variant.price) || Number(product?.price) || 0, 
+  cover_image_url: fullImageUrl || product?.cover_image_url || product?.cover_image,
+  image: fullImageUrl || product?.cover_image_url || product?.cover_image,
+  
+  store_id: product.store_id
+});
+
     });
 
     if (itemsToProcess.length === 0) {

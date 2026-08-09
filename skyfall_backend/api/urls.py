@@ -1,6 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from django.views.decorators.csrf import csrf_exempt  # 🔥 ONGEZA HII JUU!
 from api.views import (
     CategoryViewSet, OrderItemViewSet, SubCategoryViewSet, ProductsEngineViewSet,
     LeafCategoryViewSet, AdvertisementViewSet,
@@ -48,7 +49,7 @@ urlpatterns = [
      # 🔥 Google Login Endpoints
     path('auth/', include('dj_rest_auth.urls')),  # Login, Logout, Password Reset
     path('auth/registration/', include('dj_rest_auth.registration.urls')),  # Registration
-    path('auth/google/', include('allauth.socialaccount.urls')),  # Google OAuth
+    path('auth/google/', include('allauth.socialaccount.urls')),
 ]
 
 from django.conf import settings

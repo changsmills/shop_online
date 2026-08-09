@@ -28,9 +28,9 @@ const ProductSelectionDrawer = ({
     const [selectedColor, setSelectedColor] = useState(null);
     const [isMobile, setIsMobile] = useState(false);
 
-    // 🔥 BADILISHA HAPA NA JINA LAKO HALISI LA CLOUDINARY
-    const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/YOUR_CLOUD_NAME/image/upload";
 
+           // Iwe hii:
+     const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/rlgqgsnv/image/upload";
     // Detect mobile screen
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth <= 768);
@@ -338,67 +338,75 @@ const ProductSelectionDrawer = ({
     };
 
     const handleAddToCart = () => {
-        const itemsToCart = [];
-        Object.entries(selectedItems).forEach(([itemKey, qty]) => {
-            if (qty <= 0) return;
-            const parts = itemKey.split('::');
-            const searchId = parts[0];
-            const selectedSize = parts[1] || null;
-            let variant = variations.find(v => String(v.id) === String(searchId));
-            if (!variant) {
-                toast.error(`Bidhaa haikutambuliwa.`);
-                return;
-            }
-            const selectedColorValue = variant.color_name || selectedColor || 'Standard';
-            const unitPrice = Number(variant?.price ?? product?.price ?? 0);
-            const finalSize = selectedSize || 'Free Size';
-            const uniqueCartId = `${variant.id}_${finalSize}_${selectedColorValue}`.replace(/\s/g, '_');
-
-            // 🔥 Tumia URL kamili kwa image
-            let fullImageUrl = variant.color_image;
-            if (fullImageUrl && !fullImageUrl.startsWith('http')) {
-                fullImageUrl = `${CLOUDINARY_BASE_URL}/${fullImageUrl}`;
-            }
-
-            itemsToCart.push({
-                id: product.id,
-                productId: product.id,
-                product_id: product.id,
-                name: product.name,
-                product_name: product.name,
-                sku: variant?.sku || product.sku || '',
-                category_name: product.category_name || '',
-                selected_color: selectedColorValue,
-                selected_size: finalSize,
-                quantity: Number(qty),
-                price: unitPrice,
-                image: fullImageUrl || productImage,
-                product_image: fullImageUrl || productImage,
-                variant_id: variant.id,
-                store_id: product.store_id,
-                uniqueCartId: uniqueCartId,
-                added_at: new Date().toISOString()
-            });
-        });
-        if (itemsToCart.length > 0) {
-            const existingCart = JSON.parse(localStorage.getItem('alibaba_cart') || '[]');
-            itemsToCart.forEach(newItem => {
-                const existingIndex = existingCart.findIndex(item => item.uniqueCartId === newItem.uniqueCartId);
-                if (existingIndex !== -1) {
-                    existingCart[existingIndex].quantity += newItem.quantity;
-                } else {
-                    existingCart.push(newItem);
-                }
-            });
-            localStorage.setItem('alibaba_cart', JSON.stringify(existingCart));
-            window.dispatchEvent(new CustomEvent('cartUpdated', { detail: existingCart }));
-            toast.success(`Bidhaa ${itemsToCart.length} zimeongezwa kwenye kikapu!`, { duration: 2000 });
-            onClose();
-            navigate('/cart');
-        } else {
-            toast.error("Hakuna bidhaa zilizochaguliwa.");
+    const itemsToCart = [];
+    Object.entries(selectedItems).forEach(([itemKey, qty]) => {
+        if (qty <= 0) return;
+        const parts = itemKey.split('::');
+        const searchId = parts[0];
+        const selectedSize = parts[1] || null;
+        let variant = variations.find(v => String(v.id) === String(searchId));
+        if (!variant) {
+            toast.error(`Bidhaa haikutambuliwa.`);
+            return;
         }
-    };
+        const selectedColorValue = variant.color_name || selectedColor || 'Standard';
+        
+        // 🔥 MUHIMU: Tumia currentUnitPrice kama bei (iliyopitishwa kutoka ProductInfo)!
+        const unitPrice = Number(currentUnitPrice) || Number(variant?.price) || Number(product?.price) || 0;
+        
+        const finalSize = selectedSize || 'Free Size';
+        const uniqueCartId = `${variant.id}_${finalSize}_${selectedColorValue}`.replace(/\s/g, '_');
+
+        // 🔥 MUHIMU: Tumia URL kamili kwa image
+        let fullImageUrl = variant.color_image;
+        if (fullImageUrl && !fullImageUrl.startsWith('http')) {
+            fullImageUrl = `${CLOUDINARY_BASE_URL}/${fullImageUrl}`;
+        }
+        // 🔥 Angalia pia cover_image_url kutoka product
+        if (!fullImageUrl && product?.cover_image_url) {
+            fullImageUrl = product.cover_image_url;
+        }
+
+        itemsToCart.push({
+            id: product.id,
+            productId: product.id,
+            product_id: product.id,
+            name: product.name,
+            product_name: product.name,
+            sku: variant?.sku || product.sku || '',
+            category_name: product.category_name || '',
+            selected_color: selectedColorValue,
+            selected_size: finalSize,
+            quantity: Number(qty),
+            price: unitPrice, // 🔥 Hapa ndio bei sahihi!
+            image: fullImageUrl || productImage, // 🔥 Hapa ndio picha sahihi!
+            product_image: fullImageUrl || productImage,
+            cover_image_url: fullImageUrl || product?.cover_image_url || productImage, // 🔥 Muhimu!
+            variant_id: variant.id,
+            store_id: product.store_id,
+            uniqueCartId: uniqueCartId,
+            added_at: new Date().toISOString()
+        });
+    });
+    if (itemsToCart.length > 0) {
+        const existingCart = JSON.parse(localStorage.getItem('alibaba_cart') || '[]');
+        itemsToCart.forEach(newItem => {
+            const existingIndex = existingCart.findIndex(item => item.uniqueCartId === newItem.uniqueCartId);
+            if (existingIndex !== -1) {
+                existingCart[existingIndex].quantity += newItem.quantity;
+            } else {
+                existingCart.push(newItem);
+            }
+        });
+        localStorage.setItem('alibaba_cart', JSON.stringify(existingCart));
+        window.dispatchEvent(new CustomEvent('cartUpdated', { detail: existingCart }));
+        toast.success(`Bidhaa ${itemsToCart.length} zimeongezwa kwenye kikapu!`, { duration: 2000 });
+        onClose();
+        navigate('/cart');
+    } else {
+        toast.error("Hakuna bidhaa zilizochaguliwa.");
+    }
+};
 
     if (!isOpen || !product) return null;
 

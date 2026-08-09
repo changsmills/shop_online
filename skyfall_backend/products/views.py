@@ -36,10 +36,49 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
     serializer_class = ProductsEngineSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [JWTAuthentication]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ['store_id', 'leaf_category_id', 'parent_category', 'is_approved', 'sub_category_id']  # ✅ ONGEZA 'sub_category_id' hapa!
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]  # 🔥 ONGEZA SearchFilter!
+    filterset_fields = ['store_id', 'leaf_category', 'parent_category', 'is_approved', 'sub_category']  # ✅ ONGEZA 'sub_category_id' hapa!
+    search_fields = ['name', 'description', 'sku', 'barcode']  # 🔥 ONGEZA HIZI (Inaruhusu search!)
     ordering_fields = ['views', 'price', 'created_at']
     pagination_class = LimitOffsetPagination
+
+    # ==========================================================
+    # 🔥 ONGEZA HII METHOD KWA AJILI YA DEBUGGING NA CATCH
+    # ==========================================================
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        
+        # 1. Chapisha parameters zote zinazoingia kutoka Frontend
+        print(f"🔍 [PRODUCTS DEBUG] Full Request Query Params: {self.request.query_params}")
+        
+        # 2. Angalia hasa 'leaf_category_id' inayotumwa
+        leaf_category_id = self.request.query_params.get('leaf_category_id')
+        if leaf_category_id:
+            print(f"✅ [PRODUCTS] Received leaf_category_id: {leaf_category_id}")
+            # Kama ID ina hyphens, thibitisha ni UUID sahihi (kwa kujaribu kuitafuta)
+            try:
+                import uuid
+                uuid.UUID(leaf_category_id)  # Hii inatupa error kama si UUID halisi
+                print(f"  ℹ️ [PRODUCTS] leaf_category_id is a valid UUID.")
+            except ValueError:
+                print(f"❌ [PRODUCTS] WARNING: leaf_category_id '{leaf_category_id}' is NOT a valid UUID!")
+                # Unaweza kurudisha queryset tupu kama ID si sahihi, badala ya kurudisha 500
+                # return self.queryset.none()
+        else:
+            print(f"ℹ️ [PRODUCTS] No leaf_category_id provided in query params.")
+
+        # 3. Angalia store_id (kama ipo)
+        store_id = self.request.query_params.get('store_id')
+        if store_id:
+            print(f"✅ [PRODUCTS] Received store_id: {store_id}")
+        
+        # 4. Angalia sub_category_id
+        sub_category_id = self.request.query_params.get('sub_category_id')
+        if sub_category_id:
+            print(f"✅ [PRODUCTS] Received sub_category_id: {sub_category_id}")
+
+        # 5. Rudisha queryset (DjangoFilterBackend itashughulikia filtering)
+        return queryset
 
     def perform_create(self, serializer):
         try:

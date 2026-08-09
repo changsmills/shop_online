@@ -646,3 +646,30 @@
   .search-products-grid { grid-template-columns: repeat(3, 1fr); }
   .alibaba-card { break-inside: avoid; border: 1px solid #ddd; box-shadow: none; }
 }
+
+/* ============================================ */
+/* LAYER 14: FICHA HEADER ICONS KWENYE MOBILE   */
+/* ============================================ */
+
+/* 🔥 Ficha UserTools kwenye Mobile (≤768px) */
+@media (max-width: 768px) {
+  .header-right-actions.hide-on-mobile {
+    display: none !important;
+  }
+  
+  /* Hakikisha search inachukua nafasi yote katikati */
+  .header-wrapper {
+    justify-content: space-between;
+    gap: 8px;
+  }
+  
+  .skyfall-logo {
+    flex-shrink: 0;
+    font-size: 16px !important;
+  }
+  
+  .main-search-area {
+    flex: 1;
+    max-width: 100%;
+  }
+}

@@ -95,10 +95,19 @@ export default function SearchBar({ search = "", setSearch }) {
   };
 
   const navigateToSearchResults = (query) => {
-    if (!query || query.trim() === "") return;
+  if (!query || query.trim() === "") return;
+  
+  // 🔥 BADILISHA HIVI: Tumia window.open kwa desktop, navigate kwa mobile
+  if (window.innerWidth > 1024) {
+    // Desktop: Fungua kwenye tab mpya
+    window.open(`/search?q=${encodeURIComponent(query.trim())}`, '_blank');
+  } else {
+    // Mobile: Badilisha ukurasa wa sasa
     navigate(`/search?q=${encodeURIComponent(query.trim())}`);
-    setShowSuggestions(false);
-  };
+  }
+  
+  setShowSuggestions(false);
+};
 
   const handleSearchSubmit = () => {
     if (search.trim()) {

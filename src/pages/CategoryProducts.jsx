@@ -47,9 +47,24 @@ export default function CategoryProducts() {
       setError(null);
       
       try {
-        // 1. Get Leaf Category
-        const leafRes = await api.get(`/leaf-categories/${leafId}/`);
-        const leaf = leafRes.data;
+        // ==========================================
+        // 1. GET LEAF CATEGORY
+        // ==========================================
+        let leaf = null;
+        try {
+          const leafRes = await api.get(`/leaf-categories/${leafId}/`);
+          leaf = leafRes.data;
+          console.log("✅ [Leaf] Leaf data retrieved:", leaf);
+        } catch (leafErr) {
+          console.error("❌ [Leaf] Failed to fetch leaf category:", leafErr.response?.data || leafErr.message);
+          if (leafErr.response?.status === 404) {
+            setError(`Category ${leafId} haipo kwenye mfumo.`);
+          } else {
+            setError("Imeshindwa kupata kategoria ya leaf.");
+          }
+          setLoading(false);
+          return;
+        }
 
         let mainCatName = "Marketplace";
         let subName = "General";
@@ -57,14 +72,36 @@ export default function CategoryProducts() {
 
         if (leaf && leaf.sub_category_id) {
           subId = leaf.sub_category_id;
-          const subRes = await api.get(`/subcategories/${subId}/`);
-          const subData = subRes.data;
+
+          // ==========================================
+          // 2. GET SUB CATEGORY
+          // ==========================================
+          let subData = null;
+          try {
+            const subRes = await api.get(`/subcategories/${subId}/`);
+            subData = subRes.data;
+            console.log("✅ [Sub] Subcategory data retrieved:", subData);
+          } catch (subErr) {
+            console.error("❌ [Sub] Failed to fetch subcategory:", subErr.response?.data || subErr.message);
+            // Continue with defaults
+          }
           
           if (subData) {
             subName = subData.name;
             if (subData.category_id) {
-              const mainRes = await api.get(`/categories/${subData.category_id}/`);
-              if (mainRes.data) mainCatName = mainRes.data.name;
+              // ==========================================
+              // 3. GET MAIN CATEGORY
+              // ==========================================
+              try {
+                const mainRes = await api.get(`/categories/${subData.category_id}/`);
+                if (mainRes.data) {
+                  mainCatName = mainRes.data.name;
+                  console.log("✅ [Main] Main category data retrieved:", mainRes.data);
+                }
+              } catch (mainErr) {
+                console.error("❌ [Main] Failed to fetch main category:", mainErr.response?.data || mainErr.message);
+                // Continue with default
+              }
             }
           }
         }
@@ -75,40 +112,56 @@ export default function CategoryProducts() {
           leaf: leaf?.name || "Products"
         });
 
-        // 2. Get Filters (Leaf categories for this subId)
+        // ==========================================
+        // 4. GET FILTERS (Leaf categories for this subId)
+        // ==========================================
         if (subId) {
-          const filtersRes = await api.get('/leaf-categories/', {
-            params: { sub_category_id: subId }
-          });
-          const allFilters = filtersRes.data.results || filtersRes.data || [];
-          setFilters(allFilters);
+          try {
+            const filtersRes = await api.get('/leaf-categories/', {
+              params: { sub_category_id: subId }
+            });
+            const allFilters = filtersRes.data.results || filtersRes.data || [];
+            setFilters(allFilters);
+            console.log(`✅ [Filters] ${allFilters.length} filters retrieved`);
+          } catch (filterErr) {
+            console.error("❌ [Filters] Failed to fetch filters:", filterErr.response?.data || filterErr.message);
+            // Continue without filters
+          }
         }
 
-        // 3. Get Products
+        // ==========================================
+        // 5. GET PRODUCTS
+        // ==========================================
         const currentFilterId = activeFilterId || leafId;
-        const productsRes = await api.get('/products/', {
-          params: { 
-            leaf_category: currentFilterId, 
-            ordering: '-created_at' 
-          }
-        });
+        console.log(`🔍 [Products] Fetching products for leaf_category_id: ${currentFilterId}`);
 
-        const productsData = productsRes.data.results || productsRes.data || [];
+        let productsData = [];
+        try {
+          const productsRes = await api.get('/products/', {
+            params: { 
+              leaf_category: currentFilterId,
+              ordering: '-created_at' 
+            }
+          });
+          productsData = productsRes.data.results || productsRes.data || [];
+          console.log(`✅ [Products] ${productsData.length} products retrieved`);
+          console.log("📦 [Products] Product data:", productsData);
+        } catch (prodErr) {
+          console.error("❌ [Products] Failed to fetch products:", prodErr.response?.data || prodErr.message);
+          if (prodErr.response?.status === 404) {
+            setError(`Hakuna bidhaa zilizopatikana kwa kategoria hii.`);
+          } else {
+            setError("Imeshindwa kupata bidhaa za kategoria hii.");
+          }
+          setLoading(false);
+          return;
+        }
+
         setProducts(productsData);
 
       } catch (err) {
-        console.error("❌ ERROR:", err);
-        if (err.response) {
-          if (err.response.status === 404) {
-            setError(`Category ${leafId} haipo kwenye mfumo.`);
-          } else {
-            setError(`Hitilafu kutoka server: ${err.response.status}`);
-          }
-        } else if (err.request) {
-          setError("Imeshindwa kuungana na server. Hakikisha Django backend imewashwa.");
-        } else {
-          setError("Kuna tatizo la ndani la msimbo.");
-        }
+        console.error("❌ [General] Unexpected error in fetchPageData:", err);
+        setError("Kuna tatizo la jumla la mtandao au msimbo.");
       } finally {
         setLoading(false);
       }

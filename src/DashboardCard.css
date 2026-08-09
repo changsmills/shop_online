@@ -70,8 +70,6 @@
   .product-card-media { 
     aspect-ratio: 1 / 1 !important;  /* 🔥 Picha ni ndefu kidogo kuliko upana (kama suruali) */
     border-radius: 10px 10px 0 0; 
-    padding: 2px !important;         /* 🔥 Hii inapunguza ukubwa wa picha ndani! */
-
   }
 }
 
