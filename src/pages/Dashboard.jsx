@@ -64,7 +64,7 @@ export default function Dashboard() {
   const timeoutRef = useRef(null);
   const [cachedAds, setCachedAds] = useState([]);
 
-   useEffect(() => {
+    useEffect(() => {
     const fetchAdsWithCache = async () => {
       const storedAds = localStorage.getItem('skyfall_ads');
       const storedTime = localStorage.getItem('skyfall_ads_time');
@@ -72,32 +72,39 @@ export default function Dashboard() {
       // 1. Ikiwa cache ipo na bado ni mpya (chini ya dakika 5), tumia hiyo tu
       if (storedAds && storedTime && (Date.now() - Number(storedTime) < 5 * 60 * 1000)) {
         setCachedAds(JSON.parse(storedAds));
+        console.log("📦 [ADS] Zimepakuliwa kutoka cache!");
         return;
       }
 
-      // 2. Ikiwa hakuna token, USITUME ombi la 401! Tumia cache iliyopo au default banner.
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        if (storedAds) setCachedAds(JSON.parse(storedAds));
-        else setCachedAds([]); // Hakuna matangazo
-        return;
-      }
-
-      // 3. Ikiwa token ipo, ndipo tuma ombi la API
+      // 2. ✅ IMEONDOLEWA: Kizuizi cha token! Sasa mgeni yeyote anaweza kupata matangazo.
+      // Tunatuma ombi moja kwa moja kwa API.
       try {
+        console.log("⏳ [ADS] Inapakia matangazo kutoka Backend...");
         const response = await api.get('/advertisements/', {
           params: { status: 'active' }
         });
-        const data = response.data;
-        if (data) {
+
+        // 3. ✅ IMEBORESHA: Inashughulikia pagination ya Django (results)
+        const data = response.data.results || response.data || [];
+        
+        if (data.length > 0) {
+          console.log(`✅ [ADS] Matangazo ${data.length} yamepakuliwa!`);
           setCachedAds(data);
           localStorage.setItem('skyfall_ads', JSON.stringify(data));
           localStorage.setItem('skyfall_ads_time', String(Date.now()));
+        } else {
+          console.warn("⚠️ [ADS] Hakuna matangazo yaliyorudishwa na Backend.");
+          setCachedAds([]);
         }
+        
       } catch (error) {
-        console.error("Error fetching ads:", error);
-        // Kama imefeli, jaribu kutumia cache yoyote iliyopo
-        if (storedAds) setCachedAds(JSON.parse(storedAds));
+        console.error("❌ [ADS] Error fetching ads:", error.message);
+        // Kama API imeshindwa, jaribu kutumia cache iliyopo
+        if (storedAds) {
+          setCachedAds(JSON.parse(storedAds));
+        } else {
+          setCachedAds([]); // Hakuna cache, hakuna matangazo
+        }
       }
     };
     fetchAdsWithCache();

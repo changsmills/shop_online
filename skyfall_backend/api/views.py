@@ -146,7 +146,11 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
 class AdvertisementViewSet(viewsets.ModelViewSet):
     queryset = Advertisement.objects.all()
     serializer_class = AdvertisementSerializer
-    permission_classes = [IsAuthenticated]
+    
+    # ✅ MUHIMU: Badilisha hii kutoka [IsAuthenticated] kwenda [IsAuthenticatedOrReadOnly]
+    # Hii inaruhusu wageni (GET) kuona matangazo, lakini waliosajiliwa tu ndio wanaweza kuongeza au kufuta.
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    
     authentication_classes = [JWTAuthentication]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['store_id', 'status', 'ad_type']
@@ -164,8 +168,17 @@ class AdvertisementViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        
+        # ✅ Ikiwa ni mgeni (hajalogin), ruhusu waone matangazo yote.
+        # Hapa 'all()' inaruhusu DjangoFilterBackend kufanya kazi yake (kuchuja kwa status=active)
+        if user.is_anonymous:
+            return Advertisement.objects.all()
+        
+        # ✅ Ikiwa ni admin, waone yote
         if user.is_staff or user.is_superuser:
             return Advertisement.objects.all()
+        
+        # ✅ Ikiwa ni mtumiaji aliyesajiliwa wa kawaida, waone matangazo yao tu
         return Advertisement.objects.filter(user=user.profile)
 
 class StoreEngineViewSet(viewsets.ModelViewSet):
