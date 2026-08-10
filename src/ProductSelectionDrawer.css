@@ -1,111 +1,347 @@
-/* ProductVariationsDrawer.css */
+/* ============================================================== */
+/* 1. OVERLAY & GLOBAL STYLES                                     */
+/* ============================================================== */
 
-/* Overlay - HII ILIKUA SAWA */
 .drawer-overlay {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(4px);
     z-index: 999;
-    transition: all 0.3s ease;
+    animation: fadeIn 0.2s ease;
 }
 
-/* Drawer Container - ILIKUA SAWA */
-.drawer-container {
+/* ============================================================== */
+/* 2. ANIMATIONS                                                  */
+/* ============================================================== */
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+@keyframes slideDown {
+    from { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(100%); opacity: 0; }
+}
+
+/* ============================================================== */
+/* 3. DESKTOP LAYOUT (Right Drawer + Floating Image)              */
+/* ============================================================== */
+
+.desktop-layout {
+    display: block;
+}
+
+/* Floating Image Wrapper */
+.floating-image-wrapper {
+    position: fixed;
+    left: 50%;
+    top: 55%;
+    transform: translate(-50%, -50%);
+    margin-left: -480px; /* Sogeza kushoto zaidi */
+    z-index: 1000;
+    display: block;
+    
+}
+
+.floating-image-inner {
+    position: relative;
+    background: transparent;
+    padding: 20px; /* Nafasi nyeupe kuzunguka picha */
+}
+
+.product-image-container {
+    position: relative;
+    width: 750px; /* 🔥 KUZA ZAIDI (Ilikuwa 500px) */
+    height: 750px;
+    overflow: visible; /* 🔥 MUHIMU: Mishale inaweza kuonekana nje */
+}
+
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px; /* 🔥 KUZA MISHALE (Ilikuwa 40px) */
+    height: 50px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-size: 22px; /* 🔥 KUZA IKONI */
+    color: #333;
+    z-index: 20;
+    transition: all 0.2s;
+}
+
+.nav-arrow:hover {
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* 🔥 Sogeza mishale mbali na picha (itoke nje kabisa ya padding hiyo) */
+.nav-arrow.prev {
+    left: -55px; 
+}
+
+.nav-arrow.next {
+    right: -55px;
+}
+
+.image-counter {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+/* Right Side Drawer */
+.right-side-drawer {
     position: fixed;
     right: 0;
     top: 0;
-    height: 100%;
+    height: 100vh;
+    width: 600px;
+    max-width: 90vw;
+    background-color: #fff;
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
     z-index: 1000;
     display: flex;
-    align-items: center;
-    justify-content: flex-end;
+    flex-direction: column;
+    animation: slideInRight 0.3s ease-out;
+    overflow: hidden;
 }
 
-/* Main Drawer - ILIKUA SAWA */
-.main-drawer {
+/* ============================================================== */
+/* 4. MOBILE LAYOUT (Bottom Sheet)                                */
+/* ============================================================== */
+
+.mobile-layout {
+    display: none; /* Imefichwa kwenye Desktop, inaonekana Mobile */
+}
+
+.mobile-bottom-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
     background: white;
-    width: 900px;
-    height: 250%;
-    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
-    animation: slideIn 0.3s ease-out;
-    overflow-y: auto;
+    border-radius: 20px 20px 0 0;
+    z-index: 1000;
+    animation: slideUp 0.3s ease-out;
+    max-height: 90vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.15);
 }
 
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-    }
-    to {
-        transform: translateX(0);
-    }
+.bottom-sheet-drag-handle {
+    width: 40px;
+    height: 4px;
+    background: #ddd;
+    border-radius: 2px;
+    margin: 12px auto;
+    cursor: pointer;
 }
 
-/* Drawer Header */
-.drawer-header {
-    position: sticky;
-    top: 0;
-    background: white;
-    border-bottom: 1px solid #f0f0f0;
-    padding: 20px 24px;
+.bottom-sheet-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 10;
+    padding: 0 20px 12px;
+    border-bottom: 1px solid #f0f0f0;
 }
 
-.drawer-header h3 {
+.bottom-sheet-header h3 {
+    margin: 0;
     font-size: 18px;
     font-weight: 600;
     color: #1a1a1a;
+}
+
+.bottom-sheet-close {
+    background: #f5f5f5;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+}
+
+.bottom-sheet-product-preview {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.bottom-sheet-product-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f5f5f5;
+    flex-shrink: 0;
+}
+
+.bottom-sheet-product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.bottom-sheet-product-info {
+    flex: 1;
+}
+
+.bottom-sheet-product-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #1a1a1a;
+}
+
+.bottom-sheet-product-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ff4e00;
+}
+
+.bottom-sheet-footer {
+    border-top: 1px solid #eee;
+    padding: 16px 20px;
+    background: white;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+}
+
+.bottom-sheet-summary {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.bottom-sheet-summary-label {
+    font-size: 14px;
+    color: #666;
+}
+
+.bottom-sheet-summary-value {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ff4e00;
+}
+
+.bottom-sheet-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+/* ============================================================== */
+/* 5. SHARED COMPONENTS (Headers, Colors, Sizes, Inputs, Footer)  */
+/* ============================================================== */
+
+.drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #f0f0f0;
+    flex-shrink: 0; /* Header haipungui */
+}
+
+.drawer-header h3 {
     margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
 }
 
 .close-btn {
     width: 36px;
     height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     border-radius: 50%;
     background: transparent;
     border: none;
     cursor: pointer;
-    font-size: 20px;
-    transition: all 0.2s;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    transition: background 0.2s;
 }
 
 .close-btn:hover {
     background: #f5f5f5;
 }
 
-/* Drawer Content */
 .drawer-content {
     padding: 20px 24px;
     flex: 1;
+    overflow-y: auto; /* HAPA NDIO SCROLL INAFANYA KAZI! */
+    min-height: 0; /* Muhimu kwa flex layout */
+}
+
+.bottom-sheet-content {
+    flex: 1;
+    overflow-y: auto; /* HAPA NDIO SCROLL INAFANYA KAZI! */
+    padding: 16px 20px;
+    min-height: 0;
 }
 
 /* Product Info */
+.product-info {
+    margin-bottom: 24px;
+}
+
 .product-name {
     font-size: 20px;
     font-weight: 700;
     color: #1a1a1a;
     margin-bottom: 8px;
-    line-height: 1.3;
 }
 
 .product-price {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: 700;
     color: #ff4e00;
-    margin-bottom: 16px;
 }
 
-/* Section Styles */
+/* Sections */
 .section {
-    margin-bottom: 28px;
+    margin-bottom: 24px;
 }
 
 .section-title {
@@ -115,7 +351,7 @@
     font-size: 14px;
 }
 
-/* Color Selection */
+/* Colors */
 .color-list {
     display: flex;
     gap: 12px;
@@ -128,6 +364,8 @@
     transition: all 0.2s;
     border-radius: 8px;
     padding: 4px;
+    border: 1px solid #e0e0e0;
+    background: #fff;
 }
 
 .color-item.selected {
@@ -136,20 +374,19 @@
 }
 
 .color-image {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     border-radius: 8px;
     object-fit: cover;
-    border: 1px solid #e5e7eb;
 }
 
 .color-name {
     font-size: 11px;
-    margin-top: 6px;
+    margin-top: 4px;
     color: #666;
 }
 
-/* Size Items */
+/* Sizes */
 .sizes-list {
     display: flex;
     flex-direction: column;
@@ -160,9 +397,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px;
-    border-radius: 10px;
-    border: 1px solid #e5e7eb;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #eee;
     background: #fafafa;
     transition: all 0.2s;
 }
@@ -170,7 +407,6 @@
 .size-item.active {
     border-color: #ff4e00;
     background: #fff7ed;
-    box-shadow: 0 2px 8px rgba(255, 78, 0, 0.1);
 }
 
 .size-info {
@@ -178,55 +414,105 @@
 }
 
 .size-name {
-    font-weight: 600;
+    font-weight: bold;
+    font-size: 16px;
     color: #1a1a1a;
-    font-size: 15px;
 }
 
 .size-price {
-    font-size: 13px;
+    font-size: 12px;
     color: #666;
-    margin-top: 4px;
+    margin-top: 2px;
+}
+
+/* ============================================ */
+/* FIX: PUNGUZA UREFU WA SIZE BOX (Mobile)       */
+/* ============================================ */
+
+@media (max-width: 768px) {
+    /* Panga vitu vyote ndani ya size-item katikati kwa urefu */
+    .size-item {
+        align-items: center !important;
+        padding: 8px 12px !important; /* Punguza padding kidogo */
+    }
+
+    /* Badilisha upande wa kushoto kuwa mstari mmoja (row) */
+    .size-info {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important; /* Nafasi kati ya XS, TSH, na Stock */
+        flex-wrap: wrap !important; /* Iwapo nafasi ni ndogo sana, itaenda mstari mpya */
+    }
+
+    /* Ondoa margin za ziada zilizosababisha mistari mitatu */
+    .size-name {
+        margin-bottom: 0 !important;
+    }
+    .size-price {
+        margin-top: 0 !important;
+    }
+    .stock-info {
+        margin-top: 0 !important;
+    }
+}
+
+/* Kwa simu ndogo sana (max-width: 480px) - Hakikisha inafanya kazi hapa pia */
+@media (max-width: 480px) {
+    .size-item {
+        align-items: center !important;
+        padding: 6px 10px !important;
+    }
+
+    .size-info {
+        display: flex !important;
+        align-items: center !important;
+        gap: 5px !important;
+        flex-wrap: wrap !important;
+    }
+
+    .size-name {
+        margin-bottom: 0 !important;
+        font-size: 12px !important;
+    }
+    .size-price {
+        margin-top: 0 !important;
+        font-size: 10px !important;
+    }
+    .stock-info {
+        margin-top: 0 !important;
+        font-size: 9px !important;
+    }
 }
 
 .stock-info {
     font-size: 11px;
-    margin-top: 4px;
+    margin-top: 2px;
 }
 
-.stock-info.in-stock {
-    color: #10b981;
-}
-
-.stock-info.out-of-stock {
-    color: #ef4444;
-}
+.stock-info.in-stock { color: #4caf50; }
+.stock-info.out-of-stock { color: #ff4444; }
 
 /* Quantity Controls */
 .quantity-controls {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .qty-btn {
     width: 32px;
     height: 32px;
     border-radius: 6px;
-    border: 1px solid #d1d5db;
-    background: white;
+    border: 1px solid #ddd;
+    background: #fff;
+    font-weight: bold;
+    font-size: 18px;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
-    font-weight: 500;
-    cursor: pointer;
     transition: all 0.2s;
-}
-
-.qty-btn:hover:not(:disabled) {
-    background: #f5f5f5;
-    border-color: #ff4e00;
+    color: #333;
 }
 
 .qty-btn:disabled {
@@ -235,35 +521,36 @@
     cursor: not-allowed;
 }
 
+.qty-btn:hover:not(:disabled) {
+    background: #f5f5f5;
+    border-color: #ff4e00;
+}
+
 .qty-input {
-    width: 56px;
+    width: 55px;
     text-align: center;
-    border: 1px solid #d1d5db;
+    border: 1px solid #ccc;
     border-radius: 6px;
-    padding: 6px;
+    padding: 8px;
     font-size: 14px;
+    outline: none;
 }
 
 .qty-input:focus {
-    outline: none;
     border-color: #ff4e00;
-    box-shadow: 0 0 0 2px rgba(255, 78, 0, 0.2);
 }
 
-/* Footer */
+/* Footer Shared */
 .drawer-footer {
-    position: sticky;
-    bottom: 0;
-    background: white;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid #eee;
     padding: 20px 24px;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    background: #fff;
+    flex-shrink: 0; /* Footer haipungui */
 }
 
 .footer-summary {
     display: flex;
     justify-content: space-between;
-    align-items: center;
     margin-bottom: 16px;
 }
 
@@ -273,8 +560,8 @@
 }
 
 .subtotal-value {
-    font-size: 26px;
-    font-weight: 700;
+    font-size: 24px;
+    font-weight: bold;
     color: #ff4e00;
 }
 
@@ -283,22 +570,18 @@
     gap: 12px;
 }
 
+/* Buttons */
 .btn-order {
     flex: 1;
     padding: 14px;
-    border-radius: 10px;
-    font-weight: 600;
+    border-radius: 8px;
+    font-weight: bold;
     color: white;
     background: #ff4e00;
     border: none;
     cursor: pointer;
-    transition: all 0.2s;
     font-size: 15px;
-}
-
-.btn-order:hover:not(:disabled) {
-    background: #e64500;
-    transform: translateY(-1px);
+    transition: all 0.2s;
 }
 
 .btn-order:disabled {
@@ -307,1073 +590,296 @@
     opacity: 0.6;
 }
 
-.btn-chat {
+.btn-cart {
     flex: 1;
     padding: 14px;
-    border-radius: 10px;
-    font-weight: 600;
-    color: white;
-    background: #25D366;
-    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    color: #ff4e00;
+    background: #fff;
+    border: 2px solid #ff4e00;
     cursor: pointer;
-    transition: all 0.2s;
     font-size: 15px;
+    transition: all 0.2s;
 }
 
-.btn-chat:hover {
-    background: #1da15a;
-    transform: translateY(-1px);
+.btn-cart:disabled {
+    background: #f5f5f5;
+    border-color: #ccc;
+    color: #ccc;
+    cursor: not-allowed;
 }
 
-/* Floating Product Image - HII NI MUHIMU ZAIDI */
-.floating-image {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 1000;
-}
-
-.image-container {
-    position: relative;
-    background: transparent; /* MUHIMU: Hakuna background */
-    padding: 0;
-}
-
-.product-image {
-    width: 380px;
-    height: 380px;
-    object-fit: cover;
-    border-radius: 16px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-}
-
-/* Navigation Arrows for Image */
-.nav-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: white;
+.btn-chat {
+    width: 100%;
+    margin-top: 12px;
+    background: #25D366;
+    color: white;
     border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 8px;
     cursor: pointer;
+    font-size: 15px;
     transition: all 0.2s;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    font-size: 18px;
-    color: #333;
 }
 
-.nav-arrow:hover {
-    background: white;
-    transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-}
-
-.nav-arrow.prev {
-    left: -15px;
-}
-
-.nav-arrow.next {
-    right: -15px;
-}
-
-.image-counter {
-    position: absolute;
-    bottom: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-    backdrop-filter: blur(4px);
-}
-
-/* Wholesale Tiers */
-.wholesale-tiers {
-    background: #fff9f5;
-    border: 1px solid #ffe0cc;
-    border-radius: 10px;
-    padding: 14px;
-    margin-bottom: 20px;
-}
-
-.tier-header {
-    display: flex;
-    justify-content: space-between;
-    font-size: 13px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 10px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #ffe0cc;
-}
-
-.tier-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    margin-bottom: 8px;
-    color: #666;
-}
-
-.tier-price {
-    color: #ff4e00;
-    font-weight: 600;
-}
-
-/* Responsive Design */
-@media (max-width: 1200px) {
-    .floating-image {
-        left: 2%;
-    }
-    
-    .product-image {
-        width: 320px;
-        height: 320px;
-    }
-}
-
-@media (max-width: 1024px) {
-    .floating-image {
-        display: none;
-    }
-    
-    .main-drawer {
-        width: 100%;
-        max-width: 500px;
-    }
-}
-
-@media (max-width: 640px) {
-    .main-drawer {
-        width: 100%;
-        max-width: 100%;
-    }
-    
-    .drawer-content {
-        padding: 16px;
-    }
-    
-    .drawer-header {
-        padding: 16px;
-    }
-    
-    .drawer-footer {
-        padding: 16px;
-    }
-    
-    .product-name {
-        font-size: 18px;
-    }
-    
-    .product-price {
-        font-size: 24px;
-    }
-    
-    .subtotal-value {
-        font-size: 22px;
-    }
-}
-
-/* Scrollbar Styling */
-.main-drawer::-webkit-scrollbar {
-    width: 6px;
-}
-
-.main-drawer::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-.main-drawer::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 3px;
-}
-
-.main-drawer::-webkit-scrollbar-thumb:hover {
-    background: #ff4e00;
-}
-/* ============================================ */
-/* RESPONSIVE DESIGN - PRODUCT SELECTION DRAWER */
-/* ============================================ */
-
-/* Kwa tablets (max-width: 1200px) */
-@media (max-width: 1200px) {
-  .floating-image {
-    left: 2% !important;
-  }
-  
-  .product-image {
-    width: 280px !important;
-    height: 280px !important;
-  }
-  
-  .image-container {
-    width: 280px !important;
-    height: 280px !important;
-  }
-  
-  .nav-arrow {
-    width: 32px !important;
-    height: 32px !important;
-    font-size: 14px !important;
-  }
-  
-  .nav-arrow.prev {
-    left: -10px !important;
-  }
-  
-  .nav-arrow.next {
-    right: -10px !important;
-  }
-}
-
-/* Kwa tablets (max-width: 1024px) - Ficha floating image */
-@media (max-width: 1024px) {
-  /* Floating image completely hidden */
-  .floating-image,
-  div[style*="position: fixed"][style*="left: '5%'"],
-  div[style*="position: fixed"][style*="left: '2%'"] {
-    display: none !important;
-  }
-  
-  /* Drawer inachukua upana mzuri */
-  .main-drawer,
-  div[style*="position: fixed"][style*="right: 0"][style*="width: '600px'"] {
-    width: 500px !important;
-    max-width: 90vw !important;
-  }
-}
-
-/* Kwa simu (max-width: 768px) */
-@media (max-width: 768px) {
-  /* Drawer overlay */
-  .drawer-overlay,
-  div[style*="position: fixed"][style*="backgroundColor: 'rgba(0, 0, 0, 0.4)'"] {
-    backdrop-filter: blur(2px) !important;
-  }
-  
-  /* Drawer container */
-  .main-drawer,
-  div[style*="position: fixed"][style*="right: 0"][style*="width: '600px'"] {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: 100vh !important;
-  }
-  
-  /* Drawer header */
-  .drawer-header,
-  div[style*="padding: '20px 24px'"]:first-child {
-    padding: 16px 20px !important;
-  }
-  
-  .drawer-header h3,
-  div[style*="fontSize: '18px'"] {
-    font-size: 16px !important;
-  }
-  
-  /* Close button */
-  .close-btn,
-  button[style*="fontSize: '24px'"] {
-    width: 32px !important;
-    height: 32px !important;
-    font-size: 20px !important;
-  }
-  
-  /* Drawer content */
-  .drawer-content,
-  div[style*="flex: 1"][style*="overflowY: 'auto'"] {
-    padding: 16px 20px !important;
-  }
-  
-  /* Product name */
-  .product-name,
-  div[style*="fontSize: '20px'"] {
-    font-size: 18px !important;
-  }
-  
-  /* Product price */
-  .product-price,
-  div[style*="fontSize: '24px'"][style*="color: '#ff4e00'"] {
-    font-size: 22px !important;
-  }
-  
-  /* Color selection */
-  .color-item {
-    padding: 4px !important;
-  }
-  
-  .color-image {
-    width: 45px !important;
-    height: 45px !important;
-  }
-  
-  .color-name {
-    font-size: 10px !important;
-    margin-top: 4px !important;
-  }
-  
-  .color-list {
-    gap: 10px !important;
-  }
-  
-  /* Section titles */
-  .section-title,
-  div[style*="fontWeight: 600"][style*="marginBottom: '12px'"] {
-    font-size: 14px !important;
-  }
-  
-  /* Size items */
-  .size-item,
-  div[style*="padding: '12px'"][style*="backgroundColor: '#fafafa'"] {
-    padding: 10px 12px !important;
-  }
-  
-  .size-name {
-    font-size: 14px !important;
-  }
-  
-  .size-price {
-    font-size: 12px !important;
-  }
-  
-  /* Quantity controls */
-  .qty-btn,
-  div[style*="width: '32px'"][style*="height: '32px'"] {
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 16px !important;
-  }
-  
-  .qty-input,
-  input[style*="width: '55px'"] {
-    width: 50px !important;
-    padding: 6px !important;
-    font-size: 13px !important;
-  }
-  
-  /* Footer */
-  .drawer-footer,
-  div[style*="borderTop: '1px solid #eee'"][style*="padding: '20px 24px'"] {
-    padding: 16px 20px !important;
-  }
-  
-  .subtotal-label {
-    font-size: 14px !important;
-  }
-  
-  .subtotal-value,
-  div[style*="fontSize: '24px'"][style*="color: '#ff4e00'"] {
-    font-size: 22px !important;
-  }
-  
-  /* Footer buttons */
-  .footer-buttons,
-  div[style*="display: flex"][style*="gap: '12px'"] {
-    gap: 10px !important;
-  }
-  
-  .btn-order,
-  .btn-chat,
-  button[style*="backgroundColor: '#ff4e00'"],
-  button[style*="border: '2px solid #ff4e00'"] {
-    padding: 12px !important;
-    font-size: 14px !important;
-  }
-  
-  /* Wholesale tiers */
-  .wholesale-tiers {
-    padding: 12px !important;
-    margin-bottom: 16px !important;
-  }
-  
-  .tier-header {
-    font-size: 12px !important;
-  }
-  
-  .tier-row {
-    font-size: 11px !important;
-  }
-}
-
-/* Kwa simu ndogo (max-width: 480px) */
-@media (max-width: 480px) {
-  /* Drawer header */
-  .drawer-header,
-  div[style*="padding: '16px 20px'"] {
-    padding: 12px 16px !important;
-  }
-  
-  /* Drawer content */
-  .drawer-content,
-  div[style*="padding: '16px 20px'"] {
-    padding: 12px 16px !important;
-  }
-  
-  /* Product name */
-  .product-name,
-  div[style*="fontSize: '18px'"] {
-    font-size: 16px !important;
-  }
-  
-  /* Product price */
-  .product-price,
-  div[style*="fontSize: '22px'"] {
-    font-size: 20px !important;
-  }
-  
-  /* Color section */
-  .color-image {
-    width: 40px !important;
-    height: 40px !important;
-  }
-  
-  .color-list {
-    gap: 8px !important;
-  }
-  
-  /* Size items stack on mobile */
-  .size-item,
-  div[style*="display: flex"][style*="alignItems: 'center'"][style*="justifyContent: 'space-between'"] {
-    flex-wrap: wrap !important;
-    gap: 10px !important;
-  }
-  
-  .quantity-controls {
-    width: 100% !important;
-    justify-content: flex-end !important;
-  }
-  
-  /* Footer buttons stack */
-  .footer-buttons,
-  div[style*="display: flex"][style*="gap: '10px'"] {
-    flex-direction: column !important;
-  }
-  
-  .btn-order,
-  .btn-chat,
-  button[style*="backgroundColor: '#ff4e00'"],
-  button[style*="border: '2px solid #ff4e00'"] {
-    width: 100% !important;
-  }
-  
-  /* Subtotal */
-  .footer-summary {
-    margin-bottom: 12px !important;
-  }
-  
-  .subtotal-value,
-  div[style*="fontSize: '22px'"] {
-    font-size: 20px !important;
-  }
-}
-
-/* Kwa simu katika landscape mode */
-@media (max-width: 896px) and (orientation: landscape) {
-  /* Drawer height adjustment */
-  .main-drawer,
-  div[style*="position: fixed"][style*="right: 0"] {
-    height: 100vh !important;
-  }
-  
-  /* Drawer content scroll */
-  .drawer-content,
-  div[style*="flex: 1"][style*="overflowY: 'auto'"] {
-    max-height: calc(100vh - 140px) !important;
-  }
-  
-  /* Color items smaller */
-  .color-image {
-    width: 35px !important;
-    height: 35px !important;
-  }
-  
-  /* Size items compact */
-  .size-item,
-  div[style*="padding: '10px 12px'"] {
-    padding: 8px 10px !important;
-  }
-  
-  .size-name {
-    font-size: 13px !important;
-  }
-}
-
-/* ============================================ */
-/* FLOATING IMAGE RESPONSIVE (Kwa screen kubwa) */
-/* ============================================ */
-
-@media (min-width: 1025px) and (max-width: 1366px) {
-  .floating-image,
-  div[style*="position: fixed"][style*="left: '5%'"] {
-    left: 3% !important;
-  }
-  
-  .product-image,
-  div[style*="width: '500px'"][style*="height: '500px'"] img {
-    width: 350px !important;
-    height: 350px !important;
-  }
-  
-  div[style*="width: '500px'"][style*="height: '500px'"] {
-    width: 350px !important;
-    height: 350px !important;
-  }
-  
-  .nav-arrow.prev {
-    left: -40px !important;
-  }
-  
-  .nav-arrow.next {
-    right: -40px !important;
-  }
-}
-
-@media (min-width: 1367px) and (max-width: 1600px) {
-  .floating-image,
-  div[style*="position: fixed"][style*="left: '5%'"] {
-    left: 4% !important;
-  }
-  
-  .product-image,
-  div[style*="width: '500px'"][style*="height: '500px'"] img {
-    width: 420px !important;
-    height: 420px !important;
-  }
-  
-  div[style*="width: '500px'"][style*="height: '500px'"] {
-    width: 420px !important;
-    height: 420px !important;
-  }
-}
-
-/* ============================================ */
-/* TOUCH OPTIMIZATIONS */
-/* ============================================ */
-
-@media (hover: none) and (pointer: coarse) {
-  /* Add larger tap targets */
-  .color-item,
-  .qty-btn,
-  .btn-order,
-  .btn-chat,
-  .close-btn,
-  .nav-arrow,
-  button[style*="width: '32px'"] {
-    min-height: 44px !important;
-    min-width: 44px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  
-  .color-item {
-    min-width: 60px !important;
-  }
-  
-  /* Remove hover effects on touch */
-  .color-item:hover,
-  .qty-btn:hover,
-  .btn-order:hover,
-  .btn-chat:hover {
-    transform: none !important;
-  }
-  
-  /* Active state for touch feedback */
-  .color-item:active,
-  .qty-btn:active,
-  .btn-order:active,
-  .btn-chat:active {
-    transform: scale(0.97) !important;
-    transition: transform 0.05s ease !important;
-  }
-  
-  /* Improved scrolling */
-  .drawer-content,
-  div[style*="overflowY: 'auto'"] {
-    -webkit-overflow-scrolling: touch !important;
-  }
-}
-
-/* ============================================ */
-/* SCROLLBAR STYLES */
-/* ============================================ */
-
-/* Webkit browsers */
-.drawer-content::-webkit-scrollbar,
-div[style*="overflowY: 'auto'"]::-webkit-scrollbar {
-  width: 4px !important;
-}
-
-.drawer-content::-webkit-scrollbar-track,
-div[style*="overflowY: 'auto'"]::-webkit-scrollbar-track {
-  background: #f1f1f1 !important;
-  border-radius: 10px !important;
-}
-
-.drawer-content::-webkit-scrollbar-thumb,
-div[style*="overflowY: 'auto'"]::-webkit-scrollbar-thumb {
-  background: #ff4e00 !important;
-  border-radius: 10px !important;
-}
-
-/* Firefox */
-.drawer-content,
-div[style*="overflowY: 'auto'"] {
-  scrollbar-width: thin !important;
-  scrollbar-color: #ff4e00 #f1f1f1 !important;
-}
-
-/* ============================================ */
-/* ANIMATIONS */
-/* ============================================ */
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Staggered animation for size items */
-.size-item {
-  animation: slideUp 0.3s ease forwards;
-  animation-delay: calc(var(--index, 0) * 0.03s);
-}
-
-/* ============================================ */
-/* PRINT STYLES */
-/* ============================================ */
-
-@media print {
-  .drawer-overlay,
-  .floating-image,
-  .drawer-container,
-  div[style*="position: fixed"] {
-    display: none !important;
-  }
-}
-
-/* ============================================ */
-/* SAFE AREA FOR NOTCH DEVICES */
-/* ============================================ */
-
-@supports (padding: max(0px)) {
-  @media (max-width: 768px) {
-    .main-drawer,
-    div[style*="position: fixed"][style*="right: 0"] {
-      padding-bottom: max(0px, env(safe-area-inset-bottom)) !important;
-    }
-    
-    .drawer-header,
-    div[style*="padding: '16px 20px'"]:first-child {
-      padding-top: max(16px, env(safe-area-inset-top)) !important;
-    }
-  }
-}
-
-/* ============================================ */
-/* DARK MODE SUPPORT (Optional) */
-/* ============================================ */
-
-@media (prefers-color-scheme: dark) {
-  .main-drawer,
-  div[style*="backgroundColor: '#fff'"] {
-    background-color: #1f2937 !important;
-  }
-  
-  .drawer-header {
-    border-bottom-color: #374151 !important;
-    background: #1f2937 !important;
-  }
-  
-  .drawer-header h3,
-  .product-name,
-  .section-title {
-    color: #f3f4f6 !important;
-  }
-  
-  .size-item,
-  div[style*="backgroundColor: '#fafafa'"] {
-    background-color: #374151 !important;
-    border-color: #4b5563 !important;
-  }
-  
-  .size-name,
-  .size-price {
-    color: #e5e7eb !important;
-  }
-  
-  .drawer-footer {
-    background: #1f2937 !important;
-    border-top-color: #374151 !important;
-  }
-  
-  .subtotal-label {
-    color: #9ca3af !important;
-  }
-}
-
-/* ============================================ */
-/* FIX FOR NUMBER INPUT SPINNERS */
-/* ============================================ */
-
-input[type="number"] {
-  -moz-appearance: textfield !important;
-}
-
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none !important;
-  margin: 0 !important;
-}
-/* ============================================ */
-/* MOBILE BOTTOM SHEET - ALIBABA STYLE */
-/* ============================================ */
-
-/* Mobile Bottom Sheet Container */
-.mobile-bottom-sheet {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    background: white !important;
-    border-radius: 20px 20px 0 0 !important;
-    z-index: 1000 !important;
-    animation: slideUp 0.3s ease-out !important;
-    max-height: 85vh !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-    box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.15) !important;
-}
-
-/* Drag Handle */
-.bottom-sheet-drag-handle {
-    width: 40px !important;
-    height: 4px !important;
-    background: #ddd !important;
-    border-radius: 2px !important;
-    margin: 12px auto !important;
-    cursor: pointer !important;
-    transition: background 0.2s ease !important;
-}
-
-.bottom-sheet-drag-handle:active {
-    background: #ff4e00 !important;
-}
-
-/* Bottom Sheet Header */
-.bottom-sheet-header {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    padding: 0 20px 12px !important;
-    border-bottom: 1px solid #f0f0f0 !important;
-}
-
-.bottom-sheet-header h3 {
-    margin: 0 !important;
-    font-size: 18px !important;
-    font-weight: 600 !important;
-    color: #1a1a1a !important;
-}
-
-.bottom-sheet-close {
-    background: #f5f5f5 !important;
-    border: none !important;
-    font-size: 18px !important;
-    cursor: pointer !important;
-    width: 32px !important;
-    height: 32px !important;
-    border-radius: 50% !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    transition: all 0.2s ease !important;
-}
-
-.bottom-sheet-close:active {
-    background: #e5e5e5 !important;
-    transform: scale(0.95) !important;
-}
-
-/* Bottom Sheet Content */
-.bottom-sheet-content {
-    flex: 1 !important;
-    overflow-y: auto !important;
-    padding: 16px 20px !important;
-    -webkit-overflow-scrolling: touch !important;
-}
-
-/* Product Preview in Bottom Sheet */
-.bottom-sheet-product-preview {
-    display: flex !important;
-    gap: 16px !important;
-    margin-bottom: 20px !important;
-}
-
-.bottom-sheet-product-image {
-    width: 80px !important;
-    height: 80px !important;
-    border-radius: 12px !important;
-    overflow: hidden !important;
-    background: #f5f5f5 !important;
-    flex-shrink: 0 !important;
-}
-
-.bottom-sheet-product-image img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-}
-
-.bottom-sheet-product-info {
-    flex: 1 !important;
-}
-
-.bottom-sheet-product-name {
-    font-size: 14px !important;
-    font-weight: 600 !important;
-    margin-bottom: 4px !important;
-    color: #1a1a1a !important;
-}
-
-.bottom-sheet-product-price {
-    font-size: 18px !important;
-    font-weight: 700 !important;
-    color: #ff4e00 !important;
-}
-
-/* Bottom Sheet Footer */
-.bottom-sheet-footer {
-    border-top: 1px solid #eee !important;
-    padding: 16px 20px !important;
-    background: white !important;
-    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
-}
-
-.bottom-sheet-summary {
-    display: flex !important;
-    justify-content: space-between !important;
-    margin-bottom: 12px !important;
-}
-
-.bottom-sheet-summary-label {
-    font-size: 14px !important;
-    color: #666 !important;
-}
-
-.bottom-sheet-summary-value {
-    font-size: 20px !important;
-    font-weight: bold !important;
-    color: #ff4e00 !important;
-}
-
-.bottom-sheet-buttons {
-    display: flex !important;
-    gap: 12px !important;
+.btn-chat:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .bottom-sheet-btn-order {
-    flex: 1 !important;
-    background: #ff4e00 !important;
-    color: white !important;
-    border: none !important;
-    padding: 12px !important;
-    border-radius: 8px !important;
-    font-weight: bold !important;
-    font-size: 14px !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
+    flex: 1;
+    background: #ff4e00;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
 }
-
-.bottom-sheet-btn-order:active {
-    transform: scale(0.97) !important;
-    background: #e64500 !important;
-}
-
 .bottom-sheet-btn-order:disabled {
-    background: #ccc !important;
-    cursor: not-allowed !important;
-    opacity: 0.6 !important;
+    background: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 .bottom-sheet-btn-cart {
-    flex: 1 !important;
-    background: white !important;
-    color: #ff4e00 !important;
-    border: 2px solid #ff4e00 !important;
-    padding: 12px !important;
-    border-radius: 8px !important;
-    font-weight: bold !important;
-    font-size: 14px !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
+    flex: 1;
+    background: white;
+    color: #ff4e00;
+    border: 2px solid #ff4e00;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
 }
-
-.bottom-sheet-btn-cart:active {
-    transform: scale(0.97) !important;
-    background: #fff5f0 !important;
-}
-
 .bottom-sheet-btn-cart:disabled {
-    background: #f5f5f5 !important;
-    border-color: #ccc !important;
-    color: #ccc !important;
-    cursor: not-allowed !important;
+    background: #f5f5f5;
+    border-color: #ccc;
+    color: #ccc;
+    cursor: not-allowed;
 }
 
-/* ============================================ */
-/* BOTTOM SHEET RESPONSIVE */
-/* ============================================ */
+.bottom-sheet-btn-chat {
+    width: 100%;
+    margin-top: 10px;
+    background: #25D366;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+.bottom-sheet-btn-chat:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
 
+/* Input Spinners Removal */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Scrollbars */
+.drawer-content::-webkit-scrollbar,
+.bottom-sheet-content::-webkit-scrollbar {
+    width: 4px;
+}
+.drawer-content::-webkit-scrollbar-track,
+.bottom-sheet-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+.drawer-content::-webkit-scrollbar-thumb,
+.bottom-sheet-content::-webkit-scrollbar-thumb {
+    background: #ff4e00;
+    border-radius: 10px;
+}
+
+/* Screen kubwa sana (1600px+) */
+@media (min-width: 1601px) {
+    .floating-image-wrapper {
+        margin-left: -450px; /* Sogeza kushoto zaidi kwa picha kubwa */
+    }
+    .product-image-container {
+        width: 620px; /* Kuza zaidi hapa */
+        height: 620px;
+    }
+    .nav-arrow.prev { left: -55px; }
+    .nav-arrow.next { right: -55px; }
+}
+
+/* Screen za kati (1367px - 1600px) */
+@media (min-width: 1367px) and (max-width: 1600px) {
+    .floating-image-wrapper {
+        margin-left: -380px; /* Ilikuwa -250px, sasa imesogezwa kushoto zaidi */
+    }
+    .product-image-container {
+        width: 600px; /* Ilikuwa 420px, sasa imekuzwa! */
+        height: 600px;
+    }
+    .nav-arrow.prev { left: -50px; }
+    .nav-arrow.next { right: -50px; }
+}
+
+/* Screen za Laptops (1025px - 1366px) */
+@media (min-width: 1025px) and (max-width: 1366px) {
+    .floating-image-wrapper {
+        margin-left: -300px; /* Ilikuwa -200px, sasa imesogezwa kushoto zaidi */
+    }
+    .product-image-container {
+        width: 450px; /* Ilikuwa 350px, sasa imekuzwa! */
+        height: 450px;
+    }
+    .nav-arrow.prev { left: -65px; }
+    .nav-arrow.next { right: -65px; }
+}
+
+/* Mobile (max-width: 768px) - Badilisha kutoka Desktop kwenda Mobile Layout */
 @media (max-width: 768px) {
-    /* Hide right drawer on mobile */
-    .drawer-container,
-    .right-side-drawer,
-    div[style*="position: fixed"][style*="right: 0"][style*="width: '600px'"] {
+    .desktop-layout {
         display: none !important;
     }
-    
-    /* Ensure bottom sheet is visible */
-    .mobile-bottom-sheet {
+    .mobile-layout {
         display: flex !important;
+        flex-direction: column;
+        justify-content: flex-end;
+        height: 100%;
+        pointer-events: none; /* Kuruhusu klik kwenye overlay */
     }
-}
-
-@media (min-width: 769px) {
-    /* Hide bottom sheet on desktop */
     .mobile-bottom-sheet {
-        display: none !important;
+        pointer-events: auto; /* Bottom sheet inakubali klik */
     }
     
-    /* Show right drawer on desktop */
-    .drawer-container,
-    .right-side-drawer {
-        display: flex !important;
+    /* Mobile sizing adjustments */
+    .drawer-overlay {
+        backdrop-filter: blur(2px);
+    }
+    .color-image {
+        width: 45px;
+        height: 45px;
+    }
+    .size-item {
+        padding: 10px 12px;
+    }
+    .bottom-sheet-summary-value {
+        font-size: 18px;
     }
 }
 
-/* ============================================ */
-/* ANIMATION KEYFRAMES */
-/* ============================================ */
-
-@keyframes slideUp {
-    from {
-        transform: translateY(100%);
-        opacity: 0;
+/* Kwa simu ndogo sana (max-width: 480px) */
+@media (max-width: 480px) {
+    .mobile-bottom-sheet {
+        max-height: 80vh; /* Hakikisha haichukui screen nzima */
+        border-radius: 16px 16px 0 0;
     }
-    to {
-        transform: translateY(0);
-        opacity: 1;
+    .bottom-sheet-header {
+        padding: 0 16px 10px;
+        flex-shrink: 0; /* Header inakaa juu, haisogei */
+    }
+    .bottom-sheet-content {
+        padding: 12px 16px;
+    }
+    .bottom-sheet-footer {
+        padding: 12px 16px;
+        flex-shrink: 0; /* Footer inakaa chini */
+    }
+    .color-image {
+        width: 40px;
+        height: 40px;
+    }
+    .color-list {
+        gap: 8px;
+    }
+    .size-item {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .quantity-controls {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    /* ✅ MUHIMU: Lazimisha buttons ziwe horizontal sawa */
+    .bottom-sheet-buttons {
+        flex-direction: row !important; /* Hii inazilazimisha kuwa upande kwa upande */
+        gap: 8px;
+    }
+    
+    .bottom-sheet-btn-order,
+    .bottom-sheet-btn-cart {
+        flex: 1 !important;           /* Zina ukubwa sawa */
+        min-height: 44px !important;  /* Urefu sawa */
+        font-size: 13px;
+        padding: 10px 8px;
+    }
+    
+    .bottom-sheet-summary-value {
+        font-size: 18px;
     }
 }
 
-@keyframes slideDown {
-    from {
-        transform: translateY(0);
-        opacity: 1;
+/* Mobile Landscape (max-height: 700px na orientation: landscape) */
+@media (max-width: 896px) and (orientation: landscape) {
+    .mobile-bottom-sheet {
+        max-height: 100vh;
+        border-radius: 0;
     }
-    to {
-        transform: translateY(100%);
-        opacity: 0;
+    .bottom-sheet-content {
+        max-height: calc(100vh - 130px);
+    }
+    .bottom-sheet-product-preview {
+        margin-bottom: 12px;
+    }
+    .bottom-sheet-product-image {
+        width: 60px;
+        height: 60px;
     }
 }
 
-/* Slide down animation for closing */
-.mobile-bottom-sheet.closing {
-    animation: slideDown 0.25s ease-in forwards !important;
-}
-
-/* ============================================ */
-/* TOUCH OPTIMIZATIONS FOR BOTTOM SHEET */
-/* ============================================ */
+/* ============================================================== */
+/* 7. TOUCH & PRINT STYLES                                        */
+/* ============================================================== */
 
 @media (hover: none) and (pointer: coarse) {
-    .bottom-sheet-btn-order,
-    .bottom-sheet-btn-cart,
-    .bottom-sheet-close,
-    .bottom-sheet-drag-handle {
-        cursor: pointer !important;
-        -webkit-tap-highlight-color: transparent !important;
+    .color-item, .qty-btn, .btn-order, .btn-cart, .close-btn, .nav-arrow {
+        min-height: 44px;
+        min-width: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
-    
-    /* Improve scrolling in bottom sheet */
-    .bottom-sheet-content {
-        scroll-behavior: smooth !important;
+    .color-item:hover, .qty-btn:hover, .btn-order:hover, .btn-cart:hover {
+        transform: none !important;
     }
-}
-
-/* ============================================ */
-/* SAFE AREA FOR NOTCH DEVICES - BOTTOM SHEET */
-/* ============================================ */
-
-@supports (padding: max(0px)) {
-    @media (max-width: 768px) {
-        .mobile-bottom-sheet {
-            padding-bottom: env(safe-area-inset-bottom, 0px) !important;
-        }
-        
-        .bottom-sheet-footer {
-            padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
-        }
-        
-        .bottom-sheet-header {
-            padding-top: max(12px, env(safe-area-inset-top)) !important;
-        }
+    .color-item:active, .qty-btn:active, .btn-order:active, .btn-cart:active {
+        transform: scale(0.97);
+        transition: transform 0.05s ease;
     }
 }
 
-/* ============================================ */
-/* OVERLAY FIXES */
-/* ============================================ */
-
-.drawer-overlay {
-    backdrop-filter: blur(4px) !important;
-    animation: fadeIn 0.2s ease !important;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-/* ============================================ */
-/* SCROLLBAR FOR BOTTOM SHEET */
-/* ============================================ */
-
-.bottom-sheet-content::-webkit-scrollbar {
-    width: 3px !important;
-}
-
-.bottom-sheet-content::-webkit-scrollbar-track {
-    background: #f1f1f1 !important;
-    border-radius: 10px !important;
-}
-
-.bottom-sheet-content::-webkit-scrollbar-thumb {
-    background: #ff4e00 !important;
-    border-radius: 10px !important;
-}
-
-.bottom-sheet-content {
-    scrollbar-width: thin !important;
-    scrollbar-color: #ff4e00 #f1f1f1 !important;
+@media print {
+    .drawer-overlay, .desktop-layout, .mobile-layout {
+        display: none !important;
+    }
 }

@@ -88,7 +88,7 @@ export default function JustForYou({ search = "", selectedCategory }) {
 
 
 
-     // ============================================================
+   // ============================================================
   // 🔥 RENDER HEADER (Imejumuishwa kwa pande zote)
   // ============================================================
   const renderHeader = () => (
@@ -111,7 +111,14 @@ export default function JustForYou({ search = "", selectedCategory }) {
             className="jfy-arrow-link-btn"
             onClick={() => {
               const url = '/products?section=just-for-you'; 
-              window.location.href = url; 
+              
+              // ✅ MUHIMU: Angalia kama ni Desktop (>768px), fungua tab mpya.
+              // Ikiwa ni Mobile, fungua kwenye tab hii hii (kama kawaida).
+              if (window.innerWidth > 768) {
+                window.open(url, '_blank'); 
+              } else {
+                window.location.href = url; 
+              }
             }}
           >
             <ArrowRight size={24} />
@@ -120,7 +127,7 @@ export default function JustForYou({ search = "", selectedCategory }) {
       </div>
     </div>
   );
-
+  
   // ============================================================
   // 🔥 SKELETON LOADING - Inaonyesha skeleton cards wakati data inapakia
   // ============================================================

@@ -1,5 +1,7 @@
 // src/components/Header.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Globe, ChevronDown, MapPin, ChevronLeft } from 'lucide-react';
 import Logo from './Logo';
 import SearchBar from './SearchBar';
 import UserTools from './UserTools';
@@ -7,11 +9,12 @@ import NavLinks from './NavLinks';
 import "../Header.css";
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../context/LanguageContext.jsx';
-import { Globe, ChevronDown, MapPin } from 'lucide-react';
 
-const Header = () => {
+// 🔥 ONGEZA showBack prop (default ni false)
+const Header = ({ showBack = false }) => {
   const { t } = useTranslation();
   const { language, changeLanguage } = useLanguage();
+  const navigate = useNavigate(); // 🔥 Kwa ajili ya kurudi nyuma
   const [search, setSearch] = useState("");
   
   const [isLangOpen, setIsLangOpen] = useState(false);
@@ -145,9 +148,22 @@ const Header = () => {
         {/* ROW 1: Logo, Search, na Vifaa vya Kulia */}
         <div className="header-top-bar">
           
-          <div className="logo-wrapper"><Logo /></div>
+          {/* 🔥 SEHEMU MPYA KUSHOTO: Back Arrow + Logo */}
+          <div className="header-left-group" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            {showBack && (
+              <button 
+                className="mobile-back-btn" 
+                onClick={() => navigate(-1)}
+                aria-label="Rudi nyuma"
+              >
+                <ChevronLeft size={24} color="#333" />
+              </button>
+            )}
+            <div className="logo-wrapper"><Logo /></div>
+          </div>
 
-          <div className="search-bar-wrapper">
+          {/* 🔥 SEHEMU YA KATI: Search Bar - Inafichwa ikiwa showBack ni true */}
+          <div className={`search-bar-wrapper ${showBack ? 'hide-on-mobile' : ''}`}>
             <SearchBar search={search} setSearch={setSearch} />
           </div>
 
@@ -182,9 +198,7 @@ const Header = () => {
           </div>
         </div>
 
-        {/* ==========================================
-            NAV LINKS - RESPONSIVE (Desktop & Mobile)
-           ========================================== */}
+        {/* NAV LINKS - Bado ziko sawa */}
         <div className="header-navigation-row" key={language}>
           <NavLinks />
         </div>

@@ -330,7 +330,7 @@
 
     /* ✅ HAKIKISHA LOGO TEXT HAIPOTEE */
     .logo-wrapper .logo-text {
-        font-size: 14px !important;
+        font-size: 24px !important;
         font-weight: 900 !important;
         white-space: nowrap !important;
         overflow: visible !important;
@@ -437,7 +437,7 @@
 }
 
 /* =========================================
-   8. RESPONSIVE - SMALL MOBILE (≤480px)
+   8. RESPONSIVE - SMALL MOBILE (≤480px) - ILIYOSAHIHISHWA!
    ========================================= */
 @media (max-width: 480px) {
     .header-container {
@@ -446,21 +446,30 @@
 
     .header-top-bar {
         gap: 6px !important;
-        height: 48px !important;
+        height: 56px !important; /* 🔥 Ongeza urefu ili kutoshea logo kubwa */
     }
 
-    /* ✅ LOGO INABANA ZAIDI LAKINI .COM INAONEKANA */
+    /* 🔥 MUHIMU SANA: Acha logo ipanuke bila kizuizi! */
     .logo-wrapper {
-        max-width: 110px !important;
+        max-width: none !important;   /* Ondoa kizuizi cha 110px */
+        min-width: unset !important;
+        width: auto !important;
+        gap: 6px !important;
+        flex-shrink: 0 !important;
+        align-items: center !important;
     }
 
+    /* 🔥 Teksti inakuwa kubwa, nzito, kama Alibaba! */
     .logo-wrapper .logo-text {
-        font-size: 12px !important;
+        font-size: 20px !important;   /* Ilikuwa 12px, sasa ni 26px */
+        font-weight: 900 !important;   /* Nzito kabisa */
+        letter-spacing: 0.5px !important;
     }
 
     .logo-wrapper .logo-icon-box {
-        width: 24px !important;
-        height: 24px !important;
+        width: 32px !important;       /* Icon pia inakua kidogo */
+        height: 32px !important;
+        border-width: 1.5px !important;
     }
 
     .search-bar-container {
@@ -657,4 +666,53 @@
     .logo-icon-box {
         border-color: #333 !important;
     }
+}
+
+/* 🔥 KITUFE CHA KURUDI NYUMA (Back Button) */
+.mobile-back-btn {
+  background: none;
+  border: none;
+  padding: 4px 8px 4px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.mobile-back-btn:active {
+  transform: scale(0.92); /* Inapungua kidogo ikibonyezwa */
+}
+
+/* 🔥 SEARCH BAR INAFICHWA KWENYE MOBILE WAKATI showBack NI TRUE */
+@media (max-width: 768px) {
+  .search-bar-wrapper.hide-on-mobile {
+    display: none !important;
+  }
+}
+
+/* ============================================================= */
+/* 📱 SMALL SCREEN SPECIFIC ADJUSTMENTS (≤480px) - ONGEZA HII!  */
+/* ============================================================= */
+@media (max-width: 480px) {
+  
+  /* 1. Punguza nafasi kati ya Back arrow na Logo */
+  .header-left-group {
+    gap: 15px !important; 
+  }
+
+  /* 2. Punguza saizi ya Back arrow ili isiwe kubwa mno */
+  .mobile-back-btn {
+    padding: 2px 4px 2px 0 !important;
+  }
+  
+  .mobile-back-btn svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  /* 3. Hakikisha Logo haikwamani (kwa upande wa ukubwa) */
+  .logo-wrapper {
+    gap: 4px !important;
+  }
 }

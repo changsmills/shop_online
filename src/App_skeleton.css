@@ -61,7 +61,7 @@
 @media (max-width: 480px) {
   .skeleton-layout-wrapper {
     padding: 0 !important;
-    padding-top: 56px !important; /* ✅ UREFU WA HEADER YA SMALL MOBILE */
+    padding-top: 50px !important; /* ✅ UREFU WA HEADER YA SMALL MOBILE */
     margin: 0 !important;
   }
   .skeleton-banner-mobile {

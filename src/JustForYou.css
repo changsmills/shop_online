@@ -553,13 +553,49 @@
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .section-header {
-    padding: 10px 16px;
+    padding: 8px 12px !important;    /* 🔥 Punguza padding (ilikuwa 10px 16px) */
+    margin-bottom: 12px !important;
   }
+  
   .just-title {
-    font-size: 18px;
+    font-size: 16px !important;      /* 🔥 Punguza title (ilikuwa 18px) */
+    font-weight: 700;
+    line-height: 1.3;
   }
+
+  .just-subtitle {
+    font-size: 12px !important;      /* 🔥 Punguza subtitle (ilikuwa 13px) */
+    line-height: 1.2;
+    margin-top: 2px;
+    color: #888;
+  }
+
   .jfy-arrow-link-btn svg {
-    width: 20px;
-    height: 20px;
+    width: 20px !important;          /* Punguza arrow */
+    height: 20px !important;
+  }
+}
+
+/* ============================================ */
+/* 📱 SMALL MOBILE SCREENS (≤480px) - MPYA!      */
+/* ============================================ */
+@media (max-width: 480px) {
+  .section-header {
+    padding: 6px 10px !important;    /* Punguza padding zaidi */
+    margin-bottom: 8px !important;
+  }
+  
+  .just-title {
+    font-size: 14px !important;      /* Punguza title zaidi */
+    font-weight: 700;
+  }
+
+  .just-subtitle {
+    font-size: 10px !important;      /* Punguza subtitle zaidi */
+  }
+
+  .jfy-arrow-link-btn svg {
+    width: 16px !important;
+    height: 16px !important;
   }
 }

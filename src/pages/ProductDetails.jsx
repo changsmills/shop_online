@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, Suspense } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom"; // ✅ Ongeza useNavigate
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import RelatedProducts from "../components/RelatedProducts";
 import "../ProductDetails.css";
 
 import api from "../axiosConfig"; 
@@ -283,8 +284,8 @@ export default function ProductDetails() {
   return (
     <div className="product-page-root">
       <div ref={headerRef}>
-        <Header />
-      </div>
+      <Header showBack={true} /> 
+     </div>
 
       <div className="product-details-container">
         {/* ✅ BREADCRUMB IMEONDOLIWA KABISA */}
@@ -371,17 +372,32 @@ export default function ProductDetails() {
                 )}
               </div>
               <div className="store-full-details-card">
-                <div className="store-card-header">
-                  <div className="store-card-title">
-                    <h3>{product.stores?.store_name}</h3>
-                    <div className="store-card-meta">
-                      <span>TIN: {product.stores?.tin_number}</span>
-                      <span>•</span>
-                      <span>{product.stores?.business_type}</span>
-                    </div>
-                  </div>
-                  <Link to={`/store/${product.store_id}`} className="store-card-btn">Tembelea Duka</Link>
-                </div>
+               <div className="store-card-header">
+  <div className="store-card-title">
+    <h3>{product.stores?.store_name}</h3>
+    <div className="store-card-meta">
+      <span>TIN: {product.stores?.tin_number}</span>
+      <span>•</span>
+      <span>{product.stores?.business_type}</span>
+    </div>
+  </div>
+  
+  {/* ✅ IMEBADILISHWA: Tumia onClick na window.open kwa Desktop */}
+  <Link 
+    to={`/store/${product.store_id}`} 
+    className="store-card-btn"
+    onClick={(e) => {
+      // Ikiwa ni desktop (zaidi ya 768px), fungua kwenye tab mpya
+      if (window.innerWidth > 768) {
+        e.preventDefault(); // Zuia navigation ya kawaida kwenye desktop
+        window.open(`/store/${product.store_id}`, '_blank');
+      }
+      // Kama ni mobile, hapa haitazuia default navigation, inaenda kwa kawaida
+    }}
+  >
+    Tembelea Duka
+  </Link>
+</div>
 
                 {product.stores?.tin_image_url && (
                   <div className="tin-cert-box">
@@ -446,55 +462,15 @@ export default function ProductDetails() {
           </div>
         )}
 
-        {/* ============================================================ */}
-        {/* 🔥 SEHEMU MPYA: BIDHAA ZINAZOFANANA (RELATED PRODUCTS) */}
-        {/* ============================================================ */}
-        {relatedProducts.length > 0 && (
-          <section className="related-products-section" style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px solid #e5e7eb' }}>
-            <div className="related-header" style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', marginBottom: '20px' }}>
-              <h3 className="text-xl font-bold text-gray-800">Bidhaa Zinazofanana</h3>
-              <Link to={`/category/${product.leaf_category_id}`} className="text-orange-500 font-semibold text-sm hover:underline">
-                Tazama zote →
-              </Link>
-            </div>
+ {relatedProducts.length > 0 && (
+  <RelatedProducts 
+    relatedProducts={relatedProducts}
+    leafCategoryId={product.leaf_category_id}
+    loadingRelated={loadingRelated}
+    navigate={navigate}
+  />
+)}
 
-            {/* Grid ya Related Products */}
-            <div className="related-products-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '20px' }}>
-              {relatedProducts.map((p) => (
-                <div key={p.id} className="related-product-card" style={{ border: '1px solid #e5e7eb', borderRadius: '12px', padding: '12px', textAlign: 'center', transition: 'all 0.2s ease', cursor: 'pointer' }}
-                onClick={() => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    navigate(`/product/${p.id}`); // ✅ Sasa inatumia navigate
-                          }}
-                      >
-                  <div className="related-img-wrap" style={{ width: '100%', height: '150px', overflow: 'hidden', borderRadius: '8px', marginBottom: '10px', backgroundColor: '#f9f9f9' }}>
-                    <img 
-                      src={p.cover_image_url || 'https://via.placeholder.com/200x200?text=No+Image'} 
-                      alt={p.name} 
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      onError={(e) => { e.target.src = 'https://via.placeholder.com/200x200?text=No+Image'; }}
-                    />
-                  </div>
-                  <p className="related-product-name" style={{ fontSize: '14px', fontWeight: '600', color: '#333', margin: '0 0 5px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {p.name}
-                  </p>
-                  <div className="related-product-price" style={{ fontSize: '13px', fontWeight: '700', color: '#ff6a00' }}>
-                    TSH {Number(p.price).toLocaleString()}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Loading Skeleton */}
-            {loadingRelated && (
-              <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '10px' }}>
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} style={{ width: '180px', height: '220px', backgroundColor: '#f3f4f6', borderRadius: '12px', animation: 'pulse 1.5s ease-in-out infinite' }} />
-                ))}
-              </div>
-            )}
-          </section>
-        )}
       </div>
 
       {!isMobile && <Footer />}

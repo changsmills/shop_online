@@ -68,7 +68,7 @@ export default function RecentlyViewed({ navigate }) {
   }, [products]);
 
 
-  // ============================================================
+   // ============================================================
   // 🔥 RENDER HEADER (Imejumuishwa kwa pande zote)
   // ============================================================
   const renderHeader = () => (
@@ -88,7 +88,14 @@ export default function RecentlyViewed({ navigate }) {
           className="rv-arrow-link-btn"
           onClick={() => {
             const url = '/products?section=recently-viewed'; 
-            window.location.href = url; 
+            
+            // ✅ MUHIMU: Angalia kama ni Desktop (>768px), fungua tab mpya.
+            // Ikiwa ni Mobile, fungua kwenye tab hii hii (kama kawaida).
+            if (window.innerWidth > 768) {
+              window.open(url, '_blank'); 
+            } else {
+              window.location.href = url; 
+            }
           }}
         >
           <ArrowRight size={24} />

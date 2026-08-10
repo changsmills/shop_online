@@ -94,7 +94,14 @@ export default function NewArrivals({ navigate, selectedCategory }) {
           className="na-arrow-link-btn"
           onClick={() => {
             const url = '/products?section=new-arrivals'; 
-            window.location.href = url; 
+            
+            // ✅ MUHIMU: Angalia kama ni Desktop (>768px), fungua tab mpya.
+            // Ikiwa ni Mobile, fungua kwenye tab hii hii (kama kawaida).
+            if (window.innerWidth > 768) {
+              window.open(url, '_blank'); 
+            } else {
+              window.location.href = url; 
+            }
           }}
         >
           <ArrowRight size={24} />

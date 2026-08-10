@@ -7,8 +7,8 @@ export default function SkeletonProductDetails({ isMobile }) {
   return (
     <div className="product-page-root skeleton-page">
       
-      {/* ✅ ONGEZA HEADER HAPA! */}
-      <Header />
+      {/* 🔥 BADILISHA HAPA: Tumia showBack={true} */}
+      <Header showBack={true} />
 
       <div className="product-details-container skeleton-container">
         

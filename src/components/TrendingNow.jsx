@@ -60,8 +60,7 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
     }
   }, [products]);
 
-
-    // ============================================================
+  // ============================================================
   // 🔥 RENDER HEADER (Imejumuishwa kwa pande zote)
   // ============================================================
   const renderHeader = () => (
@@ -85,7 +84,14 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
           className="trend-arrow-link-btn"
           onClick={() => {
             const url = '/products?section=hot-picks'; 
-            window.location.href = url; 
+            
+            // ✅ MUHIMU: Angalia kama ni Desktop (>768px), fungua tab mpya.
+            // Ikiwa ni Mobile, fungua kwenye tab hii hii (kama kawaida).
+            if (window.innerWidth > 768) {
+              window.open(url, '_blank'); 
+            } else {
+              window.location.href = url; 
+            }
           }}
         >
           <ArrowRight size={24} />
@@ -93,7 +99,7 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
       </div>
     </div>
   );
-
+  
   // ============================================================
   // 🔥 SKELETON LOADING - Inaonyesha skeleton cards wakati data inapakia
   // ============================================================

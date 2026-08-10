@@ -91,7 +91,6 @@ export default function TopDeals({ navigate, selectedCategory }) {
   }, [products]);
 
 
-
   // ============================================================
   // 🔥 RENDER HEADER (Imejumuishwa kwa pande zote)
   // ============================================================
@@ -116,7 +115,14 @@ export default function TopDeals({ navigate, selectedCategory }) {
           className="td-arrow-link-btn"
           onClick={() => {
             const dealsUrl = '/products?section=top-deals'; 
-            window.location.href = dealsUrl; 
+            
+            // ✅ MUHIMU: Angalia kama ni Desktop (>768px), fungua tab mpya.
+            // Ikiwa ni Mobile, fungua kwenye tab hii hii (kama kawaida).
+            if (window.innerWidth > 768) {
+              window.open(dealsUrl, '_blank'); 
+            } else {
+              window.location.href = dealsUrl; 
+            }
           }}
         >
           <ArrowRight size={24} />
@@ -124,7 +130,6 @@ export default function TopDeals({ navigate, selectedCategory }) {
       </div>
     </div>
   );
-  
 
    // ============================================================
   // SKELETON LOADING

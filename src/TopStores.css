@@ -114,11 +114,6 @@
     padding: 8px 4px 20px 4px;
   }
 }
-
-/* ============================================ */
-/* 🔥 MOBILE: KADI 3.5 (3 + NUSU)              */
-/* ============================================ */
-
 @media (max-width: 768px) {
   .ts-card-wrapper {
     flex: 0 0 calc((100% - (3.5 * 10px)) / 3.5) !important;
@@ -130,16 +125,18 @@
     gap: 10px !important;
     padding: 8px 4px 16px 4px;
   }
+  
+  /* 🔥 BADILISHA HAPA CHINI: */
   .ts-header {
-    padding: 0 12px;
-    margin-bottom: 12px;
+    padding: 8px 12px !important;  /* Punguza padding */
+    margin-bottom: 12px !important;
   }
   .ts-title {
-    font-size: 18px !important;
+    font-size: 16px !important;    /* Punguza ukubwa wa title */
     font-weight: 700;
   }
   .ts-subtitle {
-    font-size: 13px !important;
+    font-size: 12px !important;    /* Punguza ukubwa wa subtitle */
     padding-left: 0;
     color: #888;
   }
@@ -169,25 +166,27 @@
   }
 }
 
-/* ============================================ */
-/* 🔥 SMALL MOBILE: KADI 2 (NDOGO ZAIDI)       */
-/* ============================================ */
-
 @media (max-width: 480px) {
   .ts-card-wrapper {
-    flex: 0 0 calc((100% - (2.5 * 8px)) / 2.5) !important;
-    min-width: calc((100% - (2.5 * 8px)) / 2.5) !important;
-    max-width: calc((100% - (2.5 * 8px)) / 2.5) !important;
+    flex: 0 0 calc((100% - (2.2 * 8px)) / 2.2) !important;
+    min-width: calc((100% - (2.2 * 8px)) / 2.2) !important;
+    max-width: calc((100% - (2.2 * 8px)) / 2.2) !important;
   }
   .ts-scroll-wrapper {
     gap: 8px !important;
   }
+  
+  /* 🔥 BADILISHA HAPA CHINI: */
+  .ts-header {
+    padding: 6px 10px !important;  /* Punguza padding zaidi */
+    margin-bottom: 8px !important;
+  }
   .ts-title {
-    font-size: 16px !important;
+    font-size: 14px !important;    /* Punguza ukubwa zaidi */
     font-weight: 700;
   }
   .ts-subtitle {
-    font-size: 12px !important;
+    font-size: 10px !important;    /* Punguza subtitle zaidi */
   }
   .ts-factory-icon {
     width: 18px !important;

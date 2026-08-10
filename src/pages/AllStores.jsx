@@ -1,52 +1,76 @@
 // src/pages/AllStores.jsx
 import React, { useState, useEffect } from 'react';
-//import { supabase } from '../supabaseClient';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import StoreCard from '../components/StoreCard';
-import { useLocation, useNavigate } from 'react-router-dom';
-import '../AllStores.css'; // ✅ ONGEZA HII
+import { useLocation, useNavigate, useParams } from 'react-router-dom'; // ✅ Ongeza useParams
+import api from '../axiosConfig'; // ✅ Supabase imeondolewa, sasa tumia api!
+import '../AllStores.css';
 
 export default function AllStores({ session }) {
+  const { storeId } = useParams(); // ✅ Pata ID kutoka URL (/stores/:storeId)
   const [stores, setStores] = useState([]);
+  const [singleStore, setSingleStore] = useState(null);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
   const selectedCategory = location.state?.selectedCategory;
 
   useEffect(() => {
-    const fetchStores = async () => {
+    const fetchStoresData = async () => {
       setLoading(true);
       try {
-        let query = supabase
-          .from('stores_engine')
-          .select('*, categories:category_id(id, name)')
-          .eq('status', 'active');
-        
-        if (selectedCategory?.id) {
-          query = query.eq('category_id', selectedCategory.id);
+        // ============================================================
+        // 1. KAMA URL INA storeId (Pakia DUKA MOJA)
+        // ============================================================
+        if (storeId) {
+          // Angalia kama data imehifadhiwa kwenye sessionStorage (kutoka TopStores)
+          const cachedStore = sessionStorage.getItem('selectedStore');
+          
+          if (cachedStore) {
+            const parsedStore = JSON.parse(cachedStore);
+            // Hakikisha ID inalingana na URL
+            if (String(parsedStore.id) === String(storeId)) {
+              setSingleStore(parsedStore);
+              setLoading(false);
+              return;
+            }
+          }
+          
+          // Kama sessionStorage haina data, chukua kutoka API ya Django
+          const response = await api.get(`/stores/${storeId}/`);
+          setSingleStore(response.data);
+          setLoading(false);
+          return;
         }
+
+        // ============================================================
+        // 2. KAMA URL Haina storeId (Pakia MADUKA YOTE)
+        // ============================================================
+        const params = { status: 'active', limit: 50 };
+        if (selectedCategory?.id) {
+          params.category_id = selectedCategory.id;
+        }
+        const response = await api.get('/stores/', { params });
         
-        const { data, error } = await query;
+        // DRF inarudisha { results: [...] }, au array moja kwa moja
+        const storesData = response.data.results || response.data || [];
+        setStores(storesData);
         
-        if (error) throw error;
-        
-        const formattedStores = (data || []).map(store => ({
-          ...store,
-          category_name: store.categories?.name
-        }));
-        
-        setStores(formattedStores);
       } catch (error) {
         console.error("Error fetching stores:", error.message);
+        setStores([]);
       } finally {
         setLoading(false);
       }
     };
-    
-    fetchStores();
-  }, [selectedCategory]);
 
+    fetchStoresData();
+  }, [storeId, selectedCategory]);
+
+  // ============================================================
+  // LOADING SKELETON
+  // ============================================================
   if (loading) {
     return (
       <div className="all-stores-page">
@@ -67,6 +91,39 @@ export default function AllStores({ session }) {
     );
   }
 
+  // ============================================================
+  // RENDER: KAMA NI DUKA MOJA (StoreId Ipo URL)
+  // ============================================================
+  if (singleStore) {
+    return (
+      <div className="all-stores-page">
+        <Header />
+        <div className="all-stores-container">
+          {/* Header ya Duka Moja */}
+          <div className="all-stores-header">
+            <h1 className="all-stores-title">{singleStore.store_name}</h1>
+            <p className="all-stores-subtitle">
+              {singleStore.business_type} • {singleStore.city || 'Tanzania'}
+            </p>
+          </div>
+
+          {/* Onyesha kadi ya duka hilo (au unaweza kuweka component yake maalum hapa) */}
+          <div className="store-card-single-container">
+            <StoreCard
+              key={singleStore.id}
+              store={singleStore}
+              onClick={() => navigate(`/store/${singleStore.id}`)}
+            />
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // ============================================================
+  // RENDER: KAMA NI MADUKA YOTE (All Stores List)
+  // ============================================================
   return (
     <div className="all-stores-page">
       <Header />

@@ -1,16 +1,26 @@
+// src/pages/StorePage.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import api from '../axiosConfig'; // 🔥 Badilisha: import api kutoka axiosConfig!
+import api from '../axiosConfig';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { 
   Store, MapPin, Phone, Mail, Instagram, Globe, Clock, 
-  Package, Zap, ShieldCheck, Star, Users, Truck, 
-  ChevronLeft, Filter, Grid3x3, List, Search
+  Package, ShieldCheck, Star, Users, 
+  ChevronLeft, Grid3x3, List, Search
 } from 'lucide-react';
 import '../StorePage.css';
 
-export default function StorePage() { // 🔥 Imeondolewa { session }
+// 🔥 Helper ya kujenga URL kamili ya picha
+const getImageUrl = (url) => {
+  if (!url) return null;
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  return `http://127.0.0.1:8000${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
+export default function StorePage() {
   const { storeId } = useParams();
   const navigate = useNavigate();
   const [store, setStore] = useState(null);
@@ -20,44 +30,20 @@ export default function StorePage() { // 🔥 Imeondolewa { session }
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [categories, setCategories] = useState([]);
-  
-  // =======================================================
-  // 🔥 MOBILE DETECTION
-  // =======================================================
-  const [isMobile, setIsMobile] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth <= 768;
-    }
-    return false;
-  });
-
-  // =======================================================
-  // 🔥 VIEW MODE
-  // =======================================================
   const [viewMode, setViewMode] = useState('grid'); 
 
-  // Detect mobile screen resize
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
   // =======================================================
-  // 🔥 FETCH STORE DATA (Django API)
+  // 🔥 FETCH STORE DATA
   // =======================================================
   useEffect(() => {
     const fetchStoreData = async () => {
       if (!storeId) return;
-      
       setLoading(true);
       try {
-        // 1. Pata taarifa za duka
         const storeRes = await api.get(`/stores/${storeId}/`);
         const storeData = storeRes.data;
         setStore(storeData);
 
-        // 2. Pata bidhaa za duka hili (zilizothibitishwa)
         const productsRes = await api.get('/products/', {
           params: {
             store_id: storeId,
@@ -65,25 +51,20 @@ export default function StorePage() { // 🔥 Imeondolewa { session }
             ordering: '-created_at'
           }
         });
-        // DRF inarudisha { results: [...] } ikiwa pagination imewashwa
         const productsData = productsRes.data.results || productsRes.data || [];
         setProducts(productsData);
         setFilteredProducts(productsData);
 
-        // 3. Pata kategoria za kipekee kutoka kwenye bidhaa
         if (productsData.length > 0) {
-          // Tumia 'sub_category_name' au 'category_name' kulingana na serializer yako
           const uniqueCats = [...new Set(productsData.map(p => p.sub_category_name || p.category_name).filter(Boolean))];
           setCategories(uniqueCats);
         }
-
       } catch (error) {
         console.error('Error fetching store data:', error.response?.data || error.message);
       } finally {
         setLoading(false);
       }
     };
-
     fetchStoreData();
   }, [storeId]);
 
@@ -148,21 +129,18 @@ export default function StorePage() { // 🔥 Imeondolewa { session }
           <span>Back</span>
         </div>
 
-        {/* Store Header / Banner */}
-        <div className="store-banner" style={{
-          backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(${store.store_banner || 'https://placehold.co/1200x300'})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          borderRadius: isMobile ? '16px' : '24px',
-          padding: isMobile ? '30px 20px' : '50px 30px',
-          marginBottom: '24px'
-        }}>
+        {/* Store Header / Banner - Sasa inline styles zote zimehamia CSS! */}
+        <div className="store-banner">
           <div className="store-banner-content">
             <div className="store-logo-large">
               {store.store_logo ? (
-                <img src={store.store_logo} alt={store.store_name} />
+                <img 
+                  src={getImageUrl(store.store_logo)} 
+                  alt={store.store_name}
+                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/150x150?text=No+Logo'; }}
+                />
               ) : (
-                <Store size={isMobile ? 40 : 50} color="#ff6a00" />
+                <Store color="#ff6a00" className="store-icon-fallback" />
               )}
             </div>
             <div className="store-banner-info">
@@ -207,7 +185,6 @@ export default function StorePage() { // 🔥 Imeondolewa { session }
                   <span className="detail-value">{store.business_type}</span>
                 </div>
               )}
-              {/* 🔥 Safe check: ikiwa established_year haipo, haionyeshi chochote */}
               {store?.established_year && (
                 <div className="detail-item">
                   <span className="detail-label">Established:</span>
@@ -245,7 +222,6 @@ export default function StorePage() { // 🔥 Imeondolewa { session }
             )}
           </div>
 
-          {/* 🔥 Imeondolewa facebook_handle na kuongezwa twitter_handle & youtube_link! */}
           {(store.instagram_handle || store.tiktok_handle || store.twitter_handle || store.youtube_link) && (
             <div className="info-card">
               <h3><Globe size={18} /> Connect With Us</h3>
@@ -309,32 +285,16 @@ export default function StorePage() { // 🔥 Imeondolewa { session }
                 </select>
               )}
 
-              {/* View Toggle */}
-              <div style={{ display: 'flex', gap: '5px' }}>
+              {/* View Toggle Buttons */}
+              <div className="view-toggle-group">
                 <button 
-                  style={{
-                    padding: '8px',
-                    borderRadius: '8px',
-                    border: viewMode === 'grid' ? '1px solid #ff6a00' : '1px solid #ddd',
-                    background: viewMode === 'grid' ? '#ff6a00' : 'white',
-                    color: viewMode === 'grid' ? 'white' : '#333',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
+                  className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
                   onClick={() => setViewMode('grid')}
                 >
                   <Grid3x3 size={18} />
                 </button>
                 <button 
-                  style={{
-                    padding: '8px',
-                    borderRadius: '8px',
-                    border: viewMode === 'list' ? '1px solid #ff6a00' : '1px solid #ddd',
-                    background: viewMode === 'list' ? '#ff6a00' : 'white',
-                    color: viewMode === 'list' ? 'white' : '#333',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
+                  className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
                   onClick={() => setViewMode('list')}
                 >
                   <List size={18} />
@@ -362,7 +322,11 @@ export default function StorePage() { // 🔥 Imeondolewa { session }
                   onClick={() => navigate(`/product/${product.id}`)}
                 >
                   <div className="product-image">
-                    <img src={product.cover_image || 'https://placehold.co/300'} alt={product.name} />
+                    <img 
+                      src={getImageUrl(product.cover_image) || 'https://placehold.co/300'} 
+                      alt={product.name} 
+                      onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/300?text=No+Img'; }} 
+                    />
                     {product.discount > 0 && (
                       <span className="discount-badge">-{product.discount}%</span>
                     )}
@@ -392,7 +356,11 @@ export default function StorePage() { // 🔥 Imeondolewa { session }
                   className="product-list-item"
                   onClick={() => navigate(`/product/${product.id}`)}
                 >
-                  <img src={product.cover_image || 'https://placehold.co/80'} alt={product.name} />
+                  <img 
+                    src={getImageUrl(product.cover_image) || 'https://placehold.co/80'} 
+                    alt={product.name} 
+                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/80?text=No+Img'; }} 
+                  />
                   <div className="product-list-info">
                     <h4>{product.name}</h4>
                     <p className="product-category">{product.sub_category_name || product.category_name || ''}</p>
@@ -410,8 +378,8 @@ export default function StorePage() { // 🔥 Imeondolewa { session }
         </div>
       </div>
 
-      {/* Footer */}
-      {!isMobile && <Footer />}
+      {/* ✅ Footer sasa inawekwa tu, CSS ndiyo inaificha kwenye Mobile */}
+      <Footer />
     </div>
   );
 }

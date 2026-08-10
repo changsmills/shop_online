@@ -80,7 +80,7 @@ export default function LocationFilter({ navigate }) {
     }
   }, [locations]);
 
-  // ============================================================
+   // ============================================================
   // 🔥 RENDER HEADER (Imejumuishwa kwa pande zote)
   // ============================================================
   const renderHeader = () => (
@@ -100,7 +100,14 @@ export default function LocationFilter({ navigate }) {
           className="loc-arrow-link-btn"
           onClick={() => {
             const url = '/products?section=location'; 
-            window.location.href = url; 
+            
+            // ✅ MUHIMU: Angalia kama ni Desktop (>768px), fungua tab mpya.
+            // Ikiwa ni Mobile, fungua kwenye tab hii hii (kama kawaida).
+            if (window.innerWidth > 768) {
+              window.open(url, '_blank'); 
+            } else {
+              window.location.href = url; 
+            }
           }}
         >
           <ArrowRight size={24} />
@@ -108,7 +115,7 @@ export default function LocationFilter({ navigate }) {
       </div>
     </div>
   );
-
+  
   // ============================================================
   // 🔥 SKELETON LOADING - Inaonyesha skeleton cards wakati data inapakia
   // ============================================================

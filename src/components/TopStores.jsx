@@ -61,7 +61,7 @@ export default function TopStores({ navigate }) {
   }, [stores]);
 
 
-    // ============================================================
+   // ============================================================
   // 🔥 RENDER HEADER (Imejumuishwa kwa pande zote)
   // ============================================================
   const renderHeader = () => (
@@ -83,7 +83,14 @@ export default function TopStores({ navigate }) {
           className="ts-arrow-link-btn"
           onClick={() => {
             const url = '/stores?section=top-suppliers'; 
-            window.location.href = url; 
+            
+            // ✅ MUHIMU: Angalia kama ni Desktop (>768px), fungua tab mpya.
+            // Ikiwa ni Mobile, fungua kwenye tab hii hii (kama kawaida).
+            if (window.innerWidth > 768) {
+              window.open(url, '_blank'); 
+            } else {
+              window.location.href = url; 
+            }
           }}
         >
           <ArrowRight size={24} />
