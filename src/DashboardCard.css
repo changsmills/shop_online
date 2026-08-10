@@ -3,25 +3,37 @@
 /* ============================================ */
 
 .product-card-item {
-  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
+  background: #f8f9fa;  /* 🔥 Kijivu chepesi kama Alibaba */
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
-  border: 1px solid #e5e7eb;
+  
+  /* 🔥 Mstari mwembamba wa kijivu kama Alibaba */
+  border: 1px solid #e5e7eb;         
+  
   box-shadow: 0 1px 2px rgba(0,0,0,0.05); 
-  transition: box-shadow 0.25s ease;
+  transition: box-shadow 0.25s ease; /* 🔥 Inabadilisha kivuli tu, sio kadi nzima */        
   width: 100%;
   position: relative;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  color: var(--text-color) !important; /* ✅ Inajibadilisha! */
 }
 
 .product-card-item:hover {
-  border-color: #10b981;
+  /* 🔥 Unapoelekeza kipanya: Mstari unageuka kijani */
+  border-color: #10b981;             
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1); 
 }
+
+/* ✅ Mobile - Mtindo wa Alibaba (Pembe za mviringo) */
+@media (max-width: 768px) {
+  .product-card-item {
+    border-radius: 10px;  /* 🔥 Pembe za mviringo sawa na Alibaba */
+    border-width: 1px;
+  }
+}
+
 
 /* ============================================ */
 /* LAYER 2: MEDIA (PICHA)                       */
@@ -31,7 +43,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
+  background: #f8f8f8;
   overflow: hidden;
   border-radius: 8px 8px 0 0;
 }
@@ -56,13 +68,14 @@
 /* ✅ Mobile - Uwiano wa Picha kama Alibaba (4/5) */
 @media (max-width: 768px) {
   .product-card-media { 
-    aspect-ratio: 1 / 1 !important;
+    aspect-ratio: 1 / 1 !important;  /* 🔥 Picha ni ndefu kidogo kuliko upana (kama suruali) */
     border-radius: 10px 10px 0 0; 
   }
 }
 
+
 /* ============================================ */
-/* LAYER 3: BADGES & RANK                       */
+/* LAYER 3: BADGES (NDOGO SANA)                 */
 /* ============================================ */
 
 .rank-indicator {
@@ -81,13 +94,19 @@
   padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 10px; z-index: 2;
 }
 
+/* ✅ Mobile - Badges zinazosomeka (Sio 6px tena) */
 @media (max-width: 768px) {
-  .rank-indicator { font-size: 8px; padding: 2px 5px; top: 4px; left: 4px; }
-  .discount-badge-mini { font-size: 8px; padding: 2px 5px; top: 4px; right: 4px; }
+  .rank-indicator { 
+    font-size: 8px; padding: 2px 5px; top: 4px; left: 4px; 
+  }
+  .discount-badge-mini { 
+    font-size: 8px; padding: 2px 5px; top: 4px; right: 4px; 
+  }
 }
 
+
 /* ============================================ */
-/* LAYER 4: INFO SECTION                        */
+/* LAYER 4: INFO SECTION (PADDING)              */
 /* ============================================ */
 
 .product-card-info {
@@ -96,52 +115,104 @@
   background: transparent; position: relative; z-index: 2;
 }
 
+/* ✅ Mobile - Nafasi ya kutosha (Sio 2px tena) */
 @media (max-width: 768px) {
-  .product-card-info { padding: 8px 8px 10px 8px !important; gap: 2px !important; }
+  .product-card-info {
+    padding: 8px 8px 10px 8px !important; /* 🔥 Nafasi ya kupumua kama Alibaba */
+    gap: 2px !important;
+  }
 }
 
 /* ============================================ */
-/* LAYER 5: TYPOGRAPHY (INAYOJIBADILISHA)       */
+/* LAYER 5: TYPOGRAPHY (MANENE NA YANAYOVUTIA)  */
 /* ============================================ */
 
 .product-card-title {
   margin: 0; 
-  font-size: 16px;
-  color: var(--text-color) !important; /* ✅ Inajibadilisha! */
-  font-weight: 700;
+  font-size: 16px;         /* 🔥 Imepanuliwa kidogo kwa desktop */
+  color: #111827;          /* 🔥 Nyeusi nzito yenye mtindo */
+  font-weight: 700;        /* 🔥 Manene (Bold) */
   line-height: 1.3;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.02em;  /* 🔥 Nafasi nzuri kati ya herufi */
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
 }
 
+/* ✅ Mobile - Jina kubwa na nzito */
 @media (max-width: 768px) {
-  .product-card-title { font-size: 14px !important; font-weight: 700 !important; line-height: 1.2; -webkit-line-clamp: 2 !important; }
+  .product-card-title { 
+    font-size: 14px !important; 
+    font-weight: 700 !important; /* 🔥 Manene hata kwenye simu */
+    line-height: 1.2; 
+    -webkit-line-clamp: 2 !important; /* Ruhusu mistari 2 ili isikate mapema */
+  }
 }
 
 .product-card-price-row {
-  display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; margin-top: 2px;
+  display: flex; 
+  align-items: baseline; 
+  gap: 4px; 
+  flex-wrap: wrap; 
+  margin-top: 2px;
 }
 
-/* Desktop Price - Rangi ya Orange inabaki ngumu kwa brand! */
-.price-currency { color: #ff6a00; font-size: 16px; font-weight: 700; }
-.price-amount { color: #ff6a00; font-size: 22px; font-weight: 800; }
-.price-original-strikethrough { text-decoration: line-through; color: #9ca3af; font-size: 14px; font-weight: 400; }
+/* Desktop Price */
+.price-currency { 
+  color: #ff6a00; 
+  font-size: 16px;         /* 🔥 Imepanuliwa */
+  font-weight: 700; 
+}
+.price-amount { 
+  color: #ff6a00; 
+  font-size: 22px;         /* 🔥 Bei kubwa na nzito sana! */
+  font-weight: 800;        /* 🔥 Manene kabisa */
+}
+.price-original-strikethrough {
+  text-decoration: line-through; 
+  color: #9ca3af; 
+  font-size: 14px; 
+  font-weight: 400;
+}
+
+/* ✅ Mobile - Bei inayoonekana wazi na nzito */
+@media (max-width: 768px) {
+  .price-currency { 
+    font-size: 12px !important; 
+    font-weight: 700 !important; 
+  }
+  .price-amount { 
+    font-size: 16px !important; 
+    font-weight: 800 !important; /* 🔥 Nzito kwenye bei ya simu */
+  } 
+  .price-original-strikethrough { 
+    font-size: 11px !important; 
+  }
+}
+
+/* MOQ (Kwa bidhaa za jumla / wholesale) */
+.store-moq-info { 
+  display: flex; 
+  align-items: center; 
+  gap: 3px; 
+  margin-top: 2px; 
+}
+.moq-label { 
+  font-size: 13px; 
+  color: #64748b; 
+  font-weight: 500; 
+}
+.moq-value { 
+  font-size: 14px; 
+  font-weight: 700;        /* 🔥 Imekuwa nzito */
+  color: #111827;          /* 🔥 Nyeusi inayosomeka vizuri */
+}
 
 @media (max-width: 768px) {
-  .price-currency { font-size: 12px !important; font-weight: 700 !important; }
-  .price-amount { font-size: 16px !important; font-weight: 800 !important; } 
-  .price-original-strikethrough { font-size: 11px !important; }
+  .moq-label { font-size: 11px !important; }
+  .moq-value { font-size: 11px !important; font-weight: 700 !important; }
 }
-
-/* MOQ */
-.store-moq-info { display: flex; align-items: center; gap: 3px; margin-top: 2px; }
-.moq-label { font-size: 13px; color: #64748b; font-weight: 500; }
-.moq-value { font-size: 14px; font-weight: 700; color: var(--text-color) !important; /* ✅ Inajibadilisha! */ }
-
-@media (max-width: 768px) { .moq-label { font-size: 11px !important; } .moq-value { font-size: 11px !important; font-weight: 700 !important; } }
 
 /* ============================================ */
 /* LAYER 6: HIDING UNNECESSARY INFO ON MOBILE   */
@@ -153,62 +224,90 @@
   .store-moq-info { display: none !important; } 
 }
 
+
 /* ============================================ */
-/* LAYER 7: VERIFIED BADGE & SOLD COUNT         */
+/* ✅ LAYER 7: ULTIMATE GRID RESPONSIVENESS     */
+/* ============================================ */
+
+/* Desktop */
+.universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important; /* 150px */
+  gap: 12px !important;
+  padding: 16px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  justify-content: center !important; 
+}
+
+/* ✅ Tablet - SAFU 3 au 4 (Kadi 3-4 kwa mstari) */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
+    grid-template-columns: repeat(4, 1fr) !important; 
+    gap: 4px !important;
+    padding: 8px !important;
+  }
+}
+
+/* ✅ Mobile - SAFU 2 KAMA ALIBABA! (Kadi 2 kwa mstari) */
+@media (max-width: 768px) {
+  .universal-grid-layout, .alibaba-grid, .category-grid, .deals-scroll-grid {
+    grid-template-columns: repeat(2, 1fr) !important;  /* 🔥 Imegeuka kuwa 2 kama Alibaba! */
+    gap: 6px !important; 
+    padding: 0 2px 2px 2px !important; 
+  }
+}
+
+/* ============================================ */
+/* 🔥 NEW: VERIFIED BADGE (Green Check)         */
 /* ============================================ */
 
 .verified-badge-wrapper {
-  display: flex; align-items: center; gap: 4px; margin-top: 1px; margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 1px;
+  margin-bottom: 2px;
 }
-.verified-icon { color: #10b981; }
-.verified-text { font-size: 11px; font-weight: 600; color: #10b981; }
 
-@media (max-width: 768px) { .verified-text { font-size: 9px; } .verified-icon { width: 10px; height: 10px; } }
+.verified-icon {
+  color: #10b981; /* Rangi ya kijani kibichi (Alibaba/Amazon style) */
+}
 
-.sold-count-wrapper { display: flex; align-items: center; margin-bottom: 2px; }
-.sold-count-wrapper span { font-size: 11px; color: #64748b; font-weight: 500; }
+.verified-text {
+  font-size: 11px;
+  font-weight: 600;
+  color: #10b981;
+}
 
-@media (max-width: 768px) { .sold-count-wrapper span { font-size: 9px; } }
+@media (max-width: 768px) {
+  .verified-text {
+    font-size: 9px;
+  }
+  .verified-icon {
+    width: 10px;
+    height: 10px;
+  }
+}
 
 /* ============================================ */
-/* ✅ LAYER 8: DARK MODE OVERRIDES              */
+/* 🔥 NEW: SOLD COUNT (Mtindo wa kuvutia)       */
 /* ============================================ */
 
-@media (prefers-color-scheme: dark) {
-  /* Card Container */
-  .product-card-item {
-    background-color: #1e293b !important; /* Dark Blue ya Skyfall */
-    color: #e2e8f0 !important;
-    border-color: #334155 !important;
-  }
-  
-  /* Media Background */
-  .product-card-media {
-    background-color: #1e293b !important;
-  }
+.sold-count-wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2px;
+}
 
-  /* Title & MOQ Text */
-  .product-card-title {
-    color: #e2e8f0 !important;
-  }
-  .moq-value {
-    color: #e2e8f0 !important;
-  }
-  
-  /* Price Orange inabaki na nguvu yake! */
-  .price-currency, .price-amount {
-    color: #ff6a00 !important;
-  }
+.sold-count-wrapper span {
+  font-size: 11px;
+  color: #64748b; /* Kijivu kinachosomeka */
+  font-weight: 500;
+}
 
-  /* Verified Badge */
-  .verified-icon { color: #34d399 !important; }
-  .verified-text { color: #34d399 !important; }
-  
-  /* Sold Count */
-  .sold-count-wrapper span { color: #94a3b8 !important; }
-  
-  /* Border on Hover */
-  .product-card-item:hover {
-    border-color: #10b981 !important;
+@media (max-width: 768px) {
+  .sold-count-wrapper span {
+    font-size: 9px;
   }
 }
