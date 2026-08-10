@@ -921,12 +921,27 @@
 }
 
 /* ============================================ */
-/* DARK MODE SUPPORT */
+/* DARK MODE SUPPORT (Imeboreshwa kwa Icons)     */
 /* ============================================ */
 
 @media (prefers-color-scheme: dark) {
+  /* Container kuu - Inabadilisha rangi ya icons zote za link na button */
+  .user-tools-container,
+  .user-tools-container a,
+  .user-tools-container button {
+    color: #e2e8f0 !important; /* Rangi nyeupe kwa icons na maandishi */
+  }
+  
+  .user-tools-container a:hover,
+  .user-tools-container button:hover {
+    color: #ff6a00 !important; /* Rangi ya Orange inapoguswa */
+  }
+
+  /* Dropdown menu - Background nyeusi */
   .alibaba-dropdown-menu {
     background: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5) !important;
   }
   
   .alibaba-dropdown-menu::before {
@@ -976,5 +991,12 @@
   .empty-text,
   .prompt-text {
     color: #94a3b8 !important;
+  }
+
+  /* 🔥 MUHIMU: Hakikisha badge za Cart na Notification zinaonekana */
+  .cart-badge, .notify-dot {
+    background: #ff4e00 !important; /* Orange inayofanana na brand */
+    border-color: #1e293b !important; /* Inaacha nafasi ya background */
+    color: white !important;
   }
 }

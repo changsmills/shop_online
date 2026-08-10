@@ -5,7 +5,7 @@
 .just-for-you-container {
   position: relative;
   width: 100%;
-  background-color: #ffffff;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
   border-top: 1px solid #e5e7eb;
   border-bottom: 1px solid #e5e7eb;
   border-left: none;
@@ -38,52 +38,57 @@
 
 .section-header {
   display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  gap: 8px;
-  margin: 0;
-  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px !important;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
+  border-radius: 12px 12px 0 0;
+  margin-bottom: 20px;
+  color: var(--text-color) !important;
 }
 
-@media (max-width: 768px) {
+/* ✅ Light Mode: Rangi ya Peach/Ivory */
+@media (prefers-color-scheme: light) {
   .section-header {
-    padding: 0 8px 12px 8px;
+    background-color: #fff7ed !important;
   }
 }
 
-@media (min-width: 769px) {
+/* ✅ Dark Mode: Dark Blue ya Skyfall */
+@media (prefers-color-scheme: dark) {
   .section-header {
-    padding: 0 16px 16px 16px;
+    background-color: #1e293b !important;
+    border-bottom: 1px solid #334155 !important;
   }
 }
 
 .header-main {
   flex: 1;
   display: flex;
+  justify-content: space-between;
   align-items: center;
+  width: 100%;
 }
 
 .header-text-group {
   display: flex;
   flex-direction: column;
-  width: 100%;
 }
 
 /* ============================================ */
-/* LAYER 3: TYPOGRAPHY (Titles & Subtitles)     */
+/* LAYER 3: TYPOGRAPHY                          */
 /* ============================================ */
 
 .just-title {
-  font-weight: bold;
+  font-weight: 700;
   margin: 0;
-  color: black;
+  color: var(--text-color) !important; /* ✅ Inajibadilisha! */
   line-height: 1.2;
 }
 
 @media (max-width: 768px) {
   .just-title {
-    font-size: 18px !important; /* ✅ KUBWA ZAIDI (ilikuwa 14px) */
-    font-weight: 700;
+    font-size: 18px !important;
     line-height: 1.3;
   }
 }
@@ -97,16 +102,15 @@
 
 .just-subtitle {
   margin: 0;
-  color: #312c2c;
+  color: #888;
   line-height: 1.2;
 }
 
 @media (max-width: 768px) {
   .just-subtitle {
-    font-size: 13px !important; /* ✅ KUBWA ZAIDI (ilikuwa 9px) */
+    font-size: 13px !important;
     line-height: 1.2;
     margin-top: 2px;
-    color: #888;
   }
 }
 
@@ -119,7 +123,37 @@
 }
 
 /* ============================================ */
-/* LAYER 4: PRODUCT GRID - PICHA 2 KWA SAFU MOBILE */
+/* LAYER 4: HEADER RIGHT ARROW                  */
+/* ============================================ */
+
+.header-right-arrow {
+  display: flex;
+  align-items: center;
+}
+
+.jfy-arrow-link-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color) !important; /* ✅ Inajibadilisha! */
+  padding: 4px;
+  transition: transform 0.2s ease;
+}
+
+.jfy-arrow-link-btn:hover {
+  transform: translateX(4px);
+  color: #f97316;
+}
+
+.jfy-arrow-link-btn:active {
+  transform: scale(0.95);
+}
+
+/* ============================================ */
+/* LAYER 5: PRODUCT GRID                        */
 /* ============================================ */
 
 .product-grid {
@@ -130,7 +164,6 @@
   padding: 0;
 }
 
-/* ✅ MOBILE (≤768px): PICHA 2 KWA SAFU */
 @media (max-width: 768px) {
   .product-grid { 
     grid-template-columns: repeat(2, 1fr) !important;
@@ -139,7 +172,6 @@
   }
 }
 
-/* Tablet (769px - 1024px): Safu 4 */
 @media (min-width: 769px) and (max-width: 1024px) {
   .product-grid { 
     grid-template-columns: repeat(4, 1fr); 
@@ -148,7 +180,6 @@
   }
 }
 
-/* Large Tablet / Small Desktop (1025px - 1280px): Safu 5 */
 @media (min-width: 1025px) and (max-width: 1280px) {
   .product-grid { 
     grid-template-columns: repeat(5, 1fr); 
@@ -157,7 +188,6 @@
   }
 }
 
-/* Large Desktop (≥1281px): Safu 6 */
 @media (min-width: 1281px) {
   .product-grid { 
     grid-template-columns: repeat(6, 1fr); 
@@ -167,20 +197,20 @@
 }
 
 /* ============================================ */
-/* LAYER 5: DASHBOARD CARD - SIZE MANAGEMENT    */
+/* LAYER 6: DASHBOARD CARD (Inajibadilisha!)    */
 /* ============================================ */
 
-/* ✅ HAKIKISHA CARDS ZINA UKUBWA UNAOFAA */
 .dashboard-card {
-  background: white;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid #f0f0f0;
+  border: 1px solid var(--text-color) !important; /* ✅ Inajibadilisha! */
   transition: all 0.3s ease;
   cursor: pointer;
   height: 100%;
   display: flex;
   flex-direction: column;
+  color: var(--text-color) !important;
 }
 
 .dashboard-card:hover {
@@ -190,14 +220,14 @@
 }
 
 /* ============================================ */
-/* CARD IMAGE - SIZE SAWA NA ALIBABA            */
+/* CARD IMAGE                                    */
 /* ============================================ */
 
 .dashboard-card .card-image {
   position: relative;
   width: 100%;
-  padding-bottom: 100%; /* ✅ SQUARE - 1:1 ASPECT RATIO (Kama Alibaba) */
-  background: #f5f5f5;
+  padding-bottom: 100%;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
   overflow: hidden;
 }
 
@@ -216,7 +246,7 @@
 }
 
 /* ============================================ */
-/* CARD BODY                                    */
+/* CARD BODY                                     */
 /* ============================================ */
 
 .dashboard-card .card-body {
@@ -224,12 +254,13 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  color: var(--text-color) !important;
 }
 
 .dashboard-card .card-title {
   font-size: 13px;
   font-weight: 500;
-  color: #333;
+  color: var(--text-color) !important;
   margin: 0 0 4px 0;
   line-height: 1.3;
   display: -webkit-box;
@@ -259,7 +290,7 @@
 }
 
 /* ============================================ */
-/* CARD FOOTER                                  */
+/* CARD FOOTER                                   */
 /* ============================================ */
 
 .dashboard-card .card-footer {
@@ -267,7 +298,7 @@
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid var(--text-color) !important; /* ✅ Inajibadilisha! */
   padding-top: 8px;
   margin-top: auto;
 }
@@ -278,9 +309,10 @@
   gap: 3px;
   font-size: 11px;
   color: #666;
-  background: #f8f9fa;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
   padding: 2px 8px;
   border-radius: 10px;
+  border: 1px solid var(--text-color) !important;
 }
 
 .dashboard-card .card-verified {
@@ -300,44 +332,38 @@
 }
 
 /* ============================================ */
-/* MOBILE CARD - SIZE NDOGO                     */
+/* MOBILE CARD ADJUSTMENTS                       */
 /* ============================================ */
 
 @media (max-width: 768px) {
   .dashboard-card .card-body {
     padding: 8px 10px 10px 10px;
   }
-  
   .dashboard-card .card-title {
     font-size: 12px;
     min-height: 28px;
   }
-  
   .dashboard-card .card-price {
     font-size: 14px;
   }
-  
   .dashboard-card .card-original-price {
     font-size: 11px;
   }
-  
   .dashboard-card .card-moq {
     font-size: 10px;
   }
-  
   .dashboard-card .card-rating,
   .dashboard-card .card-verified {
     font-size: 10px;
     padding: 1px 6px;
   }
-  
   .dashboard-card .card-years {
     font-size: 10px;
   }
 }
 
 /* ============================================ */
-/* LAYER 6: ERROR & LOADING STATES              */
+/* LAYER 7: ERROR & LOADING STATES              */
 /* ============================================ */
 
 .loading-container {
@@ -345,9 +371,10 @@
   justify-content: center;
   align-items: center;
   padding: 60px 20px;
-  background: #fff;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
   border-radius: 12px;
   margin: 20px;
+  color: var(--text-color) !important;
 }
 
 .animate-spin {
@@ -391,14 +418,14 @@
 }
 
 /* ============================================ */
-/* LAYER 7: EMPTY STATE CARD                    */
+/* LAYER 8: EMPTY STATE CARD                    */
 /* ============================================ */
 
 .empty-state-card {
-  background: white;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid #f0f0f0;
+  border: 1px solid var(--text-color) !important;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -409,12 +436,13 @@
   transition: all 0.3s ease;
   grid-column: 1 / -1;
   min-height: 300px;
+  color: var(--text-color) !important;
 }
 
 .empty-state-image {
   width: 100%;
   height: 160px;
-  background: #f0f0f0;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
   border-radius: 8px;
   margin-bottom: 16px;
   animation: pulse 1.5s infinite ease-in-out;
@@ -431,7 +459,7 @@
 .empty-state-title {
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-color) !important;
   margin: 0;
 }
 
@@ -478,7 +506,7 @@
 }
 
 /* ============================================ */
-/* LAYER 8: ANIMATION                           */
+/* LAYER 9: ANIMATION                           */
 /* ============================================ */
 
 @keyframes pulse {
@@ -488,114 +516,111 @@
 }
 
 /* ============================================ */
-/* 🔥 HEADER ILIYO NA BACKGROUND YA PEACH       */
+/* LAYER 10: MOBILE RESPONSIVE UPDATES          */
 /* ============================================ */
 
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #fff7ed; /* Rangi ya peach */
-  padding: 12px 20px;
-  border-radius: 12px 12px 0 0;
-  margin-bottom: 20px;
-}
-
-.header-main {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
-
-.header-text-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.just-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-}
-
-.header-right-arrow {
-  display: flex;
-  align-items: center;
-}
-
-/* ============================================ */
-/* 🔥 MSHALE WA KULIA                           */
-/* ============================================ */
-
-.jfy-arrow-link-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #374151;
-  padding: 4px;
-  transition: transform 0.2s ease;
-}
-
-.jfy-arrow-link-btn:hover {
-  transform: translateX(4px); /* Mshale unasogea kulia inapoelewa */
-  color: #f97316;
-}
-
-.jfy-arrow-link-btn:active {
-  transform: scale(0.95);
-}
-
-/* Mobile responsiveness */
 @media (max-width: 768px) {
   .section-header {
-    padding: 8px 12px !important;    /* 🔥 Punguza padding (ilikuwa 10px 16px) */
+    padding: 8px 12px !important;
     margin-bottom: 12px !important;
   }
-  
   .just-title {
-    font-size: 16px !important;      /* 🔥 Punguza title (ilikuwa 18px) */
-    font-weight: 700;
+    font-size: 16px !important;
     line-height: 1.3;
   }
-
   .just-subtitle {
-    font-size: 12px !important;      /* 🔥 Punguza subtitle (ilikuwa 13px) */
+    font-size: 12px !important;
     line-height: 1.2;
     margin-top: 2px;
-    color: #888;
   }
-
   .jfy-arrow-link-btn svg {
-    width: 20px !important;          /* Punguza arrow */
+    width: 20px !important;
     height: 20px !important;
   }
 }
 
-/* ============================================ */
-/* 📱 SMALL MOBILE SCREENS (≤480px) - MPYA!      */
-/* ============================================ */
 @media (max-width: 480px) {
   .section-header {
-    padding: 6px 10px !important;    /* Punguza padding zaidi */
+    padding: 6px 10px !important;
     margin-bottom: 8px !important;
   }
-  
   .just-title {
-    font-size: 14px !important;      /* Punguza title zaidi */
+    font-size: 14px !important;
     font-weight: 700;
   }
-
   .just-subtitle {
-    font-size: 10px !important;      /* Punguza subtitle zaidi */
+    font-size: 10px !important;
   }
-
   .jfy-arrow-link-btn svg {
     width: 16px !important;
     height: 16px !important;
+  }
+}
+
+/* ============================================ */
+/* DARK MODE OVERRIDES (MWISHO)                 */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .just-for-you-container {
+    border-color: #334155 !important;
+  }
+
+  .section-header {
+    background-color: #1e293b !important;
+    border-bottom: 1px solid #334155 !important;
+  }
+
+  .just-title {
+    color: #e2e8f0 !important;
+  }
+
+  .just-subtitle {
+    color: #94a3b8 !important;
+  }
+
+  .dashboard-card {
+    border-color: #334155 !important;
+  }
+
+  .dashboard-card .card-image {
+    background-color: #1e293b !important;
+  }
+
+  .dashboard-card .card-title {
+    color: #e2e8f0 !important;
+  }
+
+  .dashboard-card .card-footer {
+    border-top-color: #334155 !important;
+  }
+
+  .dashboard-card .card-rating {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #94a3b8 !important;
+  }
+
+  .loading-container {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+  }
+
+  .empty-state-card {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+  }
+
+  .empty-state-image {
+    background-color: #1e293b !important;
+  }
+
+  .empty-state-title {
+    color: #e2e8f0 !important;
+  }
+
+  .jfy-arrow-link-btn {
+    color: #e2e8f0 !important;
   }
 }

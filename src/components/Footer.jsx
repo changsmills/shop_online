@@ -1,3 +1,4 @@
+// src/components/Footer.jsx
 import { Link } from "react-router-dom";
 import "../Footer.css";
 import { FaFacebook, FaInstagram, FaTwitter, FaYoutube, FaCcVisa, FaCcMastercard } from "react-icons/fa";
@@ -107,26 +108,21 @@ export default function Footer() {
               <a href="https://youtube.com" target="_blank" rel="noreferrer"><FaYoutube className="icon" /></a>
             </div>
             
-            <h3 className="mt-4" style={{ marginTop: '30px', fontSize: '18px', fontWeight: '700' }}>
-              {t('payment_methods')}
-            </h3>
+            <h3 className="mt-4">{t('payment_methods')}</h3>
             
-            <div className="payment-methods" style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap', marginTop: '10px' }}>
-              {/* Huduma za Kimataifa */}
+            <div className="payment-methods">
               <FaCcVisa size={35} title="Visa" />
               <FaCcMastercard size={35} title="Mastercard" />
 
               {/* Huduma za Nyumbani - Maneno tu */}
-              <span style={{ padding: '4px 10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '12px' }}>M-Pesa</span>
-              <span style={{ padding: '4px 10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '12px' }}>Airtel Money</span>
-              <span style={{ padding: '4px 10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '12px' }}>Tigo Pesa</span>
-              <span style={{ padding: '4px 10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '12px' }}>CRDB</span>
-              <span style={{ padding: '4px 10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '12px' }}>NMB</span>
+              <span className="payment-tag">M-Pesa</span>
+              <span className="payment-tag">Airtel Money</span>
+              <span className="payment-tag">Tigo Pesa</span>
+              <span className="payment-tag">CRDB</span>
+              <span className="payment-tag">NMB</span>
             </div>
             
-            <p style={{ fontSize: '11px', color: '#888', marginTop: '15px' }}>
-              {t('secure_payment')}
-            </p>
+            <p className="secure-text">{t('secure_payment')}</p>
           </div>
 
         </div>

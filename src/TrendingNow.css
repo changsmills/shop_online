@@ -5,7 +5,7 @@
 .trending-main-wrapper {
   position: relative;
   width: 100%;
-  background-color: #ffffff;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
   border-top: 1px solid #e5e7eb;
   border-bottom: 1px solid #e5e7eb;
   border-left: none;
@@ -15,15 +15,33 @@
 }
 
 /* ============================================ */
-/* HEADER SECTION                                */
+/* HEADER SECTION (Hot Picks)                   */
 /* ============================================ */
 
 .trend-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 16px;
+  padding: 12px 20px !important; /* ✅ Inasawazisha padding! */
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
+  border-radius: 12px 12px 0 0;
   margin-bottom: 16px;
+  color: var(--text-color) !important;
+}
+
+/* ✅ Light Mode: Rangi ya Peach/Ivory */
+@media (prefers-color-scheme: light) {
+  .trend-header {
+    background-color: #fff7ed !important;
+  }
+}
+
+/* ✅ Dark Mode: Dark Blue ya Skyfall */
+@media (prefers-color-scheme: dark) {
+  .trend-header {
+    background-color: #1e293b !important;
+    border-bottom: 1px solid #334155 !important;
+  }
 }
 
 .trend-header-left {
@@ -46,7 +64,7 @@
 .trend-title {
   font-size: 20px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text-color) !important;
   margin: 0;
 }
 
@@ -57,8 +75,34 @@
   padding-left: 34px;
 }
 
+.trend-header-right {
+  display: flex;
+  align-items: center;
+}
+
+.trend-arrow-link-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color) !important;
+  padding: 4px;
+  transition: transform 0.2s ease;
+}
+
+.trend-arrow-link-btn:hover {
+  transform: translateX(4px);
+  color: #8b5cf6; /* Purple kwa Hot Picks */
+}
+
+.trend-arrow-link-btn:active {
+  transform: scale(0.95);
+}
+
 /* ============================================ */
-/* SCROLL WRAPPER                               */
+/* SCROLL WRAPPER                                */
 /* ============================================ */
 
 .trend-desktop-wrapper {
@@ -79,10 +123,12 @@
   gap: 12px;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
+  color: var(--text-color) !important;
 }
 
 /* ============================================ */
-/* 🔥 DESKTOP: KADI                           */
+/* CARDS & ARROWS                                */
 /* ============================================ */
 
 @media (min-width: 1025px) {
@@ -92,15 +138,7 @@
     max-width: calc((100% - (6.5 * 12px)) / 6.5);
     scroll-snap-align: start;
   }
-  .trend-scroll-wrapper {
-    gap: 12px;
-    padding: 8px 4px 20px 4px;
-  }
 }
-
-/* ============================================ */
-/* 🔥 TABLET: KADI                            */
-/* ============================================ */
 
 @media (min-width: 769px) and (max-width: 1024px) {
   .trend-card-wrapper {
@@ -109,15 +147,7 @@
     max-width: calc((100% - (4.5 * 12px)) / 4.5);
     scroll-snap-align: start;
   }
-  .trend-scroll-wrapper {
-    gap: 12px;
-    padding: 8px 4px 20px 4px;
-  }
 }
-
-/* ============================================ */
-/* 🔥 MOBILE: KADI                           */
-/* ============================================ */
 
 @media (max-width: 768px) {
   .trend-card-wrapper {
@@ -131,21 +161,20 @@
     padding: 8px 4px 16px 4px;
   }
   .trend-header {
-    padding: 0 12px;
-    margin-bottom: 12px;
+    padding: 8px 12px !important;
+    margin-bottom: 10px !important;
   }
   .trend-title {
-    font-size: 16px;
+    font-size: 16px !important;
   }
   .trend-subtitle {
-    font-size: 12px;
+    font-size: 12px !important;
     padding-left: 0;
   }
   .trend-icon {
-    width: 18px;
-    height: 18px;
+    width: 18px !important;
+    height: 18px !important;
   }
-  /* ✅ MISHALE INAONEKANA MOBILE */
   .trend-arrow-btn {
     display: flex !important;
     width: 28px !important;
@@ -163,33 +192,17 @@
   }
 }
 
-/* ============================================ */
-/* 🔥 SMALL MOBILE: KADI 2 (NDOGO ZAIDI)       */
-/* ============================================ */
-
 @media (max-width: 480px) {
   .trend-card-wrapper {
     flex: 0 0 calc((100% - (2.2 * 8px)) / 2.2) !important;
     min-width: calc((100% - (2.2 * 8px)) / 2.2) !important;
     max-width: calc((100% - (2.2 * 8px)) / 2.2) !important;
   }
-  .trend-scroll-wrapper {
-    gap: 8px !important;
-  }
-  .trend-title {
-    font-size: 14px;
-  }
-  .trend-subtitle {
-    font-size: 10px;
-  }
-  .trend-arrow-btn {
-    width: 24px !important;
-    height: 24px !important;
-  }
-  .trend-arrow-btn svg {
-    width: 14px !important;
-    height: 14px !important;
-  }
+  .trend-scroll-wrapper { gap: 8px !important; }
+  .trend-title { font-size: 14px !important; }
+  .trend-subtitle { font-size: 10px !important; }
+  .trend-arrow-btn { width: 24px !important; height: 24px !important; }
+  .trend-arrow-btn svg { width: 14px !important; height: 14px !important; }
 }
 
 /* ============================================ */
@@ -199,7 +212,7 @@
 .trend-arrow-btn {
   position: absolute;
   z-index: 10;
-  background-color: white;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
   border: 1px solid #e2e8f0;
   border-radius: 50%;
   width: 36px;
@@ -211,15 +224,15 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   transition: all 0.2s ease;
   outline: none;
-  color: #333;
+  color: var(--text-color) !important; /* ✅ Inajibadilisha! */
   top: 50%;
   transform: translateY(-50%);
 }
 
 .trend-arrow-btn:hover {
-  background-color: #8b5cf6;
-  color: white;
-  border-color: #8b5cf6;
+  background-color: #8b5cf6 !important;
+  color: white !important;
+  border-color: #8b5cf6 !important;
   transform: translateY(-50%) scale(1.05);
 }
 
@@ -227,112 +240,44 @@
   transform: translateY(-50%) scale(0.95);
 }
 
-.trend-arrow-btn.hidden {
-  display: none !important;
-}
-
-.trend-arrow-left {
-  left: -4px;
-}
-
-.trend-arrow-right {
-  right: -4px;
-}
+.trend-arrow-btn.hidden { display: none !important; }
+.trend-arrow-left { left: -4px; }
+.trend-arrow-right { right: -4px; }
 
 /* ============================================ */
-/* UTILITY: HIDE SCROLLBAR                      */
+/* UTILITY                                       */
 /* ============================================ */
 
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* ============================================ */
-/* DARK MODE SUPPORT                            */
+/* DARK MODE OVERRIDES (MWISHO)                 */
 /* ============================================ */
 
 @media (prefers-color-scheme: dark) {
   .trending-main-wrapper {
-    background-color: #1a1a2e;
-    border-color: #334155;
+    border-color: #334155 !important;
+    background-color: var(--bg-color) !important;
   }
 
   .trend-title {
-    color: #e2e8f0;
+    color: var(--text-color) !important;
   }
 
   .trend-subtitle {
-    color: #94a3b8;
+    color: #94a3b8 !important;
   }
 
   .trend-icon {
-    color: #a78bfa;
+    color: #a78bfa !important;
   }
 
   .trend-arrow-btn {
-    background-color: #1e293b;
-    border-color: #334155;
-    color: #e2e8f0;
+    border-color: #334155 !important;
   }
 
   .trend-arrow-btn:hover {
-    background-color: #8b5cf6;
-    color: white;
-    border-color: #8b5cf6;
-  }
-}
-/* ============================================ */
-/* 🔥 VIEW ALL ARROW (MSHALE WA KUONYESHA ZAIDI) */
-/* ============================================ */
-
-.trend-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 20px;
-  background-color: #fff7ed; /* 🔥 Rangi ya peach background */
-  border-radius: 12px 12px 0 0;
-  margin-bottom: 16px;
-}
-
-.trend-header-right {
-  display: flex;
-  align-items: center;
-}
-
-.trend-arrow-link-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #374151;
-  padding: 4px;
-  transition: transform 0.2s ease;
-}
-
-.trend-arrow-link-btn:hover {
-  transform: translateX(4px); /* Mshale unasogea kulia inapoelewa */
-  color: #f97316;
-}
-
-.trend-arrow-link-btn:active {
-  transform: scale(0.95);
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  .trend-header {
-    padding: 10px 16px;
-  }
-  .trend-arrow-link-btn svg {
-    width: 20px;
-    height: 20px;
+    background: #8b5cf6 !important;
   }
 }

@@ -3,7 +3,7 @@
 /* ============================================ */
 
 .skeleton-products-all-page {
-  background-color: #f7f8fa;
+  background-color: var(--bg-color) !important; /* ✅ Inajibadilisha! */
   min-height: 100vh;
   width: 100%;
   overflow-x: hidden;
@@ -14,7 +14,7 @@
 /* ============================================ */
 
 .skeleton-banner {
-  background: #e0e0e0;
+  background-color: #e2e8f0 !important; /* Rangi ya kijivu chepesi kwa Light Mode */
   height: 180px;
   display: flex;
   flex-direction: column;
@@ -23,12 +23,13 @@
   gap: 16px;
   padding: 0 20px;
   width: 100%;
+  animation: pulse 1.5s infinite ease-in-out;
 }
 
 .skeleton-banner-title {
   width: 40%;
   height: 32px;
-  background: #d0d0d0;
+  background-color: #f1f5f9 !important;
   border-radius: 8px;
   animation: pulse 1.5s infinite ease-in-out;
 }
@@ -36,7 +37,7 @@
 .skeleton-banner-desc {
   width: 60%;
   height: 16px;
-  background: #d0d0d0;
+  background-color: #f1f5f9 !important;
   border-radius: 8px;
   animation: pulse 1.5s infinite ease-in-out;
 }
@@ -46,8 +47,8 @@
 /* ============================================ */
 
 .skeleton-tabs-wrapper {
-  background: white;
-  border-bottom: 1px solid #eee;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
+  border-bottom: 1px solid #e5e7eb;
   height: 60px;
   display: flex;
   align-items: center;
@@ -64,69 +65,83 @@
 .skeleton-tab-item {
   width: 80px;
   height: 32px;
-  background: #e0e0e0;
+  background-color: #e2e8f0 !important;
   border-radius: 20px;
   flex-shrink: 0;
   animation: pulse 1.5s infinite ease-in-out;
 }
 
 /* ============================================ */
-/* 3. GRID SKELETON                             */
+/* 3. GRID SKELETON (Inajibadilisha kwa Screen) */
 /* ============================================ */
 
 .skeleton-grid-wrapper {
-  padding: 20px;
-  max-width: 1400px;
-  margin: 0 auto;
+  padding: 16px !important;
+  max-width: 1440px !important;
+  margin: 0 auto !important;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .skeleton-grid {
-  display: grid;
-  gap: 20px;
+  display: grid !important;
+  gap: 16px !important;
+  width: 100% !important;
 }
 
-/* Desktop: 5 columns */
+/* Default: Kadi 4 kwa mstari kwenye Desktop ndogo */
+.skeleton-grid {
+  grid-template-columns: repeat(4, 1fr) !important;
+}
+
+/* Desktop kubwa (≥1280px): Kadi 5 kwa mstari */
 @media (min-width: 1280px) {
   .skeleton-grid {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 20px !important;
+    padding: 20px !important;
   }
 }
 
-/* Small Desktop / Large Tablet: 4 columns */
-@media (min-width: 1024px) and (max-width: 1280px) {
+/* Tablet (768px - 1023px): Kadi 3 kwa mstari */
+@media (min-width: 768px) and (max-width: 1023px) {
   .skeleton-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 16px !important;
+    padding: 16px !important;
   }
 }
 
-/* Tablet: 4 columns */
-@media (min-width: 768px) and (max-width: 1024px) {
-  .skeleton-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-/* Mobile: 2 columns */
-@media (max-width: 768px) {
+/* Simu (≤767px): Kadi 2 kwa mstari */
+@media (max-width: 767px) {
   .skeleton-grid-wrapper {
-    padding: 12px;
+    padding: 10px !important;
   }
   .skeleton-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+    padding: 10px !important;
+  }
+}
+
+/* Simu ndogo sana (≤400px): Kadi 1 kwa mstari */
+@media (max-width: 400px) {
+  .skeleton-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    padding: 12px !important;
   }
 }
 
 /* ============================================ */
-/* 4. SKELETON CARD                             */
+/* 4. SKELETON CARD (KADI YA SKELETON)          */
 /* ============================================ */
 
 .skeleton-product-card {
-  background: white;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid #f0f0f0;
+  border: 1px solid #e5e7eb;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -135,7 +150,7 @@
 .skeleton-product-image {
   width: 100%;
   aspect-ratio: 1 / 1;
-  background: #e0e0e0;
+  background-color: #e2e8f0 !important;
   animation: pulse 1.5s infinite ease-in-out;
 }
 
@@ -148,7 +163,7 @@
 
 .skeleton-text-line {
   height: 12px;
-  background: #e0e0e0;
+  background-color: #e2e8f0 !important;
   border-radius: 4px;
   animation: pulse 1.5s infinite ease-in-out;
 }
@@ -158,11 +173,53 @@
 .skeleton-text-line.long { width: 100%; }
 
 /* ============================================ */
-/* 5. ANIMATION                                  */
+/* 5. ANIMATION & DARK MODE OVERRIDES           */
 /* ============================================ */
 
+/* Pulse Animation kwa Light Mode */
 @keyframes pulse {
-  0% { background-color: #e0e0e0; }
-  50% { background-color: #f0f0f0; }
-  100% { background-color: #e0e0e0; }
+  0% { background-color: #e2e8f0 !important; }
+  50% { background-color: #f1f5f9 !important; }
+  100% { background-color: #e2e8f0 !important; }
+}
+
+/* ✅ DARK MODE OVERRIDES (MWISHO) */
+@media (prefers-color-scheme: dark) {
+  .skeleton-products-all-page {
+    background-color: #1e293b !important;
+  }
+
+  .skeleton-banner {
+    background-color: #334155 !important;
+  }
+  .skeleton-banner-title,
+  .skeleton-banner-desc {
+    background-color: #1e293b !important;
+  }
+
+  .skeleton-tabs-wrapper {
+    background-color: #1e293b !important;
+    border-bottom-color: #334155 !important;
+  }
+  .skeleton-tab-item {
+    background-color: #334155 !important;
+  }
+
+  .skeleton-product-card {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+  }
+  .skeleton-product-image {
+    background-color: #334155 !important;
+  }
+  .skeleton-text-line {
+    background-color: #334155 !important;
+  }
+
+  /* Pulse Animation kwa Dark Mode */
+  @keyframes pulse {
+    0% { background-color: #334155 !important; }
+    50% { background-color: #1e293b !important; }
+    100% { background-color: #334155 !important; }
+  }
 }

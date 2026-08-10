@@ -1,6 +1,6 @@
-/* ============================================
-   LAYER 1: GLOBAL RESET & BASE
-   ============================================ */
+/* ============================================ */
+/* LAYER 1: GLOBAL RESET & BASE                 */
+/* ============================================ */
 * {
   margin: 0;
   padding: 0;
@@ -12,56 +12,49 @@ html, body {
   padding: 0 !important;
   overflow-x: hidden;
   font-family: 'Roboto', Helvetica, Arial, sans-serif;
-  background-color: white;
+  background-color: var(--bg-color) !important;
+  color: var(--text-color) !important;
 }
 
-/* ============================================
-   LAYER 2: DASHBOARD WRAPPER
-   ============================================ */
+/* ============================================ */
+/* LAYER 2: DASHBOARD WRAPPER                   */
+/* ============================================ */
 .dashboard-wrapper {
-    display: flex;
-    flex-direction: column;
-    background: white;
-    min-height: 100vh;
-    position: relative;
-    padding-top: 90px; /* Desktop padding */
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-color) !important;
+  color: var(--text-color) !important;
+  min-height: 100vh;
+  position: relative;
+  padding-top: 90px;
 }
 
 @media (max-width: 1024px) {
-    .dashboard-wrapper {
-        padding-top: 0px !important;
-    }
+  .dashboard-wrapper { padding-top: 0px !important; }
 }
-
 @media (max-width: 768px) {
-    .dashboard-wrapper {
-        padding-top: 0px !important;
-    }
+  .dashboard-wrapper { padding-top: 0px !important; }
 }
-
 @media (max-width: 480px) {
-    .dashboard-wrapper {
-        padding-top: 0px !important;
-    }
+  .dashboard-wrapper { padding-top: 0px !important; }
 }
 
-/* ============================================
-   LAYER 3: HEADER - STICKY
-   ============================================ */
+/* ============================================ */
+/* LAYER 3: HEADER - STICKY                     */
+/* ============================================ */
 .sticky-header {
   position: sticky;
   top: 0;
   width: 100%;
   z-index: 1000;
-  background: white;
+  background: var(--bg-color) !important;
+  color: var(--text-color) !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  padding-top: 0;
-  margin-bottom: 0;
 }
 
-/* ============================================
-   LAYER 4: MAIN CONTENT
-   ============================================ */
+/* ============================================ */
+/* LAYER 4: MAIN CONTENT                        */
+/* ============================================ */
 .main-content {
   flex: 1;
   background-color: transparent;
@@ -71,46 +64,30 @@ html, body {
   width: 100%;
 }
 
-/* ============================================
-   LAYER 5: CONTENT CONTAINER
-   ============================================ */
+/* ============================================ */
+/* LAYER 5: CONTENT CONTAINER                   */
+/* ============================================ */
 .content-container-simple {
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
   padding: 0;
 }
+@media (min-width: 600px) { .content-container-simple { padding: 0; } }
+@media (min-width: 1025px) { .content-container-simple { padding: 0 11px; } }
 
-@media (min-width: 600px) {
-  .content-container-simple {
-    padding: 0;
-  }
-}
-
-@media (min-width: 1025px) {
-  .content-container-simple {
-    padding: 0 11px;
-  }
-}
-
-
-/* ============================================
-   LAYER 6: CATEGORY SLIDER (Fluid & Scrowable)
-   ============================================ */
+/* ============================================ */
+/* LAYER 6: CATEGORY SLIDER (Simu)              */
+/* ============================================ */
 .category-slider-wrapper {
   display: block;
-  background: white;
+  background: var(--bg-color) !important;
   width: 100%;
   padding: 0;
   margin: 0;
   margin-top: 9px !important; 
 }
-
-@media (min-width: 1025px) {
-  .category-slider-wrapper {
-    display: none;
-  }
-}
+@media (min-width: 1025px) { .category-slider-wrapper { display: none; } }
 
 .mobile-category-slider {
   display: flex !important;
@@ -124,6 +101,7 @@ html, body {
   -webkit-overflow-scrolling: touch;
   width: 100%;
   box-sizing: border-box;
+  background: var(--bg-color) !important;
 }
 .mobile-category-slider::-webkit-scrollbar { display: none; }
 
@@ -141,7 +119,7 @@ html, body {
 .cat-circle-icon {
   width: 56px;
   height: 56px;
-  background: #f5f5f5;
+  background: var(--bg-color) !important; /* ✅ IMEBADILISHWA! (Ilikuwa #f5f5f5) */
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -155,7 +133,7 @@ html, body {
 
 .mobile-cat-item span {
   font-size: 11px;
-  color: #666;
+  color: var(--text-color) !important; /* ✅ IMEBADILISHWA! (Ilikuwa #666) */
   text-align: center;
   max-width: 70px;
   word-break: break-word;
@@ -165,15 +143,14 @@ html, body {
   font-weight: 500;
 }
 
-/* ============================================
-   LAYER 7: TOP LAYOUT (Sidebar + Banner)
-   ============================================ */
+/* ============================================ */
+/* LAYER 7: TOP LAYOUT (Sidebar + Banner)       */
+/* ============================================ */
 .alibaba-top-layout {
   display: block;
   width: 100%;
   margin: 0 !important;
 }
-
 @media (min-width: 1025px) {
   .alibaba-top-layout {
     display: grid;
@@ -181,16 +158,17 @@ html, body {
     gap: 0;
     margin: 0 !important;
     align-items: stretch;
-    background: white;
-    border: 1px solid #e5e7eb;
+    background: var(--bg-color) !important;
+    border: 1px solid var(--text-color) !important;
     border-radius: 12px;
     overflow: hidden;
   }
 }
 
+/* SIDEBAR */
 .side-categories {
   display: none;
-  background: white;
+  background: var(--bg-color) !important;
   border-radius: 0;
   border: none;
   overflow: hidden;
@@ -198,11 +176,10 @@ html, body {
   flex-direction: column;
   box-shadow: none;
 }
-
 @media (min-width: 1025px) {
   .side-categories { 
     display: flex;
-    border-right: 1px solid #e5e7eb;
+    border-right: 1px solid var(--text-color) !important;
     border-radius: 0;
   }
 }
@@ -214,10 +191,10 @@ html, body {
   padding: 16px 20px;
   font-weight: 700;
   font-size: 1rem;
-  color: #1a1a1a;
-  border-bottom: 1px solid #f0f0f0;
+  color: var(--text-color) !important;
+  border-bottom: 1px solid var(--text-color) !important;
   flex-shrink: 0;
-  background: white;
+  background: var(--bg-color) !important;
 }
 
 .categories-list {
@@ -226,6 +203,7 @@ html, body {
   padding: 8px 0;
   overflow-y: auto;
   flex: 1;
+  background: var(--bg-color) !important;
 }
 .categories-list::-webkit-scrollbar { width: 6px; }
 .categories-list::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
@@ -238,21 +216,25 @@ html, body {
   cursor: pointer;
   transition: all 0.2s ease;
   gap: 12px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--text-color) !important;
+  color: var(--text-color) !important;
 }
 .categories-list li:hover {
-  background: #fff5f0;
+  background: #334155 !important;
   padding-left: 24px;
+  color: #ff6a00 !important;
 }
+
 .cat-icon {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #666;
+  color: var(--text-color) !important;
+  fill: var(--text-color) !important;
 }
 .cat-name {
   font-size: 0.875rem;
-  color: #444;
+  color: var(--text-color) !important;
   font-weight: 500;
 }
 .arrow {
@@ -265,9 +247,40 @@ html, body {
   color: #ff6600;
 }
 
-/* ============================================
-   HERO BANNER
-   ============================================ */
+/* DARK MODE OVERRIDES - SIDEBAR */
+@media (prefers-color-scheme: dark) {
+  .side-categories {
+    background-color: #1e293b !important;
+    border-right-color: #334155 !important;
+  }
+  .side-header {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+    border-bottom-color: #334155 !important;
+  }
+  .categories-list {
+    background-color: #1e293b !important;
+  }
+  .categories-list li {
+    color: #e2e8f0 !important;
+    border-bottom-color: #334155 !important;
+  }
+  .categories-list li:hover {
+    background-color: #334155 !important;
+    color: #ff6a00 !important;
+  }
+  .cat-icon {
+    color: #e2e8f0 !important;
+    fill: #e2e8f0 !important;
+  }
+  .cat-name {
+    color: #e2e8f0 !important;
+  }
+}
+
+/* ============================================ */
+/* HERO BANNER                                   */
+/* ============================================ */
 .hero-banners-container {
   width: 100%;
   overflow: hidden;
@@ -280,22 +293,16 @@ html, body {
   position: relative;
   width: 100%;
   aspect-ratio: 16/9;
-  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  background: var(--bg-color) !important;
   overflow: hidden;
-  border-radius: 12px !important; /* ✅ Imeongezwa kuwa 12px */
-
+  border-radius: 12px !important; 
 }
-
-@media (min-width: 600px) {
-  .hot-picks-banner { aspect-ratio: 16/7; }
-}
-
+@media (min-width: 600px) { .hot-picks-banner { aspect-ratio: 16/7; } }
 @media (min-width: 1025px) {
   .hot-picks-banner {
     aspect-ratio: auto;
     height: 480px;
-     border-radius: 0 !important; 
-
+    border-radius: 0 !important; 
   }
 }
 
@@ -304,7 +311,7 @@ html, body {
   height: 100%;
   object-fit: cover;
   display: block;
-  background-color: #1a1a2e;
+  background: var(--bg-color) !important; /* ✅ IMEBADILISHWA! */
 }
 
 .banner-overlay-text {
@@ -315,15 +322,11 @@ html, body {
   justify-content: center;
   padding: 16px;
   color: white;
-  background: linear-gradient(90deg, rgba(0,0,0,0.6) 0%, transparent 70%);
+  background: linear-gradient(90deg, rgba(0,0,0,0.6) 0%, transparent 70%) !important;
   pointer-events: none;
 }
-@media (min-width: 600px) {
-  .banner-overlay-text { padding: 24px; }
-}
-@media (min-width: 1025px) {
-  .banner-overlay-text { padding: 40px; }
-}
+@media (min-width: 600px) { .banner-overlay-text { padding: 24px; } }
+@media (min-width: 1025px) { .banner-overlay-text { padding: 40px; } }
 
 .banner-overlay-text .ad-tag {
   background: #ff6a00;
@@ -341,12 +344,8 @@ html, body {
   font-weight: bold;
   line-height: 1.3;
 }
-@media (min-width: 600px) {
-  .banner-overlay-text .banner-title { font-size: 1.6rem; }
-}
-@media (min-width: 1025px) {
-  .banner-overlay-text .banner-title { font-size: 2rem; }
-}
+@media (min-width: 600px) { .banner-overlay-text .banner-title { font-size: 1.6rem; } }
+@media (min-width: 1025px) { .banner-overlay-text .banner-title { font-size: 2rem; } }
 
 .banner-overlay-text .banner-desc {
   margin: 4px 0;
@@ -354,9 +353,7 @@ html, body {
   max-width: 70%;
   line-height: 1.4;
 }
-@media (max-width: 768px) {
-  .banner-overlay-text .banner-desc { max-width: 100%; }
-}
+@media (max-width: 768px) { .banner-overlay-text .banner-desc { max-width: 100%; } }
 
 .banner-overlay-text .view-more-banner {
   background: #ff6a00;
@@ -373,9 +370,9 @@ html, body {
 }
 .banner-overlay-text .view-more-banner:hover { background: #e55a00; }
 
-/* ============================================
-   LAYER 8: COMPONENTS WRAPPER
-   ============================================ */
+/* ============================================ */
+/* LAYER 8: COMPONENTS WRAPPER                  */
+/* ============================================ */
 .components-wrapper {
   display: flex;
   flex-direction: column;
@@ -383,36 +380,17 @@ html, body {
   margin-top: 0; 
   padding-top: 10px; 
 }
+.components-wrapper > * { margin-top: 0 !important; }
 
-.components-wrapper > * {
-  margin-top: 0 !important;
-}
+@media (min-width: 600px) { .components-wrapper { gap: 0; margin-top: 0; } }
 
-@media (min-width: 600px) {
-  .components-wrapper { 
-    gap: 0;
-    margin-top: 0; 
-  }
-}
+/* ============================================ */
+/* LAYER 9: FOOTER & BOTTOM NAV                 */
+/* ============================================ */
+.footer-wrapper { display: block; margin-top: 0; }
+@media (max-width: 1024px) { .footer-wrapper { display: none !important; } }
 
-/* ============================================
-   LAYER 9: FOOTER & BOTTOM NAV
-   ============================================ */
-.footer-wrapper {
-  display: block;
-  margin-top: 0;
-}
-
-@media (max-width: 1024px) {
-  .footer-wrapper {
-    display: none !important;
-  }
-}
-
-.bottom-nav-wrapper {
-  display: none;
-}
-
+.bottom-nav-wrapper { display: none; }
 @media (max-width: 1024px) {
   .bottom-nav-wrapper {
     display: block !important;
@@ -423,59 +401,33 @@ html, body {
     width: 100%;
     z-index: 999;
   }
-
-  .dashboard-wrapper {
-    padding-bottom: 70px !important;
-  }
-  
-  .main-content {
-    padding-bottom: 70px !important;
-  }
+  .dashboard-wrapper { padding-bottom: 70px !important; }
+  .main-content { padding-bottom: 70px !important; }
 }
 
-/* ============================================
-   LAYER 10: GRIDS & CARDS
-   ============================================ */
+/* ============================================ */
+/* LAYER 10: GRIDS & CARDS                       */
+/* ============================================ */
 .alibaba-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 10px;
 }
 @media (min-width: 600px) {
-  .alibaba-grid { 
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 14px; 
-  }
+  .alibaba-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
 }
 @media (min-width: 1025px) {
-  .alibaba-grid { 
-    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-    gap: 18px; 
-  }
+  .alibaba-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 18px; }
 }
 
-.compact-card img {
-  width: 100%;
-  height: 130px;
-  object-fit: cover;
-  display: block;
-}
+.compact-card img { width: 100%; height: 130px; object-fit: cover; display: block; }
 .compact-card .info { padding: 10px; }
-.compact-card .name {
-  font-size: 13px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 4px;
-}
-.compact-card .price {
-  font-weight: 800;
-  color: #ff6a00;
-  font-size: 14px;
-}
+.compact-card .name { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 4px; }
+.compact-card .price { font-weight: 800; color: #ff6a00; font-size: 14px; }
 
-/* ============================================
-   LAYER 11: SECTION HEADERS
-   ============================================ */
+/* ============================================ */
+/* LAYER 11: SECTION HEADERS                    */
+/* ============================================ */
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -486,7 +438,7 @@ html, body {
 .section-header h3 {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #222;
+  color: var(--text-color) !important; /* ✅ IMEBADILISHWA! */
   margin: 0;
 }
 .view-more-btn {
@@ -500,14 +452,11 @@ html, body {
   cursor: pointer;
   transition: all 0.2s ease;
 }
-.view-more-btn:hover {
-  background: #ff6a00;
-  color: white;
-}
+.view-more-btn:hover { background: #ff6a00; color: white; }
 
-/* ============================================
-   LAYER 12: SEARCH, ERROR & LOADING
-   ============================================ */
+/* ============================================ */
+/* LAYER 12: SEARCH, ERROR & LOADING            */
+/* ============================================ */
 .search-results-wrapper { padding: 16px 0; }
 .search-heading { margin-bottom: 16px; font-size: 1.1rem; }
 
@@ -517,27 +466,19 @@ html, body {
 }
 .error-title { color: #dc2626; }
 .error-message { color: #666; }
-.error-retry-btn {
-  background: #FF6600;
-  color: white;
-  border: none;
-  padding: 10px 30px;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-top: 20px;
-}
+.error-retry-btn { background: #FF6600; color: white; border: none; padding: 10px 30px; border-radius: 8px; cursor: pointer; margin-top: 20px; }
 .loading-container { padding-top: 20px; }
 
-/* ============================================
-   LAYER 13: MEGA MENU - DESKTOP HOVER
-   ============================================ */
+/* ============================================ */
+/* LAYER 13: MEGA MENU - DESKTOP HOVER          */
+/* ============================================ */
 .mega-menu-container {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   margin-top: 60px;
-  background: white;
+  background: var(--bg-color) !important;
   box-shadow: 0 20px 40px rgba(0,0,0,0.15);
   z-index: 9999;
   animation: slideDown 0.25s ease;
@@ -545,17 +486,12 @@ html, body {
   overflow-y: auto;
 }
 
-.mega-menu-inner {
-  display: flex;
-  max-width: 1400px;
-  margin: 0 auto;
-  height: 100%;
-}
+.mega-menu-inner { display: flex; max-width: 1400px; margin: 0 auto; height: 100%; }
 
 .mega-menu-sidebar {
   width: 260px;
-  background: #f8f9fa;
-  border-right: 1px solid #eee;
+  background: var(--bg-color) !important;
+  border-right: 1px solid var(--text-color) !important;
   flex-shrink: 0;
   overflow-y: auto;
   padding: 8px 0;
@@ -572,11 +508,11 @@ html, body {
   cursor: pointer;
   transition: all 0.2s;
   gap: 10px;
-  color: #444;
+  color: var(--text-color) !important;
 }
 .sidebar-item:hover {
-  background: #fff0e5;
-  color: #ff6600;
+  background: #334155 !important; /* ✅ IMEBADILISHWA KWA DARK MODE! */
+  color: #ff6600 !important;
 }
 .sidebar-item.active {
   background: #fff0e5;
@@ -584,11 +520,7 @@ html, body {
   border-left: 3px solid #ff6600;
   font-weight: 600;
 }
-.sidebar-item-content {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+.sidebar-item-content { display: flex; align-items: center; gap: 10px; }
 .sidebar-back-header {
   display: flex;
   align-items: center;
@@ -597,13 +529,14 @@ html, body {
   cursor: pointer;
   color: #ff6a00;
   font-weight: 600;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--text-color) !important;
 }
 
 .mega-menu-content {
   flex: 1;
   padding: 24px;
   overflow-y: auto;
+  background: var(--bg-color) !important;
 }
 .mega-menu-content::-webkit-scrollbar { width: 5px; }
 .mega-menu-content::-webkit-scrollbar-track { background: #f1f1f1; }
@@ -615,33 +548,14 @@ html, body {
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 12px;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid var(--text-color) !important;
 }
-.content-header h3 { font-size: 1.25rem; font-weight: 700; margin: 0; }
-.view-all-btn {
-  color: #ff6600;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: gap 0.2s;
-}
+.content-header h3 { font-size: 1.25rem; font-weight: 700; margin: 0; color: var(--text-color) !important; }
+.view-all-btn { color: #ff6600; border: none; background: none; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 6px; transition: gap 0.2s; }
 .view-all-btn:hover { gap: 10px; }
 
-.category-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: 24px;
-}
-
-.grid-item {
-  text-align: center;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
+.category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 24px; }
+.grid-item { text-align: center; cursor: pointer; transition: transform 0.2s; }
 .grid-item:hover { transform: translateY(-5px); }
 
 .image-circle {
@@ -650,39 +564,25 @@ html, body {
   margin: 0 auto 12px;
   border-radius: 50%;
   overflow: hidden;
-  background: #f5f5f5;
+  background: var(--bg-color) !important; /* ✅ IMEBADILISHWA! */
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   transition: all 0.2s;
 }
-.image-circle img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.grid-item:hover .image-circle {
-  box-shadow: 0 8px 20px rgba(255,102,0,0.2);
-  transform: scale(1.02);
-}
-.grid-text {
-  font-size: 0.8rem;
-  color: #444;
-  margin: 0;
-  font-weight: 500;
-}
+.image-circle img { width: 100%; height: 100%; object-fit: cover; }
+.grid-item:hover .image-circle { box-shadow: 0 8px 20px rgba(255,102,0,0.2); transform: scale(1.02); }
+
+.grid-text { font-size: 0.8rem; color: var(--text-color) !important; margin: 0; font-weight: 500; }
 .grid-item:hover .grid-text { color: #ff6600; }
 
-.see-all-card .image-circle.see-all-circle {
-  background: #fff0e5;
-  border: 2px dashed #ff6600;
-}
+.see-all-card .image-circle.see-all-circle { background: #fff0e5; border: 2px dashed #ff6600; }
 .see-all-text { color: #ff6600; font-weight: 600; }
 
-/* ============================================
-   LAYER 14: MOBILE CATEGORIES MODAL (ALIBABA STYLE)
-   ============================================ */
+/* ============================================ */
+/* LAYER 14: MOBILE CATEGORIES MODAL            */
+/* ============================================ */
 .mobile-categories-overlay {
   position: fixed;
   inset: 0;
@@ -697,7 +597,7 @@ html, body {
 .mobile-categories-modal {
   width: 100%;
   height: 100%;
-  background: white;
+  background: var(--bg-color) !important;
   border-radius: 20px 20px 0 0;
   overflow: hidden;
   animation: slideUp 0.3s ease;
@@ -706,68 +606,37 @@ html, body {
   flex-direction: column;
 }
 
-/* ============================================
-   HEADER - SEHEMU YA JUU
-   ============================================ */
+/* HEADER */
 .mc-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  background: white;
-  border-bottom: 1px solid #f0f0f0;
+  background: var(--bg-color) !important;
+  border-bottom: 1px solid #334155;
   flex-shrink: 0;
   height: 60px;
 }
+.mc-back-btn { background: none; border: none; cursor: pointer; color: var(--text-color) !important; padding: 4px; display: flex; align-items: center; }
+.mc-title { font-size: 18px; font-weight: 700; color: var(--text-color) !important; margin: 0; flex: 1; text-align: center; }
+.mc-spacer { width: 30px; }
 
-.mc-back-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #333;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-}
+/* BODY */
+.mc-body { display: flex; flex: 1; overflow: hidden; height: calc(100% - 60px); }
 
-.mc-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0;
-  flex: 1;
-  text-align: center;
-}
-
-.mc-spacer {
-  width: 30px; /* Inasawazisha nafasi ya kulia na kushoto */
-}
-
-/* ============================================
-   BODY - SIDEBAR NA CONTENT
-   ============================================ */
-.mc-body {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-  height: calc(100% - 60px); /* Toa nafasi ya Header */
-}
-
-/* SIDEBAR (KUSHOTO) */
 .mc-sidebar {
   width: 28%;
   min-width: 85px;
   max-width: 110px;
-  background: #fcfcfc;
+  background: var(--bg-color) !important;
   overflow-y: auto;
-  border-right: 1px solid #f0f0f0;
+  border-right: 1px solid #334155;
   padding: 12px 0;
 }
-
 .mc-sidebar-item {
   padding: 12px 8px;
   font-size: 12px;
-  color: #666;
+  color: var(--text-color) !important;
   cursor: pointer;
   transition: all 0.15s ease;
   text-align: left;
@@ -775,268 +644,106 @@ html, body {
   word-break: break-word;
 }
 .mc-sidebar-item.active {
-  color: #000;
+  color: #ff6a00 !important;
   font-weight: 700;
-  border-left: 3px solid #ff6a00; /* Mstari wa chungwa upande wa kushoto */
-  background: #f5f5f5;
+  border-left: 3px solid #ff6a00;
+  background: #334155 !important; /* ✅ IMEBADILISHWA! */
 }
 
-/* BADILISHA HII KWA KUONGEZA PADDING KUSHOTO */
 .mc-content {
   flex: 1;
   overflow-y: auto;
-  padding-left: 80px !important; /* Hapa ndio mahali pa kuongeza nafasi kushoto */
-  background: white;
+  padding-left: 80px !important;
+  background: var(--bg-color) !important;
   box-sizing: border-box;
 }
+.mc-section-title { font-size: 14px; font-weight: 700; color: var(--text-color) !important; margin: 0 0 16px 0; }
+.mc-section-title:not(:first-child) { margin-top: 24px; }
 
-.mc-section-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: #222;
-  margin: 0 0 16px 0;
-}
-.mc-section-title:not(:first-child) {
-  margin-top: 24px;
-}
-
-/* ============================================
-   RECOMMENDATIONS (Picha za Duara) - FLEXIBLE GRID
-   ============================================ */
 .mc-recommendations-grid {
   display: grid;
-  /* ✅ BADILISHA HAPA: Inajirekebisha kuwa 2 au 3 safu kulingana na nafasi */
   grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); 
   gap: 16px;
-  justify-items: center; /* Inahakikisha picha zinakaa katikati ya column */
+  justify-items: center;
   padding-right: 0;
 }
+.mc-recommendation-item { display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; width: 100%; }
 
-.mc-recommendation-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  cursor: pointer;
-  width: 100%;
-}
-
-/* HAKIKISHA PICHA HAZIJAKATWA (UKUBWA SAWA) */
 .mc-rec-image {
   width: 60px;
   height: 60px;
   border-radius: 50%;
   overflow: hidden;
-  background: #f0f0f0;
+  background: var(--bg-color) !important;
   margin: 0 auto 6px auto;
-  flex-shrink: 0; /* Inazuia picha kupungua kuliko 60px! */
+  flex-shrink: 0;
 }
+.mc-rec-image img { width: 100%; height: 100%; object-fit: cover; }
+.mc-recommendation-item p { font-size: 10px; color: var(--text-color) !important; margin: 0; line-height: 1.2; max-width: 70px; word-break: break-word; }
 
-.mc-rec-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.mc-recommendation-item p {
-  font-size: 10px;
-  color: #333;
-  margin: 0;
-  line-height: 1.2;
-  max-width: 70px;
-  word-break: break-word;
-}
-
-/* ============================================
-   GET PRODUCT INSPIRATION (Bidhaa 2x2)
-   ============================================ */
-.mc-inspiration-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
+.mc-inspiration-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 .mc-inspiration-card {
-  background: white;
-  border: 1px solid #eee;
+  background: var(--bg-color) !important;
+  border: 1px solid var(--text-color) !important;
   border-radius: 8px;
   overflow: hidden;
   padding: 8px;
   cursor: pointer;
   transition: all 0.2s;
 }
-.mc-inspiration-card:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-  border-color: #ff6a00;
-}
+.mc-inspiration-card:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.05); border-color: #ff6a00; }
+.mc-inspiration-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; margin-bottom: 6px; }
+.mc-insp-title { font-size: 12px; font-weight: 600; color: var(--text-color) !important; margin: 0 0 2px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.mc-insp-price { font-size: 12px; font-weight: 700; color: #ff6a00; margin: 0 0 2px 0; }
+.mc-insp-moq { font-size: 10px; color: #888; margin: 0; }
 
-.mc-inspiration-card img {
-  width: 100%;
-  aspect-ratio: 1/1;
-  object-fit: cover;
-  border-radius: 4px;
-  margin-bottom: 6px;
-}
+/* ============================================ */
+/* LAYER 15: ANIMATIONS                         */
+/* ============================================ */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
 
-.mc-insp-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: #222;
-  margin: 0 0 2px 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
+.loading-dots { display: flex; gap: 6px; }
+.dot { width: 10px; height: 10px; background-color: #ff6600; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
 
-.mc-insp-price {
-  font-size: 12px;
-  font-weight: 700;
-  color: #ff6a00;
-  margin: 0 0 2px 0;
-}
+/* ============================================ */
+/* LAYER 16: MOBILE RESPONSIVE FIXES            */
+/* ============================================ */
 
-.mc-insp-moq {
-  font-size: 10px;
-  color: #888;
-  margin: 0;
-}
-
-/* ============================================
-   LAYER 15: ANIMATIONS
-   ============================================ */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-@keyframes bounce {
-  0%, 80%, 100% { transform: scale(0); }
-  40% { transform: scale(1.0); }
-}
-.loading-dots {
-  display: flex;
-  gap: 6px;
-}
-.dot {
-  width: 10px;
-  height: 10px;
-  background-color: #ff6600;
-  border-radius: 50%;
-  animation: bounce 1.4s infinite ease-in-out both;
-}
-
-/* ============================================
-   LAYER 16: MOBILE RESPONSIVE FIXES 
-   ============================================ */
 @media (max-width: 1024px) {
-  .dashboard-wrapper {
-    padding-top: 0px !important;
-  }
-
-  .main-content { 
-    padding-top: 60px !important; 
-    padding-bottom: 70px !important; 
-    overflow-x: hidden !important;
-  }
-
-  .content-container-simple {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 0 0.5px !important;
-    box-sizing: border-box !important;
-  }
-
+  .dashboard-wrapper { padding-top: 0px !important; }
+  .main-content { padding-top: 60px !important; padding-bottom: 70px !important; overflow-x: hidden !important; }
+  .content-container-simple { width: 100% !important; max-width: 100% !important; padding: 0 0.5px !important; box-sizing: border-box !important; }
   .side-categories { display: none !important; }
-  
-  .alibaba-top-layout { 
+  .alibaba-top-layout { display: block !important; width: 100% !important; margin: 0 0 20px 0 !important; }
+  .alibaba-mobile-content { display: flex !important; flex-direction: column !important; width: 100% !important; gap: 0 !important; }
+  .category-slider-wrapper { 
     display: block !important; 
-    width: 100% !important;
-    margin: 0 0 20px 0 !important;
-  }
-
-  .alibaba-mobile-content {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    gap: 0 !important;
-  }
-
-  .category-slider-wrapper {
-    display: block !important;
-    width: 100% !important;
+    width: 100% !important; 
     padding: 0 !important;
-  }
-
-  .hero-banners-container { 
-    display: block !important; 
-    width: 100% !important;
-    height: auto !important;
-  }
-
-  .hot-picks-banner { 
-    height: 240px !important;
-    min-height: 240px !important;
-    background: #1a1a2e !important;
-    position: relative !important;
-    overflow: hidden !important;
+    /* ✅ HAPA TUMEONDOA `background: #ffffff !important;` */
+  
   }
   
-  .banner-media {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    background: #1a1a2e !important;
-  }
-
-  .banner-overlay-text {
-    position: absolute !important;
-    inset: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    padding: 16px !important;
-    color: white !important;
-    background: linear-gradient(90deg, rgba(0,0,0,0.6) 0%, transparent 70%) !important;
-  }
-
-  .components-wrapper {
-    padding: 10px 0 !important;
-    width: 100% !important;
-    display: block !important;
-  }
-
-  .components-wrapper > * {
-    width: 100% !important;
-    margin-bottom: 30px !important; 
-  }
-
-  .bottom-nav-wrapper {
-    display: block !important;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    z-index: 999;
-  }
+  .hero-banners-container { display: block !important; width: 100% !important; height: auto !important; }
+  .hot-picks-banner { height: 240px !important; min-height: 240px !important; background: var(--bg-color) !important; position: relative !important; overflow: hidden !important; }
+  .banner-media { width: 100% !important; height: 100% !important; object-fit: cover !important; background: var(--bg-color) !important; }
+  .banner-overlay-text { position: absolute !important; inset: 0 !important; display: flex !important; flex-direction: column !important; justify-content: center !important; padding: 16px !important; color: white !important; background: linear-gradient(90deg, rgba(0,0,0,0.6) 0%, transparent 70%) !important; }
+  .components-wrapper { padding: 10px 0 !important; width: 100% !important; display: block !important; }
+  .components-wrapper > * { width: 100% !important; margin-bottom: 30px !important; }
+  .bottom-nav-wrapper { display: block !important; position: fixed; bottom: 0; left: 0; right: 0; width: 100%; z-index: 999; }
 }
 
-/* ============================================
-   LAYER 17: DASHBOARD CARD (GLOBAL FALLBACK)
-   ============================================ */
+/* ============================================ */
+/* LAYER 17: DASHBOARD CARD (GLOBAL FALLBACK)   */
+/* ============================================ */
 .dashboard-card {
-  background: #f6f6f7;
+  background: var(--bg-color) !important;
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--text-color) !important;
   transition: all 0.3s ease;
   cursor: pointer;
 }
@@ -1045,20 +752,18 @@ html, body {
   box-shadow: 0 10px 20px rgba(0,0,0,0.1);
   border-color: #ff6600;
 }
-.dashboard-card img {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-}
-.dashboard-card h4 {
-  padding: 10px 12px 4px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-}
-.dashboard-card p {
-  padding: 0 12px 12px;
-  font-weight: 800;
-  color: #ff6a00;
-  font-size: 16px;
+.dashboard-card img { width: 100%; height: 160px; object-fit: cover; }
+.dashboard-card h4 { padding: 10px 12px 4px; font-size: 14px; font-weight: 600; color: var(--text-color) !important; }
+.dashboard-card p { padding: 0 12px 12px; font-weight: 800; color: #ff6a00; font-size: 16px; }
+/* ============================================ */
+/* DARK MODE OVERRIDES - CATEGORY SLIDER         */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .cat-circle-icon {
+    background-color: #1e293b !important; /* Dark Blue ya Skyfall */
+  }
+  .mobile-cat-item span {
+    color: #e2e8f0 !important; /* Text inakuwa nyeupe */
+  }
 }

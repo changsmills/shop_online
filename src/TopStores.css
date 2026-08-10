@@ -5,7 +5,7 @@
 .top-stores-main-wrapper {
   position: relative;
   width: 100%;
-  background-color: #ffffff;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
   border-top: 1px solid #e5e7eb;
   border-bottom: 1px solid #e5e7eb;
   border-left: none;
@@ -22,8 +22,26 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 16px;
+  padding: 12px 20px !important;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
+  border-radius: 12px 12px 0 0;
   margin-bottom: 16px;
+  color: var(--text-color) !important;
+}
+
+/* ✅ Light Mode: Rangi ya Peach/Ivory */
+@media (prefers-color-scheme: light) {
+  .ts-header {
+    background-color: #fff7ed !important;
+  }
+}
+
+/* ✅ Dark Mode: Dark Blue ya Skyfall */
+@media (prefers-color-scheme: dark) {
+  .ts-header {
+    background-color: #1e293b !important;
+    border-bottom: 1px solid #334155 !important;
+  }
 }
 
 .ts-header-left {
@@ -46,7 +64,7 @@
 .ts-title {
   font-size: 20px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text-color) !important;
   margin: 0;
 }
 
@@ -58,7 +76,37 @@
 }
 
 /* ============================================ */
-/* SCROLL WRAPPER - "PEEK" EFFECT               */
+/* HEADER RIGHT ARROW (KULIA)                    */
+/* ============================================ */
+
+.ts-header-right {
+  display: flex;
+  align-items: center;
+}
+
+.ts-arrow-link-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color) !important;
+  padding: 4px;
+  transition: transform 0.2s ease;
+}
+
+.ts-arrow-link-btn:hover {
+  transform: translateX(4px);
+  color: #f97316;
+}
+
+.ts-arrow-link-btn:active {
+  transform: scale(0.95);
+}
+
+/* ============================================ */
+/* SCROLL WRAPPER                               */
 /* ============================================ */
 
 .ts-desktop-wrapper {
@@ -79,10 +127,12 @@
   gap: 12px;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
+  color: var(--text-color) !important;
 }
 
 /* ============================================ */
-/* 🔥 DESKTOP: KADI 6.5 (6 + NUSU)             */
+/* CARDS & ARROWS                                */
 /* ============================================ */
 
 @media (min-width: 1025px) {
@@ -92,15 +142,8 @@
     max-width: calc((100% - (6.5 * 12px)) / 6.5);
     scroll-snap-align: start;
   }
-  .ts-scroll-wrapper {
-    gap: 12px;
-    padding: 8px 4px 20px 4px;
-  }
+  .ts-scroll-wrapper { gap: 12px; padding: 8px 4px 20px 4px; }
 }
-
-/* ============================================ */
-/* 🔥 TABLET: KADI 4.5 (4 + NUSU)              */
-/* ============================================ */
 
 @media (min-width: 769px) and (max-width: 1024px) {
   .ts-card-wrapper {
@@ -109,11 +152,9 @@
     max-width: calc((100% - (4.5 * 12px)) / 4.5);
     scroll-snap-align: start;
   }
-  .ts-scroll-wrapper {
-    gap: 12px;
-    padding: 8px 4px 20px 4px;
-  }
+  .ts-scroll-wrapper { gap: 12px; padding: 8px 4px 20px 4px; }
 }
+
 @media (max-width: 768px) {
   .ts-card-wrapper {
     flex: 0 0 calc((100% - (3.5 * 10px)) / 3.5) !important;
@@ -121,49 +162,16 @@
     max-width: calc((100% - (3.5 * 10px)) / 3.5) !important;
     scroll-snap-align: start;
   }
-  .ts-scroll-wrapper {
-    gap: 10px !important;
-    padding: 8px 4px 16px 4px;
-  }
-  
-  /* 🔥 BADILISHA HAPA CHINI: */
-  .ts-header {
-    padding: 8px 12px !important;  /* Punguza padding */
-    margin-bottom: 12px !important;
-  }
-  .ts-title {
-    font-size: 16px !important;    /* Punguza ukubwa wa title */
-    font-weight: 700;
-  }
-  .ts-subtitle {
-    font-size: 12px !important;    /* Punguza ukubwa wa subtitle */
-    padding-left: 0;
-    color: #888;
-  }
-  .ts-factory-icon {
-    width: 20px !important;
-    height: 20px !important;
-  }
-  .ts-title-group {
-    gap: 6px !important;
-  }
-  
-  /* ✅ MISHALE INAONEKANA MOBILE */
-  .ts-arrow-btn {
-    display: flex !important;
-    width: 28px !important;
-    height: 28px !important;
-  }
-  .ts-arrow-btn svg {
-    width: 16px !important;
-    height: 16px !important;
-  }
-  .ts-arrow-left {
-    left: 0px !important;
-  }
-  .ts-arrow-right {
-    right: 0px !important;
-  }
+  .ts-scroll-wrapper { gap: 10px !important; padding: 8px 4px 16px 4px; }
+  .ts-header { padding: 8px 12px !important; margin-bottom: 12px !important; }
+  .ts-title { font-size: 16px !important; }
+  .ts-subtitle { font-size: 12px !important; padding-left: 0; }
+  .ts-factory-icon { width: 18px !important; height: 18px !important; }
+  .ts-title-group { gap: 6px !important; }
+  .ts-arrow-btn { display: flex !important; width: 28px !important; height: 28px !important; }
+  .ts-arrow-btn svg { width: 16px !important; height: 16px !important; }
+  .ts-arrow-left { left: 0px !important; }
+  .ts-arrow-right { right: 0px !important; }
 }
 
 @media (max-width: 480px) {
@@ -172,34 +180,13 @@
     min-width: calc((100% - (2.2 * 8px)) / 2.2) !important;
     max-width: calc((100% - (2.2 * 8px)) / 2.2) !important;
   }
-  .ts-scroll-wrapper {
-    gap: 8px !important;
-  }
-  
-  /* 🔥 BADILISHA HAPA CHINI: */
-  .ts-header {
-    padding: 6px 10px !important;  /* Punguza padding zaidi */
-    margin-bottom: 8px !important;
-  }
-  .ts-title {
-    font-size: 14px !important;    /* Punguza ukubwa zaidi */
-    font-weight: 700;
-  }
-  .ts-subtitle {
-    font-size: 10px !important;    /* Punguza subtitle zaidi */
-  }
-  .ts-factory-icon {
-    width: 18px !important;
-    height: 18px !important;
-  }
-  .ts-arrow-btn {
-    width: 24px !important;
-    height: 24px !important;
-  }
-  .ts-arrow-btn svg {
-    width: 14px !important;
-    height: 14px !important;
-  }
+  .ts-scroll-wrapper { gap: 8px !important; }
+  .ts-header { padding: 6px 10px !important; margin-bottom: 8px !important; }
+  .ts-title { font-size: 14px !important; }
+  .ts-subtitle { font-size: 10px !important; }
+  .ts-factory-icon { width: 16px !important; height: 16px !important; }
+  .ts-arrow-btn { width: 24px !important; height: 24px !important; }
+  .ts-arrow-btn svg { width: 14px !important; height: 14px !important; }
 }
 
 /* ============================================ */
@@ -209,7 +196,7 @@
 .ts-arrow-btn {
   position: absolute;
   z-index: 10;
-  background-color: white;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
   border: 1px solid #e2e8f0;
   border-radius: 50%;
   width: 36px;
@@ -221,15 +208,15 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   transition: all 0.2s ease;
   outline: none;
-  color: #333;
+  color: var(--text-color) !important; /* ✅ Inajibadilisha! */
   top: 50%;
   transform: translateY(-50%);
 }
 
 .ts-arrow-btn:hover {
-  background-color: #f97316;
-  color: white;
-  border-color: #f97316;
+  background-color: #f97316 !important;
+  color: white !important;
+  border-color: #f97316 !important;
   transform: translateY(-50%) scale(1.05);
 }
 
@@ -237,112 +224,44 @@
   transform: translateY(-50%) scale(0.95);
 }
 
-.ts-arrow-btn.hidden {
-  display: none !important;
-}
-
-.ts-arrow-left {
-  left: -4px;
-}
-
-.ts-arrow-right {
-  right: -4px;
-}
+.ts-arrow-btn.hidden { display: none !important; }
+.ts-arrow-left { left: -4px; }
+.ts-arrow-right { right: -4px; }
 
 /* ============================================ */
-/* UTILITY: HIDE SCROLLBAR                      */
+/* UTILITY                                       */
 /* ============================================ */
 
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* ============================================ */
-/* DARK MODE SUPPORT                            */
+/* DARK MODE OVERRIDES (MWISHO)                 */
 /* ============================================ */
 
 @media (prefers-color-scheme: dark) {
   .top-stores-main-wrapper {
-    background-color: #1a1a2e;
-    border-color: #334155;
+    border-color: #334155 !important;
+    background-color: var(--bg-color) !important;
   }
 
   .ts-title {
-    color: #e2e8f0;
+    color: var(--text-color) !important;
   }
 
   .ts-subtitle {
-    color: #94a3b8;
+    color: #94a3b8 !important;
   }
 
   .ts-factory-icon {
-    color: #fb923c;
+    color: #fb923c !important;
   }
 
   .ts-arrow-btn {
-    background-color: #1e293b;
-    border-color: #334155;
-    color: #e2e8f0;
+    border-color: #334155 !important;
   }
 
   .ts-arrow-btn:hover {
-    background-color: #f97316;
-    color: white;
-    border-color: #f97316;
-  }
-}
-/* ============================================ */
-/* 🔥 VIEW ALL ARROW (MSHALE WA KUONYESHA ZAIDI) */
-/* ============================================ */
-
-.ts-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 20px;
-  background-color: #fff7ed; /* 🔥 Rangi ya peach background */
-  border-radius: 12px 12px 0 0;
-  margin-bottom: 16px;
-}
-
-.ts-header-right {
-  display: flex;
-  align-items: center;
-}
-
-.ts-arrow-link-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #374151;
-  padding: 4px;
-  transition: transform 0.2s ease;
-}
-
-.ts-arrow-link-btn:hover {
-  transform: translateX(4px); /* Mshale unasogea kulia inapoelewa */
-  color: #f97316;
-}
-
-.ts-arrow-link-btn:active {
-  transform: scale(0.95);
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  .ts-header {
-    padding: 10px 16px;
-  }
-  .ts-arrow-link-btn svg {
-    width: 20px;
-    height: 20px;
+    background: #f97316 !important;
   }
 }

@@ -3,17 +3,23 @@
 /* ============================================ */
 
 :root {
-  /* Roboto imewekwa mbele, fallback ikiwa fail */
+  /* Roboto imewekwa mbele */
   font-family: 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  /* ✅ MUHIMU: Inazuia kubadilika kwa rangi */
-  color-scheme: light only; 
+  /* ✅ MUHIMU: Weka kuwa 'light' daima ili background isiwe nyeusi */
+  color-scheme: light; 
 
-  /* ✅ Rangi za default - Background nyeupe, maandishi meusi */
-  color: #1f2937; /* Kijivu giza kwa maandishi */
-  background-color: #ffffff; /* Background nyeupe daima */
+  /* ✅ Rangi za Default (Skyfall Light Mode) */
+  --bg-color: #ffffff;
+  --text-color: #1f2937;
+  --primary-color: #ff6a00;
+  --primary-hover: #e55a00;
+  --button-text: #ffffff;
+
+  color: var(--text-color);
+  background-color: var(--bg-color);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -21,37 +27,48 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* A (Links) - Rangi ya Skyfall Orange */
+/* ✅ IKIWA MTUMIAJI AMEWASHA NIGHT MODE (Dark) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Badilisha tu variables hizi kwa rangi zinazofaa kwa Dark Mode */
+    --bg-color: #1e293b;       /* Background nyeusi ya Skyfall (Gray Blue) */
+    --text-color: #e2e8f0;     /* Maandishi meupe */
+    --primary-color: #ff6a00;  /* Orange inabaki */
+    --primary-hover: #e55a00;
+    --button-text: #ffffff;
+  }
+}
+
+/* Links (Skyfall Orange) */
 a {
   font-weight: 500;
-  color: #ff6a00;
+  color: var(--primary-color);
   text-decoration: inherit;
   transition: color 0.2s;
 }
-
 a:hover {
-  color: #e55a00;
+  color: var(--primary-hover);
 }
 
-/* Body - Inabaki nyeupe pia */
+/* Body - Inatumia variables zilizowekwa */
 body {
   margin: 0;
   display: flex;
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #ffffff;
-  color: #1f2937;
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
 /* Headings */
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
-  color: #1f2937;
+  color: var(--text-color);
 }
 
-/* Buttons - Rangi ya Skyfall Orange */
+/* Buttons */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -59,18 +76,18 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #ff6a00; /* Orange */
-  color: #ffffff;
+  background-color: var(--primary-color);
+  color: var(--button-text);
   cursor: pointer;
   transition: all 0.25s ease;
 }
 
 button:hover {
-  background-color: #e55a00; /* Orange nyeusi kidogo */
-  border-color: #ff6a00;
+  background-color: var(--primary-hover);
+  border-color: var(--primary-color);
 }
 
 button:focus,
 button:focus-visible {
-  outline: 4px auto #ff6a00; /* Orange outline */
+  outline: 4px auto var(--primary-color);
 }

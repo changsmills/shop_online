@@ -1,17 +1,23 @@
 /* ============================================ */
-/* CONTAINER & WRAPPER - SAWA NA TOPDEALS       */
+/* CONTAINER & WRAPPER                           */
 /* ============================================ */
 
 .recently-viewed-main-wrapper {
   position: relative;
   width: 100%;
-  background-color: #ffffff;
+  background-color: var(--bg-color) !important; /* ✅ Inajibadilisha! */
   border-top: 1px solid #e5e7eb;
   border-bottom: 1px solid #e5e7eb;
   border-left: none;
   border-right: none;
   box-sizing: border-box;
   padding: 16px 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .recently-viewed-main-wrapper {
+    border-color: #334155 !important;
+  }
 }
 
 /* ============================================ */
@@ -22,8 +28,26 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 16px;
+  padding: 12px 20px;
+  background-color: var(--bg-color) !important; /* ✅ IMEBADILISHWA! */
+  border-radius: 12px 12px 0 0;
   margin-bottom: 16px;
+  color: var(--text-color) !important; /* ✅ Inajibadilisha */
+}
+
+/* Kwa Light Mode: Peach */
+@media (prefers-color-scheme: light) {
+  .rv-header {
+    background-color: #fff7ed !important; /* Peach */
+  }
+}
+
+/* Kwa Dark Mode: Blue/Gray */
+@media (prefers-color-scheme: dark) {
+  .rv-header {
+    background-color: #1a1a2e !important; /* Dark Blue */
+    border-bottom: 1px solid #334155 !important;
+  }
 }
 
 .rv-header-left {
@@ -46,7 +70,7 @@
 .rv-title {
   font-size: 20px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text-color) !important; /* ✅ Inajibadilisha */
   margin: 0;
 }
 
@@ -58,35 +82,37 @@
 }
 
 /* ============================================ */
-/* STANDALONE ARROW                             */
+/* HEADER RIGHT (Arrow)                          */
 /* ============================================ */
 
-.rv-arrow-only {
+.rv-header-right {
+  display: flex;
+  align-items: center;
+}
+
+.rv-arrow-link-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #9ca3af;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 8px;
-  border-radius: 50%;
+  color: var(--text-color) !important; /* ✅ Inajibadilisha */
+  padding: 4px;
+  transition: transform 0.2s ease;
 }
 
-.rv-arrow-only:hover {
-  color: #10b981;
-  background-color: #f0fdf4;
+.rv-arrow-link-btn:hover {
   transform: translateX(4px);
+  color: #f97316;
 }
 
-.real-arrow {
-  display: block;
-  font-size: 22px;
-  font-weight: 300;
-  line-height: 1;
+.rv-arrow-link-btn:active {
+  transform: scale(0.95);
 }
 
 /* ============================================ */
-/* SCROLL WRAPPER - "PEEK" EFFECT               */
+/* SCROLL WRAPPER                                */
 /* ============================================ */
 
 .rv-desktop-wrapper {
@@ -110,9 +136,10 @@
 }
 
 /* ============================================ */
-/* 🔥 DESKTOP: KADI 6.5 (6 + NUSU)             */
+/* CARDS & ARROWS                                */
 /* ============================================ */
 
+/* Desktop: 6.5 cards */
 @media (min-width: 1025px) {
   .rv-card-wrapper {
     flex: 0 0 calc((100% - (6.5 * 12px)) / 6.5);
@@ -120,16 +147,10 @@
     max-width: calc((100% - (6.5 * 12px)) / 6.5);
     scroll-snap-align: start;
   }
-  .rv-scroll-wrapper {
-    gap: 12px;
-    padding: 8px 4px 20px 4px;
-  }
+  .rv-scroll-wrapper { gap: 12px; padding: 8px 4px 20px 4px; }
 }
 
-/* ============================================ */
-/* 🔥 TABLET: KADI 4.5 (4 + NUSU)              */
-/* ============================================ */
-
+/* Tablet: 4.5 cards */
 @media (min-width: 769px) and (max-width: 1024px) {
   .rv-card-wrapper {
     flex: 0 0 calc((100% - (4.5 * 12px)) / 4.5);
@@ -137,12 +158,10 @@
     max-width: calc((100% - (4.5 * 12px)) / 4.5);
     scroll-snap-align: start;
   }
-  .rv-scroll-wrapper {
-    gap: 12px;
-    padding: 8px 4px 20px 4px;
-  }
+  .rv-scroll-wrapper { gap: 12px; padding: 8px 4px 20px 4px; }
 }
 
+/* Mobile: 3.5 cards */
 @media (max-width: 768px) {
   .rv-card-wrapper {
     flex: 0 0 calc((100% - (3.5 * 10px)) / 3.5) !important;
@@ -150,97 +169,44 @@
     max-width: calc((100% - (3.5 * 10px)) / 3.5) !important;
     scroll-snap-align: start;
   }
-  .rv-scroll-wrapper {
-    gap: 10px !important;
-    padding: 8px 4px 16px 4px;
-  }
+  .rv-scroll-wrapper { gap: 10px !important; padding: 8px 4px 16px 4px !important; }
   
-  /* 🔥 BADILISHA HAPA CHINI: */
-  .rv-header {
-    padding: 8px 12px !important;  /* Punguza padding */
-    margin-bottom: 10px !important;
-  }
-  .rv-title {
-    font-size: 16px !important;    /* Punguza ukubwa wa title */
-    font-weight: 700;
-  }
-  .rv-subtitle {
-    font-size: 12px !important;    /* Punguza ukubwa wa subtitle */
-    padding-left: 0;
-    color: #888;
-  }
-  .rv-history-icon {
-    width: 20px !important;
-    height: 20px !important;
-  }
-  .rv-title-group {
-    gap: 6px !important;
-  }
+  .rv-header { padding: 8px 12px !important; margin-bottom: 10px !important; }
+  .rv-title { font-size: 16px !important; }
+  .rv-subtitle { font-size: 12px !important; padding-left: 0; }
+  .rv-history-icon { width: 20px !important; height: 20px !important; }
+  .rv-title-group { gap: 6px !important; }
   
-  .rv-arrow-btn {
-    display: flex !important;
-    width: 28px !important;
-    height: 28px !important;
-  }
-  .rv-arrow-btn svg {
-    width: 16px !important;
-    height: 16px !important;
-  }
-  .rv-arrow-left {
-    left: 0px !important;
-  }
-  .rv-arrow-right {
-    right: 0px !important;
-  }
-  .rv-arrow-only {
-    display: none !important;
-  }
+  .rv-arrow-btn { display: flex !important; width: 28px !important; height: 28px !important; }
+  .rv-arrow-btn svg { width: 16px !important; height: 16px !important; }
+  .rv-arrow-left { left: 0px !important; }
+  .rv-arrow-right { right: 0px !important; }
 }
 
+/* Small mobile: 2.2 cards */
 @media (max-width: 480px) {
   .rv-card-wrapper {
     flex: 0 0 calc((100% - (2.2 * 8px)) / 2.2) !important;
     min-width: calc((100% - (2.2 * 8px)) / 2.2) !important;
     max-width: calc((100% - (2.2 * 8px)) / 2.2) !important;
   }
-  .rv-scroll-wrapper {
-    gap: 8px !important;
-  }
-  
-  /* 🔥 BADILISHA HAPA CHINI: */
-  .rv-header {
-    padding: 6px 10px !important;  /* Punguza padding zaidi */
-    margin-bottom: 8px !important;
-  }
-  .rv-title {
-    font-size: 14px !important;    /* Punguza ukubwa zaidi */
-    font-weight: 700;
-  }
-  .rv-subtitle {
-    font-size: 10px !important;    /* Punguza subtitle zaidi */
-  }
-  .rv-history-icon {
-    width: 18px !important;
-    height: 18px !important;
-  }
-  .rv-arrow-btn {
-    width: 24px !important;
-    height: 24px !important;
-  }
-  .rv-arrow-btn svg {
-    width: 14px !important;
-    height: 14px !important;
-  }
+  .rv-scroll-wrapper { gap: 8px !important; }
+  .rv-header { padding: 6px 10px !important; margin-bottom: 8px !important; }
+  .rv-title { font-size: 14px !important; }
+  .rv-subtitle { font-size: 10px !important; }
+  .rv-history-icon { width: 18px !important; height: 18px !important; }
+  .rv-arrow-btn { width: 24px !important; height: 24px !important; }
+  .rv-arrow-btn svg { width: 14px !important; height: 14px !important; }
 }
 
 /* ============================================ */
-/* ARROWS - KUSHOTO NA KULIA                    */
+/* ARROWS (KUSHOTO NA KULIA)                    */
 /* ============================================ */
 
 .rv-arrow-btn {
   position: absolute;
   z-index: 10;
-  background-color: white;
+  background-color: var(--bg-color) !important; /* ✅ Inajibadilisha */
   border: 1px solid #e2e8f0;
   border-radius: 50%;
   width: 36px;
@@ -252,15 +218,15 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   transition: all 0.2s ease;
   outline: none;
-  color: #333;
+  color: var(--text-color) !important; /* ✅ Inajibadilisha */
   top: 50%;
   transform: translateY(-50%);
 }
 
 .rv-arrow-btn:hover {
-  background-color: #10b981;
-  color: white;
-  border-color: #10b981;
+  background-color: #10b981 !important;
+  color: white !important;
+  border-color: #10b981 !important;
   transform: translateY(-50%) scale(1.05);
 }
 
@@ -268,121 +234,30 @@
   transform: translateY(-50%) scale(0.95);
 }
 
-.rv-arrow-btn.hidden {
-  display: none !important;
-}
-
-.rv-arrow-left {
-  left: -4px;
-}
-
-.rv-arrow-right {
-  right: -4px;
-}
+.rv-arrow-btn.hidden { display: none !important; }
+.rv-arrow-left { left: -4px; }
+.rv-arrow-right { right: -4px; }
 
 /* ============================================ */
-/* UTILITY: HIDE SCROLLBAR                      */
+/* UTILITY                                       */
 /* ============================================ */
 
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* ============================================ */
-/* DARK MODE SUPPORT                            */
+/* DARK MODE OVERRIDES (MWISHO)                 */
 /* ============================================ */
 
 @media (prefers-color-scheme: dark) {
   .recently-viewed-main-wrapper {
-    background-color: #1a1a2e;
-    border-color: #334155;
+    border-color: #334155 !important;
+    background-color: var(--bg-color) !important; /* Inajibadilisha */
   }
 
-  .rv-title {
-    color: #e2e8f0;
-  }
-
-  .rv-subtitle {
-    color: #94a3b8;
-  }
-
-  .rv-history-icon {
-    color: #34d399;
-  }
-
-  .rv-arrow-btn {
-    background-color: #1e293b;
-    border-color: #334155;
-    color: #e2e8f0;
-  }
-
-  .rv-arrow-btn:hover {
-    background-color: #10b981;
-    color: white;
-    border-color: #10b981;
-  }
-
-  .rv-arrow-only {
-    color: #94a3b8;
-  }
-
-  .rv-arrow-only:hover {
-    color: #34d399;
-    background-color: #1a3a2a;
-  }
-}
-/* ============================================ */
-/* 🔥 VIEW ALL ARROW (MSHALE WA KUONYESHA ZAIDI) */
-/* ============================================ */
-
-.rv-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 20px;
-  background-color: #fff7ed; /* 🔥 Rangi ya peach background */
-  border-radius: 12px 12px 0 0;
-  margin-bottom: 16px;
-}
-
-.rv-header-right {
-  display: flex;
-  align-items: center;
-}
-
-.rv-arrow-link-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #374151;
-  padding: 4px;
-  transition: transform 0.2s ease;
-}
-
-.rv-arrow-link-btn:hover {
-  transform: translateX(4px); /* Mshale unasogea kulia inapoelewa */
-  color: #f97316;
-}
-
-.rv-arrow-link-btn:active {
-  transform: scale(0.95);
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  .rv-header {
-    padding: 10px 16px;
-  }
-  .rv-arrow-link-btn svg {
-    width: 20px;
-    height: 20px;
-  }
+  .rv-title { color: var(--text-color) !important; }
+  .rv-subtitle { color: #94a3b8 !important; }
+  .rv-history-icon { color: #34d399 !important; }
+  .rv-arrow-btn { border-color: #334155 !important; }
+  .rv-arrow-btn:hover { background: #10b981 !important; }
 }

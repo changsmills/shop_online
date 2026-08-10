@@ -5,7 +5,7 @@
 .new-arrivals-main-wrapper {
   position: relative;
   width: 100%;
-  background-color: #ffffff;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
   border-top: 1px solid #e5e7eb;
   border-bottom: 1px solid #e5e7eb;
   border-left: none;
@@ -15,17 +15,33 @@
 }
 
 /* ============================================ */
-/* HEADER SECTION (PEACH BACKGROUND + SUBTITLE)  */
+/* HEADER SECTION (NEW ARRIVALS)                */
 /* ============================================ */
 
 .na-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 20px;
-  background-color: #fff7ed;
+  padding: 12px 20px !important;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
   border-radius: 12px 12px 0 0;
   margin-bottom: 16px;
+  color: var(--text-color) !important;
+}
+
+/* ✅ Light Mode: Rangi ya Peach/Ivory */
+@media (prefers-color-scheme: light) {
+  .na-header {
+    background-color: #fff7ed !important;
+  }
+}
+
+/* ✅ Dark Mode: Dark Blue ya Skyfall */
+@media (prefers-color-scheme: dark) {
+  .na-header {
+    background-color: #1e293b !important;
+    border-bottom: 1px solid #334155 !important;
+  }
 }
 
 .na-header-left {
@@ -48,20 +64,19 @@
 .na-title {
   font-size: 20px;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text-color) !important;
   margin: 0;
 }
 
-/* 🔥 BADILISHA HII SEHEMU KUWA HIVI (Sawa na TopStores) */
 .na-subtitle {
   font-size: 14px;
-  color: #6b7280;
+  color: #888;
   margin: 0;
-  padding-left: 34px;  /* Hii ndiyo inasukuma subtitle chini ya title */
+  padding-left: 34px;
 }
 
 /* ============================================ */
-/* HEADER RIGHT ARROW (MSHALE WA KULIA)          */
+/* HEADER RIGHT ARROW (KULIA)                   */
 /* ============================================ */
 
 .na-header-right {
@@ -76,7 +91,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #374151;
+  color: var(--text-color) !important;
   padding: 4px;
   transition: transform 0.2s ease;
 }
@@ -112,10 +127,12 @@
   gap: 12px;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
+  color: var(--text-color) !important;
 }
 
 /* ============================================ */
-/* 🔥 DESKTOP: KADI 6.5 (6 + NUSU)             */
+/* CARDS & ARROWS (SCROLL)                      */
 /* ============================================ */
 
 @media (min-width: 1025px) {
@@ -131,10 +148,6 @@
   }
 }
 
-/* ============================================ */
-/* 🔥 TABLET: KADI 4.5 (4 + NUSU)              */
-/* ============================================ */
-
 @media (min-width: 769px) and (max-width: 1024px) {
   .na-card-wrapper {
     flex: 0 0 calc((100% - (4.5 * 12px)) / 4.5);
@@ -148,14 +161,10 @@
   }
 }
 
-/* ============================================ */
-/* 🔥 MOBILE: KADI 3.5 (3 + NUSU)              */
-/* ============================================ */
-
 @media (max-width: 768px) {
   .na-card-wrapper {
     flex: 0 0 calc((100% - (3.5 * 10px)) / 3.5) !important;
-    min-width: calc((100% - (3.5* 10px)) / 3.5) !important;
+    min-width: calc((100% - (3.5 * 10px)) / 3.5) !important;
     max-width: calc((100% - (3.5 * 10px)) / 3.5) !important;
     scroll-snap-align: start;
   }
@@ -165,29 +174,25 @@
   }
   
   .na-header {
-    padding: 10px 16px;
+    padding: 8px 12px !important;
   }
   .na-title {
-    font-size: 18px;
+    font-size: 16px !important;
   }
   .na-subtitle {
-    font-size: 13px;
+    font-size: 12px !important;
     padding-left: 0;
     margin-top: 4px;
   }
   .na-sparkle-icon {
-    width: 20px;
-    height: 20px;
+    width: 18px !important;
+    height: 18px !important;
   }
   .na-arrow-link-btn svg {
     width: 20px;
     height: 20px;
   }
 }
-
-/* ============================================ */
-/* 🔥 SMALL MOBILE: KADI 2 (NDOGO ZAIDI)       */
-/* ============================================ */
 
 @media (max-width: 480px) {
   .na-card-wrapper {
@@ -199,10 +204,10 @@
     gap: 8px !important;
   }
   .na-title {
-    font-size: 16px;
+    font-size: 14px !important;
   }
   .na-subtitle {
-    font-size: 12px;
+    font-size: 10px !important;
     padding-left: 0;
     margin-top: 2px;
   }
@@ -213,13 +218,13 @@
 }
 
 /* ============================================ */
-/* ARROWS - KUSHOTO NA KULIA (SCROLL)            */
+/* ARROWS - KUSHOTO NA KULIA                    */
 /* ============================================ */
 
 .na-arrow-btn {
   position: absolute;
   z-index: 10;
-  background-color: white;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
   border: 1px solid #e2e8f0;
   border-radius: 50%;
   width: 36px;
@@ -231,15 +236,15 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   transition: all 0.2s ease;
   outline: none;
-  color: #333;
+  color: var(--text-color) !important; /* ✅ Inajibadilisha! */
   top: 50%;
   transform: translateY(-50%);
 }
 
 .na-arrow-btn:hover {
-  background-color: #eab308;
-  color: white;
-  border-color: #eab308;
+  background-color: #eab308 !important;
+  color: white !important;
+  border-color: #eab308 !important;
   transform: translateY(-50%) scale(1.05);
 }
 
@@ -247,57 +252,44 @@
   transform: translateY(-50%) scale(0.95);
 }
 
-.na-arrow-btn.hidden {
-  display: none !important;
-}
-
-.na-arrow-left {
-  left: -4px;
-}
-
-.na-arrow-right {
-  right: -4px;
-}
+.na-arrow-btn.hidden { display: none !important; }
+.na-arrow-left { left: -4px; }
+.na-arrow-right { right: -4px; }
 
 /* ============================================ */
-/* UTILITY: HIDE SCROLLBAR                      */
+/* UTILITY                                       */
 /* ============================================ */
 
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* ============================================ */
-/* DARK MODE SUPPORT                            */
+/* DARK MODE OVERRIDES (MWISHO)                 */
 /* ============================================ */
 
 @media (prefers-color-scheme: dark) {
   .new-arrivals-main-wrapper {
-    background-color: #1a1a2e;
-    border-color: #334155;
+    border-color: #334155 !important;
+    background-color: var(--bg-color) !important;
   }
+
   .na-title {
-    color: #e2e8f0;
+    color: var(--text-color) !important;
   }
+
   .na-subtitle {
-    color: #94a3b8;
+    color: #94a3b8 !important;
   }
+
   .na-sparkle-icon {
-    color: #fbbf24;
+    color: #fbbf24 !important;
   }
+
   .na-arrow-btn {
-    background-color: #1e293b;
-    border-color: #334155;
-    color: #e2e8f0;
+    border-color: #334155 !important;
   }
+
   .na-arrow-btn:hover {
-    background-color: #eab308;
-    color: white;
-    border-color: #eab308;
+    background: #eab308 !important;
   }
 }

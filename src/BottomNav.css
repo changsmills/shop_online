@@ -1,14 +1,18 @@
+/* ============================================ */
+/* BOTTOM NAVIGATION CONTAINER                  */
+/* ============================================ */
+
 .mobile-bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   height: 65px;
-  background-color: #ffffff;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
   display: flex;
   justify-content: space-around;
   align-items: center;
-  border-top: 0.5px solid rgba(0, 0, 0, 0.08);
+  border-top: 0.5px solid var(--text-color) !important; /* ✅ Inajibadilisha! */
   box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.03);
   z-index: 1000;
   padding-bottom: env(safe-area-inset-bottom);
@@ -17,15 +21,27 @@
   text-rendering: optimizeLegibility;
 }
 
+/* ============================================ */
+/* INDIVIDUAL NAV ITEMS                         */
+/* ============================================ */
+
 .nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #94a3b8;
+  color: var(--text-color) !important; /* ✅ Inajibadilisha! */
   cursor: pointer;
   transition: color 0.2s ease;
   flex: 1;
   -webkit-tap-highlight-color: transparent;
+  opacity: 0.6; /* Kwa Light Mode, icons si nyeusi sana */
+}
+
+/* Kwenye Dark Mode, opacity inakuwa nzuri zaidi */
+@media (prefers-color-scheme: dark) {
+  .nav-item {
+    opacity: 0.8;
+  }
 }
 
 .nav-item span {
@@ -33,11 +49,21 @@
   margin-top: 2px;
   font-weight: 500;
   letter-spacing: 0.02em;
+  color: inherit;
 }
 
+/* ============================================ */
+/* ACTIVE STATE (KITUFE KILICHOSAGULIWA)        */
+/* ============================================ */
+
 .nav-item.active {
-  color: #ff4d4f;
+  color: #ff4d4f !important; /* Rangi ya Orange/Red kwa active (Inabaki sawa kwa brand) */
+  opacity: 1 !important; /* Inakuwa imara wakati imechaguliwa */
 }
+
+/* ============================================ */
+/* CART BADGE                                    */
+/* ============================================ */
 
 .cart-icon-wrapper {
   position: relative;
@@ -58,11 +84,39 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.5px solid #ffffff;
+  border: 1.5px solid var(--bg-color) !important; /* ✅ Inajibadilisha! (Inaacha nafasi ya background) */
 }
+
+/* ============================================ */
+/* DESKTOP (FICHA KABISA KWA PC)                */
+/* ============================================ */
 
 @media (min-width: 768px) {
   .mobile-bottom-nav {
-    display: none;
+    display: none !important;
+  }
+}
+
+/* ============================================ */
+/* DARK MODE OVERRIDES (MWISHO)                 */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .mobile-bottom-nav {
+    background-color: #1e293b !important; /* Dark Blue ya Skyfall */
+    border-top-color: #334155 !important;
+  }
+
+  .nav-item {
+    color: #94a3b8 !important; /* Rangi ya kijivu chepesi kwa Dark Mode (Icons) */
+    opacity: 0.9;
+  }
+
+  .nav-item.active {
+    color: #f97316 !important; /* Orange inayofanana na brand kwa Active */
+  }
+
+  .cart-badge {
+    border-color: #1e293b !important; /* Border ya badge inalingana na background ya BottomNav */
   }
 }

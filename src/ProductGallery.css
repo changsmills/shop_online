@@ -1857,3 +1857,266 @@ input[type="range"]::-webkit-slider-thumb {
     margin: 0 !important;
   }
 }
+
+/* ============================================ */
+/* DARK MODE SUPPORT - PRODUCT GALLERY           */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  /* Container kuu na Backgrounds */
+  .gallery-main-container,
+  .gallery-wrapper,
+  .main-stage,
+  .main-display,
+  .thumbnails-list,
+  .kbc-full-view-list,
+  .kbc-full-view-item,
+  .full-view-item,
+  .store-verification-stack,
+  .contact-card,
+  .business-verification-grid,
+  .full-view-gallery-list {
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+  }
+
+  /* Borders na mipaka */
+  .main-stage,
+  .main-stage-container,
+  .thumb-item,
+  .full-view-item,
+  .contact-card,
+  .store-verification-stack,
+  .kbc-full-view-item,
+  .business-verification-grid,
+  .verification-details .info-item {
+    border-color: #334155 !important;
+  }
+
+  /* Rangi za Thumbnails */
+  .thumb-item {
+    background-color: var(--bg-color) !important;
+  }
+  .thumb-item img {
+    filter: brightness(0.9) !important;
+  }
+  .thumb-item.active,
+  .thumb-item:hover {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 1px var(--primary-color) !important;
+  }
+
+  /* Kitufe cha Kukuza (Maximize) */
+  .icon-btn {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5) !important;
+  }
+  .icon-btn:hover {
+    background-color: var(--primary-color) !important;
+    color: #ffffff !important;
+  }
+
+  /* Zoom Result Box */
+  .zoom-result {
+    background-color: var(--bg-color) !important;
+    border-color: #334155 !important;
+    box-shadow: 0 0 0 2px #334155 !important;
+  }
+
+  /* List ya Picha Kamili (KBC Full View) */
+  .kbc-full-view-item {
+    border-bottom-color: #334155 !important;
+  }
+
+  /* LIGHTBOX (Modal) */
+  .lightbox-overlay {
+    background: rgba(0, 0, 0, 0.95) !important;
+  }
+  .lightbox-content {
+    background-color: var(--bg-color) !important;
+    border-color: #334155 !important;
+  }
+  .lightbox-sidebar {
+    background-color: #1e293b !important;
+    border-right-color: #334155 !important;
+  }
+  .modal-header-info h4,
+  .modal-header-info p {
+    color: #e2e8f0 !important;
+  }
+  .mini-thumbs img {
+    border-color: #334155 !important;
+    background-color: #1e293b !important;
+  }
+
+  /* Vimshale vya Modal na Kitufe cha Kufunga */
+  .modal-nav-btn {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+    color: #e2e8f0 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+  }
+  .modal-nav-btn:hover {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: #ffffff !important;
+  }
+  .close-lightbox {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #334155 !important;
+  }
+  .close-lightbox:hover {
+    background-color: #334155 !important;
+  }
+
+  /* MOBILE SPECIFIC OVERRIDES */
+  .mobile-main-display {
+    background-color: #000000 !important;
+  }
+  .gallery-mobile-simple {
+    background-color: var(--bg-color) !important;
+  }
+  .mobile-full-list-view {
+    border-top-color: #334155 !important;
+  }
+
+  /* Vifungo vya Toggle (Video / Photos) kwenye Mobile */
+  .mobile-toggle-buttons button {
+    background-color: #1e293b !important;
+    color: #94a3b8 !important;
+    border: 1px solid #334155 !important;
+  }
+  .mobile-toggle-buttons button:active {
+    background-color: #334155 !important;
+  }
+
+  /* STORE VERIFICATION (Taarifa za Duka) */
+  .office-about-card {
+    background-color: #1e293b !important;
+    border-left-color: #007bff !important;
+    color: #cbd5e1 !important;
+  }
+  .verification-details .info-item {
+    border-bottom-color: #334155 !important;
+  }
+  .contact-card .label {
+    color: #e2e8f0 !important;
+  }
+  .contact-card .value {
+    color: #94a3b8 !important;
+  }
+  .full-width-map-card {
+    background-color: #1e293b !important;
+    border-color: #3b82f6 !important;
+    color: #60a5fa !important;
+  }
+  .map-placeholder {
+    background-color: #1e293b !important;
+    color: #94a3b8 !important;
+  }
+
+  /* MAANDISHI YA ZIADA (Text Colors) */
+  .section-title,
+  .modal-footer-caption,
+  .counter {
+    color: #e2e8f0 !important;
+  }
+  .business-info-card {
+    background-color: var(--bg-color) !important;
+  }
+  .social-btn {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #cbd5e1 !important;
+  }
+  .social-btn:hover {
+    background-color: #334155 !important;
+  }
+}
+/* ============================================ */
+/* DARK MODE BACKGROUND FIX - MODAL & THUMBS     */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  /* 1. Modal kuu - Inalazimika kuwa Nyeusi kabisa (#000) ili picha ionekane vizuri */
+  .lightbox-overlay {
+    background: rgba(0, 0, 0, 0.98) !important;
+  }
+  
+  .lightbox-content {
+    background: #000000 !important; /* Badala ya var(--bg-color) */
+    border-color: #334155 !important;
+  }
+
+  .lightbox-main-view {
+    background: #000000 !important; /* Hakikisha background ya picha ni nyeusi */
+  }
+
+  .modal-image-container {
+    background: #000000 !important; /* Hakikisha container ya picha ni nyeusi */
+  }
+
+  /* 2. Thumbnails - Background iwe nyeusi kidogo ili picha zionekane */
+  .thumbnails-container,
+  .thumbnails-list,
+  .thumb-item {
+    background: #1a1a2e !important; /* Nyeusi yenye rangi ya bluu kidogo */
+  }
+
+  .thumb-item {
+    background-color: #1e293b !important; /* Thumbnail box iwe nyeusi ili isichanganye */
+    border-color: #334155 !important;
+  }
+
+  .thumb-item img {
+    background-color: #1e293b !important; /* Hakikisha background ya picha ni nyeusi */
+  }
+
+  .thumb-item.active,
+  .thumb-item:hover {
+    border-color: var(--primary-color) !important;
+  }
+
+  /* 3. Gallery Main Stage - Background ya picha kuu iwe nyeusi */
+  .main-stage,
+  .main-display,
+  .main-stage-container {
+    background: #0f172a !important; /* Nyeusi yenye rangi ya bluu giza */
+  }
+
+  .gallery-main-container {
+    background-color: var(--bg-color) !important; /* Hii inabaki Dark Blue ya Skyfall */
+  }
+
+  /* 4. Kwa Mobile (Modal na gallery) */
+  .gallery-mobile-simple {
+    background: var(--bg-color) !important;
+  }
+
+  .mobile-main-display {
+    background: #000000 !important; /* Kwenye mobile picha iwe kwenye background nyeusi */
+  }
+
+  .lightbox-sidebar {
+    background: #0f172a !important; /* Sidebar ya modal iwe nyeusi */
+    border-right-color: #334155 !important;
+  }
+
+  .close-lightbox {
+    background: #1e293b !important;
+    color: #ffffff !important;
+    border: 1px solid #334155 !important;
+  }
+
+  .modal-nav-btn {
+    background: #1e293b !important;
+    color: #ffffff !important;
+    border: 1px solid #334155 !important;
+  }
+
+  .modal-nav-btn:hover {
+    background: var(--primary-color) !important;
+  }
+}

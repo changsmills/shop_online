@@ -3,13 +3,15 @@
 /* ============================================ */
 
 .products-all-page {
-  background-color: #f7f8fa;
+  background-color: var(--bg-color) !important; /* ✅ Inajibadilisha! */
+  color: var(--text-color) !important;           /* ✅ Inajibadilisha! */
   min-height: 100vh;
   font-family: 'Roboto', sans-serif;
   padding: 0;
   margin: 0;
   overflow-x: hidden;
   width: 100%;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 /* Mobile specific - remove all paddings */
@@ -55,12 +57,12 @@
 /* ============================================ */
 
 .alibaba-style-banner {
-  background: linear-gradient(135deg, #FF6A00 0%, #FF8C00 100%);
+  background: linear-gradient(135deg, #FF6A00 0%, #FF8C00 100%); /* Inabaki Orange ya brand */
   color: white;
   text-align: center;
   padding: 40px 20px;
   margin: 0;
-  position: relative; /* ✅ MUHIMU: Kwa ajili ya absolute buttons */
+  position: relative;
 }
 
 .banner-title {
@@ -75,7 +77,7 @@
   opacity: 0.9;
 }
 
-/* BACK BUTTON - Imefichwa kwenye Desktop */
+/* BACK BUTTON */
 .banner-back-btn {
   display: none !important; 
   position: absolute;
@@ -103,7 +105,7 @@
   transform: scale(0.95);
 }
 
-/* SEARCH BUTTON - Inaonekana Desktop na Mobile */
+/* SEARCH BUTTON */
 .banner-search-btn {
   display: flex;
   position: absolute;
@@ -139,8 +141,8 @@
   position: sticky;
   top: 60px;
   z-index: 100;
-  background: #ffffff;
-  border-bottom: 1px solid #e5e5e5;
+  background-color: var(--bg-color) !important; /* ✅ Inajibadilisha! */
+  border-bottom: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
   width: 100%;
@@ -169,7 +171,7 @@
 .nav-arrow {
   position: absolute;
   z-index: 20;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
   border: 1px solid #ddd;
   border-radius: 50%;
   width: 32px;
@@ -182,7 +184,7 @@
   top: 50%;
   transform: translateY(-50%);
   transition: all 0.2s ease;
-  color: #666;
+  color: var(--text-color) !important; /* ✅ Inajibadilisha! */
 }
 .nav-arrow:hover { 
   background: #f7f9fc; 
@@ -196,7 +198,7 @@
   display: inline-block;
   padding: 8px 18px;
   font-size: 14px;
-  color: #555;
+  color: var(--text-color) !important; /* ✅ Inajibadilisha! */
   background: transparent;
   border: none;
   cursor: pointer;
@@ -231,6 +233,7 @@
   display: block;
 }
 
+/* 🔥 USHAURI: Futa kabisa hii ifuatayo `.products-grid` na uache `ProductList.css` isimamie gridi */
 .products-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -322,9 +325,10 @@
 .loading-state, .no-results {
   text-align: center;
   padding: 60px 20px;
-  background: #fff;
+  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
   border-radius: 16px;
   grid-column: 1 / -1;
+  color: var(--text-color) !important; /* ✅ Inajibadilisha! */
 }
 
 @media (max-width: 480px) {
@@ -342,7 +346,7 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #ff6a00;
+  background: #ff6a00; /* Orange inabaki ngumu */
   color: white;
   border: none;
   cursor: pointer;
@@ -352,15 +356,11 @@
   justify-content: center;
   transition: all 0.3s ease;
   z-index: 1000;
-  
-  /* Imefichwa mwanzoni */
   opacity: 0;
   transform: translateY(20px) scale(0.8);
   pointer-events: none;
   visibility: hidden;
 }
-
-/* Inaonekana tu mtu akisogea chini */
 .back-to-top-btn.visible {
   opacity: 1;
   transform: translateY(0) scale(1);
@@ -368,23 +368,19 @@
   visibility: visible;
   animation: bounceIn 0.4s ease forwards;
 }
-
 .back-to-top-btn:hover {
   background: #e55a00;
   transform: scale(1.1);
   box-shadow: 0 6px 24px rgba(255, 106, 0, 0.5);
 }
-
 .back-to-top-btn:active {
   transform: scale(0.95);
 }
-
 .back-to-top-icon {
   width: 24px;
   height: 24px;
   stroke-width: 2.5;
 }
-
 @keyframes bounceIn {
   0% { opacity: 0; transform: translateY(20px) scale(0.8); }
   60% { opacity: 1; transform: translateY(-6px) scale(1.05); }
@@ -396,14 +392,9 @@
 /* ============================================ */
 
 @media (max-width: 768px) {
-  /* Banner */
-  .alibaba-style-banner {
-    padding: 40px 16px !important;
-  }
+  .alibaba-style-banner { padding: 40px 16px !important; }
   .banner-title { font-size: 24px; }
   .banner-desc { font-size: 14px; }
-
-  /* Rudisha Back button kwenye Mobile */
   .banner-back-btn {
     display: flex !important; 
     top: 20px !important;
@@ -412,8 +403,6 @@
     height: 36px;
   }
   .banner-back-btn svg { width: 18px; height: 18px; }
-
-  /* Sogeza Search button pia */
   .banner-search-btn {
     top: 20px !important;
     right: 12px;
@@ -421,8 +410,6 @@
     height: 36px;
   }
   .banner-search-btn svg { width: 18px; height: 18px; }
-
-  /* Category Tabs mobile */
   .category-tabs-wrapper {
     top: 0;
     height: 46px;
@@ -430,29 +417,11 @@
     border-radius: 0 0 14px 14px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   }
-  .category-tabs-scroll { 
-    padding: 0 38px;
-    gap: 2px;
-  }
-  .nav-arrow { 
-    width: 26px; 
-    height: 26px;
-    display: none !important; /* Ficha mishale ya tabs kwenye mobile */
-  }
+  .category-tabs-scroll { padding: 0 38px; gap: 2px; }
+  .nav-arrow { width: 26px; height: 26px; display: none !important; }
   .nav-arrow svg { width: 14px; height: 14px; }
-  .tab-item { 
-    padding: 6px 14px; 
-    font-size: 12px;
-    border-radius: 16px;
-  }
-
-  /* Back to Top mobile */
-  .back-to-top-btn {
-    bottom: 90px;
-    right: 16px;
-    width: 44px;
-    height: 44px;
-  }
+  .tab-item { padding: 6px 14px; font-size: 12px; border-radius: 16px; }
+  .back-to-top-btn { bottom: 90px; right: 16px; width: 44px; height: 44px; }
   .back-to-top-icon { width: 20px; height: 20px; }
 }
 
@@ -461,12 +430,9 @@
 /* ============================================ */
 
 @media (max-width: 480px) {
-  .alibaba-style-banner {
-    padding: 32px 12px !important;
-  }
+  .alibaba-style-banner { padding: 32px 12px !important; }
   .banner-title { font-size: 20px; }
   .banner-desc { font-size: 12px; }
-
   .banner-back-btn {
     display: flex !important;
     top: 18px !important;
@@ -475,7 +441,6 @@
     height: 32px;
   }
   .banner-back-btn svg { width: 16px; height: 16px; }
-
   .banner-search-btn {
     top: 18px !important;
     right: 10px;
@@ -483,23 +448,70 @@
     height: 32px;
   }
   .banner-search-btn svg { width: 16px; height: 16px; }
-
-  .category-tabs-wrapper { 
-    height: 42px;
-    border-radius: 0 0 12px 12px;
-  }
+  .category-tabs-wrapper { height: 42px; border-radius: 0 0 12px 12px; }
   .category-tabs-scroll { padding: 0 32px; }
-  .tab-item { 
-    padding: 4px 12px; 
-    font-size: 11px;
-    border-radius: 14px;
+  .tab-item { padding: 4px 12px; font-size: 11px; border-radius: 14px; }
+  .back-to-top-btn { bottom: 80px; right: 12px; width: 40px; height: 40px; }
+  .back-to-top-icon { width: 18px; height: 18px; }
+}
+
+/* ============================================ */
+/* ✅ DARK MODE OVERRIDES (MWISHO)               */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .products-all-page {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
   }
 
-  .back-to-top-btn {
-    bottom: 80px;
-    right: 12px;
-    width: 40px;
-    height: 40px;
+  .category-tabs-wrapper {
+    background-color: #1e293b !important;
+    border-bottom-color: #334155 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
   }
-  .back-to-top-icon { width: 18px; height: 18px; }
+
+  .nav-arrow {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+  }
+  .nav-arrow:hover {
+    background-color: #334155 !important;
+    border-color: #ff6a00 !important;
+    color: #ff6a00 !important;
+  }
+
+  .tab-item {
+    color: #e2e8f0 !important;
+  }
+  .tab-item:hover {
+    background-color: #334155 !important;
+    color: #e2e8f0 !important;
+  }
+  .tab-item.active {
+    background-color: #2d2d44 !important;
+    color: #ff6a00 !important;
+  }
+
+  .loading-state, .no-results {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+  }
+}
+/* ============================================ */
+/* ✅ DARK MODE OVERRIDES (MWISHO)               */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  /* ... CSS za awali za dark mode zilizopo ... */
+
+  /* 🔥 Hapa ndio mabadiliko ya banner ya juu! */
+  .alibaba-style-banner {
+    /* Badilisha rangi ya background kuwa Skyfall Dark Blue */
+    background: #1e293b !important; 
+    /* Au kama unataka gradient kidogo ya giza: */
+    /* background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important; */
+    color: #ffffff !important; /* Maandishi yabaki nyeupe */
+  }
 }

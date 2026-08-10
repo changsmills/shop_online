@@ -1089,3 +1089,124 @@
     width: 100% !important;
   }
 }
+/* ============================================ */
+/* DARK MODE SUPPORT - PRODUCT DETAILS PAGE      */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  /* Rangi za Background na Maandishi kuu */
+  .product-page-root,
+  .product-details-container,
+  .main-grid-container,
+  .left-content,
+  .right-sidebar,
+  .right-sidebar .sticky-info-wrapper,
+  .product-description-section,
+  .product-bottom-details,
+  .store-full-details-card,
+  .store-card-header,
+  .showroom-item-img,
+  .store-card-btn {
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+  }
+
+  /* Mipaka (Borders) ya sehemu zote */
+  .left-content,
+  .main-grid-container,
+  .right-sidebar,
+  .product-description-section,
+  .store-card-header,
+  .store-full-details-card,
+  .product-bottom-details,
+  .store-contact-grid,
+  .showroom-horizontal-scroll {
+    border-color: #334155 !important;
+  }
+
+  /* Vichwa na Majina ya bidhaa */
+  .product-name,
+  .product-description-section h3,
+  .verification-header-box h2,
+  .showroom-header h4,
+  .store-card-title h3,
+  .metric-value,
+  .bottom-sheet-summary-value {
+    color: var(--text-color) !important;
+  }
+
+  /* Maandishi madogo na label */
+  .verification-header-box p,
+  .showroom-item-name,
+  .store-card-meta span,
+  .metric-label,
+  .contact-label {
+    color: #94a3b8 !important;
+  }
+
+  /* Box ya Uhakiki wa Duka (Verification) */
+  .verification-header-box {
+    background-color: #1e293b !important;
+    border-left-color: #3b82f6 !important;
+  }
+
+  /* Kitufe cha "Tembelea Duka" */
+  .store-card-btn {
+    background: #334155 !important;
+    color: #e2e8f0 !important;
+  }
+  .store-card-btn:hover {
+    background: #475569 !important;
+  }
+
+  /* TIN Certificate Box */
+  .tin-cert-box {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+  }
+
+  /* Vifungo vya Social Media (Maps, Instagram) */
+  .social-btn {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #cbd5e1 !important;
+  }
+  .social-btn:hover {
+    background: #334155 !important;
+    border-color: #475569 !important;
+  }
+
+  /* Metrics Grid (MOQ, LEAD TIME, n.k) */
+  .metric-box {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+  }
+
+  /* Contact icons - Mfano: MapPin na Phone */
+  .contact-box:first-child .contact-icon {
+    background: #2d2d44 !important;
+    color: #ea580c !important;
+  }
+  .contact-box:last-child .contact-icon {
+    background: #1e3a8a !important;
+    color: #60a5fa !important;
+  }
+
+  /* Contact Text */
+  .contact-text {
+    color: #cbd5e1 !important;
+  }
+
+  /* Mobile Override - Zinahakikisha kwenye Simu pia zinajibadilisha */
+  @media (max-width: 768px) {
+    .product-page-root,
+    .product-details-container,
+    .main-grid-container,
+    .right-sidebar .sticky-info-wrapper,
+    .product-description-section,
+    .product-bottom-details,
+    .store-full-details-card {
+      background-color: var(--bg-color) !important;
+    }
+  }
+}

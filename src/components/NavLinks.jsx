@@ -1,3 +1,4 @@
+// src/components/NavLinks.jsx
 import { useState, useEffect, useRef } from "react";
 import api from "../axiosConfig";
 import { createPortal } from "react-dom";
@@ -12,7 +13,6 @@ export default function NavLinks({ isMobile }) {
   const { language } = useLanguage();
   const navigate = useNavigate();
 
-  // ========== STATE ==========
   const [user, setUser] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -39,7 +39,6 @@ export default function NavLinks({ isMobile }) {
   const buyerRef = useRef(null);
   const helpRef = useRef(null);
 
-  // ========== EFFECTS ==========
   useEffect(() => {
     const checkUser = async () => {
       const token = localStorage.getItem("access_token");
@@ -62,19 +61,13 @@ export default function NavLinks({ isMobile }) {
         setHasStore(false);
         return;
       }
-
       setCheckingSupplier(true);
       setCheckingStore(true);
-
       try {
         const profileRes = await api.get('/profile/');
         const profileData = profileRes.data;
         setHasSupplierProfile(profileData?.role === 'supplier');
-
-        const storeRes = await api.get('/stores/', {
-          params: { owner_id: profileData?.id }
-        });
-
+        const storeRes = await api.get('/stores/', { params: { owner_id: profileData?.id } });
         if (storeRes.data && storeRes.data.length > 0) {
           setHasStore(true);
         } else {
@@ -87,16 +80,13 @@ export default function NavLinks({ isMobile }) {
         setCheckingStore(false);
       }
     };
-
     checkUserSupplierAndStore();
   }, [user]);
 
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const response = await api.get('/categories/', {
-          params: { ordering: 'name' }
-        });
+        const response = await api.get('/categories/', { params: { ordering: 'name' } });
         const data = response.data;
         if (data && data.length > 0) {
           setCategories(data);
@@ -121,15 +111,10 @@ export default function NavLinks({ isMobile }) {
     async function fetchLeafsBySub() {
       if (viewMode === 'subcategories' && selectedSubForLeaf) {
         try {
-          // ✅ Badilisha 'category' kuwa 'sub_category'
-        const response = await api.get('/products/', {
-         params: { sub_category: selectedSubForLeaf.id }
-              });
+          const response = await api.get('/products/', { params: { sub_category: selectedSubForLeaf.id } });
           const data = response.data || [];
-
           const uniqueLeafs = [];
           const seenLeafIds = new Set();
-
           data.forEach(item => {
             if (!seenLeafIds.has(item.leaf_category_id)) {
               seenLeafIds.add(item.leaf_category_id);
@@ -137,7 +122,7 @@ export default function NavLinks({ isMobile }) {
                 id: item.leaf_category_id,
                 name: item.leaf_categories?.name,
                 name_sw: item.leaf_categories?.name_sw,
-                image_url: item.cover_image_url // ✅ Tumia cover_image_url!
+                image_url: item.cover_image_url
               });
             }
           });
@@ -150,47 +135,37 @@ export default function NavLinks({ isMobile }) {
     fetchLeafsBySub();
   }, [selectedSubForLeaf, viewMode]);
 
-async function fetchSubCategories(parentId) {
-  try {
-    const response = await api.get('/subcategories/', {
-      params: { category_id: parentId }
-    });
-    const data = response.data;
-    if (data) {
-      setSubCategories(data);
-      // 🔥 ONDOA HII LINE: if (data.length > 0) setSelectedSubForLeaf(data[0]);
-      
-      // 🔥 SAFISHA DATA ZA ZAMANI (Ili zisionekane mpaka ubonyeze upande wa kushoto)
-      setSelectedSubForLeaf(null);
-      setLeafsForSub([]);
+  async function fetchSubCategories(parentId) {
+    try {
+      const response = await api.get('/subcategories/', { params: { category_id: parentId } });
+      const data = response.data;
+      if (data) {
+        setSubCategories(data);
+        setSelectedSubForLeaf(null);
+        setLeafsForSub([]);
+      }
+    } catch (error) {
+      console.error("Error fetching subcategories:", error);
     }
-  } catch (error) {
-    console.error("Error fetching subcategories:", error);
   }
-}
 
   async function fetchFeaturedLeafs(parentId) {
     try {
-      const response = await api.get('/products/', {
-        params: { parent_category: parentId }
-      });
+      const response = await api.get('/products/', { params: { parent_category: parentId } });
       const data = response.data || [];
-
       const uniqueCategories = [];
       const seenIds = new Set();
-
       data.forEach(item => {
         if (!seenIds.has(item.leaf_category_id)) {
           seenIds.add(item.leaf_category_id);
           uniqueCategories.push({
             id: item.leaf_category_id,
             leaf_category_id: item.leaf_category_id,
-            cover_image_url: item.cover_image_url, // ✅ Tumia cover_image_url!
+            cover_image_url: item.cover_image_url,
             leaf_categories: item.leaf_categories
           });
         }
       });
-
       setFeaturedProducts(uniqueCategories.slice(0, 17));
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -198,18 +173,15 @@ async function fetchSubCategories(parentId) {
     }
   }
 
-  // ========== HANDLERS ==========
   const getDisplayName = (item) => {
     if (!item) return '';
     return i18n.language === 'sw' ? (item.name_sw || item.name) : item.name;
   };
 
-  // ✅ HANDLE MOUSE ENTER
   const handleMouseEnter = (menuName, e) => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setActiveMenu(menuName);
     setActiveNav(menuName);
-
     if (menuName === 'buyerCentral' && e) {
       const rect = e.currentTarget.getBoundingClientRect();
       setBuyerMenuPos({ top: rect.bottom, left: rect.left });
@@ -224,8 +196,8 @@ async function fetchSubCategories(parentId) {
     }
   };
 
-  // ✅ HANDLE MOUSE LEAVE (ILIKUWA IMEPOTEKA)
   const handleMouseLeave = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
       setActiveMenu(null);
       setActiveNav(null);
@@ -240,15 +212,11 @@ async function fetchSubCategories(parentId) {
   const handleSellNavigation = async () => {
     try {
       const token = localStorage.getItem("access_token");
-
       if (token) {
         const profileRes = await api.get('/profile/');
         const profileData = profileRes.data;
-
         if (profileData?.role === 'supplier') {
-          const storeRes = await api.get('/stores/', {
-            params: { owner_id: profileData.id }
-          });
+          const storeRes = await api.get('/stores/', { params: { owner_id: profileData.id } });
           const storeData = storeRes.data;
           if (storeData && storeData.length > 0) {
             navigate(`/dashboard/sellerboard/${storeData[0].id}`);
@@ -268,34 +236,19 @@ async function fetchSubCategories(parentId) {
     }
   };
 
-  // ========== MOBILE BOTTOM NAV ==========
   if (isMobile) {
     return (
       <div className="mobile-bottom-nav">
-        <Link to="/" className="mobile-nav-item">
-          <LucideIcons.Home size={24} />
-          <span>{t('home')}</span>
-        </Link>
-        <Link to="/categories" className="mobile-nav-item">
-          <LucideIcons.Grid size={24} />
-          <span>{t('categories')}</span>
-        </Link>
-        <Link to="/cart" className="mobile-nav-item">
-          <LucideIcons.ShoppingCart size={24} />
-          <span>{t('cart')}</span>
-        </Link>
-        <Link to="/dashboard/login" className="mobile-nav-item">
-          <LucideIcons.User size={24} />
-          <span>{t('account')}</span>
-        </Link>
+        <Link to="/" className="mobile-nav-item"><LucideIcons.Home size={24} /><span>{t('home')}</span></Link>
+        <Link to="/categories" className="mobile-nav-item"><LucideIcons.Grid size={24} /><span>{t('categories')}</span></Link>
+        <Link to="/cart" className="mobile-nav-item"><LucideIcons.ShoppingCart size={24} /><span>{t('cart')}</span></Link>
+        <Link to="/dashboard/login" className="mobile-nav-item"><LucideIcons.User size={24} /><span>{t('account')}</span></Link>
       </div>
     );
   }
 
-  // ========== DESKTOP NAVIGATION ==========
   return (
     <nav className="nav-links-container">
-      {/* GROUP LEFT */}
       <div className="nav-group-left">
         {/* ALL CATEGORIES */}
         <div
@@ -371,10 +324,10 @@ async function fetchSubCategories(parentId) {
                           <Link to={`/category/${leaf.leaf_category_id}`} key={leaf.id} className="grid-item">
                             <div className="image-circle">
                               <img
-    src={leaf.cover_image_url || placeholderImg}  // ✅ Tumia cover_image_url!
-    alt={getDisplayName(leaf.leaf_categories)}
-    onError={(e) => { e.target.src = placeholderImg; }}
-/>
+                                src={leaf.cover_image_url || placeholderImg}
+                                alt={getDisplayName(leaf.leaf_categories)}
+                                onError={(e) => { e.target.src = placeholderImg; }}
+                              />
                             </div>
                             <p className="grid-text">{getDisplayName(leaf.leaf_categories) || "Kategoria"}</p>
                           </Link>
@@ -391,12 +344,12 @@ async function fetchSubCategories(parentId) {
                         <Link to={`/category/${leaf.id}`} key={leaf.id} className="grid-item">
                           <div className="image-circle">
                             <img
-    src={leaf.image_url || placeholderImg}
-    alt={getDisplayName(leaf)}
-    onError={(e) => { e.target.src = placeholderImg; }}
-/>
+                              src={leaf.image_url || placeholderImg}
+                              alt={getDisplayName(leaf)}
+                              onError={(e) => { e.target.src = placeholderImg; }}
+                            />
                           </div>
-                         <p className="grid-text">{getDisplayName(leaf)}</p>
+                          <p className="grid-text">{getDisplayName(leaf)}</p>
                         </Link>
                       ))
                     )}
@@ -437,15 +390,15 @@ async function fetchSubCategories(parentId) {
                   <h4 className="dropdown-header-title">{t('payment_protection')}</h4>
                   <ul className="dropdown-list">
                     <li className="dropdown-list-item">
-                      <LucideIcons.Lock size={16} color="#27ae60" />
+                      <LucideIcons.Lock size={16} />
                       <Link to="/payment-protection">{t('your_payment_protected')}</Link>
                     </li>
                     <li className="dropdown-list-item">
-                      <LucideIcons.CreditCard size={16} color="#27ae60" />
+                      <LucideIcons.CreditCard size={16} />
                       <Link to="/refund-policy">{t('refund_policy')}</Link>
                     </li>
                     <li className="dropdown-list-item">
-                      <LucideIcons.ShieldCheck size={16} color="#27ae60" />
+                      <LucideIcons.ShieldCheck size={16} />
                       <Link to="/buyer-protection">{t('buyer_protection')}</Link>
                     </li>
                   </ul>
@@ -454,15 +407,15 @@ async function fetchSubCategories(parentId) {
                   <h4 className="dropdown-header-title">{t('product_issues')}</h4>
                   <ul className="dropdown-list">
                     <li className="dropdown-list-item">
-                      <LucideIcons.FileWarning size={16} color="#dc2626" />
+                      <LucideIcons.FileWarning size={16} />
                       <Link to="/dispute">{t('file_dispute')}</Link>
                     </li>
                     <li className="dropdown-list-item">
-                      <LucideIcons.Flag size={16} color="#dc2626" />
+                      <LucideIcons.Flag size={16} />
                       <Link to="/report-product">{t('report_bad_product')}</Link>
                     </li>
                     <li className="dropdown-list-item">
-                      <LucideIcons.MessageCircle size={16} color="#dc2626" />
+                      <LucideIcons.MessageCircle size={16} />
                       <Link to="/contact-support">{t('contact_support')}</Link>
                     </li>
                   </ul>
@@ -471,15 +424,15 @@ async function fetchSubCategories(parentId) {
                   <h4 className="dropdown-header-title">{t('verified_products')}</h4>
                   <ul className="dropdown-list">
                     <li className="dropdown-list-item">
-                      <LucideIcons.CheckCircle size={16} color="#0071dc" />
+                      <LucideIcons.CheckCircle size={16} />
                       <Link to="/verification">{t('product_verification')}</Link>
                     </li>
                     <li className="dropdown-list-item">
-                      <LucideIcons.Star size={16} color="#0071dc" />
+                      <LucideIcons.Star size={16} />
                       <Link to="/reviews">{t('buyer_reviews')}</Link>
                     </li>
                     <li className="dropdown-list-item">
-                      <LucideIcons.Truck size={16} color="#0071dc" />
+                      <LucideIcons.Truck size={16} />
                       <Link to="/shipping-protection">{t('shipping_protection')}</Link>
                     </li>
                   </ul>
@@ -491,7 +444,6 @@ async function fetchSubCategories(parentId) {
         </div>
       </div>
 
-      {/* GROUP RIGHT */}
       <div className="nav-group-right">
         {/* BUYER CENTRAL */}
         <span
@@ -602,7 +554,7 @@ async function fetchSubCategories(parentId) {
                 <h4 className="dropdown-header-title">{t('learn_more')}</h4>
                 <div className="learn-more-card">
                   <div className="learn-more-header">
-                    <LucideIcons.PlayCircle size={24} color="#0071dc" />
+                    <LucideIcons.PlayCircle size={24} />
                     <span>{t('video_tutorials')}</span>
                   </div>
                   <p className="learn-more-text">{t('video_description')}</p>
