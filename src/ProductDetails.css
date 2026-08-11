@@ -1006,57 +1006,59 @@
 .border-t { border-top: 1px solid #e5e7eb; }
 
 /* ============================================ */
-/* LAYER 14: MOBILE OVERRIDES                   */
+/* MOBILE OVERRIDES - PADDING BOTTOM FIX        */
 /* ============================================ */
 
 @media (max-width: 768px) {
+
+  /* 1. Ongeza padding chini kwenye page root ili kuzuia vitu kugusa makali */
   .product-page-root {
-    padding-top: 0;
+    padding-bottom: 40px !important; /* 🔥 HII NDIYO SULUHISHO LA PADDING! */
     background: white;
   }
-  
-  .product-details-container {
-    padding: 0 !important;
-  }
-  
-  .main-grid-container {
-    background: white;
-  }
-  
-  .right-sidebar .sticky-info-wrapper {
-    padding: 12px 12px 16px 12px;
-  }
-  
-  .product-description-section {
-    padding: 12px 12px;
-  }
-  
+
+  /* 2. Hakikisha sehemu ya store details ina padding chini */
   .product-bottom-details {
-    padding: 0 0 12px 0;
+    padding: 12px 16px 40px 16px !important; /* 🔥 Ongeza padding chini hapa pia */
     margin-top: 0;
-    border-top: 1px solid #e5e7eb;
-    border-bottom: none;
-    border-radius: 0;
   }
-  
+
+  /* 3. Hakikisha store card ina nafasi ya kutosha chini */
   .store-full-details-card {
-    padding: 12px 12px 0 12px;
+    padding: 16px 0 20px 0 !important;
+  }
+
+  /* 4. Sahihisha rangi za dark mode kwenye mobile (Tumia variables) */
+  .product-page-root,
+  .product-bottom-details,
+  .store-full-details-card,
+  .store-card-header {
+    background-color: var(--bg-primary, #ffffff) !important;
+    color: var(--text-primary, #1a1a1a) !important;
+  }
+
+  /* 5. Hakikisha mipaka inabadilika kwenye dark mode */
+  .store-card-header,
+  .store-contact-grid,
+  .store-metrics-grid {
+    border-color: var(--border-color, #e9ecef) !important;
+  }
+
+  /* 🔥 ONGEZA HII CHINI YA SEHEMU YA PRODUCT HERO */
+  .product-hero-section {
+    padding-top: 15px !important;  /* Hii inasukuma picha chini kidogo */
+    margin: 0 !important;
+    background: white;
+  }
+
+  /* Ikiwa bado inakaa juu sana, ongeza margin-top kwenye container ya gallery */
+  .gallery-mobile-simple {
+    margin-top: 10px !important;
   }
   
-  .verification-header-box {
-    margin-bottom: 8px;
-  }
-  
-  .showroom-horizontal-scroll {
-    margin-bottom: 8px;
-  }
-  
-  .showroom-header {
-    padding: 0 12px;
-  }
-  
-  .showroom-scroll {
-    padding: 4px 12px 12px 12px;
+  /* Pia hakikisha picha ya katikati ina nafasi */
+  .mobile-main-display {
+    min-height: 350px !important; /* Ongeza urefu wa chini kidogo */
   }
 }
 

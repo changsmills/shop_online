@@ -461,14 +461,14 @@
 
     /* 🔥 Teksti inakuwa kubwa, nzito, kama Alibaba! */
     .logo-wrapper .logo-text {
-        font-size: 20px !important;   /* Ilikuwa 12px, sasa ni 26px */
-        font-weight: 900 !important;   /* Nzito kabisa */
-        letter-spacing: 0.5px !important;
+        font-size: 18px !important;   /* Ilikuwa 12px, sasa ni 26px */
+        font-weight: 800 !important;   /* Nzito kabisa */
+        letter-spacing: 0.1px !important;
     }
 
     .logo-wrapper .logo-icon-box {
-        width: 32px !important;       /* Icon pia inakua kidogo */
-        height: 32px !important;
+        width: 26px !important;       /* Icon pia inakua kidogo */
+        height: 26px !important;
         border-width: 1.5px !important;
     }
 
