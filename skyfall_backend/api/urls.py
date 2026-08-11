@@ -11,8 +11,9 @@ from api.views import (
     ProductVariationViewSet, 
     ChangePasswordView, DeleteAccountView,
     ChangeEmailView, PasswordResetView,
-   OrderViewSet,
-    PasswordResetRequestView, PasswordResetVerifyView
+    OrderViewSet,
+    PasswordResetRequestView, PasswordResetVerifyView,
+    AllStoresView  # 🔥 ONGEZA HII
 
 )
 
@@ -33,6 +34,8 @@ router.register(r'orders', OrderViewSet)
 router.register(r'order-items', OrderItemViewSet)
 
 urlpatterns = [
+    
+    path('stores/all/', AllStoresView.as_view(), name='all-stores'),
     path('', include(router.urls)),
     path('register/', RegisterView.as_view(), name='register'),
     path('profile/', ProfileView.as_view(), name='profile'),

@@ -125,7 +125,7 @@ const fetchFeaturedLeafs = async (categoryId) => {
   if (!categoryId) return;
   try {
     const response = await api.get('/products/', {
-      params: { leaf_category: categoryId }
+      params: { leaf_category_id: categoryId }
     });
 
     // 🔥 1. Angalia kama data imefika
@@ -147,7 +147,8 @@ const fetchFeaturedLeafs = async (categoryId) => {
             id: item.leaf_category_id,
             leaf_category_id: item.leaf_category_id,
             cover_image_url: item.cover_image_url,
-            leaf_categories: item.leaf_categories
+            name: item.leaf_category_name || 'Unknown',
+            name_sw: item.leaf_category_name_sw || item.leaf_category_name || 'Haijulikani'
           });
           console.log("✅ Added leaf ID:", item.leaf_category_id);
         }

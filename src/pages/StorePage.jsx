@@ -11,12 +11,24 @@ import {
 } from 'lucide-react';
 import '../StorePage.css';
 
-// 🔥 Helper ya kujenga URL kamili ya picha
+// 🔥 HELPER YA KUPATA CLOUDINARY URL SAHIHI (Imeboreshwa!)
 const getImageUrl = (url) => {
   if (!url) return null;
+  
+  // 1. Kama URL tayari ni kamili (http/https), irudishe moja kwa moja
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return url;
   }
+  
+  // 2. Kama ni Cloudinary public_id, jenga URL kamili kwa kutumia CLOUD_NAME kutoka .env
+  const CLOUD_NAME = 'rlgqgsnv'; // 🔥 Tumia Cloud Name yako kutoka .env!
+  if (CLOUD_NAME) {
+    // Hakikisha public_id ina folder yake (kama store_logos/ au product_media/)
+    // Cloudinary inahitaji folder kama sehemu ya public_id
+    return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${url}`;
+  }
+  
+  // 3. Fallback - kama ni local path (kwa development tu)
   return `http://127.0.0.1:8000${url.startsWith('/') ? '' : '/'}${url}`;
 };
 
@@ -40,10 +52,13 @@ export default function StorePage() {
       if (!storeId) return;
       setLoading(true);
       try {
+        // 🔥 Pata store kwa ID (Inatumia StoreEngineViewSet)
         const storeRes = await api.get(`/stores/${storeId}/`);
         const storeData = storeRes.data;
         setStore(storeData);
+        console.log("✅ Store Data:", storeData);
 
+        // 🔥 Pata products za store hii
         const productsRes = await api.get('/products/', {
           params: {
             store_id: storeId,
@@ -55,12 +70,13 @@ export default function StorePage() {
         setProducts(productsData);
         setFilteredProducts(productsData);
 
+        // 🔥 Pata categories za products
         if (productsData.length > 0) {
           const uniqueCats = [...new Set(productsData.map(p => p.sub_category_name || p.category_name).filter(Boolean))];
           setCategories(uniqueCats);
         }
       } catch (error) {
-        console.error('Error fetching store data:', error.response?.data || error.message);
+        console.error('❌ Error fetching store data:', error.response?.data || error.message);
       } finally {
         setLoading(false);
       }
@@ -69,7 +85,7 @@ export default function StorePage() {
   }, [storeId]);
 
   // =======================================================
-  // 🔥 FILTER PRODUCTS
+  // 🔥 FILTER PRODUCTS (Search & Category)
   // =======================================================
   useEffect(() => {
     let filtered = [...products];
@@ -88,6 +104,9 @@ export default function StorePage() {
     return Number(price).toLocaleString();
   };
 
+  // =======================================================
+  // 🔥 LOADING STATE
+  // =======================================================
   if (loading) {
     return (
       <div className="store-page">
@@ -101,6 +120,9 @@ export default function StorePage() {
     );
   }
 
+  // =======================================================
+  // 🔥 STORE NOT FOUND
+  // =======================================================
   if (!store) {
     return (
       <div className="store-page">
@@ -118,6 +140,9 @@ export default function StorePage() {
     );
   }
 
+  // =======================================================
+  // 🔥 RENDER STORE PAGE
+  // =======================================================
   return (
     <div className="store-page">
       <Header />
@@ -129,7 +154,7 @@ export default function StorePage() {
           <span>Back</span>
         </div>
 
-        {/* Store Header / Banner - Sasa inline styles zote zimehamia CSS! */}
+        {/* Store Header / Banner */}
         <div className="store-banner">
           <div className="store-banner-content">
             <div className="store-logo-large">
@@ -137,14 +162,18 @@ export default function StorePage() {
                 <img 
                   src={getImageUrl(store.store_logo)} 
                   alt={store.store_name}
-                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/150x150?text=No+Logo'; }}
+                  onError={(e) => { 
+                    console.error("❌ Logo load error:", e.target.src);
+                    e.target.onerror = null; 
+                    e.target.src = 'https://placehold.co/150x150?text=No+Logo'; 
+                  }}
                 />
               ) : (
                 <Store color="#ff6a00" className="store-icon-fallback" />
               )}
             </div>
             <div className="store-banner-info">
-              <h1 className="store-name">{store.store_name}</h1>
+              <h1 className="store-name">{store.store_name || 'Store Name'}</h1>
               <div className="store-badge">
                 {store.is_verified ? (
                   <>
@@ -378,7 +407,6 @@ export default function StorePage() {
         </div>
       </div>
 
-      {/* ✅ Footer sasa inawekwa tu, CSS ndiyo inaificha kwenye Mobile */}
       <Footer />
     </div>
   );

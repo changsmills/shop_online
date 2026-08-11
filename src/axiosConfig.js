@@ -4,7 +4,7 @@ import axios from 'axios';
 // 🔥 BADILISHA HII KUWA LOCALHOST KWA AJILI YA MAJARIBIO!
 const api = axios.create({
 
-// baseURL: 'http://127.0.0.1:8000/api', 
+//baseURL: 'http://127.0.0.1:8000/api', 
 baseURL: 'https://shop-online-r9z4.onrender.com/api'
 
 });

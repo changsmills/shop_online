@@ -105,43 +105,114 @@ class LeafCategoryViewSet(viewsets.ModelViewSet):
             print(f"❌ [BACKEND ERROR] Failed to retrieve Leaf with ID {leaf_id}: {e}")
             # Ruhusu Django kushughulikia error (kama 404)
             raise e
-
 class ProductsEngineViewSet(viewsets.ModelViewSet):
     queryset = ProductsEngine.objects.all()
     serializer_class = ProductsEngineSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [JWTAuthentication]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ['store_id', 'leaf_category', 'parent_category', 'is_approved', 'sub_category']  # ✅ Tumia jina la field!    ordering_fields = ['views', 'price', 'created_at']
+    # 🔥 MUHIMU: Hapa unatumia 'leaf_category'. Kwa hivyo Frontend lazima itume `?leaf_category=ID`, sio `?leaf_category_id=ID`.
+    filterset_fields = ['store_id', 'leaf_category', 'parent_category', 'is_approved', 'sub_category']
+    ordering_fields = ['views', 'price', 'created_at']
     pagination_class = LimitOffsetPagination
 
     def perform_create(self, serializer):
-        serializer.save(
-            user=self.request.user.profile,
-            store_id=self.request.data.get('store_id')
-        )
+        try:
+            # 🔥 1. Hakikisha store_id imetumwa
+            store_id = self.request.data.get('store_id')
+            if not store_id:
+                return Response(
+                    {'error': 'store_id is required to create a product.'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # 🔥 2. Hakikisha mtumiaji ameingia na ana profile
+            if not self.request.user.is_authenticated:
+                return Response(
+                    {'error': 'User must be authenticated.'}, 
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+            
+            serializer.save(
+                user=self.request.user.profile,
+                store_id=store_id
+            )
+        except Exception as e:
+            # 🔥 3. Catch ya jumla kwa makosa yasiyotarajiwa
+            print(f"❌ [perform_create] Error: {e}")
+            return Response(
+                {'error': f'Failed to create product: {str(e)}'}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     @action(detail=True, methods=['post'])
     def increment_views(self, request, pk=None):
-        product = self.get_object()
-        product.views += 1
-        product.save()
-        return Response({'status': 'view incremented'})
+        try:
+            product = self.get_object()
+            product.views += 1
+            product.save()
+            return Response({'status': 'view incremented'}, status=status.HTTP_200_OK)
+        except ProductsEngine.DoesNotExist:
+            return Response({'error': 'Product not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"❌ [increment_views] Error: {e}")
+            return Response(
+                {'error': f'Failed to increment views: {str(e)}'}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     @action(detail=True, methods=['post'])
     def rate(self, request, pk=None):
-        product = self.get_object()
-        rating = request.data.get('rating')
-        if rating:
+        try:
+            product = self.get_object()
+            rating = request.data.get('rating')
+            
+            # 🔥 1. Thibitisha kama rating imetumwa na ni nambari sahihi
+            if rating is None:
+                return Response(
+                    {'error': 'Rating is required.'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            try:
+                rating_float = float(rating)
+            except (ValueError, TypeError):
+                return Response(
+                    {'error': 'Rating must be a valid number.'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # 🔥 2. Hakikisha rating iko kati ya 1 na 5 (kwa kawaida)
+            if rating_float < 0 or rating_float > 5:
+                return Response(
+                    {'error': 'Rating must be between 0 and 5.'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # 🔥 3. Hesabu average rating kwa usalama
             current_total = product.total_reviews or 0
-            current_avg = product.average_rating or 0
+            current_avg = float(product.average_rating or 0)
+            
             new_total = current_total + 1
-            new_avg = ((current_avg * current_total) + float(rating)) / new_total
+            new_avg = ((current_avg * current_total) + rating_float) / new_total
+            
             product.total_reviews = new_total
             product.average_rating = new_avg
             product.save()
-            return Response({'status': 'rated', 'new_average': new_avg}, status=status.HTTP_200_OK)
-        return Response({'error': 'Rating not provided'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            return Response(
+                {'status': 'rated', 'new_average': new_avg}, 
+                status=status.HTTP_200_OK
+            )
+
+        except ProductsEngine.DoesNotExist:
+            return Response({'error': 'Product not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"❌ [rate] Error: {e}")
+            return Response(
+                {'error': f'Failed to rate product: {str(e)}'}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class AdvertisementViewSet(viewsets.ModelViewSet):
     queryset = Advertisement.objects.all()
@@ -186,8 +257,12 @@ class StoreEngineViewSet(viewsets.ModelViewSet):
     serializer_class = StoreEngineSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [JWTAuthentication]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['owner']
+    
+    # 🔥 ONGEZA HII:
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]  # 🔥 ONGEZA OrderingFilter
+    filterset_fields = ['owner', 'status', 'category_id']  # 🔥 ONGEZA category_id na status
+    ordering_fields = ['created_at', 'store_name']  # 🔥 ONGEZA ordering
+    pagination_class = LimitOffsetPagination  # 🔥 ONGEZA pagination kwa ?limit=50
 
     def get_object(self):
         pk = self.kwargs.get('pk')
@@ -198,7 +273,7 @@ class StoreEngineViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user.profile)
 
-    # ✅ ONGEZA GET_QUERYSET HAPA (Nje ya perform_create, kwenye level ya class)!
+    # ✅ GET_QUERYSET IKO SAHIHI
     def get_queryset(self):
         # Ruhusu wageni waone maduka yote
         if self.action in ['list', 'retrieve']:
@@ -208,7 +283,7 @@ class StoreEngineViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_authenticated:
             return StoreEngine.objects.filter(owner__user=user)
-        return StoreEngine.objects.none()  
+        return StoreEngine.objects.none()
 
 class ProductMediaViewSet(viewsets.ModelViewSet):
     queryset = ProductMedia.objects.all()
@@ -564,3 +639,62 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     serializer_class = OrderItemSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+
+
+# ==========================================
+# 🔥 ALL STORES VIEW - Kwa AllStores.jsx
+# ==========================================
+class AllStoresView(APIView):
+    """
+    GET /api/stores/all/
+    GET /api/stores/all/?category_id=xxx
+    """
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        try:
+            # 1. Pata category_id kutoka query params
+            category_id = request.query_params.get('category_id')
+            print(f"🔍 [DEBUG] AllStoresView called with category_id: {category_id}")
+            
+            # 2. Build query - stores zote active (status='active')
+            query = StoreEngine.objects.filter(status='active')
+            
+            # 3. Filter kwa category ikiwa ipo
+            category_name = None
+            if category_id:
+                try:
+                    query = query.filter(category_id=category_id)
+                    category = Category.objects.get(id=category_id)
+                    category_name = category.name
+                    print(f"✅ [DEBUG] Filtering by category: {category_name} (ID: {category_id})")
+                except Category.DoesNotExist:
+                    print(f"⚠️ [DEBUG] Category with ID {category_id} not found")
+                    category_name = None
+                except Exception as e:
+                    print(f"❌ [ERROR] Category filter failed: {e}")
+            
+            # 4. Order by created_at (newest first)
+            stores = query.order_by('-created_at')
+            print(f"📊 [DEBUG] Found {stores.count()} stores")
+            
+            # 5. Serialize data
+            serializer = StoreEngineSerializer(stores, many=True, context={'request': request})
+            
+            # 6. Return response - Format inayotarajiwa na AllStores.jsx
+            return Response({
+                'status': 'success',
+                'data': {
+                    'stores': serializer.data,
+                    'total': stores.count(),
+                    'category_name': category_name,
+                    'selected_category_id': category_id
+                }
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            print(f"❌ [ERROR] AllStoresView failed: {e}")
+            return Response({
+                'status': 'error',
+                'message': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

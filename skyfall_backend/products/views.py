@@ -37,7 +37,7 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [JWTAuthentication]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]  # 🔥 ONGEZA SearchFilter!
-    filterset_fields = ['store_id', 'leaf_category', 'parent_category', 'is_approved', 'sub_category']  # ✅ ONGEZA 'sub_category_id' hapa!
+    filterset_fields = ['store_id', 'leaf_category_id', 'parent_category', 'is_approved', 'sub_category']   
     search_fields = ['name', 'description', 'sku', 'barcode']  # 🔥 ONGEZA HIZI (Inaruhusu search!)
     ordering_fields = ['views', 'price', 'created_at']
     pagination_class = LimitOffsetPagination

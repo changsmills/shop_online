@@ -28,6 +28,34 @@ class LeafCategorySerializer(serializers.ModelSerializer):
         model = LeafCategory
         fields = '__all__'
 
+    # 🔥 1. ONGEZA HII: Inakagua data kabla ya kuhifadhi
+    def validate(self, data):
+        # Angalia kama 'name' ipo
+        if not data.get('name'):
+            raise serializers.ValidationError({"name": "Jina la kategoria linahitajika!"})
+        
+        # Angalia kama 'sub_category' ipo (kwa sababu ni ForeignKey)
+        if not data.get('sub_category'):
+            raise serializers.ValidationError({"sub_category": "Sub category inahitajika!"})
+        
+        # Rudisha data kama hakuna tatizo
+        return data
+
+    # 🔥 2. ONGEZA HII: Inaboresha ujumbe wa makosa (Error Messages)
+    def to_representation(self, instance):
+        # Hii inabadilisha jinsi data inavyoonekana kwa Frontend
+        representation = super().to_representation(instance)
+        
+        # 🔥 Hakikisha jina linatumwa (Ikiwa ni null, tumia 'Hakuna Jina')
+        if not representation.get('name'):
+            representation['name'] = "Hakuna Jina"
+            
+        # 🔥 Hakikisha 'name_sw' pia ipo
+        if not representation.get('name_sw'):
+            representation['name_sw'] = representation.get('name')
+            
+        return representation
+
 
 
         # ============================================================
@@ -44,7 +72,7 @@ class ProductMediaSerializer(serializers.ModelSerializer):
 # 🔥 PRODUCTS ENGINE SERIALIZER (FINAL - Full Response Edition)
 # ============================================================
 class ProductsEngineSerializer(serializers.ModelSerializer):
-    leaf_categories = LeafCategorySerializer(source='leaf_category', read_only=True)
+    leaf_category_id = serializers.UUIDField(source='leaf_category.id', read_only=True)
     cover_image_url = serializers.SerializerMethodField()
     
     # 🔥 Fields za kupokea faili (write_only)
