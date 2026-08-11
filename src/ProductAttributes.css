@@ -515,3 +515,448 @@
   .text-input, .select-input, .textarea-input { border: 1px solid #ddd; background: white; }
   button, .add-tier-btn, .remove-tier-btn, .add-color-btn { display: none; }
 }
+/* ============================================ */
+/* LAYER 12: DARK MODE SUPPORT - ATTRIBUTES      */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+
+  /* 1. MAIN CONTAINER */
+  .product-attributes-container {
+    background: #0f172a !important;
+    color: #e2e8f0 !important;
+    border-bottom-color: #334155 !important;
+  }
+
+  /* 2. TYPOGRAPHY & LABELS */
+  .field-label, .field-label-main {
+    color: #e2e8f0 !important;
+  }
+  .field-label-small {
+    color: #94a3b8 !important;
+  }
+  .helper-text, .img-info-sub {
+    color: #94a3b8 !important;
+  }
+  .success-text {
+    color: #4ade80 !important;
+  }
+  .form-section-header h3 {
+    color: #e2e8f0 !important;
+  }
+  .required-badge {
+    background-color: #ef4444 !important;
+    color: #ffffff !important;
+  }
+
+  /* 3. INPUTS, SELECTS & TEXTAREAS */
+  .text-input, .select-input, .textarea-input {
+    background: #1e293b !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+  .text-input::placeholder {
+    color: #6b7280 !important;
+  }
+  .text-input:focus, .select-input:focus {
+    background: #1e293b !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.15) !important;
+  }
+
+  /* 4. SPECS SECTION */
+  .dynamic-specs-container {
+    background: #1e293b !important;
+  }
+  .specs-grid {
+    background: #0f172a !important;
+  }
+  .spec-label {
+    color: #e2e8f0 !important;
+  }
+  .spec-full-width {
+    background: #1e293b !important;
+    border-color: #4b5563 !important;
+  }
+  .spec-pill-button {
+    background: #1e293b !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+  .spec-pill-button:hover {
+    border-color: #3b82f6 !important;
+    color: #3b82f6 !important;
+  }
+  .spec-pill-button.selected {
+    background: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3) !important;
+  }
+
+  /* 5. CUSTOMIZATION TOGGLES */
+  .customization-controls {
+    background-color: #1e293b !important;
+  }
+  .custom-toggle-btn {
+    background-color: #0f172a !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+  .custom-toggle-btn.active {
+    border-color: #10b981 !important;
+    background-color: #1a3a2a !important;
+  }
+  .toggle-text {
+    color: #e2e8f0 !important;
+  }
+  .custom-toggle-btn.active .toggle-text {
+    color: #4ade80 !important;
+  }
+
+  /* 6. SIZE FORMAT */
+  .size-format-selector-wrapper {
+    background-color: #1a3a2a !important;
+    border-color: #10b981 !important;
+  }
+  .size-format-select {
+    background-color: #0f172a !important;
+    border-color: #10b981 !important;
+    color: #e2e8f0 !important;
+  }
+
+  /* 7. COLOR SECTION */
+  .color-input-wrapper {
+    background-color: #1e293b !important;
+    border-color: #4b5563 !important;
+  }
+  .color-mode-btn {
+    background-color: #0f172a !important;
+    color: #94a3b8 !important;
+  }
+  .color-mode-btn.active {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+  }
+  .color-mode-btn:last-child.active {
+    background-color: #10b981 !important;
+    color: #ffffff !important;
+  }
+  .color-picker-box {
+    border-color: #4b5563 !important;
+  }
+  .btn-add-color {
+    background-color: #4b5563 !important;
+    color: #94a3b8 !important;
+  }
+  .btn-add-color.active {
+    background-color: #10b981 !important;
+    color: #ffffff !important;
+  }
+  .color-examples {
+    color: #94a3b8 !important;
+  }
+  .color-helper-box {
+    background-color: #2d3748 !important;
+    color: #e2e8f0 !important;
+  }
+
+  /* 8. COLOR LIST CARDS */
+  .color-card {
+    border-color: #4b5563 !important;
+    background-color: #0f172a !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+  }
+  .color-header {
+    border-bottom-color: #4b5563 !important;
+  }
+  .color-swatch {
+    border-color: #4b5563 !important;
+  }
+  .color-title {
+    color: #e2e8f0 !important;
+  }
+  .color-status {
+    color: #94a3b8 !important;
+  }
+  .btn-delete-color {
+    background: #dc2626 !important;
+    color: #ffffff !important;
+  }
+  .size-add-wrapper {
+    background-color: #1e293b !important;
+  }
+  .size-add-wrapper label {
+    color: #e2e8f0 !important;
+  }
+  .btn-primary {
+    background-color: #10b981 !important;
+    color: #ffffff !important;
+  }
+
+  /* 9. STOCK GRID PER COLOR */
+  .stock-grid-wrapper label {
+    color: #e2e8f0 !important;
+  }
+  .stock-item {
+    background-color: #1e293b !important;
+    border-color: #4b5563 !important;
+  }
+  .stock-size {
+    color: #e2e8f0 !important;
+  }
+  .stock-input {
+    background-color: #0f172a !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+  .btn-remove-stock {
+    background: #dc2626 !important;
+    color: #ffffff !important;
+  }
+  .stock-total.color-total {
+    background-color: #1a3a2a !important;
+    color: #4ade80 !important;
+  }
+
+  /* 10. IMAGE UPLOAD */
+  .color-image-upload label {
+    color: #e2e8f0 !important;
+  }
+  .image-upload-box {
+    border-color: #4b5563 !important;
+    background-color: #1e293b !important;
+  }
+  .image-upload-box.uploaded {
+    border-color: #10b981 !important;
+    background-color: #1a3a2a !important;
+  }
+  .image-status-text {
+    color: #94a3b8 !important;
+  }
+
+  /* 11. GRAND TOTAL */
+  .grand-total-stock {
+    background-color: #0f172a !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+  .grand-total-number {
+    color: #4ade80 !important;
+  }
+  .helper-text-block {
+    color: #94a3b8 !important;
+  }
+
+  /* 12. MARKETPLACE LISTING */
+  .marketplace-container {
+    border-color: #dc2626 !important;
+    background-color: #2d1a1a !important;
+  }
+  .marketplace-warning {
+    background-color: #3d1a1a !important;
+    color: #f87171 !important;
+  }
+  .marketplace-card {
+    border-color: #4b5563 !important;
+    background-color: #0f172a !important;
+  }
+  .marketplace-card h4 {
+    color: #60a5fa !important;
+  }
+  .color-image-grid-item {
+    background-color: #1e293b !important;
+    border-color: #4b5563 !important;
+  }
+  .small-color-swatch {
+    border-color: #4b5563 !important;
+  }
+  .color-grid-text {
+    color: #e2e8f0 !important;
+  }
+  .stock-mini-text {
+    color: #94a3b8 !important;
+  }
+  .small-upload {
+    background-color: #1e293b !important;
+    border-color: #4b5563 !important;
+  }
+  .main-image-upload-wrapper {
+    background-color: #1e293b !important;
+    border-color: #4b5563 !important;
+  }
+  .img-info-title {
+    color: #e2e8f0 !important;
+  }
+  .img-info-sizes {
+    color: #94a3b8 !important;
+  }
+
+  /* 13. STOCK SUMMARY BOX */
+  .stock-summary-box {
+    background-color: #1e293b !important;
+  }
+  .stock-summary-box span {
+    color: #94a3b8 !important;
+  }
+  .highlight-blue {
+    color: #60a5fa !important;
+  }
+  .highlight-green {
+    color: #4ade80 !important;
+  }
+
+  /* 14. SALES MODE & TIERED PRICING */
+  .sales-mode-card {
+    background: #1e3a5f !important;
+    border-color: #3b82f6 !important;
+  }
+  .sales-mode-options {
+    color: #e2e8f0 !important;
+  }
+  .checkbox-label {
+    color: #e2e8f0 !important;
+  }
+  .checkbox-label input[type="checkbox"] {
+    accent-color: #3b82f6 !important;
+  }
+  .tiered-pricing-container {
+    background: #0f172a !important;
+    border-color: #4b5563 !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+  }
+  .tier-row-grid input {
+    background: #1e293b !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+  .tier-row-grid input:focus {
+    border-color: #3b82f6 !important;
+    background: #1e293b !important;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15) !important;
+  }
+  .remove-tier-btn {
+    background: #2d1a1a !important;
+    color: #f87171 !important;
+  }
+  .remove-tier-btn:hover {
+    background: #dc2626 !important;
+    color: #ffffff !important;
+  }
+  .add-tier-btn {
+    background: #1e293b !important;
+    color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+  }
+  .add-tier-btn:hover {
+    background: #3b82f6 !important;
+    color: #ffffff !important;
+  }
+  .minimum-order-quantity {
+    border-top-color: #4b5563 !important;
+  }
+  .minimum-order-quantity input {
+    border-color: #4b5563 !important;
+    background: #1e293b !important;
+    color: #e2e8f0 !important;
+  }
+
+  /* 15. SHIPPING */
+  .shipping-container {
+    border-color: #4b5563 !important;
+    background-color: #1e293b !important;
+  }
+  .distance-shipping {
+    background-color: #0f172a !important;
+    border-color: #4b5563 !important;
+  }
+  .shipping-formula-box {
+    background-color: #1e3a5f !important;
+  }
+  .shipping-formula-box p {
+    color: #e2e8f0 !important;
+  }
+  .shipping-formula-box p:last-child {
+    color: #94a3b8 !important;
+  }
+  .zone-box {
+    background-color: #0f172a !important;
+    border-color: #4b5563 !important;
+  }
+  .zone-box input {
+    border-color: #4b5563 !important;
+    background: #1e293b !important;
+    color: #e2e8f0 !important;
+  }
+  .free-shipping-box {
+    background-color: #1a3a2a !important;
+  }
+  .free-shipping-box p {
+    color: #4ade80 !important;
+  }
+  .free-shipping-box small {
+    color: #10b981 !important;
+  }
+  .pickup-address-box {
+    background-color: #2d3748 !important;
+    color: #e2e8f0 !important;
+  }
+  .pickup-address-box p {
+    color: #e2e8f0 !important;
+  }
+
+  /* 16. FOOTER SECTION (COST & PROFIT) */
+  .footer-section {
+    background: #1e293b !important;
+    border-color: #4b5563 !important;
+  }
+  .footer-section input[type="number"], .footer-section input[type="text"] {
+    background: #0f172a !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+  .footer-section input:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15) !important;
+  }
+  .footer-section .form-group:first-child input {
+    border-color: #10b981 !important;
+    color: #4ade80 !important;
+  }
+  .footer-section .form-group:last-child input {
+    background: #1e3a5f !important;
+    border-color: #3b82f6 !important;
+  }
+
+  /* 17. ALERTS & DEBUG */
+  .alert-box-warning {
+    background: #2d1a1a !important;
+    color: #f87171 !important;
+    border-color: #dc2626 !important;
+  }
+  .debug-box {
+    background-color: #1e293b !important;
+  }
+  .debug-box p {
+    color: #94a3b8 !important;
+  }
+
+  /* 18. SCROLLBARS */
+  .product-attributes-container::-webkit-scrollbar-track {
+    background: #1e293b !important;
+  }
+  .product-attributes-container::-webkit-scrollbar-thumb {
+    background: #4b5563 !important;
+    border-radius: 8px !important;
+  }
+  .product-attributes-container::-webkit-scrollbar-thumb:hover {
+    background: #3b82f6 !important;
+  }
+
+  /* 19. RESPONSIVE MEDIA QUERIES - DARK MODE */
+  @media (max-width: 768px) {
+    .footer-section {
+      background: #1e293b !important;
+    }
+  }
+}

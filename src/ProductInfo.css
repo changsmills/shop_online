@@ -824,3 +824,123 @@
     color: #94a3b8;
   }
 }
+/* ============================================ */
+/* 18. DARK MODE FIXES - VIFUNGO NA KADI        */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  
+  /* 1. FOOTER BUTTONS GROUP (Container nyeupe) */
+  .footer-buttons-group {
+    background: #1f2937 !important; /* Dark blue background */
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* 2. FIX: "Order via WhatsApp" Button */
+  .btn-whatsapp-full {
+    background-color: #25D366 !important; /* Inabaki green, ni brand color */
+    color: white !important;
+  }
+
+  /* 3. FIX: "Order Now" Button (Orange) */
+  .btn-orange-full {
+    background: #ff4e00 !important; /* Inabaki orange */
+    color: white !important;
+  }
+
+  /* 4. FIX: "Add to Cart" Button (White outline) */
+  .btn-white-outline {
+    background: #374151 !important; /* Dark blue instead of white */
+    color: #ff4e00 !important;
+    border: 1px solid #ff4e00 !important;
+  }
+  .btn-white-outline:hover {
+    background: #4b5563 !important;
+  }
+
+  /* 5. FIX: Chat Icon Button */
+  .btn-chat-icon {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #e5e7eb !important;
+  }
+  .btn-chat-icon:hover {
+    background-color: #4b5563 !important;
+  }
+
+  /* 6. FIX: Size Buttons */
+  .size-btn {
+    background: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+  .size-btn.active {
+    background: #fff4f0 !important;
+    color: #ff4e00 !important;
+    border-color: #ff4e00 !important;
+  }
+  .size-btn.out-of-stock {
+    opacity: 0.4 !important;
+    color: #6b7280 !important;
+  }
+
+  /* 7. FIX: Color Options */
+  .color-square {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+  }
+  .color-square.active {
+    border-color: #ff4e00 !important;
+    box-shadow: 0 0 0 2px rgba(255, 78, 0, 0.4) !important;
+  }
+
+  /* 8. FIX: Price Section (Kadi ya bei) */
+  .price-section {
+    background-color: #1f2937 !important; /* Dark blue bg */
+    border: 1px solid #4b5563 !important;
+  }
+
+  /* 9. FIX: Stock Status Row (Mstari wa hali ya stoo) */
+  .stock-status-row {
+    border-top-color: #4b5563 !important;
+    border-bottom-color: #4b5563 !important;
+  }
+
+  /* 10. FIX: MOBILE BOTTOM NAV (Footer ya simu) */
+  .mobile-bottom-order-nav {
+    background: #1f2937 !important;
+    border-top-color: #4b5563 !important;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  .mobile-bottom-order-nav button {
+    color: #e2e8f0 !important;
+  }
+
+  .mobile-add-to-cart-btn {
+    background: #374151 !important;
+    color: #ff4e00 !important;
+    border: 1px solid #ff4e00 !important;
+  }
+
+  .mobile-chat-btn {
+    background: #374151 !important;
+    color: #e2e8f0 !important;
+  }
+
+  .mobile-add-to-cart-btn:active,
+  .mobile-chat-btn:active {
+    background: #4b5563 !important;
+  }
+
+  /* 11. FIX: Scrollbar kwenye Dark Mode */
+  .info-main-container::-webkit-scrollbar-track {
+    background: #1f2937 !important;
+  }
+  .info-main-container::-webkit-scrollbar-thumb {
+    background: #4b5563 !important;
+  }
+  .info-main-container::-webkit-scrollbar-thumb:hover {
+    background: #ff4e00 !important;
+  }
+}

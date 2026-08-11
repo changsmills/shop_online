@@ -883,3 +883,260 @@ input[type="number"]::-webkit-outer-spin-button {
         display: none !important;
     }
 }
+
+/* ============================================================== */
+/* 8. DARK MODE SUPPORT - SELECTION DRAWER                        */
+/* ============================================================== */
+
+@media (prefers-color-scheme: dark) {
+
+  /* 1. OVERLAY - Inabaki nyeusi, lakini hafifu zaidi */
+  .drawer-overlay {
+    background: rgba(0, 0, 0, 0.85) !important;
+    backdrop-filter: blur(6px) !important;
+  }
+
+  /* 2. DESKTOP RIGHT DRAWER - Background kuu */
+  .right-side-drawer {
+    background-color: #1f2937 !important; /* Dark Blue Background */
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.6) !important;
+    color: #e2e8f0 !important;
+  }
+
+  /* 3. MOBILE BOTTOM SHEET - Background kuu */
+  .mobile-bottom-sheet {
+    background: #1f2937 !important;
+    box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.6) !important;
+    color: #e2e8f0 !important;
+  }
+
+  /* 4. HEADERS - "Select variations" na Close button */
+  .drawer-header,
+  .bottom-sheet-header {
+    background: #1f2937 !important;
+    border-bottom-color: #4b5563 !important;
+  }
+  
+  .drawer-header h3,
+  .bottom-sheet-header h3 {
+    color: #e2e8f0 !important;
+  }
+  
+  .close-btn,
+  .bottom-sheet-close {
+    background: #374151 !important;
+    color: #e2e8f0 !important;
+  }
+  
+  .close-btn:hover,
+  .bottom-sheet-close:hover {
+    background: #4b5563 !important;
+  }
+
+  /* 5. DRAWER CONTENT - Scrollable area */
+  .drawer-content,
+  .bottom-sheet-content {
+    background: #1f2937 !important;
+    color: #e2e8f0 !important;
+  }
+
+  /* 6. PRODUCT INFO - Jina na Bei */
+  .product-info {
+    color: #e2e8f0 !important;
+  }
+  
+  .product-name,
+  .bottom-sheet-product-name {
+    color: #e2e8f0 !important;
+  }
+  
+  .product-price,
+  .bottom-sheet-product-price {
+    color: #ff4e00 !important; /* Inabaki orange */
+  }
+
+  /* 7. SECTIONS - "Color" na "Size" labels */
+  .section-title {
+    color: #e2e8f0 !important;
+  }
+
+  /* 8. COLOR ITEMS - Picha za rangi */
+  .color-item {
+    background: #374151 !important;
+    border-color: #4b5563 !important;
+  }
+  
+  .color-item.selected {
+    box-shadow: 0 0 0 2px #ff4e00 !important;
+    background: #1f2937 !important;
+  }
+  
+  .color-name {
+    color: #94a3b8 !important;
+  }
+
+  /* 9. SIZE ITEMS - Vifungo vya ukubwa */
+  .size-item {
+    background: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+  
+  .size-item.active {
+    border-color: #ff4e00 !important;
+    background: #2d3748 !important;
+  }
+  
+  .size-name {
+    color: #e2e8f0 !important;
+  }
+  
+  .size-price {
+    color: #94a3b8 !important;
+  }
+  
+  .stock-info.in-stock {
+    color: #4ade80 !important; /* Green inayong'aa */
+  }
+  
+  .stock-info.out-of-stock {
+    color: #f87171 !important; /* Red inayong'aa */
+  }
+
+  /* 10. QUANTITY CONTROLS - Vifungo vya +/- na input */
+  .qty-btn {
+    background: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+  
+  .qty-btn:hover:not(:disabled) {
+    background: #4b5563 !important;
+    border-color: #ff4e00 !important;
+  }
+  
+  .qty-btn:disabled {
+    background: #1f2937 !important;
+    color: #6b7280 !important;
+  }
+  
+  .qty-input {
+    background: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+  
+  .qty-input:focus {
+    border-color: #ff4e00 !important;
+  }
+
+  /* 11. FOOTER - Subtotal na Buttons */
+  .drawer-footer,
+  .bottom-sheet-footer {
+    background: #1f2937 !important;
+    border-top-color: #4b5563 !important;
+  }
+  
+  .subtotal-label,
+  .bottom-sheet-summary-label {
+    color: #94a3b8 !important;
+  }
+  
+  .subtotal-value,
+  .bottom-sheet-summary-value {
+    color: #ff4e00 !important;
+  }
+
+  /* 12. BUTTONS - Order Now, Add to Cart, WhatsApp */
+  .btn-order,
+  .bottom-sheet-btn-order {
+    background: #ff4e00 !important; /* Inabaki orange */
+    color: #ffffff !important;
+  }
+  
+  .btn-order:disabled,
+  .bottom-sheet-btn-order:disabled {
+    background: #4b5563 !important;
+    color: #9ca3af !important;
+    opacity: 1 !important;
+  }
+  
+  .btn-cart,
+  .bottom-sheet-btn-cart {
+    background: #374151 !important;
+    color: #ff4e00 !important;
+    border-color: #ff4e00 !important;
+  }
+  
+  .btn-cart:disabled,
+  .bottom-sheet-btn-cart:disabled {
+    background: #1f2937 !important;
+    border-color: #4b5563 !important;
+    color: #6b7280 !important;
+  }
+  
+  .btn-chat,
+  .bottom-sheet-btn-chat {
+    background: #25D366 !important; /* Inabaki green */
+    color: #ffffff !important;
+  }
+  
+  .btn-chat:disabled,
+  .bottom-sheet-btn-chat:disabled {
+    opacity: 0.6 !important;
+  }
+
+  /* 13. PRODUCT PREVIEW (Mobile) - Picha na info */
+  .bottom-sheet-product-preview {
+    background: #1f2937 !important;
+  }
+  
+  .bottom-sheet-product-image {
+    background: #374151 !important;
+  }
+
+  /* 14. DRAG HANDLE (Mobile) */
+  .bottom-sheet-drag-handle {
+    background: #4b5563 !important;
+  }
+
+  /* 15. SCROLLBARS */
+  .drawer-content::-webkit-scrollbar-track,
+  .bottom-sheet-content::-webkit-scrollbar-track {
+    background: #1f2937 !important;
+  }
+  
+  .drawer-content::-webkit-scrollbar-thumb,
+  .bottom-sheet-content::-webkit-scrollbar-thumb {
+    background: #4b5563 !important;
+    border-radius: 10px !important;
+  }
+  
+  .drawer-content::-webkit-scrollbar-thumb:hover,
+  .bottom-sheet-content::-webkit-scrollbar-thumb:hover {
+    background: #ff4e00 !important;
+  }
+
+  /* 16. NAVIGATION ARROWS (Floating image) */
+  .nav-arrow {
+    background: #374151 !important;
+    color: #e2e8f0 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+  }
+  
+  .nav-arrow:hover {
+    background: #ff4e00 !important;
+    color: #ffffff !important;
+  }
+
+  /* 17. IMAGE COUNTER */
+  .image-counter {
+    background: rgba(31, 41, 55, 0.9) !important;
+    color: #e2e8f0 !important;
+  }
+
+  /* 18. PRODUCT IMAGE CONTAINER (Floating) */
+  .product-image-container {
+    background: transparent !important;
+  }
+}

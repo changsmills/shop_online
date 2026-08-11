@@ -1,25 +1,716 @@
-/* Mitindo ya kipekee kwa ajili ya Dashboard */
-.dashboard-container {
+/* ============================================
+   THEME VARIABLES - LIGHT MODE (Default)
+   ============================================ */
+:root {
+  /* Backgrounds */
+  --bg-body: #ffffff;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-card: #ffffff;
+  --bg-header: #ffffff;
+  --bg-sidebar: #ffffff;
+  
+  /* Text Colors */
+  --text-primary: #1a1a1a;
+  --text-secondary: #6c757d;
+  --text-muted: #9ca3af;
+  --text-cat: #444;
+  
+  /* Borders */
+  --border-color: #e9ecef;
+  --border-light: #f0f0f0;
+  
+  /* Brand */
+  --brand-orange: #ff6a00;
+  --brand-orange-hover: #e55a00;
+}
+
+/* ============================================
+   DARK MODE - INAFUATA DEVICE
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-body: #1a1a1a;
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --bg-card: #2d2d2d;
+    --bg-header: #1a1a1a;
+    --bg-sidebar: #2d2d2d;
+    
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --text-muted: #6c757d;
+    --text-cat: #aaaaaa;
+    
+    --border-color: #404040;
+    --border-light: #3d3d3d;
+    
+    --brand-orange: #ff6a00;
+    --brand-orange-hover: #e55a00;
+  }
+}
+
+/* ============================================
+   LAYER 1: GLOBAL RESET & BASE
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: hidden;
+  font-family: 'Roboto', Helvetica, Arial, sans-serif;
+  background-color: var(--bg-body);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ============================================
+   LAYER 2: DASHBOARD WRAPPER
+   ============================================ */
+.dashboard-wrapper {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-primary);
+    min-height: 100vh;
+    position: relative;
+    padding-top: 90px;
+}
+
+@media (max-width: 1024px) {
+    .dashboard-wrapper { padding-top: 0px !important; }
+}
+
+/* ============================================
+   LAYER 3: HEADER
+   ============================================ */
+.sticky-header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  background: var(--bg-header);
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+/* ============================================
+   LAYER 4: MAIN CONTENT - ✅ IMEBADILISHWA
+   ============================================ */
+.main-content {
+  flex: 1;
+  background-color: var(--bg-primary); /* IMEBADILISHWA! */
+  min-height: 100vh;
+  padding-top: 0;
+  padding-bottom: 0;
+  width: 100%;
+}
+
+/* ============================================
+   LAYER 5: CONTENT CONTAINER
+   ============================================ */
+.content-container-simple {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* ============================================
+   LAYER 6: CATEGORY SLIDER
+   ============================================ */
+.category-slider-wrapper {
+  display: block;
+  background: var(--bg-primary);
+  width: 100%;
+  margin-top: 9px !important; 
+}
+
+@media (min-width: 1025px) { .category-slider-wrapper { display: none; } }
+
+.mobile-category-slider {
+  display: flex !important;
+  overflow-x: auto !important; 
+  overflow-y: hidden !important;
+  flex-wrap: nowrap !important; 
+  gap: 12px;
+  padding: 12px 16px;
+  scroll-behavior: smooth;
+  scrollbar-width: none; 
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  box-sizing: border-box;
+}
+.mobile-category-slider::-webkit-scrollbar { display: none; }
+
+.mobile-cat-item {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-  background-color: #f8fafc;
+  align-items: center;
+  flex-shrink: 0 !important;
+  min-width: 70px !important;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.mobile-cat-item:active { transform: scale(0.95); }
+
+.cat-circle-icon {
+  width: 56px;
+  height: 56px;
+  background: var(--bg-secondary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+}
+.mobile-cat-item.active .cat-circle-icon { background: var(--brand-orange); }
+
+.mobile-cat-item span {
+  font-size: 11px;
+  color: var(--text-cat);
+  text-align: center;
+  max-width: 70px;
+  word-break: break-word;
+}
+.mobile-cat-item.active span { color: var(--brand-orange); font-weight: 500; }
+
+/* ============================================
+   LAYER 7: TOP LAYOUT (Sidebar + Banner)
+   ============================================ */
+.alibaba-top-layout {
+  display: block;
+  width: 100%;
+  margin: 0 !important;
 }
 
-/* Kuficha scrollbar ya kategoria lakini inascroll */
-.no-scrollbar::-webkit-scrollbar {
+@media (min-width: 1025px) {
+  .alibaba-top-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 0;
+    margin: 0 !important;
+    align-items: stretch;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+}
+
+.side-categories {
   display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  background: var(--bg-card);
+  border-radius: 0;
+  border: none;
+  overflow: hidden;
+  max-height: 480px;
+  flex-direction: column;
+  box-shadow: none;
 }
 
-/* Background ya sehemu ya AI */
-.ai-section-bg {
-  background: rgba(239, 246, 255, 0.5);
-  border-radius: 2.5rem;
-  border: 1px solid rgba(219, 234, 254, 0.5);
+@media (min-width: 1025px) {
+  .side-categories { 
+    display: flex;
+    border-right: 1px solid var(--border-color);
+    border-radius: 0;
+  }
+}
+
+.side-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-light);
+  flex-shrink: 0;
+  background: var(--bg-card);
+}
+
+.categories-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+  overflow-y: auto;
+  flex: 1;
+}
+.categories-list::-webkit-scrollbar { width: 6px; }
+.categories-list::-webkit-scrollbar-track { background: var(--bg-secondary); border-radius: 10px; }
+.categories-list::-webkit-scrollbar-thumb { background: var(--brand-orange); border-radius: 10px; }
+
+.categories-list li {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  gap: 12px;
+  border-bottom: 1px solid var(--border-light);
+}
+.categories-list li:hover {
+  background: var(--bg-secondary);
+  padding-left: 24px;
+}
+.cat-icon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-secondary);
+}
+.cat-name {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.arrow {
+  color: var(--border-color);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.categories-list li:hover .arrow { opacity: 1; color: var(--brand-orange); }
+
+/* ============================================
+   HERO BANNER
+   ============================================ */
+.hero-banners-container {
+  width: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+}
+
+.hot-picks-banner {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  overflow: hidden;
+  border-radius: 12px !important;
+}
+
+@media (min-width: 600px) { .hot-picks-banner { aspect-ratio: 16/7; } }
+@media (min-width: 1025px) {
+  .hot-picks-banner { aspect-ratio: auto; height: 480px; border-radius: 0 !important; }
+}
+
+.banner-media { width: 100%; height: 100%; object-fit: cover; display: block; background-color: #1a1a2e; }
+
+.banner-overlay-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 16px;
+  color: white;
+  background: linear-gradient(90deg, rgba(0,0,0,0.6) 0%, transparent 70%);
+  pointer-events: none;
+}
+@media (min-width: 600px) { .banner-overlay-text { padding: 24px; } }
+@media (min-width: 1025px) { .banner-overlay-text { padding: 40px; } }
+
+.banner-overlay-text .ad-tag {
+  background: var(--brand-orange);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 10px;
+  display: inline-block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  width: fit-content;
+}
+.banner-overlay-text .banner-title {
+  margin: 4px 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  line-height: 1.3;
+}
+@media (min-width: 600px) { .banner-overlay-text .banner-title { font-size: 1.6rem; } }
+@media (min-width: 1025px) { .banner-overlay-text .banner-title { font-size: 2rem; } }
+
+.banner-overlay-text .banner-desc {
+  margin: 4px 0;
+  font-size: 0.8rem;
+  max-width: 70%;
+  line-height: 1.4;
+}
+@media (max-width: 768px) { .banner-overlay-text .banner-desc { max-width: 100%; } }
+
+.banner-overlay-text .view-more-banner {
+  background: var(--brand-orange);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-top: 8px;
+  font-weight: 600;
+  pointer-events: auto;
+  width: fit-content;
+  transition: 0.2s;
+}
+.banner-overlay-text .view-more-banner:hover { background: var(--brand-orange-hover); }
+
+/* ============================================
+   LAYER 8: COMPONENTS WRAPPER
+   ============================================ */
+.components-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 0; 
+  padding-top: 10px; 
+}
+
+.components-wrapper > * { margin-top: 0 !important; }
+
+@media (min-width: 600px) { .components-wrapper { gap: 0; margin-top: 0; } }
+
+/* ============================================
+   LAYER 9: FOOTER & BOTTOM NAV
+   ============================================ */
+.footer-wrapper { display: block; margin-top: 0; }
+@media (max-width: 1024px) { .footer-wrapper { display: none !important; } }
+
+.bottom-nav-wrapper { display: none; }
+@media (max-width: 1024px) {
+  .bottom-nav-wrapper { display: block !important; position: fixed; bottom: 0; left: 0; right: 0; width: 100%; z-index: 999; }
+  .dashboard-wrapper { padding-bottom: 70px !important; }
+  .main-content { padding-bottom: 70px !important; }
+}
+
+/* ============================================
+   LAYER 10: GRIDS & CARDS - ✅ IMEBADILISHWA
+   ============================================ */
+.alibaba-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+  background: var(--bg-primary); /* IMEBADILISHWA! */
+}
+@media (min-width: 600px) { .alibaba-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; } }
+@media (min-width: 1025px) { .alibaba-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 18px; } }
+
+.dashboard-card {
+  background: var(--bg-card); /* IMEBADILISHWA! */
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-color); /* IMEBADILISHWA! */
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px var(--shadow-lg);
+  border-color: var(--brand-orange);
+}
+.dashboard-card img { width: 100%; height: 160px; object-fit: cover; }
+.dashboard-card h4 {
+  padding: 10px 12px 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary); /* IMEBADILISHWA! */
+}
+.dashboard-card p {
+  padding: 0 12px 12px;
+  font-weight: 800;
+  color: var(--brand-orange);
+  font-size: 16px;
+}
+
+/* ============================================
+   LAYER 11: SECTION HEADERS - ✅ IMEBADILISHWA
+   ============================================ */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 !important;
+  padding: 8px 0 !important;
+}
+.section-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary); /* IMEBADILISHWA! */
+  margin: 0;
+}
+.section-header .subtitle {
+  color: var(--text-secondary); /* IMEBADILISHWA! */
+  font-size: 0.9rem;
+}
+.view-more-btn {
+  background: transparent;
+  color: var(--brand-orange);
+  border: 1px solid var(--brand-orange);
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.view-more-btn:hover { background: var(--brand-orange); color: white; }
+
+/* ============================================
+   LAYER 12: SEARCH & ERROR
+   ============================================ */
+.search-results-wrapper { padding: 16px 0; }
+.search-heading { margin-bottom: 16px; font-size: 1.1rem; color: var(--text-primary); }
+
+.error-container { text-align: center; padding: 60px 20px; }
+.error-title { color: #dc2626; }
+.error-message { color: var(--text-secondary); }
+.error-retry-btn {
+  background: var(--brand-orange);
+  color: white;
+  border: none;
+  padding: 10px 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+/* ============================================
+   MEGA MENU, MOBILE MODAL, nk. (Zinabaki sawa, tumia variables)
+   ============================================ */
+/* ... (Nakili zilizobaki kutoka kwenye CSS yako ya awali, lakini badilisha rangi zote za hardcoded kuwa var(--bg-primary), var(--text-primary), nk.) */
+
+/* ============================================
+   LAYER 13: MOBILE CATEGORIES MODAL (ALIBABA STYLE)
+   ============================================ */
+.mobile-categories-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-overlay, rgba(0, 0, 0, 0.6));
+  z-index: 99999 !important;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  animation: fadeIn 0.2s ease;
+}
+
+.mobile-categories-modal {
+  width: 100%;
+  height: 100%;
+  background: var(--mobile-bg, #ffffff);
+  border-radius: 20px 20px 0 0;
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 -5px 20px var(--shadow-lg, rgba(0,0,0,0.2));
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================
+   HEADER - SEHEMU YA JUU
+   ============================================ */
+.mc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: var(--bg-primary, #ffffff);
+  border-bottom: 1px solid var(--border-light, #f0f0f0);
+  flex-shrink: 0;
+  height: 60px;
+}
+
+.mc-back-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-primary, #333);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.mc-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.mc-spacer {
+  width: 30px; /* Inasawazisha nafasi ya kulia na kushoto */
+}
+
+/* ============================================
+   BODY - SIDEBAR NA CONTENT
+   ============================================ */
+.mc-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  height: calc(100% - 60px); /* Toa nafasi ya Header */
+}
+
+/* SIDEBAR (KUSHOTO) */
+.mc-sidebar {
+  width: 28%;
+  min-width: 85px;
+  max-width: 110px;
+  background: var(--bg-sidebar, #fcfcfc);
+  overflow-y: auto;
+  border-right: 1px solid var(--border-light, #f0f0f0);
+  padding: 12px 0;
+}
+
+.mc-sidebar-item {
+  padding: 12px 8px;
+  font-size: 12px;
+  color: var(--text-secondary, #666);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  line-height: 1.2;
+  word-break: break-word;
+}
+.mc-sidebar-item.active {
+  color: var(--text-primary, #000);
+  font-weight: 700;
+  border-left: 3px solid var(--brand-orange, #ff6a00);
+  background: var(--bg-secondary, #f5f5f5);
+}
+
+/* CONTENT (KULIA) - INA PADDING KUSHOTO */
+.mc-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px 20px 80px !important; /* Paddings zake */
+  background: var(--bg-primary, white);
+  box-sizing: border-box;
+}
+
+.mc-section {
+  margin-bottom: 24px;
+}
+
+.mc-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary, #222);
+  margin: 0 0 16px 0;
+}
+.mc-section-title:not(:first-child) {
+  margin-top: 24px;
+}
+
+/* ============================================
+   RECOMMENDATIONS (Picha za Duara)
+   ============================================ */
+.mc-recommendations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); 
+  gap: 16px;
+  justify-items: center;
+  padding-right: 0;
+}
+
+.mc-recommendation-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  width: 100%;
+}
+
+.mc-rec-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--bg-secondary, #f0f0f0);
+  margin: 0 auto 6px auto;
+  flex-shrink: 0;
+}
+
+.mc-rec-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mc-recommendation-item p {
+  font-size: 10px;
+  color: var(--text-primary, #333);
+  margin: 0;
+  line-height: 1.2;
+  max-width: 70px;
+  word-break: break-word;
+}
+
+/* ============================================
+   GET PRODUCT INSPIRATION (Bidhaa 2x2)
+   ============================================ */
+.mc-inspiration-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.mc-inspiration-card {
+  background: var(--bg-card, white);
+  border: 1px solid var(--border-light, #eee);
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mc-inspiration-card:hover {
+  box-shadow: 0 4px 8px var(--shadow-color, rgba(0,0,0,0.05));
+  border-color: var(--brand-orange, #ff6a00);
+}
+
+.mc-inspiration-card img {
+  width: 100%;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+
+.mc-insp-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary, #222);
+  margin: 0 0 2px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.mc-insp-price {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--brand-orange, #ff6a00);
+  margin: 0 0 2px 0;
+}
+
+.mc-insp-moq {
+  font-size: 10px;
+  color: var(--text-secondary, #888);
+  margin: 0;
+}
+
+/* ============================================
+   ANIMATIONS (Zilizopo)
+   ============================================ */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
 }

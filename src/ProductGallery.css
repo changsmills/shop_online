@@ -2120,3 +2120,254 @@ input[type="range"]::-webkit-slider-thumb {
     background: var(--primary-color) !important;
   }
 }
+/* ============================================ */
+/* DARK MODE OVERRIDES (Ongeza hii MWISHONI)    */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  
+  /* 1. GALLERY MAIN CONTAINER */
+  .gallery-main-container {
+    background: var(--bg-primary, #0f172a) !important;
+    color: var(--text-primary, #e2e8f0) !important;
+  }
+
+  /* 2. THUMBNAILS & BORDERS */
+  .thumb-item {
+    background: var(--bg-card, #1e293b) !important;
+    border-color: var(--border-color, #334155) !important;
+  }
+  
+  .thumb-item img {
+    background: transparent !important;
+  }
+
+  .thumb-item:hover,
+  .thumb-item.active {
+    border-color: var(--brand-orange, #ff6a00) !important;
+    box-shadow: 0 0 0 2px var(--brand-orange, #ff6a00) !important;
+  }
+
+  /* 3. MAIN STAGE & DISPLAY */
+  .main-stage,
+  .main-display,
+  .zoom-container {
+    background: var(--bg-card, #0f172a) !important;
+    border-color: var(--border-color, #334155) !important;
+  }
+
+  .base-image {
+    background: transparent !important;
+  }
+
+  .zoom-result {
+    background-color: var(--bg-card, #0f172a) !important;
+    border-color: var(--border-color, #334155) !important;
+  }
+
+  /* 4. NAVIGATION ARROWS (External) */
+  .nav-arrow {
+    background: var(--bg-card, #1e293b) !important;
+    border-color: var(--border-color, #334155) !important;
+    color: var(--text-primary, #e2e8f0) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+  }
+  
+  .nav-arrow:hover {
+    background: var(--brand-orange, #ff6a00) !important;
+    color: #ffffff !important;
+    border-color: var(--brand-orange, #ff6a00) !important;
+  }
+
+  /* 5. ICON BUTTON (Maximize) */
+  .icon-btn {
+    background: var(--bg-card, #1e293b) !important;
+    color: var(--text-primary, #e2e8f0) !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5) !important;
+  }
+  
+  .icon-btn:hover {
+    background: var(--brand-orange, #ff6a00) !important;
+    color: #ffffff !important;
+  }
+
+  /* 6. BUSINESS SECTION & CARDS */
+  .business-scroll-section {
+    border-top-color: var(--border-color, #334155) !important;
+  }
+
+  .section-title {
+    color: var(--text-primary, #e2e8f0) !important;
+  }
+
+  .business-info-card,
+  .detail-img-full,
+  .contact-card,
+  .store-img-wrapper {
+    background: var(--bg-card, #1e293b) !important;
+    color: var(--text-primary, #e2e8f0) !important;
+  }
+
+  .store-img-wrapper {
+    color: var(--text-secondary, #94a3b8) !important;
+  }
+
+  /* 7. KBC FULL VIEW LIST */
+  .kbc-full-view-list {
+    background: var(--bg-primary, #0f172a) !important;
+  }
+  
+  .kbc-full-view-item {
+    border-bottom-color: var(--border-color, #334155) !important;
+  }
+
+  /* 8. STORE VERIFICATION */
+  .store-verification-stack,
+  .office-about-card,
+  .full-width-map-card,
+  .map-placeholder,
+  .business-verification-grid,
+  .verification-details .info-item {
+    background: var(--bg-card, #1e293b) !important;
+    border-color: var(--border-color, #334155) !important;
+    color: var(--text-primary, #e2e8f0) !important;
+  }
+
+  .office-about-card {
+    border-left-color: #3b82f6 !important;
+  }
+
+  .contact-card .label {
+    color: var(--text-primary, #e2e8f0) !important;
+  }
+
+  .contact-card .value {
+    color: var(--text-secondary, #94a3b8) !important;
+  }
+
+  .full-width-map-card {
+    border-color: #3b82f6 !important;
+    color: #60a5fa !important;
+  }
+
+  .map-placeholder {
+    color: var(--text-secondary, #94a3b8) !important;
+  }
+
+  /* 9. LIGHTBOX MODAL */
+  .lightbox-overlay {
+    background: rgba(0, 0, 0, 0.98) !important;
+  }
+
+  .lightbox-content {
+    background: #000000 !important;
+    border-color: var(--border-color, #334155) !important;
+  }
+
+  .lightbox-sidebar {
+    background: var(--bg-card, #0f172a) !important;
+    border-right-color: var(--border-color, #334155) !important;
+  }
+
+  .modal-header-info h4,
+  .modal-header-info p,
+  .modal-footer-caption,
+  .counter {
+    color: var(--text-primary, #e2e8f0) !important;
+  }
+
+  .mini-thumbs img {
+    border-color: var(--border-color, #334155) !important;
+    background: var(--bg-card, #1e293b) !important;
+  }
+
+  .mini-thumbs img.active-mini {
+    border-color: var(--brand-orange, #ff6a00) !important;
+  }
+
+  /* Modal Navigation Buttons */
+  .modal-nav-btn {
+    background: var(--bg-card, #1e293b) !important;
+    border: 1px solid var(--border-color, #334155) !important;
+    color: var(--text-primary, #e2e8f0) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+  }
+  
+  .modal-nav-btn:hover {
+    background: var(--brand-orange, #ff6a00) !important;
+    border-color: var(--brand-orange, #ff6a00) !important;
+    color: #ffffff !important;
+  }
+
+  .close-lightbox {
+    background: var(--bg-card, #1e293b) !important;
+    color: var(--text-primary, #e2e8f0) !important;
+    border: 1px solid var(--border-color, #334155) !important;
+  }
+  
+  .close-lightbox:hover {
+    background: var(--brand-orange, #ff6a00) !important;
+    color: #ffffff !important;
+  }
+
+  /* 10. MOBILE GALLERY */
+  .gallery-mobile-simple {
+    background: var(--bg-primary, #0f172a) !important;
+  }
+
+  .mobile-main-display {
+    background: #000000 !important;
+  }
+
+  .mobile-toggle-buttons button {
+    background: var(--bg-card, #1e293b) !important;
+    color: var(--text-secondary, #94a3b8) !important;
+    border: 1px solid var(--border-color, #334155) !important;
+  }
+
+  .mobile-toggle-buttons button.active {
+    background: var(--brand-orange, #ff6a00) !important;
+    color: #ffffff !important;
+  }
+
+  /* 11. FULL VIEW GALLERY LIST */
+  .full-view-gallery-list,
+  .full-view-item {
+    background: var(--bg-primary, #0f172a) !important;
+    color: var(--text-primary, #e2e8f0) !important;
+  }
+
+  .full-view-item {
+    border-color: var(--border-color, #334155) !important;
+  }
+
+  /* 12. SOCIAL BUTTONS */
+  .social-btn {
+    background: var(--bg-card, #1e293b) !important;
+    border-color: var(--border-color, #334155) !important;
+    color: var(--text-primary, #e2e8f0) !important;
+  }
+  
+  .social-btn:hover {
+    background: var(--border-color, #334155) !important;
+  }
+
+  /* 13. EMPTY & MISC */
+  .loading {
+    color: var(--text-primary, #e2e8f0) !important;
+  }
+
+  /* 14. SCROLLBARS (Zinapendeza kwenye Dark Mode) */
+  ::-webkit-scrollbar-track {
+    background: var(--bg-card, #1e293b) !important;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-color, #334155) !important;
+    border-radius: 8px !important;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--brand-orange, #ff6a00) !important;
+  }
+}

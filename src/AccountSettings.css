@@ -760,3 +760,322 @@
   .settings-container { padding: 0 !important; background: white !important; }
   .settings-card { box-shadow: none !important; border: 1px solid #ddd !important; }
 }
+/* ============================================ */
+/* DARK MODE SUPPORT - ACCOUNT SETTINGS          */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+
+  /* 1. MAIN LAYOUT & BACKGROUND */
+  .dashboard-layout {
+    background: #0f172a !important;
+  }
+
+  .dashboard-header {
+    background: #1e293b !important;
+    border-bottom-color: #334155 !important;
+  }
+
+  .dashboard-main {
+    background: #0f172a !important;
+  }
+
+  /* 2. HEADER ELEMENTS */
+  .logo-text {
+    color: #ff6a00 !important; /* Inabaki Orange */
+  }
+
+  .search-box {
+    background: #0f172a !important;
+    color: #94a3b8 !important;
+    border: 1px solid #334155 !important;
+  }
+  .search-box input {
+    color: #e2e8f0 !important;
+  }
+  .search-box input::placeholder {
+    color: #64748b !important;
+  }
+
+  .icon-btn {
+    color: #94a3b8 !important;
+  }
+  .icon-btn:hover {
+    color: #ff6a00 !important;
+  }
+
+  /* 3. SIDEBAR */
+  .dashboard-sidebar {
+    background-color: #1e293b !important;
+    border-right-color: #334155 !important;
+  }
+
+  .sidebar-link {
+    color: #94a3b8 !important;
+  }
+  .sidebar-link.active {
+    color: #ff6a00 !important;
+    background-color: #2d3748 !important;
+  }
+  .sidebar-link:hover {
+    background-color: #2d3748 !important;
+  }
+  .sidebar-link.active::before {
+    background: #ff6a00 !important;
+  }
+
+  /* Tooltip */
+  .sidebar-link::after {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #334155 !important;
+  }
+  .sidebar-link::before {
+    border-right-color: #1e293b !important;
+  }
+
+  /* 4. SETTINGS CONTENT AREA */
+  .settings-container {
+    background-color: #0f172a !important;
+  }
+
+  .settings-container::-webkit-scrollbar-track {
+    background: #1e293b !important;
+  }
+  .settings-container::-webkit-scrollbar-thumb {
+    background: #4b5563 !important;
+    border-radius: 10px !important;
+  }
+  .settings-container::-webkit-scrollbar-thumb:hover {
+    background: #ff6a00 !important;
+  }
+
+  /* 5. CARDS (Settings & Profile) */
+  .settings-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+    color: #e2e8f0 !important;
+  }
+  .settings-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .profile-header-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+  }
+
+  /* 6. PROFILE INFO */
+  .user-full-name {
+    color: #e2e8f0 !important;
+  }
+  .user-email-sub {
+    color: #94a3b8 !important;
+  }
+  .user-username {
+    color: #6b7280 !important;
+  }
+
+  .avatar-circle {
+    background-color: #334155 !important;
+    border-color: #1e293b !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  .btn-edit-profile {
+    background-color: #ff6a00 !important; /* Inabaki Orange */
+    color: #ffffff !important;
+  }
+
+  /* 7. SETTINGS GRID & LINKS */
+  .section-title {
+    color: #e2e8f0 !important;
+  }
+
+  .link-item {
+    color: #94a3b8 !important;
+  }
+  .link-item:hover {
+    background-color: #2d3748 !important;
+    color: #ff6a00 !important;
+  }
+  .link-item::after {
+    background: #ff6a00 !important;
+  }
+
+  .sub-text {
+    color: #6b7280 !important;
+  }
+  .delete-acc {
+    color: #f87171 !important;
+  }
+  .delete-acc:hover {
+    background-color: #2d1a1a !important;
+  }
+
+  /* 8. LANGUAGE SWITCHER */
+  .lang-btn {
+    border-color: #4b5563 !important;
+    color: #94a3b8 !important;
+  }
+  .lang-btn:hover {
+    background-color: #2d3748 !important;
+  }
+  .lang-btn.active {
+    background-color: #ff6a00 !important;
+    color: #ffffff !important;
+    border-color: #ff6a00 !important;
+  }
+
+  /* 9. HELPFUL LINKS */
+  .helpful-links-section h3 {
+    color: #e2e8f0 !important;
+  }
+
+  .helpful-link-item {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+  }
+  .helpful-link-item:hover {
+    border-color: #ff6a00 !important;
+  }
+
+  .helpful-icon-box {
+    background-color: #2d3748 !important;
+    color: #ff6a00 !important;
+  }
+  .helpful-link-title {
+    color: #e2e8f0 !important;
+  }
+
+  /* 10. SIGN OUT & FOOTER */
+  .sign-out-btn {
+    background-color: #1e293b !important;
+    border-color: #f87171 !important;
+    color: #f87171 !important;
+  }
+  .sign-out-btn:hover {
+    background-color: #dc2626 !important;
+    color: #ffffff !important;
+  }
+
+  .footer-copyright p {
+    color: #6b7280 !important;
+  }
+
+  /* 11. INLINE FORMS (Email & Password) */
+  .modal-input,
+  .modal-textarea,
+  .input-group input,
+  .password-edit-form input,
+  .email-edit-form input {
+    background: #0f172a !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+  .modal-input::placeholder,
+  .modal-textarea::placeholder {
+    color: #6b7280 !important;
+  }
+
+  .btn-cancel {
+    background-color: #334155 !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+  .btn-cancel:hover {
+    background-color: #4b5563 !important;
+  }
+
+  .btn-save,
+  .btn-save-primary {
+    background-color: #ff6a00 !important; /* Inabaki Orange */
+    color: #ffffff !important;
+  }
+
+  /* 12. EDIT PROFILE MODAL */
+  .modal-overlay {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+  }
+
+  .modal-box {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+  }
+
+  .modal-header {
+    border-bottom-color: #334155 !important;
+  }
+  .modal-header h3 {
+    color: #e2e8f0 !important;
+  }
+
+  .modal-close {
+    color: #94a3b8 !important;
+  }
+  .modal-close:hover {
+    color: #ff6a00 !important;
+  }
+
+  .avatar-upload-circle {
+    background-color: #334155 !important;
+  }
+  .avatar-upload-label {
+    background-color: #ff6a00 !important; /* Inabaki Orange */
+  }
+  .avatar-hint {
+    color: #6b7280 !important;
+  }
+
+  .form-group label {
+    color: #e2e8f0 !important;
+  }
+
+  /* 13. STORE SECTION (Rudi kwenye Duka) */
+  .store-section div[style*="cursor: pointer"] {
+    background-color: #2d3748 !important;
+    border-color: #ff6a00 !important;
+  }
+  .store-section div[style*="cursor: pointer"] span {
+    color: #ff6a00 !important;
+  }
+  .store-section div[style*="cursor: pointer"] p {
+    color: #94a3b8 !important;
+  }
+
+  /* 14. MOBILE BOTTOM NAV (Ikiwa inaonekana) */
+  nav[style*="position: fixed; bottom: 0"] {
+    background: #1e293b !important;
+    border-top-color: #334155 !important;
+  }
+  nav[style*="position: fixed; bottom: 0"] button span {
+    color: #94a3b8 !important;
+  }
+  nav[style*="position: fixed; bottom: 0"] button span[style*="color: #ff6600"] {
+    color: #ff6a00 !important;
+  }
+
+  /* 15. SCROLLBARS (Global kwa settings) */
+  .settings-wrapper::-webkit-scrollbar-track {
+    background: #1e293b !important;
+  }
+  .settings-wrapper::-webkit-scrollbar-thumb {
+    background: #4b5563 !important;
+    border-radius: 10px !important;
+  }
+  .settings-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #ff6a00 !important;
+  }
+
+  /* 16. MOBILE RESPONSIVE OVERRIDES */
+  @media (max-width: 768px) {
+    .dashboard-sidebar {
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.6) !important;
+    }
+    .settings-container {
+      background-color: #0f172a !important;
+    }
+  }
+}

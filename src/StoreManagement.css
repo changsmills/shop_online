@@ -185,3 +185,251 @@
   .sm-form-row { grid-template-columns: 1fr; gap: 12px; }
   .sm-input-half-grid { grid-template-columns: 1fr; }
 }
+/* ============================================ */
+/* DARK MODE SUPPORT - STORE MANAGEMENT          */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+
+  /* 1. MAIN SECTION & CARD */
+  .sm-section {
+    background: transparent !important;
+  }
+
+  .sm-card {
+    background: #1e293b !important; /* Dark Blue Background */
+    border-color: #334155 !important; /* Dark Grey Border */
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* 2. HEADERS & TITLES */
+  .sm-header-title {
+    color: #e2e8f0 !important; /* Nyeupe inayong'aa */
+  }
+
+  .sm-header-sub {
+    color: #94a3b8 !important; /* Kijivu kinachosomeka */
+  }
+
+  .sm-toggle-btn {
+    background-color: #334155 !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+
+  .sm-toggle-btn.active {
+    background-color: #ef4444 !important;
+    color: #ffffff !important;
+    border-color: #ef4444 !important;
+  }
+
+  /* 3. CATEGORY BADGES */
+  .sm-cat-item {
+    background-color: #334155 !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+
+  .sm-cat-item.active {
+    background-color: #f97316 !important; /* Inabaki orange */
+    color: #ffffff !important;
+    border-color: #f97316 !important;
+  }
+
+  .sm-cat-remove {
+    background-color: #dc2626 !important; /* Inabaki red */
+    color: #ffffff !important;
+  }
+
+  .sm-empty-cat {
+    border-color: #334155 !important;
+  }
+
+  .sm-empty-cat p {
+    color: #94a3b8 !important;
+  }
+
+  .sm-add-cat-btn {
+    background-color: #2d3748 !important;
+    border-color: #4b5563 !important;
+    color: #f97316 !important;
+  }
+
+  /* 4. SHIPPING METHODS SECTION */
+  .sm-shipping-section {
+    border-top-color: #334155 !important;
+  }
+
+  .sm-shipping-icon-wrap {
+    background-color: #2d3748 !important;
+  }
+
+  .sm-shipping-icon {
+    color: #f97316 !important; /* Inabaki orange */
+  }
+
+  .sm-shipping-title {
+    color: #e2e8f0 !important;
+  }
+
+  .sm-shipping-toggle-btn {
+    background-color: #2d3748 !important;
+    color: #f97316 !important;
+  }
+
+  /* 5. SHIPPING GRID & ITEMS */
+  .sm-shipping-empty {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+  }
+
+  .sm-shipping-empty-icon {
+    color: #4b5563 !important;
+  }
+
+  .sm-shipping-empty-text {
+    color: #94a3b8 !important;
+  }
+
+  .sm-shipping-empty-btn {
+    color: #f97316 !important;
+  }
+
+  .sm-shipping-item {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+  }
+
+  /* 6. SHIPPING EDIT MODE */
+  .sm-input-full {
+    background-color: #334155 !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+
+  .sm-input-full:focus {
+    outline-color: #f97316 !important;
+  }
+
+  .sm-btn-success {
+    background-color: #22c55e !important; /* Inabaki green */
+    color: #ffffff !important;
+  }
+
+  .sm-btn-cancel {
+    background-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+
+  /* 7. SHIPPING VIEW MODE */
+  .sm-shipping-label {
+    color: #e2e8f0 !important;
+  }
+
+  .sm-shipping-status.active {
+    background-color: #1a3a2a !important;
+    color: #4ade80 !important;
+  }
+
+  .sm-shipping-status.inactive {
+    background-color: #2d1a1a !important;
+    color: #f87171 !important;
+  }
+
+  .sm-shipping-desc {
+    color: #94a3b8 !important;
+  }
+
+  .sm-shipping-prices {
+    color: #94a3b8 !important;
+  }
+
+  /* 8. SHIPPING ACTIONS BUTTONS */
+  .sm-action-btn.edit {
+    background-color: #1e3a5f !important;
+    color: #60a5fa !important;
+  }
+
+  .sm-action-btn.toggle-on {
+    background-color: #1a3a2a !important;
+    color: #4ade80 !important;
+  }
+
+  .sm-action-btn.toggle-off {
+    background-color: #334155 !important;
+    color: #94a3b8 !important;
+  }
+
+  .sm-action-btn.delete {
+    background-color: #2d1a1a !important;
+    color: #f87171 !important;
+  }
+
+  /* 9. SHIPPING ADD FORM */
+  .sm-shipping-form-wrap {
+    background-color: #2d3748 !important;
+    border-color: #4b5563 !important;
+  }
+
+  .sm-shipping-form-title {
+    color: #f97316 !important;
+  }
+
+  .sm-shipping-submit-btn {
+    background-color: #f97316 !important; /* Inabaki orange */
+    color: #ffffff !important;
+  }
+
+  /* 10. OFFICE IMAGES & STORE DETAILS */
+  .sm-details-section {
+    border-top-color: #334155 !important;
+  }
+
+  .sm-office-box {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+  }
+
+  .sm-office-box-placeholder {
+    color: #94a3b8 !important;
+  }
+
+  /* 11. STORE DETAILS FORM */
+  .sm-input {
+    background-color: #334155 !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+
+  .sm-input:focus {
+    outline-color: #f97316 !important;
+  }
+
+  .sm-input.disabled {
+    background: #1e293b !important;
+    color: #94a3b8 !important;
+  }
+
+  .sm-textarea {
+    background-color: #334155 !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+
+  .sm-label {
+    color: #e2e8f0 !important;
+  }
+
+  .sm-submit-btn {
+    background-color: #2563eb !important; /* Inabaki blue */
+    color: #ffffff !important;
+  }
+
+  .sm-submit-btn:disabled {
+    opacity: 0.6 !important;
+  }
+
+  .sm-submit-btn:hover:not(:disabled) {
+    background-color: #1d4ed8 !important;
+  }
+}

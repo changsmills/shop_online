@@ -137,3 +137,69 @@
   .stat-number { font-size: 18px; }
   .stat-number.product-name { font-size: 13px; }
 }
+/* ============================================ */
+/* DARK MODE SUPPORT - BUSINESS ANALYTICS        */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+
+  /* 1. MAIN CONTAINER & TITLE */
+  .analytics-container {
+    background: transparent !important;
+  }
+
+  .analytics-title {
+    color: #e2e8f0 !important; /* Nyeupe inayong'aa */
+  }
+
+  /* 2. STAT CARDS - Background na Borders */
+  .stat-card {
+    background: #1e293b !important; /* Dark Blue Background */
+    border-color: #334155 !important; /* Dark Grey Border */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  .stat-card:hover {
+    border-color: #ff6a00 !important; /* Orange border inapohover */
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  /* 3. STAT NUMBERS (Views, WhatsApp, Products) */
+  .stat-number {
+    color: #e2e8f0 !important; /* Nyeupe inayong'aa */
+  }
+
+  /* 4. STAT LABELS (Views za Bidhaa, Wateja, nk.) */
+  .stat-label {
+    color: #94a3b8 !important; /* Kijivu kinachosomeka */
+  }
+
+  /* 5. PRODUCT NAME (Popular Product) */
+  .stat-number.product-name {
+    color: #f97316 !important; /* Orange inayong'aa kwa jina la bidhaa */
+  }
+
+  /* 6. ICON WRAPPERS - Background za icons */
+  .icon-blue { background: #1e3a5f !important; color: #60a5fa !important; }
+  .icon-green { background: #1a3a2a !important; color: #4ade80 !important; }
+  .icon-purple { background: #2d1b4e !important; color: #a78bfa !important; }
+  .icon-orange { background: #3d2a1a !important; color: #fb923c !important; }
+
+  /* 7. SPINNER CSS - Loading indicator */
+  .spinner-css {
+    border-color: #4b5563 !important;
+    border-top-color: #4ade80 !important; /* Green inayong'aa */
+  }
+
+  /* 8. SCROLLBARS (Kama zinaonekana) */
+  .analytics-container::-webkit-scrollbar-track {
+    background: #1e293b !important;
+  }
+  .analytics-container::-webkit-scrollbar-thumb {
+    background: #4b5563 !important;
+    border-radius: 8px !important;
+  }
+  .analytics-container::-webkit-scrollbar-thumb:hover {
+    background: #ff6a00 !important;
+  }
+}

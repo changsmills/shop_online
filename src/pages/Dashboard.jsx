@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import "../App.css";
+import "../Dashboard.css";
 import api from "../axiosConfig"; 
 import DashboardCard from "../components/DashboardCard";
 

@@ -271,3 +271,151 @@
   margin: 0 auto;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+/* ============================================ */
+/* DARK MODE SUPPORT - QUICK INVENTORY           */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+
+  /* 1. MAIN WRAPPER */
+  .quick-inventory-wrapper {
+    background: #0f172a !important;
+  }
+
+  /* 2. TOAST NOTIFICATIONS */
+  .toast-container {
+    background: #1e293b !important;
+    color: #e2e8f0 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+  }
+  .toast-success {
+    background: #065f46 !important;
+    color: #4ade80 !important;
+  }
+  .toast-error {
+    background: #7f1d1d !important;
+    color: #f87171 !important;
+  }
+
+  /* 3. ANALYTICS CARDS */
+  .analytics-card.orange {
+    background: #9a3412 !important; /* Dark orange */
+    color: #f97316 !important;
+  }
+  .analytics-card.red {
+    background: #7f1d1d !important;
+    color: #f87171 !important;
+  }
+  .analytics-card.gray {
+    background: #1e293b !important;
+    color: #94a3b8 !important;
+    border: 1px solid #334155 !important;
+  }
+  .analytics-number {
+    color: #e2e8f0 !important;
+  }
+  .analytics-label {
+    color: #94a3b8 !important;
+  }
+
+  /* 4. INVENTORY PANEL (Main Card) */
+  .inventory-panel {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* 5. PANEL HEADER */
+  .panel-header {
+    background: #0f172a !important;
+    border-bottom-color: #334155 !important;
+  }
+  .panel-title {
+    color: #e2e8f0 !important;
+  }
+  .panel-title-icon {
+    color: #f97316 !important;
+  }
+
+  /* 6. INVENTORY GRID CONTAINER */
+  .inventory-grid-container::-webkit-scrollbar-track {
+    background: #1e293b !important;
+  }
+  .inventory-grid-container::-webkit-scrollbar-thumb {
+    background: #4b5563 !important;
+    border-radius: 10px !important;
+  }
+
+  /* 7. PRODUCT CARD (inv-card) */
+  .inv-card {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+  }
+  .inv-card:hover {
+    border-color: #f97316 !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  /* 8. CARD TEXT & STATUS */
+  .inv-title {
+    color: #e2e8f0 !important;
+  }
+  .inv-status.live {
+    background: #1a3a2a !important;
+    color: #4ade80 !important;
+  }
+  .inv-status.pending {
+    background: #2d3748 !important;
+    color: #fbbf24 !important;
+  }
+
+  /* 9. INPUTS AREA */
+  .inv-label {
+    color: #94a3b8 !important;
+  }
+  .inv-input {
+    background: #1e293b !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+  .inv-input:focus {
+    border-color: #f97316 !important;
+  }
+
+  /* 10. SAVE BUTTON */
+  .inv-save-btn {
+    background: #f97316 !important;
+    color: #ffffff !important;
+  }
+  .inv-save-btn:hover:not(:disabled) {
+    background: #ea580c !important;
+  }
+  .inv-save-btn:disabled {
+    background: #4b5563 !important;
+    color: #94a3b8 !important;
+  }
+
+  /* 11. LOADING STATE */
+  .loading-state {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+  }
+  .loading-text {
+    color: #94a3b8 !important;
+  }
+
+  /* 12. PANEL FOOTER */
+  .panel-footer {
+    background: #0f172a !important;
+    border-top-color: #334155 !important;
+  }
+  .panel-footer-btn {
+    color: #f97316 !important;
+  }
+
+  /* 13. SPINNER MINI */
+  .spinner-mini {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    border-top-color: #f97316 !important;
+  }
+}

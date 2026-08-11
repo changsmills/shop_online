@@ -906,3 +906,325 @@
     border-radius: 10px !important;
   }
 }
+/* ============================================ */
+/* DARK MODE SUPPORT - PRODUCT CREATION FLOW     */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+
+  /* 1. MAIN CONTAINER - Inalazimishwa kuwa dark blue */
+  .product-creation-flow {
+    background: #0f172a !important;
+    color: #e2e8f0 !important;
+  }
+
+  .form-container {
+    background: transparent !important;
+    color: #e2e8f0 !important;
+  }
+
+  /* 2. STEP HEADERS - "Chagua Kategoria" etc */
+  .flow-steps-header {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+  }
+
+  .step-circle {
+    background: #1e293b !important;
+    border-color: #4b5563 !important;
+    color: #94a3b8 !important;
+  }
+
+  .step-item.active .step-circle {
+    background: #ff6b00 !important; /* Inabaki orange */
+    border-color: #ff6b00 !important;
+    color: #ffffff !important;
+  }
+
+  .step-circle.completed {
+    background: #22c55e !important; /* Inabaki green */
+    border-color: #22c55e !important;
+    color: #ffffff !important;
+  }
+
+  .step-label {
+    color: #94a3b8 !important;
+  }
+
+  .step-item.active .step-label {
+    color: #ff6b00 !important;
+  }
+
+  .step-line {
+    background: #4b5563 !important;
+  }
+
+  .step-line.filled {
+    background: #ff6b00 !important;
+  }
+
+  /* 3. TITLES - "Chagua Kategoria" */
+  .step-title-area {
+    background: transparent !important;
+  }
+
+  .main-title {
+    color: #e2e8f0 !important;
+  }
+
+  .sub-title {
+    color: #94a3b8 !important;
+  }
+
+  /* 4. CATEGORY CARDS */
+  .category-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  .category-card:hover {
+    border-color: #ff6b00 !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .category-card.selected {
+    border-color: #ff6b00 !important;
+    background: #2d3748 !important;
+  }
+
+  .category-image-container {
+    border-color: #1e293b !important;
+  }
+
+  .category-name {
+    color: #e2e8f0 !important;
+  }
+
+  /* 5. MEDIA STEP - Upload areas */
+  .step-navigation {
+    background: transparent !important;
+  }
+
+  .back-button {
+    background: #1e293b !important;
+    color: #e2e8f0 !important;
+  }
+
+  .step-heading {
+    color: #e2e8f0 !important;
+  }
+
+  .upload-area {
+    background: #1e293b !important;
+    border-color: #4b5563 !important;
+    color: #94a3b8 !important;
+  }
+
+  .upload-area:hover {
+    border-color: #ff6b00 !important;
+  }
+
+  .upload-area.has-content {
+    border-style: solid !important;
+    border-color: #4b5563 !important;
+  }
+
+  .placeholder {
+    color: #94a3b8 !important;
+  }
+
+  .placeholder span {
+    color: #94a3b8 !important;
+  }
+
+  /* 6. GALLERY SECTION */
+  .gallery-upload-section {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+  }
+
+  .section-title {
+    color: #e2e8f0 !important;
+  }
+
+  .gallery-add-button {
+    border-color: #4b5563 !important;
+    color: #94a3b8 !important;
+  }
+
+  .remove-button {
+    background: #1e293b !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* 7. BUTTONS - Primary, Add to Queue */
+  .step-primary-button {
+    background: #ff6b00 !important; /* Inabaki orange */
+    color: #ffffff !important;
+    box-shadow: 0 10px 20px rgba(255, 107, 0, 0.3) !important;
+  }
+
+  .add-to-queue-button {
+    background: #2d3748 !important;
+    color: #ff6b00 !important;
+    border-color: #4b5563 !important;
+  }
+
+  /* 8. QUEUE SECTION - Bidhaa zilizowekwa kwenye foleni */
+  .queue-section {
+    border-top-color: #334155 !important;
+  }
+
+  .queue-title {
+    color: #e2e8f0 !important;
+  }
+
+  .queue-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+  }
+
+  .queue-product-name {
+    color: #e2e8f0 !important;
+  }
+
+  .publish-all-button {
+    background: #22c55e !important; /* Inabaki green */
+    color: #ffffff !important;
+    box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3) !important;
+  }
+
+  .publish-all-button:disabled {
+    opacity: 0.6 !important;
+  }
+
+  /* 9. ATTRIBUTES FORM (ProductAttributes) */
+  .pd-attr-container {
+    background: #1e293b !important;
+    color: #e2e8f0 !important;
+  }
+
+  .pd-attr-title {
+    color: #e2e8f0 !important;
+  }
+
+  .pd-attr-input {
+    background: #334155 !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+
+  .pd-attr-input:focus {
+    border-color: #ff6b00 !important;
+  }
+
+  .pd-attr-input::placeholder {
+    color: #94a3b8 !important;
+  }
+
+  .pd-attr-label {
+    color: #e2e8f0 !important;
+  }
+
+  /* 10. WHOLESALE & RETAIL TOGGLES */
+  .pd-toggle-group {
+    border-color: #4b5563 !important;
+  }
+
+  .pd-toggle-btn {
+    background: #1e293b !important;
+    border-color: #4b5563 !important;
+    color: #94a3b8 !important;
+  }
+
+  .pd-toggle-btn.active {
+    background: #ff6b00 !important;
+    color: #ffffff !important;
+    border-color: #ff6b00 !important;
+  }
+
+  /* 11. PRICE TIERS & VARIATIONS */
+  .pd-price-tier {
+    background: #1e293b !important;
+    border-color: #4b5563 !important;
+  }
+
+  .pd-price-tier input {
+    background: #334155 !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+
+  .remove-tier-btn {
+    background: #2d1a1a !important;
+    color: #f87171 !important;
+  }
+
+  /* 12. SCROLLBARS */
+  .product-creation-flow::-webkit-scrollbar-track {
+    background: #1e293b !important;
+  }
+  .product-creation-flow::-webkit-scrollbar-thumb {
+    background: #4b5563 !important;
+    border-radius: 8px !important;
+  }
+  .product-creation-flow::-webkit-scrollbar-thumb:hover {
+    background: #ff6b00 !important;
+  }
+
+  /* 13. SELECT DROPDOWNS */
+  .pd-select {
+    background: #334155 !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+
+  .pd-select option {
+    background: #1e293b !important;
+    color: #e2e8f0 !important;
+  }
+
+  /* 14. COLOR PICKER & SIZE MATRIX */
+  .color-picker-item {
+    background: #1e293b !important;
+    border-color: #4b5563 !important;
+  }
+
+  .color-picker-item.selected {
+    border-color: #ff6b00 !important;
+    background: #2d3748 !important;
+  }
+
+  .size-matrix-table table {
+    background: #1e293b !important;
+    border-color: #4b5563 !important;
+  }
+
+  .size-matrix-table th,
+  .size-matrix-table td {
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+
+  .size-matrix-table th {
+    background: #334155 !important;
+  }
+
+  .size-matrix-table input {
+    background: #334155 !important;
+    border-color: #4b5563 !important;
+    color: #e2e8f0 !important;
+  }
+
+  /* 15. TOUCH DEVICES - Dark mode tap highlights */
+  @media (hover: none) and (pointer: coarse) {
+    .category-card:active {
+      background-color: #2d3748 !important;
+    }
+    
+    .back-button {
+      background: #1e293b !important;
+    }
+  }
+}

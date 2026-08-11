@@ -256,3 +256,85 @@
   50% { background-color: #f0f0f0; }
   100% { background-color: #e0e0e0; }
 }
+/* ============================================ */
+/* DARK MODE SUPPORT - SKELETON PRODUCT DETAILS  */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+
+  /* 1. PAGE BACKGROUND */
+  .skeleton-page {
+    background-color: #0f172a !important; /* Dark Blue Background */
+  }
+
+  /* 2. CONTAINER BACKGROUND */
+  .skeleton-container {
+    background: transparent !important;
+  }
+
+  /* 3. BREADCRUMB */
+  .skeleton-breadcrumb-item,
+  .skeleton-breadcrumb-item.active {
+    background: #334155 !important; /* Dark Grey Loading Bar */
+  }
+  .skeleton-breadcrumb-sep {
+    color: #4b5563 !important;
+  }
+
+  /* 4. HERO CARD (Left Side) */
+  .skeleton-hero {
+    background: #1e293b !important; /* Dark Blue Card */
+    border-color: #334155 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* 5. MAIN IMAGE & THUMBNAILS */
+  .skeleton-main-image,
+  .skeleton-thumb {
+    background: #334155 !important; /* Dark Grey Loading Bar */
+  }
+
+  /* 6. DESCRIPTION TEXT LINES */
+  .skeleton-text-line {
+    background: #334155 !important;
+  }
+
+  /* 7. RIGHT SIDEBAR (Sticky Info) */
+  .skeleton-sticky {
+    background: #1e293b !important; /* Dark Blue Card */
+    border-color: #334155 !important;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* 8. TITLE, PRICE, DIVIDER */
+  .skeleton-title,
+  .skeleton-price,
+  .skeleton-divider {
+    background: #334155 !important;
+  }
+
+  /* 9. SPECS LINES & BUTTONS */
+  .skeleton-spec-line,
+  .skeleton-btn {
+    background: #334155 !important;
+  }
+
+  /* 10. ANIMATION (Pulse) - Inabadilika kwa dark mode */
+  @keyframes pulse {
+    0% { background-color: #334155; }
+    50% { background-color: #4b5563; }
+    100% { background-color: #334155; }
+  }
+
+  /* 11. MOBILE RESPONSIVE OVERRIDES */
+  @media (max-width: 768px) {
+    .skeleton-hero {
+      background: #1e293b !important;
+      box-shadow: none !important;
+      border: none !important;
+    }
+    .skeleton-page {
+      background-color: #0f172a !important;
+    }
+  }
+}

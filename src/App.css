@@ -1,5 +1,102 @@
 /* ============================================
-   LAYER 1: GLOBAL RESET & BASE
+   THEME VARIABLES - LIGHT MODE (Default)
+   ============================================ */
+:root {
+  /* Backgrounds - Light Mode (White/Nyepesi) */
+  --bg-body: #ffffff;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-card: #ffffff;
+  --bg-header: #ffffff;
+  --bg-footer: #f8f9fa;
+  --bg-input: #ffffff;
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+  
+  /* Text Colors - Light Mode */
+  --text-primary: #1a1a1a;
+  --text-secondary: #6c757d;
+  --text-muted: #9ca3af;
+  --text-white: #ffffff;
+  
+  /* Border & Shadows - Light Mode */
+  --border-color: #e9ecef;
+  --border-dark: #d1d5db;
+  --border-light: #f0f0f0;
+  --shadow-color: rgba(0,0,0,0.08);
+  --shadow-lg: rgba(0,0,0,0.15);
+  
+  /* Brand Colors - Orange (Inabaki sawa) */
+  --brand-orange: #ff6a00;
+  --brand-orange-hover: #e55a00;
+  --brand-orange-light: #fff5f0;
+  
+  /* Inputs */
+  --input-bg: #ffffff;
+  --input-border: #e9ecef;
+  --input-text: #1a1a1a;
+  
+  /* Nav & Menus */
+  --nav-bg: #ffffff;
+  --nav-text: #1a1a1a;
+  --nav-active: #ff6a00;
+  
+  /* Mobile Modal */
+  --mobile-bg: #ffffff;
+  --mobile-overlay: rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================
+   THEME VARIABLES - DARK MODE (DARK BLUE MORPHIC)
+   Inafuata mazingira ya device
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Backgrounds - Dark Blue Morphic */
+    --bg-body: #0d1117;        /* Bluu nyeusi - GitHub Dark */
+    --bg-primary: #0d1117;     /* Bluu nyeusi */
+    --bg-secondary: #161b22;   /* Bluu nyeusi kidogo nyepesi */
+    --bg-card: #161b22;        /* Bluu nyeusi kwa cards */
+    --bg-header: #0d1117;      /* Bluu nyeusi kwa header */
+    --bg-footer: #161b22;      /* Bluu nyeusi kwa footer */
+    --bg-input: #0d1117;       /* Bluu nyeusi kwa inputs */
+    --bg-overlay: rgba(13, 17, 23, 0.8);
+    
+    /* Text Colors - Dark Mode */
+    --text-primary: #f0f6fc;   /* White inayong'aa */
+    --text-secondary: #8b949e; /* Grey inayoonekana */
+    --text-muted: #484f58;     /* Grey nyeusi */
+    --text-white: #ffffff;
+    
+    /* Border & Shadows - Dark Mode */
+    --border-color: #30363d;   /* Border ya dark blue */
+    --border-dark: #21262d;    /* Border nyeusi zaidi */
+    --border-light: #30363d;   /* Border nyepesi */
+    --shadow-color: rgba(0,0,0,0.4);
+    --shadow-lg: rgba(0,0,0,0.6);
+    
+    /* Brand Colors - Orange inabaki sawa */
+    --brand-orange: #ff6a00;
+    --brand-orange-hover: #e55a00;
+    --brand-orange-light: #2d1a0a;
+    
+    /* Inputs */
+    --input-bg: #0d1117;
+    --input-border: #30363d;
+    --input-text: #f0f6fc;
+    
+    /* Nav & Menus */
+    --nav-bg: #0d1117;
+    --nav-text: #f0f6fc;
+    --nav-active: #ff6a00;
+    
+    /* Mobile Modal */
+    --mobile-bg: #161b22;
+    --mobile-overlay: rgba(13, 17, 23, 0.8);
+  }
+}
+
+/* ============================================
+   GLOBAL RESET & BASE
    ============================================ */
 * {
   margin: 0;
@@ -12,1053 +109,283 @@ html, body {
   padding: 0 !important;
   overflow-x: hidden;
   font-family: 'Roboto', Helvetica, Arial, sans-serif;
-  background-color: white;
+  background-color: var(--bg-body);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ============================================
-   LAYER 2: DASHBOARD WRAPPER
+   LINKS
+   ============================================ */
+a {
+  color: var(--brand-orange);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+a:hover {
+  color: var(--brand-orange-hover);
+}
+
+/* ============================================
+   SCROLLBAR - Dark Blue Style
+   ============================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-orange);
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+button {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--brand-orange);
+  color: var(--text-white);
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.btn-primary:hover {
+  background: var(--brand-orange-hover);
+  transform: translateY(-2px);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--brand-orange);
+  border: 1px solid var(--brand-orange);
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.btn-outline:hover {
+  background: var(--brand-orange);
+  color: var(--text-white);
+}
+
+.btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.btn-secondary:hover {
+  background: var(--bg-card);
+  border-color: var(--brand-orange);
+}
+
+/* ============================================
+   INPUTS & FORMS
+   ============================================ */
+input, select, textarea {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--input-text);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--brand-orange);
+  box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.15);
+}
+input::placeholder {
+  color: var(--text-muted);
+}
+
+label {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* ============================================
+   CARDS
+   ============================================ */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px var(--shadow-color);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+.card:hover {
+  box-shadow: 0 4px 16px var(--shadow-lg);
+  border-color: var(--brand-orange);
+}
+
+/* ============================================
+   HEADERS & NAVIGATION
+   ============================================ */
+.header, .navbar, .sticky-header {
+  background: var(--bg-header);
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.nav-link {
+  color: var(--text-secondary);
+  transition: color 0.2s;
+}
+.nav-link:hover {
+  color: var(--brand-orange);
+}
+.nav-link.active {
+  color: var(--brand-orange);
+  font-weight: 600;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+.footer, .footer-wrapper {
+  background: var(--bg-footer);
+  color: var(--text-primary);
+  border-top: 1px solid var(--border-color);
+  padding: 40px 20px;
+  transition: all 0.3s ease;
+}
+
+/* ============================================
+   SECTIONS & CONTAINERS
+   ============================================ */
+.section {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  padding: 20px;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ============================================
+   TEXT UTILITIES
+   ============================================ */
+.text-primary { color: var(--text-primary) !important; }
+.text-secondary { color: var(--text-secondary) !important; }
+.text-muted { color: var(--text-muted) !important; }
+.text-white { color: var(--text-white) !important; }
+.text-brand { color: var(--brand-orange) !important; }
+
+/* ============================================
+   BORDERS
+   ============================================ */
+.border { border: 1px solid var(--border-color) !important; }
+.border-bottom { border-bottom: 1px solid var(--border-color) !important; }
+.border-top { border-top: 1px solid var(--border-color) !important; }
+.border-left { border-left: 1px solid var(--border-color) !important; }
+.border-right { border-right: 1px solid var(--border-color) !important; }
+
+/* ============================================
+   SHADOWS
+   ============================================ */
+.shadow { box-shadow: 0 2px 8px var(--shadow-color) !important; }
+.shadow-sm { box-shadow: 0 1px 3px var(--shadow-color) !important; }
+.shadow-md { box-shadow: 0 4px 12px var(--shadow-color) !important; }
+.shadow-lg { box-shadow: 0 8px 32px var(--shadow-lg) !important; }
+
+/* ============================================
+   BACKGROUND UTILITIES
+   ============================================ */
+.bg-primary { background: var(--bg-primary) !important; }
+.bg-secondary { background: var(--bg-secondary) !important; }
+.bg-card { background: var(--bg-card) !important; }
+.bg-brand { background: var(--brand-orange) !important; }
+
+/* ============================================
+   MODAL & OVERLAY
+   ============================================ */
+.modal-overlay {
+  background: var(--bg-overlay);
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  color: var(--text-primary);
+  box-shadow: 0 8px 40px var(--shadow-lg);
+}
+
+/* ============================================
+   SMOOTH TRANSITIONS FOR ALL ELEMENTS
+   ============================================ */
+*, *::before, *::after {
+  transition: background-color 0.3s ease, 
+              color 0.3s ease, 
+              border-color 0.3s ease,
+              box-shadow 0.3s ease,
+              opacity 0.3s ease;
+}
+
+/* ============================================
+   DASHBOARD SPECIFIC - Inabaki kwenye wrapper
    ============================================ */
 .dashboard-wrapper {
-    display: flex;
-    flex-direction: column;
-    background: white;
-    min-height: 100vh;
-    position: relative;
-    padding-top: 90px; /* Desktop padding */
-}
-
-@media (max-width: 1024px) {
-    .dashboard-wrapper {
-        padding-top: 0px !important;
-    }
-}
-
-@media (max-width: 768px) {
-    .dashboard-wrapper {
-        padding-top: 0px !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .dashboard-wrapper {
-        padding-top: 0px !important;
-    }
-}
-
-/* ============================================
-   LAYER 3: HEADER - STICKY
-   ============================================ */
-.sticky-header {
-  position: sticky;
-  top: 0;
-  width: 100%;
-  z-index: 1000;
-  background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  padding-top: 0;
-  margin-bottom: 0;
-}
-
-/* ============================================
-   LAYER 4: MAIN CONTENT
-   ============================================ */
-.main-content {
-  flex: 1;
-  background-color: transparent;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   min-height: 100vh;
-  padding-top: 0;
-  padding-bottom: 0;
-  width: 100%;
+}
+
+.dashboard-wrapper .header {
+  background: var(--bg-header);
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.dashboard-wrapper .card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.dashboard-wrapper .section-title {
+  color: var(--text-primary);
+}
+
+.dashboard-wrapper .section-subtitle {
+  color: var(--text-secondary);
 }
 
 /* ============================================
-   LAYER 5: CONTENT CONTAINER
+   RESPONSIVE - Mobile Adjustments
    ============================================ */
-.content-container-simple {
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0;
-}
-
-@media (min-width: 600px) {
-  .content-container-simple {
-    padding: 0;
-  }
-}
-
-@media (min-width: 1025px) {
-  .content-container-simple {
-    padding: 0 11px;
-  }
-}
-
-
-/* ============================================
-   LAYER 6: CATEGORY SLIDER (Fluid & Scrowable)
-   ============================================ */
-.category-slider-wrapper {
-  display: block;
-  background: white;
-  width: 100%;
-  padding: 0;
-  margin: 0;
-  margin-top: 9px !important; 
-}
-
-@media (min-width: 1025px) {
-  .category-slider-wrapper {
-    display: none;
-  }
-}
-
-.mobile-category-slider {
-  display: flex !important;
-  overflow-x: auto !important; 
-  overflow-y: hidden !important;
-  flex-wrap: nowrap !important; 
-  gap: 12px;
-  padding: 12px 16px;
-  scroll-behavior: smooth;
-  scrollbar-width: none; 
-  -webkit-overflow-scrolling: touch;
-  width: 100%;
-  box-sizing: border-box;
-}
-.mobile-category-slider::-webkit-scrollbar { display: none; }
-
-.mobile-cat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex-shrink: 0 !important;
-  min-width: 70px !important;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-.mobile-cat-item:active { transform: scale(0.95); }
-
-.cat-circle-icon {
-  width: 56px;
-  height: 56px;
-  background: #f5f5f5;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 8px;
-  transition: all 0.2s;
-}
-.mobile-cat-item.active .cat-circle-icon {
-  background: #ff6a00;
-}
-
-.mobile-cat-item span {
-  font-size: 11px;
-  color: #666;
-  text-align: center;
-  max-width: 70px;
-  word-break: break-word;
-}
-.mobile-cat-item.active span {
-  color: #ff6a00;
-  font-weight: 500;
-}
-
-/* ============================================
-   LAYER 7: TOP LAYOUT (Sidebar + Banner)
-   ============================================ */
-.alibaba-top-layout {
-  display: block;
-  width: 100%;
-  margin: 0 !important;
-}
-
-@media (min-width: 1025px) {
-  .alibaba-top-layout {
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    gap: 0;
-    margin: 0 !important;
-    align-items: stretch;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    overflow: hidden;
-  }
-}
-
-.side-categories {
-  display: none;
-  background: white;
-  border-radius: 0;
-  border: none;
-  overflow: hidden;
-  max-height: 480px;
-  flex-direction: column;
-  box-shadow: none;
-}
-
-@media (min-width: 1025px) {
-  .side-categories { 
-    display: flex;
-    border-right: 1px solid #e5e7eb;
-    border-radius: 0;
-  }
-}
-
-.side-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 16px 20px;
-  font-weight: 700;
-  font-size: 1rem;
-  color: #1a1a1a;
-  border-bottom: 1px solid #f0f0f0;
-  flex-shrink: 0;
-  background: white;
-}
-
-.categories-list {
-  list-style: none;
-  margin: 0;
-  padding: 8px 0;
-  overflow-y: auto;
-  flex: 1;
-}
-.categories-list::-webkit-scrollbar { width: 6px; }
-.categories-list::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-.categories-list::-webkit-scrollbar-thumb { background: #ff6600; border-radius: 10px; }
-
-.categories-list li {
-  display: flex;
-  align-items: center;
-  padding: 10px 20px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  gap: 12px;
-  border-bottom: 1px solid #f0f0f0;
-}
-.categories-list li:hover {
-  background: #fff5f0;
-  padding-left: 24px;
-}
-.cat-icon {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #666;
-}
-.cat-name {
-  font-size: 0.875rem;
-  color: #444;
-  font-weight: 500;
-}
-.arrow {
-  color: #ccc;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-.categories-list li:hover .arrow {
-  opacity: 1;
-  color: #ff6600;
-}
-
-/* ============================================
-   HERO BANNER
-   ============================================ */
-.hero-banners-container {
-  width: 100%;
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
-  line-height: 0;
-}
-
-.hot-picks-banner {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16/9;
-  background: linear-gradient(135deg, #1a1a2e, #16213e);
-  overflow: hidden;
-  border-radius: 12px !important; /* ✅ Imeongezwa kuwa 12px */
-
-}
-
-@media (min-width: 600px) {
-  .hot-picks-banner { aspect-ratio: 16/7; }
-}
-
-@media (min-width: 1025px) {
-  .hot-picks-banner {
-    aspect-ratio: auto;
-    height: 480px;
-     border-radius: 0 !important; 
-
-  }
-}
-
-.banner-media {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  background-color: #1a1a2e;
-}
-
-.banner-overlay-text {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 16px;
-  color: white;
-  background: linear-gradient(90deg, rgba(0,0,0,0.6) 0%, transparent 70%);
-  pointer-events: none;
-}
-@media (min-width: 600px) {
-  .banner-overlay-text { padding: 24px; }
-}
-@media (min-width: 1025px) {
-  .banner-overlay-text { padding: 40px; }
-}
-
-.banner-overlay-text .ad-tag {
-  background: #ff6a00;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 10px;
-  display: inline-block;
-  margin-bottom: 8px;
-  font-weight: 600;
-  width: fit-content;
-}
-.banner-overlay-text .banner-title {
-  margin: 4px 0;
-  font-size: 1.2rem;
-  font-weight: bold;
-  line-height: 1.3;
-}
-@media (min-width: 600px) {
-  .banner-overlay-text .banner-title { font-size: 1.6rem; }
-}
-@media (min-width: 1025px) {
-  .banner-overlay-text .banner-title { font-size: 2rem; }
-}
-
-.banner-overlay-text .banner-desc {
-  margin: 4px 0;
-  font-size: 0.8rem;
-  max-width: 70%;
-  line-height: 1.4;
-}
 @media (max-width: 768px) {
-  .banner-overlay-text .banner-desc { max-width: 100%; }
-}
-
-.banner-overlay-text .view-more-banner {
-  background: #ff6a00;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 20px;
-  cursor: pointer;
-  margin-top: 8px;
-  font-weight: 600;
-  pointer-events: auto;
-  width: fit-content;
-  transition: 0.2s;
-}
-.banner-overlay-text .view-more-banner:hover { background: #e55a00; }
-
-/* ============================================
-   LAYER 8: COMPONENTS WRAPPER
-   ============================================ */
-.components-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  margin-top: 0; 
-  padding-top: 10px; 
-}
-
-.components-wrapper > * {
-  margin-top: 0 !important;
-}
-
-@media (min-width: 600px) {
-  .components-wrapper { 
-    gap: 0;
-    margin-top: 0; 
-  }
-}
-
-/* ============================================
-   LAYER 9: FOOTER & BOTTOM NAV
-   ============================================ */
-.footer-wrapper {
-  display: block;
-  margin-top: 0;
-}
-
-@media (max-width: 1024px) {
-  .footer-wrapper {
-    display: none !important;
-  }
-}
-
-.bottom-nav-wrapper {
-  display: none;
-}
-
-@media (max-width: 1024px) {
-  .bottom-nav-wrapper {
-    display: block !important;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    z-index: 999;
-  }
-
-  .dashboard-wrapper {
-    padding-bottom: 70px !important;
+  .container {
+    padding: 0 12px;
   }
   
-  .main-content {
-    padding-bottom: 70px !important;
+  .card {
+    padding: 16px;
   }
-}
-
-/* ============================================
-   LAYER 10: GRIDS & CARDS
-   ============================================ */
-.alibaba-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 10px;
-}
-@media (min-width: 600px) {
-  .alibaba-grid { 
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 14px; 
-  }
-}
-@media (min-width: 1025px) {
-  .alibaba-grid { 
-    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-    gap: 18px; 
-  }
-}
-
-.compact-card img {
-  width: 100%;
-  height: 130px;
-  object-fit: cover;
-  display: block;
-}
-.compact-card .info { padding: 10px; }
-.compact-card .name {
-  font-size: 13px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 4px;
-}
-.compact-card .price {
-  font-weight: 800;
-  color: #ff6a00;
-  font-size: 14px;
-}
-
-/* ============================================
-   LAYER 11: SECTION HEADERS
-   ============================================ */
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 0 !important;
-  padding: 8px 0 !important;
-}
-.section-header h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #222;
-  margin: 0;
-}
-.view-more-btn {
-  background: transparent;
-  color: #ff6a00;
-  border: 1px solid #ff6a00;
-  padding: 6px 18px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-.view-more-btn:hover {
-  background: #ff6a00;
-  color: white;
-}
-
-/* ============================================
-   LAYER 12: SEARCH, ERROR & LOADING
-   ============================================ */
-.search-results-wrapper { padding: 16px 0; }
-.search-heading { margin-bottom: 16px; font-size: 1.1rem; }
-
-.error-container {
-  text-align: center;
-  padding: 60px 20px;
-}
-.error-title { color: #dc2626; }
-.error-message { color: #666; }
-.error-retry-btn {
-  background: #FF6600;
-  color: white;
-  border: none;
-  padding: 10px 30px;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-top: 20px;
-}
-.loading-container { padding-top: 20px; }
-
-/* ============================================
-   LAYER 13: MEGA MENU - DESKTOP HOVER
-   ============================================ */
-.mega-menu-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  margin-top: 60px;
-  background: white;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-  z-index: 9999;
-  animation: slideDown 0.25s ease;
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
-.mega-menu-inner {
-  display: flex;
-  max-width: 1400px;
-  margin: 0 auto;
-  height: 100%;
-}
-
-.mega-menu-sidebar {
-  width: 260px;
-  background: #f8f9fa;
-  border-right: 1px solid #eee;
-  flex-shrink: 0;
-  overflow-y: auto;
-  padding: 8px 0;
-}
-.mega-menu-sidebar::-webkit-scrollbar { width: 5px; }
-.mega-menu-sidebar::-webkit-scrollbar-track { background: #f1f1f1; }
-.mega-menu-sidebar::-webkit-scrollbar-thumb { background: #ff6600; border-radius: 10px; }
-
-.sidebar-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 20px;
-  cursor: pointer;
-  transition: all 0.2s;
-  gap: 10px;
-  color: #444;
-}
-.sidebar-item:hover {
-  background: #fff0e5;
-  color: #ff6600;
-}
-.sidebar-item.active {
-  background: #fff0e5;
-  color: #ff6600;
-  border-left: 3px solid #ff6600;
-  font-weight: 600;
-}
-.sidebar-item-content {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.sidebar-back-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  cursor: pointer;
-  color: #ff6a00;
-  font-weight: 600;
-  border-bottom: 1px solid #eee;
-}
-
-.mega-menu-content {
-  flex: 1;
-  padding: 24px;
-  overflow-y: auto;
-}
-.mega-menu-content::-webkit-scrollbar { width: 5px; }
-.mega-menu-content::-webkit-scrollbar-track { background: #f1f1f1; }
-.mega-menu-content::-webkit-scrollbar-thumb { background: #ff6600; border-radius: 10px; }
-
-.content-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid #f0f0f0;
-}
-.content-header h3 { font-size: 1.25rem; font-weight: 700; margin: 0; }
-.view-all-btn {
-  color: #ff6600;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: gap 0.2s;
-}
-.view-all-btn:hover { gap: 10px; }
-
-.category-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: 24px;
-}
-
-.grid-item {
-  text-align: center;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-.grid-item:hover { transform: translateY(-5px); }
-
-.image-circle {
-  width: 90px;
-  height: 90px;
-  margin: 0 auto 12px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #f5f5f5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  transition: all 0.2s;
-}
-.image-circle img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.grid-item:hover .image-circle {
-  box-shadow: 0 8px 20px rgba(255,102,0,0.2);
-  transform: scale(1.02);
-}
-.grid-text {
-  font-size: 0.8rem;
-  color: #444;
-  margin: 0;
-  font-weight: 500;
-}
-.grid-item:hover .grid-text { color: #ff6600; }
-
-.see-all-card .image-circle.see-all-circle {
-  background: #fff0e5;
-  border: 2px dashed #ff6600;
-}
-.see-all-text { color: #ff6600; font-weight: 600; }
-
-/* ============================================
-   LAYER 14: MOBILE CATEGORIES MODAL (ALIBABA STYLE)
-   ============================================ */
-.mobile-categories-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 99999 !important;
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-end;
-  animation: fadeIn 0.2s ease;
-}
-
-.mobile-categories-modal {
-  width: 100%;
-  height: 100%;
-  background: white;
-  border-radius: 20px 20px 0 0;
-  overflow: hidden;
-  animation: slideUp 0.3s ease;
-  box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
-  display: flex;
-  flex-direction: column;
-}
-
-/* ============================================
-   HEADER - SEHEMU YA JUU
-   ============================================ */
-.mc-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  background: white;
-  border-bottom: 1px solid #f0f0f0;
-  flex-shrink: 0;
-  height: 60px;
-}
-
-.mc-back-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #333;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-}
-
-.mc-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0;
-  flex: 1;
-  text-align: center;
-}
-
-.mc-spacer {
-  width: 30px; /* Inasawazisha nafasi ya kulia na kushoto */
-}
-
-/* ============================================
-   BODY - SIDEBAR NA CONTENT
-   ============================================ */
-.mc-body {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-  height: calc(100% - 60px); /* Toa nafasi ya Header */
-}
-
-/* SIDEBAR (KUSHOTO) */
-.mc-sidebar {
-  width: 28%;
-  min-width: 85px;
-  max-width: 110px;
-  background: #fcfcfc;
-  overflow-y: auto;
-  border-right: 1px solid #f0f0f0;
-  padding: 12px 0;
-}
-
-.mc-sidebar-item {
-  padding: 12px 8px;
-  font-size: 12px;
-  color: #666;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  text-align: left;
-  line-height: 1.2;
-  word-break: break-word;
-}
-.mc-sidebar-item.active {
-  color: #000;
-  font-weight: 700;
-  border-left: 3px solid #ff6a00; /* Mstari wa chungwa upande wa kushoto */
-  background: #f5f5f5;
-}
-
-/* BADILISHA HII KWA KUONGEZA PADDING KUSHOTO */
-.mc-content {
-  flex: 1;
-  overflow-y: auto;
-  padding-left: 80px !important; /* Hapa ndio mahali pa kuongeza nafasi kushoto */
-  background: white;
-  box-sizing: border-box;
-}
-
-.mc-section-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: #222;
-  margin: 0 0 16px 0;
-}
-.mc-section-title:not(:first-child) {
-  margin-top: 24px;
-}
-
-/* ============================================
-   RECOMMENDATIONS (Picha za Duara) - FLEXIBLE GRID
-   ============================================ */
-.mc-recommendations-grid {
-  display: grid;
-  /* ✅ BADILISHA HAPA: Inajirekebisha kuwa 2 au 3 safu kulingana na nafasi */
-  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); 
-  gap: 16px;
-  justify-items: center; /* Inahakikisha picha zinakaa katikati ya column */
-  padding-right: 0;
-}
-
-.mc-recommendation-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  cursor: pointer;
-  width: 100%;
-}
-
-/* HAKIKISHA PICHA HAZIJAKATWA (UKUBWA SAWA) */
-.mc-rec-image {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #f0f0f0;
-  margin: 0 auto 6px auto;
-  flex-shrink: 0; /* Inazuia picha kupungua kuliko 60px! */
-}
-
-.mc-rec-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.mc-recommendation-item p {
-  font-size: 10px;
-  color: #333;
-  margin: 0;
-  line-height: 1.2;
-  max-width: 70px;
-  word-break: break-word;
-}
-
-/* ============================================
-   GET PRODUCT INSPIRATION (Bidhaa 2x2)
-   ============================================ */
-.mc-inspiration-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-.mc-inspiration-card {
-  background: white;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  overflow: hidden;
-  padding: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.mc-inspiration-card:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-  border-color: #ff6a00;
-}
-
-.mc-inspiration-card img {
-  width: 100%;
-  aspect-ratio: 1/1;
-  object-fit: cover;
-  border-radius: 4px;
-  margin-bottom: 6px;
-}
-
-.mc-insp-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: #222;
-  margin: 0 0 2px 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.mc-insp-price {
-  font-size: 12px;
-  font-weight: 700;
-  color: #ff6a00;
-  margin: 0 0 2px 0;
-}
-
-.mc-insp-moq {
-  font-size: 10px;
-  color: #888;
-  margin: 0;
-}
-
-/* ============================================
-   LAYER 15: ANIMATIONS
-   ============================================ */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-@keyframes bounce {
-  0%, 80%, 100% { transform: scale(0); }
-  40% { transform: scale(1.0); }
-}
-.loading-dots {
-  display: flex;
-  gap: 6px;
-}
-.dot {
-  width: 10px;
-  height: 10px;
-  background-color: #ff6600;
-  border-radius: 50%;
-  animation: bounce 1.4s infinite ease-in-out both;
-}
-
-/* ============================================
-   LAYER 16: MOBILE RESPONSIVE FIXES 
-   ============================================ */
-@media (max-width: 1024px) {
-  .dashboard-wrapper {
-    padding-top: 0px !important;
-  }
-
-  .main-content { 
-    padding-top: 60px !important; 
-    padding-bottom: 70px !important; 
-    overflow-x: hidden !important;
-  }
-
-  .content-container-simple {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 0 0.5px !important;
-    box-sizing: border-box !important;
-  }
-
-  .side-categories { display: none !important; }
-  
-  .alibaba-top-layout { 
-    display: block !important; 
-    width: 100% !important;
-    margin: 0 0 20px 0 !important;
-  }
-
-  .alibaba-mobile-content {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    gap: 0 !important;
-  }
-
-  .category-slider-wrapper {
-    display: block !important;
-    width: 100% !important;
-    padding: 0 !important;
-  }
-
-  .hero-banners-container { 
-    display: block !important; 
-    width: 100% !important;
-    height: auto !important;
-  }
-
-  .hot-picks-banner { 
-    height: 240px !important;
-    min-height: 240px !important;
-    background: #1a1a2e !important;
-    position: relative !important;
-    overflow: hidden !important;
-  }
-  
-  .banner-media {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    background: #1a1a2e !important;
-  }
-
-  .banner-overlay-text {
-    position: absolute !important;
-    inset: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    padding: 16px !important;
-    color: white !important;
-    background: linear-gradient(90deg, rgba(0,0,0,0.6) 0%, transparent 70%) !important;
-  }
-
-  .components-wrapper {
-    padding: 10px 0 !important;
-    width: 100% !important;
-    display: block !important;
-  }
-
-  .components-wrapper > * {
-    width: 100% !important;
-    margin-bottom: 30px !important; 
-  }
-
-  .bottom-nav-wrapper {
-    display: block !important;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    z-index: 999;
-  }
-}
-
-/* ============================================
-   LAYER 17: DASHBOARD CARD (GLOBAL FALLBACK)
-   ============================================ */
-.dashboard-card {
-  background: #f6f6f7;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid #d1d5db;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-.dashboard-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-  border-color: #ff6600;
-}
-.dashboard-card img {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-}
-.dashboard-card h4 {
-  padding: 10px 12px 4px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-}
-.dashboard-card p {
-  padding: 0 12px 12px;
-  font-weight: 800;
-  color: #ff6a00;
-  font-size: 16px;
 }

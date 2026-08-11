@@ -232,3 +232,80 @@
 .skeleton-cat-item.active {
   width: 40px;
 }
+/* ==============================================
+   DARK MODE SUPPORT - SKELETON LAYOUT
+   ============================================== */
+
+@media (prefers-color-scheme: dark) {
+
+  /* 1. MAIN WRAPPER - Background ya skeleton */
+  .skeleton-layout-wrapper {
+    background: #0f172a !important; /* Dark Blue Background */
+  }
+
+  /* 2. SKELETON CARDS - Background na Shadows */
+  .skeleton-card {
+    background: #1e293b !important; /* Dark Blue Card */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* 3. SKELETON SIDEBAR (Desktop) */
+  .skeleton-sidebar {
+    background: #1e293b !important; /* Dark Blue Sidebar */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* 4. SKELETON CATEGORY SLIDER (Mobile) */
+  .skeleton-category-slider {
+    background: #0f172a !important; /* Dark Blue Background */
+    border-bottom-color: #334155 !important;
+  }
+
+  /* 5. LOADING BARS (Pulse animation) - Zinabadilika kuwa Dark Grey */
+  .skeleton-banner-mobile,
+  .skeleton-banner-desktop,
+  .skeleton-sidebar-item,
+  .skeleton-image,
+  .skeleton-text,
+  .skeleton-cat-item,
+  .skeleton-banner-mobile,
+  .skeleton-banner-desktop {
+    background: #334155 !important; /* Dark Grey Loading Bar */
+  }
+
+  /* 6. ANIMATION - Pulse inabadilika kwa dark mode */
+  @keyframes pulse {
+    0% { background-color: #334155; }
+    50% { background-color: #4b5563; }
+    100% { background-color: #334155; }
+  }
+
+  /* 7. GRID CONTAINERS - Hakikisha background inabadilika */
+  .skeleton-grid-mobile,
+  .skeleton-grid-desktop {
+    background: transparent !important;
+  }
+
+  /* 8. TOP ROW (Desktop) */
+  .skeleton-top-row {
+    background: transparent !important;
+  }
+
+  /* 9. MOBILE & TABLET LAYOUT */
+  .skeleton-mobile {
+    background: transparent !important;
+  }
+
+  /* 10. DESKTOP LAYOUT */
+  .skeleton-desktop {
+    background: transparent !important;
+  }
+
+  /* 11. SCROLLBAR (Ikiwa inaonekana) */
+  .skeleton-category-slider::-webkit-scrollbar-track {
+    background: #1e293b !important;
+  }
+  .skeleton-category-slider::-webkit-scrollbar-thumb {
+    background: #4b5563 !important;
+  }
+}

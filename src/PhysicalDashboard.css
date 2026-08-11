@@ -242,3 +242,302 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Ro
   .modal-drag-handle { display: block !important; }
   .modal-footer { padding-bottom: 30px; }
 }
+
+/* ============================================ */
+/* DARK MODE SUPPORT - PHYSICAL DASHBOARD        */
+/* ============================================ */
+
+@media (prefers-color-scheme: dark) {
+
+  /* 1. BODY & GLOBAL BACKGROUND */
+  body {
+    background: #0f172a !important;
+    color: #e2e8f0 !important;
+  }
+
+  .dashboard-wrapper {
+    background: #0f172a !important;
+  }
+
+  /* 2. HEADER */
+  .dashboard-header {
+    background: #1e293b !important;
+    border-bottom-color: #334155 !important;
+  }
+
+  .header-title {
+    color: #ff6a00 !important; /* Inabaki orange */
+  }
+
+  .header-badge {
+    background: #ff6a00 !important;
+    color: #ffffff !important;
+  }
+
+  .header-welcome {
+    color: #94a3b8 !important;
+  }
+
+  /* 3. SIDEBAR */
+  .dashboard-sidebar {
+    background: #1e293b !important;
+    border-right-color: #334155 !important;
+  }
+
+  .sidebar-header {
+    border-bottom-color: #334155 !important;
+  }
+
+  .sidebar-header h3 {
+    color: #ff6a00 !important; /* Inabaki orange */
+  }
+
+  .sidebar-menu-item {
+    color: #94a3b8 !important;
+  }
+
+  .sidebar-menu-item:hover {
+    background: #334155 !important;
+    color: #e2e8f0 !important;
+  }
+
+  .sidebar-menu-item.active {
+    background: #2d3748 !important;
+    border-color: #ff6a00 !important;
+    color: #ff6a00 !important;
+  }
+
+  .sidebar-menu-item.logout {
+    color: #f87171 !important;
+  }
+  .sidebar-menu-item.logout:hover {
+    background: #2d1a1a !important;
+  }
+
+  /* 4. MAIN CONTENT */
+  .dashboard-content {
+    background: #0f172a !important;
+  }
+
+  .dashboard-content-inner {
+    background: transparent !important;
+  }
+
+  /* 5. CARDS & CONTAINERS (Analytics, Products, Offers) */
+  .product-creation-wrapper,
+  .offers-container,
+  .advertise-banner {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+    color: #e2e8f0 !important;
+  }
+
+  /* 6. SECTION TITLES */
+  .product-section-title,
+  .existing-products-title,
+  .advertise-title {
+    color: #e2e8f0 !important;
+  }
+
+  .advertise-text {
+    color: #94a3b8 !important;
+  }
+
+  /* 7. PRODUCT CARDS (Grid) */
+  .product-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+    color: #e2e8f0 !important;
+  }
+
+  .product-card:hover {
+    border-color: #ff6a00 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .product-card-img-wrap {
+    background: #334155 !important;
+  }
+
+  .product-card-title {
+    color: #e2e8f0 !important;
+  }
+
+  .product-card-price {
+    color: #60a5fa !important; /* Blue inayong'aa */
+  }
+
+  .product-card-edit-btn {
+    background: rgba(37, 99, 235, 0.8) !important;
+  }
+
+  /* 8. ADVERTISE BANNER */
+  .advertise-banner {
+    background: linear-gradient(135deg, #ff4e00 0%, #ec2f4b 100%) !important;
+  }
+
+  .advertise-banner h3 {
+    color: #ffffff !important;
+  }
+
+  .advertise-banner p {
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+
+  .advertise-btn {
+    background: #ffffff !important;
+    color: #ff4e00 !important;
+  }
+
+  /* 9. MODAL (Kategoria) */
+  .modal-overlay {
+    background: rgba(0, 0, 0, 0.85) !important;
+  }
+
+  .modal-container {
+    background: #1e293b !important;
+    box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .modal-header {
+    background: #1e293b !important;
+    border-bottom-color: #334155 !important;
+  }
+
+  .modal-header-title {
+    color: #e2e8f0 !important;
+  }
+
+  .modal-header-sub {
+    color: #94a3b8 !important;
+  }
+
+  .modal-close-btn {
+    background: #334155 !important;
+    color: #94a3b8 !important;
+  }
+
+  .modal-cat-btn {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+  }
+
+  .modal-cat-btn:not(:disabled):hover {
+    border-color: #ff6a00 !important;
+  }
+
+  .modal-cat-name {
+    color: #e2e8f0 !important;
+  }
+
+  .modal-cat-btn:disabled .modal-cat-name {
+    color: #6b7280 !important;
+  }
+
+  .modal-empty-text {
+    color: #94a3b8 !important;
+  }
+
+  .modal-footer {
+    background: #1e293b !important;
+    border-top-color: #334155 !important;
+  }
+
+  .modal-confirm-btn {
+    background: #ff6a00 !important; /* Inabaki orange */
+    color: #ffffff !important;
+  }
+
+  /* 10. ACCOUNT DROPDOWN */
+  .account-dropdown {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .account-dropdown-header {
+    border-bottom-color: #334155 !important;
+  }
+
+  .account-dropdown-name {
+    color: #e2e8f0 !important;
+  }
+
+  .account-dropdown-email {
+    color: #94a3b8 !important;
+  }
+
+  .dropdown-section {
+    color: #e2e8f0 !important;
+  }
+
+  .dropdown-divider {
+    border-top-color: #334155 !important;
+  }
+
+  .account-dropdown-item {
+    color: #94a3b8 !important;
+  }
+
+  .account-dropdown-item:hover {
+    background: #334155 !important;
+  }
+
+  .account-dropdown-item.logout {
+    color: #f87171 !important;
+  }
+
+  .account-dropdown-item.logout:hover {
+    background: #2d1a1a !important;
+  }
+
+  /* 11. SCROLLBARS */
+  .dashboard-sidebar::-webkit-scrollbar-track,
+  .dashboard-content::-webkit-scrollbar-track {
+    background: #1e293b !important;
+  }
+
+  .dashboard-sidebar::-webkit-scrollbar-thumb,
+  .dashboard-content::-webkit-scrollbar-thumb {
+    background: #4b5563 !important;
+    border-radius: 8px !important;
+  }
+
+  .dashboard-sidebar::-webkit-scrollbar-thumb:hover,
+  .dashboard-content::-webkit-scrollbar-thumb:hover {
+    background: #ff6a00 !important;
+  }
+
+  /* 12. HEADER ICONS & BUTTONS */
+  .header-icon-btn {
+    color: #94a3b8 !important;
+  }
+
+  .header-icon-btn:hover {
+    color: #e2e8f0 !important;
+  }
+
+  .header-avatar-btn {
+    background: #ff6a00 !important;
+    color: #ffffff !important;
+  }
+
+  /* 13. OTHER UTILITIES */
+  .store-header-wrapper {
+    background: transparent !important;
+  }
+
+  .analytics-section {
+    background: transparent !important;
+  }
+
+  .store-mgmt-wrapper {
+    background: transparent !important;
+  }
+
+  .advertise-wrapper {
+    background: transparent !important;
+  }
+}
