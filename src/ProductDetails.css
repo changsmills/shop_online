@@ -1008,18 +1008,19 @@
 /* ============================================ */
 /* MOBILE OVERRIDES - PADDING BOTTOM FIX        */
 /* ============================================ */
-
 @media (max-width: 768px) {
 
   /* 1. Ongeza padding chini kwenye page root ili kuzuia vitu kugusa makali */
   .product-page-root {
-    padding-bottom: 40px !important; /* 🔥 HII NDIYO SULUHISHO LA PADDING! */
+    padding-bottom: 40px !important; 
     background: white;
+    padding-left: 0 !important;   /* 🔥 ONDOA PADDING LEFT (PEMBENI) */
+    padding-right: 0 !important;  /* 🔥 ONDOA PADDING RIGHT (PEMBENI) */
   }
 
   /* 2. Hakikisha sehemu ya store details ina padding chini */
   .product-bottom-details {
-    padding: 12px 16px 40px 16px !important; /* 🔥 Ongeza padding chini hapa pia */
+    padding: 12px 16px 40px 16px !important; 
     margin-top: 0;
   }
 
@@ -1044,24 +1045,38 @@
     border-color: var(--border-color, #e9ecef) !important;
   }
 
-  /* 🔥 ONGEZA HII CHINI YA SEHEMU YA PRODUCT HERO */
+  /* 🔥 6. HAPA: ONDOA PADDING LEFT/RIGHT (PEMBENI) KWA PICHA, BAKI TOP CHINI */
   .product-hero-section {
-    padding-top: 15px !important;  /* Hii inasukuma picha chini kidogo */
+    padding: 15px 0 0 0 !important;  /* 🔥 Inabakisha Top:15px, Left/Right:0, Bottom:0 */
     margin: 0 !important;
     background: white;
+    width: 100%;
   }
 
-  /* Ikiwa bado inakaa juu sana, ongeza margin-top kwenye container ya gallery */
+  /* 7. Hakikisha gallery container pia haina padding pembeni */
   .gallery-mobile-simple {
+    padding: 0 !important;         /* 🔥 ONDOA PADDING ZOTE (Hasa Left/Right) */
     margin-top: 10px !important;
+    width: 100%;
   }
   
-  /* Pia hakikisha picha ya katikati ina nafasi */
+  /* 8. Hakikisha picha ya katikati ina nafasi */
   .mobile-main-display {
-    min-height: 350px !important; /* Ongeza urefu wa chini kidogo */
+    min-height: 350px !important; 
+    padding: 0 !important;         /* 🔥 ONDOA PADDING PEMBENI PIA */
+  }
+
+  /* 🔥 9. PUNGUZA BORDER (LIGHT) KUWA 1px */
+  .product-bottom-details {
+    border-top: 1px solid #e5e7eb !important;  /* 🔥 Border 1px */
+  }
+  .store-full-details-card {
+    border-top: 1px solid #e5e7eb !important;  /* 🔥 Border 1px */
+  }
+  .store-card-header {
+    border-bottom: 1px solid #e5e7eb !important; /* 🔥 Border 1px */
   }
 }
-
 /* ============================================ */
 /* LAYER 15: PRINT STYLES                       */
 /* ============================================ */

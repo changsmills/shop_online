@@ -768,14 +768,18 @@ useEffect(() => {
         >
           <div className="mobile-categories-modal" onClick={(e) => e.stopPropagation()}>
             
-            {/* 1. HEADER ya Juu */}
-            <div className="mc-header">
-              <button className="mc-back-btn" onClick={() => setMobileMenuOpen(false)}>
-                <ChevronLeft size={24} />
-              </button>
-              <h2 className="mc-title">{t('categories')}</h2>
-              <div className="mc-spacer"></div>
-            </div>
+           {/* 1. HEADER ya Juu */}
+<div className="mc-header">
+  <button className="mc-back-btn" onClick={() => setMobileMenuOpen(false)}>
+    <ChevronLeft size={24} />
+  </button>
+  <h2 className="mc-title">{t('categories')}</h2>
+
+  {/* 🔥 BADILISHA HAPA: Ongeza Close Button (X) badala ya mc-spacer */}
+  <button className="mc-close-btn" onClick={() => setMobileMenuOpen(false)}>
+    <span className="close-x">✕</span>
+  </button>
+</div>
 
             {/* 2. BODY (Sidebar + Content) */}
             <div className="mc-body">
@@ -806,7 +810,7 @@ useEffect(() => {
                 
                 {/* SEHEMU YA 1: RECOMMENDATIONS (Picha za Duara) */}
                 <div className="mc-section">
-                  <h3 className="mc-section-title">Selected Products</h3>
+                  <h3 className="mc-section-title">Category Products</h3>
                   <div className="mc-recommendations-grid">
                     {featuredProducts && featuredProducts.length > 0 ? (
                       featuredProducts.slice(0, 9).map((leaf) => (

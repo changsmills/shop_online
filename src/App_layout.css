@@ -1,40 +1,122 @@
 /* ==============================================
-   SKELETON LAYOUT (Banner + Sidebar + Grid)
+   SKELETON LAYOUT WRAPPER
    ============================================== */
-
-/* MOBILE */
-.skeleton-mobile {
-  padding: 20px;
+.skeleton-layout-wrapper {
   background: #f7f8fa;
+  min-height: 100vh;
+  width: 100%;
+  padding: 0 !important;
+  padding-top: 56px !important; /* ✅ UREFU WA HEADER YA MOBILE (DEFAULT) */
+  margin: 0 !important;
+}
+
+/* ==============================================
+   DESKTOP LAYOUT (≥1025px)
+   ============================================== */
+@media (min-width: 1025px) {
+  .skeleton-layout-wrapper {
+    padding: 0 !important;
+    padding-top: 2px !important; /* ✅ UREFU WA HEADER YA DESKTOP */
+    margin: 0 !important;
+  }
+  .skeleton-mobile {
+    display: none !important;
+  }
+  .skeleton-desktop {
+    display: block !important;
+  }
+  .skeleton-category-slider {
+    display: none !important;
+  }
+}
+
+/* ==============================================
+   TABLET LAYOUT (768px - 1024px)
+   ============================================== */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .skeleton-layout-wrapper {
+    padding: 0 !important;
+    padding-top: 68px !important; /* ✅ UREFU WA HEADER YA TABLET */
+    margin: 0 !important;
+  }
+  .skeleton-grid-mobile {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ==============================================
+   MOBILE LAYOUT (≤768px)
+   ============================================== */
+@media (max-width: 768px) {
+  .skeleton-layout-wrapper {
+    padding: 0 !important;
+    padding-top: 56px !important;   /* 🔥 Hii ndiyo muhimu! Inasogeza chini */
+    margin: 0 !important;
+  }
+}
+
+/* ==============================================
+   SMALL MOBILE LAYOUT (≤480px)
+   ============================================== */
+@media (max-width: 480px) {
+  .skeleton-layout-wrapper {
+    padding: 0 !important;
+    padding-top: 58px !important; /* ✅ UREFU WA HEADER YA SMALL MOBILE */
+    margin: 0 !important;
+  }
+  .skeleton-banner-mobile {
+    height: 120px;
+  }
+  .skeleton-grid-mobile {
+    gap: 8px;
+  }
+}
+
+/* ==============================================
+   MOBILE & TABLET LAYOUT
+   ============================================== */
+.skeleton-mobile {
+  display: block;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100%;
 }
 
 .skeleton-banner-mobile {
   width: 100%;
   height: 180px;
   background: #e0e0e0;
-  border-radius: 12px;
-  margin-bottom: 20px;
+  border-radius: 0;
+  margin: 0 !important;
+  margin-bottom: 20px !important;
   animation: pulse 1.5s infinite ease-in-out;
 }
 
 .skeleton-grid-mobile {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
+  gap: 12px;
+  padding: 0 8px;
+  margin: 0 !important;
 }
 
-/* DESKTOP */
+/* ==============================================
+   DESKTOP LAYOUT
+   ============================================== */
 .skeleton-desktop {
-  padding: 20px;
+  display: none;
+  padding: 0 !important;
+  margin: 0 auto !important;
   max-width: 1400px;
-  margin: 0 auto;
-  background: #f7f8fa;
+  width: 100%;
 }
 
 .skeleton-top-row {
   display: flex;
-  gap: 20px;
-  margin-bottom: 30px;
+  gap: 24px;
+  margin: 0 !important;
+  margin-bottom: 30px !important;
+  align-items: stretch;
 }
 
 .skeleton-sidebar {
@@ -46,6 +128,9 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
+  flex-shrink: 0;
+  min-height: 350px;
+  margin: 0 !important;
 }
 
 .skeleton-sidebar-item {
@@ -58,43 +143,172 @@
 
 .skeleton-banner-desktop {
   flex: 1;
-  height: 400px;
+  min-height: 350px;
   background: #e0e0e0;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   animation: pulse 1.5s infinite ease-in-out;
+  margin: 0 !important;
 }
 
 .skeleton-grid-desktop {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 20px;
+  margin: 0 !important;
 }
 
-/* Responsive kwa Tablet */
-@media (max-width: 1024px) {
-  .skeleton-grid-desktop {
-    grid-template-columns: repeat(3, 1fr);
+/* ==============================================
+   SKELETON CARD
+   ============================================== */
+.skeleton-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  width: 100%;
+  margin: 0 !important;
+}
+
+.skeleton-image {
+  width: 100%;
+  height: 160px;
+  background: #e0e0e0;
+  border-radius: 8px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-text {
+  height: 16px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  margin-top: 12px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-text.short { width: 60%; }
+.skeleton-text.medium { width: 80%; }
+.skeleton-text.long { width: 100%; }
+
+/* ==============================================
+   ANIMATION
+   ============================================== */
+@keyframes pulse {
+  0% { background-color: #e0e0e0; }
+  50% { background-color: #f0f0f0; }
+  100% { background-color: #e0e0e0; }
+}
+
+/* ==============================================
+   SKELETON CATEGORY SLIDER (Mobile)
+   ============================================== */
+
+.skeleton-category-slider {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding: 12px 16px;
+  background: white;
+  border-bottom: 1px solid #eee;
+  scrollbar-width: none;
+  margin: 0 !important;
+  margin-top: 10px !important; /* 🔥 ONGEZA HII! Inasukuma slider chini zaidi */
+}
+
+.skeleton-category-slider::-webkit-scrollbar { display: none; }
+
+/* ✅ FICHA KWENYE DESKTOP */
+@media (min-width: 1025px) {
+  .skeleton-category-slider {
+    display: none !important;
   }
+}
+
+.skeleton-cat-item {
+  width: 90px;
+  height: 32px;
+  background: #e0e0e0;
+  border-radius: 20px;
+  flex-shrink: 0;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+.skeleton-cat-item.active {
+  width: 40px;
+}
+/* ==============================================
+   DARK MODE SUPPORT - SKELETON LAYOUT
+   ============================================== */
+
+@media (prefers-color-scheme: dark) {
+
+  /* 1. MAIN WRAPPER - Background ya skeleton */
+  .skeleton-layout-wrapper {
+    background: #0f172a !important; /* Dark Blue Background */
+  }
+
+  /* 2. SKELETON CARDS - Background na Shadows */
+  .skeleton-card {
+    background: #1e293b !important; /* Dark Blue Card */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* 3. SKELETON SIDEBAR (Desktop) */
   .skeleton-sidebar {
-    width: 200px;
+    background: #1e293b !important; /* Dark Blue Sidebar */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
   }
-}
 
-@media (max-width: 768px) {
-  .skeleton-desktop {
-    display: none;
+  /* 4. SKELETON CATEGORY SLIDER (Mobile) */
+  .skeleton-category-slider {
+    background: #0f172a !important; /* Dark Blue Background */
+    border-bottom-color: #334155 !important;
   }
-  .skeleton-mobile {
-    display: block;
-  }
-}
 
-@media (min-width: 769px) {
-  .skeleton-mobile {
-    display: none;
+  /* 5. LOADING BARS (Pulse animation) - Zinabadilika kuwa Dark Grey */
+  .skeleton-banner-mobile,
+  .skeleton-banner-desktop,
+  .skeleton-sidebar-item,
+  .skeleton-image,
+  .skeleton-text,
+  .skeleton-cat-item,
+  .skeleton-banner-mobile,
+  .skeleton-banner-desktop {
+    background: #334155 !important; /* Dark Grey Loading Bar */
   }
+
+  /* 6. ANIMATION - Pulse inabadilika kwa dark mode */
+  @keyframes pulse {
+    0% { background-color: #334155; }
+    50% { background-color: #4b5563; }
+    100% { background-color: #334155; }
+  }
+
+  /* 7. GRID CONTAINERS - Hakikisha background inabadilika */
+  .skeleton-grid-mobile,
+  .skeleton-grid-desktop {
+    background: transparent !important;
+  }
+
+  /* 8. TOP ROW (Desktop) */
+  .skeleton-top-row {
+    background: transparent !important;
+  }
+
+  /* 9. MOBILE & TABLET LAYOUT */
+  .skeleton-mobile {
+    background: transparent !important;
+  }
+
+  /* 10. DESKTOP LAYOUT */
   .skeleton-desktop {
-    display: block;
+    background: transparent !important;
+  }
+
+  /* 11. SCROLLBAR (Ikiwa inaonekana) */
+  .skeleton-category-slider::-webkit-scrollbar-track {
+    background: #1e293b !important;
+  }
+  .skeleton-category-slider::-webkit-scrollbar-thumb {
+    background: #4b5563 !important;
   }
 }

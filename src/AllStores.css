@@ -14,7 +14,7 @@
 /* ============================================ */
 
 .all-stores-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 16px;
   flex: 1;
@@ -37,6 +37,7 @@
   margin-bottom: 16px;
   padding-bottom: 8px;
   border-bottom: 1px solid #e5e7eb;
+  width: 100%; /* 🔥 Hakikisha header inajaza upana */
 }
 
 .all-stores-title {
@@ -66,37 +67,72 @@
 }
 
 /* ============================================ */
-/* STORES GRID - RESPONSIVE                     */
+/* 🔥 STORES CONTAINER - Inatumia Flex (Sio Grid ya fixed columns!) */
 /* ============================================ */
 
 .all-stores-grid {
-  display: grid;
-  gap: 12px;
-  /* 🔥 Mobile: Kadi ndogo (min 130px) */
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start; /* 🔥 Inaanza kushoto kabisa! */
+  gap: 16px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-/* Tablet (769px - 1024px) */
+/* ============================================ */
+/* 🔥 STORE CARD - Inakaa kwenye flex container */
+/* ============================================ */
+
+/* Hii inahakikisha kadi za stores zinaweza kukaa kwenye flex */
+.all-stores-grid .store-card {
+  flex: 0 0 auto;
+  width: calc((100% - (16px * 5)) / 6); /* 🔥 Hesabu kwa 6 kadi kwa upana */
+  max-width: 180px;
+}
+
+/* 🔥 Tablet - 4 kwa upana */
 @media (min-width: 769px) and (max-width: 1024px) {
+  .all-stores-grid .store-card {
+    width: calc((100% - (16px * 3)) / 4); /* 4 kadi kwa upana */
+    max-width: 220px;
+  }
   .all-stores-grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 16px;
   }
 }
 
-/* Desktop (≥1025px) */
+/* 🔥 Desktop - 6 kwa upana (≥1025px) */
 @media (min-width: 1025px) {
+  .all-stores-grid .store-card {
+    width: calc((100% - (16px * 5)) / 6); /* 6 kadi kwa upana */
+    max-width: 180px;
+  }
   .all-stores-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
+    gap: 16px;
   }
 }
 
-/* Very small mobile (≤480px) */
+/* 🔥 Mobile - 2 kwa upana (≤768px) */
+@media (max-width: 768px) {
+  .all-stores-grid .store-card {
+    width: calc((100% - 12px) / 2); /* 2 kadi kwa upana */
+    max-width: 160px;
+  }
+  .all-stores-grid {
+    gap: 12px;
+    justify-content: center; /* Kwenye mobile, zikae katikati vizuri */
+  }
+}
+
+/* 🔥 Small Mobile - 2 kwa upana (≤480px) */
 @media (max-width: 480px) {
+  .all-stores-grid .store-card {
+    width: calc((100% - 8px) / 2); /* 2 kadi kwa upana */
+    max-width: 140px;
+  }
   .all-stores-grid {
     gap: 8px;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
   }
 }
 
@@ -110,10 +146,11 @@
   background-color: white;
   border-radius: 12px;
   color: #999;
+  width: 100%; /* 🔥 Inajaza upana wote */
 }
 
 /* ============================================ */
-/* SKELETON LOADING                              */
+/* 🔥 SKELETON LOADING                          */
 /* ============================================ */
 
 .all-stores-loading-wrapper {
@@ -125,22 +162,10 @@
 }
 
 .all-stores-skeleton-grid {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-}
-
-@media (min-width: 769px) {
-  .all-stores-skeleton-grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 16px;
-  }
-}
-@media (min-width: 1025px) {
-  .all-stores-skeleton-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
-  }
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 16px;
 }
 
 .all-stores-skeleton-card {
@@ -151,21 +176,55 @@
   flex-direction: column;
   gap: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  width: calc((100% - (16px * 5)) / 6); /* 6 kwa upana */
+  max-width: 180px;
 }
 
-/* 🔥 Skeleton picha ina urefu sawa na picha halisi */
+/* 🔥 Tablet Skeleton - 4 kwa upana */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .all-stores-skeleton-card {
+    width: calc((100% - (16px * 3)) / 4);
+    max-width: 220px;
+  }
+}
+
+/* 🔥 Desktop Skeleton - 6 kwa upana */
+@media (min-width: 1025px) {
+  .all-stores-skeleton-card {
+    width: calc((100% - (16px * 5)) / 6);
+    max-width: 180px;
+  }
+}
+
+/* 🔥 Mobile Skeleton - 2 kwa upana */
+@media (max-width: 768px) {
+  .all-stores-skeleton-card {
+    width: calc((100% - 12px) / 2);
+    max-width: 160px;
+  }
+  .all-stores-skeleton-grid {
+    gap: 12px;
+    justify-content: center;
+  }
+}
+
+/* 🔥 Small Mobile Skeleton - 2 kwa upana */
+@media (max-width: 480px) {
+  .all-stores-skeleton-card {
+    width: calc((100% - 8px) / 2);
+    max-width: 140px;
+  }
+  .all-stores-skeleton-grid {
+    gap: 8px;
+  }
+}
+
 .all-stores-skeleton-image {
   width: 100%;
-  height: 140px;
+  aspect-ratio: 1 / 1;
   background: #e0e0e0;
   border-radius: 8px;
   animation: pulse 1.5s infinite ease-in-out;
-}
-
-@media (max-width: 480px) {
-  .all-stores-skeleton-image {
-    height: 110px;
-  }
 }
 
 .all-stores-skeleton-text {
@@ -198,7 +257,6 @@
 /* FOOTER - HIDE ON MOBILE                       */
 /* ============================================ */
 
-/* Footer imeonyeshwa kwa default, lakini kwenye mobile inafichwa */
 @media (max-width: 768px) {
   .all-stores-page footer {
     display: none !important;

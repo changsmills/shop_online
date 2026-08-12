@@ -20,7 +20,7 @@ const SkeletonProductDetails = React.lazy(() => import("../components/SkeletonPr
 
 export default function ProductDetails() {
   const { id } = useParams();
-  const navigate = useNavigate(); // ✅ Imeongezwa kwa ajili ya navigation
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [storeProducts, setStoreProducts] = useState([]);
   const [storeCategories, setStoreCategories] = useState([]);

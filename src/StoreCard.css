@@ -124,13 +124,32 @@
 }
 
 /* ========================================== */
-/* RESPONSIVE MEDIA QUERIES                    */
+/* RESPONSIVE MEDIA QUERIES (MAX-WIDTH ZIMEBADILISHWA) */
 /* ========================================== */
 
-/* 🔥 DESKTOP - 6 per row (≥ 1200px) */
-@media (min-width: 1200px) {
+/* 🔥 DESKTOP LARGE - 6 per row (≥ 1400px) */
+@media (min-width: 1400px) {
   .store-card {
-    max-width: 160px;
+    max-width: 180px; /* 🔥 Imepanuliwa kwa desktop kubwa */
+  }
+  
+  .store-card-img-container {
+    border-radius: 12px;
+  }
+  
+  .store-card-name {
+    font-size: 14px;
+  }
+  
+  .store-card-action span {
+    font-size: 12px;
+  }
+}
+
+/* 🔥 DESKTOP STANDARD - 6 per row (1200px - 1399px) */
+@media (min-width: 1200px) and (max-width: 1399px) {
+  .store-card {
+    max-width: 160px; /* 🔥 Inatoshea kwa desktop ya kawaida */
   }
   
   .store-card-img-container {
@@ -149,14 +168,14 @@
 /* 🔥 TABLET - 4 per row (768px - 1199px) */
 @media (min-width: 768px) and (max-width: 1199px) {
   .store-card {
-    max-width: 200px;
+    max-width: 200px; /* 🔥 Inatoshea kwa tablet */
   }
 }
 
 /* 🔥 MOBILE - 2 per row (≤ 767px) */
 @media (max-width: 767px) {
   .store-card {
-    max-width: 160px;
+    max-width: 160px; /* 🔥 Inatoshea kwa mobile */
   }
   
   .store-card-name {
@@ -201,10 +220,250 @@
 /* 🔥 SMALL MOBILE - 2 per row (≤ 400px) */
 @media (max-width: 400px) {
   .store-card {
-    max-width: 140px;
+    max-width: 140px; /* 🔥 Inatoshea kwa small mobile */
   }
   
   .store-card-name {
     font-size: 11px;
   }
+}
+/* ========================================== */
+/* 🔥 DARK MODE SUPPORT - INAFUATA DEVICE      */
+/* ========================================== */
+
+@media (prefers-color-scheme: dark) {
+
+  /* 1. Background ya card na border */
+  .store-card-info {
+    background-color: transparent !important;
+  }
+
+  /* 2. Rangi ya maandishi (Jina la duka) */
+  .store-card-name {
+    color: #f3f4f6 !important;
+  }
+
+  /* 3. Rangi ya kategoria (Orange) */
+  .store-card-category {
+    color: #ff8a3c !important; /* Orange kidogo nyepesi kwa dark mode */
+  }
+
+  /* 4. Rangi ya stats (Rating, Sales) */
+  .store-card-stats,
+  .store-card-sales,
+  .store-card-rating span {
+    color: #9ca3af !important;
+  }
+
+  /* 5. Rangi ya Location (Mji) */
+  .store-card-location,
+  .store-card-location span {
+    color: #6b7280 !important;
+  }
+
+  /* 6. Rangi ya Action (View Store) na border yake */
+  .store-card-action {
+    color: #ff8a3c !important;
+    border-top-color: #374151 !important;
+  }
+
+  /* 7. Background ya image placeholder */
+  .store-card-img-container {
+    background-color: #2d2d2d !important;
+  }
+
+  /* 8. Verified badge - Inabaki green, lakini hakikisha inaonekana */
+  .verified-badge {
+    background-color: #059669 !important;
+    color: #ffffff !important;
+  }
+
+  /* 9. Rangi ya shadow kwa cards */
+  .store-card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+  }
+}
+/* ============================================ */
+/* 🔥 THEME VARIABLES - LIGHT MODE (Default)    */
+/* ============================================ */
+:root {
+  /* Backgrounds */
+  --bg-body: #f7f8fa;
+  --bg-card: #ffffff;
+  --bg-input: #f3f4f6;
+  --bg-hover: #e5e7eb;
+  
+  /* Text Colors */
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --text-white: #ffffff;
+  
+  /* Borders */
+  --border-color: #e5e7eb;
+  --border-light: #f3f4f6;
+  
+  /* Brand */
+  --brand-orange: #ff6a00;
+  --brand-orange-hover: #e55a00;
+  
+  /* Shadows */
+  --shadow-color: rgba(0,0,0,0.05);
+  --shadow-lg: rgba(0,0,0,0.1);
+}
+
+/* ============================================ */
+/* 🔥 DARK MODE - INAFUATA DEVICE               */
+/* ============================================ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Backgrounds */
+    --bg-body: #111827;      /* 🔥 Background nyeusi kwa ukurasa mzima */
+    --bg-card: #1f2937;      /* 🔥 Background ya cards na info boxes */
+    --bg-input: #374151;
+    --bg-hover: #374151;
+    
+    /* Text Colors */
+    --text-primary: #f3f4f6; /* 🔥 Maandishi meupe */
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+    --text-white: #ffffff;
+    
+    /* Borders */
+    --border-color: #374151; /* 🔥 Borders nyeusi */
+    --border-light: #4b5563;
+    
+    /* Brand */
+    --brand-orange: #ff6a00;
+    --brand-orange-hover: #e55a00;
+    
+    /* Shadows */
+    --shadow-color: rgba(0,0,0,0.3);
+    --shadow-lg: rgba(0,0,0,0.5);
+  }
+}
+
+/* ============================================ */
+/* 🔥 TUMIA VARIABLES KWENYE CLASSES ZILIZOPO   */
+/* ============================================ */
+
+/* 1. Page Root */
+.store-page {
+  background-color: var(--bg-body) !important; /* 🔥 Sasa inabadilika kulingana na theme */
+  color: var(--text-primary) !important;
+}
+
+/* 2. Main Container */
+.store-container {
+  background-color: var(--bg-body) !important;
+}
+
+/* 3. Store Banner - Background */
+.store-banner {
+  background-color: var(--bg-banner, #4b5563) !important;
+}
+
+/* 4. Info Cards */
+.info-card {
+  background-color: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+.info-card h3 {
+  color: var(--text-primary) !important;
+  border-bottom-color: var(--border-color) !important;
+}
+
+.info-card p {
+  color: var(--text-secondary) !important;
+}
+
+/* 5. Contact & Social Items */
+.contact-item {
+  color: var(--text-secondary) !important;
+}
+
+.social-link {
+  background-color: var(--bg-input) !important;
+  color: var(--text-primary) !important;
+}
+.social-link:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+/* 6. Products Section */
+.products-header h2 {
+  color: var(--text-primary) !important;
+}
+
+.search-bar {
+  background-color: var(--bg-input) !important;
+}
+.search-bar input {
+  color: var(--text-primary) !important;
+}
+
+.category-filter {
+  background-color: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+.view-toggle-btn {
+  background-color: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+.view-toggle-btn.active {
+  background-color: var(--brand-orange) !important;
+  color: var(--text-white) !important;
+}
+
+/* 7. Product Cards */
+.product-card {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+}
+.product-card:hover {
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.product-name {
+  color: var(--text-primary) !important;
+}
+
+.original-price {
+  color: var(--text-muted) !important;
+}
+
+/* 8. Product List */
+.product-list-item {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+}
+.product-list-info h4 {
+  color: var(--text-primary) !important;
+}
+.product-category {
+  color: var(--text-secondary) !important;
+}
+
+/* 9. Back Button */
+.store-back-btn {
+  color: var(--text-secondary) !important;
+}
+.store-back-btn:hover {
+  color: var(--text-primary) !important;
+}
+
+/* 10. Empty & Loading States */
+.no-products {
+  color: var(--text-muted) !important;
+}
+.store-not-found h2 {
+  color: var(--text-primary) !important;
+}
+.store-not-found p {
+  color: var(--text-secondary) !important;
 }
