@@ -13,13 +13,15 @@ from django.conf import settings  # 🔥 ONGEZA HII
 import random  # 🔥 ONGEZA HII
 from django.utils import timezone  # 🔥 ONGEZA HII
 from datetime import timedelta  # 🔥 ONGEZA HII
+from products.models import OTPModel, Profile
+
 
 
 
 # 🔥 MODELS IMPORTS:
 from products.models import (
     Category, ProductVariation, SubCategory, ProductsEngine, LeafCategory, Advertisement, 
-    StoreEngine, ProductMedia, Message, ShippingMethod, Brand, Lead, Order, OrderItem,  OTPModel  
+    StoreEngine, ProductMedia, Message, ShippingMethod, Brand, Lead, Order, OrderItem,  
 )
 
 # 🔥 ONGEZA HII IMPORT MUHIMU KABISA (Inaingiza ViewSet kutoka products.views):
@@ -698,3 +700,121 @@ class AllStoresView(APIView):
                 'status': 'error',
                 'message': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class SellerOTPRequestView(APIView):
+    """
+    Endpoint ya kutuma OTP kwa email ili kuthibitisha akaunti ya supplier
+    POST: /api/seller/otp/request/
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        email = user.email
+
+        print(f"🔍 [SellerOTPRequest] Request received for user: {user.id} ({email})")
+
+        # 1. Pata au unda Profile kwa usalama (kuzuia 500 Error)
+        profile, created = Profile.objects.get_or_create(user=user)
+        if created:
+            print(f"✅ [SellerOTPRequest] Profile iliundwa kwa user: {user.id}")
+
+        # 2. Kama ameverify, usitume OTP tena
+        if profile.is_otp_verified:
+            print(f"⚠️ [SellerOTPRequest] User {user.id} tayari ameverify.")
+            return Response({'detail': 'Akaunti yako tayari imethibitishwa.'}, status=400)
+
+        # 3. Generate OTP (6-digit)
+        otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+        print(f"✅ [SellerOTPRequest] OTP imetengenezwa: {otp}")
+
+        # 4. Hifadhi kwenye OTPModel
+        OTPModel.objects.create(
+            email=email,
+            otp=otp,
+            created_at=timezone.now()
+        )
+        print(f"✅ [SellerOTPRequest] OTP imehifadhiwa kwenye database.")
+
+        # 5. Tuma kwa email
+        try:
+            send_mail(
+                subject='Seller Verification OTP',
+                message=f'Your OTP to verify your Seller account is: {otp}\n\nThis OTP will expire in 5 minutes.',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                fail_silently=False,
+            )
+            print(f"✅ [SellerOTPRequest] Email imetumwa kwa {email} na OTP: {otp}")
+            return Response({'detail': 'OTP sent to your email successfully'}, status=200)
+        except Exception as e:
+            print(f"❌ [SellerOTPRequest] Email failed: {e}")
+            return Response({'detail': f'Failed to send email: {str(e)}'}, status=500)
+
+
+class SellerOTPVerifyView(APIView):
+    """
+    Endpoint ya kuthibitisha OTP na kubadili is_otp_verified kuwa True
+    POST: /api/seller/otp/verify/
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        otp = request.data.get('otp')
+        email = user.email
+
+        print(f"🔍 [SellerOTPVerify] Verify attempt for user: {user.id}, OTP: {otp}")
+
+        # 1. Pata au unda Profile kwa usalama
+        profile, created = Profile.objects.get_or_create(user=user)
+        if created:
+            print(f"✅ [SellerOTPVerify] Profile iliundwa kwa user: {user.id}")
+
+        # 2. Kama ameverify, usirudie
+        if profile.is_otp_verified:
+            print(f"⚠️ [SellerOTPVerify] User {user.id} tayari ameverify.")
+            return Response({'detail': 'Akaunti yako tayari imethibitishwa.'}, status=400)
+
+        # 3. Verify OTP
+        try:
+            otp_record = OTPModel.objects.filter(
+                email=email,
+                otp=otp,
+                is_used=False
+            ).latest('created_at')
+        except OTPModel.DoesNotExist:
+            print(f"❌ [SellerOTPVerify] OTP si sahihi: {otp}")
+            return Response({'detail': 'Invalid OTP'}, status=400)
+
+        # 4. Check expiry (5 mins)
+        if otp_record.is_expired():
+            print(f"❌ [SellerOTPVerify] OTP imeisha muda: {otp}")
+            return Response({'detail': 'OTP has expired. Please request a new one.'}, status=400)
+
+        # 5. Mark user as verified and OTP as used
+        profile.is_otp_verified = True
+        profile.save()
+
+        otp_record.is_used = True
+        otp_record.save()
+
+        print(f"✅ [SellerOTPVerify] User {user.id} amethibitishwa kikamilifu!")
+
+        return Response({'detail': 'OTP verified successfully. You can now access the Seller Dashboard.'}, status=200)
+
+class SupplierLogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        try:
+            profile = Profile.objects.get(user=user)
+            # 🔥 Weka OTP kuwa False (inamruhusu kuulizwa tena)
+            profile.is_otp_verified = False
+            profile.save()
+            
+            # Futa token (hiari)
+            return Response({'detail': 'Logged out successfully. OTP will be required on next login.'}, status=200)
+        except Profile.DoesNotExist:
+            return Response({'detail': 'Profile not found.'}, status=400)

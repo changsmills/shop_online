@@ -354,13 +354,26 @@ export default function PhysicalDashboard() {
     } catch (err) { console.error(err); alert("Hitilafu: " + (err.response?.data?.detail || err.message)); }
   };
 
-  const handleLogout = async () => {
-    if (window.confirm("Je, una uhakika unataka kutoka (Logout)?")) {
+ const handleLogout = async () => {
+  if (window.confirm("Je, una uhakika unataka kutoka (Logout)?")) {
+    try {
+      // 🔥 Tuma ombi kwa backend kufuta OTP status
+      const token = localStorage.getItem("access_token");
+      if (token) {
+        await api.post('/supplier/logout/', {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      }
+    } catch (err) {
+      console.error("Logout error:", err);
+    } finally {
+      // 🔥 Futa token zote
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       navigate('/dashboard/login', { replace: true });
     }
-  };
+  }
+};
 
   const menuItems = [
     { id: 'overview', label: 'Duka Lako', icon: <LayoutDashboard size={20} /> },

@@ -62,6 +62,7 @@ import StorePage from "./pages/StorePage";
 import AllStores from './pages/AllStores';
 import SupplierAccountSettings from './pages/SupplierAccountSettings'; 
 import SellerDashboard from './pages/SellerDashboard'; 
+import VerifySellerOTP from './pages/VerifySellerOTP';
 
 
 // ========== COMPONENT MPYA YA KUDHIBITI BOTTOM NAV ==========
@@ -144,6 +145,8 @@ function AppContent({ session }) {
         <Route path="/cart" element={<CartPage session={session} />} />
         <Route path="/checkout" element={session ? <CheckoutPage session={session} /> : <Navigate to="/dashboard/login" />} />
         <Route path="/products" element={<ProductsAll session={session} />} />
+
+        <Route path="/verify-seller-otp" element={<VerifySellerOTP />} />
         <Route path="/how-to-buy" element={<HowToBuy />} />
         <Route path="/about-skyfall" element={<SkyfallBusiness session={session} />} />
         <Route path="/search" element={<SearchResults session={session} />} />

@@ -282,19 +282,37 @@ useEffect(() => {
     };
   }, []);
 
-  useEffect(() => {
+useEffect(() => {
   let isMounted = true;
   const checkAuth = async () => {
     const token = getToken();
     if (token && isMounted) {
-      setSession({ user: { id: "authenticated" } });
+      try {
+        // 🔥 Pata profile kutoka backend
+        const profileRes = await api.get('/profile/');
+        const userProfile = profileRes.data;
+
+        // 🔥 Ikiwa ni supplier na hajaverify OTP, mpeleke kwenye verify page
+        if (userProfile.role === 'supplier' && !userProfile.is_otp_verified) {
+          navigate('/verify-seller-otp');
+          return;
+        }
+
+        // Vinginevyo, set session kama kawaida
+        setSession({ user: { id: userProfile.id } });
+      } catch (err) {
+        console.error("Auth check error:", err);
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        setSession(null);
+      }
     } else {
       setSession(null);
     }
     if (isMounted) setSessionLoading(false);
   };
   checkAuth();
-}, []);
+}, [navigate]);
 
   // ========== HANDLERS ==========
   const handleMouseEnter = (menuName) => {

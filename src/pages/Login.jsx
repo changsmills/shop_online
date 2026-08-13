@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google'; // 🔥 ONGEZA HII
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import api from '../axiosConfig';
 import { useNavigate } from 'react-router-dom';
 import { toast, Toaster } from 'react-hot-toast';
@@ -21,7 +21,7 @@ const Login = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => {
+   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
@@ -40,7 +40,16 @@ const Login = () => {
         console.log("🔍 Role ya user:", role);
         console.log("🔍 User ID:", userProfile.id);
 
+        // 🔥 BADILISHA HAPA: Kagua OTP kabla ya kupeleka supplier dashboard
         if (role === 'supplier') {
+          // 1. Kama hajaverify OTP, mpeleke kwenye verify page
+          if (!userProfile.is_otp_verified) {
+            console.log("⚠️ Supplier hajaverify OTP, inapeleka /verify-seller-otp");
+            navigate('/verify-seller-otp', { replace: true });
+            return; // SIMAMA HAPA! Usiende kwenye dashboard!
+          }
+
+          // 2. Kama ameverify, endelea kupata store
           const storeRes = await api.get('/stores/', {
             params: { owner_id: userProfile.id },
             headers: { Authorization: `Bearer ${token}` }
@@ -71,7 +80,7 @@ const Login = () => {
     checkAuth();
   }, [navigate]);
 
-  // 🔥 KAZI YA KUANDAA LOGIN YA KAWAIDA
+   // 🔥 KAZI YA KUANDAA LOGIN YA KAWAIDA
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -97,7 +106,20 @@ const Login = () => {
       console.log("🔍 Role ya user (login):", role);
       console.log("🔍 User ID (login):", userProfile.id);
 
+      // 🔥 BADILISHA HAPA: Supplier lazima athibitishe OTP kwanza!
       if (role === 'supplier') {
+        // 1. Kama hajaverify OTP, mpeleke kwenye verify page
+        if (!userProfile.is_otp_verified) {
+          // ✅ Tumia toast.success au toast()
+toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
+  icon: '🔐',
+  duration: 4000,
+});
+          navigate('/verify-seller-otp', { replace: true });
+          return; // SIMAMA HAPA! Usiende kwenye dashboard!
+        }
+
+        // 2. Kama ameverify, endelea kupata store
         const storeRes = await api.get('/stores/', {
           params: { owner_id: userProfile.id },
           headers: { Authorization: `Bearer ${access}` }

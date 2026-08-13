@@ -349,6 +349,8 @@ class Profile(models.Model):
     bio = models.TextField(blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     role = models.CharField(max_length=50, blank=True, null=True)
+    is_otp_verified = models.BooleanField(default=False)  # 🔥 ONGEZA HII!
+
 
     class Meta:
         db_table = 'profiles'

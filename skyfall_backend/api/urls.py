@@ -13,7 +13,11 @@ from api.views import (
     ChangeEmailView, PasswordResetView,
     OrderViewSet,
     PasswordResetRequestView, PasswordResetVerifyView,
-    AllStoresView  # 🔥 ONGEZA HII
+    AllStoresView, # 🔥 ONGEZA HII
+
+    SellerOTPRequestView,  # 🔥 ONGEZA HII!
+    SellerOTPVerifyView,
+    SupplierLogoutView
 
 )
 
@@ -34,6 +38,9 @@ router.register(r'orders', OrderViewSet)
 router.register(r'order-items', OrderItemViewSet)
 
 urlpatterns = [
+    path('seller/otp/request/', SellerOTPRequestView.as_view(), name='seller_otp_request'),
+    path('seller/otp/verify/', SellerOTPVerifyView.as_view(), name='seller_otp_verify'),
+    path('supplier/logout/', SupplierLogoutView.as_view(), name='supplier_logout'),
     
     path('stores/all/', AllStoresView.as_view(), name='all-stores'),
     path('', include(router.urls)),

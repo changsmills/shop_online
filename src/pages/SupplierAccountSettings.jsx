@@ -147,11 +147,24 @@ const SupplierAccountSettings = ({ session }) => {
   ];
 
   const handleSignOut = async () => {
+  try {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      // 🔥 Tuma ombi kwa backend ili kuweka is_otp_verified = False
+      await api.post('/supplier/logout/', {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+    }
+  } catch (err) {
+    console.error("Logout error:", err);
+    // Hata kama backend inashindwa, endelea kufuta token za local
+  } finally {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-    navigate('/dashboard/login');
+    navigate('/dashboard/login', { replace: true });
     toast.success('Umefanikiwa kutoka!');
-  };
+  }
+};
 
   return (
     <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
