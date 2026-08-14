@@ -67,7 +67,6 @@ class ProductMediaSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['media_url'] 
 
-
 # ============================================================
 # 🔥 PRODUCTS ENGINE SERIALIZER (FINAL - Full Response Edition)
 # ============================================================

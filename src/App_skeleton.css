@@ -6,7 +6,7 @@
   min-height: 100vh;
   width: 100%;
   padding: 0 !important;
-  padding-top: 56px !important; /* ✅ UREFU WA HEADER YA MOBILE (DEFAULT) */
+  padding-top: 80px !important; /* ✅ ILIYOREKEBISHWA: INAANZA CHINI ZAIDI (KWA MOBILE) */
   margin: 0 !important;
 }
 
@@ -16,7 +16,7 @@
 @media (min-width: 1025px) {
   .skeleton-layout-wrapper {
     padding: 0 !important;
-    padding-top: 2px !important; /* ✅ UREFU WA HEADER YA DESKTOP */
+    padding-top: 20px !important; /* ✅ IMEONGEZWA: KUTOA NAFASI CHINI YA HEADER YA DESKTOP */
     margin: 0 !important;
   }
   .skeleton-mobile {
@@ -31,16 +31,44 @@
 }
 
 /* ==============================================
-   TABLET LAYOUT (768px - 1024px)
+   TABLET & MEDIUM SCREENS (768px - 1024px)
    ============================================== */
 @media (min-width: 768px) and (max-width: 1024px) {
   .skeleton-layout-wrapper {
     padding: 0 !important;
-    padding-top: 68px !important; /* ✅ UREFU WA HEADER YA TABLET */
+    padding-top: 96px !important; /* Nafasi ya header */
     margin: 0 !important;
   }
+
+  /* Ficha Desktop Sidebar na Mobile Slider */
+  .skeleton-desktop {
+    display: none !important;
+  }
+  .skeleton-category-slider {
+    display: none !important;
+  }
+
+  /* Hakikisha Mobile Grid inakuwa 4 Cards */
+  .skeleton-mobile {
+    display: block !important;
+    padding: 0 16px !important; /* Nafasi upande kushoto/kulia */
+  }
+
   .skeleton-grid-mobile {
-    grid-template-columns: repeat(3, 1fr);
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important; /* ⬅️ Hapa ndipo 4 zinatoka */
+    gap: 16px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Banner yake inachukua upana wote na kuwa na mpangilio mzuri */
+  .skeleton-banner-mobile {
+    width: 100% !important;
+    height: 220px !important; /* Inaweza kuwa kubwa kidogo kwa tablet */
+    border-radius: 12px !important; /* Pembe za mviringo */
+    margin-bottom: 24px !important;
+    margin-top: 10px !important;
   }
 }
 
@@ -50,7 +78,7 @@
 @media (max-width: 768px) {
   .skeleton-layout-wrapper {
     padding: 0 !important;
-    padding-top: 56px !important;   /* 🔥 Hii ndiyo muhimu! Inasogeza chini */
+    padding-top: 80px !important; /* ✅ ILIYOREKEBISHWA: SOGEA CHINI KWA MOBILE */
     margin: 0 !important;
   }
 }
@@ -61,7 +89,7 @@
 @media (max-width: 480px) {
   .skeleton-layout-wrapper {
     padding: 0 !important;
-    padding-top: 50px !important; /* ✅ UREFU WA HEADER YA SMALL MOBILE */
+    padding-top: 65px !important; /* ✅ ILIYOREKEBISHWA: NAFASI KWA SMALL MOBILE */
     margin: 0 !important;
   }
   .skeleton-banner-mobile {
@@ -211,6 +239,7 @@
   border-bottom: 1px solid #eee;
   scrollbar-width: none;
   margin: 0 !important;
+
 }
 .skeleton-category-slider::-webkit-scrollbar { display: none; }
 

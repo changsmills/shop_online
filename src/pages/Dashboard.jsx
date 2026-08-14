@@ -201,9 +201,9 @@ const fetchLeafsForSub = async (subCategoryId) => {
         seenLeafIds.add(item.leaf_category_id);
         return {
           id: item.leaf_category_id,
-          name: item.leaf_categories?.name || 'Unknown',
-          name_sw: item.leaf_categories?.name_sw || 'Haijulikani',
-          cover_image_url: item.cover_image_url // ✅ Tumia cover_image_url!
+           name: item.leaf_category_name || 'Unknown', // ✅ Tumia hili, linalotoka moja kwa moja kwenye API!
+           name_sw: item.leaf_category_name_sw || item.leaf_category_name || 'Haijulikani',
+           cover_image_url: item.cover_image_url // ✅ Tumia cover_image_url!
         };
       })
       .sort((a, b) => a.name.localeCompare(b.name));
@@ -707,10 +707,10 @@ useEffect(() => {
             <img src={leaf.cover_image_url || placeholderImg} alt={leaf.leaf_categories?.name} />
           </div>
           <p className="grid-text">
-            {i18n.language === 'sw' 
-              ? (leaf.leaf_categories?.name_sw || leaf.leaf_categories?.name)
-              : leaf.leaf_categories?.name}
-          </p>
+  {i18n.language === 'sw' 
+    ? (leaf.name_sw || leaf.name) // ✅ Tumia 'leaf.name' tuliyoibadilisha hapo juu!
+    : leaf.name}
+</p>
         </div>
       ))}
       {/* 🔥 See All */}
@@ -766,9 +766,9 @@ useEffect(() => {
             alt={leaf.leaf_categories?.name} 
           />
         </div>
-        <p className="grid-text">
-          {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
-        </p>
+       <p>
+  {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
+</p>
       </div>
     ))
   )}
@@ -779,111 +779,194 @@ useEffect(() => {
         document.body
       )}
 
-        {mobileMenuOpen && ReactDOM.createPortal(
-        <div 
-          className="mobile-categories-overlay"
-          onClick={() => setMobileMenuOpen(false)}
-        >
-          <div className="mobile-categories-modal" onClick={(e) => e.stopPropagation()}>
+      {mobileMenuOpen && ReactDOM.createPortal(
+  <div 
+    className="mobile-categories-overlay"
+    onClick={() => setMobileMenuOpen(false)}
+  >
+    <div className="mobile-categories-modal" onClick={(e) => e.stopPropagation()}>
+      
+      {/* 1. HEADER ya Juu */}
+      <div className="mc-header">
+        <button className="mc-back-btn" onClick={() => setMobileMenuOpen(false)}>
+          <ChevronLeft size={24} />
+        </button>
+        <h2 className="mc-title">{t('categories')}</h2>
+        <button className="mc-close-btn" onClick={() => setMobileMenuOpen(false)}>
+          <span className="close-x">✕</span>
+        </button>
+      </div>
+
+      {/* 2. BODY (Sidebar + Content) */}
+      <div className="mc-body">
+        
+        {/* ============================================ */}
+        {/* SIDEBAR (Kushoto) - Inabadilika kulingana na activeMenu */}
+        {/* ============================================ */}
+        <aside className="mc-sidebar">
+          
+          {/* 🔥 Kama tumebonyeza See All, onyesha Subcategories kushoto */}
+          {activeMenu === 'subcategories' ? (
             
-           {/* 1. HEADER ya Juu */}
-<div className="mc-header">
-  <button className="mc-back-btn" onClick={() => setMobileMenuOpen(false)}>
-    <ChevronLeft size={24} />
-  </button>
-  <h2 className="mc-title">{t('categories')}</h2>
+            <>
+              {/* Kitufe cha kurudi nyuma upande wa kushoto */}
+              <div 
+                className="mc-sidebar-back"
+                onClick={() => {
+                  setActiveMenu('categories'); // Rudi kwenye categories mode
+                  if (selectedCategory?.id) {
+                    fetchFeaturedLeafs(selectedCategory.id); // Pakia tena products za awali
+                  }
+                }}
+                style={{ 
+                  padding: '15px', 
+                  cursor: 'pointer', 
+                  color: '#ff6a00', 
+                  fontWeight: 'bold',
+                  borderBottom: '1px solid #eee',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <ChevronLeft size={18} /> Back to Categories
+              </div>
 
-  {/* 🔥 BADILISHA HAPA: Ongeza Close Button (X) badala ya mc-spacer */}
-  <button className="mc-close-btn" onClick={() => setMobileMenuOpen(false)}>
-    <span className="close-x">✕</span>
-  </button>
-</div>
-
-            {/* 2. BODY (Sidebar + Content) */}
-            <div className="mc-body">
-              
-              {/* SIDEBAR (Kushoto) */}
-              <aside className="mc-sidebar">
-                {categories.map((cat) => (
+              {/* Orodha ya Subcategories upande wa kushoto */}
+              {subCategories && subCategories.length > 0 ? (
+                subCategories.map((sub) => (
                   <div 
-                    key={cat.id} 
-                    className={`mc-sidebar-item ${selectedCategory?.id === cat.id ? 'active' : ''}`}
+                    key={sub.id} 
+                    className={`mc-sidebar-item ${selectedSubCategory?.id === sub.id ? 'active' : ''}`}
                     onClick={() => {
-                      setSelectedCategory(cat);
-                      setSelectedCategoryForComponents(cat);
-                      // Tuma ombi la kupata data za kategoria hii
-                      if (cat.id) {
-                        fetchFeaturedLeafs(cat.id);
-                        fetchSubCategories(cat.id);
-                      }
+                      setSelectedSubCategory(sub);
+                      // 🔥 Pakia bidhaa za subcategory hii upande wa kulia
+                      fetchLeafsForSub(sub.id);
                     }}
                   >
-                    {getCategoryDisplayName(cat)}
+                    {i18n.language === 'sw' ? (sub.name_sw || sub.name) : sub.name}
                   </div>
-                ))}
-              </aside>
-
-              {/* CONTENT (Kulia) */}
-              <main className="mc-content">
-                
-                {/* SEHEMU YA 1: RECOMMENDATIONS (Picha za Duara) */}
-                <div className="mc-section">
-                  <h3 className="mc-section-title">Category Products</h3>
-                  <div className="mc-recommendations-grid">
-                    {featuredProducts && featuredProducts.length > 0 ? (
-                      featuredProducts.slice(0, 9).map((leaf) => (
-                        <div 
-                          key={leaf.id} 
-                          className="mc-recommendation-item"
-                          onClick={() => {
-                            handleLeafClick(leaf.leaf_category_id);
-                            setMobileMenuOpen(false);
-                          }}
-                        >
-                          <div className="mc-rec-image">
-                            <img src={leaf.cover_image_url || placeholderImg} alt={leaf.leaf_categories?.name} />
-                          </div>
-                          <p>{i18n.language === 'sw' ? (leaf.leaf_categories?.name_sw || leaf.leaf_categories?.name) : leaf.leaf_categories?.name}</p>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="mobile-empty-state" style={{gridColumn: '1 / -1'}}></div>
-                    )}
-                  </div>
+                ))
+              ) : (
+                <div style={{ padding: '20px', color: '#999', textAlign: 'center' }}>
+                  Hakuna Subcategories
                 </div>
+              )}
+            </>
 
-                {/* SEHEMU YA 2: GET PRODUCT INSPIRATION (Bidhaa 2x2) */}
-                <div className="mc-section">
-                  <div className="mc-inspiration-grid">
-                    {trendingProducts && trendingProducts.length > 0 ? (
-                      trendingProducts.slice(0, 4).map((product) => (
-                        <div 
-                          key={product.id} 
-                          className="mc-inspiration-card"
-                          onClick={() => {
-                            navigate(`/product/${product.id}`);
-                            setMobileMenuOpen(false);
-                          }}
-                        >
-                          <img src={product.cover_image_url || product.cover_image || placeholderImg} alt={product.name} />
-                          <p className="mc-insp-title">{product.name}</p>
-                          <p className="mc-insp-price">TSh {product.price}</p>
-                          <p className="mc-insp-moq">Min. order: {product.moq || 1}</p>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="mobile-empty-state" style={{gridColumn: '1 / -1'}}></div>
-                    )}
+          ) : (
+            
+            /* IKIWA NI VIEW YA CATEGORIES KUU (Default) */
+            categories.map((cat) => (
+              <div 
+                key={cat.id} 
+                className={`mc-sidebar-item ${selectedCategory?.id === cat.id ? 'active' : ''}`}
+                onClick={() => {
+                  setSelectedCategory(cat);
+                  setSelectedCategoryForComponents(cat);
+                  if (cat.id) {
+                    fetchFeaturedLeafs(cat.id);
+                    fetchSubCategories(cat.id);
+                  }
+                }}
+              >
+                {getCategoryDisplayName(cat)}
+              </div>
+            ))
+            
+          )}
+        </aside>
+
+        {/* ============================================ */}
+        {/* CONTENT (Kulia) - SASA DAIMA INAONYESHA BIDHAA (PRODUCTS) */}
+        {/* ============================================ */}
+        <main className="mc-content">
+          
+          {/* SEHEMU YA 1: BIDHAA ZA CATEGORY (Duara/Gridi) */}
+          <div className="mc-section">
+            <h3 className="mc-section-title">Category Products</h3>
+            <div className="mc-recommendations-grid">
+              {featuredProducts && featuredProducts.length > 0 ? (
+                featuredProducts.slice(0, 9).map((leaf) => (
+                  <div 
+                    key={leaf.id} 
+                    className="mc-recommendation-item"
+                    onClick={() => {
+                      handleLeafClick(leaf.leaf_category_id);
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    <div className="mc-rec-image">
+                      <img src={leaf.cover_image_url || placeholderImg} alt={leaf.name} />
+                    </div>
+                    <p>{i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}</p>
                   </div>
-                </div>
+                ))
+              ) : (
+                <div className="mobile-empty-state" style={{ gridColumn: '1 / -1' }}></div>
+              )}
 
-              </main>
+              {/* 🔥 KITUFE CHA SEE ALL: SASA KINABADILISHA SIDEBAR TU! */}
+              {featuredProducts && featuredProducts.length > 0 && (
+                <div 
+                  className="mc-recommendation-item" 
+                  onClick={() => {
+                    // Hii inabadilisha Sidebar ya kushoto kuwa Subcategories tu, 
+                    // lakini inaacha Content (Kulia) kuonyesha Products.
+                    setActiveMenu('subcategories'); 
+                  }}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div 
+                    className="mc-rec-image" 
+                    style={{ 
+                      border: '2px dashed #ff6a00', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      backgroundColor: '#fff8f0' 
+                    }}
+                  >
+                    <Plus size={28} color="#ff6a00" />
+                  </div>
+                  <p style={{ color: '#ff6a00', fontWeight: 'bold' }}>{t('see_all')}</p>
+                </div>
+              )}
             </div>
-
           </div>
-        </div>,
-        document.body
-      )}
+
+          {/* SEHEMU YA 2: GET PRODUCT INSPIRATION (Bidhaa 2x2 za Mraba) */}
+          <div className="mc-section">
+            <div className="mc-inspiration-grid">
+              {trendingProducts && trendingProducts.length > 0 ? (
+                trendingProducts.slice(0, 4).map((product) => (
+                  <div 
+                    key={product.id} 
+                    className="mc-inspiration-card"
+                    onClick={() => {
+                      navigate(`/product/${product.id}`);
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    <img src={product.cover_image_url || product.cover_image || placeholderImg} alt={product.name} />
+                    <p className="mc-insp-title">{product.name}</p>
+                    <p className="mc-insp-price">TSh {product.price}</p>
+                    <p className="mc-insp-moq">Min. order: {product.moq || 1}</p>
+                  </div>
+                ))
+              ) : (
+                <div className="mobile-empty-state" style={{ gridColumn: '1 / -1' }}></div>
+              )}
+            </div>
+          </div>
+
+        </main>
+      </div>
+
+    </div>
+  </div>,
+  document.body
+)}
       
     </div>
   );
