@@ -66,6 +66,7 @@ export default function Dashboard() {
   const categoryCacheRef = useRef({}); // ✅ Hapa
   const [cachedAds, setCachedAds] = useState([]);
   const [loadingLeafs, setLoadingLeafs] = useState(false);
+  const [mobileActiveMenu, setMobileActiveMenu] = useState('categories');
 
     useEffect(() => {
     const fetchAdsWithCache = async () => {
@@ -902,15 +903,17 @@ const handleSubCategoryHover = (subCategory) => {
       {/* 2. BODY (Sidebar + Content) */}
       <div className="mc-body">
         
-        {/* SIDEBAR (Kushoto) - Inabadilika kulingana na activeMenu */}
+        {/* SIDEBAR (Kushoto) - Inabadilika kulingana na mobileActiveMenu */}
         <aside className="mc-sidebar">
           
-          {activeMenu === 'subcategories' ? (
+          {mobileActiveMenu === 'subcategories' ? (
             <>
               <div 
                 className="mc-sidebar-back"
                 onClick={() => {
-                  setActiveMenu('categories');
+                  setSelectedSubCategory(null);       // ✅ UPDATE 1: Safisha subcategory
+                  setMobileActiveMenu('categories');   // Badilisha menu ya mobile
+                  setViewMode('products');             // ✅ UPDATE 2: Badilisha viewMode ili Desktop na Mobile zilingane
                   if (selectedCategory?.id) {
                     fetchFeaturedLeafs(selectedCategory.id);
                   }
@@ -956,6 +959,9 @@ const handleSubCategoryHover = (subCategory) => {
                 onClick={() => {
                   setSelectedCategory(cat);
                   setSelectedCategoryForComponents(cat);
+                  setMobileActiveMenu('categories');   // Reset mobile menu
+                  setViewMode('products');             // ✅ UPDATE 2: Rudisha viewMode kwa products
+                  fetchFeaturedLeafs(cat.id);          // Pakia data mpya
                 }}
               >
                 {getCategoryDisplayName(cat)}
@@ -964,15 +970,17 @@ const handleSubCategoryHover = (subCategory) => {
           )}
         </aside>
 
-        {/* CONTENT (Kulia) - SASA INA SKELETON NA EMPTY STATE */}
+        {/* CONTENT (Kulia) */}
         <main className="mc-content">
           
-          {/* SEHEMU YA 1: BIDHAA ZA CATEGORY (Duara/Gridi) */}
+          {/* SEHEMU YA 1: BIDHAA ZA CATEGORY/SUBCATEGORY */}
           <div className="mc-section">
-            <h3 className="mc-section-title">Category Products</h3>
+            <h3 className="mc-section-title">
+              {mobileActiveMenu === 'categories' ? 'Category Products' : 'Subcategory Products'}
+            </h3>
             <div className="mc-recommendations-grid">
               {loadingLeafs ? (
-                // ✅ SKELETON LOADING
+                // SKELETON LOADING
                 <>
                   {[...Array(6)].map((_, idx) => (
                     <div key={`mobile-skeleton-${idx}`} className="mc-recommendation-item skeleton-item">
@@ -981,39 +989,71 @@ const handleSubCategoryHover = (subCategory) => {
                     </div>
                   ))}
                 </>
-              ) : featuredProducts && featuredProducts.length > 0 ? (
-                // ✅ DATA IPO
-                featuredProducts.slice(0, 9).map((leaf) => (
-                  <div 
-                    key={leaf.id} 
-                    className="mc-recommendation-item"
-                    onClick={() => {
-                      handleLeafClick(leaf.leaf_category_id || leaf.id);
-                      setMobileMenuOpen(false);
-                    }}
-                  >
-                    <div className="mc-rec-image">
-                      <img src={leaf.cover_image_url || placeholderImg} alt={leaf.name} />
+              ) : mobileActiveMenu === 'categories' ? (
+                // ✅ CATEGORY PRODUCTS
+                featuredProducts && featuredProducts.length > 0 ? (
+                  featuredProducts.slice(0, 9).map((leaf) => (
+                    <div 
+                      key={leaf.id} 
+                      className="mc-recommendation-item"
+                      onClick={() => {
+                        handleLeafClick(leaf.leaf_category_id || leaf.id);
+                        setMobileMenuOpen(false);
+                      }}
+                    >
+                      <div className="mc-rec-image">
+                        <img src={leaf.cover_image_url || placeholderImg} alt={leaf.name} />
+                      </div>
+                      <p>{i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}</p>
                     </div>
-                    <p>{i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}</p>
+                  ))
+                ) : (
+                  <div className="empty-state" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
+                    <div style={{ fontSize: '48px', marginBottom: '16px' }}>📦</div>
+                    <p style={{ fontSize: '16px', color: '#666', fontWeight: 'bold' }}>
+                      Hakuna bidhaa katika kategoria hii
+                    </p>
                   </div>
-                ))
+                )
               ) : (
-                // ✅ EMPTY STATE
-                <div className="empty-state" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
-                  <div style={{ fontSize: '48px', marginBottom: '16px' }}>📦</div>
-                  <p style={{ fontSize: '16px', color: '#666', fontWeight: 'bold' }}>
-                    Hakuna bidhaa katika kategoria hii
-                  </p>
-                </div>
+                // ✅ SUBCATEGORY PRODUCTS (HAPA NDIO DATA INAPAKIA)
+                leafsForSub && leafsForSub.length > 0 ? (
+                  leafsForSub.slice(0, 9).map((leaf) => (
+                    <div 
+                      key={leaf.id} 
+                      className="mc-recommendation-item"
+                      onClick={() => {
+                        handleLeafClick(leaf.leaf_category_id || leaf.id);
+                        setMobileMenuOpen(false);
+                      }}
+                    >
+                      <div className="mc-rec-image">
+                        <img src={leaf.cover_image_url || placeholderImg} alt={leaf.name} />
+                      </div>
+                      <p>{i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}</p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="empty-state" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
+                    <div style={{ fontSize: '48px', marginBottom: '16px' }}>📦</div>
+                    <p style={{ fontSize: '16px', color: '#666', fontWeight: 'bold' }}>
+                      Hakuna bidhaa katika subcategory hii
+                    </p>
+                  </div>
+                )
               )}
 
-              {/* See All button - onyesha tu kama kuna data */}
-              {!loadingLeafs && featuredProducts && featuredProducts.length > 0 && (
+              {/* ✅ SEE ALL BUTTON - Inaonekana TU kama mobileActiveMenu === 'categories' */}
+              {mobileActiveMenu === 'categories' && !loadingLeafs && featuredProducts && featuredProducts.length > 0 && (
                 <div 
                   className="mc-recommendation-item" 
                   onClick={() => {
-                    setActiveMenu('subcategories'); 
+                    setMobileActiveMenu('subcategories');     // Badilisha UI ya mobile
+                    setViewMode('subcategories');             // ✅ UPDATE 3: Badilisha viewMode ili data ipakie!
+                    setSelectedSubCategory(null);             // ✅ UPDATE 4: Safisha ili ipakie category nzima
+                    if (selectedCategory?.id) {
+                      fetchLeafsForSub(selectedCategory.id);  // Pakia data ya subcategory
+                    }
                   }}
                   style={{ cursor: 'pointer' }}
                 >
@@ -1035,7 +1075,7 @@ const handleSubCategoryHover = (subCategory) => {
             </div>
           </div>
 
-          {/* SEHEMU YA 2: GET PRODUCT INSPIRATION (Bidhaa 2x2 za Mraba) */}
+          {/* SEHEMU YA 2: GET PRODUCT INSPIRATION */}
           <div className="mc-section">
             <div className="mc-inspiration-grid">
               {trendingProducts && trendingProducts.length > 0 ? (

@@ -487,36 +487,30 @@ html, body {
   cursor: pointer;
   margin-top: 20px;
 }
-
 /* ============================================
-   MEGA MENU, MOBILE MODAL, nk. (Zinabaki sawa, tumia variables)
+   MOBILE CATEGORIES MODAL (ALIBABA STYLE)
    ============================================ */
-/* ... (Nakili zilizobaki kutoka kwenye CSS yako ya awali, lakini badilisha rangi zote za hardcoded kuwa var(--bg-primary), var(--text-primary), nk.) */
 
-/* ============================================
-   LAYER 13: MOBILE CATEGORIES MODAL (ALIBABA STYLE)
-   ============================================ */
 .mobile-categories-overlay {
   position: fixed;
   inset: 0;
-  background: var(--bg-overlay, rgba(0, 0, 0, 0.6));
+  background: rgba(0, 0, 0, 0.6);
   z-index: 99999 !important;
   display: flex;
   justify-content: flex-end;
   align-items: flex-end;
   animation: fadeIn 0.2s ease;
-    padding-top: 40px !important; 
-
+  padding-top: 40px !important;
 }
 
 .mobile-categories-modal {
   width: 100%;
   height: 100%;
-  background: var(--mobile-bg, #ffffff);
+  background: #ffffff;
   border-radius: 20px 20px 0 0;
   overflow: hidden;
   animation: slideUp 0.3s ease;
-  box-shadow: 0 -5px 20px var(--shadow-lg, rgba(0,0,0,0.2));
+  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
 }
@@ -524,108 +518,141 @@ html, body {
 /* ============================================
    HEADER - SEHEMU YA JUU
    ============================================ */
+
 .mc-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  background: var(--bg-primary, #ffffff);
-  border-bottom: 1px solid var(--border-light, #f0f0f0);
+  padding: 14px 18px;
+  background: #ffffff;
+  border-bottom: 1px solid #f0f0f0;
   flex-shrink: 0;
-  height: 60px;
+  height: 56px;
 }
 
 .mc-back-btn {
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--text-primary, #333);
+  color: #333;
   padding: 4px;
   display: flex;
   align-items: center;
 }
 
 .mc-title {
-  font-size: 18px;
+  font-size: 16px; /* Imepunguzwa kutoka 18 → 16 */
   font-weight: 700;
-  color: var(--text-primary, #1a1a1a);
+  color: #1a1a1a;
   margin: 0;
   flex: 1;
   text-align: center;
+  letter-spacing: 0.3px;
 }
 
 .mc-spacer {
-  width: 30px; /* Inasawazisha nafasi ya kulia na kushoto */
+  width: 28px;
 }
 
 /* ============================================
    BODY - SIDEBAR NA CONTENT
    ============================================ */
+
 .mc-body {
   display: flex;
   flex: 1;
   overflow: hidden;
-  height: calc(100% - 60px); /* Toa nafasi ya Header */
+  height: calc(100% - 56px); /* Toa nafasi ya Header */
 }
 
 /* SIDEBAR (KUSHOTO) */
+
 .mc-sidebar {
   width: 28%;
   min-width: 85px;
   max-width: 110px;
-  background: var(--bg-sidebar, #fcfcfc);
+  background: #fcfcfc;
   overflow-y: auto;
-  border-right: 1px solid var(--border-light, #f0f0f0);
-  padding: 12px 0;
+  border-right: 1px solid #f0f0f0;
+  padding: 10px 0;
+}
+
+/* SIDEBAR BACK BUTTON (Back to Categories) */
+.mc-sidebar-back {
+  padding: 10px 12px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0.3px !important;
+  color: #ff6a00 !important;
+  border-bottom: 1px solid #eee;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+/* Punguza icon ya Chevron */
+.mc-sidebar-back svg {
+  width: 14px !important;
+  height: 14px !important;
 }
 
 .mc-sidebar-item {
-  padding: 12px 8px;
-  font-size: 12px;
-  color: var(--text-secondary, #666);
+  padding: 10px 8px;
+  font-size: 11px; /* Imepunguzwa kutoka 12 → 11 */
+  color: #555;
   cursor: pointer;
   transition: all 0.15s ease;
   text-align: left;
-  line-height: 1.2;
+  line-height: 1.3;
   word-break: break-word;
-}
-.mc-sidebar-item.active {
-  color: var(--text-primary, #000);
-  font-weight: 700;
-  border-left: 3px solid var(--brand-orange, #ff6a00);
-  background: var(--bg-secondary, #f5f5f5);
+  letter-spacing: 0.2px;
 }
 
-/* CONTENT (KULIA) - INA PADDING KUSHOTO */
+.mc-sidebar-item.active {
+  color: #000;
+  font-weight: 700;
+  border-left: 3px solid #ff6a00;
+  background: #f5f5f5;
+}
+
+/* CONTENT (KULIA) */
+
 .mc-content {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 20px 20px 80px !important; /* Paddings zake */
-  background: var(--bg-primary, white);
+  padding: 14px 18px 18px 70px !important; /* Paddings zimepunguzwa kidogo */
+  background: #ffffff;
   box-sizing: border-box;
 }
 
 .mc-section {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .mc-section-title {
-  font-size: 14px;
+  font-size: 13px; /* Imepunguzwa kutoka 14 → 13 */
   font-weight: 700;
-  color: var(--text-primary, #222);
-  margin: 0 0 16px 0;
+  color: #222;
+  margin: 0 0 14px 0;
+  letter-spacing: 0.3px;
 }
+
 .mc-section-title:not(:first-child) {
-  margin-top: 24px;
+  margin-top: 20px;
 }
 
 /* ============================================
    RECOMMENDATIONS (Picha za Duara)
    ============================================ */
+
 .mc-recommendations-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); 
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); /* Imepunguzwa kutoka 70 → 65 */
+  gap: 14px;
   justify-items: center;
   padding-right: 0;
 }
@@ -640,12 +667,12 @@ html, body {
 }
 
 .mc-rec-image {
-  width: 60px;
-  height: 60px;
+  width: 55px; /* Imepunguzwa kutoka 60 → 55 */
+  height: 55px;
   border-radius: 50%;
   overflow: hidden;
-  background: var(--bg-secondary, #f0f0f0);
-  margin: 0 auto 6px auto;
+  background: #f0f0f0;
+  margin: 0 auto 5px auto;
   flex-shrink: 0;
 }
 
@@ -656,35 +683,38 @@ html, body {
 }
 
 .mc-recommendation-item p {
-  font-size: 10px;
-  color: var(--text-primary, #333);
+  font-size: 9px; /* Imepunguzwa kutoka 10 → 9 */
+  color: #333;
   margin: 0;
-  line-height: 1.2;
-  max-width: 70px;
+  line-height: 1.3;
+  max-width: 65px;
   word-break: break-word;
+  letter-spacing: 0.2px;
 }
 
 /* ============================================
    GET PRODUCT INSPIRATION (Bidhaa 2x2)
    ============================================ */
+
 .mc-inspiration-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  gap: 10px; /* Imepunguzwa kutoka 12 → 10 */
 }
 
 .mc-inspiration-card {
-  background: var(--bg-card, white);
-  border: 1px solid var(--border-light, #eee);
+  background: #ffffff;
+  border: 1px solid #eee;
   border-radius: 8px;
   overflow: hidden;
-  padding: 8px;
+  padding: 6px 8px 8px 8px; /* Imepunguzwa kutoka 8px pande zote */
   cursor: pointer;
   transition: all 0.2s;
 }
+
 .mc-inspiration-card:hover {
-  box-shadow: 0 4px 8px var(--shadow-color, rgba(0,0,0,0.05));
-  border-color: var(--brand-orange, #ff6a00);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  border-color: #ff6a00;
 }
 
 .mc-inspiration-card img {
@@ -692,40 +722,43 @@ html, body {
   aspect-ratio: 1/1;
   object-fit: cover;
   border-radius: 4px;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .mc-insp-title {
-  font-size: 12px;
+  font-size: 11px; /* Imepunguzwa kutoka 12 → 11 */
   font-weight: 600;
-  color: var(--text-primary, #222);
+  color: #222;
   margin: 0 0 2px 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  line-height: 1.3;
 }
 
 .mc-insp-price {
-  font-size: 12px;
+  font-size: 11px; /* Imepunguzwa kutoka 12 → 11 */
   font-weight: 700;
-  color: var(--brand-orange, #ff6a00);
+  color: #ff6a00;
   margin: 0 0 2px 0;
 }
 
 .mc-insp-moq {
-  font-size: 10px;
-  color: var(--text-secondary, #888);
+  font-size: 9px; /* Imepunguzwa kutoka 10 → 9 */
+  color: #888;
   margin: 0;
 }
 
 /* ============================================
    ANIMATIONS (Zilizopo)
    ============================================ */
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
 @keyframes slideUp {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
