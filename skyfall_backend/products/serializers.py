@@ -73,6 +73,8 @@ class ProductMediaSerializer(serializers.ModelSerializer):
 class ProductsEngineSerializer(serializers.ModelSerializer):
     leaf_category_id = serializers.UUIDField(source='leaf_category.id', read_only=True)
     cover_image_url = serializers.SerializerMethodField()
+    leaf_category_name = serializers.SerializerMethodField()  # ✅ ONGEZA HII
+
     
     # 🔥 Fields za kupokea faili (write_only)
     cover_image = serializers.ImageField(write_only=True, required=False, allow_null=True)
@@ -197,6 +199,13 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
 
         safe_path = urllib.parse.quote(safe_path, safe='/')
         return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{safe_path}"
+
+     # ✅ ONGEZA HAPA (baada ya get_cover_image_url)
+    def get_leaf_category_name(self, obj):
+        if obj.leaf_category:
+            return obj.leaf_category.name
+        return None
+    
     
     # 🔥 DEBUG: Angalia kama serializer inaitwa!
     def to_internal_value(self, data):

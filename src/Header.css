@@ -446,12 +446,11 @@
 
     .header-top-bar {
         gap: 6px !important;
-        height: 56px !important; /* 🔥 Ongeza urefu ili kutoshea logo kubwa */
+        height: 52px !important; /* Rudi kwenye 52px ili header isiwe kubwa mno */
     }
 
-    /* 🔥 MUHIMU SANA: Acha logo ipanuke bila kizuizi! */
     .logo-wrapper {
-        max-width: none !important;   /* Ondoa kizuizi cha 110px */
+        max-width: none !important;
         min-width: unset !important;
         width: auto !important;
         gap: 6px !important;
@@ -459,17 +458,30 @@
         align-items: center !important;
     }
 
-    /* 🔥 Teksti inakuwa kubwa, nzito, kama Alibaba! */
+    /* ✅ MAANDISHI SASA YANAWEZA KUKUA SAWA NA PICHA */
     .logo-wrapper .logo-text {
-        font-size: 18px !important;   /* Ilikuwa 12px, sasa ni 26px */
-        font-weight: 800 !important;   /* Nzito kabisa */
-        letter-spacing: 0.1px !important;
+        font-size: 20px !important;  /* Ongeza kutoka 18 hadi 22 ili ishindane */
+        font-weight: 800 !important;
+        letter-spacing: 0.5px !important;
     }
 
+    /* ✅ DURAA (BOX) SASA LIMEKUA KIDOGO ZAIDI KUSHIKA PICHA */
     .logo-wrapper .logo-icon-box {
-        width: 26px !important;       /* Icon pia inakua kidogo */
-        height: 26px !important;
+        width: 32px !important;      /* Ongeza kutoka 26 hadi 32 */
+        height: 32px !important;     /* Ili picha isitoke nje */
         border-width: 1.5px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow: hidden !important; /* Hii inazuia kukatwa nje vibaya */
+    }
+
+    /* ✅ PICHA (IMAGE) SASA IMEKUA KATI (SI KUBWA SANA, SI NDOGO SANA) */
+    .logo-wrapper .logo-image {
+        width: 190% !important;      /* Rudi 190% au jaribu 200% */
+        height: 190% !important;
+        object-fit: cover !important;
+        display: block !important;
     }
 
     .search-bar-container {
@@ -495,7 +507,6 @@
         padding: 16px !important;
     }
 }
-
 /* =========================================
    9. HAMBURGER BUTTON & MOBILE MENU
    ========================================= */

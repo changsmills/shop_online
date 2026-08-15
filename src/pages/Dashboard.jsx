@@ -62,7 +62,10 @@ export default function Dashboard() {
   const [selectedCategoryForComponents, setSelectedCategoryForComponents] = useState(null);
   
   const timeoutRef = useRef(null);
+  const abortRef = useRef(null); // ✅ ONGEZA HII - kwa ajili ya kufuta requests
+  const categoryCacheRef = useRef({}); // ✅ Hapa
   const [cachedAds, setCachedAds] = useState([]);
+  const [loadingLeafs, setLoadingLeafs] = useState(false);
 
     useEffect(() => {
     const fetchAdsWithCache = async () => {
@@ -121,132 +124,155 @@ export default function Dashboard() {
     return ad.media_url.match(/\.(mp4|webm|mov)$/i) !== null;
   };
 
-const fetchFeaturedLeafs = async (categoryId) => {
+  const fetchFeaturedLeafs = async (categoryId) => {
   if (!categoryId) return;
+
+  if (categoryCacheRef.current[categoryId]?.leafs) {
+    setFeaturedProducts(categoryCacheRef.current[categoryId].leafs);
+    setLoadingLeafs(false); // ✅ Data ipo, acha loading
+    return;
+  }
+
+  setLoadingLeafs(true); // ✅ Anza loading
+
   try {
-    const response = await api.get('/products/', {
-      params: { leaf_category_id: categoryId }
-    });
-
-    // 🔥 1. Angalia kama data imefika
-    console.log("🔍 [DEBUG] Raw Response Data:", response.data);
-
-    // 🔥 2. Panga data kwa usalama (Ikiwa backend inatumia pagination)
-    const data = response.data.results || response.data || [];
+    console.log(`⏳ [FETCH] Inapakia products za category ${categoryId}...`);
     
-    const uniqueCategories = [];
-    const seenIds = new Set();
-
-    // 🔥 3. Chuja na thibitisha ID ipo!
-    data.forEach(item => {
-      // ANGALIA KAMA leaf_category_id IPO!
-      if (item.leaf_category_id) {
-        if (!seenIds.has(item.leaf_category_id)) {
-          seenIds.add(item.leaf_category_id);
-          uniqueCategories.push({
-            id: item.leaf_category_id,
-            leaf_category_id: item.leaf_category_id,
-            cover_image_url: item.cover_image_url,
-            name: item.leaf_category_name || 'Unknown',
-            name_sw: item.leaf_category_name_sw || item.leaf_category_name || 'Haijulikani'
-          });
-          console.log("✅ Added leaf ID:", item.leaf_category_id);
-        }
-      } else {
-        console.warn("⚠️ SKIPPED - No leaf_category_id found for product:", item.id);
+    const response = await api.get('/products/', {
+      params: {
+        parent_category: categoryId,
+        limit: 17,
+        ordering: '-views'
       }
     });
 
-    // 🔥 4. Thibitisha kama zimeongezwa
-    console.log(`🏁 Final unique categories: ${uniqueCategories.length}`);
-    setFeaturedProducts(uniqueCategories.slice(0, 17));
+    const data = response.data.results || response.data || [];
+    
+    const result = data.map((product) => ({
+      id: product.id,
+      leaf_category_id: product.leaf_category_id || product.id,
+      cover_image_url: product.cover_image_url,
+      name: product.leaf_category_name || product.name,
+      name_sw: product.leaf_category_name || product.name
+    }));
+
+    categoryCacheRef.current[categoryId] = {
+      ...categoryCacheRef.current[categoryId],
+      leafs: result
+    };
+    
+    setFeaturedProducts(result);
+    setLoadingLeafs(false); // ✅ Data imefika, acha loading
 
   } catch (error) {
     console.error("❌ [fetchFeaturedLeafs] Error:", error);
     setFeaturedProducts([]);
+    setLoadingLeafs(false); // ✅ Error pia, acha loading
   }
 };
 
-  // 2. Fetch Subcategories (SORTED ALPHABETICALLY)
-  const fetchSubCategories = async (categoryId) => {
-    try {
-      const response = await api.get('/subcategories/', {
-        params: { category_id: categoryId }
-      });
-      const sortedData = (response.data || []).sort((a, b) => a.name.localeCompare(b.name));
-      setSubCategories(sortedData);
-      if (sortedData.length > 0) {
-        setSelectedSubCategory(sortedData[0]);
-        await fetchLeafsForSub(sortedData[0].id);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+const fetchSubCategories = async (categoryId) => {
+  if (!categoryId) return;
 
-  // 3. Fetch Leafs for Subcategory (SORTED ALPHABETICALLY)
-const fetchLeafsForSub = async (subCategoryId) => {
+  if (categoryCacheRef.current[categoryId]?.subCategories) {
+    const cachedSubs = categoryCacheRef.current[categoryId].subCategories;
+    setSubCategories(cachedSubs);
+    if (cachedSubs.length > 0) {
+      setSelectedSubCategory(cachedSubs[0]);
+      // Usifanye fetchLeafsForSub hapa! Itafanywa na useEffect au hover
+    }
+    return;
+  }
+
   try {
-    const response = await api.get('/products/', {
-      params: { sub_category: subCategoryId }
+    console.log(`⏳ [FETCH] Inapakia subcategories za category ${categoryId}...`);
+    const response = await api.get('/subcategories/', {
+      params: { category_id: categoryId }
     });
 
-    // 🔥 BADILISHA HAPA: Tumia 'results'!
-    const data = response.data.results || response.data || [];
+    const sortedData = (response.data || []).sort((a, b) => 
+      (a.name || '').localeCompare(b.name || '')
+    );
 
-    const seenLeafIds = new Set();
-    const uniqueLeafs = data
-      .filter(item => item.cover_image_url && !seenLeafIds.has(item.leaf_category_id))
-      .map(item => {
-        seenLeafIds.add(item.leaf_category_id);
-        return {
-          id: item.leaf_category_id,
-           name: item.leaf_category_name || 'Unknown', // ✅ Tumia hili, linalotoka moja kwa moja kwenye API!
-           name_sw: item.leaf_category_name_sw || item.leaf_category_name || 'Haijulikani',
-           cover_image_url: item.cover_image_url // ✅ Tumia cover_image_url!
-        };
-      })
-      .sort((a, b) => a.name.localeCompare(b.name));
+    categoryCacheRef.current[categoryId] = {
+      ...categoryCacheRef.current[categoryId],
+      subCategories: sortedData
+    };
 
-    setLeafsForSub(uniqueLeafs);
+    console.log(`✅ [SUCCESS] Subcategories ${sortedData.length} zimehifadhiwa!`);
+    setSubCategories(sortedData);
+
+    if (sortedData.length > 0) {
+      setSelectedSubCategory(sortedData[0]);
+      // Pia usifanye fetchLeafsForSub hapa!
+    }
   } catch (error) {
-    console.error(error);
-    setLeafsForSub([]);
+    console.error("❌ [fetchSubCategories] Error:", error);
   }
 };
 
-  // ========== EFFECTS ==========
-  useEffect(() => {
-    if (categories.length > 0 && !selectedCategory) {
-      const allCategory = categories.find(c => c.id === null) || categories[0];
-      setSelectedCategory(allCategory);
-      setSelectedCategoryForComponents(allCategory);
-    }
-  }, [categories]);
+const fetchLeafsForSub = async (subCategoryId) => {
+  if (!subCategoryId) return;
 
-  useEffect(() => {
-    if (initialFeaturedProducts.length > 0) {
-      setFeaturedProducts(initialFeaturedProducts);
-    }
-  }, [initialFeaturedProducts]);
+  const cacheKey = `sub_${subCategoryId}`;
 
-  useEffect(() => {
-    if (initialSubCategories.length > 0) {
-      // 🔥 Panga initial subcategories pia kwa alfabeti
-      const sortedInitial = [...initialSubCategories].sort((a, b) => a.name.localeCompare(b.name));
-      setSubCategories(sortedInitial);
-    }
-  }, [initialSubCategories]);
+  if (categoryCacheRef.current[cacheKey]) {
+    setLeafsForSub(categoryCacheRef.current[cacheKey]);
+    setLoadingLeafs(false);
+    return;
+  }
+
+  setLoadingLeafs(true);
+
+  try {
+    console.log(`⏳ [FETCH] Inapakia products za subcategory ${subCategoryId}...`);
+
+    const response = await api.get('/products/', {
+      params: {
+        sub_category: subCategoryId,
+        limit: 17,
+        ordering: '-views'
+      }
+    });
+
+    const data = response.data.results || response.data || [];
+
+    const result = data.map((product) => ({
+      id: product.id,
+      leaf_category_id: product.leaf_category_id || product.id,
+      cover_image_url: product.cover_image_url,
+      name: product.leaf_category_name || product.name,
+      name_sw: product.leaf_category_name || product.name
+    }));
+
+    categoryCacheRef.current[cacheKey] = result;
+    setLeafsForSub(result);
+    setLoadingLeafs(false);
+
+  } catch (error) {
+    console.error("❌ [fetchLeafsForSub] Error:", error);
+    setLeafsForSub([]);
+    setLoadingLeafs(false);
+  }
+};
 useEffect(() => {
-  // 🔥 Hakikisha selectedCategory ipo na ina id halisi
-  if (selectedCategory && selectedCategory.id && activeMenu === 'categories') {
+  if (categories.length > 0 && !selectedCategory) {
+    // Chagua category ya kwanza yenye ID halisi (siyo "All")
+    const firstRealCategory = categories.find(c => c.id !== null);
+    if (firstRealCategory) {
+      setSelectedCategory(firstRealCategory);
+      setSelectedCategoryForComponents(firstRealCategory);
+    }
+  }
+}, [categories]);
+
+useEffect(() => {
+  if (selectedCategory && selectedCategory.id) {
     console.log("🔍 Fetching data for category:", selectedCategory.id);
     fetchFeaturedLeafs(selectedCategory.id);
     fetchSubCategories(selectedCategory.id);
-  } else {
-    console.warn("⚠️ selectedCategory ni null au haina id!");
   }
-}, [selectedCategory, activeMenu]); // 🔥 Tumia 'selectedCategory' sio 'selectedCategory?.id'
+}, [selectedCategory?.id]); // ✅ Tumia optional chaining
 
   useEffect(() => {
     if (cachedAds.length === 0) return;
@@ -276,43 +302,84 @@ useEffect(() => {
     };
   }, [cachedAds, currentAdIndex]);
 
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, []);
+// ========== EFFECTS ==========
 
+// ✅ 1. CLEANUP YA TIMEOUT NA ABORT CONTROLLER (IMEUNGANISHWA)
+useEffect(() => {
+  return () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    if (abortRef.current) {
+      abortRef.current.abort(); // ✅ Futa request zote zinazoendelea
+    }
+  };
+}, []);
+
+// ✅ 2. AUTH CHECK (IMEBORESHW)
 useEffect(() => {
   let isMounted = true;
+  
   const checkAuth = async () => {
     const token = getToken();
-    if (token && isMounted) {
-      try {
-        // 🔥 Pata profile kutoka backend
-        const profileRes = await api.get('/profile/');
-        const userProfile = profileRes.data;
-
-        // 🔥 Ikiwa ni supplier na hajaverify OTP, mpeleke kwenye verify page
-        if (userProfile.role === 'supplier' && !userProfile.is_otp_verified) {
-          navigate('/verify-seller-otp');
-          return;
-        }
-
-        // Vinginevyo, set session kama kawaida
-        setSession({ user: { id: userProfile.id } });
-      } catch (err) {
-        console.error("Auth check error:", err);
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
+    
+    if (!token) {
+      if (isMounted) {
         setSession(null);
+        setSessionLoading(false);
       }
-    } else {
-      setSession(null);
+      return;
     }
-    if (isMounted) setSessionLoading(false);
+    
+    try {
+      // 🔥 Pata profile kutoka backend
+      const profileRes = await api.get('/profile/');
+      const userProfile = profileRes.data;
+
+      // Kama component imeondoka, usifanye setState
+      if (!isMounted) return;
+
+      // 🔥 Ikiwa ni supplier na hajaverify OTP, mpeleke kwenye verify page
+      if (userProfile.role === 'supplier' && !userProfile.is_otp_verified) {
+        navigate('/verify-seller-otp');
+        return;
+      }
+
+      // Vinginevyo, set session kama kawaida
+      setSession({ user: { id: userProfile.id } });
+      
+    } catch (err) {
+      console.error("Auth check error:", err);
+      
+      if (!isMounted) return;
+      
+      // Cleanup tokens kama API imeshindwa
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      setSession(null);
+      
+    } finally {
+      // Hakikisha sessionLoading inawekwa false kila wakati
+      if (isMounted) {
+        setSessionLoading(false);
+      }
+    }
   };
+  
   checkAuth();
+  
+  // Cleanup: Weka isMounted kuwa false wakati component inaondoka
+  return () => {
+    isMounted = false;
+  };
 }, [navigate]);
+
+useEffect(() => {
+  if (viewMode === 'subcategories' && selectedSubCategory?.id) {
+    console.log("🔍 Fetching products za subcategory:", selectedSubCategory.id);
+    fetchLeafsForSub(selectedSubCategory.id);
+  }
+}, [viewMode, selectedSubCategory?.id]);
 
   // ========== HANDLERS ==========
   const handleMouseEnter = (menuName) => {
@@ -332,17 +399,17 @@ useEffect(() => {
     setSelectedCategoryForComponents(category);
     setViewMode('products');
     setActiveMenu('categories');
-    fetchFeaturedLeafs(category.id);
-    fetchSubCategories(category.id);
+    //fetchFeaturedLeafs(category.id);
+    //fetchSubCategories(category.id);
   };
 
   const handleViewAll = () => setViewMode('subcategories');
   const handleBack = () => setViewMode('products');
 
-  const handleSubCategoryHover = (subCategory) => {
-    setSelectedSubCategory(subCategory);
-    fetchLeafsForSub(subCategory.id);
-  };
+
+const handleSubCategoryHover = (subCategory) => {
+  setSelectedSubCategory(subCategory);
+};
 
   const handleLeafClick = (leafId) => {
     navigate(`/category/${leafId}`);
@@ -474,18 +541,15 @@ useEffect(() => {
                       categories={categories}
                       selectedCategory={selectedCategoryForComponents}
                       onSelectCategory={(cat) => {
-                        setSelectedCategoryForComponents(cat);
-                        setSelectedCategory(cat);
-                        if (cat.id === null) {
-                          setSelectedCategoryForComponents(null);
-                          setSelectedCategory(null);
-                        } else {
-                          setSelectedCategoryForComponents(cat);
-                          setSelectedCategory(cat);
-                          fetchFeaturedLeafs(cat.id);
-                          fetchSubCategories(cat.id);
-                        }
-                      }}
+  if (cat.id === null) {
+    setSelectedCategoryForComponents(null);
+    setSelectedCategory(null);
+  } else {
+    setSelectedCategoryForComponents(cat);
+    setSelectedCategory(cat);
+    // ✅ Hakuna fetch hapa - useEffect itashughulikia
+  }
+}}
                       getDisplayName={getCategoryDisplayName}
                       getIcon={getIcon}
                     />
@@ -661,27 +725,36 @@ useEffect(() => {
               </div>
               
 <div className="category-grid">
-  {viewMode === 'products' ? (
-    <>
-      {featuredProducts.map((leaf) => (
+
+{viewMode === 'products' ? (
+  <>
+    {loadingLeafs ? (
+      // ✅ SKELETON LOADING
+      <>
+        {[...Array(8)].map((_, idx) => (
+          <div key={`skeleton-${idx}`} className="grid-item skeleton-item">
+            <div className="image-circle skeleton-circle"></div>
+            <p className="skeleton-text"></p>
+          </div>
+        ))}
+      </>
+    ) : featuredProducts.length > 0 ? (
+      // ✅ DATA IPO
+      featuredProducts.map((leaf) => (
         <div 
           key={leaf.id} 
           className="grid-item" 
           onClick={() => {
             try {
-              // 🔥 1. Pata ID halisi (kwa kipaumbele)
               const targetId = leaf.leaf_category_id || leaf.id;
-              console.log(`🔍 [LeafClick] Attempting to navigate for leaf: ${leaf.leaf_categories?.name || leaf.name}, targetId: ${targetId}`);
+              console.log(`🔍 [LeafClick] Attempting to navigate for leaf: ${leaf.name}, targetId: ${targetId}`);
 
-              // 🔥 2. Kagua kama ID ni sahihi (sio undefined, null, au 'undefined')
               if (!targetId || targetId === 'undefined' || targetId === 'null' || targetId === '') {
                 console.error("❌ [LeafClick] Invalid target ID detected:", targetId);
-                return; // Simamisha hapa!
+                return;
               }
 
-              // 🔥 3. Amua Desktop au Mobile
               if (window.innerWidth > 1024) {
-                // Desktop: Fungua tab mpya na ukague kama popup ilizuiwa
                 console.log(`🖥️ [LeafClick] Desktop: Opening new tab for ${targetId}`);
                 const newWindow = window.open(`/category/${targetId}`, '_blank');
                 
@@ -692,53 +765,73 @@ useEffect(() => {
                   console.log(`✅ [LeafClick] New tab opened successfully for ${targetId}`);
                 }
               } else {
-                // Mobile: Tumia navigate
                 console.log(`📱 [LeafClick] Mobile: Navigating in same tab for ${targetId}`);
                 handleLeafClick(targetId);
                 console.log(`✅ [LeafClick] Navigation successful.`);
               }
             } catch (error) {
-              // 🔥 4. Catch ya mwisho kwa makosa yasiyotarajiwa
               console.error("❌ [LeafClick] Unexpected error on featured leaf click:", error);
             }
           }}
         >
           <div className="image-circle">
-            <img src={leaf.cover_image_url || placeholderImg} alt={leaf.leaf_categories?.name} />
+            <img src={leaf.cover_image_url || placeholderImg} alt={leaf.name} />
           </div>
           <p className="grid-text">
-  {i18n.language === 'sw' 
-    ? (leaf.name_sw || leaf.name) // ✅ Tumia 'leaf.name' tuliyoibadilisha hapo juu!
-    : leaf.name}
-</p>
+            {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
+          </p>
         </div>
-      ))}
-      {/* 🔥 See All */}
+      ))
+    ) : (
+      // ✅ EMPTY STATE
+      <div className="empty-state" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
+        <div style={{ fontSize: '48px', marginBottom: '16px' }}>📦</div>
+        <p style={{ fontSize: '16px', color: '#666', fontWeight: 'bold' }}>
+          Hakuna bidhaa katika kategoria hii
+        </p>
+        <p style={{ fontSize: '14px', color: '#999' }}>
+          Tafadhali chagua kategoria nyingine
+        </p>
+      </div>
+    )}
+
+    {/* See All - Onyesha tu kama kuna data */}
+    {!loadingLeafs && featuredProducts.length > 0 && (
       <div onClick={handleViewAll} className="grid-item see-all-card">
         <div className="image-circle see-all-circle">
           <Plus size={30} color="#ff6a00" />
         </div>
         <p className="see-all-text">{t('see_all')}</p>
       </div>
+    )}
+  </>
+) : (
+  // ✅ KWA SUBCATEGORIES
+  loadingLeafs ? (
+    // Skeleton
+    <>
+      {[...Array(8)].map((_, idx) => (
+        <div key={`skeleton-sub-${idx}`} className="grid-item skeleton-item">
+          <div className="image-circle skeleton-circle"></div>
+          <p className="skeleton-text"></p>
+        </div>
+      ))}
     </>
-  ) : (
+  ) : leafsForSub.length > 0 ? (
     leafsForSub.map((leaf) => (
       <div 
         key={leaf.id} 
         className="grid-item" 
         onClick={() => {
           try {
-            // 🔥 1. Pata ID halisi
             const targetId = leaf.id || leaf.leaf_category_id;
             console.log(`🔍 [LeafClick] Attempting to navigate for sub-leaf: ${leaf.name}, targetId: ${targetId}`);
 
-            // 🔥 2. Kagua kama ID ni sahihi
             if (!targetId || targetId === 'undefined' || targetId === 'null' || targetId === '') {
               console.error("❌ [LeafClick] Invalid target ID detected:", targetId);
               return;
             }
 
-            // 🔥 3. Amua Desktop au Mobile
             if (window.innerWidth > 1024) {
               console.log(`🖥️ [LeafClick] Desktop: Opening new tab for ${targetId}`);
               const newWindow = window.open(`/category/${targetId}`, '_blank');
@@ -755,7 +848,6 @@ useEffect(() => {
               console.log(`✅ [LeafClick] Navigation successful.`);
             }
           } catch (error) {
-            // 🔥 4. Catch ya mwisho kwa makosa yasiyotarajiwa
             console.error("❌ [LeafClick] Unexpected error on sub-leaf click:", error);
           }
         }}
@@ -763,15 +855,25 @@ useEffect(() => {
         <div className="image-circle">
           <img 
             src={leaf.cover_image_url || leaf.cover_image || placeholderImg}
-            alt={leaf.leaf_categories?.name} 
+            alt={leaf.name} 
           />
         </div>
-       <p>
-  {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
-</p>
+        <p>
+          {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
+        </p>
       </div>
     ))
-  )}
+  ) : (
+    // Empty state kwa subcategories
+    <div className="empty-state" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
+      <div style={{ fontSize: '48px', marginBottom: '16px' }}>📦</div>
+      <p style={{ fontSize: '16px', color: '#666', fontWeight: 'bold' }}>
+        Hakuna bidhaa katika subcategory hii
+      </p>
+    </div>
+  )
+)}
+
 </div>
             </main>
           </div>
@@ -779,7 +881,7 @@ useEffect(() => {
         document.body
       )}
 
-      {mobileMenuOpen && ReactDOM.createPortal(
+{mobileMenuOpen && ReactDOM.createPortal(
   <div 
     className="mobile-categories-overlay"
     onClick={() => setMobileMenuOpen(false)}
@@ -800,22 +902,17 @@ useEffect(() => {
       {/* 2. BODY (Sidebar + Content) */}
       <div className="mc-body">
         
-        {/* ============================================ */}
         {/* SIDEBAR (Kushoto) - Inabadilika kulingana na activeMenu */}
-        {/* ============================================ */}
         <aside className="mc-sidebar">
           
-          {/* 🔥 Kama tumebonyeza See All, onyesha Subcategories kushoto */}
           {activeMenu === 'subcategories' ? (
-            
             <>
-              {/* Kitufe cha kurudi nyuma upande wa kushoto */}
               <div 
                 className="mc-sidebar-back"
                 onClick={() => {
-                  setActiveMenu('categories'); // Rudi kwenye categories mode
+                  setActiveMenu('categories');
                   if (selectedCategory?.id) {
-                    fetchFeaturedLeafs(selectedCategory.id); // Pakia tena products za awali
+                    fetchFeaturedLeafs(selectedCategory.id);
                   }
                 }}
                 style={{ 
@@ -832,7 +929,6 @@ useEffect(() => {
                 <ChevronLeft size={18} /> Back to Categories
               </div>
 
-              {/* Orodha ya Subcategories upande wa kushoto */}
               {subCategories && subCategories.length > 0 ? (
                 subCategories.map((sub) => (
                   <div 
@@ -840,7 +936,6 @@ useEffect(() => {
                     className={`mc-sidebar-item ${selectedSubCategory?.id === sub.id ? 'active' : ''}`}
                     onClick={() => {
                       setSelectedSubCategory(sub);
-                      // 🔥 Pakia bidhaa za subcategory hii upande wa kulia
                       fetchLeafsForSub(sub.id);
                     }}
                   >
@@ -853,10 +948,7 @@ useEffect(() => {
                 </div>
               )}
             </>
-
           ) : (
-            
-            /* IKIWA NI VIEW YA CATEGORIES KUU (Default) */
             categories.map((cat) => (
               <div 
                 key={cat.id} 
@@ -864,35 +956,39 @@ useEffect(() => {
                 onClick={() => {
                   setSelectedCategory(cat);
                   setSelectedCategoryForComponents(cat);
-                  if (cat.id) {
-                    fetchFeaturedLeafs(cat.id);
-                    fetchSubCategories(cat.id);
-                  }
                 }}
               >
                 {getCategoryDisplayName(cat)}
               </div>
             ))
-            
           )}
         </aside>
 
-        {/* ============================================ */}
-        {/* CONTENT (Kulia) - SASA DAIMA INAONYESHA BIDHAA (PRODUCTS) */}
-        {/* ============================================ */}
+        {/* CONTENT (Kulia) - SASA INA SKELETON NA EMPTY STATE */}
         <main className="mc-content">
           
           {/* SEHEMU YA 1: BIDHAA ZA CATEGORY (Duara/Gridi) */}
           <div className="mc-section">
             <h3 className="mc-section-title">Category Products</h3>
             <div className="mc-recommendations-grid">
-              {featuredProducts && featuredProducts.length > 0 ? (
+              {loadingLeafs ? (
+                // ✅ SKELETON LOADING
+                <>
+                  {[...Array(6)].map((_, idx) => (
+                    <div key={`mobile-skeleton-${idx}`} className="mc-recommendation-item skeleton-item">
+                      <div className="mc-rec-image skeleton-circle"></div>
+                      <p className="skeleton-text"></p>
+                    </div>
+                  ))}
+                </>
+              ) : featuredProducts && featuredProducts.length > 0 ? (
+                // ✅ DATA IPO
                 featuredProducts.slice(0, 9).map((leaf) => (
                   <div 
                     key={leaf.id} 
                     className="mc-recommendation-item"
                     onClick={() => {
-                      handleLeafClick(leaf.leaf_category_id);
+                      handleLeafClick(leaf.leaf_category_id || leaf.id);
                       setMobileMenuOpen(false);
                     }}
                   >
@@ -903,16 +999,20 @@ useEffect(() => {
                   </div>
                 ))
               ) : (
-                <div className="mobile-empty-state" style={{ gridColumn: '1 / -1' }}></div>
+                // ✅ EMPTY STATE
+                <div className="empty-state" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
+                  <div style={{ fontSize: '48px', marginBottom: '16px' }}>📦</div>
+                  <p style={{ fontSize: '16px', color: '#666', fontWeight: 'bold' }}>
+                    Hakuna bidhaa katika kategoria hii
+                  </p>
+                </div>
               )}
 
-              {/* 🔥 KITUFE CHA SEE ALL: SASA KINABADILISHA SIDEBAR TU! */}
-              {featuredProducts && featuredProducts.length > 0 && (
+              {/* See All button - onyesha tu kama kuna data */}
+              {!loadingLeafs && featuredProducts && featuredProducts.length > 0 && (
                 <div 
                   className="mc-recommendation-item" 
                   onClick={() => {
-                    // Hii inabadilisha Sidebar ya kushoto kuwa Subcategories tu, 
-                    // lakini inaacha Content (Kulia) kuonyesha Products.
                     setActiveMenu('subcategories'); 
                   }}
                   style={{ cursor: 'pointer' }}

@@ -18,6 +18,7 @@ from products.models import OTPModel, Profile
 
 
 
+
 # 🔥 MODELS IMPORTS:
 from products.models import (
     Category, ProductVariation, SubCategory, ProductsEngine, LeafCategory, Advertisement, 
@@ -75,38 +76,51 @@ class LeafCategoryViewSet(viewsets.ModelViewSet):
     queryset = LeafCategory.objects.all()
     serializer_class = LeafCategorySerializer
     permission_classes = [AllowAny]
+    pagination_class = LimitOffsetPagination  # ✅ ONGEZA HII - inapunguza data kubwa
 
-    # 🔥 BADILISHA HAPA: Inachuja kwa kutumia 'sub_category' AU 'sub_category_id'!
     def get_queryset(self):
         queryset = super().get_queryset()
         
-        # Angalia kama Frontend imetuma 'sub_category'
+        # 1. Filter kwa sub_category (kwa subcategory moja)
         sub_cat = self.request.query_params.get('sub_category')
         if sub_cat:
             queryset = queryset.filter(sub_category=sub_cat)
+            print(f"🔍 [FILTER] SubCategory: {sub_cat}, Results: {queryset.count()}")
             
-        # Angalia kama Frontend imetuma 'sub_category_id'
+        # 2. Filter kwa sub_category_id (kama frontend inatumia hili)
         sub_cat_id = self.request.query_params.get('sub_category_id')
         if sub_cat_id:
             queryset = queryset.filter(sub_category=sub_cat_id)
+            print(f"🔍 [FILTER] SubCategory ID: {sub_cat_id}, Results: {queryset.count()}")
+        
+        # 3. Filter kwa parent category (kupitia subcategory)
+        category_id = self.request.query_params.get('category_id')
+        if category_id:
+            queryset = queryset.filter(sub_category__category_id=category_id)
+            print(f"🔍 [FILTER] Category: {category_id}, Results: {queryset.count()}")
+        
+        # 4. Search (hiari - kama unataka kutafuta kwa jina)
+        search = self.request.query_params.get('search')
+        if search:
+            queryset = queryset.filter(name__icontains=search)
+            print(f"🔍 [SEARCH] Query: {search}, Results: {queryset.count()}")
             
         return queryset
 
-    # 🔥 ONGEZA HII METHOD ILI KUONA ID INAYOFIKA KUTOKA FRONTEND
     def retrieve(self, request, *args, **kwargs):
         leaf_id = kwargs.get('pk')
         print(f"🔍 [BACKEND DEBUG] LeafCategory retrieve called with ID: {leaf_id}")
         
         try:
-            # Jaribu kupata leaf kwa ID
             instance = self.get_object()
             serializer = self.get_serializer(instance)
             print(f"✅ [BACKEND] Leaf found: {instance.name} (ID: {instance.id})")
             return Response(serializer.data)
         except Exception as e:
             print(f"❌ [BACKEND ERROR] Failed to retrieve Leaf with ID {leaf_id}: {e}")
-            # Ruhusu Django kushughulikia error (kama 404)
             raise e
+
+
 class ProductsEngineViewSet(viewsets.ModelViewSet):
     queryset = ProductsEngine.objects.all()
     serializer_class = ProductsEngineSerializer

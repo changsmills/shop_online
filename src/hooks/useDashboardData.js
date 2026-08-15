@@ -7,8 +7,8 @@ export const useDashboardData = () => {
     categories: [],
     trendingProducts: [],
     ads: [],
-    featuredProducts: [],
-    subCategories: [],
+    featuredProducts: [],   // Sasa tupu, Dashboard itafetch kwa category
+    subCategories: [],      // Sasa tupu, Dashboard itafetch kwa category
     leafsForSub: [],
     loading: true,
     error: null
@@ -35,39 +35,29 @@ export const useDashboardData = () => {
         const token = localStorage.getItem("access_token");
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-        // 🔥 2. ZOTE ZINAKIMBIA SAMBAMBA - Promise.allSettled!
+        // 🔥 2. Sasa tunafetch tu data zinazohitajika mara moja
         const results = await Promise.allSettled([
-          // 1. Categories
+          // 1. Categories (zote)
           api.get('/categories/'),
           
-          // 2. Trending Products
+          // 2. Trending Products (bidhaa popular)
           api.get('/products/', {
             params: { is_approved: true, ordering: '-views', limit: 8 },
             headers
           }),
           
-          // 3. Advertisements
+          // 3. Advertisements (active)
           api.get('/advertisements/', {
             params: { status: 'active' },
             headers
-          }),
-          
-          // 4. Featured Products
-          api.get('/products/', {
-            params: { has_cover_image: true, limit: 50 },
-            headers
-          }),
-          
-          // 5. Subcategories
-          api.get('/subcategories/')
+          })
+          // ❌ Hakuna Featured Products wala Subcategories hapa tena!
         ]);
 
-        // 🔥 3. PROCESS RESULTS - Hata kama moja imeshindwa!
+        // 🔥 3. PROCESS RESULTS
         let categories = [];
         let trendingProducts = [];
         let ads = [];
-        let featuredProducts = [];
-        let subCategories = [];
 
         // 1. Categories
         if (results[0].status === 'fulfilled') {
@@ -94,46 +84,19 @@ export const useDashboardData = () => {
           console.warn("Failed to fetch ads:", results[2].reason);
         }
 
-        // 4. Featured Products
-        if (results[3].status === 'fulfilled') {
-          const rawFeatured = results[3].value.data.results || results[3].value.data || [];
-          const seenIds = new Set();
-          const featured = [];
-          rawFeatured.forEach(item => {
-            if (!seenIds.has(item.leaf_category_id)) {
-              seenIds.add(item.leaf_category_id);
-              featured.push({
-                id: item.leaf_category_id,
-                leaf_category_id: item.leaf_category_id,
-                cover_image_url: item.cover_image_url,
-                leaf_categories: item.leaf_categories || { name: 'Unknown', name_sw: 'Haijulikani' }
-              });
-            }
-          });
-          featuredProducts = featured.slice(0, 17);
-        } else {
-          console.warn("Failed to fetch featured products:", results[3].reason);
-        }
-
-        // 5. Subcategories
-        if (results[4].status === 'fulfilled') {
-          subCategories = results[4].value.data.results || results[4].value.data || [];
-        } else {
-          console.warn("Failed to fetch subcategories:", results[4].reason);
-        }
-
+        // 🔥 4. Prepare data - featuredProducts na subCategories zitaanza tupu
         const newData = {
           categories,
           trendingProducts,
           ads,
-          featuredProducts,
-          subCategories,
+          featuredProducts: [],  // Dashboard itajaza baada ya kuchagua category
+          subCategories: [],     // Dashboard itajaza baada ya kuchagua category
           leafsForSub: [],
           loading: false,
           error: null
         };
 
-        // 🔥 4. HIFADHI KWENYE CACHE
+        // 🔥 5. HIFADHI KWENYE CACHE
         localStorage.setItem(cacheKey, JSON.stringify(newData));
         localStorage.setItem(`${cacheKey}_time`, String(Date.now()));
         console.log('✅ Dashboard data cached successfully');

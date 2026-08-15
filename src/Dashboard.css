@@ -817,3 +817,55 @@ html, body {
   /* 🔥 ONGEZA HII: Inasukuma grid kulia */
   padding-left: 12px !important;
 }
+
+
+/* Skeleton Loading - Bila box, sawa na grid item halisi */
+.skeleton-item {
+  animation: pulse 1.5s infinite;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 0;          /* Hakuna padding ya box */
+  background: transparent; /* Hakuna background */
+}
+
+.skeleton-circle {
+  background: #e0e0e0;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+.skeleton-text {
+  background: #e0e0e0;
+  height: 14px;
+  width: 70px;  /* sawa na upana wa jina */
+  margin: 0 auto;
+  border-radius: 4px;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* Empty State */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+}
+
+/* Mobile skeleton - duara ndogo */
+.mc-recommendation-item .skeleton-circle {
+  width: 50px;
+  height: 50px;
+}
+
+.mc-recommendation-item .skeleton-text {
+  width: 50px;
+  height: 12px;
+}

@@ -88,32 +88,35 @@
   }
 
   .logo-image {
-    width: 140%;
-    height: 140%;
+    width: 240%;
+    height: 240%;
   }
 }
 
-/* ============================================
-   RESPONSIVE - SMALL MOBILE (≤480px) - ILIYOSAHIHISHWA!
-   ============================================ */
 @media (max-width: 480px) {
-  /* ✅ MUHIMU SANA: Tumia class mbili ili kushinda Header.css! */
+  /* ✅ SASA MAANDISHI YATAKUWA MADOGO (Sawa na Picha) */
   .logo-wrapper .logo-text {
-    font-size: 70px !important;
-    font-weight: 900 !important; 
+    font-size: 18px !important;  /* Ilikuwa 70px, sasa ni 18px! */
+    font-weight: 800 !important; 
     letter-spacing: 0.5px !important;
   }
 
+  /* ✅ PIA PUNGUZA DURAA (Icon) LIKIWE SAWA NA MAANDISHI */
   .logo-icon-box {
-    width: 40px !important;
-    height: 50px !important;
+    width: 28px !important;  /* Punguza duara ili lishindane na maandishi madogo */
+    height: 28px !important;
     border-width: 1.5px !important;
   }
 
-  .logo-wrapper {
-    gap: 6px !important;
+  /* ✅ BADILISHA PICHA NDANI YA DURAA IWE SAWA */
+  .logo-image {
+    width: 150% !important;  /* Au 160% ukitaka picha iwe kubwa zaidi ndani */
+    height: 150% !important;
   }
 
+  .logo-wrapper {
+    gap: 5px !important;
+  }
 }
 
 /* ============================================
