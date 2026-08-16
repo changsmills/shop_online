@@ -22,6 +22,8 @@ export default function NavLinks({ isMobile }) {
   const [leafsForSub, setLeafsForSub] = useState([]);
   const [selectedSubForLeaf, setSelectedSubForLeaf] = useState(null);
   const [viewMode, setViewMode] = useState('products');
+  const categoryCacheRef = useRef({}); // ✅ Cache kwa ajili ya data
+  const [loadingLeafs, setLoadingLeafs] = useState(false);
   const [activeNav, setActiveNav] = useState(null);
   const [hasStore, setHasStore] = useState(false);
   const [checkingStore, setCheckingStore] = useState(true);
@@ -99,79 +101,151 @@ export default function NavLinks({ isMobile }) {
     fetchCategories();
   }, []);
 
-  useEffect(() => {
-    if (selectedParent) {
-      setViewMode('products');
-      fetchSubCategories(selectedParent.id);
-      fetchFeaturedLeafs(selectedParent.id);
-    }
-  }, [selectedParent]);
+ useEffect(() => {
+  if (selectedParent) {
+    setViewMode('products');
+    fetchSubCategories(selectedParent.id);
+    fetchFeaturedLeafs(selectedParent.id);
+  }
+}, [selectedParent]);
 
   useEffect(() => {
     async function fetchLeafsBySub() {
-      if (viewMode === 'subcategories' && selectedSubForLeaf) {
-        try {
-          const response = await api.get('/products/', { params: { sub_category: selectedSubForLeaf.id } });
-          const data = response.data || [];
-          const uniqueLeafs = [];
-          const seenLeafIds = new Set();
-          data.forEach(item => {
-            if (!seenLeafIds.has(item.leaf_category_id)) {
-              seenLeafIds.add(item.leaf_category_id);
-              uniqueLeafs.push({
-                id: item.leaf_category_id,
-                name: item.leaf_categories?.name,
-                name_sw: item.leaf_categories?.name_sw,
-                image_url: item.cover_image_url
-              });
-            }
-          });
-          setLeafsForSub(uniqueLeafs);
-        } catch (error) {
-          setLeafsForSub([]);
-        }
-      }
+  if (viewMode === 'subcategories' && selectedSubForLeaf) {
+    const subCategoryId = selectedSubForLeaf.id;
+    const cacheKey = `sub_${subCategoryId}`;
+
+    // ✅ Angalia cache kwanza
+    if (categoryCacheRef.current[cacheKey]) {
+      setLeafsForSub(categoryCacheRef.current[cacheKey]);
+      return;
     }
+
+    setLoadingLeafs(true);
+
+    try {
+      console.log(`⏳ [FETCH] Inapakia products za subcategory ${subCategoryId}...`);
+      const response = await api.get('/products/', {
+        params: {
+          sub_category: subCategoryId,
+          limit: 17,
+          ordering: '-views'
+        }
+      });
+
+      const data = response.data.results || response.data || [];
+
+      const result = data.map((product) => ({
+        id: product.id,
+        leaf_category_id: product.leaf_category_id || product.id,
+        cover_image_url: product.cover_image_url,
+        name: product.leaf_category_name || product.name,
+        name_sw: product.leaf_category_name || product.name
+      }));
+
+      // ✅ Hifadhi kwenye cache
+      categoryCacheRef.current[cacheKey] = result;
+      setLeafsForSub(result);
+      setLoadingLeafs(false);
+
+    } catch (error) {
+      console.error("❌ [fetchLeafsBySub] Error:", error);
+      setLeafsForSub([]);
+      setLoadingLeafs(false);
+    }
+  }
+}
     fetchLeafsBySub();
   }, [selectedSubForLeaf, viewMode]);
 
-  async function fetchSubCategories(parentId) {
-    try {
-      const response = await api.get('/subcategories/', { params: { category_id: parentId } });
-      const data = response.data;
-      if (data) {
-        setSubCategories(data);
-        setSelectedSubForLeaf(null);
-        setLeafsForSub([]);
-      }
-    } catch (error) {
-      console.error("Error fetching subcategories:", error);
+ async function fetchSubCategories(parentId) {
+  if (!parentId) return;
+
+  // ✅ Angalia cache kwanza
+  if (categoryCacheRef.current[parentId]?.subCategories) {
+    const cachedSubs = categoryCacheRef.current[parentId].subCategories;
+    setSubCategories(cachedSubs);
+    if (cachedSubs.length > 0) {
+      setSelectedSubForLeaf(cachedSubs[0]);
     }
+    return;
   }
 
-  async function fetchFeaturedLeafs(parentId) {
-    try {
-      const response = await api.get('/products/', { params: { parent_category: parentId } });
-      const data = response.data || [];
-      const uniqueCategories = [];
-      const seenIds = new Set();
-      data.forEach(item => {
-        if (!seenIds.has(item.leaf_category_id)) {
-          seenIds.add(item.leaf_category_id);
-          uniqueCategories.push({
-            id: item.leaf_category_id,
-            leaf_category_id: item.leaf_category_id,
-            cover_image_url: item.cover_image_url,
-            leaf_categories: item.leaf_categories
-          });
-        }
-      });
-      setFeaturedProducts(uniqueCategories.slice(0, 17));
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      setFeaturedProducts([]);
+  try {
+    console.log(`⏳ [FETCH] Inapakia subcategories za category ${parentId}...`);
+    const response = await api.get('/subcategories/', {
+      params: { category_id: parentId }
+    });
+
+    const sortedData = (response.data || []).sort((a, b) => 
+      (a.name || '').localeCompare(b.name || '')
+    );
+
+    // ✅ Hifadhi kwenye cache
+    categoryCacheRef.current[parentId] = {
+      ...categoryCacheRef.current[parentId],
+      subCategories: sortedData
+    };
+
+    console.log(`✅ [SUCCESS] Subcategories ${sortedData.length} zimehifadhiwa!`);
+    setSubCategories(sortedData);
+
+    if (sortedData.length > 0) {
+      setSelectedSubForLeaf(sortedData[0]);
     }
+  } catch (error) {
+    console.error("❌ [fetchSubCategories] Error:", error);
   }
+}
+
+  async function fetchFeaturedLeafs(parentId) {
+  if (!parentId) return;
+
+  // ✅ Angalia cache kwanza
+  if (categoryCacheRef.current[parentId]?.leafs) {
+    setFeaturedProducts(categoryCacheRef.current[parentId].leafs);
+    setLoadingLeafs(false);
+    return;
+  }
+
+  setLoadingLeafs(true);
+
+  try {
+    console.log(`⏳ [FETCH] Inapakia products za category ${parentId}...`);
+    
+    const response = await api.get('/products/', {
+      params: {
+        parent_category: parentId,
+        limit: 17,
+        ordering: '-views'
+      }
+    });
+
+    const data = response.data.results || response.data || [];
+    
+    const result = data.map((product) => ({
+      id: product.id,
+      leaf_category_id: product.leaf_category_id || product.id,
+      cover_image_url: product.cover_image_url,
+      name: product.leaf_category_name || product.name,
+      name_sw: product.leaf_category_name || product.name
+    }));
+
+    // ✅ Hifadhi kwenye cache
+    categoryCacheRef.current[parentId] = {
+      ...categoryCacheRef.current[parentId],
+      leafs: result
+    };
+    
+    setFeaturedProducts(result);
+    setLoadingLeafs(false);
+
+  } catch (error) {
+    console.error("❌ [fetchFeaturedLeafs] Error:", error);
+    setFeaturedProducts([]);
+    setLoadingLeafs(false);
+  }
+}
 
   const getDisplayName = (item) => {
     if (!item) return '';
@@ -317,43 +391,89 @@ export default function NavLinks({ isMobile }) {
                     )}
                   </div>
 
-                  <div className="category-grid">
-                    {viewMode === 'products' ? (
-                      <>
-                        {featuredProducts.map((leaf) => (
-                          <Link to={`/category/${leaf.leaf_category_id}`} key={leaf.id} className="grid-item">
-                            <div className="image-circle">
-                              <img
-                                src={leaf.cover_image_url || placeholderImg}
-                                alt={getDisplayName(leaf.leaf_categories)}
-                                onError={(e) => { e.target.src = placeholderImg; }}
-                              />
-                            </div>
-                            <p className="grid-text">{getDisplayName(leaf.leaf_categories) || "Kategoria"}</p>
-                          </Link>
-                        ))}
-                        <div onClick={() => setViewMode('subcategories')} className="grid-item see-all-card">
-                          <div className="image-circle see-all-circle">
-                            <LucideIcons.Plus size={30} color="#ff6a00" />
-                          </div>
-                          <p className="see-all-text">{t('see_all')}</p>
-                        </div>
-                      </>
-                    ) : (
-                      leafsForSub.map((leaf) => (
-                        <Link to={`/category/${leaf.id}`} key={leaf.id} className="grid-item">
-                          <div className="image-circle">
-                            <img
-                              src={leaf.image_url || placeholderImg}
-                              alt={getDisplayName(leaf)}
-                              onError={(e) => { e.target.src = placeholderImg; }}
-                            />
-                          </div>
-                          <p className="grid-text">{getDisplayName(leaf)}</p>
-                        </Link>
-                      ))
-                    )}
-                  </div>
+<div className="category-grid">
+  {viewMode === 'products' ? (
+    <>
+      {loadingLeafs ? (
+        // ✅ SKELETON LOADING
+        [...Array(8)].map((_, idx) => (
+          <div key={`skeleton-${idx}`} className="grid-item skeleton-item">
+            <div className="image-circle skeleton-circle"></div>
+            <p className="skeleton-text"></p>
+          </div>
+        ))
+      ) : featuredProducts.length > 0 ? (
+        // ✅ DATA IPO - SAWA NA DASHBOARD
+        featuredProducts.map((leaf) => (
+          <Link to={`/category/${leaf.leaf_category_id}`} key={leaf.id} className="grid-item">
+            <div className="image-circle">
+              <img
+                src={leaf.cover_image_url || placeholderImg}
+                alt={i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
+                onError={(e) => { e.target.src = placeholderImg; }}
+              />
+            </div>
+            <p className="grid-text">
+              {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
+            </p>
+          </Link>
+        ))
+      ) : (
+        // ✅ EMPTY STATE
+        <div className="empty-state" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
+          <div style={{ fontSize: '48px' }}>📦</div>
+          <p style={{ fontSize: '16px', color: '#666', fontWeight: 'bold' }}>
+            Hakuna bidhaa katika kategoria hii
+          </p>
+        </div>
+      )}
+      
+      {/* ✅ SEE ALL */}
+      {!loadingLeafs && featuredProducts.length > 0 && (
+        <div onClick={() => setViewMode('subcategories')} className="grid-item see-all-card">
+          <div className="image-circle see-all-circle">
+            <LucideIcons.Plus size={30} color="#ff6a00" />
+          </div>
+          <p className="see-all-text">{t('see_all')}</p>
+        </div>
+      )}
+    </>
+  ) : (
+    // ✅ KWA SUBCATEGORIES
+    loadingLeafs ? (
+      // Skeleton
+      [...Array(8)].map((_, idx) => (
+        <div key={`skeleton-sub-${idx}`} className="grid-item skeleton-item">
+          <div className="image-circle skeleton-circle"></div>
+          <p className="skeleton-text"></p>
+        </div>
+      ))
+    ) : leafsForSub.length > 0 ? (
+      leafsForSub.map((leaf) => (
+        <Link to={`/category/${leaf.id}`} key={leaf.id} className="grid-item">
+          <div className="image-circle">
+            <img
+              src={leaf.cover_image_url || leaf.image_url || placeholderImg}
+              alt={i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
+              onError={(e) => { e.target.src = placeholderImg; }}
+            />
+          </div>
+          <p className="grid-text">
+            {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
+          </p>
+        </Link>
+      ))
+    ) : (
+      // Empty state kwa subcategories
+      <div className="empty-state" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
+        <div style={{ fontSize: '48px' }}>📦</div>
+        <p style={{ fontSize: '16px', color: '#666', fontWeight: 'bold' }}>
+          Hakuna bidhaa katika subcategory hii
+        </p>
+      </div>
+    )
+  )}
+</div>
                 </main>
               </div>
             </div>,

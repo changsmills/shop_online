@@ -74,6 +74,12 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
     leaf_category_id = serializers.UUIDField(source='leaf_category.id', read_only=True)
     cover_image_url = serializers.SerializerMethodField()
     leaf_category_name = serializers.SerializerMethodField()  # ✅ ONGEZA HII
+    discount = serializers.SerializerMethodField()
+
+    leaf_category_name = serializers.SerializerMethodField()  # Ulikuwa nayo
+    sub_category_name = serializers.SerializerMethodField()   # ✅ ONGEZA HII
+    category_name = serializers.SerializerMethodField() 
+
 
     
     # 🔥 Fields za kupokea faili (write_only)
@@ -99,6 +105,39 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
         model = ProductsEngine
         fields = '__all__'
         read_only_fields = ['user', 'created_at', 'cover_image']
+
+
+        # ------------------------------------------------------------------
+    # 🔥 1. LEAF CATEGORY NAME (Umeshakwisha)
+    # ------------------------------------------------------------------
+    def get_leaf_category_name(self, obj):
+        if obj.leaf_category:
+            return obj.leaf_category.name
+        return None
+    
+    # ------------------------------------------------------------------
+    # 🔥 2. SUB CATEGORY NAME (Imeongezwa)
+    # ------------------------------------------------------------------
+    def get_sub_category_name(self, obj):
+        # Leaf inaungana na Subcategory
+        if obj.leaf_category and obj.leaf_category.sub_category:
+            return obj.leaf_category.sub_category.name
+        return None
+
+    # ------------------------------------------------------------------
+    # 🔥 3. MAIN CATEGORY NAME (Imeongezwa)
+    # ------------------------------------------------------------------
+    def get_category_name(self, obj):
+        # Subcategory inaungana na Category kuu (parent)
+        if obj.leaf_category and obj.leaf_category.sub_category and obj.leaf_category.sub_category.category:
+            return obj.leaf_category.sub_category.category.name
+        return None
+
+     # 🔥 ONGEZA HII METHOD
+    def get_discount(self, obj):
+        if obj.original_price and obj.price and obj.original_price > obj.price:
+            return round(((obj.original_price - obj.price) / obj.original_price) * 100, 2)
+        return 0
 
         # 🔥 KWA PICHA ZA COVER (Sahihi 100%)
         # ==========================================================

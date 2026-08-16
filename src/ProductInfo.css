@@ -47,7 +47,8 @@
   
   .info-content-wrapper {
     overflow-y: visible !important;
-    padding: 10px 12px 90px 12px !important;
+     padding: 10px 0 20px 0 !important; /* ✅ Left/Right 0 */
+
   }
 }
 

@@ -127,9 +127,8 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [JWTAuthentication]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    # 🔥 MUHIMU: Hapa unatumia 'leaf_category'. Kwa hivyo Frontend lazima itume `?leaf_category=ID`, sio `?leaf_category_id=ID`.
-    filterset_fields = ['store_id', 'leaf_category', 'parent_category', 'is_approved', 'sub_category']
-    ordering_fields = ['views', 'price', 'created_at']
+    filterset_fields = ['store_id', 'leaf_category', 'parent_category', 'is_approved', 'sub_category','is_flash_sale', 'is_featured']
+    ordering_fields = ['views', 'price', 'created_at','order_count', 'discount']
     pagination_class = LimitOffsetPagination
 
     def perform_create(self, serializer):

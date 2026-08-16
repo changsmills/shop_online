@@ -1,7 +1,7 @@
 // src/components/Header.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Globe, ChevronDown, MapPin, ChevronLeft } from 'lucide-react';
+import { Globe, ChevronDown, MapPin, ArrowLeft } from 'lucide-react';
 import Logo from './Logo';
 import SearchBar from './SearchBar';
 import UserTools from './UserTools';
@@ -149,18 +149,19 @@ const Header = ({ showBack = false }) => {
         <div className="header-top-bar">
           
           {/* 🔥 SEHEMU MPYA KUSHOTO: Back Arrow + Logo */}
-          <div className="header-left-group" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            {showBack && (
-              <button 
-                className="mobile-back-btn" 
-                onClick={() => navigate(-1)}
-                aria-label="Rudi nyuma"
-              >
-                <ChevronLeft size={24} color="#333" />
-              </button>
-            )}
-            <div className="logo-wrapper"><Logo /></div>
-          </div>
+<div className="header-left-group" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+  {showBack && (
+    <button 
+      className="mobile-back-btn" 
+      onClick={() => navigate(-1)}
+      aria-label="Rudi nyuma"
+    >
+      {/* ✅ ONGEZA className="desktop-hidden" HAPA */}
+      <ArrowLeft size={24} color="#333" className="desktop-hidden" />
+    </button>
+  )}
+  <div className="logo-wrapper"><Logo /></div>
+</div>
 
           {/* 🔥 SEHEMU YA KATI: Search Bar - Inafichwa ikiwa showBack ni true */}
           <div className={`search-bar-wrapper ${showBack ? 'hide-on-mobile' : ''}`}>

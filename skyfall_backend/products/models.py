@@ -171,6 +171,8 @@ class ProductsEngine(models.Model):
     approved_at = models.DateTimeField(null=True, blank=True)
     approved_by = models.UUIDField(null=True, blank=True)
     fee_due_date = models.DateTimeField(null=True, blank=True)
+    discount = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+
 
     class Meta:
         db_table = 'products_engines'

@@ -93,10 +93,40 @@
 }
 
 /* ============ PRODUCTS GRID ============ */
+/* ============ PRODUCTS GRID ============ */
 .cat-products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 25px;
+}
+
+/* DEFAULT: Kadi 4 kwa mstari kwenye Desktop kubwa (≥ 1024px) */
+@media (min-width: 1024px) {
+  .cat-products-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Kati ya Desktop na Tablet (768px - 1023px): Kadi 3 */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .cat-products-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Mobile (481px - 767px): Kadi 2 */
+@media (min-width: 481px) and (max-width: 767px) {
+  .cat-products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+}
+
+/* Small Mobile (≤ 480px): Kadi 1 au 2 (Kulingana na upana) */
+@media (max-width: 480px) {
+  .cat-products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
 }
 
 /* ============ BREADCRUMB ============ */
@@ -281,4 +311,55 @@
 /* ============ FOOTER ============ */
 .footer-wrapper {
   margin-top: auto;
+}
+
+/* =============================================
+   SMALL MOBILE BREADCRUMB FIX
+   ============================================= */
+
+@media (max-width: 480px) {
+  /* Fanya breadcrumb iwe ndogo na isivunjike */
+  .cat-breadcrumb-items {
+    font-size: 11px !important;        /* Punguza fonti kuwa ndogo sana */
+    flex-wrap: nowrap !important;       /* Zuia maandishi kuvunjika kwenye mistari miwili */
+    gap: 4px !important;                /* Punguza nafasi kati ya vitu */
+    overflow-x: auto !important;        /* Ruhusu kusogea kushoto/kulia kama ni ndefu */
+    white-space: nowrap !important;     /* Lazimisha maandishi yote yawe kwenye mstari mmoja */
+    padding: 4px 6px !important;        /* Punguza padding ya ndani */
+  }
+
+  /* Fanya icons (chevron) ziwe ndogo */
+  .cat-breadcrumb-items svg,
+  .cat-breadcrumb-items .lucide-chevron-right {
+    width: 12px !important;             /* Punguza chevron (kutoka 14/16) */
+    height: 12px !important;
+    flex-shrink: 0 !important;          /* Zuia icon isipotea wakati wa scroll */
+  }
+
+  /* Fanya maandishi (Home, Apparel...) yasiwe na fonti nzito sana */
+  .cat-breadcrumb-items span,
+  .cat-breadcrumb-items .breadcrumb-link,
+  .cat-breadcrumb-items .current {
+    font-size: 11px !important;
+    font-weight: 500 !important;        /* Punguza uzito wa fonti */
+    padding: 0 2px !important;          /* Punguza nafasi kati ya maandishi */
+  }
+
+  /* Hakikisha "Home" inaonekana vizuri hata kwa saizi ndogo */
+  .cat-breadcrumb-items .breadcrumb-link {
+    color: #ff6a00 !important;          /* Rangi ya Skyfall orange */
+    text-decoration: none !important;
+  }
+
+  /* Hakikisha neno la mwisho (la sasa) linaonekana vizuri */
+  .cat-breadcrumb-items .current {
+    font-weight: 600 !important;        /* Nzito kidogo kuliko nyingine */
+    color: #1a1a1a !important;
+  }
+
+  /* Fanya chombo cha breadcrumb kisichukue nafasi nyingi juu */
+  .cat-breadcrumb {
+    padding: 6px 10px !important;       /* Punguza padding ya nje */
+    margin-bottom: 8px !important;      /* Punguza nafasi chini */
+  }
 }

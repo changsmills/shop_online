@@ -755,3 +755,19 @@
     gap: 4px !important;
   }
 }
+
+/* ========================================= */
+/* 🔥 13. FICHA ARROW LEFT KWENYE DESKTOP    */
+/* ========================================= */
+
+/* Kwa default, ifiche kwenye Desktop (zaidi ya 768px) */
+.desktop-hidden {
+  display: none !important;
+}
+
+/* Kwenye Mobile (chini ya 768px), ionyeshe */
+@media (max-width: 768px) {
+  .desktop-hidden {
+    display: flex !important;
+  }
+}

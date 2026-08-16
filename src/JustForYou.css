@@ -12,6 +12,8 @@
   border-right: none;
   box-sizing: border-box;
   overflow-x: hidden;
+   padding-top: 16px; /* Au 20px kulingana na upendeleo wako */
+  margin-top: 0 !important;
 }
 
 @media (max-width: 768px) {
@@ -185,6 +187,7 @@
     grid-template-columns: repeat(5, 1fr); 
     gap: 16px; 
     padding: 0 16px; 
+  
   }
 }
 

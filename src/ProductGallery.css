@@ -551,7 +551,7 @@
   .gallery-mobile-simple {
     display: block !important;
     width: 100%;
-    padding: 12px !important;
+    padding: 0 !important;    /* ✅ ONDOA PADDING */
     margin: 0;
     background: var(--bg-primary, #000); 
     border-radius: 20px !important;

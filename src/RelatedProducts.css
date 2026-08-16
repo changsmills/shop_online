@@ -44,6 +44,53 @@
 }
 
 /* ============================================ */
+/* RESPONSIVE - MOBILE & SMALL SCREENS           */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .related-products-grid {
+    grid-template-columns: repeat(2, 1fr) !important;  /* 🔥 KADI 2 KWA MSTARI */
+    gap: 12px !important;
+  }
+
+  .related-img-wrap {
+    height: 120px !important; /* Punguza urefu wa picha kwa mobile */
+  }
+
+  .related-product-name {
+    font-size: 13px !important;
+  }
+
+  .related-product-price {
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .related-products-grid {
+    gap: 8px !important;
+  }
+
+  .related-img-wrap {
+    height: 100px !important;
+  }
+
+  .related-product-name {
+    font-size: 12px !important;
+  }
+
+  .related-product-price {
+    font-size: 11px !important;
+  }
+
+  /* 🔥 PADDING BOTTOM KWA SMALL SCREEN */
+  .related-products-section {
+    padding-bottom: 40px !important;  /* Ongeza nafasi chini */
+    margin-bottom: 20px !important;
+  }
+}
+
+/* ============================================ */
 /* PRODUCT CARD                                  */
 /* ============================================ */
 

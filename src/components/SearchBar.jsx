@@ -3,7 +3,7 @@ import api from "../axiosConfig";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import "../SearchBar.css"; // ✅ Tumia CSS file yako
+import "../SearchBar.css";
 
 export default function SearchBar({ search = "", setSearch }) {
   const { t } = useTranslation();
@@ -15,17 +15,30 @@ export default function SearchBar({ search = "", setSearch }) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
-  // Pakia placeholders
+  // ✅ 1. PAKIA PLACEHOLDERS (Tunaangalia data ya kwanza)
   useEffect(() => {
     const fetchLeafCategoryNames = async () => {
       try {
+        console.log("🔍 [DEBUG 1] Inapakia Leaf Categories kwa placeholders...");
         const response = await api.get('/leaf-categories/', { params: { limit: 15 } });
-        if (response.data) {
-          const names = response.data.map(item => item.name);
+        
+        console.log("✅ [DEBUG 1] Response imefika! Full response:", response);
+
+        // Tumia 'results' ikiwa ipo, vinginevyo tumia 'data'
+        const data = response.data.results || response.data || [];
+        console.log("✅ [DEBUG 1] Data iliyopatikana:", data);
+
+        if (Array.isArray(data)) {
+          console.log(`✅ [DEBUG 1] Data ni array. Idadi ya items: ${data.length}`);
+          const names = data.map(item => item.name);
+          console.log("✅ [DEBUG 1] Majina yaliyopatikana:", names);
           if (names.length > 0) setPlaceholders(names);
+        } else {
+          console.warn("⚠️ [DEBUG 1] Data HAIPO kama array! Tazama hapa:", data);
         }
       } catch (err) {
-        console.error("Initial fetch error:", err);
+        console.error("❌ [DEBUG 1] Error wakati wa fetch:", err);
+        console.error("❌ [DEBUG 1] Error details:", err.response || err.message);
       }
     };
     fetchLeafCategoryNames();
@@ -40,41 +53,67 @@ export default function SearchBar({ search = "", setSearch }) {
     return () => clearInterval(timer);
   }, [placeholders]);
 
-  // Search Effect (Inashughulikia 500 Error)
+  // ✅ 2. SEARCH EFFECT (Hapa ndio muhimu zaidi!)
   useEffect(() => {
     const getCombinedSuggestions = async () => {
       if (!search || typeof search !== "string" || search.trim().length < 2) {
+        console.log("ℹ️ [DEBUG 2] Search ni fupi sana au tupu. Inafuta suggestions.");
         setSuggestions([]);
         setShowSuggestions(false);
         return;
       }
 
       const query = search.trim();
-      
+      console.log(`🔍 [DEBUG 2] Mtumiaji amechapa: "${query}"`);
+
       try {
+        console.log("⏳ [DEBUG 2] Inatuma requests kwa API...");
         const [catRes, prodRes] = await Promise.allSettled([
           api.get('/leaf-categories/', { params: { search: query, limit: 4 } }),
           api.get('/products/', { params: { search: query, limit: 4 } })
         ]);
 
-        const categories = catRes.status === 'fulfilled' ? (catRes.value.data || []) : [];
-        const products = prodRes.status === 'fulfilled' ? (prodRes.value.data || []) : [];
+        // ✅ Angalia kama Categories API imefanikiwa
+        if (catRes.status === 'fulfilled') {
+          console.log("✅ [DEBUG 2] Categories API imefanikiwa!");
+          const catData = catRes.value.data.results || catRes.value.data || [];
+          console.log("  📦 Data za Categories:", catData);
+        } else {
+          console.error("❌ [DEBUG 2] Categories API imeshindwa:", catRes.reason);
+        }
+
+        // ✅ Angalia kama Products API imefanikiwa
+        if (prodRes.status === 'fulfilled') {
+          console.log("✅ [DEBUG 2] Products API imefanikiwa!");
+          const prodData = prodRes.value.data.results || prodRes.value.data || [];
+          console.log("  📦 Data za Products:", prodData);
+        } else {
+          console.error("❌ [DEBUG 2] Products API imeshindwa:", prodRes.reason);
+        }
+
+        // Changanya data
+        const categories = catRes.status === 'fulfilled' ? (catRes.value.data.results || catRes.value.data || []) : [];
+        const products = prodRes.status === 'fulfilled' ? (prodRes.value.data.results || prodRes.value.data || []) : [];
 
         const combined = [
           ...products.map(item => ({ ...item, type: 'product' })),
           ...categories.map(item => ({ ...item, type: 'category' }))
         ];
 
+        console.log(`✅ [DEBUG 2] Combined data (Jumla: ${combined.length}):`, combined);
+
         if (combined.length > 0) {
+          console.log("✅ [DEBUG 2] Data ipo! Inaweka suggestions na kufungua portal.");
           setSuggestions(combined);
           setShowSuggestions(true);
         } else {
+          console.log("⚠️ [DEBUG 2] Data imerudi tupu! (Hakuna categories au products).");
           setSuggestions([]);
           setShowSuggestions(false);
         }
 
       } catch (err) {
-        console.error("Search Error:", err);
+        console.error("❌ [DEBUG 2] Search Error:", err);
       }
     };
 
@@ -135,7 +174,7 @@ export default function SearchBar({ search = "", setSearch }) {
         </div>
       </div>
 
-      {/* ✅ Portal inatumia CSS file tu - hakuna inline CSS */}
+      {/* Portal */}
       {showSuggestions && suggestions.length > 0 && createPortal(
         <div className="search-portal">
           <div className="suggestion-header">

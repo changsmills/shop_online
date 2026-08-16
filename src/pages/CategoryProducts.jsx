@@ -4,6 +4,7 @@ import api from "../axiosConfig";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import DashboardCard from "../components/DashboardCard";
+import { Link } from "react-router-dom"; // 🔥 ONGEZA HII MBELE
 import { ChevronRight, List } from "lucide-react";
 import "../CategoryProducts.css";
 
@@ -18,6 +19,25 @@ export default function CategoryProducts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  // CategoryProducts.jsx
+
+// 1. Ongeza hizi state karibu na state zingine
+const [minPrice, setMinPrice] = useState("");
+const [maxPrice, setMaxPrice] = useState("");
+
+// 2. Ongeza function ya kuchuja bei (Inaweza kuitwa wakati wa filter)
+const handlePriceFilter = () => {
+  // Piga API upya au chuja products zilizopo
+  // Kwa sasa tutatumia products zilizopo kwa mfano huu:
+  const filtered = products.filter(p => {
+    const price = parseFloat(p.price);
+    const min = minPrice ? parseFloat(minPrice) : 0;
+    const max = maxPrice ? parseFloat(maxPrice) : Infinity;
+    return price >= min && price <= max;
+  });
+  setProducts(filtered); // Hii inabadilisha matokeo
+};
 
   // ========== RESPONSIVE ==========
   useEffect(() => {
@@ -48,7 +68,7 @@ export default function CategoryProducts() {
       
       try {
         // ==========================================
-        // 1. GET LEAF CATEGORY
+        // 1. GET LEAF CATEGORY (INABAKI KWA FILTERS NA FALLBACK)
         // ==========================================
         let leaf = null;
         try {
@@ -66,54 +86,14 @@ export default function CategoryProducts() {
           return;
         }
 
-        let mainCatName = "Marketplace";
-        let subName = "General";
+        // 🔥 SubId bado inahitajika kwa FILTERS (Sidebar)
         let subId = null;
-
         if (leaf && leaf.sub_category_id) {
           subId = leaf.sub_category_id;
-
-          // ==========================================
-          // 2. GET SUB CATEGORY
-          // ==========================================
-          let subData = null;
-          try {
-            const subRes = await api.get(`/subcategories/${subId}/`);
-            subData = subRes.data;
-            console.log("✅ [Sub] Subcategory data retrieved:", subData);
-          } catch (subErr) {
-            console.error("❌ [Sub] Failed to fetch subcategory:", subErr.response?.data || subErr.message);
-            // Continue with defaults
-          }
-          
-          if (subData) {
-            subName = subData.name;
-            if (subData.category_id) {
-              // ==========================================
-              // 3. GET MAIN CATEGORY
-              // ==========================================
-              try {
-                const mainRes = await api.get(`/categories/${subData.category_id}/`);
-                if (mainRes.data) {
-                  mainCatName = mainRes.data.name;
-                  console.log("✅ [Main] Main category data retrieved:", mainRes.data);
-                }
-              } catch (mainErr) {
-                console.error("❌ [Main] Failed to fetch main category:", mainErr.response?.data || mainErr.message);
-                // Continue with default
-              }
-            }
-          }
         }
 
-        setHierarchy({
-          category: mainCatName,
-          sub: subName,
-          leaf: leaf?.name || "Products"
-        });
-
         // ==========================================
-        // 4. GET FILTERS (Leaf categories for this subId)
+        // 2. GET FILTERS (Leaf categories for this subId)
         // ==========================================
         if (subId) {
           try {
@@ -130,7 +110,7 @@ export default function CategoryProducts() {
         }
 
         // ==========================================
-        // 5. GET PRODUCTS
+        // 3. GET PRODUCTS (Sasa IMEBORESHA - HAPA NDIO MAJINA YANATOKA)
         // ==========================================
         const currentFilterId = activeFilterId || leafId;
         console.log(`🔍 [Products] Fetching products for leaf_category_id: ${currentFilterId}`);
@@ -145,7 +125,29 @@ export default function CategoryProducts() {
           });
           productsData = productsRes.data.results || productsRes.data || [];
           console.log(`✅ [Products] ${productsData.length} products retrieved`);
-          console.log("📦 [Products] Product data:", productsData);
+          
+          // ✅ Jaza hierarchy kutoka kwenye bidhaa ya kwanza (Ikiwa ipo)
+          if (productsData.length > 0) {
+            const firstProduct = productsData[0];
+            setHierarchy({
+              category: firstProduct.category_name || "Marketplace",
+              sub: firstProduct.sub_category_name || "General",
+              leaf: firstProduct.leaf_category_name || "Products"
+            });
+            console.log("✅ [Hierarchy] Majina yamewekwa kutoka kwenye bidhaa:", {
+              category: firstProduct.category_name,
+              sub: firstProduct.sub_category_name,
+              leaf: firstProduct.leaf_category_name
+            });
+          } else if (leaf) {
+            // ✅ Fallback: Ikiwa hakuna bidhaa, tumia majina kutoka Leaf Category
+            setHierarchy({
+              category: "Marketplace",
+              sub: "General",
+              leaf: leaf?.name || "Products"
+            });
+          }
+          
         } catch (prodErr) {
           console.error("❌ [Products] Failed to fetch products:", prodErr.response?.data || prodErr.message);
           if (prodErr.response?.status === 404) {
@@ -265,6 +267,7 @@ export default function CategoryProducts() {
                   <List size={16} /> 
                   <span>Kategoria Zote</span>
                 </div>
+
                 <ul className="filter-list">
                   {/* Current category */}
                   <li 
@@ -287,6 +290,31 @@ export default function CategoryProducts() {
                     )
                   ))}
                 </ul>
+
+                             {/* ✅ ONGEZA HAPA: Filter ya Bei */}
+    <div className="filter-price-section">
+      <div className="price-label">Bei (TSh)</div>
+      <div className="price-inputs">
+        <input 
+          type="number" 
+          placeholder="Min" 
+          value={minPrice} 
+          onChange={(e) => setMinPrice(e.target.value)}
+          className="price-input"
+        />
+        <span className="price-separator">-</span>
+        <input 
+          type="number" 
+          placeholder="Max" 
+          value={maxPrice} 
+          onChange={(e) => setMaxPrice(e.target.value)}
+          className="price-input"
+        />
+        <button onClick={handlePriceFilter} className="price-filter-btn">
+          Filter
+        </button>
+      </div>
+    </div>
               </aside>
             )}
 
@@ -296,7 +324,7 @@ export default function CategoryProducts() {
               {/* Breadcrumb */}
               <nav className="cat-breadcrumb">
                 <div className="cat-breadcrumb-items">
-                  <span onClick={() => navigate('/')}>Home</span>
+                  <Link to="/" className="breadcrumb-link">Home</Link>
                   <ChevronRight size={14} />
                   <span>{hierarchy.category}</span>
                   <ChevronRight size={14} />
