@@ -1,4 +1,4 @@
-// src/components/MobileCategorySlider.jsx (FIXED)
+// src/components/MobileCategorySlider.jsx (FIXED WITH "ALL" AT START)
 import React, { useRef, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -35,6 +35,9 @@ export default function MobileCategorySlider({
 
   if (!categories || categories.length === 0) return null;
 
+  // Kwa sababu hatuna "All" kwenye backend, tutaunda hapa kwa UI pekee
+  const allCategory = { id: null, name: 'All', name_sw: 'Zote' };
+
   return (
     <div style={{ 
       position: 'relative', 
@@ -43,7 +46,7 @@ export default function MobileCategorySlider({
       width: '100%',
       padding: '0 4px'
     }}>
-      {/* Left Arrow - sio absolute tena, na background gradient */}
+      {/* Left Arrow */}
       {showLeftArrow && (
         <button
           onClick={() => scroll('left')}
@@ -84,12 +87,37 @@ export default function MobileCategorySlider({
           WebkitOverflowScrolling: 'touch'
         }}
       >
+        {/* ✅ 1. HAPA NDIYO TULIWEKA ALL MWANZONI (Kabla ya map ya Backend) */}
+        <div
+          key="all-category"
+          onClick={() => onSelectCategory(allCategory)}
+          style={{
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+            padding: '6px 16px',
+            borderRadius: '40px',
+            // Angalia: Sasa inakagua kama selectedCategory ni null au id yake ni null
+            backgroundColor: (selectedCategory === null || selectedCategory?.id === null) ? '#000000' : '#f0f0f0',
+            color: (selectedCategory === null || selectedCategory?.id === null) ? '#ffffff' : '#333333',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: (selectedCategory === null || selectedCategory?.id === null) ? '600' : '500',
+            transition: 'all 0.2s ease',
+            userSelect: 'none',
+            boxShadow: (selectedCategory === null || selectedCategory?.id === null) ? '0 2px 6px rgba(0,0,0,0.1)' : 'none',
+            marginRight: '4px'
+          }}
+        >
+          {getDisplayName ? getDisplayName(allCategory) : 'All'}
+        </div>
+
+        {/* ✅ 2. HAPA NDIO MAP YAKO YA KWANZA KUTOKA BACKEND */}
         {categories.map((cat, index) => {
           const displayName = getDisplayName ? getDisplayName(cat) : (cat.name || cat.name_sw);
           const isActive = selectedCategory?.id === cat.id;
           return (
             <div
-              key={cat.id === null ? `all-${index}` : cat.id}
+              key={cat.id}
               onClick={() => onSelectCategory(cat)}
               style={{
                 whiteSpace: 'nowrap',

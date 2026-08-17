@@ -9,7 +9,7 @@ export default function SearchBar({ search = "", setSearch }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   
-  const [placeholders, setPlaceholders] = useState(["Search..."]);
+  const [placeholders, setPlaceholders] = useState(["Search"])
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);

@@ -143,7 +143,7 @@ function AppContent({ session }) {
         
         {/* ROUTES ZA MANUNUZI */}
         <Route path="/cart" element={<CartPage session={session} />} />
-        <Route path="/checkout" element={session ? <CheckoutPage session={session} /> : <Navigate to="/dashboard/login" />} />
+        <Route path="/checkout" element={<CheckoutPage session={session} />} />
         <Route path="/products" element={<ProductsAll session={session} />} />
 
         <Route path="/verify-seller-otp" element={<VerifySellerOTP />} />
@@ -193,6 +193,7 @@ function AppContent({ session }) {
         <Route path="/dashboard/supplier-settings" element={<SupplierAccountSettings session={session} />} />
 
         <Route path="/stores/:storeId" element={<AllStores session={session} />} />
+         <Route path="/stores" element={<AllStores session={session} />} />
         <Route path="/dashboard/sellerboard/:id?" element={<PhysicalDashboard session={session} />} />
 
         {/* DASHBOARD SUB-PAGES */}

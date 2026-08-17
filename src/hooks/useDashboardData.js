@@ -58,17 +58,20 @@ export const useDashboardData = () => {
         let categories = [];
         let trendingProducts = [];
         let ads = [];
-
-        // 1. Categories
-        if (results[0].status === 'fulfilled') {
-          const rawData = results[0].value.data.results || results[0].value.data;
-          if (rawData) {
-            const allCategory = { id: null, name: 'All', name_sw: 'Zote' };
-            categories = [allCategory, ...rawData];
-          }
-        } else {
-          console.warn("Failed to fetch categories:", results[0].reason);
-        }
+// 1. Categories
+if (results[0].status === 'fulfilled') {
+  const rawData = results[0].value.data.results || results[0].value.data;
+  if (rawData) {
+    // ✅ Futa mistari hii miwili:
+    // const allCategory = { id: null, name: 'All', name_sw: 'Zote' };
+    // categories = [allCategory, ...rawData];
+    
+    // ✅ Badala yake, acha categories irudi kama ilivyo kutoka Backend
+    categories = rawData; 
+  }
+} else {
+  console.warn("Failed to fetch categories:", results[0].reason);
+}
 
         // 2. Trending Products
         if (results[1].status === 'fulfilled') {

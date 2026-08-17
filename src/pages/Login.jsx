@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import api from '../axiosConfig';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import '../Login.css';
@@ -14,6 +14,8 @@ const Login = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 900);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
+
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 900);
@@ -135,10 +137,17 @@ toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
           toast.success("Karibu Muuzaji! Tafadhali unda duka lako kwanza.");
           navigate('/create-store', { replace: true });
         }
-      } else {
+            } else {
         toast.success("Karibu Mteja!");
-        navigate('/dashboard', { replace: true });
+        
+        // ✅ CHUKUA MAHALI ALIPOTOKA (Kama ni '/checkout', au '/cart', n.k.)
+        // Kama hakuna destination, mpeleke dashboard (default)
+        const from = location.state?.from || '/dashboard';
+        
+        // Mpeleke huko, na replace: true ili asirudi nyuma kwenye login page.
+        navigate(from, { replace: true });
       }
+      
     } catch (err) {
       console.error("❌ Login error:", err.response?.data || err.message);
       if (err.response?.status === 401) {

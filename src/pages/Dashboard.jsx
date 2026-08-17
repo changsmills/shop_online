@@ -256,16 +256,29 @@ const fetchLeafsForSub = async (subCategoryId) => {
     setLoadingLeafs(false);
   }
 };
+
+// ✅ BADILISHA HII: Hakuna kategoria inayojichagua tena!
 useEffect(() => {
-  if (categories.length > 0 && !selectedCategory) {
-    // Chagua category ya kwanza yenye ID halisi (siyo "All")
-    const firstRealCategory = categories.find(c => c.id !== null);
-    if (firstRealCategory) {
-      setSelectedCategory(firstRealCategory);
-      setSelectedCategoryForComponents(firstRealCategory);
+  // Angalia kama URL ina 'category' ID (kwa mfano /?category=5)
+  const urlParams = new URLSearchParams(window.location.search);
+  const categoryIdFromUrl = urlParams.get('category');
+
+  if (categoryIdFromUrl && categories.length > 0) {
+    const foundCategory = categories.find(c => String(c.id) === String(categoryIdFromUrl));
+    if (foundCategory) {
+      setSelectedCategory(foundCategory);
+      setSelectedCategoryForComponents(foundCategory);
+      return; // Acha, tumechagua kutoka URL
     }
   }
-}, [categories]);
+
+  // Kama hakuna kategoria kwenye URL, hakikisha inabaki NULL!
+  // Hapa ndipo tunazuiya isijichague.
+  if (!selectedCategory) {
+    setSelectedCategory(null);
+    setSelectedCategoryForComponents(null);
+  }
+}, [categories]); // ← Hii inafanya kazi tu kama categories zimebadilika
 
 useEffect(() => {
   if (selectedCategory && selectedCategory.id) {
@@ -543,15 +556,18 @@ const handleSubCategoryHover = (subCategory) => {
                       selectedCategory={selectedCategoryForComponents}
                       onSelectCategory={(cat) => {
   if (cat.id === null) {
+    // Hapa ndio mtumiaji akibonyeza "All"
     setSelectedCategoryForComponents(null);
     setSelectedCategory(null);
+    setFeaturedProducts([]); // Futa bidhaa za zamani
+    setSubCategories([]);
   } else {
+    // Hapa ni kategoria halisi
     setSelectedCategoryForComponents(cat);
     setSelectedCategory(cat);
-    // ✅ Hakuna fetch hapa - useEffect itashughulikia
+    // useEffect itafanya fetchFeaturedLeafs na fetchSubCategories
   }
-}}
-                      getDisplayName={getCategoryDisplayName}
+}}                   getDisplayName={getCategoryDisplayName}
                       getIcon={getIcon}
                     />
                   )}

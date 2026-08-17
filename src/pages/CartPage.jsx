@@ -1,5 +1,5 @@
 // src/pages/CartPage.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { 
@@ -16,6 +16,14 @@ export default function CartPage({ session }) {
   const { cartItems, removeFromCart, updateQuantity } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // ✅ 1. ONGEZA LOADING STATE (Ili kuzuia "Empty Cart" kuonekana mapema kabla data haijapakuliwa)
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    // Chelewesha sekunde 0.5 ili kuepuka flickering
+    const timer = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const totalAmount = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
@@ -45,17 +53,24 @@ export default function CartPage({ session }) {
     { icon: <Settings size={20} />, path: '/dashboard/settings', label: 'Settings' },
   ];
 
-  const handleCheckout = () => {
-    if (cartItems.length === 0) {
-      alert("Kikapu chako kiko tupu!");
-      return;
-    }
-    if (!session) {
-      navigate('/login');
-      return;
-    }
-    navigate('/checkout');
-  };
+const handleCheckout = () => {
+  if (cartItems.length === 0) {
+    alert("Kikapu chako kiko tupu!");
+    return;
+  }
+
+  const token = localStorage.getItem("access_token");
+  
+  if (!token) {
+    // ✅ MUHIMU: Tuma 'from' destination hapa!
+    navigate('/dashboard/login', { 
+      state: { from: '/checkout' } 
+    });
+    return;
+  }
+
+  navigate('/checkout');
+};
 
   return (
     <div className="cart-page-root">
@@ -63,7 +78,6 @@ export default function CartPage({ session }) {
       {/* HEADER */}
       <header className="cart-header">
         <div className="header-left">
-          {/* ✅ CSS itaamua kuficha au kuonyesha Menu kwenye Mobile */}
           <Menu 
             size={22} 
             className="menu-icon desktop-only" 
@@ -87,7 +101,7 @@ export default function CartPage({ session }) {
 
       <div className="cart-layout-container">
         
-        {/* SIDEBAR - CSS itaamua kuficha kwenye Mobile */}
+        {/* SIDEBAR */}
         <aside 
           className={`cart-sidebar desktop-only ${isExpanded ? 'expanded' : 'collapsed'}`}
           onMouseEnter={() => setIsExpanded(true)}
@@ -122,7 +136,17 @@ export default function CartPage({ session }) {
               Shopping Cart ({totalItems})
             </h2>
 
-            {cartItems.length === 0 ? (
+            {/* ✅ 2. BADILISHA LOGIC HAPA: Angalia loading kwanza */}
+            {loading ? (
+              // A. ONYESHA SKELETON WAKATI INAPOKIA
+              <div className="cart-loading-skeleton">
+                <div className="skeleton-item"></div>
+                <div className="skeleton-item"></div>
+                <div className="skeleton-item"></div>
+                <div className="skeleton-item"></div>
+              </div>
+            ) : cartItems.length === 0 ? (
+              // B. ONYESHA EMPTY CART IKIWA KWA KWELI HAKUNA BIDHAA
               <div className="empty-cart-box">
                 <ShoppingBag size={64} className="empty-cart-icon" />
                 <h3 className="empty-cart-text">Kikapu chako kiko tupu!</h3>
@@ -134,6 +158,7 @@ export default function CartPage({ session }) {
                 </button>
               </div>
             ) : (
+              // C. ONYESHA BIDHAA HALISI
               <div className="cart-with-items-layout">
                   
                 {/* LIST YA BIDHAA */}
@@ -200,7 +225,7 @@ export default function CartPage({ session }) {
                   ))}
                 </div>
 
-                {/* SUMMARY CARD - CSS inaamua kuionyesha kwenye Desktop */}
+                {/* SUMMARY CARD - Kwa Desktop */}
                 <div className="cart-summary-card desktop-only">
                   <h3 className="summary-title">Order Summary</h3>
                   <div className="summary-row">
@@ -233,8 +258,8 @@ export default function CartPage({ session }) {
         </main>
       </div>
 
-      {/* MOBILE BOTTOM CHECKOUT BAR - CSS inaamua kuonyesha kwenye Mobile */}
-      {cartItems.length > 0 && (
+      {/* MOBILE BOTTOM CHECKOUT BAR */}
+      {!loading && cartItems.length > 0 && (
         <div className="mobile-checkout-bar">
           <div className="mobile-total-info">
             <div className="mobile-total-label">Total</div>

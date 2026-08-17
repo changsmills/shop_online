@@ -6,12 +6,12 @@ export const CartProvider = ({ children }) => {
   // Tumia useRef kuhifadhi cartItems kwa haraka, kuepuka asynchronous delay
   const cartRef = useRef([]);
   
-  const [cartItems, setCartItems] = useState(() => {
-    const savedCart = localStorage.getItem("alibaba_cart");
-    const initialData = savedCart ? JSON.parse(savedCart) : [];
-    cartRef.current = initialData; // Set ref immediately
-    return initialData;
-  });
+const [cartItems, setCartItems] = useState(() => {
+  const savedCart = localStorage.getItem("alibaba_cart");
+  const initialData = savedCart ? JSON.parse(savedCart) : [];
+  cartRef.current = initialData; // 🔴 Hapa ndio sababu ya tatizo!
+  return initialData;
+});
 
   // Update localStorage whenever cart changes
   useEffect(() => {
@@ -65,6 +65,21 @@ export const CartProvider = ({ children }) => {
       }
     });
   };
+
+  // ✅ ONGEZA HII: Sikiliza tukio la 'cartUpdated' kutoka Drawer
+useEffect(() => {
+  const handleCartUpdate = (e) => {
+    const newCart = e.detail;
+    if (newCart) {
+      console.log("🔄 Cart updated via CustomEvent! Updating context...");
+      setCartItems(newCart); // Hii inafanya UI iupdate mara moja!
+      cartRef.current = newCart;
+    }
+  };
+
+  window.addEventListener('cartUpdated', handleCartUpdate);
+  return () => window.removeEventListener('cartUpdated', handleCartUpdate);
+}, []);
 
   const updateQuantity = (uniqueCartId, newQuantity) => {
     console.log("🔄 updateQuantity called with:", { uniqueCartId, newQuantity });

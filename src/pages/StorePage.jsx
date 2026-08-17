@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../axiosConfig';
-import Header from '../components/Header';
+import Header from '../components/StoresHeader';
 import Footer from '../components/Footer';
 import { 
   Store, MapPin, Phone, Mail, Instagram, Globe, Clock, 
@@ -11,25 +11,16 @@ import {
 } from 'lucide-react';
 import '../StorePage.css';
 
-// 🔥 HELPER YA KUPATA CLOUDINARY URL SAHIHI (Imeboreshwa!)
+// ✅ BADILISHA: Tumia URL sahihi kutoka Backend, usijenge kwa mkono!
 const getImageUrl = (url) => {
   if (!url) return null;
-  
-  // 1. Kama URL tayari ni kamili (http/https), irudishe moja kwa moja
+  // Backend tayari inatuma URL kamili za Cloudinary kwa fields zenye '_url'
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return url;
   }
-  
-  // 2. Kama ni Cloudinary public_id, jenga URL kamili kwa kutumia CLOUD_NAME kutoka .env
-  const CLOUD_NAME = 'rlgqgsnv'; // 🔥 Tumia Cloud Name yako kutoka .env!
-  if (CLOUD_NAME) {
-    // Hakikisha public_id ina folder yake (kama store_logos/ au product_media/)
-    // Cloudinary inahitaji folder kama sehemu ya public_id
-    return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${url}`;
-  }
-  
-  // 3. Fallback - kama ni local path (kwa development tu)
-  return `http://127.0.0.1:8000${url.startsWith('/') ? '' : '/'}${url}`;
+  // Kama siyo URL kamili (kwa products), jenga kwa Cloudinary
+  const CLOUD_NAME = 'rlgqgsnv';
+  return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${url}`;
 };
 
 export default function StorePage() {
@@ -52,25 +43,23 @@ export default function StorePage() {
       if (!storeId) return;
       setLoading(true);
       try {
-        // 🔥 Pata store kwa ID (Inatumia StoreEngineViewSet)
         const storeRes = await api.get(`/stores/${storeId}/`);
         const storeData = storeRes.data;
         setStore(storeData);
         console.log("✅ Store Data:", storeData);
 
-        // 🔥 Pata products za store hii
         const productsRes = await api.get('/products/', {
           params: {
             store_id: storeId,
-            is_approved: true,
+           // is_approved: true,
             ordering: '-created_at'
           }
         });
+
         const productsData = productsRes.data.results || productsRes.data || [];
         setProducts(productsData);
         setFilteredProducts(productsData);
 
-        // 🔥 Pata categories za products
         if (productsData.length > 0) {
           const uniqueCats = [...new Set(productsData.map(p => p.sub_category_name || p.category_name).filter(Boolean))];
           setCategories(uniqueCats);
@@ -148,19 +137,33 @@ export default function StorePage() {
       <Header />
       
       <div className="store-container">
-        {/* Back Button */}
-        <div className="store-back-btn" onClick={() => navigate(-1)}>
-          <ChevronLeft size={20} />
-          <span>Back</span>
-        </div>
+        
 
-        {/* Store Header / Banner */}
-        <div className="store-banner">
-          <div className="store-banner-content">
+               {/* Store Header / Banner */}
+        <div 
+          className="store-banner" 
+          style={{
+            backgroundImage: store.store_banner_url ? `url(${store.store_banner_url})` : 'none',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            position: 'relative'
+          }}
+        >
+          {/* Safu ya giza juu ya picha (ili maandishi yaonekane vizuri) */}
+          <div style={{
+            position: 'absolute',
+            top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(44, 62, 80, 0.85)', // Hii inaweka rangi ya giza juu ya picha
+            borderRadius: '16px'
+          }}></div>
+
+          <div className="store-banner-content" style={{ position: 'relative', zIndex: 2 }}>
             <div className="store-logo-large">
-              {store.store_logo ? (
+
+              {/* ✅ BADILISHA HAPA: Tumia store_logo_url badala ya store_logo */}
+              {store.store_logo_url ? (
                 <img 
-                  src={getImageUrl(store.store_logo)} 
+                  src={store.store_logo_url} 
                   alt={store.store_name}
                   onError={(e) => { 
                     console.error("❌ Logo load error:", e.target.src);
@@ -352,7 +355,7 @@ export default function StorePage() {
                 >
                   <div className="product-image">
                     <img 
-                      src={getImageUrl(product.cover_image) || 'https://placehold.co/300'} 
+                      src={product.cover_image_url || product.cover_image || 'https://placehold.co/300'} 
                       alt={product.name} 
                       onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/300?text=No+Img'; }} 
                     />
@@ -386,7 +389,7 @@ export default function StorePage() {
                   onClick={() => navigate(`/product/${product.id}`)}
                 >
                   <img 
-                    src={getImageUrl(product.cover_image) || 'https://placehold.co/80'} 
+                    src={product.cover_image_url || product.cover_image || 'https://placehold.co/80'} 
                     alt={product.name} 
                     onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/80?text=No+Img'; }} 
                   />

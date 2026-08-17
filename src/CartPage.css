@@ -113,7 +113,7 @@
   align-items: center;
   padding: 12px 24px;
   text-decoration: none;
-  color: #666;
+  color: #bbb2b2;
   margin: 4px 8px;
   border-radius: 8px;
   transition: background-color 0.2s;
@@ -128,15 +128,17 @@
   min-width: 22px;
   display: flex;
   justify-content: center;
+
 }
 
 .sidebar-label {
   margin-left: 15px;
   font-size: 14px;
   font-weight: 600;
-  opacity: 0;
+  opacity: 1;
   transition: opacity 0.2s ease-in-out;
   pointer-events: none;
+  
 }
 
 .cart-sidebar.expanded .sidebar-label {

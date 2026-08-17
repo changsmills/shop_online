@@ -1,222 +1,410 @@
 /* ============================================ */
-/* ALL STORES - PAGE CONTAINER                  */
+/* ROOT & LAYOUT STRUCTURE                      */
 /* ============================================ */
 
 .all-stores-page {
-  background-color: #f7f8fa;
+  background-color: #f8f9fa;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
 /* ============================================ */
-/* ALL STORES - MAIN CONTAINER                  */
-/* ============================================ */
-
-.all-stores-container {
+/* MAIN LAYOUT (SIDEBAR + GRID) - Inasukumwa chini */
+.all-stores-layout-container {
+  display: flex;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 16px;
-  flex: 1;
   width: 100%;
-  box-sizing: border-box;
+  padding: 24px 16px 40px 16px;
+  gap: 24px;
+  flex: 1;
+  
+  /* ✅ Default (Desktop) */
+  padding-top: 70px;
 }
 
-/* Desktop adjustment */
-@media (min-width: 769px) {
-  .all-stores-container {
-    padding: 30px 20px;
+/* 🔥 Tablet (≤1024px) */
+@media (max-width: 1024px) {
+  .all-stores-layout-container {
+    padding-top: 80px;
+  }
+}
+
+/* 🔥 Mobile (≤768px) */
+@media (max-width: 768px) {
+  .all-stores-layout-container {
+    padding-top: 70px; /* ✅ Inashusha chini kwa mobile */
+  }
+}
+
+/* 🔥 Small Mobile (≤480px) */
+@media (max-width: 480px) {
+  .all-stores-layout-container {
+    margin-top:  35px;
   }
 }
 
 /* ============================================ */
-/* HEADER SECTION                                */
+/* SIDEBAR FILTERS                               */
 /* ============================================ */
 
-.all-stores-header {
-  margin-bottom: 16px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #e5e7eb;
-  width: 100%; /* 🔥 Hakikisha header inajaza upana */
+.search-filter-sidebar.store-filter-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  height: fit-content;
+  position: sticky;
+  top: 100px; /* ✅ Inashikamana juu baada ya Header */
 }
 
-.all-stores-title {
-  font-size: 20px;
-  font-weight: bold;
-  margin: 0;
+.filter-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 16px;
   color: #1f2937;
 }
 
-.all-stores-subtitle {
-  margin-top: 8px;
-  color: #6b7280;
-  font-size: 12px;
+.filter-section {
+  margin-bottom: 24px;
 }
 
-@media (min-width: 769px) {
-  .all-stores-header {
-    margin-bottom: 24px;
-    padding-bottom: 12px;
-  }
-  .all-stores-title {
-    font-size: 28px;
-  }
-  .all-stores-subtitle {
-    font-size: 14px;
-  }
+.filter-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 12px;
+}
+
+.filter-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.filter-item {
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #6b7280;
+  transition: all 0.2s;
+}
+
+.filter-item:hover {
+  background-color: #f3f4f6;
+}
+
+.filter-item.active {
+  background-color: #fff5ed;
+  color: #ff6a00;
+  font-weight: 600;
+}
+
+/* Radio Buttons for Verified */
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 6px 0;
+}
+
+.radio-label input[type="radio"] {
+  accent-color: #ff6a00;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
 }
 
 /* ============================================ */
-/* 🔥 STORES CONTAINER - Inatumia Flex (Sio Grid ya fixed columns!) */
+/* MAIN CONTENT (GRID)                           */
+/* ============================================ */
+
+.all-stores-main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.all-stores-info-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.all-stores-count {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* ============================================ */
+/* STORE GRID & CARDS                           */
 /* ============================================ */
 
 .all-stores-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(4, 1fr); /* Default Desktop */
+}
+
+/* StoreCard Component Wrapper */
+.all-stores-grid > div {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start; /* 🔥 Inaanza kushoto kabisa! */
-  gap: 16px;
-  width: 100%;
-  margin: 0;
-  padding: 0;
 }
 
-/* ============================================ */
-/* 🔥 STORE CARD - Inakaa kwenye flex container */
-/* ============================================ */
-
-/* Hii inahakikisha kadi za stores zinaweza kukaa kwenye flex */
 .all-stores-grid .store-card {
-  flex: 0 0 auto;
-  width: calc((100% - (16px * 5)) / 6); /* 🔥 Hesabu kwa 6 kadi kwa upana */
-  max-width: 180px;
+  width: 100%;
+  height: 100%;
 }
-
-/* 🔥 Tablet - 4 kwa upana */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .all-stores-grid .store-card {
-    width: calc((100% - (16px * 3)) / 4); /* 4 kadi kwa upana */
-    max-width: 220px;
-  }
-  .all-stores-grid {
-    gap: 16px;
-  }
-}
-
-/* 🔥 Desktop - 6 kwa upana (≥1025px) */
-@media (min-width: 1025px) {
-  .all-stores-grid .store-card {
-    width: calc((100% - (16px * 5)) / 6); /* 6 kadi kwa upana */
-    max-width: 180px;
-  }
-  .all-stores-grid {
-    gap: 16px;
-  }
-}
-
-/* 🔥 Mobile - 2 kwa upana (≤768px) */
-@media (max-width: 768px) {
-  .all-stores-grid .store-card {
-    width: calc((100% - 12px) / 2); /* 2 kadi kwa upana */
-    max-width: 160px;
-  }
-  .all-stores-grid {
-    gap: 12px;
-    justify-content: center; /* Kwenye mobile, zikae katikati vizuri */
-  }
-}
-
-/* 🔥 Small Mobile - 2 kwa upana (≤480px) */
-@media (max-width: 480px) {
-  .all-stores-grid .store-card {
-    width: calc((100% - 8px) / 2); /* 2 kadi kwa upana */
-    max-width: 140px;
-  }
-  .all-stores-grid {
-    gap: 8px;
-  }
-}
-
-/* ============================================ */
-/* EMPTY STATE                                   */
-/* ============================================ */
 
 .all-stores-empty {
+  grid-column: 1 / -1;
   text-align: center;
   padding: 60px 20px;
   background-color: white;
   border-radius: 12px;
-  color: #999;
-  width: 100%; /* 🔥 Inajaza upana wote */
+  color: #6b7280;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.reset-filters-btn {
+  padding: 8px 20px;
+  background-color: #ff6a00;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.reset-filters-btn:hover {
+  background-color: #e65c00;
 }
 
 /* ============================================ */
-/* 🔥 SKELETON LOADING                          */
+/* INFINITE SCROLL LOADING                      */
+/* ============================================ */
+
+.loading-more {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 0;
+  color: #6b7280;
+  grid-column: 1 / -1;
+}
+
+.loader-small {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #ff6a00;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.end-of-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 30px 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.store-card-single-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 0 0 40px 0;
+  /* ✅ LAZIMISHA KUSOGEA CHINI KWA KUTUMIA HIZI */
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: 130px !important; 
+}
+
+/* VERY SMALL SCREENS (≤ 480px) */
+@media (max-width: 480px) {
+  /* 🔥 BADILISHA HAPA: Ongeza padding-top kwa nguvu zaidi! */
+  .store-card-single-container {
+    padding-top: 100px !important; /* ✅ Inasukuma chini kwa simu ndogo zaidi */
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+
+  }
+  
+  /* ... rest ya code yako ... */
+}
+
+/* ============================================ */
+/* RESPONSIVE MEDIA QUERIES                      */
+/* ============================================ */
+
+/* MEDIUM SCREENS / TABLETS (≤ 1024px) */
+@media (max-width: 1024px) {
+  .all-stores-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  
+  .search-filter-sidebar.store-filter-sidebar {
+    width: 220px;
+  }
+}
+
+/* SMALL SCREENS / MOBILE (≤ 768px) */
+@media (max-width: 768px) {
+  /* 🔥 SUKUMA CONTENT CHINI KWA MOBILE */
+  .all-stores-layout-container {
+    flex-direction: column;
+    padding: 12px 16px 80px 16px; /* ✅ Nafasi chini kwa ajili ya Footer ya mobile */
+    padding-top: 78px; /* ✅ Inasukuma content chini baada ya header ya mobile */
+    gap: 16px;
+  }
+
+  /* Sidebar inabadilika kuwa Horizontal kwenye mobile */
+  .search-filter-sidebar.store-filter-sidebar {
+    width: 100%;
+    position: static;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .filter-section {
+    margin-bottom: 16px;
+  }
+  
+  .filter-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .filter-item {
+    padding: 6px 14px;
+    font-size: 13px;
+    margin-bottom: 0;
+    border: 1px solid #e5e7eb;
+    background-color: white;
+  }
+  .filter-item.active {
+    border-color: #ff6a00;
+  }
+  
+  .radio-group {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .radio-label {
+    font-size: 13px;
+    padding: 0;
+  }
+
+  /* Grid inakuwa 2 columns */
+  .all-stores-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .all-stores-info-bar {
+    margin-bottom: 12px;
+  }
+  
+  .all-stores-empty {
+    padding: 40px 16px;
+  }
+
+    .store-card-single-container {
+    padding-top: 140px !important; /* ✅ Inasukuma chini kwa simu ndogo zaidi */
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  /* Footer ficha kwenye mobile kama kawaida */
+  .all-stores-page footer {
+    display: none !important;
+  }
+}
+
+/* VERY SMALL SCREENS (≤ 480px) */
+@media (max-width: 480px) {
+  /* 🔥 SUKUMA ZAIDI KWA SCREEN NDOGO */
+  .all-stores-layout-container {
+    padding-top: 60px; /* ✅ Inasukuma chini kwa header ndogo */
+    padding: 10px 10px 80px 10px;
+  }
+
+  .all-stores-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  
+  .filter-item {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+  
+  .search-filter-sidebar.store-filter-sidebar {
+    padding: 12px;
+  }
+}
+
+/* ============================================ */
+/* SKELETON LOADING STYLES                       */
 /* ============================================ */
 
 .all-stores-loading-wrapper {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 20px 16px;
   width: 100%;
   box-sizing: border-box;
+  
+  /* ✅ SUKUMA SKELETON CHINI PIA */
+  padding-top: 90px; 
 }
 
 .all-stores-skeleton-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 16px;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(4, 1fr);
 }
 
 .all-stores-skeleton-card {
   background: white;
   border-radius: 12px;
-  padding: 12px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  width: calc((100% - (16px * 5)) / 6); /* 6 kwa upana */
-  max-width: 180px;
-}
-
-/* 🔥 Tablet Skeleton - 4 kwa upana */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .all-stores-skeleton-card {
-    width: calc((100% - (16px * 3)) / 4);
-    max-width: 220px;
-  }
-}
-
-/* 🔥 Desktop Skeleton - 6 kwa upana */
-@media (min-width: 1025px) {
-  .all-stores-skeleton-card {
-    width: calc((100% - (16px * 5)) / 6);
-    max-width: 180px;
-  }
-}
-
-/* 🔥 Mobile Skeleton - 2 kwa upana */
-@media (max-width: 768px) {
-  .all-stores-skeleton-card {
-    width: calc((100% - 12px) / 2);
-    max-width: 160px;
-  }
-  .all-stores-skeleton-grid {
-    gap: 12px;
-    justify-content: center;
-  }
-}
-
-/* 🔥 Small Mobile Skeleton - 2 kwa upana */
-@media (max-width: 480px) {
-  .all-stores-skeleton-card {
-    width: calc((100% - 8px) / 2);
-    max-width: 140px;
-  }
-  .all-stores-skeleton-grid {
-    gap: 8px;
-  }
+  width: 100%;
 }
 
 .all-stores-skeleton-image {
@@ -243,22 +431,19 @@
   100% { background-color: #e0e0e0; }
 }
 
-/* ============================================ */
-/* SINGLE STORE VIEW (Kwa storeId)              */
-/* ============================================ */
-
-.store-card-single-container {
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 20px 0;
+/* Skeleton Responsive */
+@media (max-width: 1024px) {
+  .all-stores-skeleton-grid { grid-template-columns: repeat(3, 1fr); }
 }
-
-/* ============================================ */
-/* FOOTER - HIDE ON MOBILE                       */
-/* ============================================ */
-
 @media (max-width: 768px) {
-  .all-stores-page footer {
-    display: none !important;
+  .all-stores-loading-wrapper {
+    padding-top: 70px; /* ✅ Skeleton mobile padding */
   }
+  .all-stores-skeleton-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+}
+@media (max-width: 480px) {
+  .all-stores-loading-wrapper {
+    padding-top: 60px; /* ✅ Skeleton small mobile padding */
+  }
+  .all-stores-skeleton-grid { gap: 8px; }
 }

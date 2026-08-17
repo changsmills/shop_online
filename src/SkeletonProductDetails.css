@@ -12,7 +12,7 @@
 
 @media (max-width: 768px) {
   .skeleton-page {
-    padding-top: 10px; /* ✅ Mobile: 50px */
+    padding-top: 1px;
     padding-bottom: 80px; /* Nafasi ya Bottom Navigation */
   }
 }
