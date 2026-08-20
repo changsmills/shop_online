@@ -198,7 +198,7 @@
     box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     border: 1px solid #f0f0f0;
     padding: 20px;
-    z-index: 10000;
+    z-index: 99999 !important;  /* ✅ BADILISHA HAPA */
     width: 360px;
     box-sizing: border-box;
 }

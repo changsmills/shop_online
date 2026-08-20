@@ -1,4 +1,5 @@
 // src/pages/StorePage.jsx
+import { createPortal } from 'react-dom';
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../axiosConfig';
@@ -7,7 +8,7 @@ import Footer from '../components/Footer';
 import { 
   Store, MapPin, Phone, Mail, Instagram, Globe, Clock, 
   Package, ShieldCheck, Star, Users, 
-  ChevronLeft, Grid3x3, List, Search
+  ChevronLeft, Grid3x3, List, Search, X, ChevronRight
 } from 'lucide-react';
 import '../StorePage.css';
 
@@ -35,6 +36,12 @@ export default function StorePage() {
   const [categories, setCategories] = useState([]);
   const [viewMode, setViewMode] = useState('grid'); 
 
+  // ========== STATE ZA LIGHTBOX (PORTAL) ==========
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [lightboxImages, setLightboxImages] = useState([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [lightboxProductName, setLightboxProductName] = useState('');
+
   // =======================================================
   // 🔥 FETCH STORE DATA
   // =======================================================
@@ -51,7 +58,6 @@ export default function StorePage() {
         const productsRes = await api.get('/products/', {
           params: {
             store_id: storeId,
-           // is_approved: true,
             ordering: '-created_at'
           }
         });
@@ -94,15 +100,87 @@ export default function StorePage() {
   };
 
   // =======================================================
+  // 🔥 FUNCTION: FUNGUA LIGHTBOX YA PICHA
+  // =======================================================
+  const openImageLightbox = (product, e) => {
+    e.stopPropagation(); // Zuia navigate kwenye ProductDetails wakati wa kubonyeza picha
+
+    // Jenga orodha ya picha
+    let images = [];
+    if (product.cover_image_url || product.cover_image) {
+      images.push(product.cover_image_url || product.cover_image);
+    }
+
+    setLightboxImages(images);
+    setLightboxIndex(0);
+    setLightboxProductName(product.name);
+    setIsLightboxOpen(true);
+  };
+
+  const closeLightbox = () => setIsLightboxOpen(false);
+  const nextImage = () => setLightboxIndex((prev) => (prev + 1) % lightboxImages.length);
+  const prevImage = () => setLightboxIndex((prev) => (prev - 1 + lightboxImages.length) % lightboxImages.length);
+
+  // =======================================================
   // 🔥 LOADING STATE
   // =======================================================
   if (loading) {
     return (
       <div className="store-page">
         <Header />
-        <div className="store-loading">
-          <div className="spinner"></div>
-          <p>Inapakia taarifa za duka...</p>
+        <div className="store-container skeleton-wrapper">
+          {/* 1. Banner Skeleton */}
+          <div className="store-banner skeleton-banner">
+            <div className="store-banner-content skeleton-banner-content">
+              <div className="store-logo-large">
+                <div className="skeleton skeleton-circle-logo"></div>
+              </div>
+              <div className="store-banner-info">
+                <div className="skeleton skeleton-banner-title"></div>
+                <div className="skeleton skeleton-banner-subtitle"></div>
+                <div className="store-stats skeleton-stats">
+                  <div className="skeleton skeleton-stat"></div>
+                  <div className="skeleton skeleton-stat"></div>
+                  <div className="skeleton skeleton-stat"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 2. Info Grid Skeleton */}
+          <div className="store-info-grid">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="info-card skeleton-info-card">
+                <div className="skeleton skeleton-info-title"></div>
+                <div className="skeleton skeleton-info-text"></div>
+                <div className="skeleton skeleton-info-text"></div>
+                <div className="skeleton skeleton-info-text"></div>
+              </div>
+            ))}
+          </div>
+
+          {/* 3. Products Section Skeleton */}
+          <div className="store-products-section">
+            <div className="products-header skeleton-products-header">
+              <div className="skeleton skeleton-products-title"></div>
+              <div className="products-controls skeleton-products-controls">
+                <div className="skeleton skeleton-search-control"></div>
+                <div className="skeleton skeleton-filter-control"></div>
+              </div>
+            </div>
+
+            <div className="products-grid">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                <div key={i} className="product-card skeleton-product-card">
+                  <div className="skeleton skeleton-product-img"></div>
+                  <div className="product-info skeleton-product-info-padding">
+                    <div className="skeleton skeleton-product-name"></div>
+                    <div className="skeleton skeleton-product-price"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
         <Footer />
       </div>
@@ -138,8 +216,7 @@ export default function StorePage() {
       
       <div className="store-container">
         
-
-               {/* Store Header / Banner */}
+        {/* Store Header / Banner */}
         <div 
           className="store-banner" 
           style={{
@@ -149,24 +226,20 @@ export default function StorePage() {
             position: 'relative'
           }}
         >
-          {/* Safu ya giza juu ya picha (ili maandishi yaonekane vizuri) */}
           <div style={{
             position: 'absolute',
             top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: 'rgba(44, 62, 80, 0.85)', // Hii inaweka rangi ya giza juu ya picha
+            backgroundColor: 'rgba(44, 62, 80, 0.85)',
             borderRadius: '16px'
           }}></div>
 
           <div className="store-banner-content" style={{ position: 'relative', zIndex: 2 }}>
             <div className="store-logo-large">
-
-              {/* ✅ BADILISHA HAPA: Tumia store_logo_url badala ya store_logo */}
               {store.store_logo_url ? (
                 <img 
                   src={store.store_logo_url} 
                   alt={store.store_name}
                   onError={(e) => { 
-                    console.error("❌ Logo load error:", e.target.src);
                     e.target.onerror = null; 
                     e.target.src = 'https://placehold.co/150x150?text=No+Logo'; 
                   }}
@@ -317,7 +390,6 @@ export default function StorePage() {
                 </select>
               )}
 
-              {/* View Toggle Buttons */}
               <div className="view-toggle-group">
                 <button 
                   className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
@@ -354,14 +426,20 @@ export default function StorePage() {
                   onClick={() => navigate(`/product/${product.id}`)}
                 >
                   <div className="product-image">
-                    <img 
-                      src={product.cover_image_url || product.cover_image || 'https://placehold.co/300'} 
-                      alt={product.name} 
-                      onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/300?text=No+Img'; }} 
-                    />
-                    {product.discount > 0 && (
-                      <span className="discount-badge">-{product.discount}%</span>
-                    )}
+                    {/* ✅ PICHA INABONYEKA KUFUNGUA LIGHTBOX BILA KUHAMA UKURASA (GRID) */}
+                    <div 
+                      className="cursor-pointer relative"
+                      onClick={(e) => openImageLightbox(product, e)}
+                    >
+                      <img 
+                        src={product.cover_image_url || product.cover_image || 'https://placehold.co/300'} 
+                        alt={product.name} 
+                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/300?text=No+Img'; }} 
+                      />
+                      {product.discount > 0 && (
+                        <span className="discount-badge">-{product.discount}%</span>
+                      )}
+                    </div>
                   </div>
                   <div className="product-info">
                     <h4 className="product-name">{product.name}</h4>
@@ -388,11 +466,17 @@ export default function StorePage() {
                   className="product-list-item"
                   onClick={() => navigate(`/product/${product.id}`)}
                 >
-                  <img 
-                    src={product.cover_image_url || product.cover_image || 'https://placehold.co/80'} 
-                    alt={product.name} 
-                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/80?text=No+Img'; }} 
-                  />
+                  {/* ✅ PICHA KWA LIST VIEW INABONYEKA KUFUNGUA LIGHTBOX PIA */}
+                  <div 
+                    className="cursor-pointer"
+                    onClick={(e) => openImageLightbox(product, e)}
+                  >
+                    <img 
+                      src={product.cover_image_url || product.cover_image || 'https://placehold.co/80'} 
+                      alt={product.name} 
+                      onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/80?text=No+Img'; }} 
+                    />
+                  </div>
                   <div className="product-list-info">
                     <h4>{product.name}</h4>
                     <p className="product-category">{product.sub_category_name || product.category_name || ''}</p>
@@ -411,6 +495,47 @@ export default function StorePage() {
       </div>
 
       <Footer />
+
+      {/* ===================================================== */}
+      {/* ✅ LIGHTBOX PORTAL (IMEWEKWA MWISHONI KABISA)        */}
+      {/* ===================================================== */}
+      {isLightboxOpen && lightboxImages.length > 0 && createPortal(
+        <div className="lightbox-overlay" onClick={closeLightbox}>
+          <div className="lightbox-content-wrapper" onClick={(e) => e.stopPropagation()}>
+            
+            <button onClick={closeLightbox} className="lightbox-close-btn">
+              <X size={32} />
+            </button>
+
+            <h3 className="lightbox-product-title">{lightboxProductName}</h3>
+
+            <div className="lightbox-image-container">
+              <img 
+                src={lightboxImages[lightboxIndex]} 
+                alt="Zoomed view" 
+                className="lightbox-image"
+              />
+
+              {lightboxImages.length > 1 && (
+                <>
+                  <button onClick={prevImage} className="lightbox-nav-btn left">
+                    <ChevronLeft size={24} />
+                  </button>
+                  <button onClick={nextImage} className="lightbox-nav-btn right">
+                    <ChevronRight size={24} />
+                  </button>
+                </>
+              )}
+            </div>
+
+            <div className="lightbox-counter">
+              {lightboxIndex + 1} / {lightboxImages.length}
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
     </div>
   );
 }

@@ -1,6 +1,8 @@
 /* ============================================ */
 /* 1. CSS VARIABLES (USAHAJI WA HARAKA)         */
 /* ============================================ */
+
+
 :root {
   --primary: #f97316;
   --primary-dark: #ea580c;
@@ -129,25 +131,22 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Ro
 .tab-content.active { display: block; }
 
 /* ============================================ */
-/* SECTION WRAPPERS & COMPONENTS (NEW CLASSES)   */
+/* SECTION WRAPPERS & COMPONENTS                */
 /* ============================================ */
 .store-header-wrapper { position: relative; z-index: 9998; margin-bottom: 60px; }
 .analytics-section { margin-bottom: 16px; margin-top: 16px; }
 .store-mgmt-wrapper { margin-top: 24px; }
 .advertise-wrapper { margin-top: 24px; }
 
-/* Product Creation Flow */
 .product-creation-wrapper {
   background: white; padding: 24px; border-radius: 35px;
   border: 1px solid var(--gray-100); box-shadow: var(--shadow-sm); margin-bottom: 32px;
 }
 .product-section-title { font-size: 20px; font-weight: 900; color: var(--gray-800); margin: 0 0 24px 0; }
 
-/* Existing Products */
 .existing-products-wrapper { margin-top: 32px; }
 .existing-products-title { font-size: 18px; font-weight: 700; color: var(--gray-800); margin-bottom: 16px; }
 
-/* Product Grid & Card */
 .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
 .product-card { background: white; border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-sm); transition: all 0.2s ease-in-out; position: relative; display: flex; flex-direction: column; border: 1px solid var(--gray-200); }
 .product-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: #bfdbfe; }
@@ -162,22 +161,17 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Ro
 }
 .product-card:hover .product-card-edit-btn { opacity: 1; }
 
-/* Offers & Advertise */
 .offers-container { background: white; padding: 24px; border-radius: 35px; border: 1px solid var(--gray-100); box-shadow: var(--shadow-sm); }
 .advertise-icon { margin: 0 auto 16px auto; color: var(--primary); display: block; }
 .advertise-title { font-size: 24px; font-weight: 700; color: var(--gray-800); margin-bottom: 8px; }
 .advertise-text { color: var(--gray-600); margin-bottom: 24px; }
 .advertise-cta-btn { background: var(--primary); color: white; padding: 12px 24px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; }
 
-/* Advertise Banner */
 .advertise-banner { background: linear-gradient(135deg, #ff4e00 0%, #ec2f4b 100%); border-radius: 20px; padding: 20px; color: white; cursor: pointer; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; }
 .advertise-banner h3 { display: flex; align-items: center; gap: 8px; margin: 0; }
 .advertise-banner p { font-size: 12px; opacity: 0.9; margin: 4px 0 0 0; }
 .advertise-btn { background: white; color: #ff4e00; padding: 10px 20px; border-radius: 12px; font-weight: bold; border: none; cursor: pointer; }
 
-/* ============================================ */
-/* MODAL (KATEGORIA)                             */
-/* ============================================ */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; display: flex; align-items: flex-end; justify-content: center; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
 .modal-backdrop { position: absolute; inset: 0; }
 .modal-container { position: relative; background: white; width: 100%; max-width: 500px; border-radius: var(--radius-modal) var(--radius-modal) 0 0; overflow: hidden; display: flex; flex-direction: column; max-height: 85vh; box-shadow: 0 -10px 25px rgba(0,0,0,0.2); }
@@ -206,32 +200,54 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Ro
 .modal-confirm-btn { width: 100%; padding: 16px; background: black; color: white; border-radius: 16px; font-weight: 900; border: none; font-size: 14px; cursor: pointer; }
 
 /* ============================================ */
-/* MEDIA QUERIES (NO `isMobile` NEEDED)          */
+/* MEDIA QUERIES - Mobile Responsive (Sahihi)    */
 /* ============================================ */
 
-/* Tablet (max-width: 1024px) */
 @media (max-width: 1024px) {
   .dashboard-content { padding: 16px; }
   .product-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
 }
 
-/* Mobile (max-width: 768px) */
+/* 🔥 MOBILE QUERY (IMEUNGANISHWA HAPA, HAKUNA DUPLICATE TENSA!) */
 @media (max-width: 768px) {
   .dashboard-header { padding: 0 16px; }
-  .header-center { display: none; }
+  .header-center { display: none !important; } /* Hii ndio inaficha text na kupunguza urefu wa header */
   .mobile-menu-btn { display: flex !important; }
 
   .dashboard-sidebar {
-    position: fixed; left: 0; top: 70px; width: 280px; height: calc(100vh - 70px);
-    z-index: 9997; transform: translateX(-100%); box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    position: fixed;
+    left: -100% !important;
+    top: 70px;
+    width: 280px !important;
+    max-width: 280px !important;
+    min-width: 280px !important;
+    height: calc(100vh - 70px);
+    z-index: 99999 !important;
+    transition: left 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    will-change: left;
+    backface-visibility: hidden;
   }
-  .dashboard-sidebar.open { transform: translateX(0); }
+
+  .dashboard-sidebar.open { left: 0 !important; }
+
+  /* ✅ Sidebar Overlay imehamishwa hapa (Sio mwishoni) */
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99998;
+    backdrop-filter: blur(3px);
+    animation: fadeIn 0.2s ease;
+  }
 
   .dashboard-content { padding: 12px; }
-  .store-header-wrapper { margin-bottom: 45px !important; } /* ⬅️ CSS inabadilisha margin */
-
-  .product-creation-wrapper { padding: 16px !important; } /* ⬅️ CSS inabadilisha padding */
-  .product-section-title { font-size: 18px !important; }   /* ⬅️ CSS inabadilisha font size */
+  .store-header-wrapper { margin-bottom: 45px !important; }
+  .product-creation-wrapper { padding: 16px !important; }
+  .product-section-title { font-size: 18px !important; }
 
   .product-grid { grid-template-columns: 1fr 1fr !important; gap: 10px; }
   .product-card-img-wrap { height: 120px; }
@@ -243,301 +259,66 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Ro
   .modal-footer { padding-bottom: 30px; }
 }
 
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
 /* ============================================ */
 /* DARK MODE SUPPORT - PHYSICAL DASHBOARD        */
 /* ============================================ */
-
 @media (prefers-color-scheme: dark) {
-
-  /* 1. BODY & GLOBAL BACKGROUND */
-  body {
-    background: #0f172a !important;
-    color: #e2e8f0 !important;
-  }
-
-  .dashboard-wrapper {
-    background: #0f172a !important;
-  }
-
-  /* 2. HEADER */
-  .dashboard-header {
-    background: #1e293b !important;
-    border-bottom-color: #334155 !important;
-  }
-
-  .header-title {
-    color: #ff6a00 !important; /* Inabaki orange */
-  }
-
-  .header-badge {
-    background: #ff6a00 !important;
-    color: #ffffff !important;
-  }
-
-  .header-welcome {
-    color: #94a3b8 !important;
-  }
-
-  /* 3. SIDEBAR */
-  .dashboard-sidebar {
-    background: #1e293b !important;
-    border-right-color: #334155 !important;
-  }
-
-  .sidebar-header {
-    border-bottom-color: #334155 !important;
-  }
-
-  .sidebar-header h3 {
-    color: #ff6a00 !important; /* Inabaki orange */
-  }
-
-  .sidebar-menu-item {
-    color: #94a3b8 !important;
-  }
-
-  .sidebar-menu-item:hover {
-    background: #334155 !important;
-    color: #e2e8f0 !important;
-  }
-
-  .sidebar-menu-item.active {
-    background: #2d3748 !important;
-    border-color: #ff6a00 !important;
-    color: #ff6a00 !important;
-  }
-
-  .sidebar-menu-item.logout {
-    color: #f87171 !important;
-  }
-  .sidebar-menu-item.logout:hover {
-    background: #2d1a1a !important;
-  }
-
-  /* 4. MAIN CONTENT */
-  .dashboard-content {
-    background: #0f172a !important;
-  }
-
-  .dashboard-content-inner {
-    background: transparent !important;
-  }
-
-  /* 5. CARDS & CONTAINERS (Analytics, Products, Offers) */
-  .product-creation-wrapper,
-  .offers-container,
-  .advertise-banner {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
-    color: #e2e8f0 !important;
-  }
-
-  /* 6. SECTION TITLES */
-  .product-section-title,
-  .existing-products-title,
-  .advertise-title {
-    color: #e2e8f0 !important;
-  }
-
-  .advertise-text {
-    color: #94a3b8 !important;
-  }
-
-  /* 7. PRODUCT CARDS (Grid) */
-  .product-card {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
-    color: #e2e8f0 !important;
-  }
-
-  .product-card:hover {
-    border-color: #ff6a00 !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important;
-  }
-
-  .product-card-img-wrap {
-    background: #334155 !important;
-  }
-
-  .product-card-title {
-    color: #e2e8f0 !important;
-  }
-
-  .product-card-price {
-    color: #60a5fa !important; /* Blue inayong'aa */
-  }
-
-  .product-card-edit-btn {
-    background: rgba(37, 99, 235, 0.8) !important;
-  }
-
-  /* 8. ADVERTISE BANNER */
-  .advertise-banner {
-    background: linear-gradient(135deg, #ff4e00 0%, #ec2f4b 100%) !important;
-  }
-
-  .advertise-banner h3 {
-    color: #ffffff !important;
-  }
-
-  .advertise-banner p {
-    color: rgba(255, 255, 255, 0.9) !important;
-  }
-
-  .advertise-btn {
-    background: #ffffff !important;
-    color: #ff4e00 !important;
-  }
-
-  /* 9. MODAL (Kategoria) */
-  .modal-overlay {
-    background: rgba(0, 0, 0, 0.85) !important;
-  }
-
-  .modal-container {
-    background: #1e293b !important;
-    box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.6) !important;
-  }
-
-  .modal-header {
-    background: #1e293b !important;
-    border-bottom-color: #334155 !important;
-  }
-
-  .modal-header-title {
-    color: #e2e8f0 !important;
-  }
-
-  .modal-header-sub {
-    color: #94a3b8 !important;
-  }
-
-  .modal-close-btn {
-    background: #334155 !important;
-    color: #94a3b8 !important;
-  }
-
-  .modal-cat-btn {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-  }
-
-  .modal-cat-btn:not(:disabled):hover {
-    border-color: #ff6a00 !important;
-  }
-
-  .modal-cat-name {
-    color: #e2e8f0 !important;
-  }
-
-  .modal-cat-btn:disabled .modal-cat-name {
-    color: #6b7280 !important;
-  }
-
-  .modal-empty-text {
-    color: #94a3b8 !important;
-  }
-
-  .modal-footer {
-    background: #1e293b !important;
-    border-top-color: #334155 !important;
-  }
-
-  .modal-confirm-btn {
-    background: #ff6a00 !important; /* Inabaki orange */
-    color: #ffffff !important;
-  }
-
-  /* 10. ACCOUNT DROPDOWN */
-  .account-dropdown {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6) !important;
-  }
-
-  .account-dropdown-header {
-    border-bottom-color: #334155 !important;
-  }
-
-  .account-dropdown-name {
-    color: #e2e8f0 !important;
-  }
-
-  .account-dropdown-email {
-    color: #94a3b8 !important;
-  }
-
-  .dropdown-section {
-    color: #e2e8f0 !important;
-  }
-
-  .dropdown-divider {
-    border-top-color: #334155 !important;
-  }
-
-  .account-dropdown-item {
-    color: #94a3b8 !important;
-  }
-
-  .account-dropdown-item:hover {
-    background: #334155 !important;
-  }
-
-  .account-dropdown-item.logout {
-    color: #f87171 !important;
-  }
-
-  .account-dropdown-item.logout:hover {
-    background: #2d1a1a !important;
-  }
-
-  /* 11. SCROLLBARS */
-  .dashboard-sidebar::-webkit-scrollbar-track,
-  .dashboard-content::-webkit-scrollbar-track {
-    background: #1e293b !important;
-  }
-
-  .dashboard-sidebar::-webkit-scrollbar-thumb,
-  .dashboard-content::-webkit-scrollbar-thumb {
-    background: #4b5563 !important;
-    border-radius: 8px !important;
-  }
-
-  .dashboard-sidebar::-webkit-scrollbar-thumb:hover,
-  .dashboard-content::-webkit-scrollbar-thumb:hover {
-    background: #ff6a00 !important;
-  }
-
-  /* 12. HEADER ICONS & BUTTONS */
-  .header-icon-btn {
-    color: #94a3b8 !important;
-  }
-
-  .header-icon-btn:hover {
-    color: #e2e8f0 !important;
-  }
-
-  .header-avatar-btn {
-    background: #ff6a00 !important;
-    color: #ffffff !important;
-  }
-
-  /* 13. OTHER UTILITIES */
-  .store-header-wrapper {
-    background: transparent !important;
-  }
-
-  .analytics-section {
-    background: transparent !important;
-  }
-
-  .store-mgmt-wrapper {
-    background: transparent !important;
-  }
-
-  .advertise-wrapper {
-    background: transparent !important;
-  }
+  body { background: #0f172a !important; color: #e2e8f0 !important; }
+  .dashboard-wrapper { background: #0f172a !important; }
+  .dashboard-header { background: #1e293b !important; border-bottom-color: #334155 !important; }
+  .header-title { color: #ff6a00 !important; }
+  .header-badge { background: #ff6a00 !important; color: #ffffff !important; }
+  .header-welcome { color: #94a3b8 !important; }
+  .dashboard-sidebar { background: #1e293b !important; border-right-color: #334155 !important; }
+  .sidebar-header { border-bottom-color: #334155 !important; }
+  .sidebar-header h3 { color: #ff6a00 !important; }
+  .sidebar-menu-item { color: #94a3b8 !important; }
+  .sidebar-menu-item:hover { background: #334155 !important; color: #e2e8f0 !important; }
+  .sidebar-menu-item.active { background: #2d3748 !important; border-color: #ff6a00 !important; color: #ff6a00 !important; }
+  .sidebar-menu-item.logout { color: #f87171 !important; }
+  .sidebar-menu-item.logout:hover { background: #2d1a1a !important; }
+  .dashboard-content { background: #0f172a !important; }
+  .dashboard-content-inner { background: transparent !important; }
+  .product-creation-wrapper, .offers-container, .advertise-banner { background: #1e293b !important; border-color: #334155 !important; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important; color: #e2e8f0 !important; }
+  .product-section-title, .existing-products-title, .advertise-title { color: #e2e8f0 !important; }
+  .advertise-text { color: #94a3b8 !important; }
+  .product-card { background: #1e293b !important; border-color: #334155 !important; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important; color: #e2e8f0 !important; }
+  .product-card:hover { border-color: #ff6a00 !important; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important; }
+  .product-card-img-wrap { background: #334155 !important; }
+  .product-card-title { color: #e2e8f0 !important; }
+  .product-card-price { color: #60a5fa !important; }
+  .product-card-edit-btn { background: rgba(37, 99, 235, 0.8) !important; }
+  .advertise-banner { background: linear-gradient(135deg, #ff4e00 0%, #ec2f4b 100%) !important; }
+  .advertise-banner h3 { color: #ffffff !important; }
+  .advertise-banner p { color: rgba(255, 255, 255, 0.9) !important; }
+  .advertise-btn { background: #ffffff !important; color: #ff4e00 !important; }
+  .modal-overlay { background: rgba(0, 0, 0, 0.85) !important; }
+  .modal-container { background: #1e293b !important; box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.6) !important; }
+  .modal-header { background: #1e293b !important; border-bottom-color: #334155 !important; }
+  .modal-header-title { color: #e2e8f0 !important; }
+  .modal-header-sub { color: #94a3b8 !important; }
+  .modal-close-btn { background: #334155 !important; color: #94a3b8 !important; }
+  .modal-cat-btn { background: #1e293b !important; border-color: #334155 !important; }
+  .modal-cat-btn:not(:disabled):hover { border-color: #ff6a00 !important; }
+  .modal-cat-name { color: #e2e8f0 !important; }
+  .modal-cat-btn:disabled .modal-cat-name { color: #6b7280 !important; }
+  .modal-empty-text { color: #94a3b8 !important; }
+  .modal-footer { background: #1e293b !important; border-top-color: #334155 !important; }
+  .modal-confirm-btn { background: #ff6a00 !important; color: #ffffff !important; }
+  .account-dropdown { background: #1e293b !important; border-color: #334155 !important; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6) !important; }
+  .account-dropdown-header { border-bottom-color: #334155 !important; }
+  .account-dropdown-name { color: #e2e8f0 !important; }
+  .account-dropdown-email { color: #94a3b8 !important; }
+  .dropdown-section { color: #e2e8f0 !important; }
+  .dropdown-divider { border-top-color: #334155 !important; }
+  .account-dropdown-item { color: #94a3b8 !important; }
+  .account-dropdown-item:hover { background: #334155 !important; }
+  .account-dropdown-item.logout { color: #f87171 !important; }
+  .account-dropdown-item.logout:hover { background: #2d1a1a !important; }
+  .header-icon-btn { color: #94a3b8 !important; }
+  .header-icon-btn:hover { color: #e2e8f0 !important; }
+  .header-avatar-btn { background: #ff6a00 !important; color: #ffffff !important; }
+  .store-header-wrapper, .analytics-section, .store-mgmt-wrapper, .advertise-wrapper { background: transparent !important; }
 }

@@ -99,7 +99,7 @@ function AppContent({ session }) {
     const hasShownWelcome = sessionStorage.getItem('welcomeShown');
 
     if (session && !hasShownWelcome) {
-      toast.success(`Karibu tena, ${session.user.email?.split('@')[0] || 'Mteja'}!`, {
+      toast.success("Welcome!", {
         duration: 4000,       
         id: 'welcome-toast',   
       });

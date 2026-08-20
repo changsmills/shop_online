@@ -73,13 +73,20 @@ export default function PhysicalDashboard() {
 
   useEffect(() => { fetchDashboardData(); }, [paramId]);
 
-  useEffect(() => {
+   useEffect(() => {
+    let timeoutId;
     const handleResize = () => {
-      if (window.innerWidth < 768) setIsSidebarOpen(false);
-      else setIsSidebarOpen(true);
+      clearTimeout(timeoutId); // Futa timeout iliyopita
+      timeoutId = setTimeout(() => {
+        if (window.innerWidth < 768) setIsSidebarOpen(false);
+        else setIsSidebarOpen(true);
+      }, 250); // Subiri skrini itulie kabla ya kufanya kitendo
     };
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   useEffect(() => {
@@ -204,18 +211,94 @@ export default function PhysicalDashboard() {
     try {
       const token = localStorage.getItem("access_token");
       if (!token) return alert("Token haipo!");
+
       const formData = new FormData();
-      Object.keys(storeMeta).forEach(key => formData.append(key, storeMeta[key]));
+      
+      // ✅ 1. Tuma tu maelezo ya maandishi (Usitume category_id, sub_category_ids wala tin_number)
+      const textFields = [
+        'store_name', 'phone_number', 'whatsapp_number', 
+        'instagram_handle', 'tiktok_handle', 'youtube_link', 
+        'physical_address', 'working_hours', 'description', 'city'
+      ];
+      
+      textFields.forEach(key => {
+        if (storeMeta[key] !== undefined && storeMeta[key] !== null && storeMeta[key] !== '') {
+          formData.append(key, String(storeMeta[key]));
+        }
+      });
+
+      // ✅ 2. Ongeza picha (Logo, Banner) - kama zipo
       if (logoFile) formData.append("store_logo", logoFile);
       if (bannerFile) formData.append("store_banner", bannerFile);
-      officeFiles.forEach((file, i) => { if (file) formData.append("office_images", file); });
+
+      // ✅ 3. Ongeza picha za Ofisi - kama zipo
+      if (officeFiles && Array.isArray(officeFiles)) {
+        officeFiles.forEach((file) => {
+          if (file && file instanceof File) {
+            formData.append("office_images", file);
+          }
+        });
+      }
 
       const response = await api.put(`/stores/${myStore.id}/`, formData, {
-        headers: { "Authorization": `Bearer ${token}`, "Content-Type": "multipart/form-data" }
+        headers: { 
+          "Authorization": `Bearer ${token}`, 
+          "Content-Type": "multipart/form-data" 
+        }
       });
-      if (response.status === 200) { alert("Duka limesasishwa!"); fetchDashboardData(); }
-    } catch (err) { console.error("Update Error:", err); alert("Hitilafu: " + (err.response?.data?.detail || err.message)); } 
-    finally { setIsUpdatingStore(false); }
+      
+      if (response.status === 200) { 
+        alert("Duka limesasishwa kikamilifu!"); 
+        fetchDashboardData(); 
+      }
+    } catch (err) { 
+      console.error("❌ [Update Error] Hitilafu kamili:", err); 
+      
+      let errorMsg = "Hitilafu isiyojulikana imetokea.";
+      
+      // 4. Kagua kwa makini ikiwa Backend imerudisha error
+      if (err.response) {
+        console.log(`➡️ Status Code: ${err.response.status}`);
+        console.log("📦 Jibu la Backend:", err.response.data);
+        
+        if (typeof err.response.data === 'object' && err.response.data !== null) {
+          const errors = err.response.data;
+          
+          if (errors.detail) {
+            errorMsg = errors.detail;
+          } else {
+            // Vunja makosa kwa kila uwanja (Hapa ndipo utajua ni field gani inakosea!)
+            const fieldErrors = Object.entries(errors)
+              .map(([field, messages]) => {
+                const msg = Array.isArray(messages) ? messages.join(', ') : messages;
+                return `✖️ ${field}: ${msg}`;
+              })
+              .join('\n');
+              
+            if (fieldErrors) {
+              errorMsg = `Hitilafu za uwanja (Fields errors):\n${fieldErrors}`;
+            } else {
+              errorMsg = JSON.stringify(errors, null, 2);
+            }
+          }
+        } else {
+          errorMsg = err.response.data?.detail || err.message;
+        }
+        
+      // 5. Ikiwa hakuna jibu (Tatizo la mtandao / Server haijibu)
+      } else if (err.request) {
+        errorMsg = "Hakuna jibu kutoka kwa server (Network Error). Angalia mtandao wako au ikiwa Backend ipo.";
+        console.error("📡 Request iliyoshindwa:", err.request);
+        
+      // 6. Makosa mengine ya kawaida
+      } else {
+        errorMsg = err.message;
+      }
+
+      alert("❗ Hitilafu wakati wa kusasisha:\n\n" + errorMsg); 
+    } finally { 
+      setIsUpdatingStore(false); 
+    }
   };
 
   const addToQueue = () => {
@@ -479,6 +562,14 @@ export default function PhysicalDashboard() {
             })}
           </ul>
         </aside>
+
+           {/* ✅ ONGEZA HII CHINI YA ASIDE: Overlay ya giza kwa mobile */}
+        {isSidebarOpen && window.innerWidth < 768 && (
+          <div 
+            className="sidebar-overlay" 
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
 
         <main className="dashboard-content">
           <div className="dashboard-content-inner">

@@ -271,12 +271,99 @@ const UpdateProductPage = () => {
     setShowVariationForm(true);
   };
 
-  // ========== LOADING STATE ==========
+  // ========== LOADING STATE (SKELETON) ==========
   if (loading) {
     return (
-      <div className="up-loading">
-        <Loader2 className="up-spinner" size={40} />
-        <p>Inapakia taarifa za bidhaa...</p>
+      <div className="up-container up-skeleton-wrapper">
+        {/* 1. HEADER SKELETON */}
+        <div className="up-header">
+          <div className="up-skeleton up-skeleton-back-btn"></div>
+          <div className="up-header-title">
+            <div className="up-skeleton up-skeleton-title"></div>
+            <div className="up-skeleton up-skeleton-subtitle"></div>
+          </div>
+          <div className="up-skeleton up-skeleton-save-btn"></div>
+        </div>
+
+        <div className="up-content">
+          {/* 2. PICHA ZA BIDHAA SKELETON */}
+          <div className="up-card">
+            <div className="up-skeleton up-skeleton-section-title"></div>
+            <div className="up-media-section skeleton-media-section">
+              <div className="up-main-img-wrapper">
+                <div className="up-skeleton up-skeleton-main-img"></div>
+              </div>
+              <div className="up-gallery-wrapper">
+                <div className="up-gallery-grid skeleton-gallery-grid">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="up-skeleton up-skeleton-gallery-img"></div>
+                  ))}
+                  <div className="up-skeleton up-skeleton-add-box"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. MAELEZO YA BIDHAA SKELETON */}
+          <div className="up-card">
+            <div className="up-skeleton up-skeleton-section-title"></div>
+            <div className="up-form">
+              <div className="up-form-row">
+                <div className="up-input-group">
+                  <div className="up-skeleton up-skeleton-label"></div>
+                  <div className="up-skeleton up-skeleton-select"></div>
+                </div>
+                <div className="up-input-group">
+                  <div className="up-skeleton up-skeleton-label"></div>
+                  <div className="up-skeleton up-skeleton-select"></div>
+                </div>
+              </div>
+              <div className="up-input-group">
+                <div className="up-skeleton up-skeleton-label"></div>
+                <div className="up-skeleton up-skeleton-input"></div>
+              </div>
+              <div className="up-form-row">
+                <div className="up-input-group">
+                  <div className="up-skeleton up-skeleton-label"></div>
+                  <div className="up-skeleton up-skeleton-input"></div>
+                </div>
+                <div className="up-input-group">
+                  <div className="up-skeleton up-skeleton-label"></div>
+                  <div className="up-skeleton up-skeleton-input"></div>
+                </div>
+              </div>
+              <div className="up-input-group">
+                <div className="up-skeleton up-skeleton-label"></div>
+                <div className="up-skeleton up-skeleton-textarea"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 4. VARIATIONS SKELETON */}
+        <div className="up-card up-variations-card">
+          <div className="up-variations-header">
+            <div className="up-skeleton up-skeleton-section-title"></div>
+            <div className="up-skeleton up-skeleton-add-btn"></div>
+          </div>
+          <div className="up-variations-list skeleton-variations-list">
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="up-variation-item">
+                <div className="up-variation-info">
+                  <div className="up-skeleton up-skeleton-variation-img"></div>
+                  <div>
+                    <div className="up-skeleton up-skeleton-variation-name"></div>
+                    <div className="up-skeleton up-skeleton-variation-details"></div>
+                  </div>
+                </div>
+                <div className="up-variation-actions">
+                  <div className="up-skeleton up-skeleton-action-btn"></div>
+                  <div className="up-skeleton up-skeleton-action-btn"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }

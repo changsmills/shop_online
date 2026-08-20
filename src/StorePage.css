@@ -391,3 +391,218 @@
     display: none !important;
   }
 }
+
+
+/* ============================================
+   SKELETON LOADING STYLES (NO INLINE CSS)
+   ============================================ */
+.skeleton-wrapper {
+  pointer-events: none;
+}
+
+.skeleton {
+  background: #e0e0e0;
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* ---------- BANNER ---------- */
+.skeleton-banner {
+  background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%) !important;
+  background-size: 200% 100% !important;
+  animation: shimmer 1.5s infinite !important;
+}
+.skeleton-banner-content {
+  position: relative;
+  z-index: 2;
+}
+.skeleton-circle-logo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+}
+.skeleton-banner-title {
+  width: 200px;
+  height: 30px;
+}
+.skeleton-banner-subtitle {
+  width: 120px;
+  height: 20px;
+  margin-top: 8px;
+}
+.skeleton-stats {
+  margin-top: 12px;
+  display: flex;
+  gap: 20px;
+}
+.skeleton-stat {
+  width: 80px;
+  height: 16px;
+}
+
+/* ---------- INFO CARDS ---------- */
+.skeleton-info-title {
+  width: 60%;
+  height: 20px;
+  margin-bottom: 10px;
+}
+.skeleton-info-text-1 {
+  width: 90%;
+  height: 14px;
+  margin-bottom: 6px;
+}
+.skeleton-info-text-2 {
+  width: 70%;
+  height: 14px;
+  margin-bottom: 6px;
+}
+.skeleton-info-text-3 {
+  width: 80%;
+  height: 14px;
+}
+
+/* ---------- PRODUCTS HEADER ---------- */
+.skeleton-products-title {
+  width: 150px;
+  height: 24px;
+}
+.skeleton-products-controls {
+  display: flex;
+  gap: 10px;
+}
+.skeleton-search-control {
+  width: 200px;
+  height: 36px;
+  border-radius: 8px;
+}
+.skeleton-filter-control {
+  width: 100px;
+  height: 36px;
+  border-radius: 8px;
+}
+
+/* ---------- PRODUCTS GRID ---------- */
+.skeleton-product-card {
+  padding: 0 0 8px 0;
+  pointer-events: none;
+}
+.skeleton-product-img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+}
+.skeleton-product-info-padding {
+  padding-top: 8px;
+}
+.skeleton-product-name {
+  width: 80%;
+  height: 14px;
+  margin-bottom: 4px;
+}
+.skeleton-product-price {
+  width: 50%;
+  height: 14px;
+}
+
+/* ---------- ANIMATIONS ---------- */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* ============================================
+   LIGHTBOX / IMAGE PORTAL (No Tailwind)
+   ============================================ */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  z-index: 99999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.lightbox-content-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lightbox-close-btn {
+  position: absolute;
+  top: -50px;
+  right: 0;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 8px;
+  transition: color 0.2s;
+}
+.lightbox-close-btn:hover { color: #ff6a00; }
+
+.lightbox-product-title {
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.lightbox-image-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.lightbox-image {
+  max-width: 100%;
+  max-height: 75vh;
+  object-fit: contain;
+  display: block;
+}
+
+.lightbox-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: white;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.lightbox-nav-btn:hover { background: rgba(255, 255, 255, 0.3); }
+.lightbox-nav-btn.left { left: 16px; }
+.lightbox-nav-btn.right { right: 16px; }
+
+.lightbox-counter {
+  margin-top: 16px;
+  color: white;
+  font-size: 14px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 6px 16px;
+  border-radius: 20px;
+}
