@@ -35,6 +35,8 @@ export default function ProductDetails() {
   // ========== RELATED PRODUCTS STATE ==========
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loadingRelated, setLoadingRelated] = useState(false);
+    const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [fetchTrigger, setFetchTrigger] = useState(0); // Inalazimisha useEffect kurudia
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
@@ -200,7 +202,7 @@ export default function ProductDetails() {
       }
     }
     if (id) getFullProductData();
-  }, [id]);
+  }, [id, fetchTrigger]);
 
   useEffect(() => {
     const updateHeaderHeight = () => {
@@ -229,6 +231,7 @@ export default function ProductDetails() {
             limit: 8            // Chukua 8 tu
           }
         });
+
         
         // Chuja ili usionyeshe bidhaa hiyo yenyewe
         const data = response.data.results || response.data || [];
@@ -248,6 +251,25 @@ export default function ProductDetails() {
       fetchRelatedProducts();
     }
   }, [product?.id, product?.leaf_category_id]);
+
+    // 🔥 KAGUA MTANDAO NA KUAMUA KUPANDA REFETCH
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      console.log("🌐 Mtandao umeunganishwa! Inapakia data za bidhaa upya...");
+      // Hii itaongeza namba na kulazimisha useEffect kuu kuendesha tena!
+      setFetchTrigger(prev => prev + 1); 
+    };
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   const handleRateProduct = async (stars) => {
     const loadingToast = toast.loading("Tunahifadhi rating yako...");

@@ -395,6 +395,33 @@ useEffect(() => {
   }
 }, [viewMode, selectedSubCategory?.id]);
 
+  // 🔥 KAGUA MTANDAO NA KUVUTA DATA MPYA (REFETCH) BILA KUFUNGA UKURASA
+  useEffect(() => {
+    const handleOnline = () => {
+      console.log("🌐 Mtandao umeunganishwa! Inapakia data za Dashboard upya...");
+
+      // 1. Pata matangazo mapya (Ads)
+      fetchAdsWithCache();
+
+      // 2. Pata bidhaa za kategoria iliyochaguliwa (ikiwa ipo)
+      if (selectedCategory?.id) {
+        fetchFeaturedLeafs(selectedCategory.id);
+        fetchSubCategories(selectedCategory.id);
+      }
+
+      // 3. Pata bidhaa za subcategory iliyochaguliwa (ikiwa ipo)
+      if (viewMode === 'subcategories' && selectedSubCategory?.id) {
+        fetchLeafsForSub(selectedSubCategory.id);
+      }
+    };
+
+    window.addEventListener('online', handleOnline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+    };
+  }, [selectedCategory?.id, selectedSubCategory?.id, viewMode]); // ✅ Inategemea hali hizi
+
   // ========== HANDLERS ==========
   const handleMouseEnter = (menuName) => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);

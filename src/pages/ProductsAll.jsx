@@ -47,6 +47,10 @@ export default function ProductsAll() {
   const [error, setError] = useState(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
+  // ✅ STATE ZA MTANDAO NA REFETCH (Zilikuwa zipo, zimebaki)
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [fetchTrigger, setFetchTrigger] = useState(0);
+
   // ============================================
   // 3. MOBILE DETECTION
   // ============================================
@@ -99,59 +103,85 @@ export default function ProductsAll() {
   }, [activeCategory.name, activeSection]);
 
   // ============================================
-  // 7. FETCH CATEGORIES (Imepangwa Alphabetically + Cached)
+  // 7. FETCH CATEGORIES (✅ IMEBORESHA: Hooks haziko ndani ya useEffect tena)
   // ============================================
-  
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        // 🔥 ONGEZA CACHE
-        const cachedCategories = localStorage.getItem('categories_cache');
-        const cachedTime = localStorage.getItem('categories_cache_time');
-        
-        if (cachedCategories && cachedTime && (Date.now() - Number(cachedTime) < 10 * 60 * 1000)) {
-          const data = JSON.parse(cachedCategories);
-          setCategories([
-            { id: null, name: "All" },
-            ...data.map((cat) => ({ id: cat.id, name: cat.name }))
-          ]);
-          setLoading(false);
-          return;
-        }
-        
-        setLoading(true);
-        setError(null);
-        
-        const response = await api.get('/categories/');
-        const data = response.data;
-
-        if (Array.isArray(data) && data.length > 0) {
-          const sortedData = [...data].sort((a, b) => a.name.localeCompare(b.name));
-          
-          // 🔥 HIFADHI KWENYE CACHE
-          localStorage.setItem('categories_cache', JSON.stringify(sortedData));
-          localStorage.setItem('categories_cache_time', String(Date.now()));
-
-          setCategories([
-            { id: null, name: "All" },
-            ...sortedData.map((cat) => ({ id: cat.id, name: cat.name }))
-          ]);
-        } else {
-          setCategories([{ id: null, name: "All" }]);
-        }
-      } catch (error) {
-        console.error("Error fetching categories:", error.message);
-        setError("Imeshindwa kupakia kategoria. Tafadhali jaribu tena.");
-        setCategories([{ id: null, name: "All" }]);
-      } finally {
+  const fetchCategories = useCallback(async () => {
+    try {
+      // 🔥 ONGEZA CACHE
+      const cachedCategories = localStorage.getItem('categories_cache');
+      const cachedTime = localStorage.getItem('categories_cache_time');
+      
+      if (cachedCategories && cachedTime && (Date.now() - Number(cachedTime) < 10 * 60 * 1000)) {
+        const data = JSON.parse(cachedCategories);
+        setCategories([
+          { id: null, name: "All" },
+          ...data.map((cat) => ({ id: cat.id, name: cat.name }))
+        ]);
         setLoading(false);
+        return;
       }
-    };
-    fetchCategories();
+      
+      setLoading(true);
+      setError(null);
+      
+      const response = await api.get('/categories/');
+      const data = response.data;
+
+      if (Array.isArray(data) && data.length > 0) {
+        const sortedData = [...data].sort((a, b) => a.name.localeCompare(b.name));
+        
+        // 🔥 HIFADHI KWENYE CACHE
+        localStorage.setItem('categories_cache', JSON.stringify(sortedData));
+        localStorage.setItem('categories_cache_time', String(Date.now()));
+
+        setCategories([
+          { id: null, name: "All" },
+          ...sortedData.map((cat) => ({ id: cat.id, name: cat.name }))
+        ]);
+      } else {
+        setCategories([{ id: null, name: "All" }]);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error.message);
+      setError("Imeshindwa kupakia kategoria. Tafadhali jaribu tena.");
+      setCategories([{ id: null, name: "All" }]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
+  // ✅ USE EFFECT YA KUPIGIA FETCH CATEGORIES (Imetenganishwa vizuri)
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
   // ============================================
-  // 8. SYNC CATEGORY FROM URL
+  // 8. 🔥 KAGUA MTANDAO NA KUAMUA KUPANDA REFETCH (✅ IMEBORESHA: Imemaliza dependancy)
+  // ============================================
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      console.log("🌐 Mtandao umeunganishwa! Inapakia data za bidhaa upya...");
+      
+      // 1. Pakia kategoria upya
+      fetchCategories();
+      
+      // 2. Pakia bidhaa upya kwa kubadilisha trigger
+      setFetchTrigger(prev => prev + 1);
+    };
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [fetchCategories]); // ✅ MUHIMU: fetchCategories imeongezwa hapa!
+
+  // ============================================
+  // 9. SYNC CATEGORY FROM URL
   // ============================================
   
   useEffect(() => {
@@ -164,7 +194,7 @@ export default function ProductsAll() {
   }, [incomingCategoryId, incomingCategory]);
 
   // ============================================
-  // 9. PAGE TITLE
+  // 10. PAGE TITLE
   // ============================================
   
   useEffect(() => {
@@ -175,7 +205,7 @@ export default function ProductsAll() {
   }, [activeCategory, activeSection, incomingStoreName]);
 
   // ============================================
-  // 10. SCROLL LOGIC
+  // 11. SCROLL LOGIC
   // ============================================
   
   const scroll = useCallback((direction) => {
@@ -190,7 +220,7 @@ export default function ProductsAll() {
   }, []);
 
   // ============================================
-  // 11. BACK TO TOP - FLOATING BOTTOM BUTTON
+  // 12. BACK TO TOP - FLOATING BOTTOM BUTTON
   // ============================================
   
   useEffect(() => {
@@ -203,7 +233,7 @@ export default function ProductsAll() {
   }, []);
 
   // ============================================
-  // 12. SCROLL TO TOP FUNCTION
+  // 13. SCROLL TO TOP FUNCTION
   // ============================================
 
   const scrollToTop = useCallback(() => {
@@ -214,7 +244,7 @@ export default function ProductsAll() {
   }, []);
 
   // ============================================
-  // 13. HANDLE BACK TO DASHBOARD
+  // 14. HANDLE BACK TO DASHBOARD
   // ============================================
 
   const handleBackToDashboard = useCallback(() => {
@@ -222,7 +252,7 @@ export default function ProductsAll() {
   }, [navigate]);
 
   // ============================================
-  // 14. HANDLE SEARCH
+  // 15. HANDLE SEARCH
   // ============================================
   
   const handleSearchSubmit = useCallback((query) => {
@@ -230,7 +260,7 @@ export default function ProductsAll() {
   }, [navigate]);
 
   // ============================================
-  // 15. HANDLE CATEGORY CLICK
+  // 16. HANDLE CATEGORY CLICK
   // ============================================
   
   const handleCategoryClick = useCallback((cat) => {
@@ -248,7 +278,7 @@ export default function ProductsAll() {
   }, []);
 
   // ============================================
-  // 16. RENDER
+  // 17. RENDER
   // ============================================
 
   if (error) {
@@ -336,7 +366,8 @@ export default function ProductsAll() {
       <div className="all-products-container">
         <main className="products-main-content">
           <ProductList 
-            key={`${incomingStoreId}-${activeCategory.id}-${activeSection}-${search}-${priorityId}`}
+            // ✅ IMEBADILISHWA: Ongeza -${fetchTrigger} mwishoni mwa key!
+            key={`${incomingStoreId}-${activeCategory.id}-${activeSection}-${search}-${priorityId}-${fetchTrigger}`}
             category={activeCategory.name}
             storeId={incomingStoreId}
             categoryId={activeCategory.id}

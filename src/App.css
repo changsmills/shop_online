@@ -389,3 +389,40 @@ label {
     padding: 16px;
   }
 }
+/* ============================================ */
+/* 🔥 OFFLINE BANNER (Global)                   */
+/* ============================================ */
+.offline-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999999 !important; /* Juu kabisa */
+  background-color: #dc2626; /* Rangi nyekundu */
+  color: white;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  animation: slideDownBanner 0.4s ease;
+}
+
+.offline-icon { font-size: 20px; }
+
+@keyframes slideDownBanner {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .offline-banner {
+    padding: 10px 12px;
+    font-size: 13px;
+    text-align: center;
+    flex-wrap: wrap;
+  }
+}

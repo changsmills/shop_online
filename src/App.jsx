@@ -69,11 +69,31 @@ import VerifySellerOTP from './pages/VerifySellerOTP';
 function AppContent({ session }) {
   const location = useLocation();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isOnline, setIsOnline] = useState(navigator.onLine); 
+
   
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+    // 🔥 ONGEZA HII: KAGUA MTANDAO NA KUPATA DATA MPYA IKIRUDI
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      // ✅ Hii itapakia ukurasa upya mara tu mtandao unapounganishwa!
+      window.location.reload(); 
+    };
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
 
   // ORODHA YA KURASA ZINAZOONESHA BOTTOM NAV (DASHBOARD PEKEE)
@@ -107,6 +127,10 @@ function AppContent({ session }) {
       sessionStorage.setItem('welcomeShown', 'true');
     }
   }, [session]); 
+
+
+
+
   // --- ISHIA HAPA ---
   
   // Angalia kama current path inafaa kuonesha BottomNav
@@ -135,6 +159,17 @@ function AppContent({ session }) {
 
   return (
     <div className="app-main-layout">
+
+
+ {/* 🔥 ONGEZA HII HAPA: BANNER YA ONYO LA MTANDAO */}
+      {!isOnline && (
+        <div className="offline-banner">
+          <span className="offline-icon">📶</span>
+          <span className="offline-text">⚠️ Mtandao umekatika. Tafadhali angalia muunganisho wako...</span>
+        </div>
+      )}
+
+
       <Routes>
         {/* ROUTES ZA KAWAIDA */}
         <Route path="/dashboard" element={<Dashboard session={session} />} />

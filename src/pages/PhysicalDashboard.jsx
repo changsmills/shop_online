@@ -107,6 +107,20 @@ export default function PhysicalDashboard() {
     return () => clearInterval(interval);
   }, [myStore?.id]);
 
+    // 🔥 KAGUA MTANDAO NA REFETCH DATA KWA DASHBOARD HII (BILA KUREFRESH UKURASA)
+  useEffect(() => {
+    const handleOnline = () => {
+      console.log("🌐 Mtandao umeunganishwa! Inapakia data za duka upya...");
+      fetchDashboardData(); // ✅ Inaita fetchDashboardData mara moja mtandao ukirudi
+    };
+
+    window.addEventListener('online', handleOnline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+    };
+  }, []); // 🔥 Inakimbia mara moja tu baada ya kupakia
+
   const resetProductForm = () => {
     setAttributes({
       name: "", price: "", compare_at_price: "",
