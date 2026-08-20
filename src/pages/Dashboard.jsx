@@ -1090,32 +1090,7 @@ const handleSubCategoryHover = (subCategory) => {
               )}
             </div>
           </div>
-
-          {/* SEHEMU YA 2: GET PRODUCT INSPIRATION */}
-          <div className="mc-section">
-            <div className="mc-inspiration-grid">
-              {trendingProducts && trendingProducts.length > 0 ? (
-                trendingProducts.slice(0, 4).map((product) => (
-                  <div 
-                    key={product.id} 
-                    className="mc-inspiration-card"
-                    onClick={() => {
-                      navigate(`/product/${product.id}`);
-                      setMobileMenuOpen(false);
-                    }}
-                  >
-                    <img src={product.cover_image_url || product.cover_image || placeholderImg} alt={product.name} />
-                    <p className="mc-insp-title">{product.name}</p>
-                    <p className="mc-insp-price">TSh {product.price}</p>
-                    <p className="mc-insp-moq">Min. order: {product.moq || 1}</p>
-                  </div>
-                ))
-              ) : (
-                <div className="mobile-empty-state" style={{ gridColumn: '1 / -1' }}></div>
-              )}
-            </div>
-          </div>
-
+          
         </main>
       </div>
 
