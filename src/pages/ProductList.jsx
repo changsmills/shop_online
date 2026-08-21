@@ -83,7 +83,8 @@ export default function ProductList({
 
       const currentCategoryId = currentParamsRef.current.categoryId;
       const currentSearch = currentParamsRef.current.search;
-      const currentSection = currentParamsRef.current.section;
+      const currentSection = currentParamsRef.current.section?.trim() || "";
+      console.log("🔥 SECTION INACHAKULIWA:", currentSection);
       const currentSortBy = currentParamsRef.current.sortBy;
       const currentOrder = currentParamsRef.current.order;
       const currentMinPrice = currentParamsRef.current.minPrice;
@@ -176,14 +177,35 @@ export default function ProductList({
         };
       });
 
-      // 🔥 Top Deals filter
-      if (currentSection === "Top Deals") {
-        sanitizedData = sanitizedData.filter(p => {
-          const p_price = parseFloat(p.price) || 0;
-          const p_original = parseFloat(p.original_price) || 0;
-          return p_price > p_original && p_original > 0;
-        });
-      }
+      // 🔥 FILTER YA TOP DEALS (LAZIMA IWE HAPA!)
+if (currentSection === "Top Deals" || currentSection === "top-deals" || currentSection === "Top deals") {
+    console.log("🔥 TOP DEALS FILTER INAFANYA KAZI! Kabla:", sanitizedData.length);
+    
+    sanitizedData = sanitizedData.filter(p => {
+        const price = parseFloat(p.price) || 0;
+        const originalPrice = parseFloat(p.original_price) || 0;
+        // Inachuja bidhaa zenye original_price > 0 NA original_price < price
+        return originalPrice > 0 && originalPrice < price;
+    });
+    
+    console.log("🔥 TOP DEALS FILTER BAADA:", sanitizedData.length);
+}
+
+
+    // 🔥 FILTER YA KUTENGANISHA SECTIONS (Kuepuka kuchanganyika na Top Deals!)
+const isTopDealsSection = currentSection === "Top Deals" || currentSection === "top-deals" || currentSection === "Top deals";
+const isRecentlyViewedSection = currentSection === "Recently Viewed" || currentSection === "recently-viewed" || currentSection === "recently_viewed";
+      
+if (!isTopDealsSection && !isRecentlyViewedSection) {
+    // Hii inaondoa bidhaa ZOTE zenye punguzo (Top Deals) kwenye Hot Picks, Trending, All, n.k.
+    // LAKINI HAIONDOI kwenye Recently Viewed, kwa sababu hapa tunavuta bidhaa ulizoview.
+    sanitizedData = sanitizedData.filter(p => {
+        const price = parseFloat(p.price) || 0;
+        const originalPrice = parseFloat(p.original_price) || 0;
+        const isDiscounted = originalPrice > 0 && originalPrice < price;
+        return !isDiscounted;
+    });
+}
 
       // 🔥 Priority Item (kama ipo)
       if (priorityId && pageNum === 0) {
@@ -323,14 +345,64 @@ export default function ProductList({
     );
   }
 
-  if (loading && products.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16">
-        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-gray-500">Inapakia bidhaa...</p>
+if (loading && products.length === 0) {
+  return (
+    <div className="w-full" style={{ margin: 0, padding: 0 }}>
+      <div style={{
+        display: 'grid',
+        gap: '1rem',
+        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(6, minmax(0, 1fr))',
+        width: '100%',
+        margin: 0,
+        padding: isMobile ? '0' : '0 16px',
+      }}>
+        {Array.from({ length: isMobile ? 4 : 12 }).map((_, index) => (
+          <div key={index} className="skeleton-card" style={{
+            borderRadius: '12px',
+            overflow: 'hidden',
+            backgroundColor: '#f3f4f6',
+            minHeight: '220px',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            {/* Skeleton Image */}
+            <div style={{
+              height: '150px',
+              backgroundColor: '#e5e7eb',
+              animation: 'pulse 1.5s infinite'
+            }}></div>
+            {/* Skeleton Content */}
+            <div style={{ padding: '12px' }}>
+              <div style={{
+                height: '14px',
+                backgroundColor: '#e5e7eb',
+                borderRadius: '4px',
+                marginBottom: '8px',
+                width: '80%',
+                animation: 'pulse 1.5s infinite'
+              }}></div>
+              <div style={{
+                height: '12px',
+                backgroundColor: '#e5e7eb',
+                borderRadius: '4px',
+                marginBottom: '8px',
+                width: '60%',
+                animation: 'pulse 1.5s infinite'
+              }}></div>
+              <div style={{
+                height: '12px',
+                backgroundColor: '#e5e7eb',
+                borderRadius: '4px',
+                width: '40%',
+                animation: 'pulse 1.5s infinite'
+              }}></div>
+            </div>
+          </div>
+        ))}
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   if (!loading && products.length === 0 && !error) {
     return (

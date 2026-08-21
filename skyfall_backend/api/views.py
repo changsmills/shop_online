@@ -127,9 +127,28 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [JWTAuthentication]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ['store_id', 'leaf_category', 'parent_category', 'is_approved', 'sub_category','is_flash_sale', 'is_featured']
+    filterset_fields = ['store_id', 'leaf_category', 'parent_category', 'is_approved', 'sub_category','is_flash_sale', 'is_featured','original_price', 'created_at', 'order_count','views', 'average_rating', ]
     ordering_fields = ['views', 'price', 'created_at','order_count', 'discount']
     pagination_class = LimitOffsetPagination
+
+       # 🆕 ONGEZA HII METHOD (NDANI YA CLASS HII)
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        
+        # Chukua thamani ya original_price__gt kutoka URL (mfano: ?original_price__gt=0)
+        original_price_gt = self.request.query_params.get('original_price__gt')
+        
+        if original_price_gt is not None:
+            from django.db.models import F
+            
+            # 1. Hakikisha original_price (bei ya punguzo) ni kubwa kuliko 0
+            queryset = queryset.filter(original_price__gt=original_price_gt)
+            
+            # 2. Hakikisha original_price (bei ya punguzo) ni NDOGO kuliko price (bei halisi)
+            # Hii inazuiya bidhaa ambazo zina original_price = 0 au original_price > price zisionekane.
+            queryset = queryset.filter(original_price__lt=F('price'))
+        
+        return queryset
 
     def perform_create(self, serializer):
         try:

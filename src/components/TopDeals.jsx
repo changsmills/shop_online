@@ -114,7 +114,7 @@ export default function TopDeals({ navigate, selectedCategory }) {
         <button 
           className="td-arrow-link-btn"
           onClick={() => {
-            const dealsUrl = '/products?section=top-deals'; 
+            const dealsUrl = '/products?sectionName=Top+Deals'; 
             
             // ✅ MUHIMU: Angalia kama ni Desktop (>768px), fungua tab mpya.
             // Ikiwa ni Mobile, fungua kwenye tab hii hii (kama kawaida).
@@ -191,7 +191,7 @@ export default function TopDeals({ navigate, selectedCategory }) {
                   // ✅ ONDOA discountBadge na showProgress - Hazipo kwenye DashboardCard
                   onClick={() => {
                     const priorityId = product.id;
-                    const sectionName = encodeURIComponent(`Top Deals ${selectedCategory ? `in ${selectedCategory.name}` : ''}`);
+                   const sectionName = encodeURIComponent(`Top Deals${selectedCategory ? ` in ${selectedCategory.name}` : ''}`);
                     const categoryId = selectedCategory?.id || '';
                     const url = `/products?priorityId=${priorityId}&sectionName=${sectionName}${categoryId ? `&categoryId=${categoryId}` : ''}`;
                     window.open(url, '_blank');

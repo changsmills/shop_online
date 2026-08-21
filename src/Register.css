@@ -515,3 +515,74 @@
     color: white !important;
   }
 }
+/* Security Badges */
+.register-security-badges {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+}
+
+.security-badge-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.secure-text {
+  color: #28a745;
+  font-weight: 600;
+}
+
+/* Input Wrappers */
+.register-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.register-input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.register-input {
+  padding-left: 40px !important;
+}
+
+/* Trust Message */
+.register-trust-message {
+  margin-top: 15px;
+  text-align: center;
+  padding: 10px;
+  background: #f0f9ff;
+  border-radius: 8px;
+  border: 1px solid #e0f2fe;
+}
+
+.trust-icon-wrapper {
+  margin-bottom: 5px;
+}
+
+.trust-text {
+  font-size: 12px;
+  color: #333;
+  font-weight: 500;
+  margin: 0;
+}
+
+.trust-text-swahili {
+  font-size: 11px;
+  color: #666;
+  margin: 4px 0 0 0;
+}

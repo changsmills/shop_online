@@ -108,21 +108,6 @@ export default function Footer() {
               <a href="https://youtube.com" target="_blank" rel="noreferrer"><FaYoutube className="icon" /></a>
             </div>
             
-            <h3 className="mt-4">{t('payment_methods')}</h3>
-            
-            <div className="payment-methods">
-              <FaCcVisa size={35} title="Visa" />
-              <FaCcMastercard size={35} title="Mastercard" />
-
-              {/* Huduma za Nyumbani - Maneno tu */}
-              <span className="payment-tag">M-Pesa</span>
-              <span className="payment-tag">Airtel Money</span>
-              <span className="payment-tag">Tigo Pesa</span>
-              <span className="payment-tag">CRDB</span>
-              <span className="payment-tag">NMB</span>
-            </div>
-            
-            <p className="secure-text">{t('secure_payment')}</p>
           </div>
 
         </div>

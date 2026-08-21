@@ -24,14 +24,14 @@ export default function JustForYou({ search = "", selectedCategory }) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const fetchJustForYou = async () => {
+    const fetchJustForYou = async () => {
     try {
       setLoading(true);
       setError(null);
       
       const params = {
         ordering: '-created_at',
-        limit: 30
+        limit: 100 // 🔥 Vuta pool kubwa (100) ili upate nafasi ya kuchagua bila upendeleo
       };
 
       if (selectedCategory?.id) {
@@ -42,7 +42,52 @@ export default function JustForYou({ search = "", selectedCategory }) {
 
       if (isMounted.current) {
         const data = response.data.results || response.data || [];
-        setProducts(data);
+
+        // 🔥 1. ONDOA TOP DEALS (Bidhaa zenye punguzo)
+        const nonDeals = data.filter(p => {
+          const price = parseFloat(p.price) || 0;
+          const originalPrice = parseFloat(p.original_price) || 0;
+          const isDiscounted = originalPrice > 0 && originalPrice < price;
+          return !isDiscounted; // Weka bidhaa ambazo SI Top Deals
+        });
+
+        // 🔥 2. PANGANYA KWA KATEGORIA (Hakuna Upendeleo)
+        const categoryMap = {};
+        nonDeals.forEach(product => {
+          const catName = product.category_name || 'Other';
+          if (!categoryMap[catName]) {
+            categoryMap[catName] = [];
+          }
+          categoryMap[catName].push(product);
+        });
+
+        // 🔥 3. CHAGUA KWA USAWA (Balanced Selection)
+        
+        const overallLimit = 100;  
+        const categoryNames = Object.keys(categoryMap);
+        
+        // Kama kuna kategoria 4, kila kategoria itachukua 3 (12/4).
+        // Kama kuna kategoria 1 tu, itachukua 12 tu (si zote 100).
+        const maxPerCategory = Math.ceil(overallLimit / Math.max(categoryNames.length, 1));
+        
+        let finalProducts = [];
+        
+        categoryNames.forEach(catName => {
+          const items = categoryMap[catName];
+          // Chukua hadi maxPerCategory (au zote kama ni chache ya hapo)
+          finalProducts.push(...items.slice(0, maxPerCategory));
+        });
+
+        // 🔥 4. KATA KAMA IMEZIDI LIMIT (Safety check)
+        finalProducts = finalProducts.slice(0, overallLimit);
+
+        // 🔥 5. CHANGANYA (Shuffle) - Ili isiwe na mpangilio wa kategoria
+        for (let i = finalProducts.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [finalProducts[i], finalProducts[j]] = [finalProducts[j], finalProducts[i]];
+        }
+
+        setProducts(finalProducts);
       }
     } catch (error) {
       console.error("Error:", error.message);

@@ -4,6 +4,7 @@ import api from '../axiosConfig';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { Lock, ShieldCheck, CheckCircle, Eye, EyeOff, Mail, KeyRound } from 'lucide-react'; // 🔥 ONGEZA HII!
 import '../Login.css';
 
 const Login = () => {
@@ -47,7 +48,13 @@ const Login = () => {
           // 1. Kama hajaverify OTP, mpeleke kwenye verify page
           if (!userProfile.is_otp_verified) {
             console.log("⚠️ Supplier hajaverify OTP, inapeleka /verify-seller-otp");
-            navigate('/verify-seller-otp', { replace: true });
+            toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
+              icon: '🔐',
+              duration: 3000,
+            });
+            setTimeout(() => {
+              navigate('/verify-seller-otp', { replace: true });
+            }, 3000); // Subiri toast itoke kabla ya navigate
             return; // SIMAMA HAPA! Usiende kwenye dashboard!
           }
 
@@ -62,14 +69,29 @@ const Login = () => {
           if (storeRes.data && storeRes.data.length > 0) {
             const storeId = storeRes.data[0].id;
             console.log("✅ Store ID:", storeId);
-            navigate(`/dashboard/sellerboard/${storeId}`, { replace: true });
+            toast.success("Karibu Muuzaji! Inaelekeza kwenye Dashboard yako...", {
+              duration: 3000,
+            });
+            setTimeout(() => {
+              navigate(`/dashboard/sellerboard/${storeId}`, { replace: true });
+            }, 3000);
           } else {
             console.log("⚠️ Hakuna store, inapeleka /create-store");
-            navigate('/create-store', { replace: true });
+            toast.success("Karibu Muuzaji! Tafadhali unda duka lako kwanza.", {
+              duration: 3000,
+            });
+            setTimeout(() => {
+              navigate('/create-store', { replace: true });
+            }, 3000);
           }
         } else {
           console.log("👤 User ni customer, inapeleka /dashboard");
-          navigate('/dashboard', { replace: true });
+          toast.success("Karibu Mteja!", {
+            duration: 3000,
+          });
+          setTimeout(() => {
+            navigate('/dashboard', { replace: true });
+          }, 3000);
         }
       } catch (err) {
         console.error("❌ Auth check error:", err.response?.data || err.message);
@@ -117,7 +139,9 @@ toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
   icon: '🔐',
   duration: 4000,
 });
-          navigate('/verify-seller-otp', { replace: true });
+          setTimeout(() => {
+            navigate('/verify-seller-otp', { replace: true });
+          }, 4000);
           return; // SIMAMA HAPA! Usiende kwenye dashboard!
         }
 
@@ -131,29 +155,46 @@ toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
 
         if (storeRes.data && storeRes.data.length > 0) {
           const storeId = storeRes.data[0].id;
-          toast.success("Karibu Muuzaji! Inaelekeza kwenye Dashboard yako...");
-          navigate(`/dashboard/sellerboard/${storeId}`, { replace: true });
+          toast.success("Karibu Muuzaji! Inaelekeza kwenye Dashboard yako...", {
+            duration: 3000,
+          });
+          setTimeout(() => {
+            navigate(`/dashboard/sellerboard/${storeId}`, { replace: true });
+          }, 3000);
         } else {
-          toast.success("Karibu Muuzaji! Tafadhali unda duka lako kwanza.");
-          navigate('/create-store', { replace: true });
+          toast.success("Karibu Muuzaji! Tafadhali unda duka lako kwanza.", {
+            duration: 3000,
+          });
+          setTimeout(() => {
+            navigate('/create-store', { replace: true });
+          }, 3000);
         }
             } else {
-        toast.success("Karibu Mteja!");
+        toast.success("Karibu Mteja!", {
+          duration: 3000,
+        });
         
         // ✅ CHUKUA MAHALI ALIPOTOKA (Kama ni '/checkout', au '/cart', n.k.)
         // Kama hakuna destination, mpeleke dashboard (default)
         const from = location.state?.from || '/dashboard';
         
         // Mpeleke huko, na replace: true ili asirudi nyuma kwenye login page.
-        navigate(from, { replace: true });
+        setTimeout(() => {
+          toast.dismiss(); // Futa toast zilizopo kabla ya navigate
+          navigate(from, { replace: true });
+        }, 3000);
       }
       
     } catch (err) {
       console.error("❌ Login error:", err.response?.data || err.message);
       if (err.response?.status === 401) {
-        toast.error("Barua pepe au nenosiri si sahihi. Tafadhali jaribu tena.");
+        toast.error("Barua pepe au nenosiri si sahihi. Tafadhali jaribu tena.", {
+          duration: 4000,
+        });
       } else {
-        toast.error("Kosa la mtandao: " + (err.response?.data?.detail || err.message));
+        toast.error("Kosa la mtandao: " + (err.response?.data?.detail || err.message), {
+          duration: 4000,
+        });
       }
     } finally {
       setLoading(false);
@@ -180,24 +221,36 @@ toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
       localStorage.setItem('access_token', access);
       localStorage.setItem('refresh_token', refresh);
 
-      toast.success(`Karibu ${user.email || 'Mteja'}!`);
+      toast.success(`Karibu ${user.email || 'Mteja'}!`, {
+        duration: 3000,
+      });
 
       // Redirect kulingana na role
       if (user.role === 'supplier') {
-        navigate('/create-store');
+        setTimeout(() => {
+          toast.dismiss();
+          navigate('/create-store');
+        }, 3000);
       } else {
-        navigate('/dashboard');
+        setTimeout(() => {
+          toast.dismiss();
+          navigate('/dashboard');
+        }, 3000);
       }
     } catch (error) {
       console.error("❌ Google Login Error:", error);
-      toast.error("Google login imeshindwa. Jaribu tena.");
+      toast.error("Google login imeshindwa. Jaribu tena.", {
+        duration: 4000,
+      });
     }
   };
 
   // 🔥 KAZI MPYA: Google Login Error
   const handleGoogleError = () => {
     console.error("❌ Google Login Error");
-    toast.error("Google login imeshindwa.");
+    toast.error("Google login imeshindwa.", {
+      duration: 4000,
+    });
   };
 
   if (isCheckingAuth) {
@@ -231,9 +284,29 @@ toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
 
         {/* RIGHT PANEL */}
         <div className="login-right-panel">
+          
+          {/* 🔥 ONGEZA HII: SECURITY BADGES - REAL ICONS */}
+          <div className="login-security-badges">
+            <div className="security-badge-item">
+              <ShieldCheck size={16} color="#28a745" />
+              <span className="security-text">SSL 256-bit Encryption</span>
+            </div>
+            <div className="security-badge-item">
+              <Lock size={16} color="#28a745" />
+              <span className="security-text">2FA Enabled</span>
+            </div>
+            <div className="security-badge-item">
+              <CheckCircle size={16} color="#28a745" />
+              <span className="security-text">Verified by Skyfall</span>
+            </div>
+          </div>
+
           <div className="login-header">
             <h2 className="login-title">Sign in to your account</h2>
-            <p className="login-subtitle">Welcome back! Enter your details below.</p>
+            <p className="login-subtitle">
+              <Lock size={14} color="#28a745" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
+              <span className="secure-text">We Secure Your Data</span> | Tunalinda Data Zako
+            </p>
           </div>
 
           {/* 🔥 BADILISHA: Google Login Button */}
@@ -256,26 +329,32 @@ toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
           <form onSubmit={handleLogin} className="login-form">
             <div className="login-form-group">
               <label className="login-label">Email</label>
-              <input 
-                type="email" 
-                required 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="login-input"
-                placeholder="Enter your email"
-              />
+              <div className="login-input-wrapper">
+                <Mail size={18} color="#999" className="login-input-icon" />
+                <input 
+                  type="email" 
+                  required 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="login-input"
+                  placeholder="Enter your email"
+                />
+              </div>
             </div>
 
             <div className="login-form-group">
               <label className="login-label">Password</label>
-              <input 
-                type="password" 
-                required 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="login-input"
-                placeholder="Enter your password"
-              />
+              <div className="login-input-wrapper">
+                <KeyRound size={18} color="#999" className="login-input-icon" />
+                <input 
+                  type="password" 
+                  required 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="login-input"
+                  placeholder="Enter your password"
+                />
+              </div>
             </div>
 
             <div className="login-forgot-password">
@@ -295,6 +374,19 @@ toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
               {loading ? 'Inachakata...' : 'Sign in'}
             </button>
           </form>
+
+          {/* 🔥 ONGEZA HII: TRUST MESSAGE CHINI */}
+          <div className="login-trust-message">
+            <div className="trust-icon-wrapper">
+              <ShieldCheck size={20} color="#28a745" />
+            </div>
+            <p className="trust-text">
+              Your information is protected with 256-bit SSL encryption.
+            </p>
+            <p className="trust-text-swahili">
+              Taarifa zako zinalindwa kwa usimbaji fiche wa kiwango cha juu.
+            </p>
+          </div>
 
           <div className="login-footer">
             Don't have an account? 

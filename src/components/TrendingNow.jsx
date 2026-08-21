@@ -16,23 +16,39 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
 
   useEffect(() => {
     const fetchTrending = async () => {
-      setLoading(true);
-      try {
-        const params = {
-          limit: 10,
-          ordering: '-order_count,-views',
-        };
-        if (selectedCategory?.id) params.parent_category = selectedCategory.id;
-
-        const response = await api.get('/products/', { params });
-        const productsData = response.data.results || response.data || [];
-        setProducts(productsData);
-      } catch (err) {
-        console.error("Trending Fetch Error:", err.message);
-      } finally {
-        setLoading(false);
-      }
+  setLoading(true);
+  try {
+    const params = {
+      limit: 10,
+      ordering: '-order_count,-views',
     };
+    if (selectedCategory?.id) params.parent_category = selectedCategory.id;
+
+    const response = await api.get('/products/', { params });
+    const productsData = response.data.results || response.data || [];
+
+   const trendingProducts = productsData.filter(product => {
+  const price = parseFloat(product.price) || 0;
+  const originalPrice = parseFloat(product.original_price) || 0;
+  
+  // Ondoa Top Deals (bidhaa zenye punguzo)
+  const isDiscounted = originalPrice > 0 && originalPrice < price;
+  if (isDiscounted) return false;
+  
+  // Chuja kwa mauzo au views (kiwango cha chini - kitu chochote)
+  const orderCount = parseInt(product.order_count) || 0;
+  const views = parseInt(product.views) || 0;
+  
+  return orderCount > 0 || views > 0;  // ✅ Badilisha 100 → 0
+});
+
+    setProducts(trendingProducts);
+  } catch (err) {
+    console.error("Trending Fetch Error:", err.message);
+  } finally {
+    setLoading(false);
+  }
+};
     fetchTrending();
   }, [selectedCategory, i18n.language]);
 
@@ -83,7 +99,7 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
         <button 
           className="trend-arrow-link-btn"
           onClick={() => {
-            const url = '/products?section=hot-picks'; 
+            const url = '/products?sectionName=Hot+Picks';
             
             // ✅ MUHIMU: Angalia kama ni Desktop (>768px), fungua tab mpya.
             // Ikiwa ni Mobile, fungua kwenye tab hii hii (kama kawaida).

@@ -17,10 +17,8 @@
   box-sizing: border-box;
 }
 
-.product-card-item:hover {
-  border-color: var(--brand-orange); /* 🔥 Inabaki orange (sio green tena) */
-  box-shadow: 0 6px 16px var(--shadow-lg); 
-}
+/* 🔥 HAKUNA EFFECT KWENYE CARD - Picha TU NDIO INAZOOM */
+/* product-card-item:hover { ... } IMEONDOLWA KABISA */
 
 /* ✅ Mobile - Mtindo wa Alibaba (Pembe za mviringo) */
 @media (max-width: 768px) {
@@ -49,15 +47,12 @@
   object-fit: cover;
   object-position: center;
   display: block;
-  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); /* 🔥 Smooth Zoom */
 }
 
-.product-card-item:hover .product-card-img {
-  transform: scale(1.05);
-}
-
-@media (hover: none) {
-  .product-card-item:active .product-card-img { transform: scale(1.05); }
+/* 🔥 ZOOM INAFANYIKA HAPA - PICHA TU (SI CARD) */
+.product-card-media:hover .product-card-img {
+  transform: scale(1.08);
 }
 
 /* ✅ Mobile - Uwiano wa Picha kama Alibaba (4/5) */
@@ -301,5 +296,16 @@
 @media (max-width: 768px) {
   .sold-count-wrapper span {
     font-size: 9px;
+  }
+}
+
+/* ============================================ */
+/* 🔥 MOBILE - HAKUNA ZOOM KWENYE PICHA         */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .product-card-media:hover .product-card-img,
+  .product-card-media:active .product-card-img {
+    transform: none !important; /* Hakuna zoom kwenye mobile */
   }
 }

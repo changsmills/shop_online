@@ -165,7 +165,7 @@ function AppContent({ session }) {
       {!isOnline && (
         <div className="offline-banner">
           <span className="offline-icon">📶</span>
-          <span className="offline-text">⚠️ Mtandao umekatika. Tafadhali angalia muunganisho wako...</span>
+          <span className="offline-text">⚠️ Connection lost. Please check your internet connection...</span>
         </div>
       )}
 

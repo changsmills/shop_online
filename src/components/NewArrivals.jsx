@@ -17,23 +17,53 @@ export default function NewArrivals({ navigate, selectedCategory }) {
 
   useEffect(() => {
     const fetchNewArrivals = async () => {
-      setLoading(true);
-      try {
-        const params = {
-          ordering: '-created_at',
-          limit: 10
-        };
-        if (selectedCategory?.id) params.parent_category = selectedCategory.id;
-
-        const response = await api.get('/products/', { params });
-        const productsData = response.data.results || response.data || [];
-        setProducts(productsData);
-      } catch (err) {
-        console.error("New Arrivals Fetch Error:", err.message);
-      } finally {
-        setLoading(false);
-      }
+  setLoading(true);
+  try {
+    const params = {
+      ordering: '-created_at',
+      limit: 30 // Ongeza limit kuwa 30 ili uwe na pool nzuri ya kuchuja
     };
+    if (selectedCategory?.id) params.parent_category = selectedCategory.id;
+
+    const response = await api.get('/products/', { params });
+    const productsData = response.data.results || response.data || [];
+
+    // 🔥 1. TAREHE YA MWISHO: Siku 30 zilizopita
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    // 🔥 2. CHUJA BIDHAA MPYA (ndani ya siku 30) NA ZISIZO NA PUNGUZO (Top Deals)
+    let freshProducts = productsData.filter(p => {
+      // A. Angalia kama ni ya siku 30
+      const productDate = p.created_at ? new Date(p.created_at) : null;
+      const isNew = productDate && productDate >= thirtyDaysAgo;
+
+      // B. Angalia kama ni Top Deal (ina punguzo)
+      const price = parseFloat(p.price) || 0;
+      const originalPrice = parseFloat(p.original_price) || 0;
+      const isTopDeal = originalPrice > 0 && originalPrice < price;
+
+      // Rudi TRUE tu kama ni mpya NA si Top Deal
+      return isNew && !isTopDeal;
+    });
+
+    // 🔥 3. FALLBACK: Kama hakuna bidhaa mpya isiyo na punguzo, tumia bidhaa za karibuni ambazo SI Top Deals
+    if (freshProducts.length === 0) {
+      freshProducts = productsData.filter(p => {
+        const price = parseFloat(p.price) || 0;
+        const originalPrice = parseFloat(p.original_price) || 0;
+        const isTopDeal = originalPrice > 0 && originalPrice < price;
+        return !isTopDeal; // Chukua bidhaa yoyote ambayo si Top Deal
+      }).slice(0, 10); // Chukua 10 tu
+    }
+
+    setProducts(freshProducts);
+  } catch (err) {
+    console.error("New Arrivals Fetch Error:", err.message);
+  } finally {
+    setLoading(false);
+  }
+};
     fetchNewArrivals();
   }, [selectedCategory, i18n.language]);
 
@@ -93,7 +123,7 @@ export default function NewArrivals({ navigate, selectedCategory }) {
         <button 
           className="na-arrow-link-btn"
           onClick={() => {
-            const url = '/products?section=new-arrivals'; 
+            const url = '/products?sectionName=New+Arrivals'; 
             
             // ✅ MUHIMU: Angalia kama ni Desktop (>768px), fungua tab mpya.
             // Ikiwa ni Mobile, fungua kwenye tab hii hii (kama kawaida).

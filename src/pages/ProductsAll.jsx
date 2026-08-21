@@ -20,7 +20,6 @@ export default function ProductsAll() {
   // ============================================
   
   const incomingCategoryId = searchParams.get('categoryId') || location.state?.categoryId || null;
-  const incomingSection = searchParams.get('sectionName') || location.state?.sectionName || "";
   const incomingSortBy = searchParams.get('sortBy') || location.state?.sortBy || "created_at";
   const incomingOrder = searchParams.get('order') || location.state?.order || "desc";
   const priorityId = searchParams.get('priorityId') || location.state?.priorityId || null;
@@ -28,6 +27,26 @@ export default function ProductsAll() {
   const incomingFilterType = searchParams.get('filterType') || location.state?.filterType || null;
   const incomingStoreId = searchParams.get('storeId') || location.state?.storeId || null;
   const incomingStoreName = searchParams.get('name') || location.state?.name || null;
+
+// ✅ FUNCTION YA NORMALIZE (IWE MBELE YA MATUMIZI)
+const normalizeSection = (section) => {
+  if (!section) return "";
+  return section
+    .trim() 
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
+// ✅ SASA TUMIA
+const incomingSection = normalizeSection(
+  searchParams.get('sectionName') ||
+  searchParams.get('section') ||
+  location.state?.sectionName ||
+  location.state?.section ||
+  ""
+);
+
 
   // ============================================
   // 2. STATES
@@ -231,6 +250,11 @@ export default function ProductsAll() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+
+  useEffect(() => {
+  setActiveSection(incomingSection);
+}, [incomingSection]);
 
   // ============================================
   // 13. SCROLL TO TOP FUNCTION

@@ -85,14 +85,26 @@ export default function NavLinks({ isMobile }) {
     checkUserSupplierAndStore();
   }, [user]);
 
-  useEffect(() => {
+    useEffect(() => {
     async function fetchCategories() {
       try {
         const response = await api.get('/categories/', { params: { ordering: 'name' } });
         const data = response.data;
         if (data && data.length > 0) {
-          setCategories(data);
-          setSelectedParent(data[0]);
+          // ✅ 1. Panga kategoria kwa alfabeti (A-Z)
+          const sortedData = [...data].sort((a, b) => 
+            (a.name || '').localeCompare(b.name || '')
+          );
+          
+          // ✅ 2. Ongeza 'All Categories' mwanzoni
+          const allCategory = { 
+            id: null, 
+            name: 'All Categories', 
+            name_sw: 'Kategoria Zote' 
+          };
+          
+          setCategories([allCategory, ...sortedData]);
+          setSelectedParent(allCategory); // Chagua 'All Categories' kama default
         }
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -101,13 +113,22 @@ export default function NavLinks({ isMobile }) {
     fetchCategories();
   }, []);
 
- useEffect(() => {
-  if (selectedParent) {
-    setViewMode('products');
-    fetchSubCategories(selectedParent.id);
-    fetchFeaturedLeafs(selectedParent.id);
-  }
-}, [selectedParent]);
+  useEffect(() => {
+    if (selectedParent) {
+      setViewMode('products');
+      
+      // ✅ Kama ni 'All Categories', usifanye fetch maalum
+      if (selectedParent.id === null) {
+        setSubCategories([]);
+        setFeaturedProducts([]);
+        setLeafsForSub([]);
+        return;
+      }
+      
+      fetchSubCategories(selectedParent.id);
+      fetchFeaturedLeafs(selectedParent.id);
+    }
+  }, [selectedParent]);
 
   useEffect(() => {
     async function fetchLeafsBySub() {
@@ -247,8 +268,9 @@ export default function NavLinks({ isMobile }) {
   }
 }
 
-  const getDisplayName = (item) => {
+    const getDisplayName = (item) => {
     if (!item) return '';
+    if (item.id === null) return i18n.language === 'sw' ? 'Kategoria Zote' : 'All Categories';
     return i18n.language === 'sw' ? (item.name_sw || item.name) : item.name;
   };
 
