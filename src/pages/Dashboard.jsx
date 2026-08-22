@@ -27,7 +27,7 @@ import {
   Star, Shirt, Headphones, Dribbble, Sparkles, Gem, ChevronRight, 
   ShoppingBag, Home, Bike, Car, Wrench, Sun, Battery, ShieldCheck, 
   Truck, Sprout, Layers, Settings, Baby, HeartPulse, Gift, Dog, 
-  PenTool, Factory, HardHat, Warehouse, Plus, ChevronLeft
+  PenTool, Factory, HardHat, Warehouse, Plus, ChevronLeft , X // 🔥 ONGEZA X HAPA!
 } from "lucide-react";
 
 const placeholderImg = "https://via.placeholder.com/100?text=Skyfall";
@@ -553,99 +553,119 @@ const handleSubCategoryHover = (subCategory) => {
           )}
 
           {!search && (
+
             <div className="alibaba-top-layout">
-              
-              {/* ✅ SIDEBAR IMEFICHWA KABISA KWENYE MOBILE KWA KUONGEZA style */}
-              <aside className="side-categories">
-                <div className="side-header">
-                  <Star size={18} /> <span>{t('categories')}</span>
-                </div>
-                <ul className="categories-list">
-                  {categories.map(cat => (
-                    <li key={cat.id} onClick={() => handleCategoryClick(cat)}>
-                      <span className="cat-icon">
-                        {getIcon(cat.icon_name)}
-                        <span className="cat-name">{getCategoryDisplayName(cat)}</span>
-                      </span>
-                      <ChevronRight size={14} className="arrow" />
-                    </li>
-                  ))}
-                </ul>
-              </aside>
 
-              {/* ✅ SLIDER NA BANNER SASA ZIKO CHINI YA CONTAINER MOJA */}
-              <div className="alibaba-mobile-content">
-                
-                <div className="category-slider-wrapper">
-                  {!search && categories.length > 0 && (
-                    <MobileCategorySlider 
-                      categories={categories}
-                      selectedCategory={selectedCategoryForComponents}
-                      onSelectCategory={(cat) => {
-  if (cat.id === null) {
-    // Hapa ndio mtumiaji akibonyeza "All"
-    setSelectedCategoryForComponents(null);
-    setSelectedCategory(null);
-    setFeaturedProducts([]); // Futa bidhaa za zamani
-    setSubCategories([]);
-  } else {
-    // Hapa ni kategoria halisi
-    setSelectedCategoryForComponents(cat);
-    setSelectedCategory(cat);
-    // useEffect itafanya fetchFeaturedLeafs na fetchSubCategories
-  }
-}}                   getDisplayName={getCategoryDisplayName}
-                      getIcon={getIcon}
-                    />
-                  )}
-                </div>
+  {/* 1. SIDEBAR YA KATEGORIA (Kushoto) */}
+  <aside className="side-categories">
+    <div className="side-header">
+      <Star size={18} /> <span>{t('categories')}</span>
+    </div>
+    <ul className="categories-list">
+      {categories.map(cat => (
+        <li key={cat.id} onClick={() => handleCategoryClick(cat)}>
+          <span className="cat-icon">
+            {getIcon(cat.icon_name)}
+            <span className="cat-name">{getCategoryDisplayName(cat)}</span>
+          </span>
+          <ChevronRight size={14} className="arrow" />
+        </li>
+      ))}
+    </ul>
+  </aside>
 
-                <div className="hero-banners-container">
-                  <div className="hot-picks-banner">
-                    {activeAd && isVideoAd(activeAd) ? (
-                      <video
-                        src={activeAd.media_url}
-                        autoPlay
-                        muted
-                        playsInline
-                        onEnded={() => {
-                          if (cachedAds.length) setCurrentAdIndex((prev) => (prev + 1) % cachedAds.length);
-                        }}
-                        className="banner-media"
-                      />
-                    ) : (
-                      activeAd && (
-                        <img
-                          src={activeAd.media_url}
-                          className="banner-media"
-                          alt="promo"
-                          loading="lazy"
-                        />
-                      )
-                    )}
-                    {activeAd && (
-                      <div className="banner-overlay-text">
-                        <span className="ad-tag">{t('sponsored')}</span>
-                        <h2 className="banner-title">{activeAd.business_name}</h2>
-                        <p className="banner-desc">{activeAd.description}</p>
-                        <button 
-                          className="view-more-banner" 
-                          onClick={() => navigate(`/store/${activeAd.store_id}`)}
-                        >
-                          {t('source_now')} →
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
+  {/* 2. BANNER NA SLIDER (Kati) */}
+  <div className="alibaba-mobile-content">
+    <div className="category-slider-wrapper">
+      {!search && categories.length > 0 && (
+        <MobileCategorySlider 
+          categories={categories}
+          selectedCategory={selectedCategoryForComponents}
+          onSelectCategory={(cat) => {
+            if (cat.id === null) {
+              setSelectedCategoryForComponents(null);
+              setSelectedCategory(null);
+              setFeaturedProducts([]);
+              setSubCategories([]);
+            } else {
+              setSelectedCategoryForComponents(cat);
+              setSelectedCategory(cat);
+            }
+          }}          
+          getDisplayName={getCategoryDisplayName}
+          getIcon={getIcon}
+        />
+      )}
+    </div>
 
-              </div>
-            </div>
+    <div className="hero-banners-container">
+      <div className="hot-picks-banner">
+        {activeAd && isVideoAd(activeAd) ? (
+          <video
+            src={activeAd.media_url}
+            autoPlay
+            muted
+            playsInline
+            onEnded={() => {
+              if (cachedAds.length) setCurrentAdIndex((prev) => (prev + 1) % cachedAds.length);
+            }}
+            className="banner-media"
+          />
+        ) : (
+          activeAd && (
+            <img
+              src={activeAd.media_url}
+              className="banner-media"
+              alt="promo"
+              loading="lazy"
+            />
+          )
+        )}
+        {activeAd && (
+          <div className="banner-overlay-text">
+            <span className="ad-tag">{t('sponsored')}</span>
+            <h2 className="banner-title">{activeAd.business_name}</h2>
+            <p className="banner-desc">{activeAd.description}</p>
+            <button 
+              className="view-more-banner" 
+              onClick={() => navigate(`/store/${activeAd.store_id}`)}
+            >
+              {t('source_now')} →
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+
+  {/* 3. RECENTLY VIEWED MINI (Kulia) - IKO NJE YA KOLAMU YA KATI! */}
+  <div className="recently-viewed-mini">
+    <Suspense fallback={<ComponentFallback />}>
+      <RecentlyViewed 
+        key={`mini-${i18n.language}`} 
+        navigate={navigate}
+        compact={true} 
+      />
+    </Suspense>
+  </div>
+
+</div>
           )}
 
 <div className="components-wrapper">
+  {/* 🔥 RECENTLY VIEWED - IONEKANE MOBILE TU (Imezungukwa na div) */}
+<div className="mobile-only-recently-viewed">
   <Suspense fallback={<ComponentFallback />}>
     <RecentlyViewed key={i18n.language} navigate={navigate} />
+  </Suspense>
+</div>
+
+ <Suspense fallback={<ComponentFallback />}>
+    <NewArrivals 
+      key={i18n.language}
+      navigate={navigate}
+      selectedCategory={selectedCategoryForComponents} 
+    />
   </Suspense>
 
   <Suspense fallback={<ComponentFallback />}>
@@ -655,6 +675,14 @@ const handleSubCategoryHover = (subCategory) => {
       navigate={navigate} 
       selectedCategory={selectedCategoryForComponents} 
       getCategoryDisplayName={getCategoryDisplayName}
+    />
+  </Suspense>
+
+   <Suspense fallback={<ComponentFallback />}>
+    <TopDeals 
+      key={i18n.language}
+      navigate={navigate}
+      selectedCategory={selectedCategoryForComponents}
     />
   </Suspense>
 
@@ -670,22 +698,6 @@ const handleSubCategoryHover = (subCategory) => {
     <TopStores 
       key={i18n.language}
       navigate={navigate} 
-      selectedCategory={selectedCategoryForComponents} 
-    />
-  </Suspense>
-
-  <Suspense fallback={<ComponentFallback />}>
-    <TopDeals 
-      key={i18n.language}
-      navigate={navigate}
-      selectedCategory={selectedCategoryForComponents}
-    />
-  </Suspense>
-
-  <Suspense fallback={<ComponentFallback />}>
-    <NewArrivals 
-      key={i18n.language}
-      navigate={navigate}
       selectedCategory={selectedCategoryForComponents} 
     />
   </Suspense>
@@ -755,18 +767,31 @@ const handleSubCategoryHover = (subCategory) => {
               )}
             </aside>
             <main className="mega-menu-content">
+
               <div className="content-header">
-                <h3>
-                  {viewMode === 'products' 
-                    ? `${t('top_categories')}: ${getCategoryDisplayName(selectedCategory)}` 
-                    : (i18n.language === 'sw' ? (selectedSubCategory?.name_sw || selectedSubCategory?.name) : selectedSubCategory?.name)}
-                </h3>
-                {viewMode === 'products' && (
-                  <button onClick={handleViewAll} className="view-all-btn">
-                    {t('view_all')} <ChevronRight size={14} />
-                  </button>
-                )}
-              </div>
+  <h3>
+    {viewMode === 'products' 
+      ? `${t('top_categories')}: ${getCategoryDisplayName(selectedCategory)}` 
+      : (i18n.language === 'sw' ? (selectedSubCategory?.name_sw || selectedSubCategory?.name) : selectedSubCategory?.name)}
+  </h3>
+  <div className="content-header-actions">
+    {viewMode === 'products' && (
+      <button onClick={handleViewAll} className="view-all-btn">
+        {t('view_all')} <ChevronRight size={14} />
+      </button>
+    )}
+    {/* 🔥 ONGEZA X YA KUFUNGA MEGA MENU */}
+    <button 
+      onClick={() => {
+        setActiveMenu(null);
+        setSelectedCategory(null); // Safisha kategoria iliyochaguliwa
+      }}
+      className="mega-menu-close-btn"
+    >
+      <X size={20} />
+    </button>
+  </div>
+</div>
               
 <div className="category-grid">
 

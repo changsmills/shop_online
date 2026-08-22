@@ -201,33 +201,48 @@ html, body {
 @media (min-width: 1025px) {
   .alibaba-top-layout {
     display: grid;
-    grid-template-columns: 260px 1fr;
+    grid-template-columns: 250px 1fr 280px; /* 3 Columns */
     gap: 0;
     margin: 0 !important;
-    align-items: start; 
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     overflow: hidden;
+    height: 350px; /* 🔥 UREFU SAWA KWA WOTE */
+  }
+
+  .side-categories {
+    display: flex;
+    flex-direction: column;      /* Hakikisha hii ipo */
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+  }
+
+  /* 2. BANNER */
+  .alibaba-mobile-content {
+    height: 100%;
+  }
+
+  .hot-picks-banner {
+    height: 100% !important; /* Jaza column yake */
+    border-radius: 0 !important;
+  }
+
+  /* 3. RECENTLY VIEWED MINI */
+  .recently-viewed-mini {
+    height: 100%;
+    background: var(--bg-card);
+    border-left: 1px solid var(--border-color);
+    padding: 12px;
+    overflow: hidden;
   }
 }
 
-.side-categories {
-  display: none;
-  background: var(--bg-card);
-  border-radius: 0;
-  border: none;
-  overflow: hidden;
-  max-height: 350px;
-  flex-direction: column;
-  box-shadow: none;
-}
-
+/* Ficha Full-width Recently Viewed kwenye Desktop */
 @media (min-width: 1025px) {
-  .side-categories { 
-    display: flex;
-    border-right: 1px solid var(--border-color);
-    border-radius: 0;
+  .mobile-only-recently-viewed {
+    display: none !important;
   }
 }
 
@@ -289,7 +304,7 @@ html, body {
 /* ============================================
    HERO BANNER
    ============================================ */
-   
+
 .hero-banners-container {
   width: 100%;
   overflow: hidden;
@@ -979,4 +994,76 @@ html, body {
     width: 58px;
     height: 58px;
   }
+}
+/* 🔥 Container ya View All na X */
+.content-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 🔥 X ya kufunga Mega Menu */
+.mega-menu-close-btn {
+  background: none;
+  border: 1px solid #e5e5e5;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #333;
+  transition: all 0.2s;
+}
+
+.mega-menu-close-btn:hover {
+  background: #ff6a00;
+  border-color: #ff6a00;
+  color: white;
+  transform: scale(1.05);
+}
+
+.mega-menu-close-btn:active {
+  transform: scale(0.95);
+}
+
+/* ============================================
+   SIDEBAR YA KATEGORIA - MOBILE HUFICHWA
+   ============================================ */
+.side-categories {
+  display: none !important; /* Mobile na Tablet - Haionekani */
+}
+
+/* Desktop ONLY - Inarudisha sidebar */
+@media (min-width: 1025px) {
+  .side-categories {
+    display: flex !important;
+    flex-direction: column;
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+  }
+}
+/* 🔥 SULUHISHO LA PICHA KUBWA YA BANNER - PUNGUZA UKUBWA NA IWE KATIKATI */
+.hot-picks-banner {
+  max-height: 350px !important; /* Punguza kimo (unaweza kuweka 300px, 280px) */
+  overflow: hidden; /* Zuia picha isitoke nje */
+}
+
+.hot-picks-banner .banner-media {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important; /* Picha ijaze eneo bila kuenea */
+  object-position: center !important; /* Picha iwe katikati */
+}
+
+/* 🔥 Hakikisha maelezo (text) hayazidi eneo la banner */
+.banner-overlay-text {
+  max-width: 60% !important; /* Maandishi yasiwe marefu sana */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
 }

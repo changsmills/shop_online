@@ -298,14 +298,23 @@
     font-size: 9px;
   }
 }
-
-/* ============================================ */
-/* 🔥 MOBILE - HAKUNA ZOOM KWENYE PICHA         */
-/* ============================================ */
-
+/* 🔥 MOBILE - PUNGUZA NAFASI NYEUPE CHINI (PICHA INABAKI SAWA) */
 @media (max-width: 768px) {
-  .product-card-media:hover .product-card-img,
-  .product-card-media:active .product-card-img {
-    transform: none !important; /* Hakuna zoom kwenye mobile */
+  /* 1. Hakikisha maelezo (info section) hayana padding kubwa */
+  .product-card-item .product-card-info {
+    padding: 4px 8px 6px 8px !important;
+    gap: 0 !important;
+  }
+
+  /* 2. Bei isiwe na margin kubwa chini */
+  .product-card-item .product-card-info .product-card-price-row {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* 3. Ondoa kabisa nafasi tupu kwenye card yote */
+  .product-card-item {
+    padding-bottom: 0 !important;
+    overflow: hidden;
   }
 }

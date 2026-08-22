@@ -5,7 +5,7 @@
 .recently-viewed-main-wrapper {
   position: relative;
   width: 100%;
-  background-color: var(--bg-color) !important; /* ✅ Inajibadilisha! */
+  background-color: var(--bg-color) !important;
   border-top: 1px solid #e5e7eb;
   border-bottom: 1px solid #e5e7eb;
   border-left: none;
@@ -29,23 +29,23 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 20px;
-  background-color: var(--bg-color) !important; /* ✅ IMEBADILISHWA! */
+  background-color: var(--bg-color) !important;
   border-radius: 12px 12px 0 0;
   margin-bottom: 16px;
-  color: var(--text-color) !important; /* ✅ Inajibadilisha */
+  color: var(--text-color) !important;
 }
 
 /* Kwa Light Mode: Peach */
 @media (prefers-color-scheme: light) {
   .rv-header {
-    background-color: #fff7ed !important; /* Peach */
+    background-color: #fff7ed !important;
   }
 }
 
 /* Kwa Dark Mode: Blue/Gray */
 @media (prefers-color-scheme: dark) {
   .rv-header {
-    background-color: #1a1a2e !important; /* Dark Blue */
+    background-color: #1a1a2e !important;
     border-bottom: 1px solid #334155 !important;
   }
 }
@@ -70,7 +70,7 @@
 .rv-title {
   font-size: 20px;
   font-weight: 700;
-  color: var(--text-color) !important; /* ✅ Inajibadilisha */
+  color: var(--text-color) !important;
   margin: 0;
 }
 
@@ -97,7 +97,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-color) !important; /* ✅ Inajibadilisha */
+  color: var(--text-color) !important;
   padding: 4px;
   transition: transform 0.2s ease;
 }
@@ -206,7 +206,7 @@
 .rv-arrow-btn {
   position: absolute;
   z-index: 10;
-  background-color: var(--bg-color) !important; /* ✅ Inajibadilisha */
+  background-color: var(--bg-color) !important;
   border: 1px solid #e2e8f0;
   border-radius: 50%;
   width: 36px;
@@ -218,7 +218,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   transition: all 0.2s ease;
   outline: none;
-  color: var(--text-color) !important; /* ✅ Inajibadilisha */
+  color: var(--text-color) !important;
   top: 50%;
   transform: translateY(-50%);
 }
@@ -252,7 +252,7 @@
 @media (prefers-color-scheme: dark) {
   .recently-viewed-main-wrapper {
     border-color: #334155 !important;
-    background-color: var(--bg-color) !important; /* Inajibadilisha */
+    background-color: var(--bg-color) !important;
   }
 
   .rv-title { color: var(--text-color) !important; }
@@ -260,4 +260,198 @@
   .rv-history-icon { color: #34d399 !important; }
   .rv-arrow-btn { border-color: #334155 !important; }
   .rv-arrow-btn:hover { background: #10b981 !important; }
+}
+
+/* ============================================ */
+/* 🔥 COMPACT MODE (KWA DESKTOP THIRD COLUMN)   */
+/* ============================================ */
+@media (min-width: 1025px) {
+  .recently-viewed-main-wrapper.compact-mode {
+    border: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  .compact-mode .rv-header {
+    padding: 0 !important;
+    margin-bottom: 8px !important;
+    background: transparent !important;
+  }
+
+  .compact-mode .rv-title-group { gap: 6px !important; }
+  .compact-mode .rv-title { font-size: 16px !important; }
+  .compact-mode .rv-history-icon { width: 18px !important; height: 18px !important; }
+  .compact-mode .rv-subtitle { display: none !important; }
+
+  .compact-mode .rv-arrow-link-btn svg { width: 18px !important; height: 18px !important; }
+
+  .compact-mode .rv-scroll-wrapper {
+    gap: 8px !important;
+    padding: 4px 0 !important;
+  }
+
+  .compact-mode .rv-card-wrapper {
+    flex: 0 0 140px !important;
+    min-width: 140px !important;
+    max-width: 140px !important;
+  }
+
+  .compact-mode .rv-arrow-btn {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  .compact-mode .rv-arrow-btn svg { width: 16px !important; height: 16px !important; }
+}
+/* 🔥 COMPACT MODE (CAROUSEL STYLE) - DESKTOP */
+.recently-viewed-main-wrapper.compact-mode {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  border: none;
+  padding: 0;
+  overflow: hidden;
+}
+
+.compact-mode .rv-header {
+  padding: 0;
+  margin-bottom: 10px;
+  background: transparent;
+}
+
+.compact-mode .rv-title { font-size: 16px; }
+
+/* Carousel Wrapper */
+.compact-mode .rv-scroll-wrapper {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  gap: 0;
+  padding: 0;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.compact-mode .rv-card-wrapper {
+  flex: 0 0 100%;
+  min-width: 100%;
+  max-width: 100%;
+  scroll-snap-align: center;
+  margin: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.compact-mode .rv-card-wrapper .product-card-item {
+  height: 100%;
+}
+
+/* 🔥 MISHALE (Mviringo Kama Hot Picks) */
+.compact-mode .rv-arrow-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background: #ffffff;
+  color: #333;
+  border: 1px solid #eee;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s;
+}
+
+.compact-mode .rv-arrow-btn:hover {
+  background: #ff6a00;
+  color: white;
+  border-color: #ff6a00;
+}
+
+.compact-mode .rv-arrow-left { left: 5px; }
+.compact-mode .rv-arrow-right { right: 5px; }
+
+/* 🔥 DOTS (Kama Zile za Hot Picks) */
+.compact-mode .dots-container {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.compact-mode .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ddd;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.compact-mode .dot.active {
+  background: #ff6a00;
+  width: 20px;
+  border-radius: 4px;
+}
+
+/* 🔥 Zuia hii kuonekana kwenye Mobile */
+@media (max-width: 1024px) {
+  .recently-viewed-main-wrapper.compact-mode {
+    display: none !important;
+  }
+}
+
+/* 🔥 FICHA MSHALE WA "ArrowRight" KWENYE COMPACT MODE */
+.recently-viewed-main-wrapper.compact-mode .rv-header-right {
+  display: none !important;
+}
+/* ZIDISHA PICHA KWENYE COMPACT MODE */
+.recently-viewed-main-wrapper.compact-mode .rv-card-wrapper .product-card-item {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.recently-viewed-main-wrapper.compact-mode .rv-card-wrapper .product-card-item .product-card-media {
+  flex-grow: 1;
+  aspect-ratio: auto;
+  min-height: 250px;
+}
+
+.recently-viewed-main-wrapper.compact-mode .rv-card-wrapper .product-card-item .product-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* 🔥 SULUHISHO LA UPANA (WIDTH) - Weka mwishoni kabisa mwa RecentlyViewed.css */
+
+/* 1. Hakikisha Wrapper na Card zote zinachukua upana wa 100% */
+.recently-viewed-main-wrapper.compact-mode .rv-scroll-wrapper,
+.recently-viewed-main-wrapper.compact-mode .rv-card-wrapper,
+.recently-viewed-main-wrapper.compact-mode .rv-card-wrapper .product-card-item {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* 2. Picha ijaze upana wote na uweke urefu mzuri */
+.recently-viewed-main-wrapper.compact-mode .rv-card-wrapper .product-card-item .product-card-media {
+  width: 100% !important;
+  height: 280px !important; /* Unaweza kubadilisha hii: 250px, 280px, 300px */
+  aspect-ratio: auto; /* Inaondoa kizuizi cha mraba mdogo */
+}
+
+/* 3. Picha yenyewe ijaze nafasi hiyo yote */
+.recently-viewed-main-wrapper.compact-mode .rv-card-wrapper .product-card-item .product-card-media img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover; /* Hii inahakikisha picha inajaza upana wote bila kubanwa */
 }

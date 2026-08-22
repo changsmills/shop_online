@@ -47,7 +47,7 @@ from .serializers import (
     CategorySerializer, SubCategorySerializer,
     LeafCategorySerializer, AdvertisementSerializer,
     ProductMediaSerializer, MessageSerializer, ProfileSerializer,
-    ShippingMethodSerializer, BrandSerializer, LeadSerializer, OrderSerializer, OrderItemSerializer 
+    ShippingMethodSerializer, BrandSerializer, LeadSerializer, OrderSerializer, OrderItemSerializer ,MessageSerializer
 )
 
 User = get_user_model()
@@ -351,6 +351,38 @@ class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+
+    # 🔥 1. ONGEZA HII: Kuchuja messages kwa user_id
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user_id = self.request.query_params.get('user_id')
+        
+        if user_id:
+            from django.db.models import Q
+            # Rudi messages ambazo user huyu ametuma AU amepokea
+            queryset = queryset.filter(
+                Q(sender_id=user_id) | Q(receiver_id=user_id)
+            )
+        
+        return queryset
+
+    # 🔥 2. ONGEZA HII: Kuhakikisha sender na receiver zimehifadhiwa vizuri
+    def perform_create(self, serializer):
+        sender_id = self.request.data.get('sender')
+        receiver_id = self.request.data.get('receiver')
+        
+        # Thibitisha data
+        if not sender_id or not receiver_id:
+            from rest_framework import serializers
+            raise serializers.ValidationError({
+                'detail': 'sender na receiver zinahitajika.'
+            })
+        
+        # Hifadhi message na sender/receiver sahihi
+        serializer.save(
+            sender_id=sender_id,
+            receiver_id=receiver_id
+        )
 
 # ==========================================
 # 2. 🔥 VIEWS ZA SHIPPING, BRAND, NA LEAD

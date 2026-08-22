@@ -502,3 +502,35 @@
     display: none !important;
   }
 }
+/* 🔥 Container ya View All na X */
+.content-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 🔥 X ya kufunga Mega Menu */
+.mega-menu-close-btn {
+  background: none;
+  border: 1px solid #e5e5e5;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #333;
+  transition: all 0.2s;
+}
+
+.mega-menu-close-btn:hover {
+  background: #ff6a00;
+  border-color: #ff6a00;
+  color: white;
+  transform: scale(1.05);
+}
+
+.mega-menu-close-btn:active {
+  transform: scale(0.95);
+}

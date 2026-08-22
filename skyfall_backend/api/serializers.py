@@ -268,3 +268,17 @@ class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = '__all__'
+
+class MessageSerializer(serializers.ModelSerializer):
+    sender_name = serializers.SerializerMethodField()
+    receiver_name = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Message
+        fields = ['id', 'sender', 'receiver', 'content', 'created_at', 'is_read', 'sender_name', 'receiver_name']
+    
+    def get_sender_name(self, obj):
+        return obj.sender.full_name if obj.sender else None
+    
+    def get_receiver_name(self, obj):
+        return obj.receiver.full_name if obj.receiver else None

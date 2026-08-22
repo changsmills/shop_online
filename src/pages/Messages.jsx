@@ -38,7 +38,7 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
   const [currentUserId, setCurrentUserId] = useState(null);
   const [userRole, setUserRole] = useState('customer');
 
-  useEffect(() => {
+ useEffect(() => {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem("access_token");
@@ -47,7 +47,9 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
           return;
         }
         const res = await api.get('/profile/');
-        setCurrentUserId(res.data.id);
+        
+        // 🔥 HAPA: API inarudisha 'id' ya Profile!
+        setCurrentUserId(res.data.id); // Hii ni Profile ID (sio User ID)
         setUserRole(res.data.role || 'customer');
       } catch (err) {
         console.error("Failed to get profile ID:", err);
@@ -247,8 +249,8 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
 
     try {
       await api.post('/messages/', {
-        sender_id: currentUserId,
-        receiver_id: activeChat.id,
+        sender: currentUserId,       // 🔥 Tumia 'sender' (Profile ID)
+        receiver: activeChat.id,     // 🔥 Tumia 'receiver' (Profile ID)
         content: originalMessage,
       });
 
@@ -342,8 +344,8 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
   return (
     <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       
-      {/* HEADER */}
-      <header className="dashboard-header" style={{ position: 'sticky', top: 0, zIndex: 100 }}>
+      {/* 🔥 MOBILE: FICHA HEADER KABISA */}
+      <header className="dashboard-header" style={{ position: 'sticky', top: 0, zIndex: 100, display: isMobile ? 'none' : 'block' }}>
         <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
           {!isMobile && (
           <Menu 
@@ -365,20 +367,11 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
             </div>
           )}
         </div>
-
-        <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          {!isMobile && (
-            <>
-              <Bell size={20} style={{ cursor: 'pointer', color: '#666' }} />
-              <UserTools /> {/* 🔥 Imeondolewa { session } */}
-            </>
-          )}
-        </div>
       </header>
 
-      <div className="dashboard-main" style={{ display: 'flex', flex: 1, overflow: 'hidden', paddingBottom: isMobile ? '70px' : 0 }}>
+      <div className="dashboard-main" style={{ display: 'flex', flex: 1, overflow: 'hidden', paddingBottom: isMobile ? '0' : 0 }}>
         
-        {/* SIDEBAR */}
+        {/* 🔥 MOBILE: FICHA SIDEBAR KABISA (Desktop pekee) */}
         {!isMobile && (
           <aside 
             onMouseEnter={() => setIsExpanded(true)}
@@ -797,7 +790,7 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
                   flex: 1, 
                   overflowY: 'auto', 
                   padding: '20px',
-                  paddingBottom: isMobile ? 'calc(20px + 70px)' : '20px', 
+                  paddingBottom: isMobile ? '20px' : '20px', 
                   backgroundColor: '#f5f5f7'
                 }}>
                   {messages.length === 0 ? (
@@ -819,10 +812,10 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
                     </div>
                   ) : (
                     messages.map((msg, index) => (
-                      <div 
-                        key={index} 
-                        className={`message-bubble ${msg.sender_id === currentUserId ? 'sent' : 'received'}`}
-                      >
+  <div 
+    key={msg.id || `msg-${index}`} 
+    className={`message-bubble ${msg.sender_id === currentUserId ? 'sent' : 'received'}`}
+  >
                         <div className="bubble-content">
                           <div className="message-sender-name" style={{ fontSize: '12px', fontWeight: '600', marginBottom: '4px', color: '#ff6a00' }}>
                             {getSenderName(msg)}
@@ -881,26 +874,23 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
         </div>
       </div>
 
-      {/* MOBILE BOTTOM NAVIGATION - IMEBADILISHWA KWA SUPPLIER NA CUSTOMER */}
+      {/* 🔥 MOBILE: FICHA BOTTOM NAV KABISA */}
       {isMobile && (
         <nav 
           className="mobile-bottom-nav"
           style={{
+            display: 'none', // 🔥 FICHA KABISA KWENYE MOBILE
             position: 'fixed',
             bottom: 0,
             left: 0,
             right: 0,
             background: 'white',
-            display: 'flex',
-            justifyContent: 'space-around',
-            alignItems: 'center',
-            padding: '10px 0 calc(20px + env(safe-area-inset-bottom, 0px))',
             borderTop: '1px solid #eee',
             zIndex: 1000,
             boxShadow: '0 -2px 10px rgba(0,0,0,0.05)'
           }}
         >
-          {/* Home - Inabadilika kulingana na role */}
+          {/* Home */}
           <button 
             onClick={() => navigate(isSupplier ? '/dashboard/sellerboard' : '/dashboard')} 
             style={{
@@ -921,7 +911,7 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
             </span>
           </button>
 
-          {/* Orders - Supplier inaenda Notifications, Customer inaenda Orders */}
+          {/* Orders */}
           <button 
             onClick={() => navigate(isSupplier ? '/dashboard/notifications' : '/dashboard/orders')} 
             style={{
@@ -942,7 +932,7 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
             </span>
           </button>
 
-          {/* Search - Inabaki sawa kwa wote */}
+          {/* Search */}
           <button 
             onClick={handleSearchNavigation}
             style={{
@@ -960,12 +950,10 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
             <div style={{ background: '#ff6600', padding: '8px', borderRadius: '50%', marginBottom: '4px' }}>
               <Search size={24} color="white" />
             </div>
-            <span style={{ fontSize: '10px', color: '#ff6600', fontWeight: 'bold' }}>
-              Search
-            </span>
+            <span style={{ fontSize: '10px', color: '#ff6600', fontWeight: 'bold' }}>Search</span>
           </button>
 
-          {/* Advertise - Inabaki sawa kwa wote */}
+          {/* Ads */}
           <button 
             onClick={() => navigate('/advertise')} 
             style={{
@@ -984,7 +972,7 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
             <span style={{ fontSize: '10px', color: location.pathname === '/advertise' ? '#ff6600' : '#666' }}>Ads</span>
           </button>
 
-          {/* Notifications - Inabaki sawa kwa wote (inaenda /dashboard/notifications) */}
+          {/* Alerts */}
           <button 
             onClick={() => navigate('/dashboard/notifications')} 
             style={{

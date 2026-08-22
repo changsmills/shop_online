@@ -443,3 +443,10 @@
     white-space: normal !important;
   }
 }
+/* 🔥 SUKUMA UserTools KULIA KABISA KWENYE HEADER */
+.header-right {
+  margin-left: auto !important; /* Inasukuma UserTools kwenda kulia */
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}

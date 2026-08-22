@@ -400,18 +400,31 @@ export default function NavLinks({ isMobile }) {
                 </aside>
 
                 <main className="mega-menu-content">
+
                   <div className="content-header">
-                    <h3>
-                      {viewMode === 'products'
-                        ? `Top Categories: ${getDisplayName(selectedParent)}`
-                        : getDisplayName(selectedSubForLeaf)}
-                    </h3>
-                    {viewMode === 'products' && (
-                      <button onClick={() => setViewMode('subcategories')} className="view-all-btn">
-                        {t('view_all')} <LucideIcons.ChevronRight size={14} />
-                      </button>
-                    )}
-                  </div>
+  <h3>
+    {viewMode === 'products'
+      ? `Top Categories: ${getDisplayName(selectedParent)}`
+      : getDisplayName(selectedSubForLeaf)}
+  </h3>
+  <div className="content-header-actions">
+    {viewMode === 'products' && (
+      <button onClick={() => setViewMode('subcategories')} className="view-all-btn">
+        {t('view_all')} <LucideIcons.ChevronRight size={14} />
+      </button>
+    )}
+    {/* 🔥 ONGEZA X YA KUFUNGA MEGA MENU */}
+    <button 
+      onClick={() => {
+        setActiveMenu(null);
+        setActiveNav(null);
+      }}
+      className="mega-menu-close-btn"
+    >
+      <LucideIcons.X size={20} />
+    </button>
+  </div>
+</div>
 
 <div className="category-grid">
   {viewMode === 'products' ? (
