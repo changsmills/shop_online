@@ -15,8 +15,9 @@ from api.views import (
     PasswordResetRequestView, PasswordResetVerifyView,
     AllStoresView, # 🔥 ONGEZA HII
 
-    SellerOTPRequestView,  # 🔥 ONGEZA HII!
+    SellerOTPRequestView,
     SellerOTPVerifyView,
+    GoogleAuthView,
     SupplierLogoutView
 
 )
@@ -59,7 +60,8 @@ urlpatterns = [
      # 🔥 Google Login Endpoints
     path('auth/', include('dj_rest_auth.urls')),  # Login, Logout, Password Reset
     path('auth/registration/', include('dj_rest_auth.registration.urls')),  # Registration
-    path('auth/google/', include('allauth.socialaccount.urls')),
+    path('auth/google/', GoogleAuthView.as_view(), name='google_auth'),
+
 ]
 
 from django.conf import settings

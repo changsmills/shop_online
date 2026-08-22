@@ -4,7 +4,7 @@ import api from '../axiosConfig';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { Lock, ShieldCheck, CheckCircle, Eye, EyeOff, Mail, KeyRound } from 'lucide-react'; // 🔥 ONGEZA HII!
+import { Lock, ShieldCheck, CheckCircle, Eye, EyeOff, Mail, KeyRound } from 'lucide-react';
 import '../Login.css';
 
 const Login = () => {
@@ -295,17 +295,13 @@ toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
               <Lock size={16} color="#28a745" />
               <span className="security-text">2FA Enabled</span>
             </div>
-            <div className="security-badge-item">
-              <CheckCircle size={16} color="#28a745" />
-              <span className="security-text">Verified by Skyfall</span>
-            </div>
           </div>
 
           <div className="login-header">
             <h2 className="login-title">Sign in to your account</h2>
             <p className="login-subtitle">
-              <Lock size={14} color="#28a745" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
-              <span className="secure-text">We Secure Your Data</span> | Tunalinda Data Zako
+              <Lock size={14} color="#28a745" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '14px' }} />
+              <span className="secure-text">We Secure Your Data</span>
             </p>
           </div>
 
@@ -382,9 +378,6 @@ toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
             </div>
             <p className="trust-text">
               Your information is protected with 256-bit SSL encryption.
-            </p>
-            <p className="trust-text-swahili">
-              Taarifa zako zinalindwa kwa usimbaji fiche wa kiwango cha juu.
             </p>
           </div>
 

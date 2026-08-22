@@ -1065,3 +1065,9 @@
     z-index: 10 !important;
     transition: background-position 0.1s ease-out !important;
 }
+/* Zuia menu ya "Open image" kwenye simu */
+.mobile-image {
+    -webkit-touch-callout: none;   /* iOS Safari */
+    -webkit-user-select: none;     /* iOS Safari */
+    user-select: none;             /* Android/Desktop */
+}

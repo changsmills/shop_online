@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eye, Trophy, MapPin, BadgeCheck } from "lucide-react"; // 🔥 Ongeza BadgeCheck!
+import { Trophy, MapPin, BadgeCheck } from "lucide-react";
 import "../DashboardCard.css";
 import { useTranslation } from 'react-i18next';
 
@@ -17,7 +17,8 @@ export default function DashboardCard({
   isStore, 
   isTopDeal,
   isLocation, 
-  isVerified = false, // 🔥 Ongeza hii
+  isVerified = false,
+  displayMode = 'full', // full, image-only, price-moq, image-price
   onClick 
 }) {
   const numPrice = Number(price);
@@ -25,11 +26,17 @@ export default function DashboardCard({
   const numOriginal = Number(originalPrice);
   const hasValidPrice = price !== undefined && price !== null && !isNaN(numPrice);
 
+  // 🔥 LOGIC YA MODE (SASA UNA image-price)
+  const isFull = displayMode === 'full';
+  const isImageOnly = displayMode === 'image-only';
+  const isPriceMoq = displayMode === 'price-moq';
+  const isImagePrice = displayMode === 'image-price';
+
   const displayTitle = title?.length > 30 ? title.substring(0, 25) + '...' : title;
 
   return (
     <div 
-      className={`product-card-item ${isStore ? 'is-store' : ''} ${isLocation ? 'is-location' : ''}`}
+      className={`product-card-item ${isStore ? 'is-store' : ''} ${isLocation ? 'is-location' : ''} display-${displayMode}`}
       onClick={onClick} 
       onContextMenu={(e) => e.preventDefault()}
     >
@@ -43,13 +50,13 @@ export default function DashboardCard({
           </div>
         ) : null}
         
-        {(!isStore || isTopDeal) && numOriginal > 0 && hasValidPrice && numPrice < numOriginal && (
+        {/* 🔥 Discount Inaonekana TU kwenye FULL mode */}
+        {isFull && (!isStore || isTopDeal) && numOriginal > 0 && hasValidPrice && numPrice < numOriginal && (
           <div className="discount-badge-mini">
             -{Math.round(((numOriginal - numPrice) / numOriginal) * 100)}%
           </div>
         )}
         
-        {/* 🔥 BADILISHA HAPA: Picha halisi, placeholder ya ndani kwa usalama */}
         <img 
           src={image || ''} 
           alt={title} 
@@ -57,11 +64,12 @@ export default function DashboardCard({
           draggable="false"
           onContextMenu={(e) => e.preventDefault()}
           onError={(e) => { 
-            e.target.style.display = 'none'; // 🔥 Ficha picha ikiwa imevunjika
+            e.target.style.display = 'none';
           }}
         />
 
-        {overlay && (
+        {/* 🔥 Overlay Inaonekana TU kwenye FULL mode */}
+        {isFull && overlay && (
           <div className="product-card-location">
             <MapPin size={10} />
             <span>{overlay}</span>
@@ -71,27 +79,28 @@ export default function DashboardCard({
 
       {/* INFO SECTION */}
       <div className="product-card-info">
+        {/* 🔥 JINA LINAONEKANA KILA MARA */}
         <h4 className="product-card-title">
           {displayTitle || title}
         </h4>
 
-        {/* 🔥 NEW: Verified Badge (Ikiwa ni Verified) */}
-        {isVerified && (
+        {/* 🔥 VERIFIED - FULL TU */}
+        {isFull && isVerified && (
           <div className="verified-badge-wrapper">
             <BadgeCheck size={12} className="verified-icon" />
             <span className="verified-text">Verified</span>
           </div>
         )}
 
-        {/* 🔥 NEW: Sold Count (Kutoka kwa views) */}
-        {!isStore && views > 0 && (
+        {/* 🔥 SOLD COUNT - FULL TU */}
+        {isFull && !isStore && views > 0 && (
           <div className="sold-count-wrapper">
             <span>{views.toLocaleString()} sold</span>
           </div>
         )}
         
-        {/* PRICE ROW */}
-        {(!isStore || isTopDeal) && !isLocation && hasValidPrice && (
+        {/* 🔥 BEI - Inaonekana kwenye FULL, PRICE-MOQ, na IMAGE-PRICE */}
+        {(isFull || isPriceMoq || isImagePrice) && (!isStore || isTopDeal) && !isLocation && hasValidPrice && (
           <div className="product-card-price-row">
             <div className="price-main">
               <span className="price-currency">{t('currency')}</span>
@@ -100,7 +109,7 @@ export default function DashboardCard({
               </span>
             </div>
             
-            {numOriginal > 0 && numOriginal > numPrice && (
+            {isFull && numOriginal > 0 && numOriginal > numPrice && (
               <span className="price-original-strikethrough">
                 {numOriginal.toLocaleString()}
               </span>
@@ -108,8 +117,8 @@ export default function DashboardCard({
           </div>
         )}
 
-        {/* MOQ - Ikiwa ni Store au TopDeal */}
-        {(isStore || isTopDeal) && (
+        {/* 🔥 MOQ - Inaonekana kwenye FULL na PRICE-MOQ TU (SI IMAGE-PRICE) */}
+        {(isFull || isPriceMoq) && (isStore || isTopDeal) && (
           <div className="store-moq-info">
             <span className="moq-label">{t('moq')}:</span>
             <span className="moq-value">
@@ -118,11 +127,13 @@ export default function DashboardCard({
           </div>
         )}
 
-        {categoryName && (
+        {/* 🔥 CATEGORY - FULL TU */}
+        {isFull && categoryName && (
           <p className="product-card-category">{categoryName}</p>
         )}
 
-        {subtitle && (
+        {/* 🔥 SUBTITLE - FULL TU */}
+        {isFull && subtitle && (
           <div className="product-card-subtitle-row">
             <MapPin size={10} className="subtitle-icon" />
             <span className="product-card-subtitle">{subtitle}</span>

@@ -339,6 +339,7 @@ const ProductGallery = ({ product }) => { // 🔥 IMEBADILISHWA: isMobile imeond
                 alt={product.name} 
                 className="mobile-image"
                 onClick={() => setIsModalOpen(true)}
+                 onContextMenu={(e) => e.preventDefault()}
               />
               
               {photoItems.length > 1 && (

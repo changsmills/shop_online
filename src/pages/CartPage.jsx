@@ -198,7 +198,7 @@ const handleCheckout = () => {
                           <span className="cart-tag">📏 {item.selected_size || 'Free Size'}</span>
                         </div>
                         
-                        <div className="cart-item-bottom">
+                                                <div className="cart-item-bottom">
                           <span className="cart-item-price">
                             TSH {Number(item.price).toLocaleString()}
                           </span>
@@ -212,14 +212,31 @@ const handleCheckout = () => {
                               <Minus size={14}/>
                             </button>
                             <span className="qty-display">{item.quantity}</span>
+                            
+                            {/* 🔥 BADILISHA HAPA: Zuia kuongeza ikifikia stock */}
                             <button 
                               onClick={() => updateQuantity(item.uniqueCartId, item.quantity + 1)} 
+                              disabled={!item.stock_quantity || item.quantity >= item.stock_quantity}
                               className="qty-btn plus"
                             >
                               <Plus size={14}/>
                             </button>
                           </div>
                         </div>
+
+                        {/* 🔥 ONGEZA HII: Taarifa ya Stock chini ya quantity */}
+                        <div className="cart-item-stock" style={{ marginTop: '5px', fontSize: '12px' }}>
+                          {item.stock_quantity > 0 ? (
+                            <span style={{ color: '#10b981', fontWeight: '500' }}>
+                              ✓ Stock Available: {item.stock_quantity}
+                            </span>
+                          ) : (
+                            <span style={{ color: '#ef4444', fontWeight: '500' }}>
+                              ✗ Out of Stock
+                            </span>
+                          )}
+                        </div>
+                        
                       </div>
                     </div>
                   ))}

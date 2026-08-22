@@ -154,22 +154,14 @@ export default function RecentlyViewed({ navigate }) {
           {products.map((product) => (
             <div key={product.id} className="rv-card-wrapper">
               <DashboardCard
-                image={product.cover_image_url || product.cover_image || ''}
-                title={product.name || ''}
-                price={product.price || 'TSh 0'}
-                originalPrice={product.original_price || ''}
-                moq={product.moq || ''}
-                rating={product.rating || ''}
-                verified={product.is_verified || product.store?.is_verified || false}
-                years={product.years || ''}
-                views={product.views || 0}
-                onClick={() => {
-                  const priorityId = product.id;
-                  const sectionName = encodeURIComponent(t('recently_viewed'));
-                  const url = `/products?priorityId=${priorityId}&sectionName=${sectionName}`;
-                  window.open(url, '_blank');
-                }}
-              />
+  image={product.cover_image_url || product.cover_image || ''}
+ // title={product.name || ''}
+  price={product.price || 'TSh 0'}
+  displayMode="image-price" // 🔥 PICHA NA BEI TU
+  onClick={() => {
+    // ... code yako ya onClick
+  }}
+/>
             </div>
           ))}
         </div>

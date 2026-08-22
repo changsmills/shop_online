@@ -14,6 +14,15 @@ import random  # 🔥 ONGEZA HII
 from django.utils import timezone  # 🔥 ONGEZA HII
 from datetime import timedelta  # 🔥 ONGEZA HII
 from products.models import OTPModel, Profile
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from rest_framework_simplejwt.tokens import RefreshToken
+
+
+# Juu ya file
+import google.auth
+import google.auth.transport.requests
+import google.oauth2.id_token
 
 
 
@@ -850,3 +859,47 @@ class SupplierLogoutView(APIView):
             return Response({'detail': 'Logged out successfully. OTP will be required on next login.'}, status=200)
         except Profile.DoesNotExist:
             return Response({'detail': 'Profile not found.'}, status=400)
+
+        
+
+CLIENT_ID = "897025267638-ef196t913o7kt77dbgld9d7tmv01ftbp.apps.googleusercontent.com"
+
+@method_decorator(csrf_exempt, name='dispatch')
+class GoogleAuthView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        access_token = request.data.get('access_token')
+        if not access_token:
+            return Response({'error': 'access_token is required'}, status=400)
+
+        try:
+
+            from rest_framework_simplejwt.tokens import RefreshToken
+
+            # 1. Thibitisha token kutoka Google
+            idinfo = google.oauth2.id_token.verify_oauth2_token(
+                access_token, google.auth.transport.requests.Request(), CLIENT_ID
+            )
+
+            email = idinfo['email']
+            full_name = idinfo.get('name', '')
+
+            # 2. Tafuta au unda User
+            user, created = User.objects.get_or_create(
+                username=email,
+                defaults={'email': email}
+            )
+            if created:
+                Profile.objects.create(user=user, full_name=full_name, role='buyer')
+
+            # 3. Tengeneza JWT Tokens
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'user': {'email': email, 'role': 'buyer'}
+            }, status=200)
+
+        except ValueError:
+            return Response({'error': 'Invalid Google Token'}, status=400)

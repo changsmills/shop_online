@@ -307,6 +307,12 @@ const ProductSelectionDrawer = ({
             if (!fullImageUrl && product?.cover_image_url) {
                 fullImageUrl = product.cover_image_url;
             }
+            
+            // 🔥 ONGEZA HIZI KODI HAPA (KUHESABU STOCK):
+            let stockQty = getStockForSize(variant, finalSize);
+            // Kama hakuna size, angalia stock ya variant yenyewe au ya product
+             if (!stockQty) stockQty = Number(variant.stock_quantity) || Number(product.stock_quantity) || 0;
+
             itemsToCart.push({
                 id: product.id,
                 productId: product.id,
@@ -324,6 +330,7 @@ const ProductSelectionDrawer = ({
                 cover_image_url: fullImageUrl || product?.cover_image_url || productImage,
                 variant_id: variant.id,
                 store_id: product.store_id,
+                stock_quantity: stockQty, 
                 uniqueCartId: uniqueCartId,
                 added_at: new Date().toISOString()
             });

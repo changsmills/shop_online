@@ -22,20 +22,36 @@ export default function UserTools({ session: propSession, isMobile }) {
 
   useEffect(() => {
     let isMounted = true;
+
     const getSessionAndStore = async () => {
       const token = localStorage.getItem("access_token");
       
       if (!isMounted) return;
 
       if (token) {
-        setLocalSession({ 
-          user: { 
-            email: "Mfanyabiashara" 
-          } 
-        });
-
+        // 🔥 1. ANZA KUPATA DATA HALISI KUTOKA BACKEND!
         try {
-          // 🔥 MABADILIKO: api.get
+          const profileRes = await api.get('/profile/', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const profile = profileRes.data;
+
+          setLocalSession({ 
+            user: { 
+              email: profile.email || "User",
+              full_name: profile.full_name || "",
+              role: profile.role || "buyer"
+            } 
+          });
+        } catch (err) {
+          console.error("Error fetching profile:", err);
+          // Kama token ipo mbaya au profile haipatikani, tumia hii ya mwisho
+          setLocalSession({ user: { email: "User", full_name: "", role: "user" } });
+        }
+        // 🔥 MWISHO WA KUPATA DATA HALISI!
+
+        // (Hapa code yako ya zamani inaendelea sawa)
+        try {
           const { data: stores } = await api.get('/stores/', {
             headers: { Authorization: `Bearer ${token}` }
           });
@@ -47,7 +63,6 @@ export default function UserTools({ session: propSession, isMobile }) {
         }
 
         try {
-          // 🔥 MABADILIKO: api.get
           const msgRes = await api.get('/messages/', {
             params: { is_read: false },
             headers: { Authorization: `Bearer ${token}` }
@@ -62,6 +77,7 @@ export default function UserTools({ session: propSession, isMobile }) {
         setUserStoreId(null);
       }
     };
+    
     getSessionAndStore();
     return () => { isMounted = false; };
   }, [propSession]);
@@ -198,7 +214,10 @@ export default function UserTools({ session: propSession, isMobile }) {
                 onMouseLeave={() => handleLeave(setIsUserOpen, userTimer)}
               >
                 <div className="user-logged-header">
-                  <p className="font-bold truncate" style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis' }}>Hi, {session.user.email.split('@')[0]}</p>
+                  {/* 🔥 SEHEMU IMEBADILISHWA HAPA: Inatumia full_name kama lipo, vinginevyo inatumia email */}
+                  <p className="font-bold truncate" style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    Hi, {session.user.full_name ? session.user.full_name : session.user.email.split('@')[0]}
+                  </p>
                   <p className="text-xs text-gray-500 truncate" style={{ fontSize: '11px', color: '#888', marginBottom: '8px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{session.user.email}</p>
                   
                   <button onClick={handleLogout} className="flex items-center gap-2 text-xs text-red-500 font-semibold w-full justify-center py-1.5 border border-red-200 rounded-full hover:bg-red-50 transition" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#e53e3e', fontWeight: '600', width: '100%', justifyContent: 'center', padding: '4px 0', border: '1px solid #fecaca', borderRadius: '9999px', background: 'transparent', cursor: 'pointer' }}>

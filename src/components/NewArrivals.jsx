@@ -189,7 +189,7 @@ export default function NewArrivals({ navigate, selectedCategory }) {
             <div key={product.id} className="na-card-wrapper">
               <DashboardCard
                 image={product.cover_image_url || product.cover_image || ''}
-                title={product.name || ''}
+                //title={product.name || ''}
                 price={product.price || 'TSh 0'}
                 originalPrice={product.original_price || ''}
                 moq={product.moq || ''}

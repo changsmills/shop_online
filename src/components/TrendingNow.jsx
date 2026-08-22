@@ -167,7 +167,7 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
             <div key={item.id} className="trend-card-wrapper">
               <DashboardCard
                 image={item.cover_image_url || item.cover_image}
-                title={item.name}
+               // title={item.name}
                 price={item.price}
                 views={item.views}
                 rank={index + 1}

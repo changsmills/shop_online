@@ -81,7 +81,7 @@ useEffect(() => {
   return () => window.removeEventListener('cartUpdated', handleCartUpdate);
 }, []);
 
-  const updateQuantity = (uniqueCartId, newQuantity) => {
+const updateQuantity = (uniqueCartId, newQuantity) => {
     console.log("🔄 updateQuantity called with:", { uniqueCartId, newQuantity });
     
     if (!uniqueCartId) {
@@ -96,11 +96,23 @@ useEffect(() => {
         return prev;
       }
       
-      const updated = prev.map((item) =>
-        item.uniqueCartId === uniqueCartId 
-          ? { ...item, quantity: Math.max(1, newQuantity) } 
-          : item
-      );
+      const updated = prev.map((item) => {
+        if (item.uniqueCartId === uniqueCartId) {
+          
+          // 🔥 ONGEZA HIZI KODI CHINI (KUZUIA KUPITA STOCK!)
+          const maxStock = item.stock_quantity > 0 ? item.stock_quantity : Number.MAX_SAFE_INTEGER;
+          const safeQuantity = Math.min(Math.max(1, newQuantity), maxStock);
+
+          // 🔥 Log ya ziada kuona kama umefikia kikomo
+          if (maxStock !== Number.MAX_SAFE_INTEGER && safeQuantity >= maxStock) {
+            console.log("⚠️ Umeifikia kikomo cha stock:", maxStock);
+          }
+
+          return { ...item, quantity: safeQuantity };
+        }
+        return item;
+      });
+      
       console.log("✅ Quantity updated:", updated.find(item => item.uniqueCartId === uniqueCartId));
       return updated;
     });

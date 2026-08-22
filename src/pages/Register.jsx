@@ -191,17 +191,13 @@ const Register = () => {
               <Lock size={16} color="#28a745" />
               <span className="security-text">2FA Enabled</span>
             </div>
-            <div className="security-badge-item">
-              <CheckCircle size={16} color="#28a745" />
-              <span className="security-text">Verified by Skyfall</span>
-            </div>
           </div>
 
           <div className="register-header">
             <h2 className="register-title">Create your account</h2>
             <p className="register-subtitle">
               <Lock size={14} color="#28a745" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
-              <span className="secure-text">We Secure Your Data</span> | Tunalinda Data Zako
+              <span className="secure-text">We Secure Your Data</span>
             </p>
           </div>
 
@@ -311,9 +307,6 @@ const Register = () => {
             </div>
             <p className="trust-text">
               Your information is protected with 256-bit SSL encryption.
-            </p>
-            <p className="trust-text-swahili">
-              Taarifa zako zinalindwa kwa usimbaji fiche wa kiwango cha juu.
             </p>
           </div>
 
