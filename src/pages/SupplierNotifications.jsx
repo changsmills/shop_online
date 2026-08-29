@@ -18,7 +18,8 @@ export default function SupplierNotifications({ session }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [myStoreId, setMyStoreId] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
-  
+  const [currentUserId, setCurrentUserId] = useState(null); // 🔥 ONGEZA HII!
+
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
@@ -33,6 +34,9 @@ export default function SupplierNotifications({ session }) {
     { icon: <Settings size={20} />, path: '/dashboard/supplier-settings', label: 'Mipangilio' },
   ];
 
+  // ==========================================
+  // 🔥 FUNCTION YA KUPATA ORDERS (IMEREKEBISHWA)
+  // ==========================================
   useEffect(() => {
     const fetchSellerOrders = async () => {
       const token = localStorage.getItem("access_token");
@@ -44,24 +48,32 @@ export default function SupplierNotifications({ session }) {
       const headers = { Authorization: `Bearer ${token}` };
       
       try {
-        // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
+        // 1. PATA PROFILE UUID KUTOKA /profile/
+        const profileRes = await api.get('/profile/', { headers });
+        const profileId = profileRes.data.id; // Hii ndiyo Profile UUID!
+        setCurrentUserId(profileId);
+
+        // 2. PATA STORE KWA KUTUMIA PROFILE UUID
         const storeRes = await api.get('/stores/', {
-          params: { owner_id: session?.user?.id },
+          params: { owner_id: profileId }, // 🔥 BADILISHA HAPA!
           headers
         });
-        const store = storeRes.data?.[0];
+
+        // ✅ TUMIA .results! (Django inarudisha {results: [...]})
+        const storesData = storeRes.data.results || storeRes.data || [];
+        const store = storesData[0]; 
 
         if (store) {
           setMyStoreId(store.id);
 
-          // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
+          // 3. PATA ORDERS (Tumia .results pia!)
           const ordersRes = await api.get('/orders/', {
             params: { store_id: store.id, ordering: '-created_at' },
             headers
           });
 
-          const orders = ordersRes.data || [];
-          const ordersWithCustomers = orders.map(order => {
+          const ordersData = ordersRes.data.results || ordersRes.data || [];
+          const ordersWithCustomers = ordersData.map(order => {
             const customerData = order.customer || { full_name: 'Mteja Mpya' };
             return { ...order, profiles: customerData };
           });
@@ -80,10 +92,13 @@ export default function SupplierNotifications({ session }) {
     };
     
     fetchSellerOrders();
-  }, [session?.user?.id]);
+  }, []); // 🔥 Badilisha kwenda [] (haina haja ya session?.user?.id tena)
 
+  // ==========================================
+  // 🔥 POLLING KWA ODA MPYA (IMEREKEBISHWA)
+  // ==========================================
   useEffect(() => {
-    if (!session?.user?.id || !myStoreId) return;
+    if (!currentUserId || !myStoreId) return;
     
     let pollingInterval = null;
     let lastCheckTime = new Date().toISOString();
@@ -103,14 +118,17 @@ export default function SupplierNotifications({ session }) {
             ordering: '-created_at'
           };
 
-          // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
-          const { data: orders, status } = await api.get('/orders/', { params, headers });
+          const response = await api.get('/orders/', { params, headers });
 
-          if (status === 200 && orders && orders.length > 0) {
-            console.log(`📦 Found ${orders.length} new order(s) via polling`);
+          // ✅ TUMIA .results HAPA PIA!
+          const ordersData = response.data.results || response.data || [];
+          const status = response.status;
+
+          if (status === 200 && ordersData.length > 0) {
+            console.log(`📦 Found ${ordersData.length} new order(s) via polling`);
             lastCheckTime = new Date().toISOString();
             
-            const ordersWithCustomers = orders.map(order => ({
+            const ordersWithCustomers = ordersData.map(order => ({
               ...order,
               profiles: order.customer || { full_name: 'Mteja Mpya' }
             }));
@@ -127,7 +145,7 @@ export default function SupplierNotifications({ session }) {
               return newOrders;
             });
             
-            document.title = `🔔 (${orders.length}) Oda Mpya!`;
+            document.title = `🔔 (${ordersData.length}) Oda Mpya!`;
             setTimeout(() => { document.title = "Skyfall"; }, 8000);
             
             try {
@@ -152,7 +170,7 @@ export default function SupplierNotifications({ session }) {
         clearInterval(pollingInterval);
       }
     };
-  }, [session?.user?.id, myStoreId]);
+  }, [currentUserId, myStoreId]); // 🔥 Badilisha kutoka session?.user?.id kwenda currentUserId!
 
   const getStatusStyle = (status) => {
     const styles = {
@@ -175,6 +193,7 @@ export default function SupplierNotifications({ session }) {
   return (
     <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#f7f8fa' }}>
       
+      {/* Header */}
       <header className="dashboard-header" style={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
@@ -208,6 +227,7 @@ export default function SupplierNotifications({ session }) {
 
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         
+        {/* Desktop Sidebar */}
         {!isMobile && (
           <aside 
             onMouseEnter={() => setIsExpanded(true)}
@@ -258,6 +278,7 @@ export default function SupplierNotifications({ session }) {
           </aside>
         )}
 
+        {/* Main Content */}
         <main style={{ 
           flex: 1, 
           padding: isMobile ? '16px' : '24px', 
@@ -339,6 +360,7 @@ export default function SupplierNotifications({ session }) {
         </main>
       </div>
       
+      {/* Mobile Bottom Nav */}
       {isMobile && (
         <nav className="mobile-bottom-nav" style={{
           position: 'fixed',

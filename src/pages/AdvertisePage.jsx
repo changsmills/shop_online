@@ -12,6 +12,7 @@ import {
   ImageIcon,
   Store,
   ChevronDown,
+  ChevronLeft, // 🔥 ONGEZA HII HAPA
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -473,9 +474,35 @@ const handleSubmit = async (e) => {
   // ============================================================
   return (
     <div className="advertise-container">
-      <div className="advertise-header">
-        <h2>📢 Broadcasting Center</h2>
-        <p>Tangaza biashara yako kwenye jukwaa kubwa la Skyfall</p>
+            <div className="advertise-header" style={{ position: 'relative' }}>
+        {/* 🔥 BACK ARROW BUTTON */}
+        <button
+          onClick={() => navigate(-1)} // Inarudi nyuma kwenye ukurasa uliotoka
+          style={{
+            position: 'absolute',
+            left: '0',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            background: '#f0f0f0',
+            border: 'none',
+            borderRadius: '50%',
+            width: '40px',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            zIndex: 10
+          }}
+        >
+          <ChevronLeft size={24} color="#333" />
+        </button>
+
+        {/* Ongeza padding-left ili maandishi yasigongane na button */}
+        <div style={{ paddingLeft: '50px' }}>
+          <h2>📢 Broadcasting Center</h2>
+          <p>Tangaza biashara yako kwenye jukwaa kubwa la Skyfall</p>
+        </div>
       </div>
 
       {status.msg && (

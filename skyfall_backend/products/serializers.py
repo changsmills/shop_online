@@ -384,10 +384,33 @@ class StoreEngineSerializer(serializers.ModelSerializer):
     office_image_1_url = serializers.SerializerMethodField()
     office_image_2_url = serializers.SerializerMethodField()
     office_image_3_url = serializers.SerializerMethodField()
+    owner_profile_id = serializers.UUIDField(source='owner.id', read_only=True)
+    owner_id = serializers.UUIDField(source='owner.id', read_only=True)
 
     class Meta:
         model = StoreEngine
-        fields = '__all__'
+        fields = [
+            'id', 'owner', 'owner_id', 'owner_profile_id',
+            'store_name', 'store_slug', 'description',
+            'status', 'is_active', 'is_verified', 'verification_status',
+            'created_at',
+            'store_logo', 'store_logo_url',
+            'store_banner', 'store_banner_url',
+            'tin_image', 'tin_image_url',
+            'office_image_1', 'office_image_1_url',
+            'office_image_2', 'office_image_2_url',
+            'office_image_3', 'office_image_3_url',
+            'category', 'category_id', 'category_name',
+            'sub_category_ids', 'sub_categories',
+            'phone_number', 'email', 'physical_address', 'city',
+            'instagram_handle', 'whatsapp_number', 'twitter_handle', 'tiktok_handle',
+            'youtube_link', 'google_maps_url',
+            'business_type', 'tin_number', 'lead_time', 'moq',
+            'packaging_type', 'supply_capacity', 'working_hours',
+            'specialist_tags',
+            'total_sales', 'average_rating',
+            'store_index',
+        ]
         read_only_fields = ['owner']
 
     # ------------------------------------------------------------------
@@ -398,16 +421,16 @@ class StoreEngineSerializer(serializers.ModelSerializer):
         if not field_value:
             print(f"⚠️ [DEBUG] {field_name} haipo kwa store: {store_id}", flush=True)
             return None
-        
+
         CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
         if not CLOUD_NAME:
             print("❌ [ERROR] CLOUDINARY_CLOUD_NAME haipo kwenye .env!", flush=True)
             return None
-        
+
         public_id = str(field_value)
         safe_path = urllib.parse.quote(public_id)
         final_url = f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/v1/{safe_path}"
-        
+
         print(f"✅ [DEBUG] {field_name} imeundwa: {final_url}", flush=True)
         return final_url
 
@@ -445,7 +468,6 @@ class StoreEngineSerializer(serializers.ModelSerializer):
         if not obj.office_image_1:
             print(f"⚠️ [DEBUG] office_image_1 haipo kwa store: {obj.id}", flush=True)
             return None
-        # 🔥 Rudisha URL kamili moja kwa moja (bila kukagua chochote)
         print(f"✅ [DEBUG] office_image_1 URL: {obj.office_image_1}", flush=True)
         return obj.office_image_1
 
@@ -468,25 +490,25 @@ class StoreEngineSerializer(serializers.ModelSerializer):
     # ============================================================
     def to_internal_value(self, data):
         request = self.context.get('request')
-        
+
         print(f"🔍 [DEBUG] StoreSerializer to_internal_value called! Request FILES keys: {request.FILES.keys() if request else 'No Request'}", flush=True)
-        
+
         self._store_logo = None
         self._store_banner = None
         self._tin_image = None
         self._office_images = []
-        
+
         if request:
             self._store_logo = request.FILES.get('store_logo')
             self._store_banner = request.FILES.get('store_banner')
             self._tin_image = request.FILES.get('tin_image')
             self._office_images = request.FILES.getlist('office_images')
-            
+
             print(f"🔍 [DEBUG] Store Logo received: {self._store_logo is not None}", flush=True)
             print(f"🔍 [DEBUG] Store Banner received: {self._store_banner is not None}", flush=True)
             print(f"🔍 [DEBUG] TIN Image received: {self._tin_image is not None}", flush=True)
             print(f"🔍 [DEBUG] Office Images count: {len(self._office_images)}", flush=True)
-            
+
         return super().to_internal_value(data)
 
     # ============================================================
@@ -497,7 +519,7 @@ class StoreEngineSerializer(serializers.ModelSerializer):
         import traceback
         request = self.context.get('request')
         user = request.user
-        
+
         print("📦 [DEBUG] Starting Store Creation (Like ProductsEngine)...", flush=True)
 
         try:
@@ -505,20 +527,38 @@ class StoreEngineSerializer(serializers.ModelSerializer):
         except Profile.DoesNotExist:
             print("❌ [ERROR] Profile haipo!", flush=True)
             raise serializers.ValidationError({"owner": "Mtumiaji hana Profile. Tafadhali unda profile kwanza."})
-        
-        # 🔥 1. TOA PICHA KUTOKA self (Zilizokusanywa na to_internal_value)
+
+        # 🔥 1. PAKUA CATEGORY_ID KUTOKA REQUEST
+        category_id = request.data.get('category_id') or request.data.get('category')
+        if category_id:
+            validated_data['category_id'] = category_id
+            print(f"✅ [DEBUG] Category ID imepakiwa: {category_id}", flush=True)
+
+        # 🔥 2. PAKUA SUB_CATEGORY_IDS
+        sub_category_ids = request.data.get('sub_category_ids')
+        if sub_category_ids:
+            import json
+            if isinstance(sub_category_ids, str):
+                try:
+                    sub_category_ids = json.loads(sub_category_ids)
+                except json.JSONDecodeError:
+                    sub_category_ids = sub_category_ids.split(',')
+            validated_data['sub_category_ids'] = sub_category_ids
+            print(f"✅ [DEBUG] Sub Category IDs: {sub_category_ids}", flush=True)
+
+        # 🔥 3. TOA PICHA KUTOKA self (Zilizokusanywa na to_internal_value)
         store_logo_file = self._store_logo
         store_banner_file = self._store_banner
         tin_image_file = self._tin_image
         office_images = self._office_images
 
-        # 🔥 2. ONDOA FIELDS ZA PICHA KUTOKA validated_data
+        # 🔥 4. ONDOA FIELDS ZA PICHA KUTOKA validated_data
         validated_data.pop('store_logo', None)
         validated_data.pop('store_banner', None)
         validated_data.pop('tin_image', None)
         validated_data.pop('office_images', None)
 
-        # 🔥 3. UNDA DUKA (BILA PICHA KWANZA)
+        # 🔥 5. UNDA DUKA (BILA PICHA KWANZA)
         validated_data['owner'] = profile
         try:
             print("  🔧 [DEBUG] Creating StoreEngine instance...", flush=True)
@@ -529,7 +569,7 @@ class StoreEngineSerializer(serializers.ModelSerializer):
             print(traceback.format_exc(), flush=True)
             raise e
 
-        # 🔥 4. PAKIA NA KUHIFADHI PICHA KWENYE CLOUDINARY
+        # 🔥 6. PAKIA NA KUHIFADHI PICHA KWENYE CLOUDINARY
         # Store Logo
         if store_logo_file:
             print(f"  📸 [DEBUG] Attempting to upload Store Logo...", flush=True)
@@ -576,17 +616,17 @@ class StoreEngineSerializer(serializers.ModelSerializer):
                     try:
                         print(f"    - Uploading office image {i+1}...", flush=True)
                         result = cloudinary.uploader.upload(file, folder="store_offices")
-                        
+
                         if i == 0:
                             store.office_image_1 = result['secure_url']
                         elif i == 1:
                             store.office_image_2 = result['secure_url']
                         elif i == 2:
                             store.office_image_3 = result['secure_url']
-                        
+
                         store.save(update_fields=['office_image_1', 'office_image_2', 'office_image_3'])
                         print(f"      ✅ Office image {i+1} uploaded! URL: {result['secure_url']}", flush=True)
-                        
+
                     except Exception as e:
                         print(f"❌ [ERROR] Office image {i+1} failed: {e}", flush=True)
                         print(traceback.format_exc(), flush=True)

@@ -62,26 +62,32 @@ const SupplierMessages = () => {
   }, [navigate]);
 
   const fetchMessages = async (partnerId) => {
-    if (!partnerId || !currentUserId) return;
-    try {
-      const token = localStorage.getItem("access_token");
-      const headers = { Authorization: `Bearer ${token}` };
+  if (!partnerId || !currentUserId) return;
+  try {
+    const token = localStorage.getItem("access_token");
+    const headers = { Authorization: `Bearer ${token}` };
+    const response = await api.get('/messages/', {
+      params: { sender: currentUserId, receiver: partnerId },
+      headers
+    });
 
-      // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
-      const response = await api.get('/messages/', {
-        params: {
-          sender: currentUserId,
-          receiver: partnerId
-        },
-        headers
-      });
-
-      setMessages(response.data || []);
-    } catch (err) {
-      console.error("Error fetching messages:", err.response?.data || err.message);
-      setMessages([]);
+    // ✅ MUHIMU! Tumia .results!
+    const data = response.data.results || response.data || [];
+    
+    // (Ikiwa unataka jina la Store libadilike kwenye header)
+    if (data.length > 0) {
+      const firstMsg = data[0];
+      const isISender = firstMsg.sender_id === currentUserId;
+      const storeName = isISender ? firstMsg.receiver_name : firstMsg.sender_name;
+      setActiveChat(prev => prev ? { ...prev, name: storeName || prev.name } : prev);
     }
-  };
+
+    setMessages(data); // ✅ Hii ni array sahihi!
+  } catch (err) {
+    console.error("Error fetching messages:", err.response?.data || err.message);
+    setMessages([]);
+  }
+};
 
   const fetchInbox = async () => {
     if (!currentUserId) return;
@@ -90,7 +96,6 @@ const SupplierMessages = () => {
       const token = localStorage.getItem("access_token");
       const headers = { Authorization: `Bearer ${token}` };
 
-      // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
       const response = await api.get('/messages/', {
         params: {
           user_id: currentUserId,
@@ -99,20 +104,23 @@ const SupplierMessages = () => {
         headers
       });
 
-      const data = response.data || [];
+      // ✅ Tumia results!
+      const data = response.data.results || response.data || [];
       const chatGroups = {};
 
       data.forEach(msg => {
         const isISender = msg.sender_id === currentUserId;
         const partnerId = isISender ? msg.receiver_id : msg.sender_id;
-        const partnerData = isISender ? msg.receiver : msg.sender;
-        const partnerName = partnerData?.full_name || `Mteja ${partnerId.slice(0,4)}`;
+        
+        // 🔥 BADILISHA HAPA! Tumia sender_name / receiver_name kutoka API!
+        const partnerName = isISender ? msg.receiver_name : msg.sender_name;
+        const finalName = partnerName || `Mteja ${partnerId.slice(0,4)}`;
         
         if (partnerId && !chatGroups[partnerId]) {
           chatGroups[partnerId] = {
             id: partnerId,
-            name: partnerName,
-            avatar: partnerData?.avatar_url || null,
+            name: finalName, // 🔥 Jina la Store sasa!
+            avatar: isISender ? (msg.receiver_avatar || null) : (msg.sender_avatar || null),
             lastMsg: msg.content,
             date: new Date(msg.created_at).toLocaleDateString(),
             timestamp: new Date(msg.created_at).getTime()
@@ -153,15 +161,11 @@ const SupplierMessages = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       // 🔥 MABADILIKO: api.post na kuondoa API_BASE_URL
-      await api.post(
-        '/messages/',
-        {
-          sender_id: currentUserId,
-          receiver_id: activeChat.id,
-          content: originalMessage
-        },
-        { headers }
-      );
+      await api.post('/messages/', {
+  sender: currentUserId, // ✅ Sahihi!
+  receiver: activeChat.id, // ✅ Sahihi!
+  content: originalMessage
+}, { headers });
 
       fetchMessages(activeChat.id);
     } catch (error) {
@@ -171,13 +175,17 @@ const SupplierMessages = () => {
   };
 
   const handleChatSelect = async (chat) => {
-    setActiveChat(chat);
-    await fetchMessages(chat.id);
+    setActiveChat(chat);  // 🔥 Weka chat kwanza!
+    await fetchMessages(chat.id);  // Kisha pata messages
     scrollToBottom();
     if (isMobile) setShowMobileChat(true);
   };
 
-  const handleBackToChatList = () => setShowMobileChat(false);
+  const handleBackToChatList = () => {
+  setShowMobileChat(false);
+  setActiveChat(null); // 🔥 Ongeza hii! Inafunga chat na kurudi kwenye list.
+  setMessages([]);
+   };
 
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} />, path: '/dashboard/sellerboard', label: 'Duka Lako' },
@@ -213,7 +221,7 @@ const SupplierMessages = () => {
           {(!isMobile || (isMobile && !showMobileChat)) && (
             <div className="messages-sidebar" style={{ width: isMobile ? '100%' : '320px', flexShrink: 0, borderRight: '1px solid #eee' }}>
               <div className="sidebar-header-chat" style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
-                <h3 style={{ margin: 0 }}>Mazungumzo</h3>
+                <h3 style={{ margin: 0 }}>Inbox</h3>
               </div>
               <div className="chat-list" style={{ overflowY: 'auto', height: '100%' }}>
                 {loading ? (<p style={{ padding: '20px', textAlign: 'center' }}>Inapakia...</p>) : chats.length === 0 ? (
@@ -235,7 +243,7 @@ const SupplierMessages = () => {
             </div>
           )}
 
-          <div className="chat-window" style={{ flex: 1, display: 'flex', flexDirection: 'column', width: isMobile && showMobileChat ? '100%' : 'auto' }}>
+          <div className={`chat-window ${isMobile && showMobileChat ? 'active-mobile-chat' : ''}`} style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             {!activeChat ? (
               <div className="chat-empty-state" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', color: '#999' }}>
                 <img src={messageImage} alt="Chat" style={{ width: '150px', maxWidth: '100%' }} />

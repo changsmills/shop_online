@@ -470,7 +470,8 @@ class Message(models.Model):
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True, related_name='messages')
     content = models.TextField()
     is_read = models.BooleanField(default=False, null=True, blank=True)
-    created_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)  # ✅ ITAJAZA AUTOMATIC!
+
 
     class Meta:
         db_table = 'messages'

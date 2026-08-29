@@ -15,7 +15,8 @@ import '../Messages.css';
 import '../AccountSettings.css';
 import messageImage from "../images/messageSent.svg"; 
 
-const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
+const Messages = () => {
+
   const navigate = useNavigate();
   const location = useLocation();
   const messagesEndRef = useRef(null);
@@ -64,15 +65,16 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
   // ==========================================
 
   // Detect mobile screen
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+ useEffect(() => {
+  const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+  return () => window.removeEventListener('resize', checkMobile);
+}, []);
 
   // Sikiliza kama kuna mteja anakuja kuanza chat mpya kupitia location.state
   useEffect(() => {
+    
     const startNewChat = async () => {
       if (location.state?.sellerId && currentUserId) {
         const { sellerId, sellerName, productContext } = location.state;
@@ -120,26 +122,26 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
   // 🔥 FETCH MESSAGES (Django API)
   // ==========================================
   const fetchMessages = async (partnerId) => {
-    if (!partnerId || !currentUserId) return;
-    try {
-      const res = await api.get('/messages/', {
-        params: {
-          sender: currentUserId,
-          receiver: partnerId
-        }
-      });
-      // DRF inarudisha { results: [...] } ikiwa pagination ipo
-      setMessages(res.data.results || res.data || []);
-    } catch (err) {
-      console.error("Error fetching messages:", err.response?.data || err.message);
-      setMessages([]);
-    }
-  };
+  if (!partnerId || !currentUserId) return;
+  try {
+    const res = await api.get('/messages/', {
+      params: {
+        user_id: currentUserId,
+        receiver: partnerId
+      }
+    });
+    // 🔥 BADILISHA HII - Hakikisha unachukua messages tu, si activeChat!
+    setMessages(res.data.results || res.data || []);
+  } catch (err) {
+    console.error("Error fetching messages:", err.response?.data || err.message);
+    setMessages([]);
+  }
+};
 
   // ==========================================
   // 🔥 FETCH INBOX (Django API)
   // ==========================================
-  const fetchInbox = async () => {
+const fetchInbox = async () => {
     if (!currentUserId) return;
     setLoading(true);
 
@@ -158,13 +160,19 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
         data.forEach(msg => {
           const isISender = msg.sender_id === currentUserId;
           const partnerId = isISender ? msg.receiver_id : msg.sender_id;
-          const partnerData = isISender ? msg.receiver : msg.sender;
+          
+          // 🔥 BADILISHA HAPA: Tumia sender_name / receiver_name kutoka API!
+          const partnerName = isISender ? msg.receiver_name : msg.sender_name;
+          const partnerAvatar = isISender ? (msg.receiver_avatar || null) : (msg.sender_avatar || null);
+          
+          // 🔥 HAPA NDIPO JINA LA STORE LITAONEKANA!
+          const displayName = partnerName || `User ${partnerId.slice(0,4)}`;
 
           if (partnerId && !chatGroups[partnerId]) {
             chatGroups[partnerId] = {
               id: partnerId,
-              name: partnerData?.full_name || `User ${partnerId.slice(0,4)}`,
-              avatar: partnerData?.avatar_url || null,
+              name: displayName, // 🔥 Jina la Store au Profile!
+              avatar: partnerAvatar || null,
               lastMsg: msg.content,
               date: new Date(msg.created_at).toLocaleDateString(),
               timestamp: new Date(msg.created_at).getTime()
@@ -203,94 +211,120 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
     setIsSearching(false);
   };
 
-  const handleSelectStoreFromSearch = (store) => {
-    const existingChat = chats.find(c => c.id === store.owner_id);
-    
-    if (existingChat) {
-      handleChatSelect(existingChat);
-    } else {
-      const newChatPartner = {
-        id: store.owner_id, 
-        name: store.store_name,
-        avatar: store.store_logo || null,
-        lastMsg: "Anza mazungumzo mapya...",
-        date: "New"
-      };
-      setMessages([]); 
-      setActiveChat(newChatPartner);
-      if (isMobile) setShowMobileChat(true);
-    }
-    
-    setSearchQuery("");
-    setSearchResults([]);
-  };
+const handleSelectStoreFromSearch = (store) => {
+  // 🔥 HAKIKISHA TUNATUMIA Profile ID ya store owner!
+  const partnerId = store.owner_profile_id || store.owner_id;  // Tumia Profile ID!
+  
+  console.log("🔍 Selected store:", store);
+  console.log("🔍 Partner ID:", partnerId);
+  
+  const existingChat = chats.find(c => c.id === partnerId);
+  
+  if (existingChat) {
+    handleChatSelect(existingChat);
+  } else {
+    const newChatPartner = {
+      id: partnerId,
+      name: store.store_name,
+      avatar: store.store_logo || null,
+      lastMsg: "Anza mazungumzo mapya...",
+      date: "New"
+    };
+    setMessages([]); 
+    setActiveChat(newChatPartner);
+    if (isMobile) setShowMobileChat(true);
+  }
+  
+  setSearchQuery("");
+  setSearchResults([]);
+};
 
   // ==========================================
   // 🔥 SEND MESSAGE (Django API)
   // ==========================================
-  const handleSendMessage = async (e) => {
-    e.preventDefault();
-    if (!newMessage.trim() || !activeChat || !currentUserId) return;
+ const handleSendMessage = async (e) => {
+  e.preventDefault();
+  if (!newMessage.trim() || !activeChat || !currentUserId) return;
 
-    // Temporary message for UI
-    const tempMsg = {
-      id: Date.now(),
-      sender_id: currentUserId,
-      receiver_id: activeChat.id,
-      content: newMessage,
-      created_at: new Date().toISOString(),
-      isPending: true
-    };
-
-    setMessages(prev => [...prev, tempMsg]);
-    const originalMessage = newMessage;
-    setNewMessage("");
-    scrollToBottom();
-
-    try {
-      await api.post('/messages/', {
-        sender: currentUserId,       // 🔥 Tumia 'sender' (Profile ID)
-        receiver: activeChat.id,     // 🔥 Tumia 'receiver' (Profile ID)
-        content: originalMessage,
-      });
-
-      // Fetch updated messages to get real IDs and timestamps
-      fetchMessages(activeChat.id);
-    } catch (error) {
-      console.error("Error sending:", error);
-      setMessages(prev => prev.filter(msg => msg.id !== tempMsg.id));
-      setNewMessage(originalMessage);
-    }
+  const tempMsg = {
+    id: Date.now(),
+    sender_id: currentUserId,
+    receiver_id: activeChat.id,
+    content: newMessage,
+    created_at: new Date().toISOString(),
+    isPending: true
   };
 
-  const handleChatSelect = async (chat) => {
-    setActiveChat(chat);
-    await fetchMessages(chat.id);
-    scrollToBottom();
-    if (isMobile) {
-      setShowMobileChat(true);
-    }
-  };
+  setMessages(prev => [...prev, tempMsg]);
+  const originalMessage = newMessage;
+  setNewMessage("");
+  scrollToBottom();
 
-  const handleBackToChatList = () => {
-    setShowMobileChat(false);
-  };
+  try {
+    console.log("🔍 Sending message:", {
+      sender: currentUserId,
+      receiver: activeChat.id,
+      content: originalMessage
+    });
+
+    await api.post('/messages/', {
+      sender: currentUserId,
+      receiver: activeChat.id,
+      content: originalMessage,
+    });
+
+    // 🔥 BADILISHA HII - Usipige fetchMessages baada ya kutuma!
+    // Badala yake, weka tempMsg kwenye messages moja kwa moja!
+    setMessages(prev => [...prev, {
+      ...tempMsg,
+      isPending: false
+    }]);
+    
+    // 🔥 Au piga fetchMessages kwenye polling tu (kila sekunde 5)
+  } catch (error) {
+    console.error("Error sending:", error);
+    console.error("Error response:", error.response?.data);
+    setMessages(prev => prev.filter(msg => msg.id !== tempMsg.id));
+    setNewMessage(originalMessage);
+  }
+};
+
+ const handleChatSelect = async (chat) => {
+  setActiveChat(chat);
+  await fetchMessages(chat.id);
+  scrollToBottom();
+  if (isMobile) {
+    setShowMobileChat(true);
+  }
+};
+
+  // ==========================================
+  // 🔥 ZIADA: HII ILIKOSA, SASA IMEONGEWA (Inazuia White Screen!)
+  // ==========================================
+
+const handleBackToChatList = () => {
+  setShowMobileChat(false);
+  setActiveChat(null);
+  setMessages([]);
+  navigate('/dashboard/messages'); // 🔥 HII IKO SAHIHI!
+};
 
   // ==========================================
   // 🔥 POLLING: Kuchukua nafasi ya Supabase Realtime
   // ==========================================
-  useEffect(() => {
-    let intervalId;
-    if (activeChat && currentUserId) {
-      // Piga API kila sekunde 5 kuangalia ujumbe mpya
-      intervalId = setInterval(() => {
-        fetchMessages(activeChat.id);
-      }, 5000);
-    }
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [activeChat, currentUserId]);
+  // 🔥 BADILISHA HII - Polling haipaswi kubadilisha activeChat!
+useEffect(() => {
+  let intervalId;
+  if (activeChat && currentUserId) {
+    intervalId = setInterval(() => {
+      // 🔥 Hakikisha unapiga fetchMessages kwa activeChat.id tu!
+      fetchMessages(activeChat.id);
+    }, 5000);
+  }
+  return () => {
+    if (intervalId) clearInterval(intervalId);
+  };
+}, [activeChat?.id, currentUserId]); // 🔥 Tumia activeChat?.id, si activeChat!
 
   // Initial fetch
   useEffect(() => {
@@ -475,7 +509,7 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
                     }}>
                       {searchResults.map(store => (
                         <div 
-                          key={store.owner_id}
+                          key={store.id || store.owner_id}
                           onClick={() => handleSelectStoreFromSearch(store)}
                           style={{
                             padding: isMobile ? '10px 12px' : '12px 15px',
@@ -672,7 +706,7 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
                         }}>
                           {searchResults.map(store => (
                             <div 
-                              key={store.owner_id}
+                              key={store.id || store.owner_id}
                               onClick={() => {
                                 handleSelectStoreFromSearch(store);
                                 setShowSearchModal(false);
@@ -735,12 +769,11 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
           )}
 
           {/* CHAT WINDOW */}
-          <div className="chat-window" style={{ 
-            flex: 1, 
-            display: 'flex', 
-            flexDirection: 'column',
-            width: isMobile && showMobileChat ? '100%' : 'auto'
-          }}>
+          <div className={`chat-window ${isMobile && showMobileChat ? 'active-mobile-chat' : ''}`} style={{ 
+  flex: 1, 
+  display: 'flex', 
+  flexDirection: 'column'
+}}>
             {!activeChat ? (
               <div className="chat-empty-state">
                 <div className="empty-state-content">
@@ -759,22 +792,26 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
                   backgroundColor: '#fff'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    {isMobile && showMobileChat && (
-                      <button 
-                        onClick={handleBackToChatList}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          cursor: 'pointer',
-                          padding: '8px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          marginRight: '4px'
-                        }}
-                      >
-                        <ChevronLeft size={24} color="#666" />
-                      </button>
-                    )}
+
+                    {activeChat && isMobile && showMobileChat && (
+  <button 
+    onClick={handleBackToChatList}
+    className="mobile-back-btn"
+    style={{
+      background: 'none',
+      border: 'none',
+      cursor: 'pointer',
+      padding: '6px',
+      marginRight: '8px',
+      borderRadius: '50%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}
+  >
+    <ChevronLeft size={28} color="#333" />
+  </button>
+)}
                     <div className="chat-avatar" style={{ width: '40px', height: '40px' }}>
                       {activeChat.avatar ? (
                         <img src={activeChat.avatar} alt={activeChat.name} style={{width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover'}} />
@@ -812,10 +849,10 @@ const Messages = () => { // 🔥 IMEONDOLEShA { session } prop!
                     </div>
                   ) : (
                     messages.map((msg, index) => (
-  <div 
-    key={msg.id || `msg-${index}`} 
-    className={`message-bubble ${msg.sender_id === currentUserId ? 'sent' : 'received'}`}
-  >
+                      <div 
+                        key={msg.id || `msg-${index}`} 
+                        className={`message-bubble ${msg.sender_id === currentUserId ? 'sent' : 'received'}`}
+                      >
                         <div className="bubble-content">
                           <div className="message-sender-name" style={{ fontSize: '12px', fontWeight: '600', marginBottom: '4px', color: '#ff6a00' }}>
                             {getSenderName(msg)}

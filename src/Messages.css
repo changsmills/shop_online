@@ -4,9 +4,9 @@
 .messages-container {
     display: flex;
     flex: 1;
-    height: 100%; /* Inajaza nafasi yote chini ya header */
+    height: 100%;
     background-color: #ffffff;
-    overflow: hidden; /* Muhimu kuzuia scrollbar ya nje */
+    overflow: hidden;
 }
 
 /* =========================================
@@ -73,7 +73,7 @@
 }
 
 .chat-item.active {
-    background-color: #fff0e6; /* Rangi hafifu ya Alibaba */
+    background-color: #fff0e6;
     border-left: 3px solid #ff6a00;
 }
 
@@ -92,7 +92,7 @@
 
 .chat-info {
     flex: 1;
-    min-width: 0; /* Muhimu kwa text-overflow */
+    min-width: 0;
 }
 
 .chat-info-top {
@@ -128,7 +128,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    background: #f7f8fa; /* Background ya kijivu */
+    background: #f7f8fa;
 }
 
 /* Empty State */
@@ -171,7 +171,6 @@
     color: #ff6a00;
 }
 
-/* Active Chat Content */
 .active-chat-content {
     display: flex;
     flex-direction: column;
@@ -194,6 +193,63 @@
     flex: 1;
     padding: 20px;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background-color: #f0f2f5;
+}
+
+/* Message bubbles */
+.message-bubble {
+    max-width: 70%;
+    display: flex;
+    flex-direction: column;
+}
+
+.message-bubble.sent {
+    align-self: flex-end;
+}
+
+.message-bubble.sent .bubble-content {
+    background-color: #dcf8c6;
+    color: #303030;
+    border-radius: 15px 15px 0 15px;
+    padding: 10px 15px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.message-bubble.received {
+    align-self: flex-start;
+}
+
+.message-bubble.received .bubble-content {
+    background-color: #ffffff;
+    color: #303030;
+    border-radius: 15px 15px 15px 0;
+    padding: 10px 15px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.bubble-content p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.msg-timestamp {
+    font-size: 10px;
+    color: #888;
+    margin-top: 4px;
+    align-self: flex-end;
+    display: block;
+}
+
+.messages-display::-webkit-scrollbar {
+    width: 6px;
+}
+.messages-display::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 10px;
 }
 
 /* Input Area */
@@ -223,7 +279,7 @@
 }
 
 .send-btn {
-    background: #ff6a00; /* Rangi ya Alibaba */
+    background: #ff6a00;
     color: #fff;
     border: none;
     width: 42px;
@@ -240,213 +296,151 @@
     opacity: 0.9;
 }
 
-/* Eneo la kuonyesha meseji zote */
-.messages-display {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  background-color: #f0f2f5; /* Rangi ya nyuma kama WhatsApp */
-}
-
-/* Base style kwa bubble zote */
-.message-bubble {
-  max-width: 70%;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Meseji unazotuma (Zinakaa kulia) */
-.message-bubble.sent {
-  align-self: flex-end;
-}
-
-.message-bubble.sent .bubble-content {
-  background-color: #dcf8c6; /* Kijani hafifu */
-  color: #303030;
-  border-radius: 15px 15px 0 15px; /* Pembe ya kulia chini inakuwa kali */
-  padding: 10px 15px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-}
-
-/* Meseji unazopokea (Zinakaa kushoto) */
-.message-bubble.received {
-  align-self: flex-start;
-}
-
-.message-bubble.received .bubble-content {
-  background-color: #ffffff; /* Nyeupe */
-  color: #303030;
-  border-radius: 15px 15px 15px 0; /* Pembe ya kushoto chini inakuwa kali */
-  padding: 10px 15px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-}
-
-/* Mpangilio wa maandishi ndani ya bubble */
-.bubble-content p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-/* Muda wa meseji */
-.msg-timestamp {
-  font-size: 10px;
-  color: #888;
-  margin-top: 4px;
-  align-self: flex-end;
-  display: block;
-}
-
-/* Inatengeneza scrollbar nzuri */
-.messages-display::-webkit-scrollbar {
-  width: 6px;
-}
-.messages-display::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  border-radius: 10px;
-}
-/* ============================================ */
-/* MOBILE RESPONSIVE - MESSAGES PAGE */
-/* ============================================ */
-
+/* =========================================
+   🔥 MOBILE RESPONSIVE (HII NDIO SAHIHI KABISA)
+   ========================================= */
 @media (max-width: 768px) {
-  /* Hide desktop sidebar */
-  .dashboard-layout > .dashboard-main > aside {
-    display: none !important;
-  }
-  
-  /* Messages container full width */
-  .messages-container {
-    width: 100% !important;
-  }
-  
-  /* Messages sidebar full width when chat not open */
-  .messages-sidebar {
-    width: 100% !important;
-    border-right: none !important;
-  }
-  
-  /* Chat window takes full width when open */
-  .chat-window {
-    width: 100% !important;
-  }
-  
-  /* Chat header adjustments */
-  .chat-header-active {
-    padding: 10px 16px !important;
-  }
-  
-  /* Message bubbles smaller on mobile */
-  .message-bubble .bubble-content {
-    max-width: 85% !important;
-    font-size: 13px !important;
-  }
-  
-  .messages-display {
-    padding: 16px !important;
-  }
-  
-  /* Message input area */
-  .message-input-area {
-    padding: 12px 16px !important;
-  }
-  
-  .message-input-area input {
-    padding: 10px !important;
-    font-size: 13px !important;
-  }
-  
-  .message-input-area button {
-    width: 40px !important;
-    height: 40px !important;
-  }
-  
-  /* Chat list items */
-  .chat-item {
-    padding: 12px !important;
-  }
-  
-  .chat-avatar {
-    width: 45px !important;
-    height: 45px !important;
-  }
-  
-  .chat-name {
-    font-size: 14px !important;
-  }
-  
-  .chat-preview {
-    font-size: 12px !important;
-  }
-  
-  .chat-date {
-    font-size: 10px !important;
-  }
-  
-  /* Empty state */
-  .chat-empty-state .empty-state-content h2 {
-    font-size: 16px !important;
-    padding: 0 16px !important;
-  }
-  
-  .empty-chat-img {
-    width: 200px !important;
-  }
-  
-  /* Search bar in chat sidebar */
-  .search-bar-chat input {
-    font-size: 13px !important;
-    padding: 8px 12px !important;
-  }
+    /* 1. FICHA KILA KITU CHA DESKTOP */
+    .dashboard-layout > .dashboard-main > aside {
+        display: none !important;
+    }
+    .dashboard-header {
+        display: none !important;
+    }
+    .bottom-nav-wrapper {
+        display: none !important;
+    }
+
+    /* 2. FANYA CONTAINER IJAZE SKRINI */
+    .messages-container {
+        width: 100% !important;
+        height: 100vh !important;
+        display: block !important;
+    }
+
+    /* 3. SIDEBAR (INBOX) - IONEKANE KILA WAKATI CHAT HAIFUNGULIWI */
+    .messages-sidebar {
+        width: 100% !important;
+        height: 100vh !important;
+        display: flex !important;
+        border-right: none !important;
+    }
+
+    /* 4. CHAT WINDOW - IFICHWE KABISA KAMA HAIJAFUNGULIWA */
+    .chat-window {
+        width: 100% !important;
+        height: 100vh !important;
+        display: none !important;  /* 🔥 Hii ndiyo muhimu! Inaficha chat kama haijafunguliwa */
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        z-index: 9999 !important;
+        background: #f7f8fa !important;
+    }
+
+    /* 5. KAMA CHAT IMEFUNGULIWA (Kwa class ya ziada), IONEKANE */
+    .chat-window.active-mobile-chat {
+        display: flex !important;
+    }
+
+    /* 6. Bubbles na Input */
+    .chat-header-active {
+        padding: 10px 16px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 10px !important;
+        background-color: #fff !important;
+    }
+    .messages-display {
+        padding: 16px !important;
+        height: calc(100vh - 130px) !important;
+    }
+    .message-bubble {
+        max-width: 85% !important;
+    }
+    .bubble-content {
+        max-width: 100% !important;
+        word-break: break-word !important;
+    }
+    .message-input-area {
+        padding: 10px 16px !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 10000 !important;
+        border-top: 1px solid #e5e7eb !important;
+        background: #fff !important;
+    }
+
+    /* 7. Back Button Ionekane Vizuri */
+    .mobile-back-btn {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: #f0f0f0 !important;
+        border-radius: 50% !important;
+        width: 40px !important;
+        height: 40px !important;
+        margin-right: 8px !important;
+        padding: 0 !important;
+        border: none !important;
+        cursor: pointer !important;
+        color: #333 !important;
+    }
 }
 
+/* =========================================
+   🔥 EXTRA SMALL MOBILE (max-width: 480px)
+   ========================================= */
 @media (max-width: 480px) {
-  .message-bubble .bubble-content {
-    max-width: 95% !important;
-  }
-  
-  .chat-item {
-    padding: 10px !important;
-  }
-  
-  .chat-avatar {
-    width: 40px !important;
-    height: 40px !important;
-  }
-  
-  .messages-display {
-    padding: 12px !important;
-  }
-}
-.animate-spin {
-  animation: spin 1s linear infinite;
+    .message-bubble {
+        max-width: 95% !important;
+    }
+
+    .messages-display {
+        padding: 12px !important;
+    }
+
+    .chat-item {
+        padding: 10px !important;
+    }
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@media (max-width: 768px) {
-  /* KUHUSU BUBBLE YENYEWE */
-  .message-bubble {
-    max-width: 90% !important;   /* Inapanua sanduku hadi 90% ya skrini */
-    width: auto !important;
-  }
-
-  .bubble-content {
-    max-width: 100% !important;   /* Hairuhusu kuzidi mzazi */
-    word-break: break-word !important;
-    white-space: normal !important;
-  }
-}
-/* 🔥 SUKUMA UserTools KULIA KABISA KWENYE HEADER */
-.header-right {
-  margin-left: auto !important; /* Inasukuma UserTools kwenda kulia */
-  display: flex;
+/* 🔥 Back Arrow ya Mobile */
+.mobile-back-btn {
+  display: flex !important;
   align-items: center;
-  gap: 15px;
+  justify-content: center;
+  background: #f0f0f0 !important;
+  border-radius: 50% !important;
+  width: 40px;
+  height: 40px;
+  transition: background 0.2s;
+}
+
+.mobile-back-btn:hover {
+  background: #e0e0e0 !important;
+}
+
+/* 🔥 Mobile Header Inapaswa Kuwa Na Flex */
+@media (max-width: 768px) {
+  .chat-header-active {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    padding: 10px 16px !important;
+    background-color: #fff !important;
+  }
+
+  .chat-header-active h4 {
+    font-size: 16px !important;
+    flex: 1 !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0 !important;
+  }
 }

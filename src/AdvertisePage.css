@@ -800,3 +800,18 @@
         color: #94a3b8 !important;
     }
 }
+
+.advertise-header button:hover {
+  background: #e0e0e0 !important;
+}
+
+/* Kwenye Mobile */
+@media (max-width: 768px) {
+  .advertise-header {
+    padding-left: 10px !important;
+  }
+  .advertise-header button {
+    width: 36px !important;
+    height: 36px !important;
+  }
+}

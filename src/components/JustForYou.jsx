@@ -224,20 +224,25 @@ export default function JustForYou({ search = "", selectedCategory }) {
       <div className="product-grid">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((item) => (
-            <DashboardCard 
-              key={item.id}
-              image={item.cover_image_url || item.cover_image} // 🔥 BADILISHA HAPA!
-              //title={item.name}
-              price={item.price}
-              originalPrice={item.original_price}
-              isMobile={isMobile}
-              moq={item.moq}
-              subtitle={item.store_address}
-              categoryName={item.category_name}
-              isTopDeal={true}
-              views={item.views}
-              onClick={() => handleCardClick(item)}
-            />
+           <DashboardCard 
+  key={item.id}
+  image={item.cover_image_url || item.cover_image}
+  // title={item.name}
+  price={item.price}
+  originalPrice={item.original_price}
+  isMobile={isMobile}
+  moq={item.moq}
+  subtitle={item.store_address}
+  categoryName={item.category_name}
+  isTopDeal={true}
+  views={item.views}
+  onClick={() => handleCardClick(item)}
+>
+  {/* 🔥 HAPA NDIPO DESCRIPTION ITAONEKANA (Kwenye JustForYou TU) */}
+  <p className="just-for-you-desc">
+    {item.description || "Hakuna maelezo"}
+  </p>
+</DashboardCard>
           ))
         ) : (
           <div className="empty-state-card">

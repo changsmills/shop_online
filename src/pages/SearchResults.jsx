@@ -1,17 +1,18 @@
 // src/components/SearchResults.jsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom'; // 🔥 Link imeondolewa!
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import api from "../axiosConfig";
-import { Globe, ChevronRight, Filter } from 'lucide-react';
+import { Filter } from 'lucide-react';
 
-import SearchBar from '../components/SearchBar';
-import UserTools from '../components/UserTools';
+// 🔥 TUMIA HEADER COMPONENT ILEILE!
+import Header from "../components/Header";
+
 import "../SearchResults.css";
 
 export default function SearchResults({ session }) {
+
   const [searchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
-  
   const [search, setSearch] = useState(initialQuery);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -19,11 +20,9 @@ export default function SearchResults({ session }) {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
-  
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  
   const navigate = useNavigate();
   const lastProductRef = useRef();
   const PRODUCTS_PER_PAGE = 20;
@@ -32,36 +31,20 @@ export default function SearchResults({ session }) {
   // 🔥 FUNCTION MPYA YA KUPATA IMAGE URL
   // ============================================
   const getProductImage = (product) => {
-    // 1. Kama kuna cover_image_url (URL kamili)
     if (product.cover_image_url) return product.cover_image_url;
-    
-    // 2. Kama kuna cover_image
     if (product.cover_image) {
-      // Kama tayari ni URL kamili
-      if (product.cover_image.startsWith('http')) {
-        return product.cover_image;
-      }
-      
-      // 🔥 TUMIA BASE_URL KUTOKA API (ondoa /api kwa ajili ya images)
+      if (product.cover_image.startsWith('http')) return product.cover_image;
       const BASE_URL = api.defaults.baseURL.replace(/\/api$/, '');
-      
-      // Hakikisha image path inaanza na '/'
-      const imagePath = product.cover_image.startsWith('/') 
-        ? product.cover_image 
-        : '/' + product.cover_image;
-      
-      const fullUrl = `${BASE_URL}${imagePath}`;
-      console.log("🖼️ Image URL:", fullUrl); // Debug
-      return fullUrl;
+      const imagePath = product.cover_image.startsWith('/') ? product.cover_image : '/' + product.cover_image;
+      return `${BASE_URL}${imagePath}`;
     }
-    
-    // 3. Default image
     return '/placeholder-image.jpg';
   };
 
   // ============================================
   // 1. PATA KATEGORIA ZA SIDEBAR
   // ============================================
+  
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -90,28 +73,17 @@ export default function SearchResults({ session }) {
         ordering: '-created_at'
       };
 
-      if (initialQuery && initialQuery.trim()) {
-        params.search = initialQuery.trim();
-      }
-      if (selectedCategoryId) {
-        params.leaf_category = selectedCategoryId;
-      }
-      if (minPrice && !isNaN(minPrice)) {
-        params.price__gte = minPrice;
-      }
-      if (maxPrice && !isNaN(maxPrice)) {
-        params.price__lte = maxPrice;
-      }
+      if (initialQuery && initialQuery.trim()) params.search = initialQuery.trim();
+      if (selectedCategoryId) params.leaf_category = selectedCategoryId;
+      if (minPrice && !isNaN(minPrice)) params.price__gte = minPrice;
+      if (maxPrice && !isNaN(maxPrice)) params.price__lte = maxPrice;
 
       const response = await api.get('/products/', { params });
       const data = response.data.results || response.data || [];
       const totalCount = response.data.count || data.length;
 
-      if (reset) {
-        setProducts(data);
-      } else {
-        setProducts(prev => [...prev, ...data]);
-      }
+      if (reset) setProducts(data);
+      else setProducts(prev => [...prev, ...data]);
 
       setHasMore(data.length === PRODUCTS_PER_PAGE);
       setPage(pageNum);
@@ -148,9 +120,7 @@ export default function SearchResults({ session }) {
       { threshold: 0.1, rootMargin: "100px" }
     );
     
-    if (lastProductRef.current) {
-      observer.observe(lastProductRef.current);
-    }
+    if (lastProductRef.current) observer.observe(lastProductRef.current);
     
     return () => {
       if (lastProductRef.current) observer.unobserve(lastProductRef.current);
@@ -165,13 +135,8 @@ export default function SearchResults({ session }) {
   if (loading && products.length === 0) {
     return (
       <div className="alibaba-container skeleton">
-        <header className="alibaba-header skeleton-header">
-          <div className="header-wrapper">
-            <div className="skeleton-logo"></div>
-            <div className="skeleton-search"></div>
-            <div className="skeleton-icons"></div>
-          </div>
-        </header>
+        {/* 🔥 TUMIA HEADER KWENYE SKELETON PIA */}
+        <Header showBack={true} />
         <div className="search-skeleton-layout">
           <div className="skeleton-sidebar"></div>
           <div className="skeleton-main-grid"></div>
@@ -184,25 +149,8 @@ export default function SearchResults({ session }) {
   return (
     <div className="alibaba-container">
       
-            {/* HEADER */}
-      <header className="alibaba-header">
-        <div className="header-wrapper">
-          <div className="skyfall-logo" onClick={() => navigate('/')} style={{cursor: 'pointer'}}>
-            Skyfall<span>.com</span>
-          </div>
-          
-          <div className="main-search-area">
-            <SearchBar search={search} setSearch={setSearch} />
-          </div>
-
-          {/* 🔥 BADILISHA HAPA: Ongeza class 'hide-on-mobile' */}
-          <div className="header-right-actions hide-on-mobile">
-            <div className="nav-action-item">
-              <UserTools session={session} />
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* 🔥 TUMIA HEADER COMPONENT ILEILE - NA BACK ARROW + LOGO + SEARCH */}
+      <Header showBack={true} />
 
       {/* MAIN LAYOUT */}
       <main className="search-main-layout">
@@ -260,23 +208,9 @@ export default function SearchResults({ session }) {
           </div>
         </aside>
 
-        {/* PRODUCTS CONTENT */}
+            {/* PRODUCTS CONTENT */}
         <div className="search-products-content">
-          
-          <div className="results-info-bar">
-            <div className="deep-search-label">
-              <span className="sparkle">✦</span> 
-              {products.length > 0 ? (
-                <>Matokeo ya <strong>"{initialQuery}"</strong></>
-              ) : (
-                <>Samahani, hatukupata bidhaa kwa "{initialQuery}"</>
-              )}
-            </div>
-            <div className="results-count">
-              {products.length}+ products found
-            </div>
-          </div>
-
+      
           <div className="search-products-grid">
             {products.length > 0 ? (
               products.map((product, index) => (
@@ -285,18 +219,13 @@ export default function SearchResults({ session }) {
                   className="alibaba-card"
                   ref={index === products.length - 1 ? lastProductRef : null}
                 >
-                  {/* 🔥 BADILISHA HAPA: Ondoa <Link>, tumia onClick */}
                   <div 
                     className="card-link-container"
                     style={{ cursor: 'pointer' }}
                     onClick={() => {
                       if (window.innerWidth > 1024) {
-                        // Desktop: Fungua kwenye tab mpya
-                        console.log("🖥️ Desktop: Opening new tab for product", product.id);
                         window.open(`/product/${product.id}`, '_blank');
                       } else {
-                        // Mobile: Tumia navigate
-                        console.log("📱 Mobile: Navigating to product", product.id);
                         navigate(`/product/${product.id}`);
                       }
                     }}
@@ -306,7 +235,6 @@ export default function SearchResults({ session }) {
                         src={getProductImage(product)} 
                         alt={product.name}
                         onError={(e) => { 
-                          console.error("Image load error:", e.target.src);
                           e.target.src = '/placeholder-image.jpg'; 
                         }}
                       />

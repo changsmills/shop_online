@@ -24,7 +24,7 @@ const Login = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-   useEffect(() => {
+  useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
@@ -46,7 +46,8 @@ const Login = () => {
         // 🔥 BADILISHA HAPA: Kagua OTP kabla ya kupeleka supplier dashboard
         if (role === 'supplier') {
           // 1. Kama hajaverify OTP, mpeleke kwenye verify page
-          if (!userProfile.is_otp_verified) {
+          // 🔥 SAFETY CHECK: Hakikisha is_otp_verified ipo kabisa kwenye response!
+          if (userProfile.is_otp_verified === false || userProfile.is_otp_verified === undefined) {
             console.log("⚠️ Supplier hajaverify OTP, inapeleka /verify-seller-otp");
             toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
               icon: '🔐',
@@ -225,16 +226,69 @@ toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
         duration: 3000,
       });
 
-      // Redirect kulingana na role
+      // 🔥 BADILISHA HAPA: Sasa tunatumia ROLE HALISI kutoka backend!
       if (user.role === 'supplier') {
-        setTimeout(() => {
-          toast.dismiss();
-          navigate('/create-store');
-        }, 3000);
+        
+        // Kama Supplier HAJA VERIFY OTP, mpeleke kwenye verify page kwanza!
+        if (user.is_otp_verified === false) {
+          toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
+            icon: '🔐',
+            duration: 4000,
+          });
+          setTimeout(() => {
+            toast.dismiss();
+            navigate('/verify-seller-otp', { replace: true });
+          }, 4000);
+        } else {
+          // 🔥 MUHIMU SANA: Angalia kama ana store KWANZA!
+          try {
+            const storeRes = await api.get('/stores/', {
+              params: { owner_id: user.id }, // 🔥 Tumia user.id kutoka response ya Google
+              headers: { Authorization: `Bearer ${access}` }
+            });
+
+            console.log("🔍 Store data (Google):", storeRes.data);
+
+            if (storeRes.data && storeRes.data.length > 0) {
+              const storeId = storeRes.data[0].id;
+              toast.success("Karibu Muuzaji! Inaelekeza kwenye Dashboard yako...", {
+                duration: 3000,
+              });
+              setTimeout(() => {
+                toast.dismiss();
+                navigate(`/dashboard/sellerboard/${storeId}`, { replace: true });
+              }, 3000);
+            } else {
+              // Hakuna store, ndipo mpeleke kwenye kuunda store
+              toast.success("Karibu Muuzaji! Tafadhali unda duka lako kwanza.", {
+                duration: 3000,
+              });
+              setTimeout(() => {
+                toast.dismiss();
+                navigate('/create-store', { replace: true });
+              }, 3000);
+            }
+          } catch (storeErr) {
+            console.error("❌ Error fetching store:", storeErr);
+            // Kama kuna error kupata store, mpeleke kwenye create-store kwa usalama
+            toast.success("Karibu Muuzaji! Tafadhali unda duka lako kwanza.", {
+              duration: 3000,
+            });
+            setTimeout(() => {
+              toast.dismiss();
+              navigate('/create-store', { replace: true });
+            }, 3000);
+          }
+        }
+
       } else {
+        // 🔥 MTEJA WA KAWAIDA
+        toast.success("Karibu Mteja!", {
+          duration: 3000,
+        });
         setTimeout(() => {
           toast.dismiss();
-          navigate('/dashboard');
+          navigate('/dashboard', { replace: true });
         }, 3000);
       }
     } catch (error) {

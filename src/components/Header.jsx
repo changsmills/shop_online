@@ -10,11 +10,10 @@ import "../Header.css";
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../context/LanguageContext.jsx';
 
-// 🔥 ONGEZA showBack prop (default ni false)
-const Header = ({ showBack = false }) => {
+const Header = ({ showBack = false, showSearch = true }) => {  // 🔥 ONGEZA showSearch
   const { t } = useTranslation();
   const { language, changeLanguage } = useLanguage();
-  const navigate = useNavigate(); // 🔥 Kwa ajili ya kurudi nyuma
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   
   const [isLangOpen, setIsLangOpen] = useState(false);
@@ -49,7 +48,6 @@ const Header = ({ showBack = false }) => {
     setIsLocationOpen(false);
   };
 
-  // Dropdown ya Lugha na Sarafu
   const LanguageCurrencyDropdown = () => (
     <div className="dropdown-card lang-currency-dropdown">
       <div className="dropdown-header">
@@ -91,7 +89,6 @@ const Header = ({ showBack = false }) => {
     </div>
   );
 
-  // Dropdown ya Location
   const LocationDropdown = () => (
     <div className="dropdown-card location-dropdown">
       <div className="dropdown-header">
@@ -144,32 +141,28 @@ const Header = ({ showBack = false }) => {
   return (
     <header className="main-header">
       <div className="header-container">
-        
-        {/* ROW 1: Logo, Search, na Vifaa vya Kulia */}
         <div className="header-top-bar">
-          
-          {/* 🔥 SEHEMU MPYA KUSHOTO: Back Arrow + Logo */}
-<div className="header-left-group" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-  {showBack && (
-    <button 
-      className="mobile-back-btn" 
-      onClick={() => navigate(-1)}
-      aria-label="Rudi nyuma"
-    >
-      {/* ✅ ONGEZA className="desktop-hidden" HAPA */}
-      <ArrowLeft size={24} color="#333" className="desktop-hidden" />
-    </button>
-  )}
-  <div className="logo-wrapper"><Logo /></div>
-</div>
-
-          {/* 🔥 SEHEMU YA KATI: Search Bar - Inafichwa ikiwa showBack ni true */}
-          <div className={`search-bar-wrapper ${showBack ? 'hide-on-mobile' : ''}`}>
-            <SearchBar search={search} setSearch={setSearch} />
+          <div className="header-left-group">
+            {showBack && (
+              <button 
+                className="mobile-back-btn" 
+                onClick={() => navigate(-1)}
+                aria-label="Rudi nyuma"
+              >
+                <ArrowLeft size={24} color="#333" className="desktop-hidden" />
+              </button>
+            )}
+            <div className="logo-wrapper"><Logo /></div>
           </div>
 
+          {/* 🔥 SEARCH BAR - INAONYESHWA TU KAMA showSearch NI TRUE */}
+          {showSearch && (
+            <div className="search-bar-wrapper">
+              <SearchBar search={search} setSearch={setSearch} />
+            </div>
+          )}
+
           <div className="user-tools-group">
-            {/* LOCATION SELECTOR */}
             <div ref={locationDropdownRef} className="header-dropdown-wrapper">
               <button 
                 onClick={() => setIsLocationOpen(!isLocationOpen)}
@@ -181,10 +174,8 @@ const Header = ({ showBack = false }) => {
               {isLocationOpen && <LocationDropdown />}
             </div>
 
-            {/* USER TOOLS */}
             <UserTools />
 
-            {/* GLOBE - LUUGHA NA SARAFU */}
             <div ref={dropdownRef} className="header-dropdown-wrapper">
               <button 
                 onClick={() => setIsLangOpen(!isLangOpen)}
@@ -199,11 +190,9 @@ const Header = ({ showBack = false }) => {
           </div>
         </div>
 
-        {/* NAV LINKS - Bado ziko sawa */}
         <div className="header-navigation-row" key={language}>
           <NavLinks />
         </div>
-        
       </div>
     </header>
   );

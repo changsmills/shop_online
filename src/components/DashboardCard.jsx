@@ -6,6 +6,8 @@ import { useTranslation } from 'react-i18next';
 export default function DashboardCard({ 
   image, 
   title, 
+    children, // 🔥 BADILISHA HII! (Badala ya description)
+
   price, 
   originalPrice, 
   moq,
@@ -83,6 +85,9 @@ export default function DashboardCard({
         <h4 className="product-card-title">
           {displayTitle || title}
         </h4>
+
+         {children}
+
 
         {/* 🔥 VERIFIED - FULL TU */}
         {isFull && isVerified && (

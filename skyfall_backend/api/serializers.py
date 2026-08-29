@@ -109,15 +109,13 @@ class ProductMediaSerializer(serializers.ModelSerializer):
         model = ProductMedia
         fields = '__all__'
 
-class MessageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Message
-        fields = '__all__'
-
 class ProfileSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(source='user.email', read_only=True)
+    
     class Meta:
         model = Profile
-        fields = '__all__'
+        fields = ['id', 'email', 'full_name', 'role', 'is_otp_verified', 'user_id']  # 🔥 Hakikisha hizi zipo!
+        read_only_fields = ['is_otp_verified']
 
 class ShippingMethodSerializer(serializers.ModelSerializer):
     class Meta:
@@ -269,16 +267,38 @@ class OrderItemSerializer(serializers.ModelSerializer):
         model = OrderItem
         fields = '__all__'
 
+        
 class MessageSerializer(serializers.ModelSerializer):
     sender_name = serializers.SerializerMethodField()
     receiver_name = serializers.SerializerMethodField()
+    sender_avatar = serializers.SerializerMethodField()
+    receiver_avatar = serializers.SerializerMethodField()
+    sender_id = serializers.UUIDField(read_only=True)
+    receiver_id = serializers.UUIDField(read_only=True)
     
     class Meta:
         model = Message
-        fields = ['id', 'sender', 'receiver', 'content', 'created_at', 'is_read', 'sender_name', 'receiver_name']
+        fields = ['id', 'sender', 'receiver', 'sender_id', 'receiver_id', 
+                 'content', 'created_at', 'is_read', 'sender_name', 'receiver_name', 'sender_avatar', 'receiver_avatar']
     
     def get_sender_name(self, obj):
+        # 🔥 LAZIMA: Angalia kama kuna store kwanza!
+        if obj.sender and hasattr(obj.sender, 'store'):
+            return obj.sender.store.store_name  # Hii inarudisha Jina la Store!
         return obj.sender.full_name if obj.sender else None
     
     def get_receiver_name(self, obj):
+        # 🔥 LAZIMA: Angalia kama kuna store kwanza!
+        if obj.receiver and hasattr(obj.receiver, 'store'):
+            return obj.receiver.store.store_name  # Hii inarudisha Jina la Store!
         return obj.receiver.full_name if obj.receiver else None
+
+    def get_sender_avatar(self, obj):
+        if obj.sender and hasattr(obj.sender, 'store'):
+            return obj.sender.store.store_logo
+        return obj.sender.avatar_url if obj.sender else None
+
+    def get_receiver_avatar(self, obj):
+        if obj.receiver and hasattr(obj.receiver, 'store'):
+            return obj.receiver.store.store_logo
+        return obj.receiver.avatar_url if obj.receiver else None

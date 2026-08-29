@@ -4,7 +4,7 @@ import api from "../axiosConfig";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import DashboardCard from "../components/DashboardCard";
-import { Link } from "react-router-dom"; // 🔥 ONGEZA HII MBELE
+import { Link } from "react-router-dom";
 import { ChevronRight, List } from "lucide-react";
 import "../CategoryProducts.css";
 
@@ -20,14 +20,13 @@ export default function CategoryProducts() {
   const [error, setError] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
-  // CategoryProducts.jsx
 
 // 1. Ongeza hizi state karibu na state zingine
-const [minPrice, setMinPrice] = useState("");
-const [maxPrice, setMaxPrice] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
 
 // 2. Ongeza function ya kuchuja bei (Inaweza kuitwa wakati wa filter)
-const handlePriceFilter = () => {
+  const handlePriceFilter = () => {
   // Piga API upya au chuja products zilizopo
   // Kwa sasa tutatumia products zilizopo kwa mfano huu:
   const filtered = products.filter(p => {

@@ -5,6 +5,22 @@
 .alibaba-container {
   min-height: 100vh;
   background-color: #f7f8fa;
+  /* 🔥 Kwenye Desktop (≥769px) */
+  padding-top: 80px;
+}
+
+/* 🔥 Kwenye Mobile (≤768px) - Header ni ndogo! */
+@media (max-width: 768px) {
+  .alibaba-container {
+    padding-top: 60px !important;
+  }
+}
+
+/* 🔥 Kwenye Simu Ndogo Sana (≤400px) - Punguza zaidi! */
+@media (max-width: 400px) {
+  .alibaba-container {
+    padding-top: 50px !important;
+  }
 }
 
 .alibaba-header {
@@ -671,5 +687,72 @@
   .main-search-area {
     flex: 1;
     max-width: 100%;
+  }
+}
+@media (max-width: 768px) {
+  .header-top-bar {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding: 10px 15px !important;
+    background: #fff !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+  }
+  
+  .header-left-group {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 4px !important;
+    width: auto !important;
+  }
+  
+  .mobile-back-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    color: #333;
+    border-radius: 50%;
+  }
+  
+  .mobile-back-btn:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .search-bar-wrapper {
+    flex: 1 !important;
+    margin-left: 8px !important;
+  }
+  
+  .user-tools-group {
+    display: none !important; /* Ficha vifaa vya ziada kwenye mobile */
+  }
+}
+
+
+/* 🔥 Mobile: Sogeza cards chini kidogo kutoka kwenye header */
+@media (max-width: 768px) {
+  .alibaba-container {
+    padding-top: 70px !important;  /* Inaondoa nafasi ya header */
+  }
+  
+  .search-main-layout {
+    padding-top: 16px !important;  /* Ongeza nafasi zaidi chini ya header */
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
+
+/* 🔥 Kwenye Simu Ndogo Sana (≤400px) - Punguza zaidi */
+@media (max-width: 400px) {
+  .alibaba-container {
+    padding-top: 65px !important;
+  }
+  
+  .search-main-layout {
+    padding-top: 12px !important;
   }
 }

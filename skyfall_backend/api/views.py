@@ -139,6 +139,8 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
     filterset_fields = ['store_id', 'leaf_category', 'parent_category', 'is_approved', 'sub_category','is_flash_sale', 'is_featured','original_price', 'created_at', 'order_count','views', 'average_rating', ]
     ordering_fields = ['views', 'price', 'created_at','order_count', 'discount']
     pagination_class = LimitOffsetPagination
+    search_fields = ['name', 'description', 'sku']
+
 
        # 🆕 ONGEZA HII METHOD (NDANI YA CLASS HII)
     def get_queryset(self):
@@ -156,6 +158,18 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
             # 2. Hakikisha original_price (bei ya punguzo) ni NDOGO kuliko price (bei halisi)
             # Hii inazuiya bidhaa ambazo zina original_price = 0 au original_price > price zisionekane.
             queryset = queryset.filter(original_price__lt=F('price'))
+
+
+
+            # 🔥 BADILISHA HII BLOCK (Search)
+        search = self.request.query_params.get('search')
+        if search:
+            from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+            vector = SearchVector('name', 'name_sw', weight='A')
+            query = SearchQuery(search)
+            queryset = queryset.annotate(
+                rank=SearchRank(vector, query)
+            ).filter(rank__gte=0.1).order_by('-rank')
         
         return queryset
 
@@ -352,38 +366,75 @@ class MessageViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
-    # 🔥 1. ONGEZA HII: Kuchuja messages kwa user_id
     def get_queryset(self):
         queryset = super().get_queryset()
         user_id = self.request.query_params.get('user_id')
         
         if user_id:
             from django.db.models import Q
-            # Rudi messages ambazo user huyu ametuma AU amepokea
             queryset = queryset.filter(
                 Q(sender_id=user_id) | Q(receiver_id=user_id)
             )
         
         return queryset
 
-    # 🔥 2. ONGEZA HII: Kuhakikisha sender na receiver zimehifadhiwa vizuri
     def perform_create(self, serializer):
+        # 🔥 BADILISHA HII - Weka validation bora
         sender_id = self.request.data.get('sender')
         receiver_id = self.request.data.get('receiver')
+        content = self.request.data.get('content')
         
-        # Thibitisha data
-        if not sender_id or not receiver_id:
-            from rest_framework import serializers
-            raise serializers.ValidationError({
-                'detail': 'sender na receiver zinahitajika.'
-            })
+        # 🔥 Angalia kama data zote zipo
+        if not sender_id:
+            return Response(
+                {'detail': 'sender ni required.'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
-        # Hifadhi message na sender/receiver sahihi
-        serializer.save(
-            sender_id=sender_id,
-            receiver_id=receiver_id
-        )
-
+        if not receiver_id:
+            return Response(
+                {'detail': 'receiver ni required.'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if not content:
+            return Response(
+                {'detail': 'content ni required.'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # 🔥 Thibitisha kama sender na receiver ni UUID sahihi
+        import uuid
+        try:
+            uuid.UUID(str(sender_id))
+            uuid.UUID(str(receiver_id))
+        except ValueError:
+            return Response(
+                {'detail': 'sender na receiver lazima ziwe UUID sahihi.'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # 🔥 Hifadhi message
+        try:
+            from django.utils import timezone  # 🔥 ONGEZA HII!
+            
+            message = serializer.save(
+                sender_id=sender_id,
+                receiver_id=receiver_id,
+                content=content,
+                created_at=timezone.now()  # ✅ ONGEZA HII!
+            )
+            return Response(
+                MessageSerializer(message).data,
+                status=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            print(f"❌ [ERROR] Failed to save message: {e}")
+            return Response(
+                {'detail': f'Failed to save message: {str(e)}'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
 # ==========================================
 # 2. 🔥 VIEWS ZA SHIPPING, BRAND, NA LEAD
 # ==========================================
@@ -906,7 +957,6 @@ class GoogleAuthView(APIView):
             return Response({'error': 'access_token is required'}, status=400)
 
         try:
-
             from rest_framework_simplejwt.tokens import RefreshToken
 
             # 1. Thibitisha token kutoka Google
@@ -922,15 +972,38 @@ class GoogleAuthView(APIView):
                 username=email,
                 defaults={'email': email}
             )
-            if created:
-                Profile.objects.create(user=user, full_name=full_name, role='buyer')
+
+            # 🔥 BADILISHA HAPA: Tumia get_or_create kwa Profile
+            profile, profile_created = Profile.objects.get_or_create(
+                user=user,
+                defaults={
+                    'full_name': full_name, 
+                    'role': 'buyer'  # Hii ni default TU kama ni mtumiaji mpya kabisa
+                }
+            )
+
+            # 🔥 MUHIMU SANA: Kama profile ilikuwa ipo (user ni wa zamani),
+            # hakikisha unachukua ROLE Yake HALISI (si default ya buyer)
+            if not profile_created:
+                # Sasisha jina kamili kama halipo kwenye profile
+                if full_name and not profile.full_name:
+                    profile.full_name = full_name
+                    profile.save()
+
+            # 🔥 Pata role halisi kutoka kwenye profile (iwe ni buyer au supplier)
+            user_role = profile.role
 
             # 3. Tengeneza JWT Tokens
             refresh = RefreshToken.for_user(user)
             return Response({
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
-                'user': {'email': email, 'role': 'buyer'}
+                'user': {
+                    'email': email, 
+                    'role': user_role,  # 🔥 HAPA NDIPO ROLE HALISI INARUDISHWA!
+                    'id': user.id,
+                    'is_otp_verified': profile.is_otp_verified  # 🔥 Muhimu kwa Supplier!
+                }
             }, status=200)
 
         except ValueError:

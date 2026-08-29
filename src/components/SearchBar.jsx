@@ -174,39 +174,29 @@ export default function SearchBar({ search = "", setSearch }) {
         </div>
       </div>
 
-      {/* Portal */}
-      {showSuggestions && suggestions.length > 0 && createPortal(
-        <div className="search-portal">
-          <div className="suggestion-header">
-            {search.trim().length > 0 ? `Matokeo ya "${search.trim()}"` : "Mapendekezo"}
+     {/* Portal - Inaonyesha majina tu! */}
+{showSuggestions && suggestions.length > 0 && createPortal(
+  <div className="search-portal">
+    <div className="suggestion-scroll-area">
+      {suggestions.map((item) => (
+        <div 
+          key={`${item.type}-${item.id}`} 
+          className="suggestion-item"
+          onMouseDown={() => {
+            if (typeof setSearch === "function") setSearch(item.name);
+            navigateToSearchResults(item.name);
+          }}
+        >
+          <div className="suggestion-info">
+            <span className="suggestion-name">{item.name}</span>
           </div>
-          
-          <div className="suggestion-scroll-area">
-            {suggestions.map((item) => (
-              <div 
-                key={`${item.type}-${item.id}`} 
-                className="suggestion-item"
-                onMouseDown={() => {
-                  if (typeof setSearch === "function") setSearch(item.name);
-                  navigateToSearchResults(item.name);
-                }}
-              >
-                <div className="category-icon">
-                  {item.type === 'product' ? '📦' : '🔍'}
-                </div>
-                
-                <div className="suggestion-info">
-                  <span className="suggestion-name">{item.name}</span>
-                  <span className="suggestion-type-badge">
-                    {item.type === 'product' ? 'Bidhaa' : 'Kategoria'}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>,
-        document.body
-      )}
+        </div>
+      ))}
+    </div>
+  </div>,
+  document.body
+)}
+
     </div>
   );
 }
