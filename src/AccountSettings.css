@@ -1079,3 +1079,61 @@
     }
   }
 }
+
+/* ============================================
+   SKELETON LOADING KWA ACCOUNT SETTINGS
+   ============================================ */
+
+/* Animation ya Pulse (Inafanana na Dashboard) */
+@keyframes pulse {
+  0% { background-color: #e0e0e0; }
+  50% { background-color: #f0f0f0; }
+  100% { background-color: #e0e0e0; }
+}
+
+/* Header Skeleton */
+.skeleton-header {
+  height: 60px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* Sidebar Skeleton (Desktop Only) */
+.skeleton-sidebar-account {
+  width: 220px;
+  background: #fff;
+  border-right: 1px solid #eee;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* Profile Card Skeleton */
+.skeleton-profile-card {
+  height: 120px;
+  background: #fff;
+  border-radius: 12px;
+  margin: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* Settings Grid Skeleton */
+.skeleton-settings-grid {
+  height: 200px;
+  background: #fff;
+  border-radius: 12px;
+  margin: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* Mobile: Ficha Sidebar Skeleton na ipate nafasi nzima */
+@media (max-width: 768px) {
+  .skeleton-sidebar-account {
+    display: none !important;
+  }
+  .skeleton-profile-card,
+  .skeleton-settings-grid {
+    margin: 10px !important;
+  }
+}

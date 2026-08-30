@@ -322,3 +322,43 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Ro
   .header-avatar-btn { background: #ff6a00 !important; color: #ffffff !important; }
   .store-header-wrapper, .analytics-section, .store-mgmt-wrapper, .advertise-wrapper { background: transparent !important; }
 }
+/* ============================================ */
+/* 🔥 FIX YA MWISHO - LAZIMISHA HEADER NA HAMBURGER KUONEKANA KWENYE MOBILE */
+/* ============================================ */
+
+.dashboard-header {
+  display: flex !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 999999 !important; /* Inazidi kila kitu! */
+  background-color: #ffffff !important;
+  height: 70px !important;
+  padding: 0 16px !important;
+  border-bottom: 1px solid #eee !important;
+}
+
+.header-brand {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.mobile-menu-btn {
+  display: flex !important;
+  z-index: 999999 !important;
+  color: #333 !important;
+  background: transparent !important;
+  border: none !important;
+  margin-right: 10px !important;
+}
+
+.header-actions {
+  display: flex !important;
+  z-index: 999999 !important;
+}
+
+/* 🔥 FIX YA OVERLAY - INAANZA CHINI YA HEADER (SI JUU!) */
+/* Hii inazuia overlay kufunika header na hamburger unapofungua sidebar */
+.sidebar-overlay {
+  top: 70px !important;
+  height: calc(100vh - 70px) !important;
+}

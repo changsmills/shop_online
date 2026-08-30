@@ -112,10 +112,39 @@ class ProductMediaSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email', read_only=True)
     
+    # 🔥 1. MPYA: Hii inakubali Picha (File) kutoka Frontend!
+    avatar_file = serializers.ImageField(write_only=True, required=False)
+
     class Meta:
         model = Profile
-        fields = ['id', 'email', 'full_name', 'role', 'is_otp_verified', 'user_id']  # 🔥 Hakikisha hizi zipo!
-        read_only_fields = ['is_otp_verified']
+        # 🔥 2. MPYA: Tumeongeza 'username', 'bio', 'avatar_url' na 'avatar_file'
+        fields = ['id', 'email', 'full_name', 'username', 'bio', 'role', 'is_otp_verified', 'user_id', 'avatar_url', 'avatar_file']
+        
+        # 🔥 3. MPYA: Usiruhusu mtumiaji kubadilisha id, email, role na avatar_url moja kwa moja (kwa sababu inapakiwa na backend)
+        read_only_fields = ['id', 'email', 'role', 'is_otp_verified', 'user_id', 'avatar_url']
+
+    # 🔥 4. MPYA: Hii method inachukua data, ikapokea picha inaipakia kwenye Cloudinary, kisha inahifadhi URL kwenye DB!
+    def update(self, instance, validated_data):
+        # Toa picha kutoka validated_data (kwa sababu si ya database moja kwa moja)
+        avatar_file = validated_data.pop('avatar_file', None)
+        
+        # Sasisha maandishi
+        instance.full_name = validated_data.get('full_name', instance.full_name)
+        instance.username = validated_data.get('username', instance.username)
+        instance.bio = validated_data.get('bio', instance.bio)
+        
+        # Kama kuna picha mpya, ipakie kwenye Cloudinary
+        if avatar_file:
+            try:
+                result = cloudinary.uploader.upload(avatar_file, folder="profile_avatars")
+                instance.avatar_url = result['secure_url']
+                print(f"✅ [Cloudinary] Profile avatar uploaded: {result['secure_url']}")
+            except Exception as e:
+                print(f"❌ [Cloudinary] Profile avatar upload failed: {e}")
+                raise serializers.ValidationError({"avatar_file": "Imeshindikana kupakia picha. Tafadhali jaribu tena."})
+        
+        instance.save()
+        return instance
 
 class ShippingMethodSerializer(serializers.ModelSerializer):
     class Meta:
@@ -279,7 +308,10 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = ['id', 'sender', 'receiver', 'sender_id', 'receiver_id', 
-                 'content', 'created_at', 'is_read', 'sender_name', 'receiver_name', 'sender_avatar', 'receiver_avatar']
+                 'content','image', 'created_at', 'is_read', 'sender_name', 'receiver_name', 'sender_avatar', 'receiver_avatar']
+
+        read_only_fields = ['image']  
+
     
     def get_sender_name(self, obj):
         # 🔥 LAZIMA: Angalia kama kuna store kwanza!

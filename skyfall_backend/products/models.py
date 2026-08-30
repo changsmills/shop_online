@@ -469,6 +469,7 @@ class Message(models.Model):
     receiver = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='received_messages')
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True, related_name='messages')
     content = models.TextField()
+    image = models.URLField(max_length=500, blank=True, null=True)
     is_read = models.BooleanField(default=False, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)  # ✅ ITAJAZA AUTOMATIC!
 

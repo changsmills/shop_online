@@ -137,7 +137,7 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
 
       // Kama kuna picha mpya, iongeze kwenye FormData
       if (avatarFile) {
-        formData.append('avatar_url', avatarFile); // Au 'avatar_file' kulingana na serializer yako
+        formData.append('avatar_file', avatarFile); // 🔥 SAHIHI!// Au 'avatar_file' kulingana na serializer yako
       }
 
       // Tumia PATCH kusasisha profile (Endpoints: /api/profile/ au /api/profiles/{id}/)
@@ -288,8 +288,26 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
   };
 
   if (loading) {
-    return <div className="dashboard-loading">Inapakia...</div>;
-  }
+    return (
+      <div className="dashboard-layout">
+        {/* 🔥 Skeleton Header */}
+        <div className="skeleton-header"></div>
+
+        <div className="dashboard-main">
+          {/* 🔥 Skeleton Sidebar (Inaonekana Desktop tu) */}
+          <div className="skeleton-sidebar-account"></div>
+
+          {/* 🔥 Skeleton Content */}
+          <div className="settings-container">
+            <div className="settings-wrapper">
+              <div className="skeleton-profile-card"></div>
+              <div className="skeleton-settings-grid"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+}
 
   return (
     <div className="dashboard-layout">

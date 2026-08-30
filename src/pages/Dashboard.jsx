@@ -125,16 +125,16 @@ export default function Dashboard() {
     return ad.media_url.match(/\.(mp4|webm|mov)$/i) !== null;
   };
 
-  const fetchFeaturedLeafs = async (categoryId) => {
+const fetchFeaturedLeafs = async (categoryId) => {
   if (!categoryId) return;
 
   if (categoryCacheRef.current[categoryId]?.leafs) {
     setFeaturedProducts(categoryCacheRef.current[categoryId].leafs);
-    setLoadingLeafs(false); // ✅ Data ipo, acha loading
+    setLoadingLeafs(false); 
     return;
   }
 
-  setLoadingLeafs(true); // ✅ Anza loading
+  setLoadingLeafs(true); 
 
   try {
     console.log(`⏳ [FETCH] Inapakia products za category ${categoryId}...`);
@@ -157,18 +157,74 @@ export default function Dashboard() {
       name_sw: product.leaf_category_name || product.name
     }));
 
+    // 🔥 FIX MPYA: Kama hakuna bidhaa direct, inakwenda kuchukua kutoka kwenye SUB-CATEGORIES!
+    if (result.length === 0) {
+      console.log("⚠️ Hakuna direct, inaangalia subcategories zote...");
+      
+      // 1. Vuta subcategories za hiyo category
+      const subResponse = await api.get('/subcategories/', {
+        params: { category_id: categoryId }
+      });
+      const subs = subResponse.data || [];
+
+      if (subs.length > 0) {
+        // Weka subcategories kwenye state (ili zionekane kwenye desktop/mobile menu)
+        setSubCategories(subs);
+        setSelectedSubCategory(subs[0]); // Chagua ya kwanza tu kama reference
+
+        let allMappedProducts = [];
+
+        // 2. Piga API kwa KILA subcategory (au kwanza 8 za kwanza ili isiwe slow sana)
+        const subsToFetch = subs.slice(0, 8); // Badilisha hii 8 uweke 100 kama unataka zote
+        for (const sub of subsToFetch) {
+           try {
+             const prodRes = await api.get('/products/', {
+               params: { sub_category: sub.id, limit: 17, ordering: '-views' }
+             });
+             const prodData = prodRes.data.results || prodRes.data || [];
+             
+             const mapped = prodData.map((product) => ({
+               id: product.id,
+               leaf_category_id: product.leaf_category_id || product.id,
+               cover_image_url: product.cover_image_url,
+               name: product.leaf_category_name || product.name,
+               name_sw: product.leaf_category_name || product.name
+             }));
+
+             // Changanya bidhaa za subcategory hii na zilizopo
+             allMappedProducts = allMappedProducts.concat(mapped);
+           } catch (e) {
+             console.error(`❌ Error fetching products for sub ${sub.id}`, e);
+           }
+        }
+
+        // Weka bidhaa zote zilizokusanywa (All Products View!)
+        setFeaturedProducts(allMappedProducts);
+        
+        // Hifadhi kwenye cache
+        categoryCacheRef.current[categoryId] = {
+          ...categoryCacheRef.current[categoryId],
+          leafs: allMappedProducts
+        };
+        
+        setLoadingLeafs(false);
+        return; // Acha hapa kwa sababu tumepata bidhaa!
+      }
+    }
+
+    // Kama kuna bidhaa direct (au hakuna subs), endelea na zile za kawaida
     categoryCacheRef.current[categoryId] = {
       ...categoryCacheRef.current[categoryId],
       leafs: result
     };
     
     setFeaturedProducts(result);
-    setLoadingLeafs(false); // ✅ Data imefika, acha loading
+    setLoadingLeafs(false);
 
   } catch (error) {
     console.error("❌ [fetchFeaturedLeafs] Error:", error);
     setFeaturedProducts([]);
-    setLoadingLeafs(false); // ✅ Error pia, acha loading
+    setLoadingLeafs(false);
   }
 };
 
@@ -496,20 +552,15 @@ const handleSubCategoryHover = (subCategory) => {
     </div>
   );
 
-  if (dataError) {
-    return (
-      <div className="dashboard-wrapper">
-        <Header search={search} setSearch={setSearch} />
-        <div className="error-container">
-          <h2 className="error-title">Error Loading Dashboard</h2>
-          <p className="error-message">{dataError}</p>
-          <button className="error-retry-btn" onClick={() => window.location.reload()}>
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
+ if (dataLoading || sessionLoading) {
+  return (
+    <div className="dashboard-wrapper">
+      <Header search={search} setSearch={setSearch} />
+      {/* 🔥 BADILISHA HII: Ondoa div ya loading-container */}
+      <SkeletonLayout />
+    </div>
+  );
+}
 
   if (dataLoading || sessionLoading) {
     return (

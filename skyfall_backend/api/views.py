@@ -17,6 +17,8 @@ from products.models import OTPModel, Profile
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.parsers import MultiPartParser, FormParser
+import cloudinary.uploader
 
 
 # Juu ya file
@@ -47,7 +49,7 @@ from .serializers import (
     CategorySerializer, SubCategorySerializer,
     LeafCategorySerializer, AdvertisementSerializer,
     ProductMediaSerializer, MessageSerializer, ProfileSerializer,
-    ShippingMethodSerializer, BrandSerializer, LeadSerializer, OrderSerializer, OrderItemSerializer ,MessageSerializer
+    ShippingMethodSerializer, BrandSerializer, LeadSerializer, OrderSerializer, OrderItemSerializer
 )
 
 User = get_user_model()
@@ -365,6 +367,9 @@ class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+    
+    # 🔥 ONGEZA HIZI - Inaruhusu Backend kupokea Picha + Maandishi!
+    parser_classes = [MultiPartParser, FormParser] 
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -382,27 +387,16 @@ class MessageViewSet(viewsets.ModelViewSet):
         # 🔥 BADILISHA HII - Weka validation bora
         sender_id = self.request.data.get('sender')
         receiver_id = self.request.data.get('receiver')
-        content = self.request.data.get('content')
+        content = self.request.data.get('content', '') # 🔥 Badilisha hii: Ruhusu content kuwa tupu kama kuna picha
+        image_file = self.request.FILES.get('image') # 🔥 ONGEZA HII: Pata picha kutoka FormData!
         
-        # 🔥 Angalia kama data zote zipo
-        if not sender_id:
+        # 🔥 Angalia kama data zote zipo (Maandishi AU Picha)
+        if not content and not image_file:
             return Response(
-                {'detail': 'sender ni required.'}, 
+                {'detail': 'Unahitaji kuandika ujumbe au kupakia picha.'}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
-        if not receiver_id:
-            return Response(
-                {'detail': 'receiver ni required.'}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        if not content:
-            return Response(
-                {'detail': 'content ni required.'}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
+
         # 🔥 Thibitisha kama sender na receiver ni UUID sahihi
         import uuid
         try:
@@ -414,6 +408,19 @@ class MessageViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
+        # 🔥 PAKIA PICHA KWA CLOUDINARY (Kama ipo)
+        image_url = None
+        if image_file:
+            try:
+                upload_result = cloudinary.uploader.upload(image_file, folder="chat_images")
+                image_url = upload_result['secure_url']
+                print(f"✅ [Cloudinary] Chat image uploaded: {image_url}")
+            except Exception as e:
+                return Response(
+                    {'detail': f'Imeshindikana kupakia picha: {str(e)}'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
         # 🔥 Hifadhi message
         try:
             from django.utils import timezone  # 🔥 ONGEZA HII!
@@ -422,6 +429,7 @@ class MessageViewSet(viewsets.ModelViewSet):
                 sender_id=sender_id,
                 receiver_id=receiver_id,
                 content=content,
+                image=image_url, # 🔥 ONGEZA HII: Hifadhi URL ya picha kwenye database!
                 created_at=timezone.now()  # ✅ ONGEZA HII!
             )
             return Response(
@@ -497,6 +505,9 @@ class RegisterView(APIView):
 
 class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
+    
+    # 🔥 MUHIMU SANA: Hii inaruhusu Backend kupokea Picha (FormData)!
+    parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request):
         from products.models import Profile
@@ -512,6 +523,20 @@ class ProfileView(APIView):
         
         serializer = ProfileSerializer(profile)
         return Response(serializer.data)
+
+    # 🔥 ONGEZA HII: Inasasisha Profile kupitia PATCH (Edit Profile)
+    def patch(self, request, *args, **kwargs):
+        try:
+            profile = request.user.profile
+        except Profile.DoesNotExist:
+            return Response({'detail': 'Profile not found.'}, status=404)
+
+        # 🔥 Tumia serializer mpya (ambayo ina avatar_file)
+        serializer = ProfileSerializer(profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()  # 🔥 Hii itaenda kwenye 'update' method ya Serializer yako!
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # ==========================================
     # 4. 🔥 VIEWS ZA MIPANGILIO (ZIWE NJE YA ProfileView!)

@@ -110,22 +110,72 @@
     gap: 2px !important;
   }
 }
-
 /* ============================================ */
 /* LAYER 5: TYPOGRAPHY (MANENE NA YANAYOVUTIA)  */
 /* ============================================ */
 
 .product-card-title {
   margin: 0; 
-  font-size: 16px;
-  color: var(--text-primary) !important;  /* 🔥 Ongeza !important ili kushinda override nyingine */
-  font-weight: 700;
+  font-size: 14px; /* 🔥 Imepunguzwa: 16px -> 14px */
+  color: var(--text-primary) !important; 
+  font-weight: 600; /* 🔥 Imepunguzwa: 700 -> 600 */
   line-height: 1.3;
   letter-spacing: 0.02em;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
+}
+
+.product-card-price-row {
+  display: flex; 
+  align-items: baseline; 
+  gap: 4px; 
+  flex-wrap: wrap; 
+  margin-top: 2px;
+}
+
+/* Desktop Price */
+.price-currency { 
+  color: var(--brand-orange); 
+  font-size: 13px; 
+  font-weight: 700; 
+}
+.price-amount { 
+  color: var(--brand-orange); 
+  font-size: 18px; 
+  font-weight: 800;
+}
+.price-original-strikethrough {
+  text-decoration: line-through; 
+  color: var(--text-muted); 
+  font-size: 12px; 
+  font-weight: 400;
+}
+
+/* MOQ */
+.store-moq-info { 
+  display: flex; 
+  align-items: center; 
+  gap: 3px; 
+  margin-top: 2px; 
+}
+.moq-label { 
+  font-size: 11px; 
+  color: var(--text-secondary); 
+  font-weight: 500; 
+}
+.moq-value { 
+  font-size: 12px; 
+  font-weight: 700;
+  color: var(--text-primary);   
+}
+
+/* Category */
+.product-card-category {
+  font-size: 11px;
+  margin-top: 1px;
+  color: var(--text-secondary);
 }
 
 /* ✅ Mobile - Jina kubwa na nzito */
@@ -201,16 +251,36 @@
   .moq-label { font-size: 11px !important; }
   .moq-value { font-size: 11px !important; font-weight: 700 !important; }
 }
-
-/* ============================================ */
-/* LAYER 6: HIDING UNNECESSARY INFO ON MOBILE   */
-/* ============================================ */
-
 @media (max-width: 768px) {
-  .product-card-category { display: none !important; }
-  .product-card-subtitle-row { display: none !important; }
-  .store-moq-info { display: none !important; } 
+  /* Jina la bidhaa */
+  .product-card-title { 
+    font-size: 12px !important; 
+    font-weight: 600 !important; 
+    line-height: 1.2; 
+    -webkit-line-clamp: 2 !important;
+  }
+
+  /* Bei */
+  .price-currency { 
+    font-size: 10px !important; 
+    font-weight: 700 !important; 
+  }
+  .price-amount { 
+    font-size: 13px !important; 
+    font-weight: 800 !important;
+  } 
+  .price-original-strikethrough { 
+    font-size: 10px !important; 
+  }
+
+  /* MOQ */
+  .moq-label { font-size: 9px !important; font-weight: 500 !important; }
+  .moq-value { font-size: 9px !important; font-weight: 700 !important; }
+
+  /* Category */
+  .product-card-category { font-size: 10px !important; }
 }
+
 
 /* ============================================ */
 /* ✅ LAYER 7: ULTIMATE GRID RESPONSIVENESS     */
@@ -316,5 +386,31 @@
   .product-card-item {
     padding-bottom: 0 !important;
     overflow: hidden;
+  }
+}
+
+/* ============================================ */
+/* FIX: KADI ZIONEKANE VIZURI KWENYE BACKGROUND  */
+/* ============================================ */
+
+/* Light Mode: Weka kijivu chepesi na mipaka */
+@media (prefers-color-scheme: light) {
+  .product-card-item {
+    background-color: #f8f9fa !important;  /* Kijivu chepesi sana */
+    border: 1px solid #e5e7eb !important;   /* Mipaka inayoonekana */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important; /* Kivuli kidogo cha kuinua kadi */
+  }
+
+  /* Pia picha iwe na rangi tofauti kidogo na kadi */
+  .product-card-media {
+    background-color: #f1f3f5 !important;
+  }
+}
+
+/* Dark Mode: Inabaki nyeusi kama ilivyo */
+@media (prefers-color-scheme: dark) {
+  .product-card-item {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
   }
 }

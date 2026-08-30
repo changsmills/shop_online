@@ -184,7 +184,7 @@
 
 @media (min-width: 1025px) and (max-width: 1280px) {
   .product-grid { 
-    grid-template-columns: repeat(5, 1fr); 
+    grid-template-columns: repeat(6, 1fr); 
     gap: 16px; 
     padding: 0 16px; 
   
@@ -626,4 +626,12 @@
   .jfy-arrow-link-btn {
     color: #e2e8f0 !important;
   }
+}
+/* 🔥 FIX YA DESCRIPTION KWENYE DESKTOP (Punguza 16px -> 12px) */
+.just-for-you-desc {
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+  color: var(--text-secondary) !important;
+  margin-top: 2px !important;
+  margin-bottom: 2px !important;
 }

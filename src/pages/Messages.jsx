@@ -4,7 +4,7 @@ import {
   LayoutDashboard, MessageSquare, ClipboardList, 
   Settings, BarChart3, Bell, Search, Send, Menu, 
   ChevronLeft, Home, ShoppingCart, User,
-  Plus, Megaphone, Loader2
+  Plus, Megaphone, Loader2, Image as ImageIcon 
 } from 'lucide-react';
 
 // 🔥 BADILISHA: Import api kutoka axiosConfig, sio supabase!
@@ -32,6 +32,8 @@ const Messages = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   // ==========================================
   // 🔥 MPYA: PATA USER ID NA ROLE KUTOKA BACKEND
@@ -242,15 +244,28 @@ const handleSelectStoreFromSearch = (store) => {
   // ==========================================
   // 🔥 SEND MESSAGE (Django API)
   // ==========================================
- const handleSendMessage = async (e) => {
+const handleSendMessage = async (e) => {
   e.preventDefault();
-  if (!newMessage.trim() || !activeChat || !currentUserId) return;
+  
+  // 🔥 BADILISHA 1: Ruhusu kutuma kama kuna maandishi AU picha
+  if ((!newMessage.trim() && !selectedImage) || !activeChat || !currentUserId) return;
+
+  // 🔥 ONGEZA 2: Tengeneza FormData (Hili ni muhimu kwa kutuma picha)
+  const formData = new FormData();
+  formData.append('sender', currentUserId);
+  formData.append('receiver', activeChat.id);
+  formData.append('content', newMessage.trim() || 'Image'); // Kama hakuna text, tumia 'Image'
+  
+  if (selectedImage) {
+    formData.append('image', selectedImage);
+  }
 
   const tempMsg = {
     id: Date.now(),
     sender_id: currentUserId,
     receiver_id: activeChat.id,
-    content: newMessage,
+    content: newMessage.trim(),
+    image_url: imagePreview, // 🔥 ONGEZA 3: Onyesha preview ya picha mara moja
     created_at: new Date().toISOString(),
     isPending: true
   };
@@ -258,20 +273,23 @@ const handleSelectStoreFromSearch = (store) => {
   setMessages(prev => [...prev, tempMsg]);
   const originalMessage = newMessage;
   setNewMessage("");
+  
+  // 🔥 ONGEZA 4: Safisha picha na preview baada ya kutuma
+  setSelectedImage(null);
+  setImagePreview(null);
+  
   scrollToBottom();
 
   try {
     console.log("🔍 Sending message:", {
       sender: currentUserId,
       receiver: activeChat.id,
-      content: originalMessage
+      content: originalMessage,
+      hasImage: !!selectedImage
     });
 
-    await api.post('/messages/', {
-      sender: currentUserId,
-      receiver: activeChat.id,
-      content: originalMessage,
-    });
+    // 🔥 BADILISHA 5: Tuma FormData badala ya Object ya kawaida (Axios inaichukulia multipart/form-data yenyewe)
+    await api.post('/messages/', formData);
 
     // 🔥 BADILISHA HII - Usipige fetchMessages baada ya kutuma!
     // Badala yake, weka tempMsg kwenye messages moja kwa moja!
@@ -286,6 +304,10 @@ const handleSelectStoreFromSearch = (store) => {
     console.error("Error response:", error.response?.data);
     setMessages(prev => prev.filter(msg => msg.id !== tempMsg.id));
     setNewMessage(originalMessage);
+    
+    // 🔥 ONGEZA 6: Rudisha picha kwenye input kama imeshindikana
+    setSelectedImage(selectedImage);
+    setImagePreview(imagePreview);
   }
 };
 
@@ -301,14 +323,21 @@ const handleSelectStoreFromSearch = (store) => {
   // ==========================================
   // 🔥 ZIADA: HII ILIKOSA, SASA IMEONGEWA (Inazuia White Screen!)
   // ==========================================
+  // 🔥 Logic ya "Rudi Hatua Moja Nyuma" (Smart Back)
+  const handleBackNavigation = () => {
+    // 1. Kama uko ndani ya Chat moja (Mobile), rudi kwenye Inbox (Chat List)
+    if (isMobile && showMobileChat) {
+      setShowMobileChat(false);
+      setActiveChat(null);
+      setMessages([]);
+    } 
+    // 2. Kama uko kwenye Inbox (Chat List), rudi Dashboard
+    else {
+      navigate('/dashboard');
+    }
+  };
 
-const handleBackToChatList = () => {
-  setShowMobileChat(false);
-  setActiveChat(null);
-  setMessages([]);
-  navigate('/dashboard/messages'); // 🔥 HII IKO SAHIHI!
-};
-
+ 
   // ==========================================
   // 🔥 POLLING: Kuchukua nafasi ya Supabase Realtime
   // ==========================================
@@ -375,25 +404,49 @@ useEffect(() => {
     setShowSearchModal(true);
   };
 
+ 
+
   return (
     <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       
-      {/* 🔥 MOBILE: FICHA HEADER KABISA */}
+           {/* 🔥 MOBILE: FICHA HEADER KABISA (Kwenye Mobile Inaonekana tu ikiwa na Back Arrow) */}
       <header className="dashboard-header" style={{ position: 'sticky', top: 0, zIndex: 100, display: isMobile ? 'none' : 'block' }}>
         <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          {!isMobile && (
-          <Menu 
-            size={22} 
-            className="menu-toggle" 
-            style={{ cursor: 'pointer', color: '#666' }} 
-            onClick={() => setIsExpanded(!isExpanded)} 
-          />
+          
+          {/* 🔥 ONGEZA HII: Back Arrow ya Kurudi Dashboard - Inaonekana TU kwenye Mobile */}
+          {isMobile && (
+            <button 
+              onClick={handleBackNavigation}
+              style={{ 
+                background: 'none', 
+                border: 'none', 
+                cursor: 'pointer', 
+                padding: '4px', 
+                display: 'flex', 
+                alignItems: 'center',
+                marginRight: '2px'
+              }}
+            >
+              <ChevronLeft size={28} color="#333" />
+            </button>
           )}
 
+          {/* 🔥 Desktop Tu: Menu ya Kufungua Sidebar */}
+          {!isMobile && (
+            <Menu 
+              size={22} 
+              className="menu-toggle" 
+              style={{ cursor: 'pointer', color: '#666' }} 
+              onClick={() => setIsExpanded(!isExpanded)} 
+            />
+          )}
+
+          {/* Logo */}
           <Link to="/dashboard" style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: '800', color: '#ff6a00', textDecoration: 'none' }}>
             Skyfall.com
           </Link>
 
+          {/* 🔥 Desktop Tu: Search Box */}
           {!isMobile && (
             <div className="search-box">
               <Search size={16} />
@@ -478,9 +531,13 @@ useEffect(() => {
               flexShrink: 0,
               borderRight: '1px solid #eee'
             }}>
-              <div className="sidebar-header-chat">
-                <h3>Inbox</h3>
-                <div className="search-bar-chat" style={{ position: 'relative' }}>
+              <div className="sidebar-header-chat" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: isMobile ? '15px' : '15px' }}>
+  
+ 
+
+  <h3 style={{ margin: 0, flexShrink: 0 }}>Inbox</h3>
+  
+  <div className="search-bar-chat" style={{ position: 'relative', flex: isMobile ? '1' : 'auto' }}>
                   <Search size={14} className="search-icon-chat" />
                   <input 
                     type="text" 
@@ -570,7 +627,18 @@ useEffect(() => {
 
               <div className="chat-list" style={{ overflowY: 'auto' }}>
                 {loading ? (
-                  <p style={{padding: '20px', textAlign: 'center'}}>Inapakia...</p>
+                  /* 🔥 SKELETON MPYA BADALA YA "Inapakia..." */
+                  <div className="skeleton-chat-list">
+                    {[1, 2, 3, 4, 5].map((item) => (
+                      <div key={item} className="skeleton-chat-item">
+                        <div className="skeleton-chat-avatar"></div>
+                        <div className="skeleton-chat-lines">
+                          <div className="skeleton-line skeleton-line-name"></div>
+                          <div className="skeleton-line skeleton-line-text"></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 ) : chats.length === 0 ? (
                   <>
                     {isMobile && (
@@ -795,7 +863,7 @@ useEffect(() => {
 
                     {activeChat && isMobile && showMobileChat && (
   <button 
-    onClick={handleBackToChatList}
+    onClick={handleBackNavigation}
     className="mobile-back-btn"
     style={{
       background: 'none',
@@ -827,7 +895,8 @@ useEffect(() => {
                   flex: 1, 
                   overflowY: 'auto', 
                   padding: '20px',
-                  paddingBottom: isMobile ? '20px' : '20px', 
+                  paddingBottom: isMobile ? '20px' : '60px', 
+                   marginBottom: isMobile ? '60px' : '20px',
                   backgroundColor: '#f5f5f7'
                 }}>
                   {messages.length === 0 ? (
@@ -854,14 +923,28 @@ useEffect(() => {
                         className={`message-bubble ${msg.sender_id === currentUserId ? 'sent' : 'received'}`}
                       >
                         <div className="bubble-content">
-                          <div className="message-sender-name" style={{ fontSize: '12px', fontWeight: '600', marginBottom: '4px', color: '#ff6a00' }}>
-                            {getSenderName(msg)}
-                          </div>
-                          <p style={{ margin: 0, wordBreak: 'break-word' }}>{msg.content}</p>
-                          <span className="msg-timestamp" style={{ fontSize: '10px', color: '#999', marginTop: '4px', display: 'block' }}>
-                            {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                        </div>
+  <div className="message-sender-name" style={{ fontSize: '12px', fontWeight: '600', marginBottom: '4px', color: '#ff6a00' }}>
+    {getSenderName(msg)}
+  </div>
+
+  {/* 🔥 ONGEZA HII: Angalia kama kuna picha (msg.image) kisha ionyeshe */}
+  {msg.image && (
+    <img 
+      src={msg.image} 
+      alt="Sent attachment" 
+      style={{ maxWidth: '200px', borderRadius: '8px', marginBottom: '5px', display: 'block' }} 
+    />
+  )}
+
+  {/* 🔥 BADILISHA HII: Usionyeshe neno "Image" kama ni picha tu */}
+  {msg.content && msg.content !== 'Image' && (
+    <p style={{ margin: 0, wordBreak: 'break-word' }}>{msg.content}</p>
+  )}
+
+  <span className="msg-timestamp" style={{ fontSize: '10px', color: '#999', marginTop: '4px', display: 'block' }}>
+    {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+  </span>
+</div>
                       </div>
                     ))
                   )}
@@ -869,42 +952,122 @@ useEffect(() => {
                 </div>
 
                 <form className="message-input-area" onSubmit={handleSendMessage} style={{
-                  display: 'flex',
-                  gap: '10px',
-                  padding: '15px 20px',
-                  borderTop: '1px solid #eee',
-                  backgroundColor: '#fff'
-                }}>
-                  <input 
-                    type="text" 
-                    placeholder="Type a message..." 
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    style={{
-                      flex: 1,
-                      padding: '12px',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '25px',
-                      outline: 'none',
-                      fontSize: '14px'
-                    }}
-                  />
-                  <button type="submit" className="send-btn" style={{
-                    background: '#ff6600',
-                    border: 'none',
-                    borderRadius: '50%',
-                    width: '44px',
-                    height: '44px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    color: 'white',
-                    transition: 'background 0.2s'
-                  }}>
-                    <Send size={18} />
-                  </button>
-                </form>
+  display: 'flex',
+  flexDirection: 'column', // 🔥 TUMEBADILISHA: Sasa inaweza kuweka Preview juu
+  gap: '10px',
+  padding: '15px 20px',
+  borderTop: '1px solid #eee',
+  backgroundColor: '#fff'
+}}>
+
+  {/* 🔥 ONGEZA HII: PREVIEW YA PICHA KABLA YA KUTUMA */}
+  {selectedImage && (
+    <div style={{ position: 'relative', width: '100px', height: '100px' }}>
+      <img 
+        src={imagePreview} 
+        alt="Preview" 
+        style={{ 
+          width: '100%', 
+          height: '100%', 
+          objectFit: 'cover', 
+          borderRadius: '10px', 
+          border: '1px solid #eee' 
+        }} 
+      />
+      <button 
+        type="button"
+        onClick={() => { 
+          setSelectedImage(null); 
+          setImagePreview(null); 
+        }}
+        style={{ 
+          position: 'absolute', 
+          top: '-5px', 
+          right: '-5px', 
+          background: '#ff4d4d', 
+          color: '#fff', 
+          border: 'none', 
+          borderRadius: '50%', 
+          width: '20px', 
+          height: '20px', 
+          cursor: 'pointer', 
+          fontSize: '12px', 
+          lineHeight: '20px', 
+          textAlign: 'center' 
+        }}
+      >
+        ✕
+      </button>
+    </div>
+  )}
+
+  {/* 🔥 SAFU YA CHINI: Icon ya Picha, Input, na Send Button */}
+  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+    
+    {/* 🔥 ICON YA KUPANGA PICHA */}
+    <button 
+      type="button" 
+      onClick={() => document.getElementById('file-input').click()}
+      style={{ 
+        background: 'none', 
+        border: 'none', 
+        cursor: 'pointer', 
+        color: '#888', 
+        padding: '5px',
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center'
+      }}
+    >
+      <ImageIcon size={24} /> {/* 🔥 Hakikisha umeimport ImageIcon kutoka lucide-react */}
+    </button>
+
+    {/* 🔥 INPUT YA FILE - Imefichwa (Inatumika tu kwa kupiga click icon) */}
+    <input 
+      id="file-input" 
+      type="file" 
+      accept="image/*" 
+      style={{ display: 'none' }} 
+      onChange={(e) => {
+        const file = e.target.files[0];
+        if (file) {
+          setSelectedImage(file);
+          setImagePreview(URL.createObjectURL(file)); // 🔥 Inaonyesha preview mara moja
+        }
+      }}
+    />
+
+    <input 
+      type="text" 
+      placeholder="Type a message..." 
+      value={newMessage}
+      onChange={(e) => setNewMessage(e.target.value)}
+      style={{
+        flex: 1,
+        padding: '12px',
+        border: '1px solid #e0e0e0',
+        borderRadius: '25px',
+        outline: 'none',
+        fontSize: '14px'
+      }}
+    />
+    <button type="submit" className="send-btn" style={{
+      background: '#ff6600',
+      border: 'none',
+      borderRadius: '50%',
+      width: '44px',
+      height: '44px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      cursor: 'pointer',
+      color: 'white',
+      transition: 'background 0.2s'
+    }}>
+      <Send size={18} />
+    </button>
+  </div>
+</form>
               </div>
             )}
           </div>

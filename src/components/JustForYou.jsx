@@ -224,7 +224,7 @@ export default function JustForYou({ search = "", selectedCategory }) {
       <div className="product-grid">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((item) => (
-           <DashboardCard 
+          <DashboardCard 
   key={item.id}
   image={item.cover_image_url || item.cover_image}
   // title={item.name}
@@ -233,7 +233,14 @@ export default function JustForYou({ search = "", selectedCategory }) {
   isMobile={isMobile}
   moq={item.moq}
   subtitle={item.store_address}
-  categoryName={item.category_name}
+  
+  // 🔥 BADILISHA HAPA CHINI!
+  categoryName={
+    i18n.language === 'sw' 
+      ? (item.leaf_category_name_sw || item.leaf_category_name || item.category_name) 
+      : (item.leaf_category_name || item.category_name)
+  }
+
   isTopDeal={true}
   views={item.views}
   onClick={() => handleCardClick(item)}
