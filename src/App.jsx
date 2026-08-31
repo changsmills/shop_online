@@ -63,6 +63,8 @@ import AllStores from './pages/AllStores';
 import SupplierAccountSettings from './pages/SupplierAccountSettings'; 
 import SellerDashboard from './pages/SellerDashboard'; 
 import VerifySellerOTP from './pages/VerifySellerOTP';
+import StorePending from './pages/StorePending'; // 🔥 Ongoza Import!
+
 
 
 // ========== COMPONENT MPYA YA KUDHIBITI BOTTOM NAV ==========
@@ -244,6 +246,8 @@ function AppContent({ session }) {
 
         <Route path="/payments" element={<PricingPage />} />
         <Route path="/category/:leafId" element={<CategoryProducts session={session} />} />
+        <Route path="/store-pending/:storeId" element={<StorePending />} />
+
       </Routes>
 
       {/* BOTTOM NAV - INAONEKANA KWA MASHARTI TU */}

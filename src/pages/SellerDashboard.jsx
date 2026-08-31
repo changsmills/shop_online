@@ -15,15 +15,16 @@ const SellerDashboard = () => {
       position: 'relative', width: '100%', height: '650px',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       flexDirection: 'column', color: '#fff', overflow: 'hidden',
-      backgroundColor: '#0b0f19',
+      backgroundColor: '#000', // 🔥 Badilisha kuwa nyeusi tu
     },
     videoBackground: {
       position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-      objectFit: 'cover', opacity: 0.6, zIndex: 0,
+      objectFit: 'cover', opacity: 1, zIndex: 0, // 🔥 Opacity 1 - video inaonekana!
     },
     overlay: {
       position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-      background: 'linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.3))', zIndex: 1,
+      background: 'linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.2))', // 🔥 Punguza giza
+      zIndex: 1,
     },
     content: {
       position: 'relative', zIndex: 2, textAlign: 'center', padding: '0 20px',
@@ -82,11 +83,12 @@ const SellerDashboard = () => {
     <div style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>
       
       {/* ==========================================
-          1. HERO SECTION (VIDEO - Imebaki sawa!)
+          1. HERO SECTION (VIDEO - Inaonekana Vizuri!)
          ========================================== */}
       <div style={styles.heroContainer}>
         <video autoPlay loop muted playsInline style={styles.videoBackground}>
-          <source src="https://assets.mixkit.co/videos/preview/mixkit-stylish-dark-office-working-1121-large.mp4" type="video/mp4" />
+          {/* 🔥 Tumia video nzuri inayoonekana vizuri! */}
+          <source src="https://assets.mixkit.co/videos/preview/mixkit-waves-in-the-water-1164-large.mp4" type="video/mp4" />
         </video>
         <div style={styles.overlay}></div>
 
@@ -280,7 +282,7 @@ const SellerDashboard = () => {
       {/* ==========================================
           5. FLOATING CHAT WIDGET
          ========================================== */}
-      <div style={styles.chatWidget} onClick={() => window.open('https://wa.me/255...', '_blank')}>
+      <div style={styles.chatWidget} onClick={() => window.open('https://wa.me/255754394845', '_blank')}>
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'white' }}>
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
         </svg>

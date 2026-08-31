@@ -59,7 +59,8 @@ const UpdateProductPage = () => {
       const mediaRes = await api.get(`/product-media/?product_id=${productId}`, { headers });
       setGallery(mediaRes.data.results || mediaRes.data || []);
 
-      const varRes = await api.get(`/product-variations/?product_id=${productId}`, { headers });
+      const cleanProductId = productId.replace(/-/g, ''); // 🔥 Ondoa hyphens
+      const varRes = await api.get(`/product-variations/?product_id=${encodeURIComponent(productId)}`, { headers });
       setVariations(varRes.data.results || varRes.data || []);
 
       if (productData.store_id) {

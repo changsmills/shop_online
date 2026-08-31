@@ -37,9 +37,9 @@ from products.models import (
 )
 
 # 🔥 ONGEZA HII IMPORT MUHIMU KABISA (Inaingiza ViewSet kutoka products.views):
-from products.views import ProductVariationViewSet
 from products.serializers import ProductsEngineSerializer
 from products.serializers import StoreEngineSerializer
+from products.serializers import ProductVariationSerializer
 
 
 
@@ -167,7 +167,7 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
         search = self.request.query_params.get('search')
         if search:
             from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
-            vector = SearchVector('name', 'name_sw', weight='A')
+            vector = SearchVector('name', weight='A')
             query = SearchQuery(search)
             queryset = queryset.annotate(
                 rank=SearchRank(vector, query)
@@ -362,6 +362,7 @@ class ProductMediaViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save()
 
+
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
@@ -375,13 +376,24 @@ class MessageViewSet(viewsets.ModelViewSet):
         queryset = super().get_queryset()
         user_id = self.request.query_params.get('user_id')
         
+        # 🔥 Hii inachukua messages zote za user huyu (Supplier au Buyer)
         if user_id:
             from django.db.models import Q
             queryset = queryset.filter(
                 Q(sender_id=user_id) | Q(receiver_id=user_id)
             )
         
-        return queryset
+        # 🔥 MUHIMU SANA: Hii inachuja kwa MTEJA (Partner) MAALUM!
+        # Hii inazuia messages za mteja mmoja kuchanganyika na mteja mwingine!
+        partner_id = self.request.query_params.get('partner_id')
+        if partner_id:
+            from django.db.models import Q
+            queryset = queryset.filter(
+                Q(sender_id=partner_id) | Q(receiver_id=partner_id)
+            )
+        
+        # 🔥 MUHIMU SANA: Hii inaweka mpangilio sahihi (Zamani kwanza)!
+        return queryset.order_by('created_at')
 
     def perform_create(self, serializer):
         # 🔥 BADILISHA HII - Weka validation bora
@@ -1033,3 +1045,33 @@ class GoogleAuthView(APIView):
 
         except ValueError:
             return Response({'error': 'Invalid Google Token'}, status=400)
+        
+
+class ProductVariationViewSet(viewsets.ModelViewSet):
+    queryset = ProductVariation.objects.all()
+    serializer_class = ProductVariationSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    # 🔥 MUHIMU SANA: Hii inachuja variations kwa bidhaa moja!
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        
+        # 1. Angalia kama Frontend imetuma product_id
+        product_id = self.request.query_params.get('product_id')
+        if product_id:
+            # Safisha hyphens kama ni UUID string (kwa usalama)
+            clean_id = str(product_id).replace('-', '')
+            # 🔥 HAPA NDIYO SAHIHI: Tumia 'product__id' badala ya 'product_id'
+            # Kwa sababu 'product' ni Foreign Key!
+            queryset = queryset.filter(product__id=clean_id)
+        
+        # 2. Pia unaweza kuchuja kwa 'product' (kama API inatumia hili)
+        product = self.request.query_params.get('product')
+        if product:
+            queryset = queryset.filter(product=product)
+        
+        # 3. Rudisha queryset iliyochujwa
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save()

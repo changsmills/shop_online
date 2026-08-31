@@ -606,3 +606,68 @@
   padding: 6px 16px;
   border-radius: 20px;
 }
+
+/* ========================================================== */
+/* STORE GALLERY (PICHA ZA OFISI) - IMEBORESHA                */
+/* ========================================================== */
+
+.store-gallery-section {
+  margin-bottom: 30px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #eee;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+
+.store-gallery-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #111;
+}
+
+/* 🔥 GRID - Inapanga picha kwa usawa bila kubandana */
+.store-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Picha 3 kwa safu moja */
+  gap: 16px; /* 🔥 Nafasi kati ya picha - sio zibandane! */
+}
+
+/* 🔥 PICHA - Ukubwa mdogo, inaonekana vizuri */
+.store-gallery-image {
+  width: 100%;
+  height: 160px; /* 🔥 Punguza urefu - 160px ni nzuri! */
+  object-fit: cover; /* 🔥 Inazuia picha kunyoka */
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  border: 1px solid #f0f0f0;
+  background-color: #f9f9f9; /* 🔥 Background ya placeholder */
+}
+
+.store-gallery-image:hover {
+  transform: scale(1.02);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .store-gallery-grid {
+    grid-template-columns: repeat(2, 1fr); /* Picha 2 kwa safu kwenye mobile */
+    gap: 10px;
+  }
+  .store-gallery-image {
+    height: 120px; /* 🔥 Punguza zaidi kwenye mobile */
+  }
+}
+
+/* Screen ndogo sana (max-width: 480px) */
+@media (max-width: 480px) {
+  .store-gallery-grid {
+    grid-template-columns: 1fr; /* Picha moja kwa safu kwenye simu ndogo */
+    gap: 8px;
+  }
+  .store-gallery-image {
+    height: 180px;
+  }
+}

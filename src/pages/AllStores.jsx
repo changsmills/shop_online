@@ -162,19 +162,20 @@ export default function AllStores({ session }) {
       if (!storeId) return;
       setLoading(true);
       try {
-        const cachedStore = sessionStorage.getItem('selectedStore');
-        if (cachedStore) {
-          const parsedStore = JSON.parse(cachedStore);
-          if (String(parsedStore.id) === String(storeId)) {
-            setSingleStore(parsedStore);
-            setLoading(false);
-            return;
-          }
-        }
+        // 🔥 TUMIA API MOJA KWA MOJA - Hii ni salama kabisa!
         const response = await api.get(`/stores/${storeId}/`);
-        setSingleStore(response.data);
+        const data = response.data;
+        
+        // 🔥 ANGALIA KAMA DATA INA KOSA LOLOTE
+        if (!data || !data.id) {
+          console.error("Store data is missing or undefined:", data);
+          setSingleStore(null);
+        } else {
+          setSingleStore(data);
+        }
       } catch (error) {
         console.error("Error fetching single store:", error);
+        setSingleStore(null);
       } finally {
         setLoading(false);
       }
@@ -183,36 +184,9 @@ export default function AllStores({ session }) {
   }, [storeId]);
 
   // ============================================================
-  // RENDER: SINGLE STORE
+  // 6. LOADING SKELETON (Ikiwa inapakia na hakuna stores)
   // ============================================================
-   if (singleStore) {
-    return (
-      <div className="all-stores-page">
-        <StoresHeader showBack={true} onSearch={setSearchQuery} />
-        <div className="all-stores-container">
-          <div className="all-stores-header">
-            <h1 className="all-stores-title">{singleStore.store_name}</h1>
-            <p className="all-stores-subtitle">
-              {singleStore.business_type} • {singleStore.city || 'Tanzania'}
-            </p>
-          </div>
-          <div className="store-card-single-container">
-            <StoreCard
-              key={singleStore.id}
-              store={singleStore}
-              onClick={() => navigate(`/store/${singleStore.id}`)}
-            />
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
-  // ============================================================
-  // LOADING SKELETON
-  // ============================================================
-  if (loading && stores.length === 0) {
+  if (loading && !singleStore && stores.length === 0) {
     return (
       <div className="all-stores-page">
         <StoresHeader showBack={true} onSearch={setSearchQuery} />
@@ -233,7 +207,7 @@ export default function AllStores({ session }) {
   }
 
   // ============================================================
-  // RENDER: MAIN PAGE (WITH SIDEBAR & SEARCH)
+  // 7. RENDER: MAIN PAGE (WITH SIDEBAR & SEARCH) - HII NDIYO RETURN YA MWISHO
   // ============================================================
   return (
     <div className="all-stores-page search-results-style">
@@ -338,6 +312,17 @@ export default function AllStores({ session }) {
           </div>
 
           <div className="all-stores-grid">
+            {/* 🔥 ONGEZA HII: Ikiwa singleStore ipo, ionyeshe kwanza! */}
+            {singleStore && (
+              <div className="single-store-card-wrapper">
+                <StoreCard
+                  key={singleStore.id}
+                  store={singleStore}
+                  onClick={() => navigate(`/store/${singleStore.id}`)}
+                />
+              </div>
+            )}
+
             {stores.length > 0 ? (
               stores.map((store, index) => (
                 <div 

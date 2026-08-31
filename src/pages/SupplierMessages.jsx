@@ -70,33 +70,33 @@ const SupplierMessages = () => {
     fetchProfile();
   }, [navigate]);
 
-  const fetchMessages = async (partnerId) => {
+ const fetchMessages = async (partnerId) => {
   if (!partnerId || !currentUserId) return;
   try {
     const token = localStorage.getItem("access_token");
     const headers = { Authorization: `Bearer ${token}` };
+    
+    // 🔥 SASA TUNAKUWEKA user_id NA partner_id PAMOJA!
     const response = await api.get('/messages/', {
-      params: { sender: currentUserId, receiver: partnerId },
+      params: {
+        user_id: currentUserId,   // 🔥 Inachukua messages za Supplier
+        partner_id: partnerId,    // 🔥 Inachuja kwa Mteja huyu TU!
+        ordering: 'created_at'    // 🔥 Zamani kwanza (Mpangilio sahihi)
+      },
       headers
     });
 
     const data = response.data.results || response.data || [];
-    
-    if (data.length > 0) {
-      const firstMsg = data[0];
-      const isISender = firstMsg.sender_id === currentUserId;
-      const storeName = isISender ? firstMsg.receiver_name : firstMsg.sender_name;
-      setActiveChat(prev => prev ? { ...prev, name: storeName || prev.name } : prev);
-    }
 
-    setMessages(data);
+    // 🔥 Usitumie reverse tena! 'created_at' inaleta mpangilio sahihi (zamani -> mpya)
+    setMessages(data); 
   } catch (err) {
     console.error("Error fetching messages:", err.response?.data || err.message);
     setMessages([]);
   }
 };
 
-  const fetchInbox = async () => {
+const fetchInbox = async () => {
     if (!currentUserId) return;
     setLoading(true);
     try {
@@ -116,19 +116,22 @@ const SupplierMessages = () => {
 
       data.forEach(msg => {
         const isISender = msg.sender_id === currentUserId;
-        const partnerId = isISender ? msg.receiver_id : msg.sender_id;
+        const actualPartnerId = isISender ? msg.receiver_id : msg.sender_id;
         
         const partnerName = isISender ? msg.receiver_name : msg.sender_name;
-        const finalName = partnerName || `Mteja ${partnerId.slice(0,4)}`;
+        const finalName = partnerName || `Mteja ${actualPartnerId.slice(0,4)}`;
         
-        if (partnerId && !chatGroups[partnerId]) {
-          chatGroups[partnerId] = {
-            id: partnerId,
+        if (actualPartnerId && !chatGroups[actualPartnerId]) {
+          chatGroups[actualPartnerId] = {
+            id: actualPartnerId,
             name: finalName,
             avatar: isISender ? (msg.receiver_avatar || null) : (msg.sender_avatar || null),
-            lastMsg: msg.content,
+            lastMsg: msg.content || (msg.image ? '📷 Picha' : ''),
             date: new Date(msg.created_at).toLocaleDateString(),
-            timestamp: new Date(msg.created_at).getTime()
+            timestamp: new Date(msg.created_at).getTime(),
+            
+            // 🔥 ONGEZA HII: Angalia kama ni message mpya (is_read = false) na haijatoka kwako!
+            isUnread: msg.is_read === false && msg.sender_id !== currentUserId
           };
         }
       });
@@ -202,10 +205,10 @@ const SupplierMessages = () => {
    };
 
   const sidebarItems = [
-    { icon: <LayoutDashboard size={20} />, path: '/dashboard/sellerboard', label: 'Duka Lako' },
-    { icon: <MessageSquare size={20} />, path: '/dashboard/supplier-messages', label: 'Ujumbe' },
-    { icon: <ClipboardList size={20} />, path: '/dashboard/supplier-notifications', label: 'Arifa (Oda)' },
-    { icon: <Settings size={20} />, path: '/dashboard/supplier-settings', label: 'Mipangilio' },
+    { icon: <LayoutDashboard size={20} />, path: '/dashboard/sellerboard', label: 'My Store' },
+    { icon: <MessageSquare size={20} />, path: '/dashboard/supplier-messages', label: 'Messages' },
+    { icon: <ClipboardList size={20} />, path: '/dashboard/supplier-notifications', label: 'Order Alerts' },
+    { icon: <Settings size={20} />, path: '/dashboard/supplier-settings', label: 'Settings' },
   ];
 
   return (
@@ -258,18 +261,70 @@ const SupplierMessages = () => {
               </div>
 
               <div className="chat-list" style={{ overflowY: 'auto', height: '100%' }}>
-                {loading ? (<p style={{ padding: '20px', textAlign: 'center' }}>Inapakia...</p>) : chats.length === 0 ? (
+                {loading ? (
+  /* 🔥 SKELETON MPYA BADALA YA "Inapakia..." */
+  <div className="skeleton-chat-list">
+    {[1, 2, 3, 4, 5].map((item) => (
+      <div key={item} className="skeleton-chat-item">
+        <div className="skeleton-chat-avatar"></div>
+        <div className="skeleton-chat-lines">
+          <div className="skeleton-line skeleton-line-name"></div>
+          <div className="skeleton-line skeleton-line-text"></div>
+        </div>
+      </div>
+    ))}
+  </div>
+) : chats.length === 0 ? (
                   <p style={{ padding: '20px', textAlign: 'center', color: '#9ca3af' }}>Hakuna mazungumzo bado</p>
                 ) : (
+
                   chats.map(chat => (
-                    <div key={chat.id} className={`chat-item ${activeChat?.id === chat.id ? 'active' : ''}`} onClick={() => handleChatSelect(chat)} style={{ padding: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid #f5f5f5', backgroundColor: activeChat?.id === chat.id ? '#f3f4f6' : 'transparent' }}>
+                    <div 
+                      key={chat.id} 
+                      className={`chat-item ${activeChat?.id === chat.id ? 'active' : ''}`} 
+                      onClick={() => handleChatSelect(chat)} 
+                      style={{ 
+                        padding: '15px', 
+                        cursor: 'pointer', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '12px', 
+                        borderBottom: '1px solid #f5f5f5',
+                        backgroundColor: chat.isUnread ? '#fff5ed' : (activeChat?.id === chat.id ? '#f3f4f6' : 'transparent')
+                      }}
+                    >
                       <div className="chat-avatar" style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#ff6a00', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 'bold' }}>
                         {chat.avatar ? (<img src={chat.avatar} alt={chat.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />) : (chat.name[0]?.toUpperCase() || '?')}
                       </div>
                       <div className="chat-info" style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontWeight: '600' }}>{chat.name}</span><span style={{ fontSize: '11px', color: '#999' }}>{chat.date}</span></div>
-                        <p style={{ fontSize: '13px', color: '#666', margin: '4px 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{chat.lastMsg?.length > 40 ? chat.lastMsg.substring(0, 40) + '...' : chat.lastMsg}</p>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span style={{ fontWeight: chat.isUnread ? 'bold' : '600', color: chat.isUnread ? '#ff6a00' : '#111827' }}>{chat.name}</span>
+                          <span style={{ fontSize: '11px', color: '#999' }}>{chat.date}</span>
+                        </div>
+                        <p style={{ 
+                          fontSize: '13px', 
+                          color: chat.isUnread ? '#333' : '#666', 
+                          margin: '4px 0 0', 
+                          whiteSpace: 'nowrap', 
+                          overflow: 'hidden', 
+                          textOverflow: 'ellipsis',
+                          fontWeight: chat.isUnread ? 'bold' : 'normal'
+                        }}>
+                          {chat.lastMsg?.length > 40 ? chat.lastMsg.substring(0, 40) + '...' : chat.lastMsg}
+                        </p>
                       </div>
+                      
+                      {/* 🔥 ONGEZA HII: Dot ya Unread Badge */}
+                      {chat.isUnread && (
+                        <div style={{ 
+                          width: '10px', 
+                          height: '10px', 
+                          borderRadius: '50%', 
+                          backgroundColor: '#ff6a00', 
+                          flexShrink: 0,
+                          boxShadow: '0 0 5px rgba(255, 106, 0, 0.5)'
+                        }}></div>
+                      )}
                     </div>
                   ))
                 )}

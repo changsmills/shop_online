@@ -167,17 +167,24 @@ export default function TopStores({ navigate }) {
                   businessType={store.business_type}
                   rating={store.average_rating}
                   isStore={true}
-                  onClick={() => {
-                    const storeData = {
-                      id: store.id,
-                      name: store.store_name,
-                      categoryId: store.category_id,
-                      city: store.city,
-                      type: store.business_type
-                    };
-                    sessionStorage.setItem('selectedStore', JSON.stringify(storeData));
-                    window.open(`/stores/${store.id}`, '_blank');
-                  }}
+                onClick={() => {
+  // 🔥 Hifadhi data kamili kwenye sessionStorage!
+  const storeData = {
+    id: store.id,
+    store_name: store.store_name,
+    category_id: store.category_id,
+    city: store.city,
+    business_type: store.business_type,
+    store_logo_url: store.store_logo_url || store.store_logo || null,
+    office_images: store.office_images || [],
+    is_verified: store.is_verified || false
+  };
+  sessionStorage.setItem('selectedStore', JSON.stringify(storeData));
+
+  // 🔥 ANGALIA KAMA UNATUMIA '/stores/:id' AU '/store/:id'!
+  // Kama Router yako inatumia hii, tumia:
+  window.open(`/stores/${store.id}`, '_blank'); 
+}}
                 />
               </div>
             );

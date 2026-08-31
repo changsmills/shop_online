@@ -8,10 +8,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework_simplejwt.authentication import JWTAuthentication  # 🔥 ONGEZA HII!
 from products.models import (
     Category, SubCategory, ProductsEngine, LeafCategory, StoreEngine,
-    ProductMedia, ProductVariation, Profile
+    ProductMedia, Profile
 )
 
-from products.serializers import ProductVariationSerializer  # ✅ ONGEZA HII!
 
 from .serializers import (
     CategorySerializer, SubCategorySerializer, ProductsEngineSerializer,
@@ -189,10 +188,3 @@ class ProductMediaViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save()
 
-class ProductVariationViewSet(viewsets.ModelViewSet):
-    queryset = ProductVariation.objects.all()
-    serializer_class = ProductVariationSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
-
-    def perform_create(self, serializer):
-        serializer.save()

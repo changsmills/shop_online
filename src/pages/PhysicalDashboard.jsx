@@ -481,15 +481,15 @@ export default function PhysicalDashboard() {
   }
 };
 
-  const menuItems = [
-    { id: 'overview', label: 'Duka Lako', icon: <LayoutDashboard size={20} /> },
-    { id: 'products', label: 'Bidhaa Zangu', icon: <Package size={20} /> },
+   const menuItems = [
+    { id: 'overview', label: 'My Store', icon: <LayoutDashboard size={20} /> },
+    { id: 'products', label: 'My Products', icon: <Package size={20} /> },
     { id: 'inventory', label: 'Inventory', icon: <Box size={20} /> },
-    { id: 'offers', label: 'Punguzo (Offers)', icon: <TrendingUp size={20} /> }, 
-    { id: 'analytics', label: 'Takwimu', icon: <BarChart3 size={20} /> },
-    { id: 'settings', label: 'Mipangilio ya Akaunti', icon: <Settings size={20} /> },
-    { id: 'advertise', label: 'Matangazo', icon: <Megaphone size={20} /> },
-    { id: 'logout', label: 'Toka (Logout)', icon: <LogOut size={20} /> },
+    { id: 'offers', label: 'Offers', icon: <TrendingUp size={20} /> }, 
+    { id: 'analytics', label: 'Analytics', icon: <BarChart3 size={20} /> },
+    { id: 'settings', label: 'Account Settings', icon: <Settings size={20} /> },
+    { id: 'advertise', label: 'Advertisements', icon: <Megaphone size={20} /> },
+    { id: 'logout', label: 'Logout', icon: <LogOut size={20} /> },
   ];
 
   return (
@@ -506,7 +506,7 @@ export default function PhysicalDashboard() {
         </div>
 
         <div className="header-center">
-          <span className="header-welcome">Karibu kwenye Skyfall.com</span>
+          <span className="header-welcome">Welcome to Skyfall.com</span>
         </div>
 
         <div className="header-actions">

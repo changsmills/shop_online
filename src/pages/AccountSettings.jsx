@@ -5,7 +5,8 @@ import api from '../axiosConfig'; // 🔥 Badilisha: Tumia api kutoka axiosConfi
 import { 
   LayoutDashboard, MessageSquare, ClipboardList, 
   Settings, BarChart3, Bell, Search, User, LogOut, ChevronRight, Menu, X, Eye, EyeOff,
-  Camera, Upload, Save, HelpCircle, FileText, Shield, Phone, Mail, Globe, Truck, Store
+  Camera, Upload, Save, HelpCircle, FileText, Shield, Phone, Mail, Globe, Truck, Store,
+  ArrowLeft
 } from 'lucide-react';
 import UserTools from '../components/UserTools';
 import { useTranslation } from 'react-i18next';
@@ -315,21 +316,34 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
       {/* HEADER */}
       <header className="dashboard-header">
         <div className="header-left">
-          {!isExpanded && (
-            <Menu 
-              size={22} 
-              className="icon-btn menu-toggle" 
-              onClick={() => setIsExpanded(!isExpanded)} 
-            />
-          )}
-          <Link to="/dashboard" className="logo-text">
-            Skyfall.com
-          </Link>
-          <div className="search-box">
-            <Search size={16} color="#999" />
-            <input type="text" placeholder="Search in cart..." />
-          </div>
-        </div>
+  {/* 🔥 BACK ARROW - Ipo kabla ya Menu na Logo */}
+  <button 
+    className="icon-btn back-arrow-btn" 
+    onClick={() => navigate(-1)} // Inarudi nyuma kwenye ukurasa uliopita
+    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ff5722' }} // Rangi ya chungwa kama logo
+    title="Back"
+  >
+    <ArrowLeft size={22} />
+  </button>
+
+  {/* Menu ya Sidebar (Inabaki kama ilivyo) */}
+  {!isExpanded && (
+    <Menu 
+      size={22} 
+      className="icon-btn menu-toggle" 
+      onClick={() => setIsExpanded(!isExpanded)} 
+    />
+  )}
+
+  <Link to="/dashboard" className="logo-text">
+    Skyfall.com
+  </Link>
+  
+  <div className="search-box">
+    <Search size={16} color="#999" />
+    <input type="text" placeholder="Search in cart..." />
+  </div>
+</div>
 
         <div className="header-right">
           <Bell size={20} className="icon-btn" />

@@ -409,52 +409,54 @@ useEffect(() => {
   return (
     <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       
-           {/* 🔥 MOBILE: FICHA HEADER KABISA (Kwenye Mobile Inaonekana tu ikiwa na Back Arrow) */}
-      <header className="dashboard-header" style={{ position: 'sticky', top: 0, zIndex: 100, display: isMobile ? 'none' : 'block' }}>
-        <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          
-          {/* 🔥 ONGEZA HII: Back Arrow ya Kurudi Dashboard - Inaonekana TU kwenye Mobile */}
-          {isMobile && (
-            <button 
-              onClick={handleBackNavigation}
-              style={{ 
-                background: 'none', 
-                border: 'none', 
-                cursor: 'pointer', 
-                padding: '4px', 
-                display: 'flex', 
-                alignItems: 'center',
-                marginRight: '2px'
-              }}
-            >
-              <ChevronLeft size={28} color="#333" />
-            </button>
-          )}
+            {/* 🔥 MOBILE: Header inaonekana TU wakati chat haijafunguliwa */}
+      {(!isMobile || (isMobile && !showMobileChat)) && (
+        <header className="dashboard-header" style={{ position: 'sticky', top: 0, zIndex: 100 }}>
+          <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            
+            {/* 🔥 ONGEZA HII: Back Arrow ya Kurudi Dashboard - Inaonekana TU kwenye Mobile */}
+            {isMobile && (
+              <button 
+                onClick={handleBackNavigation}
+                style={{ 
+                  background: 'none', 
+                  border: 'none', 
+                  cursor: 'pointer', 
+                  padding: '4px', 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  marginRight: '2px'
+                }}
+              >
+                <ChevronLeft size={28} color="#333" />
+              </button>
+            )}
 
-          {/* 🔥 Desktop Tu: Menu ya Kufungua Sidebar */}
-          {!isMobile && (
-            <Menu 
-              size={22} 
-              className="menu-toggle" 
-              style={{ cursor: 'pointer', color: '#666' }} 
-              onClick={() => setIsExpanded(!isExpanded)} 
-            />
-          )}
+            {/* 🔥 Desktop Tu: Menu ya Kufungua Sidebar */}
+            {!isMobile && (
+              <Menu 
+                size={22} 
+                className="menu-toggle" 
+                style={{ cursor: 'pointer', color: '#666' }} 
+                onClick={() => setIsExpanded(!isExpanded)} 
+              />
+            )}
 
-          {/* Logo */}
-          <Link to="/dashboard" style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: '800', color: '#ff6a00', textDecoration: 'none' }}>
-            Skyfall.com
-          </Link>
+            {/* Logo */}
+            <Link to="/dashboard" style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: '800', color: '#ff6a00', textDecoration: 'none' }}>
+              Skyfall.com
+            </Link>
 
-          {/* 🔥 Desktop Tu: Search Box */}
-          {!isMobile && (
-            <div className="search-box">
-              <Search size={16} />
-              <input type="text" placeholder="Search chats..." />
-            </div>
-          )}
-        </div>
-      </header>
+            {/* 🔥 Desktop Tu: Search Box */}
+            {!isMobile && (
+              <div className="search-box">
+                <Search size={16} />
+                <input type="text" placeholder="Search chats..." />
+              </div>
+            )}
+          </div>
+        </header>
+      )}
 
       <div className="dashboard-main" style={{ display: 'flex', flex: 1, overflow: 'hidden', paddingBottom: isMobile ? '0' : 0 }}>
         

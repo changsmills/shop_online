@@ -278,6 +278,41 @@ export default function StorePage() {
           </div>
         </div>
 
+        {/* ================================================= */}
+        {/* ✅ STORE GALLERY (PICHA ZA OFISI ZA DUKA)        */}
+        {/* ================================================= */}
+        {(store?.office_image_1_url || store?.office_image_2_url || store?.office_image_3_url) && (
+          <div className="store-gallery-section">
+            <h2 className="store-gallery-title">📸 Store Showroom & Physical Location</h2>
+            <div className="store-gallery-grid">
+              {store.office_image_1_url && (
+                <img 
+                  src={store.office_image_1_url} 
+                  alt="Store Office 1" 
+                  className="store-gallery-image"
+                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/300x200?text=No+Image'; }}
+                />
+              )}
+              {store.office_image_2_url && (
+                <img 
+                  src={store.office_image_2_url} 
+                  alt="Store Office 2" 
+                  className="store-gallery-image"
+                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/300x200?text=No+Image'; }}
+                />
+              )}
+              {store.office_image_3_url && (
+                <img 
+                  src={store.office_image_3_url} 
+                  alt="Store Office 3" 
+                  className="store-gallery-image"
+                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/300x200?text=No+Image'; }}
+                />
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Store Info Cards */}
         <div className="store-info-grid">
           <div className="info-card">

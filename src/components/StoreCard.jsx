@@ -9,13 +9,13 @@ export default function StoreCard({ store, onClick }) {
   const city = store.city || 'Tanzania';
   const categoryName = store.category_name || store.business_type || 'Store';
 
-  // 🔥 Tumia picha kutoka backend au placeholder
-  let storeImage = 
-    store.office_image_1 || 
-    store.office_image_2 || 
-    store.store_logo || 
-    store.store_banner || 
-    'https://via.placeholder.com/300x300?text=Store';
+   // 🔥 Tumia URL halisi kutoka Backend (zilizopo!) AU fallback ya ndani
+  const storeImage = 
+    store.store_logo_url || 
+    store.office_image_1_url || 
+    store.office_image_2_url || 
+    (store.store_logo ? `https://res.cloudinary.com/rlgqgsnv/image/upload/${store.store_logo}` : null) ||
+    null; // 🔥 Hakuna placeholder ya nje!
 
   // 🔥 DEBUG: Chapisha kwenye console ili uone ni picha ipi inayotumika
   console.log(`🖼️ [StoreCard] Store: ${storeName}`);
@@ -36,21 +36,32 @@ export default function StoreCard({ store, onClick }) {
           </div>
         )}
         
-        <img 
-          src={storeImage} 
-          alt={storeName}
-          draggable="false"
-          onContextMenu={(e) => e.preventDefault()}
-          className="store-card-img"
-          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-          onTouchStart={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
-          onTouchEnd={(e) => e.currentTarget.style.transform = 'scale(1)'}
-          onError={(e) => { 
-            console.warn(`⚠️ [StoreCard] Image failed to load for ${storeName}, using placeholder.`);
-            e.target.src = 'https://via.placeholder.com/300x300?text=Store'; 
-          }}
-        />
+                {storeImage ? (
+          <img 
+            src={storeImage} 
+            alt={storeName}
+            className="store-card-img"
+            onError={(e) => { 
+              // 🔥 Tumia SVG ya ndani (haitegemei internet!)
+              e.target.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><rect fill='%23f0f0f0' width='300' height='300'/><text fill='%23888' font-size='20' x='50%' y='50%' text-anchor='middle'>No Image</text></svg>"; 
+            }}
+          />
+        ) : (
+          <div className="store-card-no-image" style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#f0f0f0',
+            color: '#888',
+            fontSize: '48px',
+            fontWeight: 'bold'
+          }}>
+            {storeName.charAt(0).toUpperCase()}
+          </div>
+        )}
+        
       </div>
 
       {/* INFO SECTION */}

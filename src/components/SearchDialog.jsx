@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, ArrowUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import '../SearchDialog.css';
+import api from "../axiosConfig"; // 🔥 ONGEZA HII
 
 export default function SearchDialog({ isOpen, onClose, onSearch }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -96,7 +97,7 @@ export default function SearchDialog({ isOpen, onClose, onSearch }) {
         {suggestions.length > 0 && (
           <div className="search-dialog-suggestions">
             <div className="search-dialog-suggestions-header">
-              <span>Matokeo ya haraka</span>
+              <span>Results</span>
             </div>
             {suggestions.map((item) => (
               <div 
@@ -104,14 +105,10 @@ export default function SearchDialog({ isOpen, onClose, onSearch }) {
                 className="search-dialog-suggestion-item"
                 onClick={() => handleSuggestionClick(item)}
               >
-                <img 
-                  src={item.cover_image || 'https://via.placeholder.com/40'} 
-                  alt={item.name}
-                  className="search-dialog-suggestion-img"
-                />
+                
                 <div className="search-dialog-suggestion-info">
                   <span className="search-dialog-suggestion-name">{item.name}</span>
-                  <span className="search-dialog-suggestion-price">{item.price}</span>
+                
                 </div>
               </div>
             ))}
