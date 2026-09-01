@@ -21,7 +21,12 @@ export default function StorePending() {
       try {
         const response = await api.get(`/stores/${storeId}/`);
         const data = response.data;
-        setStoreStatus(data.status || 'pending');
+        
+        // 🔥 MUHIMU SANA: Soma 'verification_status' KWANZA!
+        // Kama ni 'pending', mtumiaji abaki hapa. Usitumie 'status' kwa sababu ni 'active'.
+        const currentStatus = data.verification_status || data.status || 'pending';
+        
+        setStoreStatus(currentStatus);
         setStoreName(data.store_name || '');
       } catch (error) {
         console.error("Error fetching store status:", error);
@@ -37,10 +42,10 @@ export default function StorePending() {
   }, [storeId]);
 
   // =======================================================
-  // 🔥 KAMA STORE IMEPITISHWA, ENDA KWA DASHBOARD
+  // 🔥 ENDA DASHBOARD TU PALE ADMIN ANAPOBADILISHA VERIFICATION_STATUS KUWA APPROVED!
   // =======================================================
   useEffect(() => {
-    if (storeStatus === 'approved' || storeStatus === 'active') {
+    if (storeStatus === 'approved' || storeStatus === 'verified') {
       navigate(`/dashboard/physical/${storeId}`);
     }
   }, [storeStatus, storeId, navigate]);
@@ -52,24 +57,25 @@ export default function StorePending() {
           <Clock size={48} color="#ff6a00" />
         </div>
         
-        <h2 className="store-pending-title">Duka Linasubiri Kupitishwa</h2>
+        {/* 🔥 Maneno yote ni ya Kiingereza */}
+        <h2 className="store-pending-title">Store Pending Approval</h2>
         <p className="store-pending-store-name">
-          <Store size={16} /> {storeName || 'Duka Lako'}
+          <Store size={16} /> {storeName || 'Your Store'}
         </p>
         
         <p className="store-pending-text">
-          Mfumo wetu wa ukaguzi unapitia taarifa za duka lako. 
+          Our verification system is reviewing your store details.
           <br />
-          Hutumwa kwenye Dashboard mara tu duka litakapopitishwa na Admin.
+          You will be redirected to the Dashboard once your store is approved by Admin.
         </p>
         
         <div className="store-pending-progress">
           <div className="progress-bar"></div>
-          <span className="progress-text">Inasubiri... {isChecking ? 'Inakagua' : ''}</span>
+          <span className="progress-text">Waiting... {isChecking ? 'Checking' : ''}</span>
         </div>
 
         <button onClick={() => navigate('/')} className="back-home-btn">
-          Rudi Nyumbani
+          Back to Home
         </button>
       </div>
     </div>

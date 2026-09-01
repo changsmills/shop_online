@@ -305,7 +305,7 @@ export default function NavLinks({ isMobile }) {
     return <IconComponent size={size} />;
   };
 
-  const handleSellNavigation = async () => {
+    const handleSellNavigation = async () => {
     try {
       const token = localStorage.getItem("access_token");
       if (token) {
@@ -315,7 +315,16 @@ export default function NavLinks({ isMobile }) {
           const storeRes = await api.get('/stores/', { params: { owner_id: profileData.id } });
           const storeData = storeRes.data;
           if (storeData && storeData.length > 0) {
-            navigate(`/dashboard/sellerboard/${storeData[0].id}`);
+            const store = storeData[0];
+            const storeId = store.id;
+            const verificationStatus = store.verification_status || store.status;
+
+            // 🔥 MUHIMU: Kagua kama store imepitishwa!
+            if (verificationStatus === 'pending' || verificationStatus === 'unverified') {
+              navigate(`/store-pending/${storeId}`);
+            } else {
+              navigate(`/dashboard/sellerboard/${storeId}`);
+            }
             return;
           } else {
             navigate('/create-store');

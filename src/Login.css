@@ -545,3 +545,68 @@
   color: #666;
   margin: 4px 0 0 0;
 }
+
+/* ============================================ */
+/* SKELETON LOADING KWA LOGIN                   */
+/* ============================================ */
+
+.login-loading-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+}
+
+.login-skeleton-left {
+  flex: 1;
+  background: #f7f8fa;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15px;
+}
+
+.login-skeleton-right {
+  flex: 1;
+  background: #fff;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15px;
+  max-width: 500px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.skeleton-box {
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-box-lg { height: 150px; width: 80%; }
+.skeleton-box-sm { height: 30px; width: 50%; }
+.skeleton-badge { height: 30px; width: 120px; border-radius: 20px; }
+.skeleton-title { height: 40px; width: 60%; }
+.skeleton-title-sm { height: 20px; width: 40%; }
+.skeleton-input { height: 45px; width: 100%; }
+.skeleton-btn { height: 45px; width: 100%; border-radius: 8px; }
+.skeleton-footer { height: 20px; width: 60%; margin-top: 20px; }
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* Mobile: Ficha left panel skeleton kwenye simu */
+@media (max-width: 900px) {
+  .login-skeleton-left {
+    display: none;
+  }
+  .login-skeleton-right {
+    max-width: 100%;
+    padding: 20px;
+  }
+}

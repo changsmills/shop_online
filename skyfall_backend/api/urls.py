@@ -18,7 +18,8 @@ from api.views import (
     SellerOTPRequestView,
     SellerOTPVerifyView,
     GoogleAuthView,
-    SupplierLogoutView
+    SupplierLogoutView,
+    AdminStoreApprovalViewSet
 
 )
 
@@ -37,6 +38,7 @@ router.register(r'leads', LeadViewSet)
 router.register(r'product-variations', ProductVariationViewSet)
 router.register(r'orders', OrderViewSet)
 router.register(r'order-items', OrderItemViewSet)
+router.register(r'admin/stores', AdminStoreApprovalViewSet, basename='admin-store-approval')
 
 urlpatterns = [
     path('seller/otp/request/', SellerOTPRequestView.as_view(), name='seller_otp_request'),

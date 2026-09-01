@@ -66,7 +66,7 @@ export default function CreateStore() {
     try {
       const token = localStorage.getItem("access_token");
       if (!token) {
-        alert("Tafadhali ingia kwanza!");
+        alert("Please login first!");
         setIsLoading(false);
         return;
       }
@@ -101,13 +101,17 @@ export default function CreateStore() {
       if (formData.banner) submissionData.append("store_banner", formData.banner);
       if (formData.tin_image) submissionData.append("tin_image", formData.tin_image);
       
-            // 🔥 BADILISHA HAPA: Tumia 'office_images' kama list
+           // 🔥 BADILISHA HAPA: Tumia 'office_images' kama list
       const officeImages = [formData.image1, formData.image2, formData.image3].filter(Boolean);
       officeImages.forEach((file) => {
           if (file) {
               submissionData.append("office_images", file);
           }
       });
+
+      // 🔥 MUHIMU SANA: Lazima uweke status kuwa 'pending' ili ukurasa wa kusubiri uonekane!
+      submissionData.append("status", "pending");
+      submissionData.append("verification_status", "pending");
 
       const response = await api.post(
         "/stores/",
@@ -117,23 +121,25 @@ export default function CreateStore() {
 
       if (response.status === 201) {
         setIsSuccess(true);
-        setTimeout(() => navigate(`/dashboard/physical/${response.data.id}`), 2000);
+        // 🔥 BADILISHA HAPA: Enda kwenye ukurasa wa kusubiri badala ya Dashboard!
+        setTimeout(() => navigate(`/store-pending/${response.data.id}`), 2000);
       }
+
     } catch (error) {
       console.error("Error creating store:", error.response?.data || error.message);
-      alert("Kuna kosa limejitokeza: " + (error.response?.data?.detail || "Tafadhali jaribu tena"));
+      alert("An error occurred: " + (error.response?.data?.detail || "Please try again"));
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (isSuccess) {
+   if (isSuccess) {
     return (
       <div className="create-store-page">
         <div className="premium-success-card">
           <div className="success-lottie">🏢</div>
-          <h2 className="gradient-text">Duka Limesajiliwa!</h2>
-          <p>Mfumo unatayarisha duka lako la <strong>{formData.name}</strong>...</p>
+          <h2 className="gradient-text">Store Registered!</h2>
+          <p>Preparing your store: <strong>{formData.name}</strong>...</p>
           <div className="progress-bar-container">
             <div className="progress-fill"></div>
           </div>
@@ -151,22 +157,24 @@ export default function CreateStore() {
 
       <div className="main-container">
         {!storeType ? (
-          <div className="selection-view animate-fade">
+
+            <div className="selection-view animate-fade">
             <div className="text-center mb-5">
-              <h1 className="hero-title">Anzisha Biashara Yako</h1>
-              <p className="hero-subtitle">Chagua mfumo wa uendeshaji unaofaa biashara yako</p>
+              <h1 className="hero-title">Start Your Business</h1>
+              <p className="hero-subtitle">Choose the business model that suits you</p>
             </div>
 
             <div className="card-grid">
               <div onClick={() => setStoreType("physical")} className="choice-card-premium virtual">
-                <div className="badge">Rahisi</div>
+                <div className="badge">Free Trial</div>
                 <div className="icon-wrapper">🌐</div>
                 <h3>VIRTUAL STORE</h3>
-                <p>Duka lenye Kuwafikia maelfu ya wateja no boundary popote tutafika Skyfall.com.</p>
-                <button className="select-btn">Chagua Hii</button>
+                <p>Reach thousands of customers without boundaries anywhere on Skyfall.com. <strong>Free for now.</strong></p>
+                <button className="select-btn">Start Free Trial</button>
               </div>
             </div>
           </div>
+
         ) : (
           <StoreForm
             storeType={storeType}

@@ -67,15 +67,29 @@ const Login = () => {
           
           console.log("🔍 Store data:", storeRes.data);
 
-          if (storeRes.data && storeRes.data.length > 0) {
-            const storeId = storeRes.data[0].id;
-            console.log("✅ Store ID:", storeId);
-            toast.success("Karibu Muuzaji! Inaelekeza kwenye Dashboard yako...", {
-              duration: 3000,
-            });
-            setTimeout(() => {
-              navigate(`/dashboard/sellerboard/${storeId}`, { replace: true });
-            }, 3000);
+                    if (storeRes.data && storeRes.data.length > 0) {
+            const store = storeRes.data[0];
+            const storeId = store.id;
+            const verificationStatus = store.verification_status || store.status;
+
+            // 🔥 MUHIMU: Kagua kama store bado inasubiri kupitishwa!
+            if (verificationStatus === 'pending' || verificationStatus === 'unverified') {
+              toast("Store yako inasubiri kupitishwa na Admin.", {
+                icon: '⏳',
+                duration: 3000,
+              });
+              setTimeout(() => {
+                navigate(`/store-pending/${storeId}`, { replace: true });
+              }, 3000);
+            } else {
+              console.log("✅ Store ID:", storeId);
+              toast.success("Karibu Muuzaji! Inaelekeza kwenye Dashboard yako...", {
+                duration: 3000,
+              });
+              setTimeout(() => {
+                navigate(`/dashboard/sellerboard/${storeId}`, { replace: true });
+              }, 3000);
+            }
           } else {
             console.log("⚠️ Hakuna store, inapeleka /create-store");
             toast.success("Karibu Muuzaji! Tafadhali unda duka lako kwanza.", {
@@ -154,14 +168,28 @@ toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
 
         console.log("🔍 Store data (login):", storeRes.data);
 
-        if (storeRes.data && storeRes.data.length > 0) {
-          const storeId = storeRes.data[0].id;
-          toast.success("Karibu Muuzaji! Inaelekeza kwenye Dashboard yako...", {
-            duration: 3000,
-          });
-          setTimeout(() => {
-            navigate(`/dashboard/sellerboard/${storeId}`, { replace: true });
-          }, 3000);
+                if (storeRes.data && storeRes.data.length > 0) {
+          const store = storeRes.data[0];
+          const storeId = store.id;
+          const verificationStatus = store.verification_status || store.status;
+
+          // 🔥 MUHIMU: Kagua kama store bado inasubiri kupitishwa!
+          if (verificationStatus === 'pending' || verificationStatus === 'unverified') {
+            toast("Store yako inasubiri kupitishwa na Admin.", {
+              icon: '⏳',
+              duration: 3000,
+            });
+            setTimeout(() => {
+              navigate(`/store-pending/${storeId}`, { replace: true });
+            }, 3000);
+          } else {
+            toast.success("Karibu Muuzaji! Inaelekeza kwenye Dashboard yako...", {
+              duration: 3000,
+            });
+            setTimeout(() => {
+              navigate(`/dashboard/sellerboard/${storeId}`, { replace: true });
+            }, 3000);
+          }
         } else {
           toast.success("Karibu Muuzaji! Tafadhali unda duka lako kwanza.", {
             duration: 3000,
@@ -249,16 +277,32 @@ toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
 
             console.log("🔍 Store data (Google):", storeRes.data);
 
-            if (storeRes.data && storeRes.data.length > 0) {
-              const storeId = storeRes.data[0].id;
-              toast.success("Karibu Muuzaji! Inaelekeza kwenye Dashboard yako...", {
-                duration: 3000,
-              });
-              setTimeout(() => {
-                toast.dismiss();
-                navigate(`/dashboard/sellerboard/${storeId}`, { replace: true });
-              }, 3000);
+                        if (storeRes.data && storeRes.data.length > 0) {
+              const store = storeRes.data[0];
+              const storeId = store.id;
+              const verificationStatus = store.verification_status || store.status;
+
+              // 🔥 MUHIMU: Kagua kama store bado inasubiri kupitishwa!
+              if (verificationStatus === 'pending' || verificationStatus === 'unverified') {
+                toast("Store yako inasubiri kupitishwa na Admin.", {
+                  icon: '⏳',
+                  duration: 3000,
+                });
+                setTimeout(() => {
+                  toast.dismiss();
+                  navigate(`/store-pending/${storeId}`, { replace: true });
+                }, 3000);
+              } else {
+                toast.success("Karibu Muuzaji! Inaelekeza kwenye Dashboard yako...", {
+                  duration: 3000,
+                });
+                setTimeout(() => {
+                  toast.dismiss();
+                  navigate(`/dashboard/sellerboard/${storeId}`, { replace: true });
+                }, 3000);
+              }
             } else {
+
               // Hakuna store, ndipo mpeleke kwenye kuunda store
               toast.success("Karibu Muuzaji! Tafadhali unda duka lako kwanza.", {
                 duration: 3000,
@@ -307,10 +351,25 @@ toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
     });
   };
 
-  if (isCheckingAuth) {
+   if (isCheckingAuth) {
     return (
-      <div className="login-loading-container">
-        <div className="login-spinner"></div>
+      <div className="login-loading-container login-skeleton-wrapper">
+        {/* Skeleton ya Left Panel */}
+        <div className="login-skeleton-left">
+          <div className="skeleton-box skeleton-box-lg"></div>
+          <div className="skeleton-box skeleton-box-sm"></div>
+        </div>
+
+        {/* Skeleton ya Right Panel */}
+        <div className="login-skeleton-right">
+          <div className="skeleton-box skeleton-badge"></div>
+          <div className="skeleton-box skeleton-title"></div>
+          <div className="skeleton-box skeleton-title-sm"></div>
+          <div className="skeleton-box skeleton-input"></div>
+          <div className="skeleton-box skeleton-input"></div>
+          <div className="skeleton-box skeleton-btn"></div>
+          <div className="skeleton-box skeleton-footer"></div>
+        </div>
       </div>
     );
   }

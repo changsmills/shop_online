@@ -2,7 +2,7 @@ from rest_framework import viewsets, filters, mixins, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.pagination import LimitOffsetPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth import get_user_model
@@ -319,7 +319,7 @@ class StoreEngineViewSet(viewsets.ModelViewSet):
     
     # 🔥 ONGEZA HII:
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]  # 🔥 ONGEZA OrderingFilter
-    filterset_fields = ['owner', 'status', 'category_id']  # 🔥 ONGEZA category_id na status
+    filterset_fields = ['owner', 'status', 'verification_status', 'category_id', 'is_verified']
     ordering_fields = ['created_at', 'store_name']  # 🔥 ONGEZA ordering
     pagination_class = LimitOffsetPagination  # 🔥 ONGEZA pagination kwa ?limit=50
 
@@ -1075,3 +1075,33 @@ class ProductVariationViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save()
+
+class AdminStoreApprovalViewSet(viewsets.ModelViewSet):
+    """
+    Admin pekee ndiye anaweza kuona na kupitisha maduka.
+    Endpoint: /api/admin/stores/?verification_status=pending
+    """
+    queryset = StoreEngine.objects.all()
+    serializer_class = StoreEngineSerializer
+    permission_classes = [IsAdminUser]  # 🔥 Ni Admin tu!
+    authentication_classes = [JWTAuthentication]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        # Chuja kwa verification_status (mfano: pending)
+        status_filter = self.request.query_params.get('verification_status')
+        if status_filter:
+            queryset = queryset.filter(verification_status=status_filter)
+        return queryset
+
+    # 🔥 ONGEZA HII HAPA (Ni muhimu sana!)
+    def perform_update(self, serializer):
+        store = serializer.save()  # Hifadhi mabadiliko ya store
+
+        # Kama store imepitishwa (approved), sasisha profile ya mmiliki
+        if store.verification_status == 'approved':
+            profile = store.owner  # Hii ni Profile ya mtumiaji aliyeomba
+            profile.role = 'supplier'  # Weka kuwa Supplier
+            profile.is_otp_verified = True  # Mruhusu aingle bila OTP tena
+            profile.save()
+            print(f"✅ Profile ya {profile.user.email} imewekwa kuwa supplier!")

@@ -15,13 +15,16 @@ export default function TopStores({ navigate }) {
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
 
-  useEffect(() => {
+   useEffect(() => {
     const fetchTopStores = async () => {
       setLoading(true);
       try {
         const response = await api.get('/stores/', { 
           params: { 
             limit: 10,
+            // 🔥 MUHIMU: Onyesha zilizopitishwa (approved) na zilizo active tu!
+            verification_status: 'approved',
+            status: 'active',
             ordering: '-average_rating,-created_at'
           } 
         });

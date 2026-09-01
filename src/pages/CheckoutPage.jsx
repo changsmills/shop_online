@@ -260,7 +260,7 @@ const CheckoutPage = () => {
 
                   <div className="form-group">
                     <label className="form-label">Street address *</label>
-                    <input type="text" placeholder="Sinza, Dar es Salaam" value={customerInfo.address}
+                    <input type="text" placeholder="Makongo Juu, House No. 12" value={customerInfo.address}
                       onChange={(e) => setCustomerInfo({...customerInfo, address: e.target.value})}
                       className="form-input" />
                   </div>
@@ -355,15 +355,33 @@ const CheckoutPage = () => {
                   <strong className="summary-total-amount">TZS {totalAmount.toLocaleString()}</strong>
                 </div>
                 
+                                {/* 🔥 BUTTON YA KUWEKA ODA */}
                 <button onClick={handlePlaceOrder} disabled={orderItems.length === 0 || loading}
                   className="btn-place-order">
                   {loading ? 'Processing...' : 'Place Order'}
                 </button>
                 
+                {/* 🔥 PAYMENT INFO BOX (MPYA) */}
+                <div className="payment-info-box">
+                  <div className="payment-info-icon">💵</div>
+                  <div className="payment-info-text">
+                    <strong>Payment Method: Cash on Delivery</strong>
+                    <p>
+                      Kwa sasa, malipo yanafanyika <strong>baada ya kupokea bidhaa (Pay on Delivery)</strong>. 
+                      Hii inahakikisha unalipa pale tu bidhaa inapofika mikononi mwako.
+                    </p>
+                    <p style={{ fontSize: '12px', color: '#999', marginTop: '8px' }}>
+                      💳 Mfumo wa malipo mtandaoni (Online Payment) utakuja kwenye toleo lijalo.
+                    </p>
+                  </div>
+                </div>
+                
+                {/* 🔥 BADILISHA HII: Ondoa "Secure payment" ya zamani */}
                 <div className="secure-badge-row">
                   <Lock size={14} className="lock-icon" />
-                  <span className="secure-text">Secure payment protected</span>
+                  <span className="secure-text">Order protected by Skyfall.com</span>
                 </div>
+
               </div>
             </div>
           </div>

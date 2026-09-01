@@ -24,9 +24,23 @@ export default function VerifySellerOTP() {
           navigate('/dashboard'); // Si supplier, wapeleke dashboard
           return;
         }
-        if (profileRes.data.is_otp_verified) {
-          navigate('/dashboard/sellerboard'); // Ameverify, wapeleke dashboard
+
+               if (profileRes.data.is_otp_verified) {
+          // 🔥 MUHIMU: Kagua store kwanza!
+          const storeRes = await api.get('/stores/', { params: { owner_id: profileRes.data.id } });
+          if (storeRes.data && storeRes.data.length > 0) {
+            const store = storeRes.data[0];
+            const status = store.verification_status || store.status;
+            if (status === 'pending' || status === 'unverified') {
+              navigate(`/store-pending/${store.id}`);
+            } else {
+              navigate(`/dashboard/sellerboard/${store.id}`);
+            }
+          } else {
+            navigate('/create-store');
+          }
         }
+
       } catch (err) {
         console.error("Auth check error:", err);
         navigate('/login');
@@ -69,14 +83,23 @@ export default function VerifySellerOTP() {
       // 4. Pata data upya na uelekeze kwenye supplier dashboard
       const profileRes = await api.get('/profile/');
       const role = profileRes.data.role;
-      if (role === 'supplier') {
+
+           if (role === 'supplier') {
         const storeRes = await api.get('/stores/', { params: { owner_id: profileRes.data.id } });
         if (storeRes.data && storeRes.data.length > 0) {
-          navigate(`/dashboard/sellerboard/${storeRes.data[0].id}`);
+          const store = storeRes.data[0];
+          const status = store.verification_status || store.status;
+          // 🔥 MUHIMU: Ikiwa inasubiri kupitishwa, mpeleke kwenye Store Pending!
+          if (status === 'pending' || status === 'unverified') {
+            navigate(`/store-pending/${store.id}`);
+          } else {
+            navigate(`/dashboard/sellerboard/${store.id}`);
+          }
         } else {
           navigate('/create-store');
         }
       }
+
     } catch (err) {
       console.error("❌ [FRONTEND] OTP verify error:", err.response?.data || err.message);
       toast.error(err.response?.data?.detail || "OTP si sahihi au imeisha muda.");

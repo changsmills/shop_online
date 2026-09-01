@@ -231,10 +231,7 @@ export default function UserTools({ session: propSession, isMobile }) {
                   <Link to="/dashboard/orders" className="flex justify-between text-sm text-gray-700 hover:text-orange-600 transition" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#333', textDecoration: 'none' }}>
                     My Orders <ChevronRight size={14} className="text-gray-300" />
                   </Link>
-                  
-                  <Link to={userStoreId ? `/dashboard/physical/${userStoreId}` : "/dashboard"} className="flex justify-between text-sm text-gray-700 hover:text-orange-600 transition" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#333', textDecoration: 'none' }}>
-                    My Store <ChevronRight size={14} className="text-gray-300" />
-                  </Link>
+                
                   
                   <Link to="/dashboard/settings" className="flex justify-between text-sm text-gray-700 hover:text-orange-600 transition" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#333', textDecoration: 'none' }}>
                     Settings <ChevronRight size={14} className="text-gray-300" />

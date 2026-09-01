@@ -34,7 +34,7 @@ const StoreForm = ({
       const subCatValid = formData.sub_category_ids && formData.sub_category_ids.length > 0;
 
       if (!nameValid || !phoneValid || !catValid || !subCatValid) {
-        setError("Tafadhali jaza: Jina, Simu, Kategoria na Bobezi zote.");
+       setError("Please fill in: Name, Phone, Category, and all Sub-categories.");
         return;
       }
       setStep(2);
@@ -43,11 +43,11 @@ const StoreForm = ({
 
     if (step === 2) {
       if (!formData.city || !formData.location) {
-        setError("Mji na Anwani ni lazima.");
+        setError("City and Address are required.");
         return;
       }
       if (!formData.description || formData.description.length < 10) {
-        setError("Maelezo ya duka ni mafupi mno (Weka angalau herufi 10).");
+        setError("Store description is too short (Enter at least 10 characters).");
         return;
       }
       setStep(3);
@@ -56,11 +56,11 @@ const StoreForm = ({
 
     if (step === 3) {
       if (!formData.tin_number) {
-        setError("Tafadhali jaza namba ya TIN ya biashara.");
+       setError("Please fill in the business TIN number.");
         return;
       }
       if (!formData.tin_image) {
-        setError("Tafadhali pakia picha ya cheti cha TIN.");
+        setError("Please upload the TIN certificate photo.");
         return;
       }
       setStep(4);
@@ -125,7 +125,7 @@ const handleSubmitInternal = async (e) => {
     try {
       const token = localStorage.getItem("access_token");
       if (!token) {
-        setError("Tafadhali ingia kwanza!");
+        setError("Please login first!");
         setIsLoading(false);
         return;
       }
@@ -167,6 +167,10 @@ const handleSubmitInternal = async (e) => {
       formDataObj.append("staff_count", formData.staff_count || "");
       formDataObj.append("store_type", storeType);
       formDataObj.append("agreed_to_terms", formData.agreed_to_terms ? "true" : "false");
+
+      // 🔥 MUHIMU SANA: Weka pending ili iende ukurasa wa kusubiri!
+      formDataObj.append("status", "pending");
+      formDataObj.append("verification_status", "pending");
 
       if (formData.logo) formDataObj.append("store_logo", formData.logo[0]);
       if (formData.banner) formDataObj.append("store_banner", formData.banner[0]);
@@ -212,9 +216,9 @@ const handleSubmitInternal = async (e) => {
       // ============================================
       setIsSuccess(true);
       if (response.data && response.data.id) {
-        // 🔥 Subiri kidogo ili mtumiaji aone ujumbe wa success
+        // 🔥 BADILISHA HAPA: Enda kwenye ukurasa wa kusubiri badala ya Dashboard!
         setTimeout(() => {
-          navigate(`/dashboard/sellerboard/${response.data.id}`, { replace: true });
+          navigate(`/store-pending/${response.data.id}`, { replace: true });
         }, 2000);
       }
 
@@ -264,23 +268,27 @@ const handleSubmitInternal = async (e) => {
           onClick={step === 1 ? () => setStoreType(null) : prevStep}
           className="back-link"
         >
-          {step === 1 ? "← Ghairi" : "← Nyuma"}
+          {step === 1 ? "← Cancel" : "← Back"}
         </button>
 
         <div className="sidebar-content mt-8">
-          <span className="step-count">HATUA {step} / 4</span>
+          <span className="step-count">STEP {step} / 4</span>
           <h2 className="title-xl font-bold mt-2">
-            {step === 1 && "Taarifa za Store"}
-            {step === 2 && "Maelezo & Huduma"}
-            {step === 3 && "Branding & Picha"}
-            {step === 4 && "Mawasiliano ya Jamii"}
+
+            {step === 1 && "Store Information"}
+            {step === 2 && "Details & Services"}
+            {step === 3 && "Branding & Photos"}
+            {step === 4 && "Social Media"}
+
           </h2>
+
           <p className="text-gray-400 mt-2">
-            {step === 1 && "Anza na utambulisho mkuu wa duka lako."}
-            {step === 2 && "Tueleze duka lako linahusu nini na wateja wakupate wapi."}
-            {step === 3 && "Weka Logo, Banner na picha za ofisi yako."}
-            {step === 4 && "Ongeza mitandao ya kijamii ili wateja waone kazi zako."}
+           {step === 1 && "Start with your store's main identity."}
+           {step === 2 && "Tell us what your store is about and where customers can find you."}
+           {step === 3 && "Upload your Logo, Banner, and office photos."}
+           {step === 4 && "Add social media so customers can see your work."}
           </p>
+
         </div>
       </div>
 
@@ -306,7 +314,7 @@ const handleSubmitInternal = async (e) => {
                     <option value="Manufacturer">Manufacturer (Kiwanda / Mtengenezaji)</option>
                     <option value="Service Provider">Service Provider (Mtoa Huduma)</option>
                   </select>
-                  <p className="text-small-italic">* Chagua aina inayoelezea biashara yako vizuri zaidi.</p>
+                  <p className="text-small-italic">* Choose the type that best describes your business.</p>
                 </div>
 
                 <div className="premium-group">
@@ -318,16 +326,16 @@ const handleSubmitInternal = async (e) => {
                     required 
                     className="premium-input"
                   >
-                    <option value="">Chagua Kategoria...</option>
+                    <option value="">Select Category..</option>
                     {dbCategories.map((cat) => (
                       <option key={cat.id} value={cat.id}>{cat.name}</option> 
                     ))}
                   </select>
                   {formData.category_id && (
                     <div className="cat-info-box">
-                      <p className="text-xs-uppercase">Kuhusu Kategoria Hii:</p>
+                      <p className="text-xs-uppercase">About this category:</p>
                       <p className="text-orange-italic">
-                        {dbCategories.find(c => c.id === formData.category_id)?.description || "Maelezo yanapakuliwa..."}
+                        {dbCategories.find(c => c.id === formData.category_id)?.description || "Loading description..."}
                       </p>
                     </div>
                   )}
@@ -361,7 +369,7 @@ const handleSubmitInternal = async (e) => {
               )}
 
               <div className="premium-group mt-6">
-                <label className="group-label">Tags za Ubobezi (Andika kisha bonyeza Enter)</label>
+               <label className="group-label">Expertise Tags (Type then press Enter)</label>
                 <div className="tags-container">
                   {(formData.specialist_tags || []).map((tag, index) => (
                     <span key={index} className="specialist-tag">
@@ -398,17 +406,17 @@ const handleSubmitInternal = async (e) => {
               </div>
 
               <div className="premium-group border-top pt-4">
-                <label>Jina la Store</label>
+                <label>Store Name</label>
                 <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="Ali Mobile Shop" />
               </div>
 
               <div className="grid-2-col">
                 <div className="premium-group">
-                  <label>Namba ya Simu</label>
+                  <label>Phone Number</label>
                   <input type="tel" name="phone" value={formData.phone} onChange={handleChange} required placeholder="07xxxxxxxx" />
                 </div>
                 <div className="premium-group">
-                  <label>Barua Pepe (Email)</label>
+                  <label>Email</label>
                   <input 
                     type="email" 
                     name="email" 
@@ -426,7 +434,7 @@ const handleSubmitInternal = async (e) => {
                 </div>
               )}
 
-              <button type="button" onClick={nextStep} className="premium-submit-btn">Endelea Hatua ya 2</button>
+              <button type="button" onClick={nextStep} className="premium-submit-btn">Continue to Step 2</button>
             </div>
           )}
 
@@ -436,7 +444,7 @@ const handleSubmitInternal = async (e) => {
                 <h3 className="title-orange-border"></h3>
                 <div className="location-grid">
                   <div className="flex-col-gap">
-                    <label className="premium-label-light">Mji</label>
+                    <label className="premium-label-light">City</label>
                     <div className="relative-wrapper">
                       <select 
                         name="city" 
@@ -445,7 +453,7 @@ const handleSubmitInternal = async (e) => {
                         required 
                         className="custom-select"
                       >
-                        <option value="">Chagua Mji...</option>
+                        <option value="">Select City...</option>
                         <option value="Dar es Salaam">Dar es Salaam</option>
                         <option value="Arusha">Arusha</option>
                         <option value="Mwanza">Mwanza</option>
@@ -457,7 +465,7 @@ const handleSubmitInternal = async (e) => {
                   </div>
 
                   <div className="flex-col-gap">
-                    <label className="premium-label-light">Anwani (Mtaa/Jengo)</label>
+                    <label className="premium-label-light">Address (Street/Building)</label>
                     <input 
                       type="text" 
                       name="location" 
@@ -472,10 +480,10 @@ const handleSubmitInternal = async (e) => {
               </div>
 
               <div className="operation-section mt-6">
-                <h3 className="title-orange-border-icon">⚙️ Uendeshaji & Uwezo wa Ugavi</h3>
+                <h3 className="title-orange-border-icon">⚙️ Operations & Supply Capacity</h3>
                 <div className="grid-2-col">
                   <div className={`premium-group active-wholesaler ${formData.business_type === "Wholesaler (Jumla)" ? "bg-orange-highlight" : ""}`}>
-                    <label className="flex-center-gap mb-2">📦 Kiwango cha Chini cha Oda (MOQ)</label>
+                    <label className="flex-center-gap mb-2">📦 Minimum Order Quantity (MOQ)</label>
                     <input type="text" name="moq" value={formData.moq} onChange={handleChange} placeholder="Mfano: 10 PC" className="premium-input mb-3" required={formData.business_type === "Wholesaler (Jumla)"} />
                     <div className="btn-flex-wrap">
                       {["1 PC", "10 PC", "1 Katoni", "Dazeni 1", "Pipa 1"].map((option) => (
@@ -490,63 +498,62 @@ const handleSubmitInternal = async (e) => {
                   </div>
 
                   <div className="premium-group">
-                    <label>Muda wa Kutayarisha Oda (Lead Time)</label>
+                    <label>Order Preparation Time (Lead Time)</label>
                     <select name="lead_time" value={formData.lead_time} onChange={handleChange} className="premium-input">
-                      <option value="">Chagua muda...</option>
-                      <option value="Saa 24">Chini ya Saa 24</option>
-                      <option value="Siku 1-3">Siku 1 - 3</option>
-                      <option value="Siku 3-7">Siku 3 - 7</option>
-                      <option value="Siku 7+">Zaidi ya Siku 7</option>
+                      <option value="">Select time...</option>
+                     <option value="Saa 24">Under 24 hours</option>
+                     <option value="Siku 1-3">1 - 3 Days</option>
+                     <option value="Siku 3-7">3 - 7 Days</option>
+                     <option value="Siku 7+">More than 7 days</option>
                     </select>
                   </div>
 
                   <div className="premium-group">
-                    <label>Uwezo wa Ugavi kwa Mwezi</label>
-                    <input type="text" name="supply_capacity" value={formData.supply_capacity} onChange={handleChange} placeholder="Mfano: PC 5,000" />
+                    <label>Monthly Supply Capacity</label>
+                    <input type="text" name="supply_capacity" value={formData.supply_capacity} onChange={handleChange} placeholder="Example: 5,000 pcs" />
                   </div>
 
                   <div className="premium-group">
-                    <label>Aina ya Ufungashaji</label>
-                    <input type="text" name="packaging_type" value={formData.packaging_type} onChange={handleChange} placeholder="Mfano: Mifuko ya Nylon, Maboksi" />
+                    <label>Packaging Type</label>
+                    <input type="text" name="packaging_type" value={formData.packaging_type} onChange={handleChange} placeholder="Example: Nylon bags, Boxes" />
                   </div>
 
                   <div className="premium-group">
-                    <label>Miaka ya Uzoefu (Experience)</label>
-                    <input type="text" name="experience" value={formData.experience || ""} onChange={handleChange} placeholder="Mfano: Miaka 5" className="premium-input" />
+                    <label>Years of Experience</label>
+                    <input type="text" name="experience" value={formData.experience || ""} onChange={handleChange} placeholder="Example: 5 years" className="premium-input" />
                   </div>
 
                   <div className="premium-group">
-                    <label>Idadi ya Wafanyakazi (Staff Count)</label>
-                    <input type="number" name="staff_count" value={formData.staff_count || ""} onChange={handleChange} placeholder="Mfano: 10" className="premium-input" />
+                    <label>Number of Employees (Staff Count)</label>
+                    <input type="number" name="staff_count" value={formData.staff_count || ""} onChange={handleChange} placeholder="Example: 10" className="premium-input" />
                   </div>
                 </div>
               </div>
 
               <div className="premium-group mt-4">
-                <label className="flex-center-gap"><span className="text-orange">📝</span> Maelezo ya Huduma/Bidhaa (Description)</label>
-                <textarea name="description" value={formData.description} onChange={handleChange} rows="4" placeholder="Mfano: Sisi ni mabingwa wa vifaa vya elektroniki..." required className="premium-textarea-input"></textarea>
-                <div className="flex-right"><span className="text-small-gray">Maelezo haya yataonekana kwenye profile yako</span></div>
+                <label className="flex-center-gap"><span className="text-orange">📝</span> Service/Product Description</label>
+                <textarea name="description" value={formData.description} onChange={handleChange} rows="4" placeholder="Example: We are experts in electronics..." required className="premium-textarea-input"></textarea>
+                <div className="flex-right"><span className="text-small-gray">This description will appear on your profile</span></div>
               </div>
 
               <div className="flex-gap-4 border-top pt-4">
-                <button type="button" onClick={prevStep} className="premium-submit-btn bg-gray-800">Nyuma</button>
+                 <button type="button" onClick={prevStep} className="premium-submit-btn bg-gray-800">Back</button>
                 {error && <div className="error-box"><span>⚠️</span> {error}</div>}
-                <button type="button" onClick={() => { console.log("Data ya sasa:", formData); nextStep(); }} className="premium-submit-btn">Endelea Kwenye Picha</button>
-              </div>
+                  <button type="button" onClick={() => { console.log("Data ya sasa:", formData); nextStep(); }} className="premium-submit-btn">Continue to Photos</button></div>
             </div>
           )}
 
           {step === 3 && (
             <div className="step-fade">
               <div className="verification-section">
-                <h3 className="flex-center-gap title-orange">🛡️ Uhakiki wa Biashara (Verification)</h3>
+                <h3 className="flex-center-gap title-orange">🛡️ Business Verification</h3>
                 <div className="grid-2-col">
                   <div className="premium-group">
-                    <label>Namba ya TIN</label>
-                    <input type="text" name="tin_number" value={formData.tin_number || ""} onChange={handleChange} placeholder="Mfano: 123-456-789" className="premium-input" />
+                    <label>TIN Number</label>
+                    <input type="text" name="tin_number" value={formData.tin_number || ""} onChange={handleChange} placeholder="Example: 123-456-789" className="premium-input" />
                   </div>
                   <div className="premium-group">
-                    <label>Picha ya Cheti cha TIN / Leseni</label>
+                    <label>TIN Certificate / License Photo</label>
                     <input type="file" onChange={(e) => handleFileChange(e, "tin_image")} accept="image/*" />
                     {previews.tin_image && (
                       <div className="mt-2 relative inline-block">
@@ -559,33 +566,32 @@ const handleSubmitInternal = async (e) => {
               </div>
 
               <div className="location-verification">
-                <h3 className="flex-center-gap title-blue">📍 Mahali (Google Maps)</h3>
+                <h3 className="flex-center-gap title-blue">📍 Location (Google Maps)</h3>
                 <div className="premium-group">
                   <label>Google Maps Link (URL)</label>
                   <input type="url" name="maps_link" value={formData.maps_link || ""} onChange={handleChange} placeholder="https://goo.gl/maps/..." className="premium-input" />
-                  <p className="text-small-gray-italic">Nenda Google Maps, tafuta duka lako, kisha bonyeza "Share" na u-copy link uweke hapa.</p>
-                </div>
+                  <p className="text-small-gray-italic">Go to Google Maps, find your store, click "Share", and copy the link here.</p>                </div>
               </div>
 
               <div className="branding-upload-section grid-2-col">
                 <div className="premium-group">
-                  <label>Logo ya Duka (Square)</label>
+                  <label>Store Logo (Square)</label>
                   <input type="file" onChange={(e) => handleFileChange(e, "logo")} accept="image/*" />
                 </div>
                 <div className="premium-group">
-                  <label>Banner la Duka (Landscape)</label>
+                  <label>Store Banner (Landscape)</label>
                   <input type="file" onChange={(e) => handleFileChange(e, "banner")} accept="image/*" />
                 </div>
               </div>
 
               <div className="office-photos">
-                <label className="mb-4">Picha za Muonekano wa Ofisi/Duka (Picha 3)</label>
+                <label className="mb-4">Store/Office Appearance Photos (3 Photos)</label>
                 <div className="image-upload-grid">
                   {[1, 2, 3].map((i) => (
                     <div key={i} className="upload-box-wrapper">
                       <input type="file" id={`img${i}`} hidden onChange={(e) => handleFileChange(e, `image${i}`)} accept="image/*" />
                       <label htmlFor={`img${i}`} className={`upload-box ${previews[`image${i}`] ? "has-img" : ""}`}>
-                        {previews[`image${i}`] ? <img src={previews[`image${i}`]} alt="Preview" /> : <span>📸 Picha {i}</span>}
+                        {previews[`image${i}`] ? <img src={previews[`image${i}`]} alt="Preview" /> : <span>📸 Photo {i}</span>}
                       </label>
                     </div>
                   ))}
@@ -593,18 +599,18 @@ const handleSubmitInternal = async (e) => {
               </div>
 
               <div className="flex-gap-4 mt-6">
-                <button type="button" onClick={prevStep} className="premium-submit-btn bg-gray-800">Nyuma</button>
-                <button type="button" onClick={nextStep} className="premium-submit-btn">Hatua ya Mwisho</button>
+                <button type="button" onClick={prevStep} className="premium-submit-btn bg-gray-800">Back</button>
+                <button type="button" onClick={nextStep} className="premium-submit-btn">Last Step</button>
               </div>
             </div>
           )}
 
           {step === 4 && (
             <div className="step-fade">
-              <h3 className="title-orange-border-icon">🌐 Mitandao ya Jamii & Mawasiliano</h3>
+              <h3 className="title-orange-border-icon">🌐 Social Media & Communication</h3>
               <div className="grid-2-col">
                 <div className="premium-group">
-                  <label>Namba ya WhatsApp</label>
+                  <label>WhatsApp Number</label>
                   <input type="tel" name="whatsapp" value={formData.whatsapp || ""} onChange={handleChange} placeholder="07xxxxxxxx" className="premium-input" />
                 </div>
                 <div className="premium-group">
@@ -628,7 +634,7 @@ const handleSubmitInternal = async (e) => {
               <div className="terms-box">
                 <label className="flex-start-gap cursor-pointer">
                   <input type="checkbox" checked={formData.agreed_to_terms || false} onChange={(e) => handleChange({ target: { name: 'agreed_to_terms', value: e.target.checked } })} required className="checkbox-orange" />
-                  <span className="text-small-gray">Ninakubali kuwa taarifa zote nilizotoa ni za kweli. Naelewa kuwa akaunti yangu inaweza kufungiwa ikiwa nitakiuka sheria za biashara na utapeli.</span>
+                  <span className="text-small-gray">I confirm that all information provided is true. I understand that my account can be suspended if I violate business rules and fraud.</span>
                 </label>
               </div>
 
@@ -638,9 +644,9 @@ const handleSubmitInternal = async (e) => {
                   {isLoading ? (
                     <span className="flex-center-gap">
                       <svg className="spin-icon" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                      Inatengeneza Duka...
+                      Creating Store...
                     </span>
-                  ) : ("🚀 Kamilisha na Fungua Duka")}
+                  ) : ("🚀 Complete and Open Store")}
                 </button>
               </div>
             </div>

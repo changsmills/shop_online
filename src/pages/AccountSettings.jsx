@@ -264,6 +264,43 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
     { icon: <Settings size={20} />, path: '/dashboard/settings', label: 'Settings' },
   ];
 
+
+    const handleSellNavigation = async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        navigate('/dashboard/register-supplier');
+        return;
+      }
+
+      const profileRes = await api.get('/profile/');
+      const profileData = profileRes.data;
+      if (profileData?.role === 'supplier') {
+        const storeRes = await api.get('/stores/', { params: { owner_id: profileData.id } });
+        const storeData = storeRes.data;
+        if (storeData && storeData.length > 0) {
+          const store = storeData[0];
+          const storeId = store.id;
+          const verificationStatus = store.verification_status || store.status;
+
+          // 🔥 MUHIMU: Kagua kama store inasubiri kupitishwa!
+          if (verificationStatus === 'pending' || verificationStatus === 'unverified') {
+            navigate(`/store-pending/${storeId}`);
+          } else {
+            navigate(`/dashboard/sellerboard/${storeId}`);
+          }
+        } else {
+          navigate('/create-store');
+        }
+      } else {
+        navigate('/dashboard/seller');
+      }
+    } catch (err) {
+      console.error("🔥 Error:", err.response?.data || err.message);
+      navigate('/dashboard/seller');
+    }
+  };
+
   const helpfulLinks = [
     { icon: <HelpCircle size={18} />, title: 'Help Center', path: '/help-center' },
     { icon: <FileText size={18} />, title: 'Tutorials', path: '/tutorials' },
@@ -360,17 +397,43 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
           onMouseEnter={() => setIsExpanded(true)} 
           onMouseLeave={() => setIsExpanded(false)} 
         >
-          {sidebarItems.map((item) => (
-            <Link 
-              key={item.path} 
-              to={item.path} 
-              className={`sidebar-link ${location.pathname === item.path ? 'active' : ''}`}
-              data-tooltip={item.label}
-            >
-              {item.icon}
-              <span className="sidebar-label">{item.label}</span>
-            </Link>
-          ))}
+                    {sidebarItems.map((item) => {
+            if (item.path === '/dashboard/seller') {
+              // 🔥 Badilisha kuwa Button ili tuweze kukagua approval!
+              return (
+                <button
+                  key={item.path}
+                  className={`sidebar-link ${location.pathname === item.path ? 'active' : ''}`}
+                  onClick={handleSellNavigation}
+                  style={{ 
+                    background: 'none', 
+                    border: 'none', 
+                    width: '100%', 
+                    textAlign: 'left', 
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    fontSize: 'inherit'
+                  }}
+                  data-tooltip={item.label}
+                >
+                  {item.icon}
+                  <span className="sidebar-label">{item.label}</span>
+                </button>
+              );
+            }
+            return (
+              <Link 
+                key={item.path} 
+                to={item.path} 
+                className={`sidebar-link ${location.pathname === item.path ? 'active' : ''}`}
+                data-tooltip={item.label}
+              >
+                {item.icon}
+                <span className="sidebar-label">{item.label}</span>
+              </Link>
+            );
+          })}
+
         </aside>
 
         {/* SETTINGS CONTENT */}
@@ -547,7 +610,7 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
                   <div 
                     key={index}
                     className="helpful-link-item"
-                    onClick={() => navigate(link.path)}
+                    onClick={() => link.path === '/dashboard/seller' ? handleSellNavigation() : navigate(link.path)}
                   >
                     <div className="helpful-icon-box">
                       {link.icon}

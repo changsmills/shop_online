@@ -610,3 +610,49 @@
     color: #94a3b8 !important;
   }
 }
+/* ========================================================== */
+/* PAYMENT INFO BOX (Cash on Delivery)                        */
+/* ========================================================== */
+
+.payment-info-box {
+  background: #f0fdf4; /* Background ya kijani isiyokolea */
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.payment-info-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.payment-info-text {
+  flex: 1;
+}
+
+.payment-info-text strong {
+  display: block;
+  font-size: 14px;
+  color: #166534;
+  margin-bottom: 5px;
+}
+
+.payment-info-text p {
+  margin: 0;
+  font-size: 13px;
+  color: #374151;
+  line-height: 1.5;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .payment-info-box {
+    flex-direction: row;
+    padding: 12px;
+  }
+}

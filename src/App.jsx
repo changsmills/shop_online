@@ -64,6 +64,7 @@ import SupplierAccountSettings from './pages/SupplierAccountSettings';
 import SellerDashboard from './pages/SellerDashboard'; 
 import VerifySellerOTP from './pages/VerifySellerOTP';
 import StorePending from './pages/StorePending'; // 🔥 Ongoza Import!
+import AdminStores from './pages/AdminStores';
 
 
 
@@ -240,13 +241,16 @@ function AppContent({ session }) {
         <Route path="/create-store" element={<CreateStore session={session} />} />
         <Route path="/dashboard/supplier-orders" element={<SupplierOrders session={session} />} />
 
-        {/* Default Redirects */}
-        <Route path="/" element={<Navigate replace to="/dashboard" />} />
-        <Route path="*" element={<Navigate to="/dashboard" />} />
+      
 
         <Route path="/payments" element={<PricingPage />} />
         <Route path="/category/:leafId" element={<CategoryProducts session={session} />} />
         <Route path="/store-pending/:storeId" element={<StorePending />} />
+        <Route path="/admin/stores" element={<AdminStores />} />
+
+          {/* Default Redirects */}
+        <Route path="/" element={<Navigate replace to="/dashboard" />} />
+        <Route path="*" element={<Navigate to="/dashboard" />} />
 
       </Routes>
 

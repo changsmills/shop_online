@@ -1079,3 +1079,8 @@ main::-webkit-scrollbar-thumb {
     background: #475569 !important;
   }
 }
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}

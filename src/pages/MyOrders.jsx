@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, MessageSquare, ClipboardList, 
-  Settings, BarChart3, Bell, Search, CheckCircle2, Menu 
+  Settings, BarChart3, Bell, Search, CheckCircle2, Menu , ChevronLeft 
 } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
 import api from '../axiosConfig'; // 🔥 Badilisha: tumia api!
@@ -201,48 +201,145 @@ const MyOrders = () => { // 🔥 Imeondolewa { session }
     { icon: <Settings size={20} />, path: '/dashboard/settings', label: 'Settings' },
   ];
 
-  if (loading) return <div className="orders-loader">Inapakia oda zako...</div>;
+// 🔥 SKELETON LOADING - Inafanana na muonekano halisi!
+if (loading) {
+  return (
+    <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+      
+      {/* Header Skeleton (Inafanana na Header halisi) */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        padding: '10px 24px', 
+        borderBottom: '1px solid #eee', 
+        backgroundColor: '#fff' 
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <div style={{ width: '30px', height: '30px', borderRadius: '8px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
+          <div style={{ width: '120px', height: '20px', borderRadius: '8px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
+        </div>
+      </div>
 
+      {/* Main Content Skeleton */}
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        <main style={{ flex: 1, padding: '24px', backgroundColor: '#f7f8fa' }}>
+          <div className="orders-content-wrapper" style={{ maxWidth: '1100px', margin: '0 auto' }}>
+            
+            {/* Title Skeleton */}
+            <div style={{ width: '200px', height: '30px', borderRadius: '8px', backgroundColor: '#e0e0e0', marginBottom: '20px', animation: 'pulse 1.5s infinite' }}></div>
+
+            {/* Order Cards Skeleton */}
+            <div className="orders-list-grid" style={{ display: 'grid', gap: '20px' }}>
+              {[1, 2].map((i) => (
+                <div key={i} style={{ backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #eee', overflow: 'hidden' }}>
+                  
+                  {/* Header ya Card (Order no & Status) */}
+                  <div style={{ padding: '20px', borderBottom: '1px solid #eee', backgroundColor: '#fafafa' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                      <div>
+                        <div style={{ width: '100px', height: '12px', borderRadius: '6px', backgroundColor: '#e0e0e0', marginBottom: '8px', animation: 'pulse 1.5s infinite' }}></div>
+                        <div style={{ width: '150px', height: '12px', borderRadius: '6px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <div style={{ width: '60px', height: '24px', borderRadius: '12px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
+                        <div style={{ width: '80px', height: '24px', borderRadius: '8px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
+                      </div>
+                    </div>
+                    <div style={{ marginTop: '15px', textAlign: 'right' }}>
+                      <div style={{ width: '120px', height: '20px', borderRadius: '8px', backgroundColor: '#e0e0e0', marginLeft: 'auto', animation: 'pulse 1.5s infinite' }}></div>
+                    </div>
+                  </div>
+
+                  {/* Items Skeleton (Picha + Maelezo) */}
+                  <div style={{ padding: '20px' }}>
+                    <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                      <div style={{ width: '70px', height: '70px', borderRadius: '10px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <div style={{ width: '70%', height: '14px', borderRadius: '8px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
+                        <div style={{ width: '50%', height: '12px', borderRadius: '8px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
+                        <div style={{ width: '30%', height: '12px', borderRadius: '8px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
+                      </div>
+                    </div>
+
+                    {/* Buttons Skeleton */}
+                    <div style={{ marginTop: '20px', paddingTop: '15px', borderTop: '1px solid #f5f5f5', display: 'flex', gap: '10px' }}>
+                      <div style={{ width: '100px', height: '34px', borderRadius: '8px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
+                      <div style={{ width: '100px', height: '34px', borderRadius: '8px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
   return (
     <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <Toaster position="top-center" />
       
       <header className="dashboard-header" style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        padding: isMobile ? '10px 15px' : '10px 24px', 
-        borderBottom: '1px solid #eee', 
-        backgroundColor: '#fff' 
-      }}>
-        <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          {!isMobile && (
-            <Menu size={22} style={{ cursor: 'pointer', color: '#666' }} onClick={() => setIsExpanded(!isExpanded)} />
-          )}
-          <Link to="/dashboard" style={{ 
-            fontSize: isMobile ? '18px' : '20px', 
-            fontWeight: '800', 
-            color: '#ff6a00', 
-            textDecoration: 'none' 
-          }}>
-            Skyfall.com
-          </Link>
-          {!isMobile && (
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', backgroundColor: '#f4f4f4', padding: '6px 12px', borderRadius: '8px' }}>
-              <Search size={16} color="#999" />
-              <input type="text" placeholder="Search orders..." style={{ border: 'none', background: 'none', outline: 'none', marginLeft: '8px', fontSize: '14px' }} />
-            </div>
-          )}
-        </div>
-        <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          {!isMobile && (
-            <>
-              <Bell size={20} style={{ cursor: 'pointer', color: '#666' }} />
-              <UserTools /> {/* 🔥 Imeondolewa { session } */}
-            </>
-          )}
-        </div>
-      </header>
+  display: 'flex', 
+  justifyContent: 'space-between', 
+  alignItems: 'center',
+  padding: isMobile ? '10px 15px' : '10px 24px', 
+  borderBottom: '1px solid #eee', 
+  backgroundColor: '#fff' 
+}}>
+  <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+    
+    {/* 🔥 ONGEZA BACK ARROW (Inaonekana Mobile tu) */}
+    {isMobile && (
+      <button 
+        onClick={() => navigate(-1)}
+        style={{ 
+          background: 'none', 
+          border: 'none', 
+          cursor: 'pointer', 
+          padding: '4px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <ChevronLeft size={24} color="#333" />
+      </button>
+    )}
+
+    {/* 🔥 Desktop tu: Menu ya Kufungua Sidebar */}
+    {!isMobile && (
+      <Menu size={22} style={{ cursor: 'pointer', color: '#666' }} onClick={() => setIsExpanded(!isExpanded)} />
+    )}
+
+    <Link to="/dashboard" style={{ 
+      fontSize: isMobile ? '18px' : '20px', 
+      fontWeight: '800', 
+      color: '#ff6a00', 
+      textDecoration: 'none' 
+    }}>
+      Skyfall.com
+    </Link>
+
+    {/* 🔥 Desktop tu: Search Box */}
+    {!isMobile && (
+      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', backgroundColor: '#f4f4f4', padding: '6px 12px', borderRadius: '8px' }}>
+        <Search size={16} color="#999" />
+        <input type="text" placeholder="Search orders..." style={{ border: 'none', background: 'none', outline: 'none', marginLeft: '8px', fontSize: '14px' }} />
+      </div>
+    )}
+  </div>
+  <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+    {!isMobile && (
+      <>
+        <Bell size={20} style={{ cursor: 'pointer', color: '#666' }} />
+        <UserTools /> {/* 🔥 Imeondolewa { session } */}
+      </>
+    )}
+  </div>
+</header>
 
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         
