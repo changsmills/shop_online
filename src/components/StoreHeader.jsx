@@ -23,7 +23,7 @@ const StoreHeader = ({
 
     try {
       const token = localStorage.getItem("access_token");
-      if (!token) { alert("Tafadhali ingia tena."); return; }
+            if (!token) { alert("Please login again."); return; }
 
       const formData = new FormData();
       const fieldName = type === 'banner' ? 'store_banner' : 'store_logo';
@@ -50,10 +50,11 @@ const StoreHeader = ({
         setLogoPreview(updatedStore.store_logo_url);
       }
 
-      alert('Imefanikiwa kubadilishwa!');
+    alert('Successfully updated!');
     } catch (error) {
-      console.error('Shida imetokea:', error.response?.data || error.message);
-      alert('Imeshindikana kupakia picha. Tafadhali jaribu tena.');
+
+      console.error('An error occurred:', error.response?.data || error.message);
+      alert('Failed to upload image. Please try again.');
     }
   };
 
@@ -70,7 +71,7 @@ const StoreHeader = ({
         <div className="store-info-content">
           <div className="store-title-group">
             <h1 className="store-title">
-              {myStore?.store_name || "Jina la Duka"}
+              {myStore?.store_name || "Store Name"}
             </h1>
             
             {myStore?.is_verified ? (
@@ -125,7 +126,7 @@ const StoreHeader = ({
 
         <label className="store-header-btn">
           <Camera size={16} />
-          <span className="btn-label-desktop">Badili Banner</span>
+          <span className="btn-label-desktop">Change Banner</span>
           <span className="btn-label-mobile">Banner</span>
           <input type="file" hidden onChange={(e) => handleImageChange(e, 'banner')} />
         </label>

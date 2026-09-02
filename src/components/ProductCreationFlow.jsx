@@ -210,13 +210,14 @@ const ProductCreationFlow = ({
   }, [myStoreSubCats, storeSubCategoryIds]);
 
  const handleFinalPublishAll = async () => {
-  if (addedProducts.length === 0) return alert("Hakuna bidhaa ya kurusha!");
+
+    if (addedProducts.length === 0) return alert("No products to publish!");
   setLoading(true);
 
   try {
     const token = localStorage.getItem("access_token");
-    if (!token) throw new Error("Session imeisha.");
-    if (!storeId) throw new Error("Store ID haipo!");
+    if (!token) throw new Error("Session expired.");
+    if (!storeId) throw new Error("Store ID missing!");
 
     console.log("🔍 [DEBUG] Fetching store data for parent category...");
     const storeRes = await api.get(`/stores/${storeId}/`, { headers: { Authorization: `Bearer ${token}` } });
@@ -443,13 +444,15 @@ if (parentCategoryId) {
     }
 
     if (successCount > 0) {
-      let message = `✅ ${successCount} bidhaa zimehifadhiwa!`;
+
+    let message = `✅ ${successCount} products saved!`;
       if (errors.length > 0) {
-        message += `\n\n⚠️ Lakini ${errors.length} zimeshindwa.`;
+        message += `\n\n⚠️ But ${errors.length} failed.`;
         alert(message + `\n\n${errors.map(e => `- ${e.name}:\n${e.error}`).join('\n\n')}`);
       } else {
         alert(message);
       }
+
       if (onComplete) onComplete();
       setCurrentStep(1);
       setAttributes(initialAttributes);
@@ -470,11 +473,13 @@ if (parentCategoryId) {
   return (
     <section className="product-creation-flow">
       <div className="flow-steps-header">
+
         {[
-          { id: 1, label: "Kategoria" },
+          { id: 1, label: "Category" },
           { id: 2, label: "Media" },
-          { id: 3, label: "Maelezo" }
+          { id: 3, label: "Details" }
         ].map((s) => (
+
           <div key={s.id} className={`step-item ${currentStep >= s.id ? "active" : ""}`}>
             <div className={`step-circle ${currentStep > s.id ? "completed" : ""}`}>
               {currentStep > s.id ? "✓" : s.id}
@@ -488,8 +493,8 @@ if (parentCategoryId) {
       {currentStep === 1 && (
         <div className="category-selection-step">
           <div className="step-title-area">
-            <h3 className="main-title">Chagua Kategoria</h3>
-            <p className="sub-title">Gusa kategoria moja ili kuendelea kuweka bidhaa</p>
+            <h3 className="main-title">Select Category</h3>
+            <p className="sub-title">Click one category to continue adding products</p>
           </div>
           <div className="category-grid">
             {filteredStoreSubCats.map((sub) => (
@@ -527,18 +532,17 @@ if (parentCategoryId) {
         <div className="media-upload-step">
           <div className="step-navigation">
             <button onClick={() => setCurrentStep(1)} className="back-button"><ArrowLeft size={20} /></button>
-            <h3 className="step-heading">2. Media ya {filteredStoreSubCats.find(s => s.id === attributes.sub_category_id)?.name}</h3>
-          </div>
+            <h3 className="step-heading">2. Media for {filteredStoreSubCats.find(s => s.id === attributes.sub_category_id)?.name}</h3>          </div>
           <div className="main-media-grid">
             <div className="upload-box-main" onClick={() => coverInputRef.current.click()}>
               <div className={`upload-area cover-area ${coverPreview ? "has-content" : ""}`}>
-                {coverPreview ? <img src={coverPreview} className="preview-image" /> : <div className="placeholder"><Camera size={32} /><span>Picha Kuu *</span></div>}
+                {coverPreview ? <img src={coverPreview} className="preview-image" /> : <div className="placeholder"><Camera size={32} /><span>Main Image *</span></div>}
                 <input ref={coverInputRef} type="file" hidden onChange={handleCoverChange} accept="image/*" />
               </div>
             </div>
             <div className="upload-box-main" onClick={() => videoInputRef.current.click()}>
               <div className={`upload-area video-area ${videoPreview ? "has-content" : ""}`}>
-                {videoPreview ? <video src={videoPreview} className="preview-video" /> : <div className="placeholder"><PlayCircle size={32} /><span>Video Promo</span></div>}
+                {videoPreview ? <video src={videoPreview} className="preview-video" /> : <div className="placeholder"><PlayCircle size={32} /><span>Promo Video</span></div>}
                 <input ref={videoInputRef} type="file" hidden onChange={handleVideoChange} accept="video/*" />
               </div>
             </div>
@@ -558,7 +562,7 @@ if (parentCategoryId) {
               ))}
             </div>
           </div>
-          <button onClick={() => coverPreview ? setCurrentStep(3) : alert("Weka Picha Kuu!")} className="step-primary-button">ENDELEA →</button>
+          <button onClick={() => coverPreview ? setCurrentStep(3) : alert("Weka Picha Kuu!")} className="step-primary-button">CONTINUE →</button>
         </div>
       )}
 
@@ -566,8 +570,7 @@ if (parentCategoryId) {
         <div className="attributes-step">
           <div className="step-navigation">
             <button onClick={() => setCurrentStep(2)} className="back-button"><ArrowLeft size={20} /></button>
-            <h3 className="step-heading">3. Sifa za {filteredStoreSubCats.find(s => s.id === attributes.sub_category_id)?.name}</h3>
-          </div>
+            <h3 className="step-heading">3. Details for {filteredStoreSubCats.find(s => s.id === attributes.sub_category_id)?.name}</h3>          </div>
           <div className="form-container">
             <ProductAttributes 
               attributes={attributes} 
@@ -578,20 +581,21 @@ if (parentCategoryId) {
             <div className="form-actions">
               <button 
                 onClick={() => {
-                  if (!attributes.name) return alert("Tafadhali jaza jina la bidhaa!");
+
+                  if (!attributes.name) return alert("Please fill in the product name!");
                   if (attributes.is_retail && !attributes.price) {
-                    return alert("Umechagua Retail, tafadhali jaza bei ya pisi moja!");
+                    return alert("You selected Retail, please add a unit price!");
                   }
                   if (attributes.is_wholesale && (!attributes.price_tiers || attributes.price_tiers.length === 0)) {
-                    return alert("Umechagua Jumla, tafadhali ongeza angalau range moja ya bei!");
+                    return alert("You selected Wholesale, please add at least one price range!");
                   }
                   if (attributes.is_wholesale && !attributes.moq) {
-                    return alert("Tafadhali jaza Minimum Order Quantity (MOQ) kwa ajili ya mauzo ya jumla!");
+                    return alert("Please fill in the Minimum Order Quantity (MOQ) for wholesale!");
                   }
                   if (!attributes.is_retail && !attributes.is_wholesale) {
-                    return alert("Tafadhali chagua mfumo wa uuzaji (Retail au Wholesale)!");
+                    return alert("Please select a selling mode (Retail or Wholesale)!");
                   }
-                  if (!coverFile) return alert("Tafadhali weka picha kuu!");
+                  if (!coverFile) return alert("Please add the main image!");
 
                   const newEntry = { 
                     ...attributes, 
@@ -669,18 +673,18 @@ if (parentCategoryId) {
                   setCoverFile(null); setCoverPreview(null); 
                   setVideoFile(null); setVideoPreview(null); 
                   setGalleryFiles([]); setGalleryPreviews([]);
-                  alert(`✅ ${newEntry.name} imeongezwa kwenye foleni!`);
-                }}
+                  alert(`✅ ${newEntry.name} added to the queue!`);
+                  }}
                 className="add-to-queue-button"
               >
-                <PlusCircle size={20} /> HIFADHI NA ONGEZA NYINGINE
+              <PlusCircle size={20} /> SAVE AND ADD ANOTHER
               </button>
             </div>
           </div>
 
           {addedProducts.length > 0 && (
             <div className="queue-section">
-              <h4 className="queue-title">📦 Bidhaa Tayari ({addedProducts.length})</h4>
+              <h4 className="queue-title">📦 Products Ready ({addedProducts.length})</h4>
               <div className="queue-list">
                 {addedProducts.map((prod) => (
                   <div key={prod.id} className="queue-card">
@@ -695,7 +699,7 @@ if (parentCategoryId) {
                 ))}
               </div>
               <button onClick={handleFinalPublishAll} disabled={loading || !storeId} className="publish-all-button">
-                <CheckCircle size={24} /> {loading ? "INAPAKIA..." : "MALIZA NA CHAPISHA ZOTE"}
+                <CheckCircle size={24} /> {loading ? "LOADING..." : "FINISH AND PUBLISH ALL"}
               </button>
             </div>
           )}

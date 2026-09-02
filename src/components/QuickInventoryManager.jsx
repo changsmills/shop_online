@@ -25,8 +25,9 @@ const QuickInventoryManager = ({ products, setProducts }) => {
     setUpdatingId(productId);
     try {
       const token = localStorage.getItem("access_token");
-      if (!token) {
-        setToast({ show: true, text: 'Tafadhali ingia tena! ❌', type: 'error' });
+         if (!token) {
+        setToast({ show: true, text: 'Please login again! ❌', type: 'error' });
+
         setTimeout(() => setToast({ show: false, text: '', type: '' }), 3000);
         setUpdatingId(null);
         return;
@@ -47,12 +48,12 @@ const QuickInventoryManager = ({ products, setProducts }) => {
       delete newChanges[productId];
       setLocalChanges(newChanges);
 
-      setToast({ show: true, text: 'Mabadiliko yamehifadhiwa! ✅', type: 'success' });
+      setToast({ show: true, text: 'Changes saved successfully! ✅', type: 'success' });
 
     } catch (err) {
       console.error("Update Error:", err.response?.data || err.message);
-      setToast({ show: true, text: 'Imeshindikana kusave. Jaribu tena! ❌', type: 'error' });
-    } finally {
+      setToast({ show: true, text: 'Failed to save. Try again! ❌', type: 'error' });
+        } finally {
       setUpdatingId(null);
       setTimeout(() => setToast({ show: false, text: '', type: '' }), 3000);
     }
@@ -62,7 +63,7 @@ const QuickInventoryManager = ({ products, setProducts }) => {
     return (
       <div className="loading-state">
         <div className="spinner-mini" />
-        <p className="loading-text">Inatafuta Bidhaa...</p>
+        <p className="loading-text">Searching Products...</p>
       </div>
     );
   }
@@ -82,20 +83,20 @@ const QuickInventoryManager = ({ products, setProducts }) => {
         <div className="analytics-card orange">
           <PackageSearch size={20} className="analytics-icon" />
           <h4 className="analytics-number">{products.length}</h4>
-          <p className="analytics-label">Bidhaa Zote</p>
+          <p className="analytics-label">All Products</p>
         </div>
         
         <div className={`analytics-card ${lowStockCount > 0 ? 'red' : 'gray'}`}>
           <AlertTriangle size={20} className="analytics-icon" />
           <h4 className="analytics-number">{lowStockCount}</h4>
-          <p className="analytics-label">Zinaisha Stoku</p>
+            <p className="analytics-label">Low Stock</p>
         </div>
       </div>
 
       <div className="inventory-panel">
         <div className="panel-header">
-          <h3 className="panel-title">
-            <Settings size={16} className="panel-title-icon" /> Marekebisho ya Haraka
+           <h3 className="panel-title">
+            <Settings size={16} className="panel-title-icon" /> Quick Edits
           </h3>
           <TrendingUp size={16} style={{ color: '#22c55e' }} />
         </div>
@@ -172,7 +173,7 @@ const QuickInventoryManager = ({ products, setProducts }) => {
                           <div className="spinner-mini" />
                         ) : (
                           <>
-                            <Save size={12} /> Hifadhi
+                          <Save size={12} /> Save
                           </>
                         )}
                       </button>
@@ -186,7 +187,7 @@ const QuickInventoryManager = ({ products, setProducts }) => {
 
         <div className="panel-footer">
           <button className="panel-footer-btn">
-            Angalia Ripoti Kamili →
+            View Full Report →
           </button>
         </div>
       </div>

@@ -10,10 +10,10 @@ const TopDealsSection = ({ products, onUpdate }) => {
       <div className="top-deals-header">
         <div className="top-deals-title-group">
           <div className="top-deals-pulse" />
-          <h2 className="top-deals-title">Simamia Punguzo (Offers)</h2>
+                   <h2 className="top-deals-title">Manage Offers</h2>
         </div>
         <span className="top-deals-badge">
-          {myProducts.length} Bidhaa
+          {myProducts.length} Products
         </span>
       </div>
 
@@ -27,8 +27,8 @@ const TopDealsSection = ({ products, onUpdate }) => {
             />
           ))
         ) : (
-          <div className="flash-card-empty">
-            Hakuna bidhaa za kuonyesha
+           <div className="flash-card-empty">
+            No products to display
           </div>
         )}
       </div>
@@ -53,30 +53,30 @@ const FlashSaleCard = ({ product, onUpdate }) => {
     : 0;
 
   const handleApplyOffer = async () => {
-    if (percentage <= 0 || percentage > 90) {
+        if (percentage <= 0 || percentage > 90) {
       alert("Weka asilimia sahihi (1% mpaka 90%)");
       return;
     }
 
-    if (product.is_flash_sale && product.offer_started_at) {
+        if (product.is_flash_sale && product.offer_started_at) {
       const sasa = new Date().getTime();
       const mwanzo = new Date(product.offer_started_at).getTime();
       if ((sasa - mwanzo) < masaa24) {
-        alert("🔒 Ofa hii bado imefungwa. Huwezi kubadilisha mpaka masaa 24 yaishe.");
+        alert("🔒 This offer is still locked. You cannot change it until 24 hours have passed.");
         return;
       }
     }
 
     const beiYaOfa = Math.round(beiMpyaYaOfa).toLocaleString();
     const confirmAction = window.confirm(
-      `ZINGATIA: Bei mpya itakuwa ${beiYaOfa} TZS na itajifunga kwa masaa 24. Je, unaendelea?`
+      `NOTE: The new price will be ${beiYaOfa} TZS and will self-lock for 24 hours. Do you want to continue?`
     );
     if (!confirmAction) return;
 
     setIsUpdating(true);
     try {
       const token = localStorage.getItem("access_token");
-      if (!token) throw new Error("Tafadhali ingia tena.");
+        if (!token) throw new Error("Please login again.");
 
       await api.patch(
         `/products/${product.id}/`,
@@ -89,12 +89,12 @@ const FlashSaleCard = ({ product, onUpdate }) => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert(`✅ Ofa ya ${percentage}% imewekwa kikamilifu!`);
+      alert(`✅ Offer of ${percentage}% applied successfully!`);
       if (onUpdate) onUpdate(); 
       setPercentage(0);
-      
+       
     } catch (err) {
-      alert("Imefeli: " + (err.response?.data?.detail || err.message));
+      alert("Failed: " + (err.response?.data?.detail || err.message));
     } finally {
       setIsUpdating(false);
     }
@@ -145,9 +145,11 @@ const FlashSaleCard = ({ product, onUpdate }) => {
         </div>
 
         <div className="flash-card-input-area">
-          <label className={`flash-card-label ${isLocked ? 'locked' : ''}`}>
-            {isLocked ? `🔒 FUNGWA (${masaaYaliyobaki}h)` : "Punguza %"}
+
+               <label className={`flash-card-label ${isLocked ? 'locked' : ''}`}>
+            {isLocked ? `🔒 LOCKED (${masaaYaliyobaki}h)` : "Discount %"}
           </label>
+
           <div className="flash-card-input-row">
             <input 
               type="number" 
@@ -162,7 +164,7 @@ const FlashSaleCard = ({ product, onUpdate }) => {
               onClick={handleApplyOffer}
               disabled={isUpdating || isLocked || percentage <= 0}
             >
-              {isUpdating ? "..." : "Weka"}
+            {isUpdating ? "..." : "Apply"}
             </button>
           </div>
         </div>

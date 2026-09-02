@@ -74,8 +74,8 @@ const StoreManagement = ({
   }, [storeUuid]);
 
   const handleAddShipping = async () => {
-    if (!storeUuid) return alert("Store ID haipo.");
-    if (!newShipping.label.trim()) return alert('Tafadhali jaza jina la njia');
+    if (!storeUuid) return alert("Store ID is missing.");
+    if (!newShipping.label.trim()) return alert('Please fill in the shipping method name');
     try {
       const token = localStorage.getItem("access_token");
       // 🔥 MABADILIKO: api.post
@@ -87,7 +87,7 @@ const StoreManagement = ({
       setShippingMethods([...shippingMethods, response.data]);
       setNewShipping({ label: '', description: '', price_local: '', price_national: '', is_active: true });
       setShowAddForm(false);
-    } catch (error) { alert('Imeshindwa kuongeza: ' + (error.response?.data?.detail || error.message)); }
+      } catch (error) { alert('Failed to add: ' + (error.response?.data?.detail || error.message)); }
   };
 
   const handleUpdateShipping = async (id, updatedFields) => {
@@ -97,17 +97,17 @@ const StoreManagement = ({
       await api.patch(`/shipping-methods/${id}/`, updatedFields, { headers: { Authorization: `Bearer ${token}` } });
       setShippingMethods(shippingMethods.map(m => m.id === id ? { ...m, ...updatedFields } : m));
       setEditingShippingId(null);
-    } catch (error) { alert('Imeshindwa kusasisha: ' + (error.response?.data?.detail || error.message)); }
+      } catch (error) { alert('Failed to update: ' + (error.response?.data?.detail || error.message)); }
   };
 
   const handleDeleteShipping = async (id) => {
-    if (!window.confirm('Je, una uhakika unataka kufuta njia hii?')) return;
+    if (!window.confirm('Are you sure you want to delete this shipping method?')) return;
     try {
       const token = localStorage.getItem("access_token");
       // 🔥 MABADILIKO: api.delete
       await api.delete(`/shipping-methods/${id}/`, { headers: { Authorization: `Bearer ${token}` } });
       setShippingMethods(shippingMethods.filter(m => m.id !== id));
-    } catch (error) { alert('Imeshindwa kufuta: ' + (error.response?.data?.detail || error.message)); }
+        } catch (error) { alert('Failed to delete: ' + (error.response?.data?.detail || error.message)); }
   };
 
   const toggleActive = async (id, currentStatus) => {
@@ -145,14 +145,14 @@ const StoreManagement = ({
         
         <div className="sm-header">
           <div>
-            <h3 className="sm-header-title">🏷️ Kategoria za Duka Lako</h3>
-            <p className="sm-header-sub">Chagua kategoria ya bidhaa unayotaka kuongeza</p>
+            <h3 className="sm-header-title">🏷️ Store Categories</h3>
+            <p className="sm-header-sub">Choose the product category you want to add</p>
           </div>
           <button 
             onClick={() => setIsManageMode(!isManageMode)}
             className={`sm-toggle-btn ${isManageMode ? 'active' : ''}`}
           >
-            <Settings size={12} /> {isManageMode ? "MALIZA" : "DHIBITI"}
+          <Settings size={12} /> {isManageMode ? "FINISH" : "MANAGE"}
           </button>
         </div>
 
@@ -180,7 +180,7 @@ const StoreManagement = ({
             ))
           ) : (
             <div className="sm-empty-cat">
-              <p>Hujachagua kategoria bado.</p>
+              <p>You haven't selected any categories yet.</p>
             </div>
           )}
           <button 
@@ -197,14 +197,14 @@ const StoreManagement = ({
               <div className="sm-shipping-icon-wrap">
                 <Truck size={20} className="sm-shipping-icon" />
               </div>
-              <h3 className="sm-shipping-title">🚚 Njia za Usafirishaji</h3>
+                <h3 className="sm-shipping-title">🚚 Shipping Methods</h3>
             </div>
             <button 
               onClick={() => setShowAddForm(!showAddForm)}
               className="sm-shipping-toggle-btn"
             >
               {showAddForm ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-              {showAddForm ? "Ficha fomu" : "Ongeza njia"}
+              {showAddForm ? "Hide form" : "Add method"}
             </button>
           </div>
 
@@ -212,10 +212,12 @@ const StoreManagement = ({
             {shippingMethods.length === 0 ? (
               <div className="sm-shipping-empty">
                 <Truck size={32} className="sm-shipping-empty-icon" />
-                <p className="sm-shipping-empty-text">Hakuna njia za usafirishaji</p>
+
+                <p className="sm-shipping-empty-text">No shipping methods available</p>
                 <button onClick={() => setShowAddForm(true)} className="sm-shipping-empty-btn">
-                  + Weka njia ya kwanza
+                  + Add the first method
                 </button>
+
               </div>
             ) : (
               shippingMethods.map((method) => (
@@ -227,29 +229,29 @@ const StoreManagement = ({
                           const updated = { ...method, label: e.target.value };
                           setShippingMethods(shippingMethods.map(m => m.id === method.id ? updated : m));
                         }} />
-                      <textarea rows="1" className="sm-input-full" placeholder="Maelezo" value={method.description || ''}
+                                            <textarea rows="1" className="sm-input-full" placeholder="Description" value={method.description || ''}
                         onChange={(e) => {
                           const updated = { ...method, description: e.target.value };
                           setShippingMethods(shippingMethods.map(m => m.id === method.id ? updated : m));
                         }} />
                       <div className="sm-input-half-grid">
-                        <input type="number" placeholder="Dar" className="sm-input-full" value={method.price_local}
+                          <input type="number" placeholder="Dar es Salaam" className="sm-input-full" value={method.price_local}
                           onChange={(e) => {
                             const updated = { ...method, price_local: e.target.value };
                             setShippingMethods(shippingMethods.map(m => m.id === method.id ? updated : m));
                           }} />
-                        <input type="number" placeholder="Mikoa" className="sm-input-full" value={method.price_national}
+                          <input type="number" placeholder="Regions" className="sm-input-full" value={method.price_national}
                           onChange={(e) => {
                             const updated = { ...method, price_national: e.target.value };
                             setShippingMethods(shippingMethods.map(m => m.id === method.id ? updated : m));
                           }} />
                       </div>
                       <div className="sm-edit-actions">
-                        <button onClick={() => handleUpdateShipping(method.id, {
+                          <button onClick={() => handleUpdateShipping(method.id, {
                           label: method.label, description: method.description,
                           price_local: method.price_local, price_national: method.price_national
-                        })} className="sm-btn-success">Hifadhi</button>
-                        <button onClick={() => setEditingShippingId(null)} className="sm-btn-cancel">Ghairi</button>
+                        })} className="sm-btn-success">Save</button>
+                        <button onClick={() => setEditingShippingId(null)} className="sm-btn-cancel">Cancel</button>
                       </div>
                     </div>
                   ) : (
@@ -257,15 +259,19 @@ const StoreManagement = ({
                       <div className="sm-shipping-view-content">
                         <div className="sm-shipping-label-row">
                           <span className="sm-shipping-label">{method.label}</span>
-                          <span className={`sm-shipping-status ${method.is_active ? 'active' : 'inactive'}`}>
-                            {method.is_active ? 'Inatumika' : 'Imefichwa'}
+
+                           <span className={`sm-shipping-status ${method.is_active ? 'active' : 'inactive'}`}>
+                            {method.is_active ? 'Active' : 'Hidden'}
                           </span>
+
                         </div>
                         {method.description && <p className="sm-shipping-desc">{method.description}</p>}
-                        <div className="sm-shipping-prices">
-                          <span>Dar: TZS {Number(method.price_local).toLocaleString()}</span>
-                          <span>Mikoa: TZS {Number(method.price_national).toLocaleString()}</span>
+
+                       <div className="sm-shipping-prices">
+                          <span>Dar es Salaam: TZS {Number(method.price_local).toLocaleString()}</span>
+                          <span>Regions: TZS {Number(method.price_national).toLocaleString()}</span>
                         </div>
+
                       </div>
                       <div className="sm-shipping-actions">
                         <button onClick={() => setEditingShippingId(method.id)} className="sm-action-btn edit">
@@ -287,16 +293,18 @@ const StoreManagement = ({
 
           {showAddForm && (
             <div className="sm-shipping-form-wrap">
-              <h4 className="sm-shipping-form-title">➕ Njia mpya</h4>
+
+                <h4 className="sm-shipping-form-title">➕ New Shipping Method</h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <input type="text" placeholder="Jina la njia *" className="sm-input-full" value={newShipping.label} onChange={e => setNewShipping({...newShipping, label: e.target.value})} />
-                <textarea rows="1" placeholder="Maelezo (hiari)" className="sm-input-full" value={newShipping.description} onChange={e => setNewShipping({...newShipping, description: e.target.value})} />
+                <input type="text" placeholder="Method name *" className="sm-input-full" value={newShipping.label} onChange={e => setNewShipping({...newShipping, label: e.target.value})} />
+                <textarea rows="1" placeholder="Description (optional)" className="sm-input-full" value={newShipping.description} onChange={e => setNewShipping({...newShipping, description: e.target.value})} />
                 <div className="sm-input-half-grid">
-                  <input type="number" placeholder="Bei Dar" className="sm-input-full" value={newShipping.price_local} onChange={e => setNewShipping({...newShipping, price_local: e.target.value})} />
-                  <input type="number" placeholder="Bei Mikoa" className="sm-input-full" value={newShipping.price_national} onChange={e => setNewShipping({...newShipping, price_national: e.target.value})} />
+                  <input type="number" placeholder="Dar es Salaam price" className="sm-input-full" value={newShipping.price_local} onChange={e => setNewShipping({...newShipping, price_local: e.target.value})} />
+                  <input type="number" placeholder="Regions price" className="sm-input-full" value={newShipping.price_national} onChange={e => setNewShipping({...newShipping, price_national: e.target.value})} />
                 </div>
-                <button onClick={handleAddShipping} className="sm-shipping-submit-btn">Weka Njia</button>
+                <button onClick={handleAddShipping} className="sm-shipping-submit-btn">Add Method</button>
               </div>
+
             </div>
           )}
         </div>
@@ -312,7 +320,7 @@ const StoreManagement = ({
                 {url ? (
                   <img src={getFullImageUrl(url)} alt="Office" />
                 ) : (
-                  <div className="sm-office-box-placeholder">📸 Picha {index + 1}</div>
+                  <div className="sm-office-box-placeholder">📸 Photo {index + 1}</div>
                 )}
                 <input 
                   type="file" 
@@ -343,11 +351,11 @@ const StoreManagement = ({
           <div className="sm-details-form">
             <div className="sm-form-row">
               <div className="sm-input-group">
-                <label className="sm-label">Jina la Duka</label>
+                   <label className="sm-label">Store Name</label>
                 <input type="text" className="sm-input" value={storeMeta.store_name} onChange={(e) => setStoreMeta({ ...storeMeta, store_name: e.target.value })} />
               </div>
               <div className="sm-input-group">
-                <label className="sm-label">Simu ya Biashara</label>
+                 <label className="sm-label">Business Phone</label>
                 <input type="text" className="sm-input" value={storeMeta.phone_number} onChange={(e) => setStoreMeta({ ...storeMeta, phone_number: e.target.value })} />
               </div>
             </div>
@@ -372,8 +380,8 @@ const StoreManagement = ({
             
             <div className="sm-form-row">
               <div className="sm-input-group">
-                <label className="sm-label">TIN Number 🔒</label>
-                <input type="text" value={storeMeta.tin_number || "Inapakia..."} readOnly className="sm-input disabled" />
+                  <label className="sm-label">TIN Number 🔒</label>
+                <input type="text" value={storeMeta.tin_number || "Loading..."} readOnly className="sm-input disabled" />
               </div>
               <div className="sm-input-group">
                 <label className="sm-label">TikTok Handle</label>
@@ -383,13 +391,13 @@ const StoreManagement = ({
             
             <div className="sm-form-row full">
               <div className="sm-input-group">
-                <label className="sm-label" style={{ fontSize: '14px', fontWeight: '500' }}>Maelezo ya Duka</label>
+                <label className="sm-label" style={{ fontSize: '14px', fontWeight: '500' }}>Store Description</label>
                 <textarea rows="3" className="sm-textarea" value={storeMeta.description || ""} onChange={(e) => setStoreMeta({ ...storeMeta, description: e.target.value })} />
               </div>
             </div>
-            
-            <button onClick={handleUpdateStoreDetails} disabled={isUpdatingStore} className="sm-submit-btn">
-              {isUpdatingStore ? "Inasave..." : "Hifadhi Mabadiliko ya Duka ✅"}
+          
+             <button onClick={handleUpdateStoreDetails} disabled={isUpdatingStore} className="sm-submit-btn">
+              {isUpdatingStore ? "Saving..." : "Save Store Changes ✅"}
             </button>
           </div>
         </div>

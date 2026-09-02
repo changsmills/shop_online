@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../axiosConfig"; // 🔥 Tumia api
-const BACKEND_URL = "https://shop-online-r9z4.onrender.com"; // 🔥 URL ya Render
-//const BACKEND_URL = "http://127.0.0.1:8000"; // 🔥 Sio Render! 
+const BACKEND_URL = "https://shop-online-r9z4.onrender.com";
+//const BACKEND_URL = "http://127.0.0.1:8000";
 import QuickInventoryManager from '../components/QuickInventoryManager';
 import BusinessAnalytics from '../components/BusinessAnalytics';
 import TopDealsSection from "../components/TopDealsSection"
@@ -217,8 +217,8 @@ export default function PhysicalDashboard() {
   };
 
   const handleRemoveCategoryFromStore = async (catId) => {
-    if (!window.confirm("Je, una uhakika unataka kuondoa kategoria hii?")) return;
-    if (!myStore?.id) return alert("Duka halijapatikana!");
+    if (!window.confirm("Are you sure you want to remove this category?")) return;
+    if (!myStore?.id) return alert("Store not found!");
     try {
       const token = localStorage.getItem("access_token");
       if (!token) return alert("Token haipo!");
@@ -487,8 +487,8 @@ export default function PhysicalDashboard() {
     { id: 'inventory', label: 'Inventory', icon: <Box size={20} /> },
     { id: 'offers', label: 'Offers', icon: <TrendingUp size={20} /> }, 
     { id: 'analytics', label: 'Analytics', icon: <BarChart3 size={20} /> },
-    { id: 'settings', label: 'Account Settings', icon: <Settings size={20} /> },
-    { id: 'advertise', label: 'Advertisements', icon: <Megaphone size={20} /> },
+    { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
+    { id: 'advertise', label: 'Advertise', icon: <Megaphone size={20} /> },
     { id: 'logout', label: 'Logout', icon: <LogOut size={20} /> },
   ];
 
@@ -532,12 +532,12 @@ export default function PhysicalDashboard() {
 
             <div className={`account-dropdown ${isAccountMenuOpen ? 'open' : ''}`}>
               <div className="account-dropdown-header">
-                <p className="account-dropdown-name">{myStore?.store_name || "Jina la Duka"}</p>
+                <p className="account-dropdown-name">{myStore?.store_name || "Store Name"}</p>
                 <p className="account-dropdown-email">{myStore?.email || "supplier@skyfall.com"}</p>
               </div>
               <div className="dropdown-section">
                 <div className="account-dropdown-item" onClick={() => navigate('/dashboard/messages')}>
-                  <MessageSquare size={16} /> Ujumbe
+                <MessageSquare size={16} /> Messages
                   {unreadMessages > 0 && (
                     <span className="dropdown-unread-badge">
                       {unreadMessages}
@@ -547,7 +547,7 @@ export default function PhysicalDashboard() {
               </div>
               <div className="dropdown-divider">
                 <div className="account-dropdown-item logout" onClick={handleLogout}>
-                  <LogOut size={16} /> Toka (Logout)
+                  <LogOut size={16} /> Logout
                 </div>
               </div>
             </div>
@@ -631,21 +631,23 @@ export default function PhysicalDashboard() {
                     storeId={myStore?.id}
                   />
                 </div>
-                <div className="advertise-wrapper">
+
+               <div className="advertise-wrapper">
                   <div className="advertise-banner" onClick={() => navigate('/advertise')}>
                     <div>
-                      <h3><Rocket size={20} /> ONGEZA MAUZO LEO!</h3>
-                      <p>Weka bidhaa zako mbele ya maelfu ya wateja sasa.</p>
+                      <h3><Rocket size={20} /> INCREASE YOUR SALES TODAY!</h3>
+                      <p>Put your products in front of thousands of customers now.</p>
+                      <button className="advertise-btn">ADVERTISE NOW 🚀</button>
                     </div>
-                    <button className="advertise-btn">TANGAA SASA 🚀</button>
                   </div>
                 </div>
               </section>
             </div>
+          
 
             <div className={`tab-content ${activeTab === 'products' ? 'active' : ''}`}>
               <div className="product-creation-wrapper">
-                <h2 className="product-section-title">✨ Ongeza Bidhaa Mpya</h2>
+                <h2 className="product-section-title">✨ Add New Product</h2>
                 <ProductCreationFlow
                   storeId={myStore?.id} 
                   storeSubCategoryIds={myStore?.sub_category_ids || []} 
@@ -676,7 +678,7 @@ export default function PhysicalDashboard() {
                 />
               </div>
               <div className="existing-products-wrapper">
-                <h3 className="existing-products-title">Bidhaa Zilizopo</h3>
+               <h3 className="existing-products-title">Existing Products</h3>
                 <div className="product-grid">
                   {myProducts.map((p) => (
                     <div key={p.id} className="product-card">
@@ -699,7 +701,7 @@ export default function PhysicalDashboard() {
                         className="product-card-edit-btn"
                         onClick={() => navigate(`/update/${p.id}`)}
                       >
-                        <Edit3 size={14} /> Hariri
+                      <Edit3 size={14} /> Edit
                       </button>
                     </div>
                   ))}
@@ -724,11 +726,13 @@ export default function PhysicalDashboard() {
             <div className={`tab-content ${activeTab === 'advertise' ? 'active' : ''}`}>
               <div style={{ background: 'white', padding: '24px', borderRadius: '35px', border: '1px solid var(--gray-100)', boxShadow: 'var(--shadow-sm)', textAlign: 'center' }}>
                 <Megaphone size={48} className="advertise-icon" />
-                <h2 className="advertise-title">Tangaza Bidhaa Zako</h2>
-                <p className="advertise-text">Weka bidhaa zako mbele ya maelfu ya wateja.</p>
+
+                <h2 className="advertise-title">Advertise Your Products</h2>
+                <p className="advertise-text">Put your products in front of thousands of customers.</p>
                 <button className="advertise-cta-btn" onClick={() => navigate('/advertise')}>
-                  Anza Kutangaza Sasa
+                  Start Advertising Now
                 </button>
+
               </div>
             </div>
 
@@ -743,8 +747,10 @@ export default function PhysicalDashboard() {
             <div className="modal-drag-handle" />
             <div className="modal-header">
               <div>
-                <h3 className="modal-header-title">Soko la Kategoria</h3>
-                <p className="modal-header-sub">Chagua sub-kategoria ya kuongeza</p>
+
+                <h3 className="modal-header-title">Category Market</h3>
+                <p className="modal-header-sub">Choose a sub-category to add</p>
+
               </div>
               <button onClick={() => setShowCategoryManager(false)} className="modal-close-btn">
                 <X size={18} />
@@ -789,18 +795,20 @@ export default function PhysicalDashboard() {
                 }).length === 0 && (
                   <div className="modal-empty-state">
                     <p className="modal-empty-text">
-                      {myStore?.category_id || myStore?.category 
-                        ? "Hakuna sub-kategoria zinazofanana na duka hili." 
-                        : "⚠️ Tatizo: Duka hili halina Category ID."}
+
+                          {myStore?.category_id || myStore?.category 
+                        ? "No sub-categories match this store." 
+                        : "⚠️ Issue: This store has no Category ID."}
+                      
                     </p>
                   </div>
                 )}
               </div>
             </div>
             <div className="modal-footer">
-              <button onClick={() => setShowCategoryManager(false)} className="modal-confirm-btn">
-                NIMEKAMILISHA
-              </button>
+                <button onClick={() => setShowCategoryManager(false)} className="modal-confirm-btn">
+                DONE
+                </button>
             </div>
           </div>
         </div>,

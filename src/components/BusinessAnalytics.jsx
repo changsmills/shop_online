@@ -36,7 +36,7 @@ const BusinessAnalytics = ({ products = [], sellerId }) => {
 
     return (
         <div className="analytics-container">
-            <h3 className="analytics-title">Muhtasari wa Biashara</h3>
+          <h3 className="analytics-title">Business Overview</h3>
             
             <div className="analytics-grid">
                 <div className="stat-card">
@@ -45,7 +45,7 @@ const BusinessAnalytics = ({ products = [], sellerId }) => {
                     </div>
                     <div className="stat-info">
                         <h4 className="stat-number">{totalViews.toLocaleString()}</h4>
-                        <p className="stat-label">Views za Bidhaa</p>
+                        <h3 className="analytics-title">Business Overview</h3>
                     </div>
                 </div>
 
@@ -57,7 +57,7 @@ const BusinessAnalytics = ({ products = [], sellerId }) => {
                         <h4 className="stat-number">
                             {loading ? <div className="spinner-css" /> : leadsCount}
                         </h4>
-                        <p className="stat-label">Wateja (WhatsApp)</p>
+                        <p className="stat-label">Customers (WhatsApp)</p>
                     </div>
                 </div>
 
@@ -69,7 +69,7 @@ const BusinessAnalytics = ({ products = [], sellerId }) => {
                         <h4 className="stat-number product-name">
                             {popularProduct?.name || 'N/A'}
                         </h4>
-                        <p className="stat-label">Inayotazamwa Sana</p>
+                        <p className="stat-label">Most Viewed</p>
                     </div>
                 </div>
 
@@ -79,7 +79,7 @@ const BusinessAnalytics = ({ products = [], sellerId }) => {
                     </div>
                     <div className="stat-info">
                         <h4 className="stat-number">{products.length}</h4>
-                        <p className="stat-label">Aina za Bidhaa</p>
+                         <p className="stat-label">Product Types</p>
                     </div>
                 </div>
             </div>

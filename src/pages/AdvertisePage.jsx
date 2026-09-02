@@ -141,7 +141,7 @@ export default function AdvertisePage() {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       if (selectedFile.size > 10 * 1024 * 1024) {
-        toast.error("Faili ni kubwa sana. Inapaswa kuwa chini ya 10MB");
+        toast.error("File is too large. It should be under 10MB");
         return;
       }
 
@@ -155,14 +155,14 @@ export default function AdvertisePage() {
         "video/quicktime",
       ];
       if (!allowedTypes.includes(selectedFile.type)) {
-        toast.error("Aina ya faili haikubaliki. Tumia JPEG, PNG, GIF, WebP, au MP4");
+        toast.error("File type not accepted. Use JPEG, PNG, GIF, WebP, or MP4");
         return;
       }
 
       setFile(selectedFile);
       if (preview) URL.revokeObjectURL(preview);
       setPreview(URL.createObjectURL(selectedFile));
-      setStatus({ type: "info", msg: `Umechagua: ${selectedFile.name}` });
+      setStatus({ type: "info", msg: `Selected: ${selectedFile.name}` });
     }
   };
 
@@ -180,12 +180,12 @@ const handleSubmit = async (e) => {
 
   // 1. Angalia kama mtumiaji ameingia
   if (!currentUserId) {
-    errors.push("Tafadhali ingia kwenye akaunti kwanza!");
+    errors.push("Please login to your account first!");
   }
 
   // 2. Angalia store_id
   if (!formData.store_id) {
-    errors.push("Tafadhali chagua duka unalotaka kutangaza!");
+       errors.push("Please select the store you want to advertise!");
   } else {
     const uuidRegex =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -196,24 +196,24 @@ const handleSubmit = async (e) => {
 
   // 3. Angalia business_name
   if (!formData.business_name || formData.business_name.trim() === "") {
-    errors.push("Jina la biashara linahitajika!");
+       errors.push("Business name is required!");
   }
 
   // 4. Angalia description
   if (!formData.description || formData.description.trim() === "") {
     errors.push("Maelezo ya tangazo yanahitajika!");
   } else if (formData.description.length < 5) {
-    errors.push("Maelezo ya tangazo yanapaswa kuwa na angalau herufi 5!");
+      errors.push("Advertisement description must be at least 5 characters!");
   }
 
   // 5. Angalia file
   if (!file) {
-    errors.push("Tafadhali pakia picha au video ya tangazo!");
+      errors.push("Please upload an advertisement image or video!");
   } else {
     // Angalia ukubwa wa file
     if (file.size > 10 * 1024 * 1024) {
-      errors.push(`Faili ni kubwa sana (${(file.size / 1024 / 1024).toFixed(2)}MB). Inapaswa kuwa chini ya 10MB!`);
-    }
+      errors.push(`File is too large (${(file.size / 1024 / 1024).toFixed(2)}MB). It should be under 10MB!`);
+        }
     
     // Angalia aina ya file
     const allowedTypes = [
@@ -226,18 +226,18 @@ const handleSubmit = async (e) => {
       "video/quicktime",
     ];
     if (!allowedTypes.includes(file.type)) {
-      errors.push(`Aina ya faili haikubaliki: ${file.type}. Tumia JPEG, PNG, GIF, WebP, au MP4`);
+           errors.push(`File type not accepted: ${file.type}. Use JPEG, PNG, GIF, WebP, or MP4`);
     }
   }
 
   // 6. Angalia ad_type
   if (!formData.ad_type) {
-    errors.push("Aina ya tangazo inahitajika!");
+    errors.push("Advertisement type is required!");
   }
 
   // 7. Angalia media_type
   if (file && !file.type.startsWith("image") && !file.type.startsWith("video")) {
-    errors.push(`Aina ya media haijulikani: ${file.type}`);
+       errors.push(`Media type unknown: ${file.type}`);
   }
 
   // ============================================================
@@ -404,24 +404,23 @@ const handleSubmit = async (e) => {
         }
       }
 
-      // Toast message
-      let toastMessage = "";
+        let toastMessage = "";
       switch (status) {
         case 400:
-          toastMessage = `Hitilafu ya Data (400): ${errorMessage}`;
+          toastMessage = `Data Error (400): ${errorMessage}`;
           break;
         case 401:
         case 403:
-          toastMessage = `Haijaruhusiwa (${status}): Tafadhali ingia tena.`;
+          toastMessage = `Not Allowed (${status}): Please login again.`;
           break;
         case 404:
-          toastMessage = `Endpoint haipatikani (404): Angalia URL.`;
+          toastMessage = `Endpoint not found (404): Check the URL.`;
           break;
         case 500:
-          toastMessage = `Hitilafu ya Server (500): Jaribu tena baadae.`;
+          toastMessage = `Server Error (500): Try again later.`;
           break;
         default:
-          toastMessage = `Hitilafu (${status}): ${errorMessage}`;
+          toastMessage = `Error (${status}): ${errorMessage}`;
       }
 
       toast.error(toastMessage);
@@ -458,12 +457,28 @@ const handleSubmit = async (e) => {
   // ============================================================
   // 8. LOADING STATE
   // ============================================================
+    // ============================================================
+  // 8. SKELETON LOADING (Badala ya Loading)
+  // ============================================================
   if (loadingStores) {
     return (
       <div className="advertise-container">
-        <div style={{ textAlign: "center", padding: "60px" }}>
-          <Loader2 size={40} className="animate-spin" style={{ color: "#ff6a00" }} />
-          <p>Inapakia store zako...</p>
+        {/* Skeleton ya Header */}
+        <div className="skeleton-block" style={{ width: '400px', height: '60px', marginBottom: '20px', borderRadius: '8px' }}></div>
+        <div className="skeleton-block" style={{ width: '250px', height: '20px', marginBottom: '40px', borderRadius: '8px' }}></div>
+
+        {/* Skeleton ya Form */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div className="skeleton-block" style={{ width: '100%', height: '50px', borderRadius: '8px' }}></div>
+          <div className="skeleton-block" style={{ width: '100%', height: '50px', borderRadius: '8px' }}></div>
+          <div className="skeleton-block" style={{ width: '100%', height: '50px', borderRadius: '8px' }}></div>
+          <div className="skeleton-block" style={{ width: '100%', height: '120px', borderRadius: '8px' }}></div>
+          
+          {/* Skeleton ya Media Upload */}
+          <div className="skeleton-block" style={{ width: '100%', height: '180px', borderRadius: '12px' }}></div>
+
+          {/* Skeleton ya Submit Button */}
+          <div className="skeleton-block" style={{ width: '100%', height: '50px', borderRadius: '8px' }}></div>
         </div>
       </div>
     );
@@ -501,7 +516,7 @@ const handleSubmit = async (e) => {
         {/* Ongeza padding-left ili maandishi yasigongane na button */}
         <div style={{ paddingLeft: '50px' }}>
           <h2>📢 Broadcasting Center</h2>
-          <p>Tangaza biashara yako kwenye jukwaa kubwa la Skyfall</p>
+              <p>Advertise your business on the big Skyfall platform</p>
         </div>
       </div>
 
@@ -529,7 +544,7 @@ const handleSubmit = async (e) => {
         {/* STORE SELECTION */}
         <div className="input-group full-width">
           <label>
-            Chagua Duka Lako <span style={{ color: "#ff6a00" }}>*</span>
+              Select Your Store <span style={{ color: "#ff6a00" }}>*</span>
           </label>
           <div className="store-select-wrapper">
             <Store size={18} className="store-icon" />
@@ -539,7 +554,7 @@ const handleSubmit = async (e) => {
               onChange={(e) => handleStoreChange(e.target.value)}
               className="store-select"
             >
-              <option value="">-- Chagua duka unalotaka kutangaza --</option>
+             <option value="">-- Select the store you want to advertise --</option>
               {stores.map((store) => (
                 <option key={store.id} value={store.id}>
                   🏪 {store.store_name}
@@ -550,14 +565,14 @@ const handleSubmit = async (e) => {
           </div>
           {stores.length > 1 && (
             <small className="form-hint">
-              Una store {stores.length}. Chagua moja unayotaka kutangaza.
+               You have {stores.length} stores. Select one to advertise.
             </small>
           )}
         </div>
 
         {/* BUSINESS NAME */}
         <div className="input-group full-width">
-          <label>Jina la Biashara</label>
+          <label>Business Name</label>
           <input
             type="text"
             required
@@ -566,33 +581,34 @@ const handleSubmit = async (e) => {
             className="readonly-input"
             style={{ backgroundColor: "#f5f5f5", cursor: "not-allowed" }}
           />
-          <small className="form-hint">Jina limechukuliwa kutoka duka lako.</small>
+            <small className="form-hint">Name is taken from your store.</small>
         </div>
 
         {/* AD TYPE */}
         <div className="input-group full-width">
-          <label>Aina ya Tangazo</label>
+              <label>Advertisement Type</label>
           <select
             value={formData.ad_type}
             onChange={(e) => setFormData({ ...formData, ad_type: e.target.value })}
           >
-            <option value="banner">Main Hero Banner (Inaonekana juu ya ukurasa)</option>
-            <option value="side">Side Ad (Kadi ya Pembeni)</option>
-            <option value="popup">Popup Ad (Inaonekana ikifunguka page)</option>
+            <option value="banner">Main Hero Banner (Appears at top of page)</option>
+            <option value="side">Side Ad (Side Card)</option>
+            <option value="popup">Popup Ad (Appears when page opens)</option>
+
           </select>
         </div>
 
         {/* DESCRIPTION */}
         <div className="input-group full-width">
-          <label>Maelezo ya Tangazo (Broadcasting Text)</label>
+          <label>Advertisement Description (Broadcasting Text)</label>
           <textarea
             rows="3"
             required
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            placeholder="Andika ujumbe utakaotokea kwenye tangazo lako. Hakikisha ni mafupi na unaovutia..."
+            placeholder="Write the message that will appear in your advertisement. Make it short and catchy..."
           />
-          <small className="form-hint">Ujumbe mzuri unaweza kuongeza mauzo hadi 40%</small>
+            <small className="form-hint">A good message can increase sales by up to 40%</small>
         </div>
 
         {/* MEDIA PREVIEW */}
@@ -614,7 +630,7 @@ const handleSubmit = async (e) => {
                   }}
                   className="change-file-btn"
                 >
-                  Badilisha Faili
+                   Change File
                 </button>
               </div>
             </div>
@@ -623,9 +639,9 @@ const handleSubmit = async (e) => {
               <div className="icon-box">
                 <UploadCloud size={40} />
               </div>
-              <p>Bofya hapa kupakia Picha au Video fupi</p>
-              <span>Ingiza file la ubora wa juu (Max 10MB)</span>
-              <span className="file-types">Aina: JPEG, PNG, GIF, WebP, MP4</span>
+               <p>Click here to upload an Image or short Video</p>
+              <span>Upload a high quality file (Max 10MB)</span>
+              <span className="file-types">Types: JPEG, PNG, GIF, WebP, MP4</span>
               <input type="file" hidden onChange={handleFileChange} accept="image/*,video/*" />
             </label>
           )}
@@ -634,11 +650,11 @@ const handleSubmit = async (e) => {
         <button type="submit" className="submit-ad-btn" disabled={loading}>
           {loading ? (
             <>
-              <Loader2 size={20} className="animate-spin" /> Inatuma tangazo...
+              <Loader2 size={20} className="animate-spin" /> Submitting advertisement...
             </>
           ) : (
             <>
-              <Send size={20} /> Tuma Maombi ya Matangazo
+              <Send size={20} /> Submit Advertisement Request
             </>
           )}
         </button>
@@ -646,12 +662,12 @@ const handleSubmit = async (e) => {
 
       {/* INFO BOX */}
       <div className="ad-info-box">
-        <h4>📌 Kumbuka:</h4>
+        <h4>📌 Remember:</h4>
         <ul>
-          <li>Tangazo lako litapitishwa na Admin ndani ya saa 24</li>
-          <li>Hakikisha picha/video ni ya ubora wa juu</li>
-          <li>Maelezo yako yanapaswa kuwa ya kweli na sahihi</li>
-          <li>Matangazo yanayokiuka sheria yatakataliwa</li>
+          <li>Your advertisement will be reviewed by Admin within 24 hours</li>
+          <li>Make sure the image/video is high quality</li>
+          <li>Your description must be true and accurate</li>
+          <li>Advertisements that violate rules will be rejected</li>
         </ul>
       </div>
     </div>
