@@ -19,7 +19,10 @@ from api.views import (
     SellerOTPVerifyView,
     GoogleAuthView,
     SupplierLogoutView,
-    AdminStoreApprovalViewSet
+    AdminStoreApprovalViewSet,
+    NearbyProductsView,
+    NearbyStoresView  # 🔥 ONGEZA HII
+
 
 )
 
@@ -63,6 +66,10 @@ urlpatterns = [
     path('auth/', include('dj_rest_auth.urls')),  # Login, Logout, Password Reset
     path('auth/registration/', include('dj_rest_auth.registration.urls')),  # Registration
     path('auth/google/', GoogleAuthView.as_view(), name='google_auth'),
+    path('nearby-products/', NearbyProductsView.as_view(), name='nearby-products'),
+        path('nearby-stores/', NearbyStoresView.as_view(), name='nearby-stores'),  # 🔥 ONGEZA HII
+
+
 
 ]
 

@@ -5,29 +5,44 @@ import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
 import SkeletonCardz from "./SkeletonCardz";
 import { useTranslation } from 'react-i18next';
+import { useUserLocation } from '../hooks/useUserLocation,js';  // 🔥 ONGEZA HII
 import '../TopStores.css';
 
 export default function TopStores({ navigate }) {
   const { t, i18n } = useTranslation();
+  const { location, error: locationError } = useUserLocation();  // 🔥 ONGEZA HII
   const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(true);
   const scrollContainerRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
 
-   useEffect(() => {
+    useEffect(() => {
     const fetchTopStores = async () => {
       setLoading(true);
       try {
-        const response = await api.get('/stores/', { 
-          params: { 
-            limit: 10,
-            // 🔥 MUHIMU: Onyesha zilizopitishwa (approved) na zilizo active tu!
-            verification_status: 'approved',
-            status: 'active',
-            ordering: '-average_rating,-created_at'
-          } 
-        });
+        let response;
+        
+        if (location) {
+          // 🔥 Tumia Nearby Stores API (Maduka ya karibu na mtumiaji)
+          response = await api.get('/nearby-stores/', {
+            params: {
+              lat: location.lat,
+              lng: location.lng,
+            }
+          });
+        } else {
+          // 🔥 Fallback: Tumia stores za kawaida (kama hakuna location)
+          response = await api.get('/stores/', {
+            params: {
+              limit: 10,
+              verification_status: 'approved',
+              status: 'active',
+              ordering: '-average_rating,-created_at'
+            }
+          });
+        }
+        
         const storesData = response.data.results || response.data || [];
         setStores(storesData);
       } catch (error) {
@@ -37,7 +52,7 @@ export default function TopStores({ navigate }) {
       }
     };
     fetchTopStores();
-  }, [i18n.language]);
+  }, [location, i18n.language]);
 
   const checkScrollPosition = () => {
     if (scrollContainerRef.current) {
@@ -162,10 +177,12 @@ export default function TopStores({ navigate }) {
                    image={store.office_image_1_url || store.office_image_2_url || 'https://via.placeholder.com/300x150?text=Verified+Store'}
                   title={store.store_name}
                   subtitle={
-                    store.category?.name 
-                    ? `${store.category.name} • ${store.city}` 
-                    : `${store.business_type} • ${store.city}`
-                  }
+                     store.distance_km 
+                     ? `${store.city} • ${store.distance_km} km` 
+                        : (store.category?.name 
+                        ? `${store.category.name} • ${store.city}` 
+                        : `${store.business_type} • ${store.city}`)
+                             }
                   isVerified={store.is_verified}
                   businessType={store.business_type}
                   rating={store.average_rating}

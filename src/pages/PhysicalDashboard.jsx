@@ -11,7 +11,9 @@ import StoreManagement from '../components/StoreManagement';
 import ProductCreationFlow from '../components/ProductCreationFlow';
 import {
   Edit3, Rocket, X, CheckCircle, Plus,
-  LayoutDashboard, Package, Box, BarChart3, Store, Megaphone, Menu, Bell, User,TrendingUp,LogOut,MessageSquare, Settings, ClipboardList
+  LayoutDashboard, Package, Box, BarChart3, Store, Megaphone, Menu, Bell, 
+  User,TrendingUp,LogOut,MessageSquare,
+   Settings, ClipboardList
 } from 'lucide-react';
 import ReactDOM from 'react-dom';
 import "../PhysicalDashboard.css";
@@ -44,7 +46,7 @@ export default function PhysicalDashboard() {
     store_name: "", phone_number: "", whatsapp_number: "",
     instagram_handle: "", tiktok_handle: "", youtube_link: "",
     physical_address: "", working_hours: "", tin_number: "",
-    description: "", city: "",
+    description: "", city: "", latitude: "", longitude: "",
   });
 
   const [attributes, setAttributes] = useState({
@@ -190,7 +192,9 @@ export default function PhysicalDashboard() {
           city: store.city || "",
           
           category_id: store.category_id || null,
-          sub_category_ids: store.sub_category_ids || []
+          sub_category_ids: store.sub_category_ids || [],
+           latitude: store.latitude || "", // 🔥 ONGEZA HII!
+           longitude: store.longitude || "", // 🔥 ONGEZA HII!
         });
 
          setOfficePreviews([
@@ -241,7 +245,8 @@ export default function PhysicalDashboard() {
       const textFields = [
         'store_name', 'phone_number', 'whatsapp_number', 
         'instagram_handle', 'tiktok_handle', 'youtube_link', 
-        'physical_address', 'working_hours', 'description', 'city'
+        'physical_address', 'working_hours', 'description', 'city',
+         'latitude', 'longitude' 
       ];
       
       textFields.forEach(key => {

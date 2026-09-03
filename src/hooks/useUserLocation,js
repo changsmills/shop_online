@@ -1,0 +1,42 @@
+// hooks/useUserLocation.js
+import { useState, useEffect } from 'react';
+
+export function useUserLocation() {
+  const [location, setLocation] = useState(null);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // 🔥 ANGALIA KAMA MTUMIAJI AMESIGNUP (Token Ipo?)
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      setIsLoading(false);
+      return; // Usiombe GPS kama hajasignup
+    }
+    
+    if (!navigator.geolocation) {
+      setError('Geolocation not supported');
+      setIsLoading(false);
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+        setIsLoading(false);
+      },
+      (err) => {
+        setError(err.message);
+        setIsLoading(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }, []);
+
+  return { location, error, isLoading };
+}

@@ -76,7 +76,15 @@ class ProductsEngine(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     user = models.ForeignKey('Profile', on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
-    store_id = models.UUIDField()
+    # NEW (Badilisha kuwa hivi):
+    store = models.ForeignKey(
+    'StoreEngine',
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name='products',
+    db_column='store_id'  # Hii inahakikisha column ya DB inabaki 'store_id'
+    )
         # 🔥 1. Hii sasa inaenda kwenye SubCategory (category_id kwenye DB)
     sub_category = models.ForeignKey(
         SubCategory,
@@ -352,6 +360,8 @@ class Profile(models.Model):
     email = models.EmailField(blank=True, null=True)
     role = models.CharField(max_length=50, blank=True, null=True)
     is_otp_verified = models.BooleanField(default=False)  # 🔥 ONGEZA HII!
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
 
 
     class Meta:
@@ -620,6 +630,11 @@ class StoreEngine(models.Model):
     total_sales = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
     verification_status = models.CharField(max_length=50, default='pending')
+    # Kwenye StoreEngine class, baada ya fields zilizopo:
+
+    # 🔥 LOCATION FIELDS (GPS)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
 
     class Meta:
         db_table = 'stores_engine'

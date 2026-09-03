@@ -89,54 +89,83 @@ const Header = ({ showBack = false, showSearch = true }) => {  // 🔥 ONGEZA sh
     </div>
   );
 
-  const LocationDropdown = () => (
-    <div className="dropdown-card location-dropdown">
-      <div className="dropdown-header">
-        <h3>{t('specify_location')}</h3>
-        <p>{t('shipping_options_desc')}</p>
-      </div>
-
-      <button 
-        onClick={() => console.log("Add address clicked")}
-        className="dropdown-add-address-btn"
-      >
-        {t('add_address')}
-      </button>
-
-      <div className="dropdown-or-divider">
-        <span>{t('or')}</span>
-      </div>
-
-      <div className="dropdown-field">
-        <select 
-          value={deliveryCountry} 
-          onChange={(e) => setDeliveryCountry(e.target.value)}
-          className="dropdown-select"
-        >
-          <option value="TZ">🇹🇿 Tanzania</option>
-          <option value="KE">🇰🇪 Kenya</option>
-          <option value="UG">🇺🇬 Uganda</option>
-        </select>
-      </div>
-
-      <div className="dropdown-field">
-        <input 
-          type="text" 
-          placeholder={t('enter_zip_postal')}
-          value={zipCode}
-          onChange={(e) => setZipCode(e.target.value)}
-          className="dropdown-input"
-        />
-      </div>
-
-      <button 
-        onClick={handleLocationSave}
-        className="dropdown-save-btn"
-      >
-        {t('save')}
-      </button>
+ const LocationDropdown = () => (
+  <div className="dropdown-card location-dropdown">
+    <div className="dropdown-header">
+      <h3>{t('specify_location')}</h3>
+      <p>{t('shipping_options_desc')}</p>
     </div>
-  );
+
+    <button 
+      onClick={() => {
+        // 🔥 Ongeza GPS location permission
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              api.patch('/profile/', {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+              })
+              .then(() => {
+                console.log("✅ GPS Location saved to profile!");
+                localStorage.setItem('location_allowed', 'true');
+                setIsLocationOpen(false);
+                window.location.reload();
+              })
+              .catch(err => {
+                console.error("❌ Error saving location:", err);
+                setIsLocationOpen(false);
+              });
+            },
+            (err) => {
+              console.error("❌ Error getting GPS:", err);
+              setIsLocationOpen(false);
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+          );
+        } else {
+          console.log("Geolocation not supported");
+          setIsLocationOpen(false);
+        }
+      }}
+      className="dropdown-add-address-btn"
+    >
+      📍 {t('use_my_current_location')}
+    </button>
+
+    <div className="dropdown-or-divider">
+      <span>{t('or')}</span>
+    </div>
+
+    <div className="dropdown-field">
+      <select 
+        value={deliveryCountry} 
+        onChange={(e) => setDeliveryCountry(e.target.value)}
+        className="dropdown-select"
+      >
+        <option value="TZ">🇹🇿 Tanzania</option>
+        {/* 🔥 ONDOA KENYA NA UGANDA */}
+      </select>
+    </div>
+
+    <div className="dropdown-field">
+      <input 
+        type="text" 
+        placeholder={t('enter_zip_postal')}
+        value={zipCode}
+        onChange={(e) => setZipCode(e.target.value)}
+        className="dropdown-input"
+      />
+    </div>
+
+    <button 
+      onClick={handleLocationSave}
+      className="dropdown-save-btn"
+    >
+      {t('save')}
+    </button>
+  </div>
+);
 
   return (
     <header className="main-header">

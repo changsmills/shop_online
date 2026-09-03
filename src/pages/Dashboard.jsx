@@ -6,6 +6,8 @@ import Footer from "../components/Footer";
 import "../Dashboard.css";
 import api from "../axiosConfig"; 
 import DashboardCard from "../components/DashboardCard";
+import { useUserLocation } from '../hooks/useUserLocation,js';
+
 
 const TopStores = lazy(() => import("../components/TopStores"));
 const LocationFilter = lazy(() => import("../components/LocationFilter"));
@@ -67,6 +69,9 @@ export default function Dashboard() {
   const [cachedAds, setCachedAds] = useState([]);
   const [loadingLeafs, setLoadingLeafs] = useState(false);
   const [mobileActiveMenu, setMobileActiveMenu] = useState('categories');
+  const { location, error: locationError, isLoading: locationLoading } = useUserLocation();
+  const [nearbyProducts, setNearbyProducts] = useState([]);
+  const [showLocationPrompt, setShowLocationPrompt] = useState(false);
 
     useEffect(() => {
     const fetchAdsWithCache = async () => {
@@ -478,6 +483,24 @@ useEffect(() => {
     };
   }, [selectedCategory?.id, selectedSubCategory?.id, viewMode]); // ✅ Inategemea hali hizi
 
+useEffect(() => {
+  // 🔥 ANGALIA KAMA MTUMIAJI AMESIGNUP
+  if (!session) {
+    setShowLocationPrompt(false);
+    return;
+  }
+  
+  const locationAllowed = localStorage.getItem('location_allowed');
+  
+  if (location) {
+    setShowLocationPrompt(false);
+  } else if (locationAllowed) {
+    setShowLocationPrompt(false);
+  } else {
+    setShowLocationPrompt(true);
+  }
+}, [location, locationError, locationLoading, session]);
+
   // ========== HANDLERS ==========
   const handleMouseEnter = (menuName) => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -581,6 +604,102 @@ const handleSubCategoryHover = (subCategory) => {
       </div>
       
       <div className="main-content">
+
+{session && !location && showLocationPrompt && ReactDOM.createPortal(
+  <div className="location-modal-overlay">
+    <div className="location-modal">
+      <div className="location-modal-icon">📍</div>
+      <h2 className="location-modal-title">Allow Location Access</h2>
+      <p className="location-modal-desc">We need your location to show products from stores near you. This helps you find the best deals in your area.</p>
+      <div className="location-modal-actions">
+        <button 
+          className="location-modal-btn allow"
+          onClick={() => {
+  setShowLocationPrompt(false);
+  
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        api.patch('/profile/', {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        })
+        .then(() => {
+          console.log("✅ Location saved to profile!");
+          localStorage.setItem('location_allowed', 'true');
+          window.location.reload();
+        })
+        .catch(err => {
+          console.error("❌ Error saving location:", err);
+          window.location.reload();
+        });
+      },
+      (err) => {
+        console.error("❌ Error getting location:", err);
+        // 🔥 FALLBACK: Tumia IP Address kupata location
+        fetch('https://ipapi.co/json/')
+          .then(response => response.json())
+          .then(data => {
+            if (data.latitude && data.longitude) {
+              return api.patch('/profile/', {
+                latitude: data.latitude,
+                longitude: data.longitude
+              });
+            }
+            throw new Error('IP location not available');
+          })
+          .then(() => {
+            console.log("✅ Location saved via IP!");
+            localStorage.setItem('location_allowed', 'true');
+            window.location.reload();
+          })
+          .catch(err => {
+            console.error("❌ Error saving location via IP:", err);
+            localStorage.setItem('location_allowed', 'true');
+            window.location.reload();
+          });
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  } else {
+    // 🔥 Browser haisupport GPS, tumia IP
+    fetch('https://ipapi.co/json/')
+      .then(response => response.json())
+      .then(data => {
+        if (data.latitude && data.longitude) {
+          return api.patch('/profile/', {
+            latitude: data.latitude,
+            longitude: data.longitude
+          });
+        }
+        throw new Error('IP location not available');
+      })
+      .then(() => {
+        console.log("✅ Location saved via IP!");
+        localStorage.setItem('location_allowed', 'true');
+        window.location.reload();
+      })
+      .catch(err => {
+        console.error("❌ Error saving location:", err);
+        localStorage.setItem('location_allowed', 'true');
+        window.location.reload();
+      });
+  }
+}}
+        >
+          Allow Now
+        </button>
+        <button 
+          className="location-modal-btn cancel"
+          onClick={() => setShowLocationPrompt(false)}
+        >
+          Not Now
+        </button>
+      </div>
+    </div>
+  </div>,
+  document.body
+)}
 
         <div className="content-container-simple">
 

@@ -1,46 +1,77 @@
+// src/components/LocationFilter.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronRight, ChevronLeft, MapPin, ArrowRight } from "lucide-react";
+import { ChevronRight, ChevronLeft, MapPin, ArrowRight, Navigation } from "lucide-react";
 import api from "../axiosConfig"; 
 import DashboardCard from "./DashboardCard";
 import SkeletonCardz from "./SkeletonCardz"; // 🔥 IMPORT SKELETON
 import { useTranslation } from 'react-i18next';
+import { useUserLocation } from '../hooks/useUserLocation,js'; // 🔥 ONGEZA HII
 import '../LocationFilter.css';
 
 export default function LocationFilter({ navigate }) {
   const { t, i18n } = useTranslation();
+  const { location, error: locationError } = useUserLocation(); // 🔥 ONGEZA HII
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const scrollContainerRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
 
+  // 🔥 BADILISHA: Tumia nearby-products API kulingana na GPS
   useEffect(() => {
     const fetchLocations = async () => {
       try {
         setLoading(true);
         
-        const response = await api.get('/products/');
+        let response;
+        
+        if (location) {
+          // 🔥 Tumia Nearby Products API (bidhaa za maduka ya karibu)
+          response = await api.get('/nearby-products/', {
+            params: {
+              lat: location.lat,
+              lng: location.lng,
+            }
+          });
+        } else {
+          // Fallback: Tumia products za kawaida
+          response = await api.get('/products/');
+        }
+        
         const data = response.data.results || response.data || [];
 
-        const cityMap = {};
+        // 🔥 Panga kulingana na umbali (kama data ina distance_km)
+        if (location) {
+          data.sort((a, b) => (a.distance_km || 0) - (b.distance_km || 0));
+        }
+
+        // 🔥 Chuja kwa store zilizo na location (city au GPS)
+        const uniqueStores = {};
         data.forEach(item => {
+          const storeId = item.store?.id;
           const cityName = item.store?.city;
           const address = item.store?.physical_address;
+          const distance = item.distance_km;
           
-          if (cityName && !cityMap[cityName]) {
-            cityMap[cityName] = {
-              image: item.cover_image,
+          if (storeId && !uniqueStores[storeId]) {
+            uniqueStores[storeId] = {
+              storeId: storeId,
+              name: cityName || item.store?.store_name || 'Unknown',
+              image: item.cover_image || item.store?.store_logo_url,
               address: address,
-              price: item.price
+              price: item.price,
+              distance: distance
             };
           }
         });
 
-        const formatted = Object.keys(cityMap).map(city => ({
-          name: city,
-          image: cityMap[city].image,
-          address: cityMap[city].address,
-          price: cityMap[city].price
+        const formatted = Object.values(uniqueStores).map(store => ({
+          name: store.name,
+          image: store.image,
+          address: store.address,
+          price: store.price,
+          distance: store.distance,
+          storeId: store.storeId
         }));
 
         setLocations(formatted);
@@ -51,7 +82,7 @@ export default function LocationFilter({ navigate }) {
       }
     };
     fetchLocations();
-  }, [i18n.language]);
+  }, [location, i18n.language]); // ✅ Ongeza location kwenye dependencies
 
   const checkScrollPosition = () => {
     if (scrollContainerRef.current) {
@@ -92,14 +123,18 @@ export default function LocationFilter({ navigate }) {
         </div>
         
         {/* ✅ ONGEZA SUBTITLE HAPA CHINI YA TITLE */}
-        <p className="loc-subtitle">{t('find_best_deals_near_you')}</p>
+        <p className="loc-subtitle">
+          {location ? t('find_best_deals_near_you') : t('find_best_deals_across_tz')}
+        </p>
       </div>
       
       <div className="loc-header-right">
         <button 
           className="loc-arrow-link-btn"
           onClick={() => {
-            const url = '/products?section=location'; 
+            const url = location 
+              ? `/products?lat=${location.lat}&lng=${location.lng}&section=nearby`
+              : '/products?section=location'; 
             
             // ✅ MUHIMU: Angalia kama ni Desktop (>768px), fungua tab mpya.
             // Ikiwa ni Mobile, fungua kwenye tab hii hii (kama kawaida).
@@ -165,16 +200,24 @@ export default function LocationFilter({ navigate }) {
           {locations.map((loc, index) => (
             <div key={index} className="loc-card-wrapper">
               <DashboardCard 
-                image={loc.image}
+                image={loc.image || 'https://via.placeholder.com/300x200?text=Store'}
                 title={loc.name}
-                subtitle={loc.address?.split(',')[0]}
+                subtitle={
+                  loc.distance 
+                  ? `${loc.address?.split(',')[0] || loc.name} • ${loc.distance} km`
+                  : loc.address?.split(',')[0] || loc.name
+                }
                 price={loc.price}
                 isLocation={true}
                 onClick={() => {
                   const locationName = encodeURIComponent(loc.name);
                   const sectionTitle = `${t('products_in')} ${loc.name}`;
                   const encodedSectionName = encodeURIComponent(sectionTitle);
-                  const url = `/products?location=${locationName}&sectionName=${encodedSectionName}`;
+                  
+                  const url = location 
+                    ? `/products?location=${locationName}&sectionName=${encodedSectionName}&lat=${location.lat}&lng=${location.lng}`
+                    : `/products?location=${locationName}&sectionName=${encodedSectionName}`;
+                  
                   window.open(url, '_blank');
                 }}
               />

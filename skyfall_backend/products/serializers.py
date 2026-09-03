@@ -409,8 +409,9 @@ class StoreEngineSerializer(serializers.ModelSerializer):
             'packaging_type', 'supply_capacity', 'working_hours',
             'specialist_tags',
             'total_sales', 'average_rating',
-            'store_index',
+            'store_index', 'latitude', 'longitude', 
         ]
+        
         read_only_fields = ['owner']
 
     # ------------------------------------------------------------------

@@ -19,6 +19,8 @@ from django.utils.decorators import method_decorator
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.parsers import MultiPartParser, FormParser
 import cloudinary.uploader
+import math
+
 
 
 # Juu ya file
@@ -272,15 +274,12 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
                 {'error': f'Failed to rate product: {str(e)}'}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
+        
 class AdvertisementViewSet(viewsets.ModelViewSet):
     queryset = Advertisement.objects.all()
     serializer_class = AdvertisementSerializer
     
-    # ✅ MUHIMU: Badilisha hii kutoka [IsAuthenticated] kwenda [IsAuthenticatedOrReadOnly]
-    # Hii inaruhusu wageni (GET) kuona matangazo, lakini waliosajiliwa tu ndio wanaweza kuongeza au kufuta.
     permission_classes = [IsAuthenticatedOrReadOnly]
-    
     authentication_classes = [JWTAuthentication]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['store_id', 'status', 'ad_type']
@@ -288,10 +287,19 @@ class AdvertisementViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         print("🔍 [DEBUG] Saving advertisement...")
         print(f"  User: {self.request.user}")
-        print(f"  Profile: {self.request.user.profile}")
+        
         try:
-            serializer.save(user=self.request.user.profile)
-            print("✅ [DEBUG] Saved successfully!")
+            from products.models import Profile
+            profile, created = Profile.objects.get_or_create(
+                user=self.request.user,
+                defaults={
+                    'full_name': self.request.user.username or self.request.user.email,
+                    'role': 'buyer'
+                }
+            )
+            
+            serializer.save(user=profile)
+            print(f"✅ [DEBUG] Saved successfully! Profile: {profile.id}")
         except Exception as e:
             print(f"❌ [DEBUG] Error: {e}")
             raise e
@@ -299,17 +307,21 @@ class AdvertisementViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         
-        # ✅ Ikiwa ni mgeni (hajalogin), ruhusu waone matangazo yote.
-        # Hapa 'all()' inaruhusu DjangoFilterBackend kufanya kazi yake (kuchuja kwa status=active)
         if user.is_anonymous:
             return Advertisement.objects.all()
         
-        # ✅ Ikiwa ni admin, waone yote
         if user.is_staff or user.is_superuser:
             return Advertisement.objects.all()
         
-        # ✅ Ikiwa ni mtumiaji aliyesajiliwa wa kawaida, waone matangazo yao tu
-        return Advertisement.objects.filter(user=user.profile)
+        from products.models import Profile
+        profile, created = Profile.objects.get_or_create(
+            user=user,
+            defaults={
+                'full_name': user.username or user.email,
+                'role': 'buyer'
+            }
+        )
+        return Advertisement.objects.filter(user=profile)
 
 class StoreEngineViewSet(viewsets.ModelViewSet):
     queryset = StoreEngine.objects.all()
@@ -1105,3 +1117,91 @@ class AdminStoreApprovalViewSet(viewsets.ModelViewSet):
             profile.is_otp_verified = True  # Mruhusu aingle bila OTP tena
             profile.save()
             print(f"✅ Profile ya {profile.user.email} imewekwa kuwa supplier!")
+
+
+def haversine_distance(lat1, lon1, lat2, lon2):
+    # Radius ya dunia kwa km
+    R = 6371
+    dLat = math.radians(lat2 - lat1)
+    dLon = math.radians(lon2 - lon1)
+    a = (math.sin(dLat/2) ** 2 +
+         math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) *
+         math.sin(dLon/2) ** 2)
+    c = 2 * math.asin(math.sqrt(a))
+    return R * c
+
+class NearbyProductsView(APIView):
+    def get(self, request):
+        lat = request.query_params.get('lat')
+        lng = request.query_params.get('lng')
+        
+        if not lat or not lng:
+            return Response({"error": "lat na lng zinahitajika"}, status=400)
+        
+        try:
+            user_lat = float(lat)
+            user_lng = float(lng)
+        except ValueError:
+            return Response({"error": "lat/lng sio sahihi"}, status=400)
+        
+        # Pata bidhaa zote zilizoidhinishwa
+        products = ProductsEngine.objects.filter(
+            is_approved=True,
+            status='active',
+            store_id__isnull=False
+        ).select_related('store')[:200]
+        
+        # Hesabu umbali kwa kila bidhaa
+        product_list = []
+        for product in products:
+            store = product.store
+            if store and store.latitude and store.longitude:
+                distance = haversine_distance(
+                    user_lat, user_lng,
+                    float(store.latitude), float(store.longitude)
+                )
+                product_list.append((distance, product))
+        
+        # Panga kwa umbali (karibu kwanza)
+        product_list.sort(key=lambda x: x[0])
+        
+        # Chukua 20 za karibu
+        nearby_products_data = []
+        for distance, product in product_list[:20]:
+            data = ProductSerializer(product).data
+            data['distance_km'] = round(distance, 2)  # 🔥 ONGEZA HII!
+            nearby_products_data.append(data)
+        
+        return Response(nearby_products_data, status=200)
+
+class NearbyStoresView(APIView):
+    def get(self, request):
+        lat = request.query_params.get('lat')
+        lng = request.query_params.get('lng')
+        if not lat or not lng:
+            return Response({"error": "lat na lng zinahitajika"}, status=400)
+        try:
+            user_lat = float(lat)
+            user_lng = float(lng)
+        except ValueError:
+            return Response({"error": "lat/lng sio sahihi"}, status=400)
+
+        stores = StoreEngine.objects.filter(
+            verification_status='approved',
+            status='active'
+        )
+        store_list = []
+        for store in stores:
+            if store.latitude and store.longitude:
+                distance = haversine_distance(user_lat, user_lng, float(store.latitude), float(store.longitude))
+                store_list.append((distance, store))
+        store_list.sort(key=lambda x: x[0])
+        
+        # 🔥 ONGEZA HII: Rudisha distance_km kwenye kila store!
+        nearby_stores_data = []
+        for distance, store in store_list[:10]:
+            data = StoreEngineSerializer(store).data
+            data['distance_km'] = round(distance, 2)
+            nearby_stores_data.append(data)
+
+        return Response(nearby_stores_data, status=200)

@@ -348,58 +348,126 @@ const StoreManagement = ({
             ))}
           </div>
 
-          <div className="sm-details-form">
-            <div className="sm-form-row">
-              <div className="sm-input-group">
-                   <label className="sm-label">Store Name</label>
-                <input type="text" className="sm-input" value={storeMeta.store_name} onChange={(e) => setStoreMeta({ ...storeMeta, store_name: e.target.value })} />
-              </div>
-              <div className="sm-input-group">
-                 <label className="sm-label">Business Phone</label>
-                <input type="text" className="sm-input" value={storeMeta.phone_number} onChange={(e) => setStoreMeta({ ...storeMeta, phone_number: e.target.value })} />
-              </div>
-            </div>
-            
-            <div className="sm-form-row">
-              <div className="sm-input-group">
-                <label className="sm-label"><Phone size={14} className="sm-icon" /> WhatsApp</label>
-                <input type="text" className="sm-input" placeholder="255..." value={storeMeta.whatsapp_number} onChange={(e) => setStoreMeta({ ...storeMeta, whatsapp_number: e.target.value })} />
-              </div>
-              <div className="sm-input-group">
-                <label className="sm-label"><Instagram size={14} className="sm-icon" /> Instagram</label>
-                <input type="text" className="sm-input" placeholder="@handle" value={storeMeta.instagram_handle} onChange={(e) => setStoreMeta({ ...storeMeta, instagram_handle: e.target.value })} />
-              </div>
-            </div>
-            
-            <div className="sm-form-row full">
-              <div className="sm-input-group">
-                <label className="sm-label">Physical Address</label>
-                <input type="text" className="sm-input" value={storeMeta.physical_address} onChange={(e) => setStoreMeta({ ...storeMeta, physical_address: e.target.value })} />
-              </div>
-            </div>
-            
-            <div className="sm-form-row">
-              <div className="sm-input-group">
-                  <label className="sm-label">TIN Number 🔒</label>
-                <input type="text" value={storeMeta.tin_number || "Loading..."} readOnly className="sm-input disabled" />
-              </div>
-              <div className="sm-input-group">
-                <label className="sm-label">TikTok Handle</label>
-                <input type="text" className="sm-input" placeholder="@username" value={storeMeta.tiktok_handle || ""} onChange={(e) => setStoreMeta({ ...storeMeta, tiktok_handle: e.target.value })} />
-              </div>
-            </div>
-            
-            <div className="sm-form-row full">
-              <div className="sm-input-group">
-                <label className="sm-label" style={{ fontSize: '14px', fontWeight: '500' }}>Store Description</label>
-                <textarea rows="3" className="sm-textarea" value={storeMeta.description || ""} onChange={(e) => setStoreMeta({ ...storeMeta, description: e.target.value })} />
-              </div>
-            </div>
-          
-             <button onClick={handleUpdateStoreDetails} disabled={isUpdatingStore} className="sm-submit-btn">
-              {isUpdatingStore ? "Saving..." : "Save Store Changes ✅"}
-            </button>
-          </div>
+         <div className="sm-details-form">
+  <div className="sm-form-row">
+    <div className="sm-input-group">
+      <label className="sm-label">Store Name</label>
+      <input type="text" className="sm-input" value={storeMeta.store_name} onChange={(e) => setStoreMeta({ ...storeMeta, store_name: e.target.value })} />
+    </div>
+    <div className="sm-input-group">
+      <label className="sm-label">Business Phone</label>
+      <input type="text" className="sm-input" value={storeMeta.phone_number} onChange={(e) => setStoreMeta({ ...storeMeta, phone_number: e.target.value })} />
+    </div>
+  </div>
+
+  <div className="sm-form-row">
+    <div className="sm-input-group">
+      <label className="sm-label"><Phone size={14} className="sm-icon" /> WhatsApp</label>
+      <input type="text" className="sm-input" placeholder="255..." value={storeMeta.whatsapp_number} onChange={(e) => setStoreMeta({ ...storeMeta, whatsapp_number: e.target.value })} />
+    </div>
+    <div className="sm-input-group">
+      <label className="sm-label"><Instagram size={14} className="sm-icon" /> Instagram</label>
+      <input type="text" className="sm-input" placeholder="@handle" value={storeMeta.instagram_handle} onChange={(e) => setStoreMeta({ ...storeMeta, instagram_handle: e.target.value })} />
+    </div>
+  </div>
+
+  <div className="sm-form-row full">
+    <div className="sm-input-group">
+      <label className="sm-label">Physical Address</label>
+      <input type="text" className="sm-input" value={storeMeta.physical_address} onChange={(e) => setStoreMeta({ ...storeMeta, physical_address: e.target.value })} />
+    </div>
+  </div>
+
+  <div className="sm-form-row">
+    <div className="sm-input-group">
+      <label className="sm-label">TIN Number 🔒</label>
+      <input type="text" value={storeMeta.tin_number || "Loading..."} readOnly className="sm-input disabled" />
+    </div>
+    <div className="sm-input-group">
+      <label className="sm-label">TikTok Handle</label>
+      <input type="text" className="sm-input" placeholder="@username" value={storeMeta.tiktok_handle || ""} onChange={(e) => setStoreMeta({ ...storeMeta, tiktok_handle: e.target.value })} />
+    </div>
+  </div>
+
+  <div className="sm-form-row full">
+    <div className="sm-input-group">
+      <label className="sm-label" style={{ fontSize: '14px', fontWeight: '500' }}>Store Description</label>
+      <textarea rows="3" className="sm-textarea" value={storeMeta.description || ""} onChange={(e) => setStoreMeta({ ...storeMeta, description: e.target.value })} />
+    </div>
+  </div>
+
+  {/* 🔥 ONGEZA HAPA: LOCATION SETTINGS */}
+  <div className="sm-form-row full">
+    <div className="sm-input-group">
+      <label className="sm-label">📍 Store Location (GPS)</label>
+      <button
+        onClick={() => {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                setStoreMeta({
+                  ...storeMeta,
+                  latitude: position.coords.latitude,
+                  longitude: position.coords.longitude
+                });
+                alert("✅ Location imepatikana!");
+              },
+              (err) => {
+                console.error("Error getting location:", err);
+                alert("❌ Imeshindwa kupata location. Hakikisha browser inaruhusu location.");
+              },
+              { enableHighAccuracy: true, timeout: 10000 }
+            );
+          } else {
+            alert("Geolocation not supported!");
+          }
+        }}
+        style={{
+          padding: '10px 20px',
+          backgroundColor: '#ff6a00',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          fontWeight: '600',
+          marginBottom: '12px',
+          width: '100%'
+        }}
+      >
+        📍 Get My Location
+      </button>
+    </div>
+  </div>
+
+  <div className="sm-form-row">
+    <div className="sm-input-group">
+      <label className="sm-label">Latitude</label>
+      <input
+        type="text"
+        className="sm-input"
+        placeholder="-6.7924"
+        value={storeMeta.latitude || ""}
+        onChange={(e) => setStoreMeta({ ...storeMeta, latitude: e.target.value })}
+        readOnly
+      />
+    </div>
+    <div className="sm-input-group">
+      <label className="sm-label">Longitude</label>
+      <input
+        type="text"
+        className="sm-input"
+        placeholder="39.2083"
+        value={storeMeta.longitude || ""}
+        onChange={(e) => setStoreMeta({ ...storeMeta, longitude: e.target.value })}
+        readOnly
+      />
+    </div>
+  </div>
+
+  <button onClick={handleUpdateStoreDetails} disabled={isUpdatingStore} className="sm-submit-btn">
+    {isUpdatingStore ? "Saving..." : "Save Store Changes ✅"}
+  </button>
+</div>
         </div>
       </div>
     </section>
