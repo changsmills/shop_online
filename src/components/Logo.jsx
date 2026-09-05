@@ -9,7 +9,7 @@ const Logo = () => {
         <img src={logoSvg} alt="Skyfall Logo" className="logo-image" />
       </div>
       <div className="logo-text">
-        Skyfall.com
+        Skyfall
       </div>
     </div>
   );
