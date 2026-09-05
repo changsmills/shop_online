@@ -335,11 +335,6 @@ class StoreEngineViewSet(viewsets.ModelViewSet):
     ordering_fields = ['created_at', 'store_name']  # 🔥 ONGEZA ordering
     pagination_class = LimitOffsetPagination  # 🔥 ONGEZA pagination kwa ?limit=50
 
-    def get_object(self):
-        pk = self.kwargs.get('pk')
-        if pk:
-            pk = pk.replace('-', '')
-        return StoreEngine.objects.get(id=pk)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user.profile)

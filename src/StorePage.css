@@ -541,16 +541,26 @@
 
 .lightbox-close-btn {
   position: absolute;
-  top: -50px;
-  right: 0;
-  background: none;
+  top: 45px;   /* ✅ INASHUSHA CHINI HAPA */
+  right: 15px; /* ✅ INAINGIA NDANI KIDOGO */
+  background: rgba(0, 0, 0, 0.7); /* ✅ Inaweka background nyeusi ya uwazi */
   border: none;
   color: white;
   cursor: pointer;
-  padding: 8px;
-  transition: color 0.2s;
+  padding: 10px;
+  border-radius: 50%;  /* ✅ Inaifanya iwe duara nzuri */
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.2s;
 }
-.lightbox-close-btn:hover { color: #ff6a00; }
+
+.lightbox-close-btn:hover {
+  background: #ff6a00; /* Inageuka rangi ya machungwa ikibonyezwa */
+}
 
 .lightbox-product-title {
   color: white;
@@ -670,4 +680,95 @@
   .store-gallery-image {
     height: 180px;
   }
+}
+/* ========================================= */
+/* 🔥 LIGHTBOX - MISHALE NA VIEW MORE        */
+/* ========================================= */
+.lightbox-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.3s;
+}
+
+.lightbox-nav-btn:hover {
+  background: #ff6a00;
+}
+
+.lightbox-nav-btn.left { left: 15px; }
+.lightbox-nav-btn.right { right: 15px; }
+
+.lightbox-view-more-btn {
+  display: block;
+  margin: 15px auto 0 auto;
+  background: #ff6a00;
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: background 0.2s;
+}
+
+.lightbox-view-more-btn:hover {
+  background: #e55a00;
+}
+
+/* ========================================= */
+/* 🔥 DARK MODE KWA SKELETON (LOADING STATE) */
+/* ========================================= */
+@media (prefers-color-scheme: dark) {
+    /* 1. Background ya ukurasa mzima iwe Nyeusi (Navy Blue) */
+    .store-page,
+    .store-container {
+        background-color: #1a1a2e !important;
+    }
+
+    /* 2. Skeleton za kawaida (Vipande vya kijivu) viwe vya rangi ya Giza */
+    .skeleton {
+        background: #334155 !important;
+    }
+
+    /* 3. Skeleton ya Banner iwe na Gradient ya Giza */
+    .skeleton-banner {
+        background: linear-gradient(90deg, #2d2d44 25%, #3b3b5c 50%, #2d2d44 75%) !important;
+    }
+
+    /* 4. Cards za Info na Product ziwe na Background ya Giza */
+    .skeleton-info-card,
+    .skeleton-product-card {
+        background-color: #1a1a2e !important;
+    }
+
+    /* 5. Picha za Skeleton (Product Image) ziwe Giza */
+    .skeleton-product-img {
+        background: #334155 !important;
+    }
+
+    /* 6. Vichwa na Matini ya skeleton viwe vya Giza */
+    .skeleton-info-title,
+    .skeleton-info-text-1,
+    .skeleton-info-text-2,
+    .skeleton-info-text-3,
+    .skeleton-products-title,
+    .skeleton-search-control,
+    .skeleton-filter-control,
+    .skeleton-product-name,
+    .skeleton-product-price {
+        background: #334155 !important;
+    }
 }

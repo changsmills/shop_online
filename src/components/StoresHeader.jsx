@@ -79,14 +79,14 @@ const StoresHeader = ({ onSearch, showBack = true }) => {
           {/* SEHEMU YA KUSHOTO: Back Arrow + Logo */}
           <div className="header-left-group" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             {showBack && (
-              <button 
-                className="mobile-back-btn" 
-                onClick={() => navigate(-1)}
-                aria-label="Rudi nyuma"
+           <button 
+             className="mobile-back-btn desktop-hidden" 
+             onClick={() => navigate(-1)}
+             aria-label="Rudi nyuma"
               >
-                <ArrowLeft size={24} color="#333" className="desktop-hidden" />
-              </button>
-            )}
+            <ArrowLeft size={24} color="#333" />
+            </button>
+                )}
             <div className="logo-wrapper"><Logo /></div>
           </div>
 

@@ -35,8 +35,10 @@ export default function ProductDetails() {
   // ========== RELATED PRODUCTS STATE ==========
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loadingRelated, setLoadingRelated] = useState(false);
-    const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [fetchTrigger, setFetchTrigger] = useState(0); // Inalazimisha useEffect kurudia
+  const [hideHeader, setHideHeader] = useState(false);
+  const lastScrollYRef = useRef(0);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
@@ -271,6 +273,44 @@ export default function ProductDetails() {
     };
   }, []);
 
+
+  // 🔥 FICHA HEADER UKIENDA CHINI, IONEKANE UKIRUDI JUU (DESKTOP TU)
+  useEffect(() => {
+    if (!product) return; // Subiri bidhaa ipakie kwanza
+
+    const handleScroll = () => {
+      if (window.innerWidth <= 768) return;
+
+      // Soma scroll kutoka kwenye boxes za kushoto (Gallery) na kulia (Info)
+      const leftScroll = document.querySelector('.left-content')?.scrollTop || 0;
+      const rightScroll = document.querySelector('.right-sidebar')?.scrollTop || 0;
+      const currentScrollY = Math.max(leftScroll, rightScroll, window.scrollY || document.documentElement.scrollTop);
+
+      if (currentScrollY > lastScrollYRef.current && currentScrollY > 100) {
+        setHideHeader(true);
+      } else if (currentScrollY < lastScrollYRef.current) {
+        setHideHeader(false);
+      }
+
+      lastScrollYRef.current = currentScrollY;
+    };
+
+    // Chagua vitu vinavyoscroll
+    const leftContent = document.querySelector('.left-content');
+    const rightContent = document.querySelector('.right-sidebar');
+
+    // Weka listeners kwenye hizo boxes na window
+    leftContent?.addEventListener('scroll', handleScroll);
+    rightContent?.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      leftContent?.removeEventListener('scroll', handleScroll);
+      rightContent?.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [product]); // Inategemea product, ina run baada ya kuchora DOM
+
   const handleRateProduct = async (stars) => {
     const loadingToast = toast.loading("Tunahifadhi rating yako...");
     try {
@@ -304,10 +344,11 @@ export default function ProductDetails() {
   }
 
   return (
-    <div className="product-page-root">
-      <div ref={headerRef}>
-      <Header showBack={true} /> 
-     </div>
+    <div className={`product-page-root ${hideHeader ? 'no-header-space' : ''}`}>
+
+       <div ref={headerRef} className={`header-wrapper ${hideHeader ? 'header-hidden' : ''}`}>
+        <Header showBack={true} /> 
+      </div>
 
       <div className="product-details-container">
         {/* ✅ BREADCRUMB IMEONDOLIWA KABISA */}

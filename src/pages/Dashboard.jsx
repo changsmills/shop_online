@@ -585,16 +585,16 @@ const handleSubCategoryHover = (subCategory) => {
   );
 }
 
-  if (dataLoading || sessionLoading) {
-    return (
-      <div className="dashboard-wrapper">
-        <Header search={search} setSearch={setSearch} />
-        <div className="loading-container">
-          <SkeletonLayout />
-        </div>
+ if (dataLoading || sessionLoading) {
+  return (
+    <div className="dashboard-wrapper">
+      <Header search={search} setSearch={setSearch} />
+      <div className="loading-container">
+        <SkeletonLayout />
       </div>
-    );
-  }
+    </div>
+  );
+} 
 
   return (
     <div key={i18n.language} className="dashboard-wrapper">
@@ -796,12 +796,20 @@ const handleSubCategoryHover = (subCategory) => {
             <span className="ad-tag">{t('sponsored')}</span>
             <h2 className="banner-title">{activeAd.business_name}</h2>
             <p className="banner-desc">{activeAd.description}</p>
-            <button 
-              className="view-more-banner" 
-              onClick={() => navigate(`/store/${activeAd.store_id}`)}
-            >
-              {t('source_now')} →
-            </button>
+           <button 
+             className="view-more-banner" 
+                onClick={() => {
+                 // Kama ni Desktop (zaidi ya 1024px), fungua kwenye tab mpya
+                 if (window.innerWidth > 1024) {
+                  window.open(`/store/${activeAd.store_id}`, '_blank');
+                   } else {
+                    // Kama ni Mobile, navigate kama kawaida
+                     navigate(`/store/${activeAd.store_id}`);
+                }
+                      }}
+                       >
+            {t('source_now')} →
+                    </button>
           </div>
         )}
       </div>

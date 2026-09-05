@@ -75,8 +75,8 @@ const Header = ({ showBack = false, showSearch = true }) => {  // 🔥 ONGEZA sh
           className="dropdown-select"
         >
           <option value="TZS">TZS - Tanzanian Shilling</option>
-          <option value="USD">USD - US Dollar</option>
-          <option value="KES">KES - Kenyan Shilling</option>
+         {/* <option value="USD">USD - US Dollar</option>*/}
+         {/*<option value="KES">KES - Kenyan Shilling</option>*/}
         </select>
       </div>
 
@@ -174,12 +174,12 @@ const Header = ({ showBack = false, showSearch = true }) => {  // 🔥 ONGEZA sh
           <div className="header-left-group">
             {showBack && (
               <button 
-                className="mobile-back-btn" 
-                onClick={() => navigate(-1)}
-                aria-label="Rudi nyuma"
-              >
-                <ArrowLeft size={24} color="#333" className="desktop-hidden" />
-              </button>
+                  className="mobile-back-btn desktop-hidden"  // ✅ ONGEZA HII HAPA
+                  onClick={() => navigate(-1)}
+                   aria-label="Rudi nyuma"
+                    >
+              <ArrowLeft size={24} color="#333" />
+             </button>
             )}
             <div className="logo-wrapper"><Logo /></div>
           </div>

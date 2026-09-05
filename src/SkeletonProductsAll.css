@@ -223,3 +223,48 @@
     100% { background-color: #334155 !important; }
   }
 }
+/* ========================================= */
+/* 🔥 DARK MODE FIX - SKELETON PRODUCTS ALL  */
+/* ========================================= */
+@media (prefers-color-scheme: dark) {
+    /* Background ya ukurasa mzima */
+    .skeleton-products-all-page {
+        background-color: #1a1a2e !important;
+    }
+
+    /* Banner ya Skeleton */
+    .skeleton-banner {
+        background-color: #1a1a2e !important;
+        border-bottom: 1px solid #2d2d44 !important;
+    }
+    .skeleton-banner-title,
+    .skeleton-banner-desc {
+        background-color: #334155 !important;
+    }
+
+    /* Tabs za Skeleton */
+    .skeleton-tabs-wrapper {
+        background-color: #1a1a2e !important;
+        border-bottom: 1px solid #2d2d44 !important;
+    }
+    .skeleton-tab-item {
+        background-color: #334155 !important;
+    }
+
+    /* Cards na Grid */
+    .skeleton-product-card {
+        background-color: #161b22 !important; /* Background ya card (nyeusi kidogo) */
+        border: 1px solid #334155 !important;
+    }
+    .skeleton-product-image,
+    .skeleton-text-line {
+        background-color: #334155 !important; /* Rangi ya kijivu giza kwa vipande */
+    }
+
+    /* Animation ya Pulse (Ibadilishe kuwa ya dark mode) */
+    @keyframes pulse {
+        0% { background-color: #334155; }
+        50% { background-color: #4b5563; } /* Kijivu chepesi kidogo */
+        100% { background-color: #334155; }
+    }
+}

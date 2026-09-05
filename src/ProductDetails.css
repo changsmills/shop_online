@@ -1230,3 +1230,106 @@
   }
 }
 
+/* ========================================= */
+/* 🔥 FICHA HEADER KWA SCROLL (DESKTOP TU)     */
+/* ========================================= */
+@media (min-width: 769px) {
+    /* Tunapanga Header kama fixed juu */
+    .header-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    /* Ukiwa na class ya header-hidden, inasonga juu kutoweka */
+    .header-wrapper.header-hidden {
+        transform: translateY(-100%);
+    }
+
+    /* Pia, tunahakikisha sehemu za kushoto na kulia (Gallery na Info) 
+       zinapanda juu kidogo wakati header imefichika */
+    .header-wrapper.header-hidden + .product-details-container .left-content,
+    .header-wrapper.header-hidden + .product-details-container .right-sidebar {
+        top: 20px !important; 
+        transition: top 0.3s ease;
+    }
+    
+    .left-content,
+    .right-sidebar {
+        transition: top 0.3s ease;
+    }
+}
+
+/* ========================================= */
+/* 🔥 FIX: FANYA ICON YA CHAT IONEKANE (DARK MODE) */
+/* ========================================= */
+@media (prefers-color-scheme: dark) {
+    /* Lazimisha icon ya chat (au button yoyote yenye icon) iwe nyeupe */
+    button svg,
+    .chat-btn svg,
+    .message-btn svg,
+    .contact-icon svg,
+    a svg {
+        color: #ffffff !important;
+        fill: #ffffff !important;
+    }
+
+    /* Hakikisha button ya chat yenyewe ina background inayoonekana */
+    .chat-btn,
+    .message-btn,
+    .contact-icon {
+        background-color: #334155 !important; /* Navy Blue ya Giza */
+        border-color: #334155 !important;
+    }
+}
+
+/* ========================================= */
+/* 🔥 FICHA HEADER KWA SCROLL (DESKTOP TU) */
+/* ========================================= */
+@media (min-width: 769px) {
+    /* Header inabaki juu na inasonga vizuri */
+    .header-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    /* Header inatoweka ukienda chini */
+    .header-wrapper.header-hidden {
+        transform: translateY(-100%);
+    }
+    
+    /* Lazimisha header ya ndani isonge pia */
+    .header-wrapper.header-hidden .main-header {
+        transform: translateY(-100%) !important;
+    }
+}
+
+/* ========================================= */
+/* FIX: ONDOA NAFASI YA BACKGROUND WAKATI HEADER IMEPOTEA */
+/* ========================================= */
+
+/* Desktop - ikiwa header imepotea, ondoa padding na usogeze content juu */
+@media (min-width: 769px) {
+    .product-page-root.no-header-space {
+        padding-top: 0 !important;
+    }
+    
+    .product-page-root.no-header-space .left-content,
+    .product-page-root.no-header-space .right-sidebar {
+        top: 0 !important; /* Inasogeza sticky content juu kabisa */
+    }
+}
+
+/* Mobile - ikiwa header imepotea, ondoa margin */
+@media (max-width: 768px) {
+    .product-page-root.no-header-space {
+        margin-top: 0 !important;
+    }
+}

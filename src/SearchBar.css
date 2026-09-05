@@ -438,3 +438,78 @@
     display: none !important;
   }
 }
+/* ========================================= */
+/* 🔥 FIX YA MWISHO KABISA: FANYA MAANDISHI YAONEKANE (DARK MODE) */
+/* ========================================= */
+@media (prefers-color-scheme: dark) {
+    /* 1. Input ya search - Lazimisha rangi ya maandishi iwe nyeupe (au inayobadilika) */
+    .search-input {
+        color: #ffffff !important;
+        background: transparent !important;
+    }
+
+    /* 2. Placeholder (maandishi ya kwanza "Search", "Jump Starters", n.k.) */
+    .search-input::placeholder {
+        color: #a0aec0 !important; /* Rangi ya kijivu inayoonekana vizuri kwenye background nyeusi */
+        opacity: 1 !important;
+    }
+
+    /* 3. Maandishi ya majina ya bidhaa/kategoria kwenye dropdown (suggestions) */
+    .suggestion-name {
+        color: #ffffff !important; /* Lazimisha kuwa nyeupe */
+        background: transparent !important;
+    }
+
+    /* 4. Kama kuna "Badge" ya type (Product/Category) */
+    .suggestion-type-badge {
+        color: #a0aec0 !important;
+        background: #334155 !important;
+    }
+
+    /* 5. Hakikisha taarifa zingine zinapita vizuri (mfano: category icon) */
+    .category-icon {
+        color: #ffffff !important;
+        background: #334155 !important;
+    }
+
+    /* 6. Hakikisha Suggestion item yenyewe ina background sahihi na inapobonyezwa inabadilika */
+    .suggestion-item {
+        background: #1e293b !important;
+        border-bottom: 1px solid #334155 !important;
+    }
+    
+    .suggestion-item:hover {
+        background: #334155 !important;
+    }
+
+    /* 7. Acha nafasi ya "header" ya dropdown iwe nyeusi na text nyeupe */
+    .search-portal {
+        background: #1e293b !important;
+        border: 1px solid #334155 !important;
+    }
+
+    .suggestion-header {
+        background: #0f172a !important;
+        color: #94a3b8 !important;
+        border-bottom: 1px solid #334155 !important;
+    }
+}
+/* ========================================= */
+/* 🔥 FORCE: LAZIMISHA SEARCH BAR KUWA NAVY BLUE */
+/* ========================================= */
+@media (prefers-color-scheme: dark) {
+    .search-bar-container {
+        background: #2d2d44 !important; /* Tumia Navy Blue ya Desktop */
+        background-color: #2d2d44 !important;
+        border: 1px solid #334155 !important;
+    }
+    
+    .search-input {
+        color: #ffffff !important;
+    }
+
+    .search-input::placeholder {
+        color: #94a3b8 !important;
+        opacity: 1 !important;
+    }
+}

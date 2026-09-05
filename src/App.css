@@ -437,3 +437,63 @@ label {
     opacity: 1;
   }
 }
+
+/* ========================================= */
+/* ULTIMATE GLOBAL FORCE - DARK MODE */
+/* ========================================= */
+@media (prefers-color-scheme: dark) {
+    /* Lazimisha chombo cha Header kiwe Navy Blue */
+    .header-container, 
+    .header-top-bar, 
+    .header-left-group, 
+    .logo-wrapper, 
+    .search-bar-wrapper {
+        background: #1a1a2e !important;
+        background-color: #1a1a2e !important;
+    }
+    
+    /* Lazimisha sanduku la Logo kuwa transparent (si nyeupe) */
+    .logo-wrapper,
+    .logo-icon-box {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    /* Lazimisha Search Bar iwe Nyeusi Kidogo (Navy Blue ya giza) */
+    .search-bar-container {
+        background: #2d2d44 !important;
+        background-color: #2d2d44 !important;
+        border: 1px solid #334155 !important;
+    }
+}
+
+
+/* ========================================= */
+/* ULTIMATE GLOBAL FORCE - DARK MODE */
+/* ========================================= */
+@media (prefers-color-scheme: dark) {
+    /* Lazimisha chombo cha Header kiwe Navy Blue */
+    .header-container, 
+    .header-top-bar, 
+    .header-left-group, 
+    .logo-wrapper, 
+    .search-bar-wrapper {
+        background: #1a1a2e !important;
+        background-color: #1a1a2e !important;
+    }
+    
+    /* Lazimisha sanduku la Logo kuwa transparent (si nyeupe) */
+    .logo-wrapper,
+    .logo-icon-box {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    /* Lazimisha Search Bar iwe Nyeusi Kidogo (Navy Blue ya giza) */
+    .search-bar-container {
+        background: #2d2d44 !important;
+        background-color: #2d2d44 !important;
+        border: 1px solid #334155 !important;
+    }
+}
+

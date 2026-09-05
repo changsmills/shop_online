@@ -44,7 +44,9 @@ return (
       display: 'flex', 
       alignItems: 'center', 
       width: '100%',
-      padding: '0 4px'
+      padding: '0 4px',
+      backgroundColor: 'var(--bg-primary)'  // ✅ ONGEZA HII HAPA
+
     }}>
       {/* Left Arrow */}
       {showLeftArrow && (

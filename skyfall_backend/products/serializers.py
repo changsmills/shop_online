@@ -374,6 +374,22 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
         print("🏁 [DEBUG] Product Creation Finished.", flush=True)
         return product
 
+
+
+        # 🔥 ONGEZA HII METHOD MWISHONI MWA ProductsEngineSerializer:
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        
+        # ✅ HAKIKISHA STORE_ID IPO KWENYE RESPONSE!
+        if hasattr(instance, 'store_id') and instance.store_id:
+            data['store_id'] = str(instance.store_id)
+        # Kama model inatumia 'store' kama ForeignKey, tumia hii:
+        elif hasattr(instance, 'store') and instance.store:
+            data['store_id'] = str(instance.store_id)  # instance.store_id inatoa UUID
+            data['store'] = str(instance.store_id)
+            
+        return data
+    
 class StoreEngineSerializer(serializers.ModelSerializer):
     sub_categories = serializers.SerializerMethodField()
     category_name = serializers.SerializerMethodField()

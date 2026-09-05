@@ -1224,3 +1224,66 @@ html, body {
     color: var(--text-primary) !important;
   }
 }
+/* ========================================= */
+/* 🔥 FIX YA MWISHO: LAZIMISHA RANGI KATIKA DARK MODE */
+/* ========================================= */
+@media (prefers-color-scheme: dark) {
+    /* Lazimisha MobileCategorySlider kuwa nyeusi */
+    .mobile-category-slider,
+    .mobile-cat-item,
+    .category-slider-wrapper {
+        background: #1a1a1a !important;
+        background-color: #1a1a1a !important;
+        border-bottom: 1px solid #2d2d2d !important; /* Mstari mweusi */
+    }
+    
+    /* Pia hakikisha maandishi ya kategoria ni meupe */
+    .mobile-cat-item span {
+        color: #ffffff !important;
+    }
+    .mobile-cat-item.active span {
+        color: #ff6a00 !important;
+    }
+    
+    /* Lazimisha eneo la juu (Ambapo kategoria ziko) kuwa nyeusi */
+    .alibaba-top-layout {
+        background: #1a1a1a !important;
+    }
+}
+
+/* ========================================= */
+/* ULTIMATE FORCE 2: FANYA COMPONENTS ZOTE ZIWE NYEUSI (DARK MODE) */
+/* ========================================= */
+@media (prefers-color-scheme: dark) {
+    /* Lazimisha mizizi yote ya dashboard kuwa nyeusi */
+    .dashboard-wrapper,
+    .main-content,
+    .content-container-simple,
+    .components-wrapper {
+        background: #1a1a2e !important;
+        background-color: #1a1a2e !important;
+    }
+
+    /* Lazimisha Mobile Category Slider (Hii ndiyo inayokuwa nyeupe) */
+    .mobile-category-slider,
+    .mobile-cat-item,
+    .category-slider-wrapper,
+    .alibaba-top-layout {
+        background: #1a1a2e !important;
+        background-color: #1a1a2e !important;
+        border-bottom: 1px solid #2d2d44 !important;
+    }
+
+    /* Lazimisha KILA Component (New Arrivals, TopStores, n.k.) kuwa nyeusi */
+    .components-wrapper > * {
+        background: #1a1a2e !important;
+        background-color: #1a1a2e !important;
+    }
+    
+    /* Rekebisha maandishi ya vichwa vya habari viwe meupe */
+    .section-header h3,
+    .section-header .subtitle,
+    .component-title {
+        color: #ffffff !important;
+    }
+}

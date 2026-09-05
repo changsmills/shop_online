@@ -165,12 +165,12 @@ function AppContent({ session }) {
 
 
  {/* 🔥 ONGEZA HII HAPA: BANNER YA ONYO LA MTANDAO */}
-      {!isOnline && (
-        <div className="offline-banner">
-          <span className="offline-icon">📶</span>
-          <span className="offline-text">⚠️ Connection lost. Please check your internet connection...</span>
-        </div>
-      )}
+        {!isOnline && (
+         <div className="offline-banner">
+            <span className="offline-icon">📶</span> 
+           <span className="offline-text">⚠️ Connection lost. Please check your internet connection...</span>
+         </div>
+       )}
 
 
       <Routes>

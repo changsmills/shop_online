@@ -42,6 +42,11 @@ export default function StorePage() {
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [lightboxProductName, setLightboxProductName] = useState('');
 
+
+   const [lightboxProductList, setLightboxProductList] = useState([]);
+  const [lightboxProductIndex, setLightboxProductIndex] = useState(0);
+  const [lightboxProductId, setLightboxProductId] = useState(null);
+
   // =======================================================
   // 🔥 FETCH STORE DATA
   // =======================================================
@@ -102,10 +107,15 @@ export default function StorePage() {
   // =======================================================
   // 🔥 FUNCTION: FUNGUA LIGHTBOX YA PICHA
   // =======================================================
-  const openImageLightbox = (product, e) => {
-    e.stopPropagation(); // Zuia navigate kwenye ProductDetails wakati wa kubonyeza picha
+    const openImageLightbox = (product, e, index) => {
+    e.stopPropagation(); // Zuia navigate
 
-    // Jenga orodha ya picha
+    // 🔥 Weka orodha ya bidhaa zote zinazoonekana (Filtered Products)
+    setLightboxProductList(filteredProducts);
+    setLightboxProductIndex(index);
+    setLightboxProductId(product.id);
+
+    // Picha ya bidhaa hii
     let images = [];
     if (product.cover_image_url || product.cover_image) {
       images.push(product.cover_image_url || product.cover_image);
@@ -117,9 +127,38 @@ export default function StorePage() {
     setIsLightboxOpen(true);
   };
 
+
+  // 🔥 MISHALE INABADILISHA BIDHAA (Sio picha tu!)
+  const goToNextProduct = () => {
+    if (lightboxProductList.length === 0) return;
+    const nextIndex = (lightboxProductIndex + 1) % lightboxProductList.length;
+    setLightboxProductIndex(nextIndex);
+    
+    const nextProduct = lightboxProductList[nextIndex];
+    setLightboxProductId(nextProduct.id);
+    setLightboxProductName(nextProduct.name);
+    
+    // Weka picha ya bidhaa mpya (unaweza kuongeza logic ya kupata gallery picha za bidhaa hiyo hapa)
+    setLightboxImages([nextProduct.cover_image_url || nextProduct.cover_image]);
+    setLightboxIndex(0);
+  };
+
+  const goToPrevProduct = () => {
+    if (lightboxProductList.length === 0) return;
+    const prevIndex = (lightboxProductIndex - 1 + lightboxProductList.length) % lightboxProductList.length;
+    setLightboxProductIndex(prevIndex);
+    
+    const prevProduct = lightboxProductList[prevIndex];
+    setLightboxProductId(prevProduct.id);
+    setLightboxProductName(prevProduct.name);
+    
+    // Weka picha ya bidhaa mpya
+    setLightboxImages([prevProduct.cover_image_url || prevProduct.cover_image]);
+    setLightboxIndex(0);
+  };
+
   const closeLightbox = () => setIsLightboxOpen(false);
-  const nextImage = () => setLightboxIndex((prev) => (prev + 1) % lightboxImages.length);
-  const prevImage = () => setLightboxIndex((prev) => (prev - 1 + lightboxImages.length) % lightboxImages.length);
+
 
   // =======================================================
   // 🔥 LOADING STATE
@@ -454,7 +493,7 @@ export default function StorePage() {
             </div>
           ) : viewMode === 'grid' ? (
             <div className="products-grid">
-              {filteredProducts.map(product => (
+              {filteredProducts.map((product, index) => (
                 <div 
                   key={product.id} 
                   className="product-card"
@@ -464,7 +503,7 @@ export default function StorePage() {
                     {/* ✅ PICHA INABONYEKA KUFUNGUA LIGHTBOX BILA KUHAMA UKURASA (GRID) */}
                     <div 
                       className="cursor-pointer relative"
-                      onClick={(e) => openImageLightbox(product, e)}
+                      onClick={(e) => openImageLightbox(product, e, index)}
                     >
                       <img 
                         src={product.cover_image_url || product.cover_image || 'https://placehold.co/300'} 
@@ -495,7 +534,7 @@ export default function StorePage() {
             </div>
           ) : (
             <div className="products-list">
-              {filteredProducts.map(product => (
+              {filteredProducts.map((product, index) => (
                 <div 
                   key={product.id} 
                   className="product-list-item"
@@ -504,7 +543,7 @@ export default function StorePage() {
                   {/* ✅ PICHA KWA LIST VIEW INABONYEKA KUFUNGUA LIGHTBOX PIA */}
                   <div 
                     className="cursor-pointer"
-                    onClick={(e) => openImageLightbox(product, e)}
+                       onClick={(e) => openImageLightbox(product, e, index)} 
                   >
                     <img 
                       src={product.cover_image_url || product.cover_image || 'https://placehold.co/80'} 
@@ -531,10 +570,7 @@ export default function StorePage() {
 
       <Footer />
 
-      {/* ===================================================== */}
-      {/* ✅ LIGHTBOX PORTAL (IMEWEKWA MWISHONI KABISA)        */}
-      {/* ===================================================== */}
-      {isLightboxOpen && lightboxImages.length > 0 && createPortal(
+        {isLightboxOpen && lightboxImages.length > 0 && createPortal(
         <div className="lightbox-overlay" onClick={closeLightbox}>
           <div className="lightbox-content-wrapper" onClick={(e) => e.stopPropagation()}>
             
@@ -551,12 +587,13 @@ export default function StorePage() {
                 className="lightbox-image"
               />
 
-              {lightboxImages.length > 1 && (
+              {/* ✅ MISHALE INABADILISHA BIDHAA (Sio picha tu) */}
+              {lightboxProductList.length > 1 && (
                 <>
-                  <button onClick={prevImage} className="lightbox-nav-btn left">
+                  <button onClick={goToPrevProduct} className="lightbox-nav-btn left">
                     <ChevronLeft size={24} />
                   </button>
-                  <button onClick={nextImage} className="lightbox-nav-btn right">
+                  <button onClick={goToNextProduct} className="lightbox-nav-btn right">
                     <ChevronRight size={24} />
                   </button>
                 </>
@@ -564,8 +601,19 @@ export default function StorePage() {
             </div>
 
             <div className="lightbox-counter">
-              {lightboxIndex + 1} / {lightboxImages.length}
+              Bidhaa {lightboxProductIndex + 1} / {lightboxProductList.length}
             </div>
+
+            {/* ✅ BUTTON YA "VIEW MORE" (Inaenda kwenye Product Details) */}
+            <button 
+              className="lightbox-view-more-btn" 
+              onClick={() => { 
+                closeLightbox(); 
+                navigate(`/product/${lightboxProductId}`); 
+              }}
+            >
+              View More
+            </button>
           </div>
         </div>,
         document.body
