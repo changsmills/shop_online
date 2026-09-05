@@ -534,3 +534,41 @@
 .mega-menu-close-btn:active {
   transform: scale(0.95);
 }
+
+/* ============================================ */
+/* FIX: DARK MODE SELL ON SKYFALL BUTTON         */
+/* ============================================ */
+@media (prefers-color-scheme: dark) {
+  .nav-sell-link {
+    background-color: #1e293b !important; /* Badilisha nyeupe kuwa nyeusi! */
+    border: 1px solid #334155 !important;
+    color: #e2e8f0 !important;
+  }
+  
+  .nav-sell-link:hover {
+    background-color: #0f172a !important;
+    border-color: #ff6a00 !important;
+    color: #ff6a00 !important;
+  }
+  
+  /* Ikiwa ni transparent (mtumiaji ameingia) */
+  .nav-sell-link-transparent {
+    background-color: transparent !important;
+    border-color: #334155 !important;
+  }
+  
+  .nav-sell-link-transparent:hover {
+    border-color: #ff6a00 !important;
+  }
+}
+/* 🔥 FIX LA MWISHO: EMPTY STATE (Sanduku Nyeupe) - Desktop Mega Menu */
+@media (prefers-color-scheme: dark) {
+  .empty-state {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+  }
+  
+  .empty-state p {
+    color: var(--text-primary) !important;
+  }
+}

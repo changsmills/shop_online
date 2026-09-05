@@ -38,7 +38,7 @@ export default function MobileCategorySlider({
   // Kwa sababu hatuna "All" kwenye backend, tutaunda hapa kwa UI pekee
   const allCategory = { id: null, name: 'All', name_sw: 'Zote' };
 
-  return (
+return (
     <div style={{ 
       position: 'relative', 
       display: 'flex', 
@@ -54,7 +54,7 @@ export default function MobileCategorySlider({
             position: 'absolute',
             left: 0,
             zIndex: 10,
-            background: 'linear-gradient(90deg, white 60%, transparent)',
+            background: 'linear-gradient(90deg, var(--bg-body) 60%, transparent)',
             border: 'none',
             borderRadius: '0 20px 20px 0',
             width: '32px',
@@ -64,7 +64,8 @@ export default function MobileCategorySlider({
             justifyContent: 'flex-start',
             paddingLeft: '6px',
             cursor: 'pointer',
-            boxShadow: 'none'
+            boxShadow: 'none',
+            color: 'var(--text-secondary)' // 🔥 Rangi ya mshale kwenye dark mode
           }}
         >
           <ChevronLeft size={20} strokeWidth={2} />
@@ -96,9 +97,8 @@ export default function MobileCategorySlider({
             flexShrink: 0,
             padding: '6px 16px',
             borderRadius: '40px',
-            // Angalia: Sasa inakagua kama selectedCategory ni null au id yake ni null
-            backgroundColor: (selectedCategory === null || selectedCategory?.id === null) ? '#000000' : '#f0f0f0',
-            color: (selectedCategory === null || selectedCategory?.id === null) ? '#ffffff' : '#333333',
+            backgroundColor: (selectedCategory === null || selectedCategory?.id === null) ? 'var(--brand-orange)' : 'var(--bg-secondary)',
+            color: (selectedCategory === null || selectedCategory?.id === null) ? '#ffffff' : 'var(--text-primary)',
             cursor: 'pointer',
             fontSize: '14px',
             fontWeight: (selectedCategory === null || selectedCategory?.id === null) ? '600' : '500',
@@ -124,8 +124,8 @@ export default function MobileCategorySlider({
                 flexShrink: 0,
                 padding: '6px 16px',
                 borderRadius: '40px',
-                backgroundColor: isActive ? '#000000' : '#f0f0f0',
-                color: isActive ? '#ffffff' : '#333333',
+                backgroundColor: isActive ? 'var(--brand-orange)' : 'var(--bg-secondary)',
+                color: isActive ? '#ffffff' : 'var(--text-primary)',
                 cursor: 'pointer',
                 fontSize: '14px',
                 fontWeight: isActive ? '600' : '500',
@@ -148,7 +148,7 @@ export default function MobileCategorySlider({
             position: 'absolute',
             right: 0,
             zIndex: 10,
-            background: 'linear-gradient(270deg, white 60%, transparent)',
+            background: 'linear-gradient(270deg, var(--bg-body) 60%, transparent)',
             border: 'none',
             borderRadius: '20px 0 0 20px',
             width: '32px',
@@ -158,7 +158,8 @@ export default function MobileCategorySlider({
             justifyContent: 'flex-end',
             paddingRight: '6px',
             cursor: 'pointer',
-            boxShadow: 'none'
+            boxShadow: 'none',
+            color: 'var(--text-secondary)' // 🔥 Rangi ya mshale kwenye dark mode
           }}
         >
           <ChevronRight size={20} strokeWidth={2} />

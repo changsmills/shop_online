@@ -771,3 +771,95 @@
     display: flex !important;
   }
 }
+
+/* ========================================= */
+/* 🔥 FINAL FIX: MOBILE DARK MODE (Lazima iwe mwisho) */
+/* ========================================= */
+@media (max-width: 768px) {
+    @media (prefers-color-scheme: dark) {
+        .main-header {
+            background: #0d1117 !important;
+            border-top: 1px solid #30363d !important;
+            border-bottom: 1px solid #30363d !important;
+            box-shadow: none !important;
+        }
+
+        .search-bar-container {
+            background-color: #161b22 !important;
+            border: 1px solid #30363d !important;
+        }
+        .search-input {
+            color: #f0f6fc !important;
+            background: transparent !important;
+        }
+        .search-input::placeholder {
+            color: #8b949e !important;
+        }
+
+        .search-submit-btn {
+            background-color: #ff6a00 !important;
+            color: white !important;
+        }
+
+        .logo-wrapper .logo-text {
+            color: #ff6a00 !important;
+        }
+        .logo-wrapper .logo-icon-box {
+            background-color: #0d1117 !important;
+            border-color: #ff6a00 !important;
+        }
+
+        .mobile-back-btn svg {
+            color: #f0f6fc !important;
+        }
+
+        .header-icon-btn, 
+        .category-toggle, 
+        .nav-sell-link, 
+        .nav-item {
+            color: #f0f6fc !important;
+        }
+
+        .mobile-menu-overlay {
+            background-color: #0d1117 !important;
+            border-bottom-color: #30363d !important;
+        }
+        .mobile-nav-links a {
+            color: #f0f6fc !important;
+        }
+        .mobile-user-tools button {
+            color: #f0f6fc !important;
+        }
+    }
+}
+
+/* 🔥 SMALL SCREEN (≤480px) FIX - MOBILE DARK MODE */
+@media (max-width: 480px) {
+    @media (prefers-color-scheme: dark) {
+        .main-header {
+            background: #0d1117 !important;
+            border-top: 1px solid #30363d !important;
+            border-bottom: 1px solid #30363d !important;
+        }
+        .search-bar-container {
+            background-color: #161b22 !important;
+            border: 1px solid #30363d !important;
+        }
+        .search-input {
+            color: #f0f6fc !important;
+        }
+        .logo-wrapper .logo-text {
+            color: #ff6a00 !important;
+        }
+        .logo-wrapper .logo-icon-box {
+            background-color: #0d1117 !important;
+            border-color: #ff6a00 !important;
+        }
+        .search-submit-btn {
+            background-color: #ff6a00 !important;
+        }
+        .mobile-back-btn svg {
+            color: #f0f6fc !important;
+        }
+    }
+}

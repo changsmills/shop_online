@@ -1159,3 +1159,68 @@ html, body {
 .location-modal-btn.cancel:hover {
   background: #e0e0e0;
 }
+
+/* ============================================ */
+/* 🔥 FIX LA MWISHO: DARK MODE YA MOBILE MODAL  */
+/* ============================================ */
+@media (prefers-color-scheme: dark) {
+  .mobile-categories-modal {
+    background: var(--bg-body) !important;
+  }
+  .mc-header {
+    background: var(--bg-header) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+  }
+  .mc-back-btn, .mc-close-btn {
+    color: var(--text-primary) !important;
+  }
+  .mc-title {
+    color: var(--text-primary) !important;
+  }
+  .mc-sidebar {
+    background: var(--bg-secondary) !important;
+    border-right: 1px solid var(--border-color) !important;
+  }
+  .mc-sidebar-item {
+    color: var(--text-secondary) !important;
+  }
+  .mc-sidebar-item.active {
+    background: var(--bg-primary) !important;
+    color: var(--brand-orange) !important;
+    border-left: 3px solid var(--brand-orange) !important;
+  }
+  .mc-content {
+    background: var(--bg-primary) !important;
+  }
+  .mc-section-title {
+    color: var(--text-primary) !important;
+  }
+  .mc-rec-image {
+    background: var(--bg-secondary) !important;
+  }
+  .mc-recommendation-item p {
+    color: var(--text-primary) !important;
+  }
+  
+  /* Kwa screens ndogo (≤480px) */
+  @media (max-width: 480px) {
+    .mc-sidebar {
+      background: var(--bg-secondary) !important;
+    }
+    .mc-content {
+      background: var(--bg-primary) !important;
+    }
+  }
+}
+/* 🔥 FIX LA MWISHO: EMPTY STATE (Sanduku Nyeupe) - Mobile & Desktop */
+@media (prefers-color-scheme: dark) {
+  .empty-state {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+  }
+  
+  /* Hii inazidi rangi za inline styles (color: #666 na #999) */
+  .empty-state p {
+    color: var(--text-primary) !important;
+  }
+}

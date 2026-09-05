@@ -447,3 +447,106 @@
   }
   .all-stores-skeleton-grid { gap: 8px; }
 }
+/* ============================================ */
+/* DARK MODE SUPPORT - AllStores.css             */
+/* ============================================ */
+@media (prefers-color-scheme: dark) {
+    .all-stores-page {
+        background-color: #0d1117 !important;
+    }
+
+    .search-filter-sidebar.store-filter-sidebar {
+        background: #161b22 !important;
+        border: 1px solid #30363d !important;
+    }
+
+    .filter-header {
+        color: #f0f6fc !important;
+        border-bottom: 1px solid #30363d !important;
+    }
+
+    .filter-section-title {
+        color: #f0f6fc !important;
+    }
+
+    .filter-item {
+        color: #8b949e !important;
+    }
+
+    .filter-item:hover {
+        background-color: #21262d !important;
+    }
+
+    .filter-item.active {
+        background-color: #2d1a0a !important; /* Orange tint nyeusi */
+        color: #ff6a00 !important;
+    }
+
+    .radio-label {
+        color: #8b949e !important;
+    }
+
+    .all-stores-info-bar {
+        color: #8b949e !important;
+    }
+    .all-stores-count {
+        color: #8b949e !important;
+    }
+
+    .all-stores-empty {
+        background-color: #161b22 !important;
+        color: #8b949e !important;
+        border: 1px solid #30363d !important;
+    }
+
+    .reset-filters-btn {
+        background-color: #ff6a00 !important;
+        color: white !important;
+    }
+
+    .loading-more {
+        color: #8b949e !important;
+    }
+
+    .loader-small {
+        border: 3px solid #30363d !important;
+        border-top-color: #ff6a00 !important;
+    }
+
+    .end-of-results {
+        color: #8b949e !important;
+    }
+
+    /* Skeleton Cards */
+    .all-stores-skeleton-card {
+        background: #161b22 !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    .all-stores-skeleton-image,
+    .all-stores-skeleton-text {
+        background: #30363d !important;
+    }
+
+    /* Radio button accent color */
+    .radio-label input[type="radio"] {
+        accent-color: #ff6a00;
+    }
+
+    /* Mobile filter adjustments */
+    @media (max-width: 768px) {
+        .filter-item {
+            background-color: #161b22 !important;
+            border: 1px solid #30363d !important;
+        }
+        .filter-item.active {
+            border-color: #ff6a00 !important;
+        }
+        .filter-list {
+            background-color: transparent !important;
+        }
+        .search-filter-sidebar.store-filter-sidebar {
+            background: transparent !important;
+        }
+    }
+}

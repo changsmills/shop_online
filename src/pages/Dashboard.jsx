@@ -945,11 +945,7 @@ const handleSubCategoryHover = (subCategory) => {
       : (i18n.language === 'sw' ? (selectedSubCategory?.name_sw || selectedSubCategory?.name) : selectedSubCategory?.name)}
   </h3>
   <div className="content-header-actions">
-    {viewMode === 'products' && (
-      <button onClick={handleViewAll} className="view-all-btn">
-        {t('view_all')} <ChevronRight size={14} />
-      </button>
-    )}
+    
     {/* 🔥 ONGEZA X YA KUFUNGA MEGA MENU */}
     <button 
       onClick={() => {

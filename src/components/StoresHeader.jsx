@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Globe, ChevronDown, ArrowLeft } from 'lucide-react';
 import Logo from './Logo';
-import "../Header.css"; 
+import "../StoreHeader.css"; 
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import StoreSearchBar from './StoreSearchBar'; // ✅ Tumia StoreSearchBar mpya
