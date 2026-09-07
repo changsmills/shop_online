@@ -21,12 +21,18 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-default-key-change-this')
 #DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 # 🔥 BADILISHA KUWA TRUE ILI UONE ERRORS KWENYE RENDER LOGS!
-DEBUG = True 
+DEBUG = False 
 
 #ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-ALLOWED_HOSTS = ['*'] 
-# Au baadaye: ALLOWED_HOSTS = ['skyfall.com', 'www.skyfall.com']
+ALLOWED_HOSTS = [
+    'skyfall.co.tz',                    # Domain yako (bila www)
+    'www.skyfall.co.tz',                # Domain yako (na www)
+    'shop-online-r9z4.onrender.com',    # Backend yako ya Live!
+    'shop-online-tan.vercel.app',       # Frontend yako ya Live!
+    'localhost', 
+    '127.0.0.1'
+]
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # 🔥 Inatumia SMTP halisi (Gmail)
@@ -55,6 +61,9 @@ INSTALLED_APPS = [
     'cloudinary',
      # 'cloudinary_storage', # 🔥 FUTE HII KABISA!
 
+    'csp',  # 🔥 ONGEZA HII HAPA!
+
+
      'dj_rest_auth',
     'django.contrib.sites',
     'allauth',
@@ -62,7 +71,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
 
-    # Our apps
+    
+
     'api',
    'users',
     'products',
@@ -94,9 +104,11 @@ AUTH_USER_MODEL = 'users.User'  # Sio 'products.Profile'!
 
 
 MIDDLEWARE = [
+    'skyfall_backend.middleware.RemoveServerHeaderMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware', # 🔥 ONGEZA HII! (Inapaswa kuwa chini ya SecurityMiddleware)
     'corsheaders.middleware.CorsMiddleware',  # Must be at the top!
     'django.middleware.security.SecurityMiddleware',
+    'csp.middleware.CSPMiddleware',  # 🔥 2. ONGEZA HII HAPA!
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -164,12 +176,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ==================== CORS CONFIGURATION ====================
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
     'http://localhost:5173',
-    'https://shop-online-tan.vercel.app', 
+    'http://localhost:3000',
+    'https://shop-online-tan.vercel.app',
+    'https://skyfall.co.tz',           # 🔥 Ongeza hii!
+    'https://www.skyfall.co.tz',       # 🔥 Ongeza hii pia!
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 
 # ==================== CSRF TRUSTED ORIGINS (ONGEZA HII!) ====================
@@ -198,6 +212,15 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ),
+    # 🔥 Rate limiting
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',
+        'user': '1000/day'
+    }
 }
 
 # ==================== JWT CONFIGURATION ====================
@@ -232,4 +255,99 @@ CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
     'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+}
+
+# ==================== CONTENT SECURITY POLICY (CSP) ====================
+if DEBUG:
+    CONTENT_SECURITY_POLICY = {
+        "DIRECTIVES": {
+            "default-src": ["'self'"],
+            "script-src": ["'self'", "'unsafe-inline'"],
+            "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+            "font-src": ["'self'", "https://fonts.gstatic.com"],
+            "img-src": ["'self'", "data:"],
+            "connect-src": ["'self'", "http://localhost:5173", "http://127.0.0.1:8000"],
+            "frame-ancestors": ["'none'"],
+            "form-action": ["'self'"],
+            "base-uri": ["'self'"],
+            "object-src": ["'none'"],
+        },
+    }
+else:
+    CONTENT_SECURITY_POLICY = {
+        "DIRECTIVES": {
+            "default-src": ["'self'"],
+            "script-src": ["'self'"],
+            "style-src": ["'self'", "https://fonts.googleapis.com"],
+            "font-src": ["'self'", "https://fonts.gstatic.com"],
+            "img-src": ["'self'", "data:"],
+            "connect-src": ["'self'", "https://shop-online-tan.vercel.app", "https://skyfall.co.tz", "https://www.skyfall.co.tz"],  # 🔥 Ongeza hizi!
+            "frame-ancestors": ["'none'"],
+            "form-action": ["'self'"],
+            "base-uri": ["'self'"],
+            "object-src": ["'none'"],
+        },
+    }
+
+# ==================== SECURITY HEADERS ====================
+# Zuia MIME sniffing
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Zuia kufichua taarifa za URL kwenye browser nyingine
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# Zuia Clickjacking
+X_FRAME_OPTIONS = 'DENY'
+
+if DEBUG:
+    SESSION_COOKIE_SECURE = False   
+    CSRF_COOKIE_SECURE = False     
+else:
+    SESSION_COOKIE_SECURE = True    
+    CSRF_COOKIE_SECURE = True       
+
+
+    # ============================================================
+# 🔥 ULTIMATE SECURITY SETTINGS - ONGEZA HIZI ZOTE!
+# ============================================================
+
+# 1. HTTPS na HSTS
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    
+    # HSTS - Force browser kutumia HTTPS
+    SECURE_HSTS_SECONDS = 31536000  # Mwaka 1
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+# 2. Cookies zote ziwe safe
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'  # Au 'Strict' kwa usalama zaidi
+CSRF_COOKIE_SAMESITE = 'Lax'
+
+# 3. Zuia directory listing
+# (Ikiwa unatumia Apache/Nginx, weka kwenye server config, lakini hii ni backup)
+import os
+if not DEBUG:
+    # Hakikisha hakuna folder inayoonyeshwa
+    pass
+
+# 4. Logging security (Ili kufuatilia mashambulizi)
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.security': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+    },
 }

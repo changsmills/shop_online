@@ -604,16 +604,18 @@ export default function StorePage() {
               Bidhaa {lightboxProductIndex + 1} / {lightboxProductList.length}
             </div>
 
-            {/* ✅ BUTTON YA "VIEW MORE" (Inaenda kwenye Product Details) */}
-            <button 
-              className="lightbox-view-more-btn" 
+              {/* ✅ BUTTON YA "VIEW MORE" (Inaenda kwenye Product Details kwenye TAB MPYA) */}
+                  <button 
+             className="lightbox-view-more-btn" 
               onClick={() => { 
-                closeLightbox(); 
-                navigate(`/product/${lightboxProductId}`); 
-              }}
-            >
+              closeLightbox(); 
+           // 🔥 BADILISHO HAPA: Tumia window.open badala ya navigate
+             window.open(`/product/${lightboxProductId}`, '_blank'); 
+             }}
+              >
               View More
-            </button>
+                 </button>
+                 
           </div>
         </div>,
         document.body
