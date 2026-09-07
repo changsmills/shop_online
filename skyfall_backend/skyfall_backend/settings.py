@@ -61,7 +61,6 @@ INSTALLED_APPS = [
     'cloudinary',
      # 'cloudinary_storage', # 🔥 FUTE HII KABISA!
 
-    'csp',  # 🔥 ONGEZA HII HAPA!
 
 
      'dj_rest_auth',
@@ -108,7 +107,6 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware', # 🔥 ONGEZA HII! (Inapaswa kuwa chini ya SecurityMiddleware)
     'corsheaders.middleware.CorsMiddleware',  # Must be at the top!
     'django.middleware.security.SecurityMiddleware',
-    'csp.middleware.CSPMiddleware',  # 🔥 2. ONGEZA HII HAPA!
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -257,37 +255,6 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
 }
 
-# ==================== CONTENT SECURITY POLICY (CSP) ====================
-if DEBUG:
-    CONTENT_SECURITY_POLICY = {
-        "DIRECTIVES": {
-            "default-src": ["'self'"],
-            "script-src": ["'self'", "'unsafe-inline'"],
-            "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-            "font-src": ["'self'", "https://fonts.gstatic.com"],
-            "img-src": ["'self'", "data:"],
-            "connect-src": ["'self'", "http://localhost:5173", "http://127.0.0.1:8000"],
-            "frame-ancestors": ["'none'"],
-            "form-action": ["'self'"],
-            "base-uri": ["'self'"],
-            "object-src": ["'none'"],
-        },
-    }
-else:
-    CONTENT_SECURITY_POLICY = {
-        "DIRECTIVES": {
-            "default-src": ["'self'"],
-            "script-src": ["'self'"],
-            "style-src": ["'self'", "https://fonts.googleapis.com"],
-            "font-src": ["'self'", "https://fonts.gstatic.com"],
-            "img-src": ["'self'", "data:"],
-            "connect-src": ["'self'", "https://shop-online-tan.vercel.app", "https://skyfall.co.tz", "https://www.skyfall.co.tz"],  # 🔥 Ongeza hizi!
-            "frame-ancestors": ["'none'"],
-            "form-action": ["'self'"],
-            "base-uri": ["'self'"],
-            "object-src": ["'none'"],
-        },
-    }
 
 # ==================== SECURITY HEADERS ====================
 # Zuia MIME sniffing
