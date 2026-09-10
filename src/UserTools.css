@@ -258,3 +258,111 @@
         padding: 20px;
     }
 }
+/* ============================================
+   CART DROPDOWN
+   ============================================ */
+
+.cart-dropdown-menu {
+  background: #ffffff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.cart-dropdown-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #000000;
+  margin: 0 0 8px 0;
+}
+
+.cart-dropdown-divider {
+  height: 1px;
+  background: #eee;
+  margin: 8px 0;
+}
+
+.cart-dropdown-empty {
+  text-align: center;
+  padding: 16px 0;
+  color: #999;
+}
+
+.cart-dropdown-empty-icon {
+  margin: 0 auto 8px auto;
+  opacity: 0.2;
+  display: block;
+}
+
+.cart-dropdown-empty-text {
+  font-size: 13px;
+  margin: 0;
+  color: #999;
+}
+
+.cart-dropdown-count {
+  padding: 8px 0;
+}
+
+.cart-dropdown-count p {
+  font-size: 13px;
+  color: #ff6a00;
+  font-weight: 700;
+  margin: 0;
+}
+
+.cart-dropdown-btn {
+  margin-top: 8px;
+  display: block;
+  text-align: center;
+  background: #ff6a00;
+  color: #ffffff;
+  border-radius: 9999px;
+  padding: 8px 0;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+
+.cart-dropdown-btn:hover {
+  background: #e55a00;
+}
+
+/* ============================================
+   DARK MODE — Cart Dropdown
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  .cart-dropdown-menu {
+    background: #0a0a0a;
+    border-color: #1f1f1f;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+  }
+
+  .cart-dropdown-title {
+    color: #ffffff;
+  }
+
+  .cart-dropdown-divider {
+    background: #1f1f1f;
+  }
+
+  .cart-dropdown-empty,
+  .cart-dropdown-empty-text {
+    color: #6b6b6b;
+  }
+
+  .cart-dropdown-empty-icon {
+    color: #6b6b6b;
+  }
+
+  .cart-dropdown-count p {
+    color: #ff6a00;
+  }
+
+  .cart-dropdown-btn {
+    background: #ff6a00;
+    color: #ffffff;
+  }
+}

@@ -1,16 +1,17 @@
 // src/components/SkeletonLayout.jsx
 import React from 'react';
 import SkeletonCard from './SkeletonCard';
+import NavBottom from './BottomNav'; // ✅ 1. Import NavBottom (Badilisha jina kama unaitwa tofauti)
 import '../App_skeleton.css';
 
 const SkeletonLayout = () => {
   return (
     <div className="skeleton-layout-wrapper">
       
-      {/* Mobile & Tablet Layout - Inaonekana <1024px */}
+      {/* Mobile & Tablet Layout */}
       <div className="skeleton-mobile">
         
-        {/* ✅ ONGEZA HII: Skeleton ya Category Slider kwa Mobile */}
+        {/* Skeleton ya Category Slider */}
         <div className="skeleton-category-slider">
           <div className="skeleton-cat-item active"></div>
           <div className="skeleton-cat-item"></div>
@@ -20,12 +21,13 @@ const SkeletonLayout = () => {
         </div>
 
         <div className="skeleton-banner-mobile"></div>
+        
         <div className="skeleton-grid-mobile">
           {[1, 2, 3, 4, 5, 6].map(i => <SkeletonCard key={i} />)}
         </div>
       </div>
 
-      {/* Desktop Layout - Inaonekana >1024px */}
+      {/* Desktop Layout */}
       <div className="skeleton-desktop">
         <div className="skeleton-top-row">
           <div className="skeleton-sidebar">
@@ -40,6 +42,11 @@ const SkeletonLayout = () => {
         <div className="skeleton-grid-desktop">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(i => <SkeletonCard key={i} />)}
         </div>
+      </div>
+
+      {/* ✅ 2. Ongeza NavBottom hapa ili ionekane kwenye simu wakati wa kupakia */}
+      <div className="skeleton-nav-bottom-wrapper">
+        <NavBottom />
       </div>
 
     </div>

@@ -118,56 +118,62 @@ export default function UserTools({ session: propSession, isMobile }) {
             {cartCount > 0 && <span style={{ position: 'absolute', top: '-4px', right: '-6px', background: '#ff4e00', color: 'white', borderRadius: '50%', width: '16px', height: '16px', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>{cartCount}</span>}
           </div>
         </Link>
+{isCartOpen && (
+  <div 
+    className="alibaba-dropdown-menu cart-dropdown-menu"
+    style={{ 
+      position: 'absolute', 
+      top: '40px', 
+      right: '0', 
+      width: '280px', 
+      zIndex: 999 
+    }}
+    onMouseEnter={() => handleEnter(setIsCartOpen, cartTimer)} 
+    onMouseLeave={() => handleLeave(setIsCartOpen, cartTimer)}
+  >
+    <p className="cart-dropdown-title">Shopping Cart</p>
+    <div className="cart-dropdown-divider"></div>
+    {cartItems.length === 0 ? (
+      <div className="cart-dropdown-empty">
+        <ShoppingCart size={40} strokeWidth={1} className="cart-dropdown-empty-icon" />
+        <p className="cart-dropdown-empty-text">Cart is empty</p>
+      </div>
+    ) : (
+      <div className="cart-dropdown-count">
+        <p>{cartCount} items selected</p>
+      </div>
+    )}
+    <Link to="/cart" className="cart-dropdown-btn">Go to Cart</Link>
+  </div>
+)}
 
-        {isCartOpen && (
-          <div 
-            className="alibaba-dropdown-menu"
-            style={{ position: 'absolute', top: '40px', right: '0', background: 'white', width: '280px', boxShadow: '0 8px 20px rgba(0,0,0,0.1)', borderRadius: '12px', border: '1px solid #eee', zIndex: 999, padding: '16px' }}
-            onMouseEnter={() => handleEnter(setIsCartOpen, cartTimer)} 
-            onMouseLeave={() => handleLeave(setIsCartOpen, cartTimer)}
-          >
-            <p className="font-bold text-sm mb-2" style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>Shopping Cart</p>
-            <div className="dropdown-divider" style={{ height: '1px', background: '#eee', margin: '8px 0' }}></div>
-            {cartItems.length === 0 ? (
-              <div className="text-center py-4 text-gray-400" style={{ textAlign: 'center', padding: '16px 0', color: '#999' }}>
-                <ShoppingCart size={40} strokeWidth={1} style={{ margin: '0 auto 8px auto', opacity: 0.2 }} />
-                <p className="text-sm" style={{ fontSize: '13px' }}>Cart is empty</p>
-              </div>
-            ) : (
-              <div className="py-2" style={{ padding: '8px 0' }}>
-                 <p className="text-sm text-orange-600 font-bold" style={{ color: '#FF6600', fontWeight: 'bold', fontSize: '13px' }}>{cartCount} items selected</p>
-              </div>
-            )}
-            <Link to="/cart" className="mt-2 block text-center py-2 rounded-full bg-orange-500 text-white text-sm font-bold" style={{ marginTop: '8px', display: 'block', textAlign: 'center', background: '#FF6600', color: 'white', borderRadius: '9999px', padding: '8px 0', textDecoration: 'none' }}>Go to Cart</Link>
-          </div>
-        )}
       </div>
 
       {!session ? (
         <div className="flex items-center gap-4" style={{ display: 'flex', gap: isMobile ? '8px' : '12px', alignItems: 'center' }}>
            <Link 
-             to="/dashboard/login" 
-             className="text-sm font-semibold text-gray-700 hover:text-orange-600 transition"
-             style={{ color: '#333', textDecoration: 'none', cursor: 'pointer', fontSize: isMobile ? '13px' : '14px' }}
-           >
-             Sign in
-           </Link>
+  to="/dashboard/login" 
+  className="text-sm font-semibold text-gray-700 hover:text-orange-600 transition"
+  style={{ color: '#333', textDecoration: 'none', cursor: 'pointer', fontSize: isMobile ? '13px' : '14px' }}
+>
+  Sign in
+</Link>
 
-           <Link 
-             to="/dashboard/register" 
-             className="px-5 py-2 text-sm font-bold text-white rounded-full transition"
-             style={{ 
-               backgroundColor: '#FF6600', 
-               color: 'white', 
-               borderRadius: '9999px', 
-               textDecoration: 'none',
-               boxShadow: '0 4px 6px rgba(255,102,0,0.2)',
-               padding: isMobile ? '4px 12px' : '8px 20px',
-               fontSize: isMobile ? '12px' : '14px'
-             }}
-           >
-             Create account
-           </Link>
+<Link 
+  to="/dashboard/register" 
+  className="px-5 py-2 text-sm font-bold text-white rounded-full transition"
+  style={{ 
+    backgroundColor: '#FF6600', 
+    color: 'white', 
+    borderRadius: '9999px', 
+    textDecoration: 'none',
+    boxShadow: '0 4px 6px rgba(255,102,0,0.2)',
+    padding: isMobile ? '4px 12px' : '8px 20px',
+    fontSize: isMobile ? '12px' : '14px'
+  }}
+>
+  Create account
+</Link>
         </div>
       ) : (
         

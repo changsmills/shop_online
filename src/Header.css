@@ -11,10 +11,10 @@
     width: 100%;
     height: auto;
     z-index: 1000;
-    background: white;
-    /* ✅ MISTARI MIWILI - CHAGUA MOJA TU HAPA CHINI */
-    border-top: 2px solid #eeebe8;    /* ✅ MSTARI MACHUNGWA JUU */
-    border-bottom: 1px solid #e5e7eb; /* ✅ MSTARI KIJIVU CHINI */
+    background: var(--bg-header, #ffffff);
+    color: var(--text-primary, #000000);
+    border-top: 2px solid var(--border-light, #f0f0f0);
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
@@ -54,8 +54,8 @@
     flex: 1;
     max-width: 900px;
     height: 40px;
-    background-color: #fff;
-    border: 2px solid #ddd;
+    background-color: var(--input-bg, #ffffff);
+    border: 2px solid var(--input-border, #e0e0e0);
     border-radius: 50px;
     padding: 1px 1px 1px 15px;
     transition: 0.3s;
@@ -73,6 +73,8 @@
     font-size: 16px;
     width: 100%;
     padding: 0 10px;
+    color: var(--input-text, #000000);
+    background: transparent;
 }
 
 .search-tools {
@@ -118,7 +120,8 @@
 .header-navigation-row {
     margin-top: 0;
     position: relative;
-    border-top: 1px solid #f3f4f6;
+    border-top: 1px solid var(--border-light, #f0f0f0);
+    background: var(--bg-header, #ffffff);
 }
 
 .nav-links-container {
@@ -138,17 +141,14 @@
 .category-toggle {
     cursor: pointer !important;
     font-weight: 700;
-    color: #333;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    color: var(--text-primary, #000000);
 }
 
 .nav-sell-link {
     font-weight: 700;
-    border-left: 1px solid #eee;
+    border-left: 1px solid var(--border-light, #f0f0f0);
     padding-left: 12px;
-    color: #333;
+    color: var(--text-primary, #000000);
     text-decoration: none;
 }
 
@@ -274,6 +274,7 @@
 .dropdown-or-divider span { padding: 0 10px; background: #fff; }
 
 .header-dropdown-wrapper { position: relative; }
+
 .header-icon-btn {
     display: flex;
     align-items: center;
@@ -283,8 +284,9 @@
     cursor: pointer;
     font-weight: 500;
     font-size: 13px;
-    color: #333;
+    color: var(--text-primary, #000000);
 }
+
 .header-icon-text { font-weight: bold; }
 .header-icon.small { width: 14px; height: 14px; }
 
@@ -581,108 +583,6 @@
 
 
 
-/* ========================================= */
-/* 11. DARK MODE SUPPORT (Imeboreshwa)        */
-/* ========================================= */
-@media (prefers-color-scheme: dark) {
-    /* 🔥 Rangi kuu ya header - Navy Blue ya Skyfall */
-    .main-header {
-        background: #1a1a2e;
-        border-top: 2px solid #2d2d44;
-        border-bottom: 1px solid #2d2d44;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    }
-
-    /* 🔥 Rangi ya Maandishi ya Logo (Skyfall Orange inabaki) */
-    .main-header .logo-text {
-        color: #ff6a00 !important;
-    }
-    .main-header .logo-icon-box {
-        background-color: #1a1a2e !important;
-        border-color: #ff6a00 !important;
-    }
-
-    /* 🔥 Search Bar - Background nyeusi kidogo na Border */
-    .search-bar-container {
-        background-color: #2d2d44 !important;
-        border: 2px solid #334155 !important;
-    }
-    .search-bar-container:hover {
-        border-color: #ff6a00 !important;
-    }
-    .search-input {
-        color: #f1f5f9 !important;
-        background: transparent !important;
-    }
-    .search-input::placeholder {
-        color: #94a3b8 !important;
-    }
-
-    /* 🔥 Vifungo vya Search na Camera */
-    .search-submit-btn {
-        background-color: #ff6a00 !important;
-        color: white !important;
-    }
-    .camera-button {
-        color: #94a3b8 !important;
-    }
-    .camera-button:hover {
-        color: #ff6a00 !important;
-    }
-
-    /* 🔥 Maandishi ya Navigation */
-    .nav-item,
-    .category-toggle,
-    .nav-sell-link,
-    .header-icon-btn {
-        color: #e2e8f0 !important;
-    }
-    .nav-item:hover,
-    .category-toggle:hover,
-    .header-icon-btn:hover {
-        color: #ff6a00 !important;
-    }
-
-    /* 🔥 Dropdown Cards (Language na Location) */
-    .dropdown-card {
-        background: #1e293b;
-        border-color: #334155;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-    .dropdown-header h3 {
-        color: #f1f5f9;
-    }
-    .dropdown-header p {
-        color: #94a3b8;
-    }
-    .dropdown-field label {
-        color: #e2e8f0;
-    }
-    .dropdown-select,
-    .dropdown-input {
-        background: #0f172a;
-        border-color: #334155;
-        color: #e2e8f0;
-    }
-    .dropdown-select option {
-        background: #1e293b;
-        color: #e2e8f0;
-    }
-
-    /* 🔥 Mobile Menu Overlay */
-    @media (max-width: 768px) {
-        .mobile-menu-overlay {
-            background-color: #1a1a2e !important;
-            border-bottom-color: #2d2d44 !important;
-        }
-        .mobile-nav-links a {
-            color: #e2e8f0 !important;
-        }
-        .mobile-user-tools button {
-            color: #e2e8f0 !important;
-        }
-    }
-}
 
 
 /* =========================================
@@ -776,162 +676,177 @@
 }
 
 /* ========================================= */
-/* 🔥 FINAL FIX: MOBILE DARK MODE (Lazima iwe mwisho) */
-/* ========================================= */
-@media (max-width: 768px) {
-    @media (prefers-color-scheme: dark) {
-        .main-header {
-            background: #0d1117 !important;
-            border-top: 1px solid #30363d !important;
-            border-bottom: 1px solid #30363d !important;
-            box-shadow: none !important;
-        }
-
-        .search-bar-container {
-            background-color: #161b22 !important;
-            border: 1px solid #30363d !important;
-        }
-        .search-input {
-            color: #f0f6fc !important;
-            background: transparent !important;
-        }
-        .search-input::placeholder {
-            color: #8b949e !important;
-        }
-
-        .search-submit-btn {
-            background-color: #ff6a00 !important;
-            color: white !important;
-        }
-
-        .logo-wrapper .logo-text {
-            color: #ff6a00 !important;
-        }
-        .logo-wrapper .logo-icon-box {
-            background-color: #0d1117 !important;
-            border-color: #ff6a00 !important;
-        }
-
-        .mobile-back-btn svg {
-            color: #f0f6fc !important;
-        }
-
-        .header-icon-btn, 
-        .category-toggle, 
-        .nav-sell-link, 
-        .nav-item {
-            color: #f0f6fc !important;
-        }
-
-        .mobile-menu-overlay {
-            background-color: #0d1117 !important;
-            border-bottom-color: #30363d !important;
-        }
-        .mobile-nav-links a {
-            color: #f0f6fc !important;
-        }
-        .mobile-user-tools button {
-            color: #f0f6fc !important;
-        }
-    }
-}
-
-/* 🔥 SMALL SCREEN (≤480px) FIX - MOBILE DARK MODE */
-@media (max-width: 480px) {
-    @media (prefers-color-scheme: dark) {
-        .main-header {
-            background: #0d1117 !important;
-            border-top: 1px solid #30363d !important;
-            border-bottom: 1px solid #30363d !important;
-        }
-        .search-bar-container {
-            background-color: #161b22 !important;
-            border: 1px solid #30363d !important;
-        }
-        .search-input {
-            color: #f0f6fc !important;
-        }
-        .logo-wrapper .logo-text {
-            color: #ff6a00 !important;
-        }
-        .logo-wrapper .logo-icon-box {
-            background-color: #0d1117 !important;
-            border-color: #ff6a00 !important;
-        }
-        .search-submit-btn {
-            background-color: #ff6a00 !important;
-        }
-        .mobile-back-btn svg {
-            color: #f0f6fc !important;
-        }
-    }
-}
-
-/* ========================================= */
-/* 🔥 ULINZI WA MWISHO: HEADER MOBILE DARK MODE */
-/* ========================================= */
-@media (max-width: 768px) {
-    @media (prefers-color-scheme: dark) {
-        .main-header {
-            background: #0d1117 !important;
-            border: none !important;
-            box-shadow: none !important;
-        }
-        
-        /* HAPA NDIYO DIV UNAYOIONA NI NYEUPE */
-        .header-top-bar {
-            background: #0d1117 !important;
-        }
-        
-        .header-container {
-            background: #0d1117 !important;
-        }
-
-        .logo-wrapper {
-            background: #0d1117 !important;
-        }
-
-        .search-bar-wrapper {
-            background: #0d1117 !important;
-        }
-
-        .search-bar-container {
-            background: #161b22 !important; /* Inakuwa nyeusi kidogo */
-            border: 1px solid #30363d !important;
-        }
-
-        .search-input {
-            color: #f0f6fc !important;
-            background: transparent !important;
-        }
-
-        .search-input::placeholder {
-            color: #8b949e !important;
-        }
-    }
-}
-
-/* ========================================= */
-/* 🔥 FIX: FANYA CART, SIGN IN NA ICONS ZIONEKANE (DARK MODE) */
+/* DARK MODE — BLACK / WHITE / ORANGE         */
 /* ========================================= */
 @media (prefers-color-scheme: dark) {
-    /* Lazimisha maandishi na icons ziwe nyeupe */
-    .user-tools-container a,
-    .user-tools-container button,
-    .user-tools-container svg {
-        color: #ffffff !important;
-        fill: #ffffff !important;
-    }
+  .main-header {
+    background: var(--bg-header, #000000);
+    color: var(--text-primary, #ffffff);
+    border-top: 2px solid var(--border-color, #1f1f1f);
+    border-bottom: 1px solid var(--border-color, #1f1f1f);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  }
 
-    /* Hakikisha "Create account" inabaki nyeupe ndani ya butoni yake ya Orange */
-    .user-tools-container a[href*="register"],
-    .user-tools-container a[href*="register"] * {
-        color: #ffffff !important;
-    }
+  .header-container,
+  .header-top-bar,
+  .header-left-group,
+  .header-navigation-row {
+    background: var(--bg-header, #000000);
+    color: var(--text-primary, #ffffff);
+    border-color: var(--border-color, #1f1f1f);
+  }
 
-    /* Hakikisha maandishi ya "Sign in" yanaonekana vizuri */
-    .user-tools-container a[href*="login"] {
-        color: #ffffff !important;
-    }
+  /* Logo */
+  .logo-wrapper { background: transparent; }
+  .logo-text { color: #ff6a00; }
+  .logo-icon-box {
+    background-color: transparent;
+    border-color: #ff6a00;
+  }
+
+  /* Search bar */
+  .search-bar-wrapper { background: transparent; }
+  .search-bar-container {
+    background-color: var(--input-bg, #0f0f0f);
+    border: 2px solid var(--input-border, #1f1f1f);
+  }
+  .search-bar-container:hover { border-color: #ff6a00; }
+  .search-input {
+    color: var(--input-text, #ffffff);
+    background: transparent;
+  }
+  .search-input::placeholder {
+    color: var(--text-muted, #6b6b6b);
+  }
+
+  /* Nav links */
+  .category-toggle,
+  .nav-sell-link,
+  .nav-item {
+    color: var(--text-primary, #ffffff);
+  }
+  .category-toggle:hover,
+  .nav-sell-link:hover,
+  .nav-item:hover {
+    color: #ff6a00;
+  }
+  .nav-sell-link { border-left-color: var(--border-color, #1f1f1f); }
+
+  /* Header icons */
+  .header-icon-btn,
+  .header-icon-text {
+    color: var(--text-primary, #ffffff);
+  }
+  .header-icon-btn:hover {
+    color: #ff6a00;
+  }
+
+  /* Dropdown cards */
+  .dropdown-card {
+    background: var(--bg-card, #0a0a0a);
+    border-color: var(--border-color, #1f1f1f);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  }
+  .dropdown-header h3 { color: var(--text-primary, #ffffff); }
+  .dropdown-header p  { color: var(--text-secondary, #b0b0b0); }
+  .dropdown-field label { color: var(--text-primary, #ffffff); }
+  .dropdown-select,
+  .dropdown-input {
+    background: var(--input-bg, #0f0f0f);
+    border-color: var(--input-border, #1f1f1f);
+    color: var(--input-text, #ffffff);
+  }
+  .dropdown-select option {
+    background: var(--bg-card, #0a0a0a);
+    color: var(--text-primary, #ffffff);
+  }
+
+  /* Mobile menu */
+  .mobile-menu-overlay {
+    background-color: var(--bg-header, #000000);
+    border-bottom-color: var(--border-color, #1f1f1f);
+  }
+  .mobile-nav-links a { color: var(--text-primary, #ffffff); }
+  .mobile-user-tools button { color: var(--text-primary, #ffffff); }
+
+  /* Back button */
+  .mobile-back-btn svg { color: var(--text-primary, #ffffff); }
 }
+
+/* Mobile dark mode override — inatumia tokens zile zile */
+@media (max-width: 768px) and (prefers-color-scheme: dark) {
+  .main-header,
+  .header-container,
+  .header-top-bar,
+  .header-left-group,
+  .logo-wrapper,
+  .search-bar-wrapper,
+  .header-navigation-row {
+    background: var(--bg-header, #000000) !important;
+  }
+
+  .search-bar-container {
+    background-color: var(--input-bg, #0f0f0f) !important;
+    border: 1px solid var(--border-color, #1f1f1f) !important;
+  }
+
+  .search-input { color: var(--input-text, #ffffff) !important; }
+  .search-input::placeholder { color: var(--text-muted, #6b6b6b) !important; }
+}
+
+/* ============================================
+   USER TOOLS — Dark Mode Fix (Sign in, Cart, Icons)
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  /* Kila kitu ndani ya user-tools-group */
+  .user-tools-group,
+  .user-tools-group * {
+    color: #ffffff !important;
+  }
+
+  /* Links na buttons zote */
+  .user-tools-group a,
+  .user-tools-group button,
+  .user-tools-group span,
+  .user-tools-group p,
+  .user-tools-group div {
+    color: #ffffff !important;
+  }
+
+  /* SVG icons */
+  .user-tools-group svg {
+    color: #ffffff !important;
+    fill: #ffffff !important;
+    stroke: currentColor !important;
+  }
+
+  /* Hover state */
+  .user-tools-group a:hover,
+  .user-tools-group button:hover {
+    color: #ff6a00 !important;
+  }
+
+  /* Sign in link — specific */
+  .user-tools-group a[href*="login"],
+  .user-tools-group a[href*="signin"] {
+    color: #ffffff !important;
+  }
+
+  /* Cart, Sign in icons */
+  .user-tools-group .header-icon,
+  .user-tools-group .header-icon-text {
+    color: #ffffff !important;
+  }
+
+  /* "Create Account" button — inabaki na rangi yake ya orange */
+  .user-tools-group a[href*="register"] {
+    color: #ffffff !important;
+  }
+  .user-tools-group a[href*="register"] *,
+  .user-tools-group .create-account-btn,
+  .user-tools-group .create-account-btn * {
+    color: #ffffff !important;
+  }
+}
+
 

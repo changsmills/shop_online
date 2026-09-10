@@ -1,52 +1,108 @@
 /* ============================================
-   THEME VARIABLES - LIGHT MODE (Default)
+   THEME TOKENS — WHITE / BLACK / ORANGE
    ============================================ */
 :root {
-  /* Backgrounds */
+  /* Backgrounds — Pure White */
   --bg-body: #ffffff;
   --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
+  --bg-secondary: #f5f5f5;
   --bg-card: #ffffff;
   --bg-header: #ffffff;
   --bg-sidebar: #ffffff;
-  
-  /* Text Colors */
-  --text-primary: #1a1a1a;
-  --text-secondary: #6c757d;
-  --text-muted: #9ca3af;
-  --text-cat: #444;
-  
+  --bg-footer: #fafafa;
+  --bg-input: #ffffff;
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+
+  /* Text — Black */
+  --text-primary: #000000;
+  --text-secondary: #4a4a4a;
+  --text-muted: #808080;
+  --text-cat: #1a1a1a;
+  --text-white: #ffffff;
+
   /* Borders */
-  --border-color: #e9ecef;
+  --border-color: #e0e0e0;
   --border-light: #f0f0f0;
-  
-  /* Brand */
+  --border-dark: #c0c0c0;
+
+  /* Shadows */
+  --shadow-color: rgba(0, 0, 0, 0.08);
+  --shadow-lg: rgba(0, 0, 0, 0.15);
+
+  /* Brand — Orange */
   --brand-orange: #ff6a00;
   --brand-orange-hover: #e55a00;
+  --brand-orange-light: #fff5f0;
+
+  /* Inputs */
+  --input-bg: #ffffff;
+  --input-border: #e0e0e0;
+  --input-text: #000000;
+
+  /* Nav */
+  --nav-bg: #ffffff;
+  --nav-text: #000000;
+  --nav-active: #ff6a00;
+
+  /* Mobile */
+  --mobile-bg: #ffffff;
+  --mobile-overlay: rgba(0, 0, 0, 0.5);
+
+  /* Font */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont,
+               'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 /* ============================================
-   DARK MODE - INAFUATA DEVICE
+   DARK MODE — Pure Black / Pure White / Orange
    ============================================ */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-body: #1a1a1a;
-    --bg-primary: #1a1a1a;
-    --bg-secondary: #2d2d2d;
-    --bg-card: #2d2d2d;
-    --bg-header: #1a1a1a;
-    --bg-sidebar: #2d2d2d;
-    
+    /* Backgrounds — BLACK (no blue tint) */
+    --bg-body: #000000;
+    --bg-primary: #000000;
+    --bg-secondary: #0a0a0a;
+    --bg-card: #0a0a0a;
+    --bg-header: #000000;
+    --bg-sidebar: #0a0a0a;
+    --bg-footer: #0a0a0a;
+    --bg-input: #0f0f0f;
+    --bg-overlay: rgba(0, 0, 0, 0.8);
+
+    /* Text — Pure White */
     --text-primary: #ffffff;
-    --text-secondary: #a0a0a0;
-    --text-muted: #6c757d;
-    --text-cat: #aaaaaa;
-    
-    --border-color: #404040;
-    --border-light: #3d3d3d;
-    
+    --text-secondary: #b0b0b0;
+    --text-muted: #6b6b6b;
+    --text-cat: #d0d0d0;
+    --text-white: #ffffff;
+
+    /* Borders */
+    --border-color: #1f1f1f;
+    --border-light: #141414;
+    --border-dark: #2a2a2a;
+
+    /* Shadows */
+    --shadow-color: rgba(0, 0, 0, 0.6);
+    --shadow-lg: rgba(0, 0, 0, 0.8);
+
+    /* Brand — Orange */
     --brand-orange: #ff6a00;
-    --brand-orange-hover: #e55a00;
+    --brand-orange-hover: #ff8533;
+    --brand-orange-light: #1f1000;
+
+    /* Inputs */
+    --input-bg: #0f0f0f;
+    --input-border: #1f1f1f;
+    --input-text: #ffffff;
+
+    /* Nav */
+    --nav-bg: #000000;
+    --nav-text: #ffffff;
+    --nav-active: #ff6a00;
+
+    /* Mobile */
+    --mobile-bg: #0a0a0a;
+    --mobile-overlay: rgba(0, 0, 0, 0.8);
   }
 }
 
@@ -1212,6 +1268,8 @@ html, body {
     }
   }
 }
+
+
 /* 🔥 FIX LA MWISHO: EMPTY STATE (Sanduku Nyeupe) - Mobile & Desktop */
 @media (prefers-color-scheme: dark) {
   .empty-state {
@@ -1225,19 +1283,17 @@ html, body {
   }
 }
 /* ========================================= */
-/* 🔥 FIX YA MWISHO: LAZIMISHA RANGI KATIKA DARK MODE */
+/* DARK MODE — FORCE BLACK CATEGORY SLIDER */
 /* ========================================= */
 @media (prefers-color-scheme: dark) {
-    /* Lazimisha MobileCategorySlider kuwa nyeusi */
     .mobile-category-slider,
     .mobile-cat-item,
     .category-slider-wrapper {
-        background: #1a1a1a !important;
-        background-color: #1a1a1a !important;
-        border-bottom: 1px solid #2d2d2d !important; /* Mstari mweusi */
+        background: #000000 !important;
+        background-color: #000000 !important;
+        border-bottom: 1px solid #1f1f1f !important;
     }
     
-    /* Pia hakikisha maandishi ya kategoria ni meupe */
     .mobile-cat-item span {
         color: #ffffff !important;
     }
@@ -1245,45 +1301,416 @@ html, body {
         color: #ff6a00 !important;
     }
     
-    /* Lazimisha eneo la juu (Ambapo kategoria ziko) kuwa nyeusi */
     .alibaba-top-layout {
-        background: #1a1a1a !important;
+        background: #000000 !important;
     }
 }
 
 /* ========================================= */
-/* ULTIMATE FORCE 2: FANYA COMPONENTS ZOTE ZIWE NYEUSI (DARK MODE) */
+/* DARK MODE — FORCE BLACK COMPONENTS */
 /* ========================================= */
 @media (prefers-color-scheme: dark) {
-    /* Lazimisha mizizi yote ya dashboard kuwa nyeusi */
     .dashboard-wrapper,
     .main-content,
     .content-container-simple,
     .components-wrapper {
-        background: #1a1a2e !important;
-        background-color: #1a1a2e !important;
+        background: #000000 !important;
+        background-color: #000000 !important;
     }
 
-    /* Lazimisha Mobile Category Slider (Hii ndiyo inayokuwa nyeupe) */
     .mobile-category-slider,
     .mobile-cat-item,
     .category-slider-wrapper,
     .alibaba-top-layout {
-        background: #1a1a2e !important;
-        background-color: #1a1a2e !important;
-        border-bottom: 1px solid #2d2d44 !important;
+        background: #000000 !important;
+        background-color: #000000 !important;
+        border-bottom: 1px solid #1f1f1f !important;
     }
 
-    /* Lazimisha KILA Component (New Arrivals, TopStores, n.k.) kuwa nyeusi */
     .components-wrapper > * {
-        background: #1a1a2e !important;
-        background-color: #1a1a2e !important;
+        background: #000000 !important;
+        background-color: #000000 !important;
     }
     
-    /* Rekebisha maandishi ya vichwa vya habari viwe meupe */
     .section-header h3,
     .section-header .subtitle,
     .component-title {
         color: #ffffff !important;
     }
 }
+
+/* ============================================
+   MEGA MENU — CSS ILIYOKOSEKANA
+   ============================================ */
+.mega-menu-container {
+  position: fixed;
+  top: 97px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9998;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 0 16px 24px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.mega-menu-inner {
+  width: 100%;
+  max-width: 1400px;
+  height: 100%;
+  max-height: calc(100vh - 180px);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.mega-menu-sidebar {
+  width: 250px;
+  min-width: 250px;
+  max-width: 250px;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.mega-menu-sidebar::-webkit-scrollbar { width: 6px; }
+.mega-menu-sidebar::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.mega-menu-sidebar .sidebar-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-light);
+  transition: background 0.15s ease;
+}
+.mega-menu-sidebar .sidebar-item:hover {
+  background: var(--bg-card);
+  padding-left: 20px;
+}
+.mega-menu-sidebar .sidebar-item.active {
+  background: var(--bg-card);
+  color: var(--brand-orange);
+  font-weight: 700;
+  border-left: 3px solid var(--brand-orange);
+}
+.mega-menu-sidebar .sidebar-item-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mega-menu-sidebar .sidebar-back-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--brand-orange);
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-card);
+}
+
+.mega-menu-content {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 20px 24px;
+  background: var(--bg-primary);
+}
+
+.mega-menu-content::-webkit-scrollbar { width: 8px; }
+.mega-menu-content::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+.mega-menu-content::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-orange);
+}
+
+.mega-menu-content .content-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.mega-menu-content .content-header h3 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.mega-menu-content .category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+.mega-menu-content .grid-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+}
+.mega-menu-content .grid-item:hover {
+  background: var(--bg-secondary);
+}
+
+.mega-menu-content .image-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--bg-secondary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mega-menu-content .image-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mega-menu-content .grid-text {
+  font-size: 12px;
+  color: var(--text-primary);
+  margin: 0;
+  max-width: 100px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.mega-menu-content .see-all-circle {
+  border: 2px dashed var(--brand-orange);
+  background: var(--brand-orange-light);
+}
+.mega-menu-content .see-all-text {
+  color: var(--brand-orange);
+  font-weight: 700;
+}
+
+/* Ficha kwenye mobile — mobile inatumia modal */
+@media (max-width: 1024px) {
+  .mega-menu-container { display: none; }
+}
+
+/* ============================================
+   SIDEBAR CATEGORIES — Compact size
+   ============================================ */
+
+/* Mega menu sidebar */
+.mega-menu-sidebar .sidebar-item {
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.mega-menu-sidebar .sidebar-item span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 170px;
+}
+
+/* Side categories (left panel) */
+.side-categories .categories-list li {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+.side-categories .cat-name {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+.side-categories .cat-icon svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* Header ya categories */
+.side-categories .side-header {
+  padding: 12px 16px;
+  font-size: 14px;
+}
+/* ============================================
+   MEGA MENU — Category Grid Compact (Desktop)
+   ============================================ */
+
+.mega-menu-content .category-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)) !important;
+  gap: 8px !important;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  justify-items: center;
+}
+
+.mega-menu-content .grid-item {
+  width: 80px;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.mega-menu-content .image-circle {
+  width: 68px;
+  height: 68px;
+  margin-bottom: 6px;
+}
+
+.mega-menu-content .grid-text {
+  font-size: 12px;
+  max-width: 80px;
+  line-height: 1.2;
+  margin: 0;
+}
+
+/* ============================================
+   MEGA MENU — PURE BLACK (kill navy blue)
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  /* Container */
+  .mega-menu-container {
+    background: rgba(0, 0, 0, 0.85) !important;
+  }
+
+  /* Inner card — PURE BLACK */
+  .mega-menu-inner {
+    background: #000000 !important;
+    border-color: #1f1f1f !important;
+  }
+
+  /* Sidebar — PURE BLACK */
+  .mega-menu-sidebar {
+    background: #000000 !important;
+    border-right-color: #1f1f1f !important;
+  }
+
+  /* Content — PURE BLACK */
+  .mega-menu-content {
+    background: #000000 !important;
+  }
+
+  /* Sidebar items */
+  .mega-menu-sidebar .sidebar-item {
+    background: transparent !important;
+    color: #ffffff !important;
+    border-bottom-color: #1a1a1a !important;
+  }
+
+  .mega-menu-sidebar .sidebar-item:hover {
+    background: #0a0a0a !important;
+    color: #ff6a00 !important;
+  }
+
+  .mega-menu-sidebar .sidebar-item.active {
+    background: #0a0a0a !important;
+    color: #ff6a00 !important;
+    border-left: 3px solid #ff6a00 !important;
+  }
+
+  /* Content header */
+  .mega-menu-content .content-header {
+    border-bottom-color: #1a1a1a !important;
+  }
+
+  .mega-menu-content .content-header h3 {
+    color: #ffffff !important;
+  }
+
+  /* Grid items */
+  .mega-menu-content .grid-item {
+    background: transparent !important;
+  }
+
+  .mega-menu-content .grid-item:hover {
+    background: #0a0a0a !important;
+  }
+
+  .mega-menu-content .image-circle {
+    background: #0a0a0a !important;
+  }
+
+  .mega-menu-content .grid-text {
+    color: #ffffff !important;
+  }
+
+  /* See all */
+  .mega-menu-content .see-all-circle {
+    background: #0a0a0a !important;
+    border-color: #ff6a00 !important;
+  }
+
+  .mega-menu-content .see-all-text {
+    color: #ff6a00 !important;
+  }
+
+  /* Close button */
+  .mega-menu-close-btn {
+    background: transparent !important;
+    border-color: #1f1f1f !important;
+    color: #ffffff !important;
+  }
+
+  .mega-menu-close-btn:hover {
+    background: #ff6a00 !important;
+    border-color: #ff6a00 !important;
+    color: #ffffff !important;
+  }
+
+  /* Skeleton */
+  .mega-menu-content .skeleton-circle,
+  .mega-menu-content .skeleton-text {
+    background: #0a0a0a !important;
+  }
+}
+/* ============================================
+   MEGA MENU — FULL WIDTH (no padding sides)
+   ============================================ */
+
+.mega-menu-container {
+  padding: 0 0 24px 0 !important;  /* 🔥 Ondoa padding kushoto/kulia, acha chini tu */
+}
+
+.mega-menu-inner {
+  max-width: 100% !important;      /* 🔥 Ondoa max-width 1400px */
+  border-radius: 0 !important;      /* 🔥 Ondoa rounded corners (edge to edge) */
+  border-left: none !important;     /* 🔥 Ondoa border kushoto */
+  border-right: none !important;    /* 🔥 Ondoa border kulia */
+  border-top: none !important;      /* 🔥 Ondoa border juu */
+}
+

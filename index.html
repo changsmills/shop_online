@@ -4,49 +4,90 @@
     <meta charset="UTF-8" />
 
     <!-- Favicon -->
-    <!-- Sasa Vite inaona picha hii moja kwa moja kutoka public folder -->
     <link rel="icon" type="image/png" href="/logo.png" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover"
+    />
 
     <!-- SEO -->
-    <meta name="description" content="Virtual Store Platform for managing products, sales, and analytics." />
+    <meta
+      name="description"
+      content="Skyfall — Smart Business Platform for managing products, sales, and analytics."
+    />
     <meta name="author" content="Joshua Julius" />
-    
-    <!-- Theme Colors (White) -->
-    <meta name="theme-color" content="#ffffff" />
+
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
 
-    <!-- Google Fonts - ROBO TU (Sahihi) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet" integrity="sha384-ZQRSu4gKpTxb2uxT0qTHHDzXbujPOYtjSY5msjt2vccx51THfYI2Ygq0SXU9JDju" crossorigin="anonymous">
+    <!-- Google Fonts — PLUS JAKARTA SANS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+     />
 
-    <!-- Title (Default) -->
-    <title>Virtual Store | Smart Business Platform</title>
+    <!-- Title -->
+    <title>Skyfall | Smart Business Platform</title>
 
-    <!-- CSS ya msingi -->
+    <!-- Base CSS -->
     <style>
-      * {
+      *,
+      *::before,
+      *::after {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
       }
-      
-      body {
-        font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
+
+      html, body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont,
+      'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+     -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
       }
 
-      /* CSS ya kufanya picha zote za logo au darasa hili ziwe za duara kwenye tovuti */
-      img.circular-logo, .logo-img {
+      body {
+        background: #ffffff;
+        color: #0f172a;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #0b1220;
+          color: #f1f5f9;
+        }
+      }
+
+      img.circular-logo,
+      .logo-img {
         border-radius: 50%;
         object-fit: cover;
       }
-      
+
+      #root:empty::before {
+        content: '';
+        display: block;
+        width: 36px;
+        height: 36px;
+        margin: 40vh auto 0;
+        border: 3px solid rgba(255, 106, 0, 0.2);
+        border-top-color: #ff6a00;
+        border-radius: 50%;
+        animation: bootspin 0.8s linear infinite;
+      }
+
+      @keyframes bootspin {
+        to { transform: rotate(360deg); }
+      }
     </style>
   </head>
 

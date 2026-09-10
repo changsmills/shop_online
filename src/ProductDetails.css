@@ -1108,127 +1108,6 @@
     width: 100% !important;
   }
 }
-/* ============================================ */
-/* DARK MODE SUPPORT - PRODUCT DETAILS PAGE      */
-/* ============================================ */
-
-@media (prefers-color-scheme: dark) {
-  /* Rangi za Background na Maandishi kuu */
-  .product-page-root,
-  .product-details-container,
-  .main-grid-container,
-  .left-content,
-  .right-sidebar,
-  .right-sidebar .sticky-info-wrapper,
-  .product-description-section,
-  .product-bottom-details,
-  .store-full-details-card,
-  .store-card-header,
-  .showroom-item-img,
-  .store-card-btn {
-    background-color: var(--bg-color) !important;
-    color: var(--text-color) !important;
-  }
-
-  /* Mipaka (Borders) ya sehemu zote */
-  .left-content,
-  .main-grid-container,
-  .right-sidebar,
-  .product-description-section,
-  .store-card-header,
-  .store-full-details-card,
-  .product-bottom-details,
-  .store-contact-grid,
-  .showroom-horizontal-scroll {
-    border-color: #334155 !important;
-  }
-
-  /* Vichwa na Majina ya bidhaa */
-  .product-name,
-  .product-description-section h3,
-  .verification-header-box h2,
-  .showroom-header h4,
-  .store-card-title h3,
-  .metric-value,
-  .bottom-sheet-summary-value {
-    color: var(--text-color) !important;
-  }
-
-  /* Maandishi madogo na label */
-  .verification-header-box p,
-  .showroom-item-name,
-  .store-card-meta span,
-  .metric-label,
-  .contact-label {
-    color: #94a3b8 !important;
-  }
-
-  /* Box ya Uhakiki wa Duka (Verification) */
-  .verification-header-box {
-    background-color: #1e293b !important;
-    border-left-color: #3b82f6 !important;
-  }
-
-  /* Kitufe cha "Tembelea Duka" */
-  .store-card-btn {
-    background: #334155 !important;
-    color: #e2e8f0 !important;
-  }
-  .store-card-btn:hover {
-    background: #475569 !important;
-  }
-
-  /* TIN Certificate Box */
-  .tin-cert-box {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-  }
-
-  /* Vifungo vya Social Media (Maps, Instagram) */
-  .social-btn {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-    color: #cbd5e1 !important;
-  }
-  .social-btn:hover {
-    background: #334155 !important;
-    border-color: #475569 !important;
-  }
-
-  /* Metrics Grid (MOQ, LEAD TIME, n.k) */
-  .metric-box {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-  }
-
-  /* Contact icons - Mfano: MapPin na Phone */
-  .contact-box:first-child .contact-icon {
-    background: #2d2d44 !important;
-    color: #ea580c !important;
-  }
-  .contact-box:last-child .contact-icon {
-    background: #1e3a8a !important;
-    color: #60a5fa !important;
-  }
-
-  /* Contact Text */
-  .contact-text {
-    color: #cbd5e1 !important;
-  }
-
-  /* Mobile Override - Zinahakikisha kwenye Simu pia zinajibadilisha */
-  @media (max-width: 768px) {
-    .product-page-root,
-    .product-details-container,
-    .main-grid-container,
-    .right-sidebar .sticky-info-wrapper,
-    .product-description-section,
-    .product-bottom-details,
-    .store-full-details-card {
-      background-color: var(--bg-color) !important;
-    }
-  }
-}
 
 /* ========================================= */
 /* 🔥 FICHA HEADER KWA SCROLL (DESKTOP TU)     */
@@ -1260,29 +1139,6 @@
     .left-content,
     .right-sidebar {
         transition: top 0.3s ease;
-    }
-}
-
-/* ========================================= */
-/* 🔥 FIX: FANYA ICON YA CHAT IONEKANE (DARK MODE) */
-/* ========================================= */
-@media (prefers-color-scheme: dark) {
-    /* Lazimisha icon ya chat (au button yoyote yenye icon) iwe nyeupe */
-    button svg,
-    .chat-btn svg,
-    .message-btn svg,
-    .contact-icon svg,
-    a svg {
-        color: #ffffff !important;
-        fill: #ffffff !important;
-    }
-
-    /* Hakikisha button ya chat yenyewe ina background inayoonekana */
-    .chat-btn,
-    .message-btn,
-    .contact-icon {
-        background-color: #334155 !important; /* Navy Blue ya Giza */
-        border-color: #334155 !important;
     }
 }
 
@@ -1332,4 +1188,193 @@
     .product-page-root.no-header-space {
         margin-top: 0 !important;
     }
+}
+
+/* ============================================
+   DARK MODE — PRODUCT DETAILS (PURE BLACK)
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  /* ========== PAGE BACKGROUNDS ========== */
+  .product-page-root,
+  .product-details-container,
+  .product-main-layout,
+  .main-grid-container,
+  .left-content,
+  .right-sidebar,
+  .right-sidebar .sticky-info-wrapper,
+  .product-description-section,
+  .product-bottom-details,
+  .store-full-details-card,
+  .showroom-item-img,
+  .store-card-btn,
+  .product-hero-section {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+  }
+
+  /* ========== BORDERS ========== */
+  .left-content,
+  .main-grid-container,
+  .right-sidebar,
+  .product-description-section,
+  .store-card-header,
+  .store-full-details-card,
+  .product-bottom-details,
+  .store-contact-grid,
+  .store-metrics-grid,
+  .showroom-horizontal-scroll,
+  .tin-cert-box {
+    border-color: #1f1f1f !important;
+  }
+
+  /* ========== HEADINGS ========== */
+  .product-name,
+  .product-description-section h3,
+  .verification-header-box h2,
+  .showroom-header h4,
+  .store-card-title h3,
+  .metric-value,
+  .bottom-sheet-summary-value,
+  .store-card-btn {
+    color: #ffffff !important;
+  }
+
+  /* ========== SECONDARY TEXT ========== */
+  .verification-header-box p,
+  .showroom-item-name,
+  .store-card-meta span,
+  .metric-label,
+  .contact-label,
+  .product-description-section p,
+  .contact-text {
+    color: #b0b0b0 !important;
+  }
+
+  /* ========== VERIFICATION BOX ========== */
+  .verification-header-box {
+    background-color: #0a0a0a !important;
+    border-left-color: #ff6a00 !important;
+  }
+  .verified-store-badge {
+    color: #ff6a00 !important;
+  }
+
+  /* ========== STORE CARD BUTTON ========== */
+  .store-card-btn {
+    background: #0a0a0a !important;
+    color: #ffffff !important;
+    border: 1px solid #1f1f1f !important;
+  }
+  .store-card-btn:hover {
+    background: #ff6a00 !important;
+    color: #ffffff !important;
+    border-color: #ff6a00 !important;
+  }
+
+  /* ========== TIN CERT BOX ========== */
+  .tin-cert-box {
+    background: #0a0a0a !important;
+  }
+  .tin-cert-header,
+  .tin-cert-header span {
+    color: #b0b0b0 !important;
+  }
+
+  /* ========== SOCIAL BUTTONS ========== */
+  .social-btn {
+    background: #0a0a0a !important;
+    border: 1px solid #1f1f1f !important;
+    color: #ffffff !important;
+  }
+  .social-btn:hover {
+    background: #ff6a00 !important;
+    border-color: #ff6a00 !important;
+    color: #ffffff !important;
+  }
+
+  /* ========== METRIC BOXES ========== */
+  .metric-box {
+    background: #0a0a0a !important;
+    border: 1px solid #1f1f1f !important;
+  }
+  .metric-icon,
+  .metric-icon svg {
+    color: #b0b0b0 !important;
+  }
+
+  /* ========== CONTACT ICONS ========== */
+  .contact-box:first-child .contact-icon {
+    background: #1f1000 !important;
+    color: #ff6a00 !important;
+  }
+  .contact-box:last-child .contact-icon {
+    background: #1f1000 !important;
+    color: #ff6a00 !important;
+  }
+
+  /* ========== SHOWROOM ITEMS ========== */
+  .showroom-item-img {
+    background: #0a0a0a !important;
+    border-color: #1f1f1f !important;
+  }
+  .showroom-item-img.active-border {
+    border-color: #ff6a00 !important;
+  }
+  .showroom-item-badge {
+    background: #ff6a00 !important;
+    color: #ffffff !important;
+  }
+
+  /* ========== ALL SVG ICONS ========== */
+  .product-page-root svg {
+    color: #ffffff !important;
+    stroke: currentColor !important;
+  }
+
+  /* ========== LOADER ========== */
+  .spinner {
+    border-color: #1f1f1f !important;
+    border-top-color: #ff6a00 !important;
+  }
+  .skeleton-loader {
+    color: #6b6b6b !important;
+  }
+
+  /* ========== IMAGE VIEWER OVERLAY ========== */
+  .image-viewer-overlay {
+    background: rgba(0, 0, 0, 0.95) !important;
+  }
+  .viewer-close-btn {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+  }
+  .viewer-title {
+    color: #ffffff !important;
+  }
+}
+
+/* ============================================
+   MOBILE DARK MODE OVERRIDE
+   ============================================ */
+@media (max-width: 768px) and (prefers-color-scheme: dark) {
+  .product-page-root,
+  .product-details-container,
+  .main-grid-container,
+  .left-content,
+  .right-sidebar,
+  .right-sidebar .sticky-info-wrapper,
+  .product-description-section,
+  .product-bottom-details,
+  .store-full-details-card,
+  .product-hero-section {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+  }
+
+  /* Mobile borders */
+  .product-bottom-details,
+  .store-full-details-card,
+  .store-card-header {
+    border-color: #1f1f1f !important;
+  }
 }

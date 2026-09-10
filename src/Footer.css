@@ -228,50 +228,66 @@
 
 @media (prefers-color-scheme: dark) {
   .main-footer {
-    background-color: #1e293b !important; /* Dark Blue ya Skyfall */
-    color: #e2e8f0 !important;
-    border-top-color: #334155 !important;
+    background-color: #0a0a0a;
+    color: #ffffff;
+    border-top-color: #1f1f1f;
   }
 
   .footer-column h3 {
-    color: #f1f5f9 !important;
+    color: #ffffff;
   }
 
   .footer-column ul li a {
-    color: #94a3b8 !important; /* Kijivu chepesi kwenye Dark Mode */
+    color: #b0b0b0;
   }
-  
+
   .footer-column ul li a:hover {
-    color: #ff6a00 !important;
+    color: #ff6a00;
   }
 
   .social-icons a {
-    color: #94a3b8 !important;
+    color: #b0b0b0;
+  }
+
+  .social-icons a:hover {
+    color: #ff6a00;
   }
 
   .payment-methods {
-    color: #94a3b8 !important;
+    color: #b0b0b0;
   }
-  
+
   .payment-tag {
-    border-color: #334155 !important;
-    color: #94a3b8 !important;
+    border-color: #1f1f1f;
+    color: #b0b0b0;
+  }
+
+  .secure-text {
+    color: #6b6b6b;
   }
 
   .footer-divider {
-    border-top-color: #334155 !important;
+    border-top-color: #1f1f1f;
+  }
+
+  .footer-bottom {
+    color: #6b6b6b;
   }
 
   .footer-bottom p {
-    color: #94a3b8 !important;
+    color: #6b6b6b;
   }
 
   .footer-bottom-links a {
-    color: #94a3b8 !important;
+    color: #6b6b6b;
   }
-  
+
   .footer-bottom-links a:hover {
-    color: #ff6a00 !important;
+    color: #ff6a00;
+  }
+
+  .footer-bottom-links a::after {
+    background-color: #ff6a00;
   }
 }
 

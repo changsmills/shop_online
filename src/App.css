@@ -1,448 +1,352 @@
 /* ============================================
-   THEME VARIABLES - LIGHT MODE (Default)
+   APP.CSS — GLOBAL FOUNDATION
+   Typography, tokens, reset, base utilities
+   ============================================ */
+
+/* ============================================
+   COLOR TOKENS — WHITE / BLACK / ORANGE (3 only)
    ============================================ */
 :root {
-  /* Backgrounds - Light Mode (White/Nyepesi) */
+  /* ═══════════════════════════════════════
+     LIGHT MODE — Pure White + Pure Black
+     ═══════════════════════════════════════ */
+  
+  /* Surfaces — White */
   --bg-body: #ffffff;
   --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
+  --bg-secondary: #f5f5f5;    /* slightly gray for subtle separation */
   --bg-card: #ffffff;
   --bg-header: #ffffff;
-  --bg-footer: #f8f9fa;
+  --bg-footer: #fafafa;
+  --bg-sidebar: #ffffff;
   --bg-input: #ffffff;
+  --bg-hover: #f0f0f0;
   --bg-overlay: rgba(0, 0, 0, 0.5);
-  
-  /* Text Colors - Light Mode */
-  --text-primary: #1a1a1a;
-  --text-secondary: #6c757d;
-  --text-muted: #9ca3af;
+
+  /* Text — Black */
+  --text-primary: #000000;
+  --text-secondary: #4a4a4a;
+  --text-muted: #808080;
+  --text-cat: #1a1a1a;
   --text-white: #ffffff;
-  
-  /* Border & Shadows - Light Mode */
-  --border-color: #e9ecef;
-  --border-dark: #d1d5db;
+
+  /* Borders */
+  --border-color: #e0e0e0;
   --border-light: #f0f0f0;
-  --shadow-color: rgba(0,0,0,0.08);
-  --shadow-lg: rgba(0,0,0,0.15);
-  
-  /* Brand Colors - Orange (Inabaki sawa) */
+  --border-dark: #c0c0c0;
+
+  /* Shadows */
+  --shadow-color: rgba(0, 0, 0, 0.08);
+  --shadow-lg: rgba(0, 0, 0, 0.15);
+
+  /* Brand — Orange */
   --brand-orange: #ff6a00;
   --brand-orange-hover: #e55a00;
   --brand-orange-light: #fff5f0;
-  
+  --brand-orange-glow: rgba(255, 106, 0, 0.2);
+
+  /* Semantic */
+  --success: #16a34a;
+  --warning: #f59e0b;
+  --danger: #dc2626;
+
   /* Inputs */
   --input-bg: #ffffff;
-  --input-border: #e9ecef;
-  --input-text: #1a1a1a;
-  
-  /* Nav & Menus */
+  --input-border: #e0e0e0;
+  --input-text: #000000;
+
+  /* Nav */
   --nav-bg: #ffffff;
-  --nav-text: #1a1a1a;
+  --nav-text: #000000;
   --nav-active: #ff6a00;
-  
-  /* Mobile Modal */
+
+  /* Mobile */
   --mobile-bg: #ffffff;
   --mobile-overlay: rgba(0, 0, 0, 0.5);
+
+  /* ═══════════════════════════════════════
+     FONT TOKENS
+     ═══════════════════════════════════════ */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont,
+               'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Type Scale */
+  --fs-xs:   11px;
+  --fs-sm:   13px;
+  --fs-base: 14px;
+  --fs-md:   15px;
+  --fs-lg:   16px;
+  --fs-xl:   18px;
+  --fs-2xl:  22px;
+  --fs-3xl:  28px;
+  --fs-4xl:  36px;
+
+  /* Line Heights */
+  --lh-tight:   1.2;
+  --lh-snug:    1.35;
+  --lh-normal:  1.5;
+  --lh-relaxed: 1.6;
+
+  /* Weights */
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+  --fw-black:    800;
+
+  /* Letter Spacing */
+  --ls-tight:  -0.01em;
+  --ls-normal: 0;
+  --ls-wide:   0.03em;
+  --ls-wider:  0.08em;
+
+  /* Spacing */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+
+  /* Radius */
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+  --r-full: 9999px;
+
+  color-scheme: light dark;
 }
 
 /* ============================================
-   THEME VARIABLES - DARK MODE (DARK BLUE MORPHIC)
-   Inafuata mazingira ya device
+   DARK MODE — Pure Black + Pure White + Orange
    ============================================ */
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Backgrounds - Dark Blue Morphic */
-    --bg-body: #0d1117;        /* Bluu nyeusi - GitHub Dark */
-    --bg-primary: #0d1117;     /* Bluu nyeusi */
-    --bg-secondary: #161b22;   /* Bluu nyeusi kidogo nyepesi */
-    --bg-card: #161b22;        /* Bluu nyeusi kwa cards */
-    --bg-header: #0d1117;      /* Bluu nyeusi kwa header */
-    --bg-footer: #161b22;      /* Bluu nyeusi kwa footer */
-    --bg-input: #0d1117;       /* Bluu nyeusi kwa inputs */
-    --bg-overlay: rgba(13, 17, 23, 0.8);
-    
-    /* Text Colors - Dark Mode */
-    --text-primary: #f0f6fc;   /* White inayong'aa */
-    --text-secondary: #8b949e; /* Grey inayoonekana */
-    --text-muted: #484f58;     /* Grey nyeusi */
+    /* Surfaces — BLACK (not blue, not gray) */
+    --bg-body: #000000;
+    --bg-primary: #000000;
+    --bg-secondary: #0a0a0a;    /* nearly black, subtle */
+    --bg-card: #0a0a0a;
+    --bg-header: #000000;
+    --bg-footer: #0a0a0a;
+    --bg-sidebar: #0a0a0a;
+    --bg-input: #0f0f0f;
+    --bg-hover: #1a1a1a;
+    --bg-overlay: rgba(0, 0, 0, 0.8);
+
+    /* Text — WHITE */
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --text-muted: #6b6b6b;
+    --text-cat: #d0d0d0;
     --text-white: #ffffff;
-    
-    /* Border & Shadows - Dark Mode */
-    --border-color: #30363d;   /* Border ya dark blue */
-    --border-dark: #21262d;    /* Border nyeusi zaidi */
-    --border-light: #30363d;   /* Border nyepesi */
-    --shadow-color: rgba(0,0,0,0.4);
-    --shadow-lg: rgba(0,0,0,0.6);
-    
-    /* Brand Colors - Orange inabaki sawa */
+
+    /* Borders */
+    --border-color: #1f1f1f;
+    --border-light: #141414;
+    --border-dark: #2a2a2a;
+
+    /* Shadows */
+    --shadow-color: rgba(0, 0, 0, 0.6);
+    --shadow-lg: rgba(0, 0, 0, 0.8);
+
+    /* Brand — Orange */
     --brand-orange: #ff6a00;
-    --brand-orange-hover: #e55a00;
-    --brand-orange-light: #2d1a0a;
-    
+    --brand-orange-hover: #ff8533;
+    --brand-orange-light: #1f1000;
+    --brand-orange-glow: rgba(255, 106, 0, 0.3);
+
     /* Inputs */
-    --input-bg: #0d1117;
-    --input-border: #30363d;
-    --input-text: #f0f6fc;
-    
-    /* Nav & Menus */
-    --nav-bg: #0d1117;
-    --nav-text: #f0f6fc;
+    --input-bg: #0f0f0f;
+    --input-border: #1f1f1f;
+    --input-text: #ffffff;
+
+    /* Nav */
+    --nav-bg: #000000;
+    --nav-text: #ffffff;
     --nav-active: #ff6a00;
-    
-    /* Mobile Modal */
-    --mobile-bg: #161b22;
-    --mobile-overlay: rgba(13, 17, 23, 0.8);
+
+    /* Mobile */
+    --mobile-bg: #0a0a0a;
+    --mobile-overlay: rgba(0, 0, 0, 0.8);
   }
 }
 
 /* ============================================
-   GLOBAL RESET & BASE
+   GLOBAL RESET — NO ITALIC ANYWHERE
    ============================================ */
-* {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-style: normal;
 }
 
-html, body {
-  margin: 0 !important;
-  padding: 0 !important;
-  overflow-x: hidden;
-  font-family: 'Roboto', Helvetica, Arial, sans-serif;
-  background-color: var(--bg-body);
-  color: var(--text-primary);
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-normal);
+  color: var(--text-primary, #0f172a);
+  background-color: var(--bg-body, #ffffff);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  min-height: 100vh;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* ============================================
+   HEADINGS — BOLD
+   ============================================ */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  color: inherit;
+  margin: 0;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
+}
+
+h1 { font-size: var(--fs-4xl); font-weight: var(--fw-black);  line-height: 1.1; }
+h2 { font-size: var(--fs-3xl); font-weight: var(--fw-bold); }
+h3 { font-size: var(--fs-2xl); font-weight: var(--fw-bold);   line-height: var(--lh-snug); }
+h4 { font-size: var(--fs-xl);  font-weight: var(--fw-bold);   line-height: var(--lh-snug); }
+h5 { font-size: var(--fs-lg);  font-weight: var(--fw-semibold); line-height: var(--lh-snug); }
+h6 {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-wider);
+  text-transform: uppercase;
+  color: var(--text-secondary, #475569);
+}
+
+/* ============================================
+   BODY TEXT
+   ============================================ */
+p {
+  font-size: var(--fs-base);
+  line-height: var(--lh-relaxed);
+  margin: 0 0 0.75em;
+}
+p:last-child { margin-bottom: 0; }
+
+small {
+  font-size: var(--fs-xs);
+  line-height: var(--lh-normal);
+  color: var(--text-muted, #94a3b8);
+}
+
+strong, b { font-weight: var(--fw-bold); }
 
 /* ============================================
    LINKS
    ============================================ */
 a {
-  color: var(--brand-orange);
+  color: var(--brand-orange, #ff6a00);
   text-decoration: none;
-  transition: color 0.2s;
+  font-weight: var(--fw-medium);
+  transition: color 0.15s ease;
 }
-a:hover {
-  color: var(--brand-orange-hover);
-}
+a:hover { color: var(--brand-orange-hover, #e55a00); }
 
 /* ============================================
-   SCROLLBAR - Dark Blue Style
+   LISTS
    ============================================ */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--brand-orange);
-}
+ul, ol { padding-left: 1.25em; margin: 0 0 0.75em; }
+li { margin-bottom: 0.25em; }
 
 /* ============================================
-   BUTTONS
+   BUTTONS (base — Dashboard.css inaongeza)
    ============================================ */
 button {
+  font-family: inherit;
+  font-size: var(--fs-base);
+  font-weight: var(--fw-bold);
   cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-primary {
-  background: var(--brand-orange);
-  color: var(--text-white);
   border: none;
-  padding: 10px 24px;
-  border-radius: 8px;
-  font-weight: 600;
+  background: none;
+  color: inherit;
+  letter-spacing: 0.01em;
+  transition: all 0.15s ease;
 }
-.btn-primary:hover {
-  background: var(--brand-orange-hover);
-  transform: translateY(-2px);
-}
-
-.btn-outline {
-  background: transparent;
-  color: var(--brand-orange);
-  border: 1px solid var(--brand-orange);
-  padding: 10px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-}
-.btn-outline:hover {
-  background: var(--brand-orange);
-  color: var(--text-white);
-}
-
-.btn-secondary {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  padding: 10px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-}
-.btn-secondary:hover {
-  background: var(--bg-card);
-  border-color: var(--brand-orange);
-}
+button:disabled { cursor: not-allowed; opacity: 0.5; }
 
 /* ============================================
-   INPUTS & FORMS
+   INPUTS (base)
    ============================================ */
-input, select, textarea {
-  background: var(--input-bg);
-  border: 1px solid var(--input-border);
-  color: var(--input-text);
-  padding: 10px 16px;
-  border-radius: 8px;
+input, textarea, select {
   font-family: inherit;
-  font-size: 14px;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  width: 100%;
+  font-size: var(--fs-base);
+  font-weight: var(--fw-medium);
+  color: inherit;
 }
-input:focus, select:focus, textarea:focus {
-  outline: none;
-  border-color: var(--brand-orange);
-  box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.15);
-}
-input::placeholder {
-  color: var(--text-muted);
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted, #94a3b8);
+  font-weight: var(--fw-regular);
 }
 
 label {
-  color: var(--text-secondary);
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 6px;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--text-secondary, #475569);
+}
+
+/* ============================================
+   MEDIA
+   ============================================ */
+img, video, svg {
   display: block;
+  max-width: 100%;
+  height: auto;
 }
 
 /* ============================================
-   CARDS
+   FOCUS & SELECTION
    ============================================ */
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 8px var(--shadow-color);
-  color: var(--text-primary);
-  transition: all 0.3s ease;
+:focus-visible {
+  outline: 2px solid var(--brand-orange, #ff6a00);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
-.card:hover {
-  box-shadow: 0 4px 16px var(--shadow-lg);
-  border-color: var(--brand-orange);
+
+::selection {
+  background: rgba(255, 106, 0, 0.25);
+  color: var(--text-primary, #0f172a);
 }
 
 /* ============================================
-   HEADERS & NAVIGATION
+   DARK MODE FALLBACK
    ============================================ */
-.header, .navbar, .sticky-header {
-  background: var(--bg-header);
-  color: var(--text-primary);
-  border-bottom: 1px solid var(--border-color);
-  transition: all 0.3s ease;
-}
-
-.nav-link {
-  color: var(--text-secondary);
-  transition: color 0.2s;
-}
-.nav-link:hover {
-  color: var(--brand-orange);
-}
-.nav-link.active {
-  color: var(--brand-orange);
-  font-weight: 600;
-}
-
-/* ============================================
-   FOOTER
-   ============================================ */
-.footer, .footer-wrapper {
-  background: var(--bg-footer);
-  color: var(--text-primary);
-  border-top: 1px solid var(--border-color);
-  padding: 40px 20px;
-  transition: all 0.3s ease;
-}
-
-/* ============================================
-   SECTIONS & CONTAINERS
-   ============================================ */
-.section {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  padding: 20px;
-}
-
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-/* ============================================
-   TEXT UTILITIES
-   ============================================ */
-.text-primary { color: var(--text-primary) !important; }
-.text-secondary { color: var(--text-secondary) !important; }
-.text-muted { color: var(--text-muted) !important; }
-.text-white { color: var(--text-white) !important; }
-.text-brand { color: var(--brand-orange) !important; }
-
-/* ============================================
-   BORDERS
-   ============================================ */
-.border { border: 1px solid var(--border-color) !important; }
-.border-bottom { border-bottom: 1px solid var(--border-color) !important; }
-.border-top { border-top: 1px solid var(--border-color) !important; }
-.border-left { border-left: 1px solid var(--border-color) !important; }
-.border-right { border-right: 1px solid var(--border-color) !important; }
-
-/* ============================================
-   SHADOWS
-   ============================================ */
-.shadow { box-shadow: 0 2px 8px var(--shadow-color) !important; }
-.shadow-sm { box-shadow: 0 1px 3px var(--shadow-color) !important; }
-.shadow-md { box-shadow: 0 4px 12px var(--shadow-color) !important; }
-.shadow-lg { box-shadow: 0 8px 32px var(--shadow-lg) !important; }
-
-/* ============================================
-   BACKGROUND UTILITIES
-   ============================================ */
-.bg-primary { background: var(--bg-primary) !important; }
-.bg-secondary { background: var(--bg-secondary) !important; }
-.bg-card { background: var(--bg-card) !important; }
-.bg-brand { background: var(--brand-orange) !important; }
-
-/* ============================================
-   MODAL & OVERLAY
-   ============================================ */
-.modal-overlay {
-  background: var(--bg-overlay);
-  backdrop-filter: blur(4px);
-}
-
-.modal {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  color: var(--text-primary);
-  box-shadow: 0 8px 40px var(--shadow-lg);
-}
-
-/* ============================================
-   SMOOTH TRANSITIONS FOR ALL ELEMENTS
-   ============================================ */
-*, *::before, *::after {
-  transition: background-color 0.3s ease, 
-              color 0.3s ease, 
-              border-color 0.3s ease,
-              box-shadow 0.3s ease,
-              opacity 0.3s ease;
-}
-
-/* ============================================
-   DASHBOARD SPECIFIC - Inabaki kwenye wrapper
-   ============================================ */
-.dashboard-wrapper {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  min-height: 100vh;
-}
-
-.dashboard-wrapper .header {
-  background: var(--bg-header);
-  color: var(--text-primary);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.dashboard-wrapper .card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-}
-
-.dashboard-wrapper .section-title {
-  color: var(--text-primary);
-}
-
-.dashboard-wrapper .section-subtitle {
-  color: var(--text-secondary);
-}
-
-/* ============================================
-   RESPONSIVE - Mobile Adjustments
-   ============================================ */
-@media (max-width: 768px) {
-  .container {
-    padding: 0 12px;
+@media (prefers-color-scheme: dark) {
+  body {
+    color: var(--text-primary, #f1f5f9);
+    background-color: var(--bg-body, #0b1220);
   }
-  
-  .card {
-    padding: 16px;
+  ::selection {
+    background: rgba(255, 106, 0, 0.35);
+    color: #ffffff;
   }
 }
-/* ============================================ */
-/* 🔥 OFFLINE BANNER (Global)                   */
-/* ============================================ */
-.offline-banner {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 999999 !important; /* Juu kabisa */
-  background-color: #dc2626; /* Rangi nyekundu */
-  color: white;
-  padding: 12px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  font-weight: 700;
-  font-size: 14px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  animation: slideDownBanner 0.4s ease;
-}
-
-.offline-icon { font-size: 20px; }
-
-@keyframes slideDownBanner {
-  from { transform: translateY(-100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@media (max-width: 768px) {
-  .offline-banner {
-    padding: 10px 12px;
-    font-size: 13px;
-    text-align: center;
-    flex-wrap: wrap;
-  }
-}
-@keyframes pulse {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.4;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
 /* ========================================= */
 /* ULTIMATE GLOBAL FORCE - DARK MODE */
 /* ========================================= */
 @media (prefers-color-scheme: dark) {
-    /* Lazimisha chombo cha Header kiwe Navy Blue */
     .header-container, 
     .header-top-bar, 
     .header-left-group, 
@@ -452,14 +356,12 @@ label {
         background-color: #1a1a2e !important;
     }
     
-    /* Lazimisha sanduku la Logo kuwa transparent (si nyeupe) */
     .logo-wrapper,
     .logo-icon-box {
         background: transparent !important;
         background-color: transparent !important;
     }
 
-    /* Lazimisha Search Bar iwe Nyeusi Kidogo (Navy Blue ya giza) */
     .search-bar-container {
         background: #2d2d44 !important;
         background-color: #2d2d44 !important;
@@ -467,33 +369,24 @@ label {
     }
 }
 
-
-/* ========================================= */
-/* ULTIMATE GLOBAL FORCE - DARK MODE */
-/* ========================================= */
-@media (prefers-color-scheme: dark) {
-    /* Lazimisha chombo cha Header kiwe Navy Blue */
-    .header-container, 
-    .header-top-bar, 
-    .header-left-group, 
-    .logo-wrapper, 
-    .search-bar-wrapper {
-        background: #1a1a2e !important;
-        background-color: #1a1a2e !important;
-    }
-    
-    /* Lazimisha sanduku la Logo kuwa transparent (si nyeupe) */
-    .logo-wrapper,
-    .logo-icon-box {
-        background: transparent !important;
-        background-color: transparent !important;
-    }
-
-    /* Lazimisha Search Bar iwe Nyeusi Kidogo (Navy Blue ya giza) */
-    .search-bar-container {
-        background: #2d2d44 !important;
-        background-color: #2d2d44 !important;
-        border: 1px solid #334155 !important;
-    }
+/* ============================================
+   LUCIDE ICONS — Normalize stroke-width globally
+   ============================================ */
+svg.lucide,
+svg[class*="lucide"] {
+  stroke-width: 2;
 }
 
+svg.lucide *,
+svg[class*="lucide"] * {
+  stroke-width: 2;
+}
+
+/* Kwa icons kubwa (size ≥ 32), nyembamba kidogo */
+svg.lucide[width="32"],
+svg.lucide[width="40"],
+svg.lucide[width="48"],
+svg.lucide[width="64"],
+svg.lucide[width="96"] {
+  stroke-width: 1.5;
+}

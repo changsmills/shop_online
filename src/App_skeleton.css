@@ -7,7 +7,15 @@
   width: 100%;
   padding: 0 !important;
   padding-top: 80px !important; /* ✅ ILIYOREKEBISHWA: INAANZA CHINI ZAIDI (KWA MOBILE) */
+  padding-bottom: 80px !important; /* ✅ IMEONGEZWA: NAFASI YA NAVBOTTOM ISIFUNIKE CARDS */
   margin: 0 !important;
+}
+
+/* ==============================================
+   NAVBOTTOM WRAPPER (Ili kuficha/kudhibiti NavBottom)
+   ============================================== */
+.skeleton-nav-bottom-wrapper {
+  display: block;
 }
 
 /* ==============================================
@@ -17,6 +25,7 @@
   .skeleton-layout-wrapper {
     padding: 0 !important;
     padding-top: 20px !important; /* ✅ IMEONGEZWA: KUTOA NAFASI CHINI YA HEADER YA DESKTOP */
+    padding-bottom: 20px !important; /* ✅ HAKUNA NAVBOTTOM KWENYE DESKTOP */
     margin: 0 !important;
   }
   .skeleton-mobile {
@@ -28,6 +37,10 @@
   .skeleton-category-slider {
     display: none !important;
   }
+  /* Ficha NavBottom kwenye Desktop */
+  .skeleton-nav-bottom-wrapper {
+    display: none !important;
+  }
 }
 
 /* ==============================================
@@ -37,6 +50,7 @@
   .skeleton-layout-wrapper {
     padding: 0 !important;
     padding-top: 96px !important; /* Nafasi ya header */
+    padding-bottom: 80px !important; /* ✅ NAFASI YA NAVBOTTOM */
     margin: 0 !important;
   }
 
@@ -79,6 +93,7 @@
   .skeleton-layout-wrapper {
     padding: 0 !important;
     padding-top: 80px !important; /* ✅ ILIYOREKEBISHWA: SOGEA CHINI KWA MOBILE */
+    padding-bottom: 80px !important; /* ✅ NAFASI YA NAVBOTTOM */
     margin: 0 !important;
   }
 }
@@ -90,6 +105,7 @@
   .skeleton-layout-wrapper {
     padding: 0 !important;
     padding-top: 65px !important; /* ✅ ILIYOREKEBISHWA: NAFASI KWA SMALL MOBILE */
+    padding-bottom: 80px !important; /* ✅ NAFASI YA NAVBOTTOM */
     margin: 0 !important;
   }
   .skeleton-banner-mobile {
@@ -124,7 +140,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
-  padding: 0 8px;
+  padding: 0 16px !important; /* ✅ IMEBADILISHWA: Kutoka 8px kwenda 16px ili cards zisiguse kingo */
   margin: 0 !important;
 }
 
