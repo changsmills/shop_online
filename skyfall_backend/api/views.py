@@ -133,7 +133,6 @@ class LeafCategoryViewSet(viewsets.ModelViewSet):
             print(f"❌ [BACKEND ERROR] Failed to retrieve Leaf with ID {leaf_id}: {e}")
             raise e
 
-
 class ProductsEngineViewSet(viewsets.ModelViewSet):
     queryset = ProductsEngine.objects.all()
     serializer_class = ProductsEngineSerializer
@@ -146,26 +145,31 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'description', 'sku']
 
 
-       # 🆕 ONGEZA HII METHOD (NDANI YA CLASS HII)
+    # 🆕 ONGEZA HII METHOD (NDANI YA CLASS HII)
     def get_queryset(self):
         queryset = super().get_queryset()
-        
-        # Chukua thamani ya original_price__gt kutoka URL (mfano: ?original_price__gt=0)
+        user = self.request.user
+
+        # ─────────────────────────────────────────────
+        # 🔥 1. ADMIN — anaona KILA KITU (bidhaa zote, hata zisizoidhinishwa)
+        # ─────────────────────────────────────────────
+        if user.is_authenticated and (user.is_staff or user.is_superuser):
+            return queryset.order_by('-created_at')
+
+        # ─────────────────────────────────────────────
+        # 🔥 2. MTUMIAJI WA KAWAIDA / MGENI — anaona zilizoidhinishwa tu
+        # ─────────────────────────────────────────────
+        queryset = queryset.filter(is_approved=True)
+
+        # ─── Sehemu zako zilizokuwa zipo (HAZIBADILIKI) ───
+        # Chukua thamani ya original_price__gt kutoka URL
         original_price_gt = self.request.query_params.get('original_price__gt')
-        
         if original_price_gt is not None:
             from django.db.models import F
-            
-            # 1. Hakikisha original_price (bei ya punguzo) ni kubwa kuliko 0
             queryset = queryset.filter(original_price__gt=original_price_gt)
-            
-            # 2. Hakikisha original_price (bei ya punguzo) ni NDOGO kuliko price (bei halisi)
-            # Hii inazuiya bidhaa ambazo zina original_price = 0 au original_price > price zisionekane.
             queryset = queryset.filter(original_price__lt=F('price'))
 
-
-
-            # 🔥 BADILISHA HII BLOCK (Search)
+        # Search
         search = self.request.query_params.get('search')
         if search:
             from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
@@ -174,7 +178,7 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
             queryset = queryset.annotate(
                 rank=SearchRank(vector, query)
             ).filter(rank__gte=0.1).order_by('-rank')
-        
+
         return queryset
 
     def perform_create(self, serializer):
@@ -183,17 +187,17 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
             store_id = self.request.data.get('store_id')
             if not store_id:
                 return Response(
-                    {'error': 'store_id is required to create a product.'}, 
+                    {'error': 'store_id is required to create a product.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            
+
             # 🔥 2. Hakikisha mtumiaji ameingia na ana profile
             if not self.request.user.is_authenticated:
                 return Response(
-                    {'error': 'User must be authenticated.'}, 
+                    {'error': 'User must be authenticated.'},
                     status=status.HTTP_401_UNAUTHORIZED
                 )
-            
+
             serializer.save(
                 user=self.request.user.profile,
                 store_id=store_id
@@ -202,7 +206,7 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
             # 🔥 3. Catch ya jumla kwa makosa yasiyotarajiwa
             print(f"❌ [perform_create] Error: {e}")
             return Response(
-                {'error': f'Failed to create product: {str(e)}'}, 
+                {'error': f'Failed to create product: {str(e)}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -218,7 +222,7 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
         except Exception as e:
             print(f"❌ [increment_views] Error: {e}")
             return Response(
-                {'error': f'Failed to increment views: {str(e)}'}, 
+                {'error': f'Failed to increment views: {str(e)}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -227,42 +231,42 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
         try:
             product = self.get_object()
             rating = request.data.get('rating')
-            
+
             # 🔥 1. Thibitisha kama rating imetumwa na ni nambari sahihi
             if rating is None:
                 return Response(
-                    {'error': 'Rating is required.'}, 
+                    {'error': 'Rating is required.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            
+
             try:
                 rating_float = float(rating)
             except (ValueError, TypeError):
                 return Response(
-                    {'error': 'Rating must be a valid number.'}, 
+                    {'error': 'Rating must be a valid number.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            
+
             # 🔥 2. Hakikisha rating iko kati ya 1 na 5 (kwa kawaida)
             if rating_float < 0 or rating_float > 5:
                 return Response(
-                    {'error': 'Rating must be between 0 and 5.'}, 
+                    {'error': 'Rating must be between 0 and 5.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
             # 🔥 3. Hesabu average rating kwa usalama
             current_total = product.total_reviews or 0
             current_avg = float(product.average_rating or 0)
-            
+
             new_total = current_total + 1
             new_avg = ((current_avg * current_total) + rating_float) / new_total
-            
+
             product.total_reviews = new_total
             product.average_rating = new_avg
             product.save()
-            
+
             return Response(
-                {'status': 'rated', 'new_average': new_avg}, 
+                {'status': 'rated', 'new_average': new_avg},
                 status=status.HTTP_200_OK
             )
 
@@ -271,7 +275,7 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
         except Exception as e:
             print(f"❌ [rate] Error: {e}")
             return Response(
-                {'error': f'Failed to rate product: {str(e)}'}, 
+                {'error': f'Failed to rate product: {str(e)}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
@@ -328,27 +332,32 @@ class StoreEngineViewSet(viewsets.ModelViewSet):
     serializer_class = StoreEngineSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [JWTAuthentication]
-    
-    # 🔥 ONGEZA HII:
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]  # 🔥 ONGEZA OrderingFilter
-    filterset_fields = ['owner', 'status', 'verification_status', 'category_id', 'is_verified']
-    ordering_fields = ['created_at', 'store_name']  # 🔥 ONGEZA ordering
-    pagination_class = LimitOffsetPagination  # 🔥 ONGEZA pagination kwa ?limit=50
 
+    # 🔥 Filter, ordering, pagination
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['owner', 'status', 'verification_status', 'category_id', 'is_verified']
+    ordering_fields = ['created_at', 'store_name']
+    pagination_class = LimitOffsetPagination
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user.profile)
 
-    # ✅ GET_QUERYSET IKO SAHIHI
     def get_queryset(self):
+        user = self.request.user
+
+        # 🔥 1. ADMIN — anaona KILA KITU (ruhusa ya kwanza kabisa)
+        if user.is_authenticated and (user.is_staff or user.is_superuser):
+            return StoreEngine.objects.all().order_by('-created_at')
+
+        # ─── Sehemu zako zilizokuwa zipo (HAZIBADILIKI) ───
         # Ruhusu wageni waone maduka yote
         if self.action in ['list', 'retrieve']:
             return StoreEngine.objects.all()
-        
+
         # Kwa kuunda/kuhariri - zuia kwa mmiliki tu
-        user = self.request.user
         if user.is_authenticated:
             return StoreEngine.objects.filter(owner__user=user)
+
         return StoreEngine.objects.none()
 
 class ProductMediaViewSet(viewsets.ModelViewSet):
@@ -790,14 +799,50 @@ class PasswordResetVerifyView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
     
-       # ==========================================
-       # 5. 🔥 VIEWS ZA ORDERS NA ORDER ITEMS
-       # ==========================================
+# ==========================================
+# 5. 🔥 VIEWS ZA ORDERS NA ORDER ITEMS
+# ==========================================
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+
+    def get_queryset(self):
+        """
+        Admin anaona orders ZOTE.
+        Mtumiaji wa kawaida anaona orders ZAKE tu.
+        """
+        user = self.request.user
+
+        # 🔥 1. Admin/staff wanaona orders zote (kwa dashboard)
+        if user.is_staff or user.is_superuser:
+            queryset = Order.objects.all()
+
+            # Ruhusu ordering (mfano: ?ordering=-created_at)
+            ordering = self.request.query_params.get('ordering')
+            if ordering:
+                queryset = queryset.order_by(ordering)
+            else:
+                queryset = queryset.order_by('-created_at')
+
+            # Ruhusu limit (mfano: ?limit=5)
+            limit = self.request.query_params.get('limit')
+            if limit:
+                try:
+                    queryset = queryset[: int(limit)]
+                except (ValueError, TypeError):
+                    pass
+
+            return queryset
+
+        # 🔥 2. Mtumiaji wa kawaida anaona orders zake tu
+        try:
+            return Order.objects.filter(
+                customer=user.profile
+            ).order_by('-created_at')
+        except Profile.DoesNotExist:
+            return Order.objects.none()
 
     def perform_create(self, serializer):
         # Hakikisha customer ni profile ya mtumiaji aliyeingia
@@ -809,6 +854,25 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     serializer_class = OrderItemSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+
+    def get_queryset(self):
+        """
+        Admin anaona order items ZOTE.
+        Mtumiaji wa kawaida anaona items za orders ZAKE tu.
+        """
+        user = self.request.user
+
+        # 🔥 1. Admin anaona kila kitu
+        if user.is_staff or user.is_superuser:
+            return OrderItem.objects.all().order_by('-id')
+
+        # 🔥 2. Mtumiaji wa kawaida anaona items za orders zake
+        try:
+            return OrderItem.objects.filter(
+                order__customer=user.profile
+            ).order_by('-id')
+        except Profile.DoesNotExist:
+            return OrderItem.objects.none()
 
 
 # ==========================================
