@@ -793,51 +793,14 @@ class PasswordResetVerifyView(APIView):
                 {'detail': 'User not found'}, 
                 status=status.HTTP_404_NOT_FOUND
             )
-    
-# ==========================================
-# 5. 🔥 VIEWS ZA ORDERS NA ORDER ITEMS
-# ==========================================
+       # ==========================================
+       # 5. 🔥 VIEWS ZA ORDERS NA ORDER ITEMS
+       # ==========================================
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
-
-    def get_queryset(self):
-        """
-        Admin anaona orders ZOTE.
-        Mtumiaji wa kawaida anaona orders ZAKE tu.
-        """
-        user = self.request.user
-
-        # 🔥 1. Admin/staff wanaona orders zote (kwa dashboard)
-        if user.is_staff or user.is_superuser:
-            queryset = Order.objects.all()
-
-            # Ruhusu ordering (mfano: ?ordering=-created_at)
-            ordering = self.request.query_params.get('ordering')
-            if ordering:
-                queryset = queryset.order_by(ordering)
-            else:
-                queryset = queryset.order_by('-created_at')
-
-            # Ruhusu limit (mfano: ?limit=5)
-            limit = self.request.query_params.get('limit')
-            if limit:
-                try:
-                    queryset = queryset[: int(limit)]
-                except (ValueError, TypeError):
-                    pass
-
-            return queryset
-
-        # 🔥 2. Mtumiaji wa kawaida anaona orders zake tu
-        try:
-            return Order.objects.filter(
-                customer=user.profile
-            ).order_by('-created_at')
-        except Profile.DoesNotExist:
-            return Order.objects.none()
 
     def perform_create(self, serializer):
         # Hakikisha customer ni profile ya mtumiaji aliyeingia
@@ -849,26 +812,6 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     serializer_class = OrderItemSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
-
-    def get_queryset(self):
-        """
-        Admin anaona order items ZOTE.
-        Mtumiaji wa kawaida anaona items za orders ZAKE tu.
-        """
-        user = self.request.user
-
-        # 🔥 1. Admin anaona kila kitu
-        if user.is_staff or user.is_superuser:
-            return OrderItem.objects.all().order_by('-id')
-
-        # 🔥 2. Mtumiaji wa kawaida anaona items za orders zake
-        try:
-            return OrderItem.objects.filter(
-                order__customer=user.profile
-            ).order_by('-id')
-        except Profile.DoesNotExist:
-            return OrderItem.objects.none()
-
 
 # ==========================================
 # 🔥 ALL STORES VIEW - Kwa AllStores.jsx
