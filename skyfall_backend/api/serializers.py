@@ -281,12 +281,106 @@ class ProductVariationSerializer(serializers.ModelSerializer):
  # 🔥 SERIALIZERS MPYA ZA ORDERS NA ORDER ITEMS
  # ============================================================
 
+# api/serializers.py
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fields = '__all__'
+
+
 class OrderSerializer(serializers.ModelSerializer):
+    # 🔥 1. Customer info (kutoka FK)
+    customer_name = serializers.SerializerMethodField()
+    customer_email = serializers.SerializerMethodField()
+    customer_phone = serializers.SerializerMethodField()
+    
+    # 🔥 2. Items za order
+    items = OrderItemSerializer(source='items', many=True, read_only=True)
+    
+    # 🔥 3. Payment (latest payment for this order)
+    payment = serializers.SerializerMethodField()
+    
+    # 🔥 4. Dispute (latest dispute)
+    dispute = serializers.SerializerMethodField()
+    
     class Meta:
         model = Order
         fields = '__all__'
-        # 🔥 'order_number' na 'customer' zinajazwa na backend (toka kwenye perform_create)
         read_only_fields = ['customer']
+    
+    def get_customer_name(self, obj):
+        """Pata jina la mteja kutoka Profile"""
+        if obj.customer:
+            return obj.customer.full_name or obj.customer.username or 'N/A'
+        # Fallback: parse from customer_location
+        if obj.customer_location:
+            parts = obj.customer_location.split('|')
+            if len(parts) > 0:
+                return parts[0].strip()
+        return 'N/A'
+    
+    def get_customer_email(self, obj):
+        """Pata email ya mteja"""
+        if obj.customer and obj.customer.user:
+            return obj.customer.user.email or 'N/A'
+        return 'N/A'
+    
+    def get_customer_phone(self, obj):
+        """Pata simu - angalia Profile kwanza, kisha parse kutoka customer_location"""
+        if obj.customer and obj.customer.phone:
+            return obj.customer.phone
+        
+        # Fallback: parse kutoka customer_location
+        # Format: "chacha magige | Gongo la mboto, House No. 56 | Simu: 0610768845"
+        if obj.customer_location:
+            parts = obj.customer_location.split('|')
+            for part in parts:
+                if 'Simu:' in part or 'Phone:' in part:
+                    phone = part.replace('Simu:', '').replace('Phone:', '').strip()
+                    return phone
+        return 'N/A'
+    
+    def get_payment(self, obj):
+        """Pata payment ya order hii (kama Payment model ipo)"""
+        try:
+            from api.models import Payment  # au jina la model yako
+            payment = Payment.objects.filter(order_id=obj.id).first()
+            if payment:
+                return {
+                    'id': str(payment.id),
+                    'amount': str(payment.amount),
+                    'status': payment.status,
+                    'method': payment.method or obj.payment_method,
+                    'transaction_id': getattr(payment, 'transaction_id', None),
+                    'paid_at': payment.paid_at,
+                }
+        except Exception as e:
+            pass
+        
+        # Fallback: tengeneza kutoka Order fields
+        return {
+            'method': obj.payment_method or 'N/A',
+            'status': 'paid' if obj.status in ['received', 'approved', 'completed'] else 'pending',
+            'amount': str(obj.grand_total),
+        }
+    
+    def get_dispute(self, obj):
+        """Pata dispute ya order hii"""
+        try:
+            from api.models import Dispute
+            dispute = Dispute.objects.filter(order=obj).first()
+            if dispute:
+                return {
+                    'id': str(dispute.id),
+                    'reason': dispute.reason,
+                    'status': dispute.status,
+                    'description': dispute.description,
+                    'created_at': dispute.created_at,
+                }
+        except Exception:
+            pass
+        return None
 
 
 class OrderItemSerializer(serializers.ModelSerializer):

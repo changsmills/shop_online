@@ -177,8 +177,10 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://localhost:3000',
     'https://shop-online-tan.vercel.app',
-    'https://skyfall.co.tz',           # 🔥 Ongeza hii!
-    'https://www.skyfall.co.tz',       # 🔥 Ongeza hii pia!
+    'https://skyfall.co.tz',           
+    'https://www.skyfall.co.tz',  
+    'https://skyfall-admin-ten.vercel.app',
+   
 ]
 
 CORS_ALLOW_ALL_ORIGINS = False
