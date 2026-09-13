@@ -145,31 +145,26 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'description', 'sku']
 
 
-    # 🆕 ONGEZA HII METHOD (NDANI YA CLASS HII)
+       # 🆕 ONGEZA HII METHOD (NDANI YA CLASS HII)
     def get_queryset(self):
         queryset = super().get_queryset()
-        user = self.request.user
-
-        # ─────────────────────────────────────────────
-        # 🔥 1. ADMIN — anaona KILA KITU (bidhaa zote, hata zisizoidhinishwa)
-        # ─────────────────────────────────────────────
-        if user.is_authenticated and (user.is_staff or user.is_superuser):
-            return queryset.order_by('-created_at')
-
-        # ─────────────────────────────────────────────
-        # 🔥 2. MTUMIAJI WA KAWAIDA / MGENI — anaona zilizoidhinishwa tu
-        # ─────────────────────────────────────────────
-        queryset = queryset.filter(is_approved=True)
-
-        # ─── Sehemu zako zilizokuwa zipo (HAZIBADILIKI) ───
-        # Chukua thamani ya original_price__gt kutoka URL
+        
+        # Chukua thamani ya original_price__gt kutoka URL (mfano: ?original_price__gt=0)
         original_price_gt = self.request.query_params.get('original_price__gt')
+        
         if original_price_gt is not None:
             from django.db.models import F
+            
+            # 1. Hakikisha original_price (bei ya punguzo) ni kubwa kuliko 0
             queryset = queryset.filter(original_price__gt=original_price_gt)
+            
+            # 2. Hakikisha original_price (bei ya punguzo) ni NDOGO kuliko price (bei halisi)
+            # Hii inazuiya bidhaa ambazo zina original_price = 0 au original_price > price zisionekane.
             queryset = queryset.filter(original_price__lt=F('price'))
 
-        # Search
+
+
+            # 🔥 BADILISHA HII BLOCK (Search)
         search = self.request.query_params.get('search')
         if search:
             from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
@@ -178,7 +173,7 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
             queryset = queryset.annotate(
                 rank=SearchRank(vector, query)
             ).filter(rank__gte=0.1).order_by('-rank')
-
+        
         return queryset
 
     def perform_create(self, serializer):
@@ -187,17 +182,17 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
             store_id = self.request.data.get('store_id')
             if not store_id:
                 return Response(
-                    {'error': 'store_id is required to create a product.'},
+                    {'error': 'store_id is required to create a product.'}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
-
+            
             # 🔥 2. Hakikisha mtumiaji ameingia na ana profile
             if not self.request.user.is_authenticated:
                 return Response(
-                    {'error': 'User must be authenticated.'},
+                    {'error': 'User must be authenticated.'}, 
                     status=status.HTTP_401_UNAUTHORIZED
                 )
-
+            
             serializer.save(
                 user=self.request.user.profile,
                 store_id=store_id
@@ -206,7 +201,7 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
             # 🔥 3. Catch ya jumla kwa makosa yasiyotarajiwa
             print(f"❌ [perform_create] Error: {e}")
             return Response(
-                {'error': f'Failed to create product: {str(e)}'},
+                {'error': f'Failed to create product: {str(e)}'}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -222,7 +217,7 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
         except Exception as e:
             print(f"❌ [increment_views] Error: {e}")
             return Response(
-                {'error': f'Failed to increment views: {str(e)}'},
+                {'error': f'Failed to increment views: {str(e)}'}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -231,42 +226,42 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
         try:
             product = self.get_object()
             rating = request.data.get('rating')
-
+            
             # 🔥 1. Thibitisha kama rating imetumwa na ni nambari sahihi
             if rating is None:
                 return Response(
-                    {'error': 'Rating is required.'},
+                    {'error': 'Rating is required.'}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
-
+            
             try:
                 rating_float = float(rating)
             except (ValueError, TypeError):
                 return Response(
-                    {'error': 'Rating must be a valid number.'},
+                    {'error': 'Rating must be a valid number.'}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
-
+            
             # 🔥 2. Hakikisha rating iko kati ya 1 na 5 (kwa kawaida)
             if rating_float < 0 or rating_float > 5:
                 return Response(
-                    {'error': 'Rating must be between 0 and 5.'},
+                    {'error': 'Rating must be between 0 and 5.'}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
             # 🔥 3. Hesabu average rating kwa usalama
             current_total = product.total_reviews or 0
             current_avg = float(product.average_rating or 0)
-
+            
             new_total = current_total + 1
             new_avg = ((current_avg * current_total) + rating_float) / new_total
-
+            
             product.total_reviews = new_total
             product.average_rating = new_avg
             product.save()
-
+            
             return Response(
-                {'status': 'rated', 'new_average': new_avg},
+                {'status': 'rated', 'new_average': new_avg}, 
                 status=status.HTTP_200_OK
             )
 
@@ -275,7 +270,7 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
         except Exception as e:
             print(f"❌ [rate] Error: {e}")
             return Response(
-                {'error': f'Failed to rate product: {str(e)}'},
+                {'error': f'Failed to rate product: {str(e)}'}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
