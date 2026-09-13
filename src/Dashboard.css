@@ -1348,7 +1348,7 @@ html, body {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 9998;
+  z-index: 999;
   background: rgba(0, 0, 0, 0.5);
   padding: 0 16px 24px;
   box-sizing: border-box;
