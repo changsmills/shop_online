@@ -793,17 +793,51 @@ class PasswordResetVerifyView(APIView):
                 {'detail': 'User not found'}, 
                 status=status.HTTP_404_NOT_FOUND
             )
+
+
+
        # ==========================================
        # 5. 🔥 VIEWS ZA ORDERS NA ORDER ITEMS
        # ==========================================
+
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+    
+    # 🔥 ONGEZA HIZI
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['status', 'store_id', 'customer']
+    ordering_fields = ['created_at', 'grand_total', 'status']
+    ordering = ['-created_at']  # Default ordering
+    pagination_class = LimitOffsetPagination  # 🔥 Muhimu sana!
+
+    def get_queryset(self):
+        user = self.request.user
+        
+        # 🔥 1. Admin — anaona KILA KITU
+        if user.is_authenticated and (user.is_staff or user.is_superuser):
+            return Order.objects.all().order_by('-created_at')
+        
+        # 🔥 2. Supplier — anaona oda za store yake tu
+        if user.is_authenticated:
+            try:
+                profile = user.profile
+                if profile.role == 'supplier':
+                    # Pata store ya supplier huyu
+                    stores = StoreEngine.objects.filter(owner=profile)
+                    store_ids = [str(store.id) for store in stores]
+                    return Order.objects.filter(store_id__in=store_ids).order_by('-created_at')
+                else:
+                    # Buyer — anaona oda zake tu
+                    return Order.objects.filter(customer=profile).order_by('-created_at')
+            except Profile.DoesNotExist:
+                return Order.objects.none()
+        
+        return Order.objects.none()
 
     def perform_create(self, serializer):
-        # Hakikisha customer ni profile ya mtumiaji aliyeingia
         serializer.save(customer=self.request.user.profile)
 
 
@@ -812,6 +846,57 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     serializer_class = OrderItemSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+    
+    # 🔥 ONGEZA HIZI FILTERS
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['order', 'product', 'variant']
+    ordering_fields = ['id', 'quantity', 'unit_price', 'subtotal']
+    pagination_class = LimitOffsetPagination  # 🔥 Muhimu kwa data nyingi!
+
+    def get_queryset(self):
+        """
+        Chuja order items kulingana na mtumiaji:
+        - Admin: Anaona items ZOTE
+        - Supplier: Anaona items za oda za store yake
+        - Buyer: Anaona items za oda zake tu
+        """
+        user = self.request.user
+        queryset = super().get_queryset()
+        
+        # 🔥 1. Admin — anaona KILA KITU
+        if user.is_authenticated and (user.is_staff or user.is_superuser):
+            pass  # Rudi na queryset yote
+        
+        # 🔥 2. Supplier — anaona items za oda za store yake
+        elif user.is_authenticated:
+            try:
+                profile = user.profile
+                if profile.role == 'supplier':
+                    # Pata stores za supplier huyu
+                    stores = StoreEngine.objects.filter(owner=profile)
+                    store_ids = [str(store.id) for store in stores]
+                    # Chuja items kwa kutumia order__store_id
+                    queryset = queryset.filter(order__store_id__in=store_ids)
+                else:
+                    # Buyer — anaona items za oda zake tu
+                    queryset = queryset.filter(order__customer=profile)
+            except Profile.DoesNotExist:
+                return OrderItem.objects.none()
+        else:
+            return OrderItem.objects.none()
+        
+        # 🔥 3. Filter kwa order_id (kama frontend inatuma)
+        order_id = self.request.query_params.get('order_id')
+        if order_id:
+            queryset = queryset.filter(order_id=order_id)
+        
+        # 🔥 4. Filter kwa product_id (kama frontend inatuma)
+        product_id = self.request.query_params.get('product_id')
+        if product_id:
+            queryset = queryset.filter(product_id=product_id)
+        
+        # 🔥 5. Order by id (ili items zionekane kwa mpangilio)
+        return queryset.order_by('id')
 
 # ==========================================
 # 🔥 ALL STORES VIEW - Kwa AllStores.jsx

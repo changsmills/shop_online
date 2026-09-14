@@ -288,7 +288,6 @@ class OrderItemSerializer(serializers.ModelSerializer):
         model = OrderItem
         fields = '__all__'
 
-
 class OrderSerializer(serializers.ModelSerializer):
     # 🔥 1. Customer info (kutoka FK)
     customer_name = serializers.SerializerMethodField()
@@ -382,11 +381,6 @@ class OrderSerializer(serializers.ModelSerializer):
             pass
         return None
 
-
-class OrderItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrderItem
-        fields = '__all__'
 
         
 class MessageSerializer(serializers.ModelSerializer):
