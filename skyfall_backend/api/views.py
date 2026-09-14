@@ -799,39 +799,38 @@ class PasswordResetVerifyView(APIView):
        # ==========================================
        # 5. 🔥 VIEWS ZA ORDERS NA ORDER ITEMS
        # ==========================================
-
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
     
-    # 🔥 ONGEZA HIZI
+    # 🔥 FILTERS & PAGINATION
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['status', 'store_id', 'customer']
-    ordering_fields = ['created_at', 'grand_total', 'status']
-    ordering = ['-created_at']  # Default ordering
-    pagination_class = LimitOffsetPagination  # 🔥 Muhimu sana!
+    ordering_fields = ['created_at', 'grand_total', 'status', 'id']
+    ordering = ['-id']  # 🔥 Badilisha -created_at kuwa -id ili kuepuka 500 Error
+    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
         user = self.request.user
         
         # 🔥 1. Admin — anaona KILA KITU
         if user.is_authenticated and (user.is_staff or user.is_superuser):
-            return Order.objects.all().order_by('-created_at')
+            return Order.objects.all().order_by('-id')
         
         # 🔥 2. Supplier — anaona oda za store yake tu
         if user.is_authenticated:
             try:
                 profile = user.profile
                 if profile.role == 'supplier':
-                    # Pata store ya supplier huyu
+                    # Pata store za supplier huyu
                     stores = StoreEngine.objects.filter(owner=profile)
                     store_ids = [str(store.id) for store in stores]
-                    return Order.objects.filter(store_id__in=store_ids).order_by('-created_at')
+                    return Order.objects.filter(store_id__in=store_ids).order_by('-id')
                 else:
                     # Buyer — anaona oda zake tu
-                    return Order.objects.filter(customer=profile).order_by('-created_at')
+                    return Order.objects.filter(customer=profile).order_by('-id')
             except Profile.DoesNotExist:
                 return Order.objects.none()
         
@@ -839,7 +838,6 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(customer=self.request.user.profile)
-
 
 class OrderItemViewSet(viewsets.ModelViewSet):
     queryset = OrderItem.objects.all()
