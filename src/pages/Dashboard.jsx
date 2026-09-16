@@ -1030,7 +1030,7 @@ const handleSubCategoryHover = (subCategory) => {
       <div className="empty-state" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
         <div style={{ fontSize: '48px', marginBottom: '16px' }}>📦</div>
         <p style={{ fontSize: '16px', color: '#666', fontWeight: 'bold' }}>
-          Hakuna bidhaa katika kategoria hii
+          Tap a category to browse its products.
         </p>
         <p style={{ fontSize: '14px', color: '#999' }}>
           Tafadhali chagua kategoria nyingine
@@ -1111,7 +1111,7 @@ const handleSubCategoryHover = (subCategory) => {
     <div className="empty-state" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
       <div style={{ fontSize: '48px', marginBottom: '16px' }}>📦</div>
       <p style={{ fontSize: '16px', color: '#666', fontWeight: 'bold' }}>
-        Hakuna bidhaa katika subcategory hii
+        Tap a subcategory to browse its products.
       </p>
     </div>
   )
@@ -1253,7 +1253,7 @@ const handleSubCategoryHover = (subCategory) => {
                   <div className="empty-state" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
                     <div style={{ fontSize: '48px', marginBottom: '16px' }}>📦</div>
                     <p style={{ fontSize: '16px', color: '#666', fontWeight: 'bold' }}>
-                      Hakuna bidhaa katika kategoria hii
+                      Tap a category to browse its products.
                     </p>
                   </div>
                 )
