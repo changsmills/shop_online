@@ -25,18 +25,24 @@
   padding: 0 20px;
   z-index: 100;
   flex-shrink: 0;
+  position: relative;
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 20px;
 }
 
 .menu-toggle {
   cursor: pointer;
   color: #666;
   transition: color 0.2s;
+  background: none;
+  border: none;
+  padding: 4px;
+  display: flex;
+  align-items: center;
 }
 .menu-toggle:hover { color: #ff6a00; }
 
@@ -46,6 +52,7 @@
   color: #ff6a00;
   text-decoration: none;
   letter-spacing: -0.5px;
+  white-space: nowrap;
 }
 
 .search-box {
@@ -76,8 +83,18 @@
   color: #4b5563;
   cursor: pointer;
   transition: color 0.2s;
+  background: none;
+  border: none;
+  padding: 4px;
+  display: flex;
+  align-items: center;
 }
 .icon-btn:hover { color: #ff6a00; }
+
+/* Back Arrow - Fichwa kwenye Desktop */
+.back-arrow-btn {
+  display: none;
+}
 
 /* ============================================ */
 /* 3. BODY (SIDEBAR + CONTENT)                  */
@@ -87,6 +104,8 @@
   display: flex;
   flex: 1;
   overflow: hidden;
+  position: relative;
+  width: 100%;
 }
 
 /* ============================================ */
@@ -94,8 +113,10 @@
 /* ============================================ */
 
 .dashboard-sidebar {
+  position: relative;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow-x: hidden;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   background-color: #fff;
@@ -103,6 +124,7 @@
   padding-top: 10px;
   flex-shrink: 0;
   z-index: 10;
+  height: 100%;
 }
 
 .sidebar-collapsed { width: 72px; }
@@ -129,6 +151,13 @@
   transition: background 0.2s, color 0.2s;
   cursor: pointer;
   position: relative;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  width: calc(100% - 20px);
+  padding: 0;
+  text-align: left;
 }
 .sidebar-link.active {
   color: #ff6a00;
@@ -186,8 +215,11 @@
 .settings-container {
   flex: 1;
   background-color: #f7f8fa;
-  padding: 25px;
+  padding: 16px 25px 25px 25px;   /* ✅ Punguza padding ya juu */
   overflow-y: auto;
+  min-width: 0;
+  width: 100%;
+  margin-top: 50px;
 }
 
 .settings-wrapper {
@@ -195,7 +227,6 @@
   margin: 0 auto;
 }
 
-/* Custom Scrollbar */
 .settings-container::-webkit-scrollbar { width: 6px; }
 .settings-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
 .settings-container::-webkit-scrollbar-thumb { background: #ff6a00; border-radius: 10px; }
@@ -228,6 +259,7 @@
   display: flex;
   align-items: center;
   gap: 20px;
+  width: 100%;
 }
 
 .avatar-circle {
@@ -240,7 +272,7 @@
   justify-content: center;
   font-size: 28px;
   font-weight: bold;
-  color: #4f46e5;
+  color: #ff6a00;
   border: 3px solid #ffffff;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   overflow: hidden;
@@ -251,6 +283,11 @@
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.user-details-text {
+  flex: 1;
+  min-width: 0;
 }
 
 .user-full-name {
@@ -271,17 +308,19 @@
 }
 
 .btn-edit-profile {
-  padding: 8px 16px;
-  background-color: #4f46e5;
+  padding: 10px 20px;
+  background-color: #ff6a00;
   color: white;
   border: none;
-  border-radius: 6px;
-  font-weight: 500;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
   cursor: pointer;
-  transition: opacity 0.2s, transform 0.2s;
+  transition: all 0.2s;
+  white-space: nowrap;
 }
 .btn-edit-profile:hover {
-  opacity: 0.9;
+  background-color: #e55a00;
   transform: translateY(-1px);
 }
 
@@ -308,6 +347,7 @@
 .settings-links-list {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .link-item {
@@ -320,23 +360,11 @@
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  font-size: 14px;
 }
 .link-item:hover {
   background-color: #f9fafb;
   color: #ff6a00;
-}
-.link-item::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: #ff6a00;
-  transition: width 0.2s ease;
-}
-.link-item:hover::after {
-  width: 100%;
 }
 
 .flex-between {
@@ -359,6 +387,7 @@
 }
 .delete-acc:hover {
   background-color: #fef2f2;
+  color: #dc2626;
 }
 
 /* ============================================ */
@@ -435,6 +464,7 @@
   font-size: 14px;
   font-weight: 500;
   color: #333;
+  flex: 1;
 }
 .helpful-arrow {
   margin-left: auto;
@@ -488,6 +518,10 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #eee;
 }
 
 .input-group {
@@ -516,11 +550,19 @@
 .modal-input,
 .modal-textarea {
   width: 100%;
-  padding: 10px;
+  padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid #ddd;
   font-size: 14px;
   box-sizing: border-box;
+  outline: none;
+  font-family: inherit;
+  background: #fff;
+  color: #111;
+}
+.modal-input:focus,
+.modal-textarea:focus {
+  border-color: #ff6a00;
 }
 .modal-textarea { resize: vertical; font-family: inherit; }
 
@@ -531,18 +573,22 @@
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
+  font-size: 13px;
   transition: 0.2s;
 }
 .btn-cancel:hover { background-color: #e5e5e5; }
 
 .btn-save {
-  padding: 6px 12px;
+  padding: 8px 16px;
   background-color: #ff6a00;
   color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
 }
+.btn-save:hover { background-color: #e55a00; }
 .btn-save-primary {
   padding: 10px 20px;
   background-color: #ff6a00;
@@ -554,17 +600,17 @@
   align-items: center;
   gap: 8px;
   transition: all 0.2s ease;
+  font-weight: 600;
 }
 .btn-save-primary:hover {
+  background-color: #e55a00;
   transform: translateY(-1px);
-  filter: brightness(1.05);
 }
 .btn-save:disabled,
 .btn-save-primary:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
-
 
 /* ============================================ */
 /* 12. EDIT PROFILE MODAL                        */
@@ -581,30 +627,30 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  padding: 20px;
 }
 
 .modal-box {
   background-color: #fff;
   border-radius: 16px;
-  width: 90%;
+  width: 100%;
   max-width: 500px;
   max-height: 90vh;
-  overflow-y: auto; /* Inaruhusu scroll */
-  margin: 20px auto; 
+  overflow-y: auto;
   padding-bottom: 20px;
 }
 
-/* Header inabaki juu wakati unascroll */
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 20px;
   border-bottom: 1px solid #eee;
-  position: sticky; 
+  position: sticky;
   top: 0;
   background-color: #fff;
   z-index: 10;
+  border-radius: 16px 16px 0 0;
 }
 .modal-header h3 { margin: 0; }
 
@@ -614,49 +660,47 @@
   cursor: pointer;
   padding: 4px;
   transition: transform 0.2s;
+  color: #666;
+  display: flex;
+  align-items: center;
 }
-.modal-close:hover { transform: scale(1.1); }
+.modal-close:hover { transform: scale(1.1); color: #ff6a00; }
 
 .modal-body { 
   padding: 20px; 
 }
 
-/* --- SEHEMU YA AVATAR (Imerekebishwa kabisa) --- */
+/* Avatar */
 .avatar-upload-area {
   text-align: center;
   margin-bottom: 20px;
-  position: relative; /* 🔥 Muhimu: Inazuia kamera kutoroka! */
+  position: relative;
 }
 
-/* Hii ndio mzazi wa kamera! */
 .avatar-upload-circle {
-  position: relative; /* 🔥 Muhimu SANA: Inafanya kamera kukaa hapa! */
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: relative;
+  display: inline-block;
   width: 110px;
   height: 110px;
   border-radius: 50%;
   background-color: #f0f0f0;
-  margin: 0 auto; /* Inaweka katikati */
-  overflow: visible; /* Inaruhusu kamera itoke nje ya duara */
   border: 3px solid #ff6a00;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: visible;
 }
 
-/* Picha yenyewe */
 .avatar-preview-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
+  display: block;
 }
 
-/* 🔥 Kamera - Sasa itakaa kwenye picha (kona ya chini-kulia) */
 .avatar-upload-label {
   position: absolute;
-  bottom: 0;  /* 🔥 Inaweka chini ya picha */
-  right: 0;   /* 🔥 Inaweka kulia ya picha */
+  bottom: 0;
+  right: 0;
   background-color: #ff6a00;
   border-radius: 50%;
   width: 36px;
@@ -666,10 +710,10 @@
   justify-content: center;
   cursor: pointer;
   color: #fff;
-  border: 3px solid #fff; 
+  border: 3px solid #fff;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   transition: transform 0.2s ease, background 0.2s ease;
-  z-index: 5; /* 🔥 Inahakikisha iko juu ya picha */
+  z-index: 5;
 }
 
 .avatar-upload-label:hover {
@@ -686,7 +730,7 @@
   font-weight: 500;
 }
 
-/* --- SEHEMU ZINGINE --- */
+/* Form */
 .form-group {
   margin-bottom: 15px;
 }
@@ -695,248 +739,311 @@
   margin-bottom: 5px;
   font-weight: 600;
   font-size: 14px;
+  color: #374151;
 }
 
 .modal-actions {
   display: flex;
   gap: 10px;
   justify-content: flex-end;
-  padding-top: 10px; 
+  padding-top: 10px;
 }
 
 /* ============================================ */
 /* 13. RESPONSIVE MEDIA QUERIES                 */
 /* ============================================ */
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
+  .settings-container {
+    padding: 20px;
+  }
   .settings-grid {
-    grid-template-columns: 1fr !important;
-    gap: 15px;
+    gap: 16px;
   }
-  .profile-header-card {
-    flex-direction: column !important;
-    text-align: center;
-    padding: 20px !important;
+}
+
+@media (max-width: 768px) {
+  /* Header */
+  .dashboard-header {
+    padding: 0 12px;
+    height: 60px;
   }
-  .profile-info-main {
-    flex-direction: column !important;
-    text-align: center;
-    gap: 12px !important;
+  .header-left {
+    gap: 12px;
   }
-  .avatar-circle { width: 60px !important; height: 60px !important; font-size: 22px !important; }
-  .user-full-name { font-size: 18px !important; }
-  .btn-edit-profile { width: 100%; justify-content: center; margin-top: 10px; }
-  
-  .dashboard-header { padding: 0 12px !important; }
-  .header-left { gap: 12px !important; }
-  .search-box { display: none !important; }
-  
-  /* 🔥 FICHA HAMBURGER NA ICONS ZA KULIA KWENYE MOBILE */
-  .menu-toggle {
-    display: none !important;
+  .search-box {
+    display: none;
   }
   .header-right {
+    display: none;
+  }
+  .menu-toggle {
+    display: none;
+  }
+  .back-arrow-btn {
+    display: flex !important;
+  }
+  .logo-text {
+    font-size: 18px;
+  }
+
+  /* Sidebar - Fichwa kabisa kwenye mobile */
+  .dashboard-sidebar {
     display: none !important;
   }
 
-  .logo-text { font-size: 16px !important; }
-
-  .dashboard-sidebar {
-    position: fixed !important;
-    left: 0;
-    top: 60px;
-    bottom: 0;
-    z-index: 200 !important;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  /* Content */
+  .dashboard-main {
+    flex-direction: column;
+  }
+  .settings-container {
+    padding: 15px;
+    padding-bottom: 80px;
   }
 
-  .settings-container { padding: 15px !important; padding-bottom: 80px !important; }
-  .settings-card { padding: 16px !important; }
-  .section-title { font-size: 14px !important; }
-  .link-item { padding: 10px 12px !important; }
-  .user-email-sub, .user-username { font-size: 12px !important; }
-  .helpful-links-grid { grid-template-columns: 1fr; gap: 8px; }
+  /* Profile Card */
+  .profile-header-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+  .profile-info-main {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+  .avatar-circle { 
+    width: 60px; 
+    height: 60px; 
+    font-size: 22px; 
+  }
+  .user-full-name { 
+    font-size: 18px; 
+  }
+  .btn-edit-profile { 
+    width: 100%; 
+    justify-content: center; 
+    margin-top: 10px; 
+  }
 
+  /* Settings Grid */
+  .settings-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  .settings-card {
+    padding: 16px;
+  }
+  .section-title {
+    font-size: 14px;
+  }
+  .link-item {
+    padding: 10px 12px;
+  }
+  .user-email-sub, .user-username {
+    font-size: 12px;
+  }
+
+  /* Helpful Links */
+  .helpful-links-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  /* Modal */
   .modal-box {
-    width: 95% !important;
-    margin: 10px auto !important;
-    max-height: 85vh !important;
-    border-radius: 20px !important;
+    width: 95%;
+    max-height: 85vh;
+    border-radius: 20px;
   }
-  .modal-header { padding: 15px !important; }
-  .modal-body { padding: 15px !important; }
-  .avatar-upload-circle { width: 80px !important; height: 80px !important; }
+  .modal-header { padding: 15px; }
+  .modal-body { padding: 15px; }
+  .avatar-upload-circle { 
+    width: 80px; 
+    height: 80px; 
+  }
   .modal-actions {
-    flex-direction: column !important;
-    gap: 8px !important;
+    flex-direction: column;
+    gap: 8px;
   }
-  .modal-actions button { width: 100% !important; justify-content: center !important; }
+  .modal-actions button { 
+    width: 100%; 
+    justify-content: center; 
+  }
 
+  /* Ficha tooltip kwenye mobile */
   .sidebar-link::after,
-  .sidebar-link::before { display: none !important; }
+  .sidebar-link::before {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
-  .dashboard-sidebar.sidebar-expanded { width: 200px !important; }
-  .header-right { gap: 12px !important; }
-  .settings-grid { gap: 12px !important; }
+  .settings-container {
+    padding: 12px;
+    padding-bottom: 80px;
+  }
+  .settings-grid {
+    gap: 12px;
+  }
+  .settings-card {
+    padding: 14px;
+  }
 }
 
 @media (min-width: 1400px) {
-  .settings-wrapper { max-width: 1200px !important; }
-  .settings-grid { gap: 30px !important; }
+  .settings-wrapper {
+    max-width: 1200px;
+  }
+  .settings-grid {
+    gap: 30px;
+  }
 }
 
 @media print {
   .dashboard-header,
   .dashboard-sidebar,
   .btn-edit-profile,
-  .header-right { display: none !important; }
-  .settings-container { padding: 0 !important; background: white !important; }
-  .settings-card { box-shadow: none !important; border: 1px solid #ddd !important; }
+  .header-right {
+    display: none !important;
+  }
+  .settings-container {
+    padding: 0 !important;
+    background: white !important;
+  }
+  .settings-card {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
 }
+
 /* ============================================ */
-/* DARK MODE SUPPORT - ACCOUNT SETTINGS          */
+/* 14. DARK MODE SUPPORT                         */
 /* ============================================ */
 
 @media (prefers-color-scheme: dark) {
-
-  /* 1. MAIN LAYOUT & BACKGROUND */
   .dashboard-layout {
-    background: #0f172a !important;
+    background: #000000 !important;
+    color: #ffffff !important;
   }
 
   .dashboard-header {
-    background: #1e293b !important;
-    border-bottom-color: #334155 !important;
+    background: #0a0a0a !important;
+    border-bottom-color: #1f1f1f !important;
   }
 
   .dashboard-main {
-    background: #0f172a !important;
+    background: #000000 !important;
   }
 
-  /* 2. HEADER ELEMENTS */
   .logo-text {
-    color: #ff6a00 !important; /* Inabaki Orange */
+    color: #ff6a00 !important;
   }
 
   .search-box {
-    background: #0f172a !important;
-    color: #94a3b8 !important;
-    border: 1px solid #334155 !important;
+    background: #111111 !important;
+    color: #b0b0b0 !important;
+    border: 1px solid #1f1f1f !important;
   }
   .search-box input {
-    color: #e2e8f0 !important;
+    color: #ffffff !important;
   }
   .search-box input::placeholder {
-    color: #64748b !important;
+    color: #6b7280 !important;
   }
 
   .icon-btn {
-    color: #94a3b8 !important;
+    color: #b0b0b0 !important;
   }
   .icon-btn:hover {
     color: #ff6a00 !important;
   }
 
-  /* 3. SIDEBAR */
   .dashboard-sidebar {
-    background-color: #1e293b !important;
-    border-right-color: #334155 !important;
+    background-color: #0a0a0a !important;
+    border-right-color: #1f1f1f !important;
   }
 
   .sidebar-link {
-    color: #94a3b8 !important;
+    color: #b0b0b0 !important;
   }
   .sidebar-link.active {
     color: #ff6a00 !important;
-    background-color: #2d3748 !important;
+    background-color: #1a1a1a !important;
   }
   .sidebar-link:hover {
-    background-color: #2d3748 !important;
+    background-color: #1a1a1a !important;
   }
   .sidebar-link.active::before {
     background: #ff6a00 !important;
   }
 
-  /* Tooltip */
   .sidebar-link::after {
-    background-color: #1e293b !important;
-    color: #e2e8f0 !important;
-    border: 1px solid #334155 !important;
-  }
-  .sidebar-link::before {
-    border-right-color: #1e293b !important;
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+    border: 1px solid #1f1f1f !important;
   }
 
-  /* 4. SETTINGS CONTENT AREA */
   .settings-container {
-    background-color: #0f172a !important;
+    background-color: #000000 !important;
   }
 
   .settings-container::-webkit-scrollbar-track {
-    background: #1e293b !important;
+    background: #111111 !important;
   }
   .settings-container::-webkit-scrollbar-thumb {
-    background: #4b5563 !important;
-    border-radius: 10px !important;
+    background: #333333 !important;
   }
   .settings-container::-webkit-scrollbar-thumb:hover {
     background: #ff6a00 !important;
   }
 
-  /* 5. CARDS (Settings & Profile) */
   .settings-card {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
-    color: #e2e8f0 !important;
+    background: #111111 !important;
+    border: 1px solid #1f1f1f !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6) !important;
+    color: #ffffff !important;
   }
   .settings-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8) !important;
   }
 
   .profile-header-card {
-    background: #1e293b !important;
-    border-color: #334155 !important;
+    background: #111111 !important;
+    border-color: #1f1f1f !important;
   }
 
-  /* 6. PROFILE INFO */
   .user-full-name {
-    color: #e2e8f0 !important;
+    color: #ffffff !important;
   }
   .user-email-sub {
-    color: #94a3b8 !important;
+    color: #b0b0b0 !important;
   }
   .user-username {
     color: #6b7280 !important;
   }
 
   .avatar-circle {
-    background-color: #334155 !important;
-    border-color: #1e293b !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4) !important;
+    background-color: #1a1a1a !important;
+    border-color: #111111 !important;
+    color: #ff6a00 !important;
   }
 
   .btn-edit-profile {
-    background-color: #ff6a00 !important; /* Inabaki Orange */
+    background-color: #ff6a00 !important;
     color: #ffffff !important;
   }
 
-  /* 7. SETTINGS GRID & LINKS */
   .section-title {
-    color: #e2e8f0 !important;
+    color: #ffffff !important;
   }
 
   .link-item {
-    color: #94a3b8 !important;
+    color: #b0b0b0 !important;
   }
   .link-item:hover {
-    background-color: #2d3748 !important;
+    background-color: #1a1a1a !important;
     color: #ff6a00 !important;
-  }
-  .link-item::after {
-    background: #ff6a00 !important;
   }
 
   .sub-text {
@@ -949,13 +1056,12 @@
     background-color: #2d1a1a !important;
   }
 
-  /* 8. LANGUAGE SWITCHER */
   .lang-btn {
-    border-color: #4b5563 !important;
-    color: #94a3b8 !important;
+    border-color: #333333 !important;
+    color: #b0b0b0 !important;
   }
   .lang-btn:hover {
-    background-color: #2d3748 !important;
+    background-color: #1a1a1a !important;
   }
   .lang-btn.active {
     background-color: #ff6a00 !important;
@@ -963,31 +1069,29 @@
     border-color: #ff6a00 !important;
   }
 
-  /* 9. HELPFUL LINKS */
   .helpful-links-section h3 {
-    color: #e2e8f0 !important;
+    color: #ffffff !important;
   }
 
   .helpful-link-item {
-    background-color: #1e293b !important;
-    border-color: #334155 !important;
-    color: #e2e8f0 !important;
+    background-color: #111111 !important;
+    border-color: #1f1f1f !important;
+    color: #ffffff !important;
   }
   .helpful-link-item:hover {
     border-color: #ff6a00 !important;
   }
 
   .helpful-icon-box {
-    background-color: #2d3748 !important;
+    background-color: #1a1a1a !important;
     color: #ff6a00 !important;
   }
   .helpful-link-title {
-    color: #e2e8f0 !important;
+    color: #ffffff !important;
   }
 
-  /* 10. SIGN OUT & FOOTER */
   .sign-out-btn {
-    background-color: #1e293b !important;
+    background-color: #111111 !important;
     border-color: #f87171 !important;
     color: #f87171 !important;
   }
@@ -1000,15 +1104,18 @@
     color: #6b7280 !important;
   }
 
-  /* 11. INLINE FORMS (Email & Password) */
+  .email-edit-form,
+  .password-edit-form {
+    background: #0a0a0a !important;
+    border-color: #1f1f1f !important;
+  }
+
   .modal-input,
   .modal-textarea,
-  .input-group input,
-  .password-edit-form input,
-  .email-edit-form input {
-    background: #0f172a !important;
-    border-color: #4b5563 !important;
-    color: #e2e8f0 !important;
+  .input-group input {
+    background: #0a0a0a !important;
+    border-color: #333333 !important;
+    color: #ffffff !important;
   }
   .modal-input::placeholder,
   .modal-textarea::placeholder {
@@ -1016,117 +1123,77 @@
   }
 
   .btn-cancel {
-    background-color: #334155 !important;
-    border-color: #4b5563 !important;
-    color: #e2e8f0 !important;
+    background-color: #1a1a1a !important;
+    border-color: #333333 !important;
+    color: #ffffff !important;
   }
   .btn-cancel:hover {
-    background-color: #4b5563 !important;
+    background-color: #333333 !important;
   }
 
   .btn-save,
   .btn-save-primary {
-    background-color: #ff6a00 !important; /* Inabaki Orange */
+    background-color: #ff6a00 !important;
     color: #ffffff !important;
   }
 
-  /* 12. EDIT PROFILE MODAL */
   .modal-overlay {
-    background-color: rgba(0, 0, 0, 0.8) !important;
+    background-color: rgba(0, 0, 0, 0.85) !important;
   }
 
   .modal-box {
-    background-color: #1e293b !important;
-    color: #e2e8f0 !important;
+    background-color: #111111 !important;
+    color: #ffffff !important;
   }
 
   .modal-header {
-    border-bottom-color: #334155 !important;
+    border-bottom-color: #1f1f1f !important;
+    background-color: #111111 !important;
   }
   .modal-header h3 {
-    color: #e2e8f0 !important;
+    color: #ffffff !important;
   }
 
   .modal-close {
-    color: #94a3b8 !important;
+    color: #b0b0b0 !important;
   }
   .modal-close:hover {
     color: #ff6a00 !important;
   }
 
   .avatar-upload-circle {
-    background-color: #334155 !important;
+    background-color: #1a1a1a !important;
   }
   .avatar-upload-label {
-    background-color: #ff6a00 !important; /* Inabaki Orange */
+    background-color: #ff6a00 !important;
   }
   .avatar-hint {
     color: #6b7280 !important;
   }
 
   .form-group label {
-    color: #e2e8f0 !important;
-  }
-
-  /* 13. STORE SECTION (Rudi kwenye Duka) */
-  .store-section div[style*="cursor: pointer"] {
-    background-color: #2d3748 !important;
-    border-color: #ff6a00 !important;
-  }
-  .store-section div[style*="cursor: pointer"] span {
-    color: #ff6a00 !important;
-  }
-  .store-section div[style*="cursor: pointer"] p {
-    color: #94a3b8 !important;
-  }
-
-  /* 14. MOBILE BOTTOM NAV (Ikiwa inaonekana) */
-  nav[style*="position: fixed; bottom: 0"] {
-    background: #1e293b !important;
-    border-top-color: #334155 !important;
-  }
-  nav[style*="position: fixed; bottom: 0"] button span {
-    color: #94a3b8 !important;
-  }
-  nav[style*="position: fixed; bottom: 0"] button span[style*="color: #ff6600"] {
-    color: #ff6a00 !important;
-  }
-
-  /* 15. SCROLLBARS (Global kwa settings) */
-  .settings-wrapper::-webkit-scrollbar-track {
-    background: #1e293b !important;
-  }
-  .settings-wrapper::-webkit-scrollbar-thumb {
-    background: #4b5563 !important;
-    border-radius: 10px !important;
-  }
-  .settings-wrapper::-webkit-scrollbar-thumb:hover {
-    background: #ff6a00 !important;
-  }
-
-  /* 16. MOBILE RESPONSIVE OVERRIDES */
-  @media (max-width: 768px) {
-    .dashboard-sidebar {
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.6) !important;
-    }
-    .settings-container {
-      background-color: #0f172a !important;
-    }
+    color: #ffffff !important;
   }
 }
 
 /* ============================================
-   SKELETON LOADING KWA ACCOUNT SETTINGS
+   SKELETON LOADING
    ============================================ */
 
-/* Animation ya Pulse (Inafanana na Dashboard) */
 @keyframes pulse {
   0% { background-color: #e0e0e0; }
   50% { background-color: #f0f0f0; }
   100% { background-color: #e0e0e0; }
 }
 
-/* Header Skeleton */
+@media (prefers-color-scheme: dark) {
+  @keyframes pulse {
+    0% { background-color: #1a1a1a; }
+    50% { background-color: #2a2a2a; }
+    100% { background-color: #1a1a1a; }
+  }
+}
+
 .skeleton-header {
   height: 60px;
   background: #fff;
@@ -1134,62 +1201,41 @@
   animation: pulse 1.5s infinite ease-in-out;
 }
 
-/* Sidebar Skeleton (Desktop Only) */
 .skeleton-sidebar-account {
-  width: 220px;
+  width: 72px;
   background: #fff;
   border-right: 1px solid #eee;
   animation: pulse 1.5s infinite ease-in-out;
+  flex-shrink: 0;
 }
 
-/* Profile Card Skeleton */
 .skeleton-profile-card {
   height: 120px;
   background: #fff;
   border-radius: 12px;
-  margin: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
   animation: pulse 1.5s infinite ease-in-out;
 }
 
-/* Settings Grid Skeleton */
 .skeleton-settings-grid {
   height: 200px;
   background: #fff;
   border-radius: 12px;
-  margin: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   animation: pulse 1.5s infinite ease-in-out;
 }
 
-/* Mobile: Ficha Sidebar Skeleton na ipate nafasi nzima */
+@media (prefers-color-scheme: dark) {
+  .skeleton-header,
+  .skeleton-sidebar-account,
+  .skeleton-profile-card,
+  .skeleton-settings-grid {
+    background: #111111 !important;
+    border-color: #1f1f1f !important;
+  }
+}
+
 @media (max-width: 768px) {
   .skeleton-sidebar-account {
     display: none !important;
-  }
-  .skeleton-profile-card,
-  .skeleton-settings-grid {
-    margin: 10px !important;
-  }
-}
-/* Back Arrow Button - IMEFICHWA KWENYE DESKTOP */
-.back-arrow-btn {
-  display: none; /* 🔥 FICHA KABISA KWENYE DESKTOP */
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-  border-radius: 50%;
-  transition: background 0.2s;
-  margin-right: 10px;
-}
-
-.back-arrow-btn:hover {
-  background-color: rgba(255, 87, 34, 0.1); /* Background nyepesi ya chungwa ikibonyezwa */
-}
-
-/* 🔥 ONYESHA BACK ARROW KWENYE MOBILE PEKEE (Chini ya 768px) */
-@media (max-width: 768px) {
-  .back-arrow-btn {
-    display: flex !important; /* Inaonekana kwenye simu */
   }
 }

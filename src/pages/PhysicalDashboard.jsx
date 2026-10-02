@@ -497,328 +497,325 @@ export default function PhysicalDashboard() {
     { id: 'logout', label: 'Logout', icon: <LogOut size={20} /> },
   ];
 
-  return (
-    <div className="dashboard-wrapper">
-      <header className="dashboard-header">
-        <div className="header-brand">
-          <button className="mobile-menu-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-            <Menu size={24} />
-          </button>
-          <div className="header-brand-inner">
-            <span className="header-title">Skyfall</span>
-            <span className="header-badge">Supplier</span>
-          </div>
+ return (
+  <div className="dashboard-wrapper">
+    
+    {/* ============ HEADER ============ */}
+    <header className="dashboard-header">
+      <div className="header-brand">
+        <button 
+          className="mobile-menu-btn" 
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        >
+          <Menu size={24} />
+        </button>
+        <div className="header-brand-inner">
+          <span className="header-title">Skyfall</span>
+          <span className="header-badge">Supplier</span>
         </div>
+      </div>
 
-        <div className="header-center">
-          <span className="header-welcome">Welcome to Skyfall.com</span>
-        </div>
+      <div className="header-center">
+        <span className="header-welcome">Welcome to Skyfall.com</span>
+      </div>
 
-        <div className="header-actions">
-          <button className="header-icon-btn" onClick={() => navigate('/dashboard/supplier-notifications')}>
-            <Bell size={20} color="#4b5563" />
+      <div className="header-actions">
+        <button className="header-icon-btn" onClick={() => navigate('/dashboard/supplier-notifications')}>
+          <Bell size={20} />
+        </button>
+        <button className="header-icon-btn" onClick={() => navigate('/dashboard/supplier-orders')}>
+          <ClipboardList size={20} />
+        </button>
+        <button className="header-icon-btn" onClick={() => navigate('/dashboard/supplier-messages')}>
+          <MessageSquare size={20} />
+          {unreadMessages > 0 && (
+            <span className="header-unread-badge">
+              {unreadMessages > 9 ? '9+' : unreadMessages}
+            </span>
+          )}
+        </button>
+
+        <div className="header-actions-wrap">
+          <button 
+            className="header-avatar-btn" 
+            onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
+          >
+            <span>{myStore?.store_name ? myStore.store_name.charAt(0).toUpperCase() : 'U'}</span>
           </button>
-          <button className="header-icon-btn" onClick={() => navigate('/dashboard/supplier-orders')}>
-            <ClipboardList size={20} color="#4b5563" />
-          </button>
-          <button className="header-icon-btn" onClick={() => navigate('/dashboard/supplier-messages')}>
-            <MessageSquare size={20} color="#4b5563" />
-            {unreadMessages > 0 && (
-              <span className="header-unread-badge">
-                {unreadMessages > 9 ? '9+' : unreadMessages}
-              </span>
-            )}
-          </button>
 
-          <div className="header-actions-wrap">
-            <button className="header-avatar-btn" onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}>
-              <span>{myStore?.store_name ? myStore.store_name.charAt(0).toUpperCase() : 'U'}</span>
-            </button>
-
-            <div className={`account-dropdown ${isAccountMenuOpen ? 'open' : ''}`}>
-              <div className="account-dropdown-header">
-                <p className="account-dropdown-name">{myStore?.store_name || "Store Name"}</p>
-                <p className="account-dropdown-email">{myStore?.email || "supplier@skyfall.com"}</p>
-              </div>
-              <div className="dropdown-section">
-                <div className="account-dropdown-item" onClick={() => navigate('/dashboard/messages')}>
-                <MessageSquare size={16} /> Messages
-                  {unreadMessages > 0 && (
-                    <span className="dropdown-unread-badge">
-                      {unreadMessages}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="dropdown-divider">
-                <div className="account-dropdown-item logout" onClick={handleLogout}>
-                  <LogOut size={16} /> Logout
-                </div>
-              </div>
+          <div className={`account-dropdown ${isAccountMenuOpen ? 'open' : ''}`}>
+            <div className="account-dropdown-header">
+              <p className="account-dropdown-name">{myStore?.store_name || "Store Name"}</p>
+              <p className="account-dropdown-email">{myStore?.email || "supplier@skyfall.com"}</p>
+            </div>
+            <div className="account-dropdown-item" onClick={() => navigate('/dashboard/messages')}>
+              <MessageSquare size={16} /> Messages
+              {unreadMessages > 0 && (
+                <span className="dropdown-unread-badge">{unreadMessages}</span>
+              )}
+            </div>
+            <div className="account-dropdown-item logout" onClick={handleLogout}>
+              <LogOut size={16} /> Logout
             </div>
           </div>
         </div>
-      </header>
+      </div>
+    </header>
 
-      <div className="dashboard-main-wrapper">
-        <aside className={`dashboard-sidebar ${isSidebarOpen ? 'open' : ''}`}>
-          <div className="sidebar-header">
-            <h3>Supplier</h3>
-          </div>
-          <ul className="sidebar-menu">
-            {menuItems.map((item) => {
-              const isActive = activeTab === item.id;
-              return (
-                <li
-                  key={item.id}
-                  className={`sidebar-menu-item ${isActive ? 'active' : ''} ${item.id === 'logout' ? 'logout' : ''}`}
-                  onClick={() => {
-                    if (item.id === 'logout') {
-                      handleLogout();
-                    } else if (item.id === 'settings') {
-                      navigate('/dashboard/supplier-settings');
-                    } else {
-                      setActiveTab(item.id);
-                      if (window.innerWidth < 768) setIsSidebarOpen(false);
-                    }
-                  }}
-                >
-                  {item.icon}
-                  <span>{item.label}</span>
-                </li>
-              );
-            })}
-          </ul>
-        </aside>
+    {/* ============ MAIN WRAPPER ============ */}
+    <div className="dashboard-main-wrapper">
+      
+      {/* ============ SIDEBAR ============ */}
+      <aside className={`dashboard-sidebar ${isSidebarOpen ? 'open' : ''}`}>
+        <div className="sidebar-header">
+          <h3>Supplier</h3>
+        </div>
+        <ul className="sidebar-menu">
+          {menuItems.map((item) => {
+            const isActive = activeTab === item.id;
+            return (
+              <li
+                key={item.id}
+                className={`sidebar-menu-item ${isActive ? 'active' : ''} ${item.id === 'logout' ? 'logout' : ''}`}
+                onClick={() => {
+                  if (item.id === 'logout') {
+                    handleLogout();
+                  } else if (item.id === 'settings') {
+                    navigate('/dashboard/supplier-settings');
+                  } else {
+                    setActiveTab(item.id);
+                    if (window.innerWidth < 768) setIsSidebarOpen(false);
+                  }
+                }}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </li>
+            );
+          })}
+        </ul>
+      </aside>
 
-           {/* ✅ ONGEZA HII CHINI YA ASIDE: Overlay ya giza kwa mobile */}
-        {isSidebarOpen && window.innerWidth < 768 && (
-          <div 
-            className="sidebar-overlay" 
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        )}
+      {/* Overlay ya mobile */}
+      {isSidebarOpen && window.innerWidth < 768 && (
+        <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />
+      )}
 
-        <main className="dashboard-content">
-          <div className="dashboard-content-inner">
+      {/* ============ MAIN CONTENT ============ */}
+      <main className="dashboard-content">
+        <div className="dashboard-content-inner">
+          
+          {/* ===== OVERVIEW TAB ===== */}
+          <div className={`tab-content ${activeTab === 'overview' ? 'active' : ''}`}>
             
-            <div className={`tab-content ${activeTab === 'overview' ? 'active' : ''}`}>
-              <div className="store-header-wrapper">  
-                <StoreHeader
-                  myStore={myStore}
-                  bannerPreview={bannerPreview}
-                  setBannerFile={setBannerFile}
-                  setBannerPreview={setBannerPreview}
-                  logoPreview={logoPreview}
-                  setLogoFile={setLogoFile}
-                  setLogoPreview={setLogoPreview}
+            {/* 1. Store Header (Banner) */}
+            <div className="store-header-wrapper">
+              <StoreHeader
+                myStore={myStore}
+                bannerPreview={bannerPreview}
+                setBannerFile={setBannerFile}
+                setBannerPreview={setBannerPreview}
+                logoPreview={logoPreview}
+                setLogoFile={setLogoFile}
+                setLogoPreview={setLogoPreview}
+              />
+            </div>
+
+            {/* 2. Analytics + Management */}
+            <section className="analytics-section">
+              <BusinessAnalytics products={myProducts} sellerId={myStore?.id} />
+              
+              <div className="store-mgmt-wrapper">
+                <StoreManagement
+                  isManageMode={isManageMode}
+                  setIsManageMode={setIsManageMode}
+                  myStoreSubCats={myStoreSubCats}
+                  attributes={attributes}
+                  setAttributes={setAttributes}
+                  handleRemoveCategoryFromStore={handleRemoveCategoryFromStore}
+                  setShowCategoryManager={setShowCategoryManager}
+                  officePreviews={officePreviews}
+                  setOfficeFiles={setOfficeFiles}
+                  setOfficePreviews={setOfficePreviews}
+                  officeInputRefs={officeInputRefs}
+                  storeMeta={storeMeta}
+                  setStoreMeta={setStoreMeta}
+                  isUpdatingStore={isUpdatingStore}
+                  handleUpdateStoreDetails={handleUpdateStoreDetails}
+                  storeId={myStore?.id}
                 />
               </div>
-              <section className="analytics-section">
-                <BusinessAnalytics products={myProducts} sellerId={myStore?.id} />
-                <div className="store-mgmt-wrapper">
-                  <StoreManagement
-                    isManageMode={isManageMode}
-                    setIsManageMode={setIsManageMode}
-                    myStoreSubCats={myStoreSubCats}
-                    attributes={attributes}
-                    setAttributes={setAttributes}
-                    handleRemoveCategoryFromStore={handleRemoveCategoryFromStore}
-                    setShowCategoryManager={setShowCategoryManager}
-                    officePreviews={officePreviews}
-                    setOfficeFiles={setOfficeFiles}
-                    setOfficePreviews={setOfficePreviews}
-                    officeInputRefs={officeInputRefs}
-                    storeMeta={storeMeta}
-                    setStoreMeta={setStoreMeta}
-                    isUpdatingStore={isUpdatingStore}
-                    handleUpdateStoreDetails={handleUpdateStoreDetails}
-                    storeId={myStore?.id}
-                  />
-                </div>
 
-               <div className="advertise-wrapper">
-                  <div className="advertise-banner" onClick={() => navigate('/advertise')}>
-                    <div>
-                      <h3><Rocket size={20} /> INCREASE YOUR SALES TODAY!</h3>
-                      <p>Put your products in front of thousands of customers now.</p>
-                      <button className="advertise-btn">ADVERTISE NOW 🚀</button>
-                    </div>
+              {/* 3. Advertise Banner */}
+              <div className="advertise-wrapper">
+                <div className="advertise-banner" onClick={() => navigate('/advertise')}>
+                  <div>
+                    <h3><Rocket size={20} /> INCREASE YOUR SALES TODAY!</h3>
+                    <p>Put your products in front of thousands of customers now.</p>
+                    <button className="advertise-btn">ADVERTISE NOW 🚀</button>
                   </div>
                 </div>
-              </section>
-            </div>
-          
-
-            <div className={`tab-content ${activeTab === 'products' ? 'active' : ''}`}>
-              <div className="product-creation-wrapper">
-                <h2 className="product-section-title">✨ Add New Product</h2>
-                <ProductCreationFlow
-                  storeId={myStore?.id} 
-                  storeSubCategoryIds={myStore?.sub_category_ids || []} 
-                  currentStep={currentStep} setCurrentStep={setCurrentStep}
-                  myStoreSubCats={myStoreSubCats}
-                  attributes={attributes} setAttributes={setAttributes}
-                  selectedCategoryName={selectedCategoryName}
-                  
-                  // ✅ PREVIEWS NA UI (Zinabaki kama zilivyo kwa kuonyesha)
-                  coverPreview={coverPreview} coverInputRef={coverInputRef} handleCoverChange={handleCoverChange}
-                  videoPreview={videoPreview} videoInputRef={videoInputRef} handleVideoChange={handleVideoChange}
-                  galleryPreviews={galleryPreviews} galleryInputRef={galleryInputRef} handleGalleryChange={handleGalleryChange} removeGalleryImage={removeGalleryImage}
-                  
-                  // 🔥 MPYA: HII NDIYO ITAKUSANYA FAILI HALISI ZA MEDIA KUTOKA FLOW
-                  onMediaChange={(mediaFiles) => {
-                    // mediaFiles ni object: { coverFile, videoFile, galleryFiles }
-                    if (mediaFiles.coverFile) setCoverFile(mediaFiles.coverFile);
-                    if (mediaFiles.videoFile) setVideoFile(mediaFiles.videoFile);
-                    if (mediaFiles.galleryFiles && mediaFiles.galleryFiles.length > 0) {
-                      setGalleryFiles(mediaFiles.galleryFiles);
-                    }
-                  }}
-
-                  // ✅ HIZI ZINABAKI KWA AJILI YA QUEUE NA PUBLISH
-                  addedProducts={addedProducts} setAddedProducts={setAddedProducts}
-                  addToQueue={addToQueue} resetProductForm={resetProductForm} handleFinalPublishAll={handleFinalPublishAll}
-                  isLoading={isLoading} editingProductId={editingProductId}
-                />
               </div>
-              <div className="existing-products-wrapper">
-               <h3 className="existing-products-title">Existing Products</h3>
-                <div className="product-grid">
-                  {myProducts.map((p) => (
-                    <div key={p.id} className="product-card">
-                      <div className="product-card-img-wrap">
-                        <img 
-    src={`${p.cover_image_url || (p.cover_image ? `${BACKEND_URL}/${p.cover_image}` : "https://via.placeholder.com/150")}?t=${new Date().getTime()}`} 
-    alt={p.name} 
-    className="product-card-img"
-    onError={(e) => { 
-        e.target.onerror = null; 
-        e.target.src = "https://via.placeholder.com/150"; 
-    }}
-/>
-                      </div>
-                      <div className="product-card-body">
-                        <h4 className="product-card-title">{p.name}</h4>
-                        <p className="product-card-price">TZS {Number(p.price).toLocaleString()}</p>
-                      </div>
-                      <button
-                        className="product-card-edit-btn"
-                        onClick={() => navigate(`/update/${p.id}`)}
-                      >
-                      <Edit3 size={14} /> Edit
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className={`tab-content ${activeTab === 'inventory' ? 'active' : ''}`}>
-              <QuickInventoryManager products={myProducts} setProducts={setMyProducts} />
-            </div>
-
-            <div className={`tab-content ${activeTab === 'offers' ? 'active' : ''}`}>
-              <div className="offers-container">
-                <TopDealsSection products={myProducts} />
-              </div>
-            </div>
-
-            <div className={`tab-content ${activeTab === 'analytics' ? 'active' : ''}`}>
-              <BusinessAnalytics products={myProducts} sellerId={myStore?.id} />
-            </div>
-
-            <div className={`tab-content ${activeTab === 'advertise' ? 'active' : ''}`}>
-              <div style={{ background: 'white', padding: '24px', borderRadius: '35px', border: '1px solid var(--gray-100)', boxShadow: 'var(--shadow-sm)', textAlign: 'center' }}>
-                <Megaphone size={48} className="advertise-icon" />
-
-                <h2 className="advertise-title">Advertise Your Products</h2>
-                <p className="advertise-text">Put your products in front of thousands of customers.</p>
-                <button className="advertise-cta-btn" onClick={() => navigate('/advertise')}>
-                  Start Advertising Now
-                </button>
-
-              </div>
-            </div>
-
+            </section>
           </div>
-        </main>
-      </div>
-      {/* MODAL YA KATEGORIA */}
-      {showCategoryManager && ReactDOM.createPortal(
-        <div className="modal-overlay">
-          <div className="modal-backdrop" onClick={() => setShowCategoryManager(false)} />
-          <div className="modal-container modal-slide-up">
-            <div className="modal-drag-handle" />
-            <div className="modal-header">
-              <div>
 
-                <h3 className="modal-header-title">Category Market</h3>
-                <p className="modal-header-sub">Choose a sub-category to add</p>
-
+          {/* ===== PRODUCTS TAB ===== */}
+          <div className={`tab-content ${activeTab === 'products' ? 'active' : ''}`}>
+            <div className="product-creation-wrapper">
+              <h2 className="product-section-title">✨ Add New Product</h2>
+              <ProductCreationFlow
+                storeId={myStore?.id}
+                storeSubCategoryIds={myStore?.sub_category_ids || []}
+                currentStep={currentStep}
+                setCurrentStep={setCurrentStep}
+                myStoreSubCats={myStoreSubCats}
+                attributes={attributes}
+                setAttributes={setAttributes}
+                selectedCategoryName={selectedCategoryName}
+                coverPreview={coverPreview}
+                coverInputRef={coverInputRef}
+                handleCoverChange={handleCoverChange}
+                videoPreview={videoPreview}
+                videoInputRef={videoInputRef}
+                handleVideoChange={handleVideoChange}
+                galleryPreviews={galleryPreviews}
+                galleryInputRef={galleryInputRef}
+                handleGalleryChange={handleGalleryChange}
+                removeGalleryImage={removeGalleryImage}
+                onMediaChange={(mediaFiles) => {
+                  if (mediaFiles.coverFile) setCoverFile(mediaFiles.coverFile);
+                  if (mediaFiles.videoFile) setVideoFile(mediaFiles.videoFile);
+                  if (mediaFiles.galleryFiles && mediaFiles.galleryFiles.length > 0) {
+                    setGalleryFiles(mediaFiles.galleryFiles);
+                  }
+                }}
+                addedProducts={addedProducts}
+                setAddedProducts={setAddedProducts}
+                addToQueue={addToQueue}
+                resetProductForm={resetProductForm}
+                handleFinalPublishAll={handleFinalPublishAll}
+                isLoading={isLoading}
+                editingProductId={editingProductId}
+              />
+            </div>
+            <div className="existing-products-wrapper">
+              <h3 className="existing-products-title">Existing Products</h3>
+              <div className="product-grid">
+                {myProducts.map((p) => (
+                  <div key={p.id} className="product-card">
+                    <div className="product-card-img-wrap">
+                      <img
+                        src={`${p.cover_image_url || (p.cover_image ? `${BACKEND_URL}/${p.cover_image}` : "https://via.placeholder.com/150")}?t=${new Date().getTime()}`}
+                        alt={p.name}
+                        className="product-card-img"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = "https://via.placeholder.com/150";
+                        }}
+                      />
+                    </div>
+                    <div className="product-card-body">
+                      <h4 className="product-card-title">{p.name}</h4>
+                      <p className="product-card-price">TZS {Number(p.price).toLocaleString()}</p>
+                    </div>
+                    <button
+                      className="product-card-edit-btn"
+                      onClick={() => navigate(`/update/${p.id}`)}
+                    >
+                      <Edit3 size={14} /> Edit
+                    </button>
+                  </div>
+                ))}
               </div>
-              <button onClick={() => setShowCategoryManager(false)} className="modal-close-btn">
-                <X size={18} />
+            </div>
+          </div>
+
+          {/* ===== INVENTORY TAB ===== */}
+          <div className={`tab-content ${activeTab === 'inventory' ? 'active' : ''}`}>
+            <QuickInventoryManager products={myProducts} setProducts={setMyProducts} />
+          </div>
+
+          {/* ===== OFFERS TAB ===== */}
+          <div className={`tab-content ${activeTab === 'offers' ? 'active' : ''}`}>
+            <div className="offers-container">
+              <TopDealsSection products={myProducts} />
+            </div>
+          </div>
+
+          {/* ===== ANALYTICS TAB ===== */}
+          <div className={`tab-content ${activeTab === 'analytics' ? 'active' : ''}`}>
+            <BusinessAnalytics products={myProducts} sellerId={myStore?.id} />
+          </div>
+
+          {/* ===== ADVERTISE TAB ===== */}
+          <div className={`tab-content ${activeTab === 'advertise' ? 'active' : ''}`}>
+            <div className="advertise-tab-content">
+              <Megaphone size={48} className="advertise-icon" />
+              <h2 className="advertise-title">Advertise Your Products</h2>
+              <p className="advertise-text">Put your products in front of thousands of customers.</p>
+              <button className="advertise-cta-btn" onClick={() => navigate('/advertise')}>
+                Start Advertising Now
               </button>
             </div>
-            <div className="modal-body">
-              <div className="modal-cat-list">
-                {allSubCategories
-                  .filter(cat => {
-                    const storeCatId = String((myStore?.category_id || myStore?.category) || "").replace(/-/g, '').trim();
-                    const subCatId = String(cat.category || "").replace(/-/g, '').trim(); 
-                    
-                    if (!storeCatId) {
-                      console.warn("⚠️ [DBG] Duka halina Category ID wala Category! Hakuna kategoria zitakazoonekana.");
-                      return false;
-                    }
-                    return subCatId === storeCatId;
-                  })
-                  .map((cat) => {
-                    const isAdded = (storeMeta.sub_category_ids || []).includes(cat.id);
-                    return (
-                      <button
-                        key={cat.id}
-                        disabled={isAdded}
-                        onClick={() => handleAddCategoryToStore(cat)}
-                        className="modal-cat-btn"
-                      >
-                        <span className="modal-cat-name">{cat.name}</span>
-                        {isAdded ? (
-                          <CheckCircle size={18} style={{ color: '#10b981' }} />
-                        ) : (
-                          <div className="modal-plus-icon"><Plus size={18} /></div>
-                        )}
-                      </button>
-                    );
-                  })}
-                
-                {allSubCategories.filter(cat => {
-                   const storeCatId = String((myStore?.category_id || myStore?.category) || "").replace(/-/g, '').trim();
-                   const subCatId = String(cat.category || "").replace(/-/g, '').trim();
-                   return subCatId === storeCatId;
-                }).length === 0 && (
-                  <div className="modal-empty-state">
-                    <p className="modal-empty-text">
+          </div>
 
-                          {myStore?.category_id || myStore?.category 
-                        ? "No sub-categories match this store." 
-                        : "⚠️ Issue: This store has no Category ID."}
-                      
-                    </p>
-                  </div>
-                )}
-              </div>
+        </div>
+      </main>
+    </div>
+
+    {/* ===== MODAL YA KATEGORIA ===== */}
+    {showCategoryManager && ReactDOM.createPortal(
+      <div className="modal-overlay">
+        <div className="modal-backdrop" onClick={() => setShowCategoryManager(false)} />
+        <div className="modal-container modal-slide-up">
+          <div className="modal-drag-handle" />
+          <div className="modal-header">
+            <div>
+              <h3 className="modal-header-title">Category Market</h3>
+              <p className="modal-header-sub">Choose a sub-category to add</p>
             </div>
-            <div className="modal-footer">
-                <button onClick={() => setShowCategoryManager(false)} className="modal-confirm-btn">
-                DONE
-                </button>
+            <button onClick={() => setShowCategoryManager(false)} className="modal-close-btn">
+              <X size={18} />
+            </button>
+          </div>
+          <div className="modal-body">
+            <div className="modal-cat-list">
+              {allSubCategories
+                .filter(cat => {
+                  const storeCatId = String((myStore?.category_id || myStore?.category) || "").replace(/-/g, '').trim();
+                  const subCatId = String(cat.category || "").replace(/-/g, '').trim();
+                  if (!storeCatId) return false;
+                  return subCatId === storeCatId;
+                })
+                .map((cat) => {
+                  const isAdded = (storeMeta.sub_category_ids || []).includes(cat.id);
+                  return (
+                    <button
+                      key={cat.id}
+                      disabled={isAdded}
+                      onClick={() => handleAddCategoryToStore(cat)}
+                      className="modal-cat-btn"
+                    >
+                      <span className="modal-cat-name">{cat.name}</span>
+                      {isAdded ? (
+                        <CheckCircle size={18} style={{ color: '#10b981' }} />
+                      ) : (
+                        <div className="modal-plus-icon"><Plus size={18} /></div>
+                      )}
+                    </button>
+                  );
+                })}
             </div>
           </div>
-        </div>,
-        document.body
-      )}
-    </div>
-  );
+          <div className="modal-footer">
+            <button onClick={() => setShowCategoryManager(false)} className="modal-confirm-btn">
+              DONE
+            </button>
+          </div>
+        </div>
+      </div>,
+      document.body
+    )}
+  </div>
+);
 }

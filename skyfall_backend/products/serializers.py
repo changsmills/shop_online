@@ -1,8 +1,14 @@
+import traceback
+
 from rest_framework import serializers
 import cloudinary.uploader 
 import os
 import urllib.parse
 from django.conf import settings  # 🔥 ONGEZA HII MBELE!
+from PIL import Image, ImageOps
+from io import BytesIO
+from django.core.files.base import ContentFile
+from pathlib import Path
 
 
 
@@ -12,6 +18,79 @@ from products.models import (
     StoreEngine, ProductMedia, Message, Profile,
     ShippingMethod, Brand, Lead, ProductVariation  
 )
+
+
+
+def optimize_image_for_upload(image_file, quality=80, max_width=1920, max_height=1920):
+    """
+    Resize and compress uploaded image to WebP before Cloudinary upload.
+    """
+
+    if not image_file:
+        return None
+
+    image_file.seek(0)
+
+    try:
+        with Image.open(image_file) as img:
+
+            # Rekebisha orientation ya picha kutoka simu
+            img = ImageOps.exif_transpose(img)
+
+            # Punguza dimensions bila kuharibu aspect ratio
+            img.thumbnail(
+                (max_width, max_height),
+                Image.Resampling.LANCZOS
+            )
+
+            # Hifadhi transparency
+            if img.mode in ("RGBA", "LA") or (
+                img.mode == "P" and "transparency" in img.info
+            ):
+                img = img.convert("RGBA")
+            else:
+                img = img.convert("RGB")
+
+            output = BytesIO()
+
+            img.save(
+                output,
+                format="WEBP",
+                quality=quality,
+                method=6
+            )
+
+            original_size = image_file.size
+            optimized_size = output.tell()
+
+            output.seek(0)
+
+            filename = Path(image_file.name).stem + ".webp"
+
+            optimized_file = ContentFile(
+                output.read(),
+                name=filename
+            )
+
+            print(
+                f"🖼️ Optimization: {original_size / 1024:.2f} KB "
+                f"→ {optimized_size / 1024:.2f} KB",
+                flush=True
+            )
+
+            return optimized_file
+
+    except Exception as e:
+        raise serializers.ValidationError(
+            {"image": f"Image optimization failed: {str(e)}"}
+        )
+
+    finally:
+        try:
+            image_file.seek(0)
+        except Exception:
+            pass
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -58,7 +137,7 @@ class LeafCategorySerializer(serializers.ModelSerializer):
 
 
 
-        # ============================================================
+# ============================================================
 # 🔥 PRODUCT MEDIA SERIALIZER (MUHIMU: Ondoa read_only kwenye media_url!)
 # ============================================================
 class ProductMediaSerializer(serializers.ModelSerializer):
@@ -302,7 +381,8 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
         if cover_image:
             print(f"  📸 [DEBUG] Attempting to upload Cover Image...", flush=True)
             try:
-                result = cloudinary.uploader.upload(cover_image, folder="product_media")
+                result = cloudinary.uploader.upload(cover_image, folder="product_media", format="webp"
+)
                 ProductMedia.objects.create(
                     product=product,
                     media_type='cover',
@@ -318,24 +398,58 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
                 print(f"❌ [UNKNOWN ERROR] Cover Image processing failed: {e}", flush=True)
                 print(traceback.format_exc(), flush=True)
 
-        # 4. Hifadhi Gallery Images 🔥 FIX: ONGEZA FOLDER
+                # 4. Hifadhi Gallery Images
         if gallery_images:
-            print(f"  🖼️ [DEBUG] Attempting to upload {len(gallery_images)} Gallery Images...", flush=True)
+            print(
+                f"🖼️ [DEBUG] Attempting to upload {len(gallery_images)} Gallery Images...",
+                flush=True
+            )
+
             for idx, img in enumerate(gallery_images):
                 try:
-                    print(f"    - Uploading gallery image {idx+1}...", flush=True)
-                    result = cloudinary.uploader.upload(img, folder="product_media")
+                    print(
+                        f"    - Optimizing gallery image {idx+1}...",
+                        flush=True
+                    )
+
+                    optimized_img = optimize_image_for_upload(
+                        img,
+                        quality=80,
+                        max_width=1920,
+                        max_height=1920
+                    )
+
+                    result = cloudinary.uploader.upload(
+                        optimized_img,
+                        folder="product_media",
+                        resource_type="image",
+                        format="webp"
+                    )
+
                     ProductMedia.objects.create(
                         product=product,
                         media_type='gallery',
                         media_url=result['secure_url'],
                         display_order=idx + 1
                     )
-                    print(f"      ✅ Gallery image {idx+1} saved.", flush=True)
+
+                    print(
+                        f"      ✅ Gallery image {idx+1} optimized and saved.",
+                        flush=True
+                    )
+
                 except cloudinary.api.Error as e:
-                    print(f"❌ [CLOUDINARY ERROR] Gallery image {idx+1} failed: {e}", flush=True)
+                    print(
+                        f"❌ [CLOUDINARY ERROR] Gallery image {idx+1} failed: {e}",
+                        flush=True
+                    )
+
                 except Exception as e:
-                    print(f"❌ [UNKNOWN ERROR] Gallery image {idx+1} failed: {e}", flush=True)
+                    print(
+                        f"❌ [UNKNOWN ERROR] Gallery image {idx+1} failed: {e}",
+                        flush=True
+                    )
+                    print(traceback.format_exc(), flush=True)
 
         # 5. Hifadhi Video 🔥 FIX: ONGEZA FOLDER
         if video_file:
@@ -360,7 +474,8 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
             print(f"  🎨 [DEBUG] Uploading {len(color_image_files)} Color Images...", flush=True)
             for file in color_image_files:
                 try:
-                    result = cloudinary.uploader.upload(file, folder="product_media")
+                    result = cloudinary.uploader.upload(file, folder="product_media", format="webp"
+)
                     ProductMedia.objects.create(
                         product=product,
                         media_type='color_image',
@@ -603,7 +718,8 @@ class StoreEngineSerializer(serializers.ModelSerializer):
         if store_banner_file:
             print(f"  📸 [DEBUG] Attempting to upload Store Banner...", flush=True)
             try:
-                result = cloudinary.uploader.upload(store_banner_file, folder="store_banners")
+                result = cloudinary.uploader.upload(store_banner_file, folder="store_banners", format="webp"
+)
                 store.store_banner = result['public_id']
                 store.save(update_fields=['store_banner'])
                 print(f"    ✅ Store Banner uploaded! Public ID: {result['public_id']}", flush=True)
@@ -615,7 +731,8 @@ class StoreEngineSerializer(serializers.ModelSerializer):
         if tin_image_file:
             print(f"  📸 [DEBUG] Attempting to upload TIN Image...", flush=True)
             try:
-                result = cloudinary.uploader.upload(tin_image_file, folder="tin_verification")
+                result = cloudinary.uploader.upload(tin_image_file, folder="tin_verification", format="webp"
+)
                 store.tin_image = result['public_id']
                 store.save(update_fields=['tin_image'])
                 print(f"    ✅ TIN Image uploaded! Public ID: {result['public_id']}", flush=True)
@@ -632,7 +749,8 @@ class StoreEngineSerializer(serializers.ModelSerializer):
                 for i, file in enumerate(office_images[:3]):
                     try:
                         print(f"    - Uploading office image {i+1}...", flush=True)
-                        result = cloudinary.uploader.upload(file, folder="store_offices")
+                        result = cloudinary.uploader.upload(file, folder="store_offices", format="webp"
+)
 
                         if i == 0:
                             store.office_image_1 = result['secure_url']
@@ -712,21 +830,38 @@ class ProductVariationSerializer(serializers.ModelSerializer):
         # 🔥 3. Ikiwa picha ipo, ipakie Cloudinary
         if color_image_file:
             print(f"  📸 [DEBUG] Uploading color_image for {variation.color_name}...")
+
             try:
+                # 1. Optimize picha kwanza
+                optimized_image = optimize_image_for_upload(
+                    color_image_file,
+                    quality=80,
+                    max_width=1920,
+                    max_height=1920
+                )
+
+                # 2. Upload picha iliyoboreshwa Cloudinary
                 result = cloudinary.uploader.upload(
-                    color_image_file, 
+                    optimized_image,
                     folder="product_variations",
+                    resource_type="image",
+                    format="webp",
                     timeout=60
                 )
-                
-                # ✅ Sasa hii itafanya kazi kwa sababu color_image HAIPO kwenye read_only!
-                variation.color_image = result['public_id'] 
+
+                # 3. Hifadhi Cloudinary Public ID
+                variation.color_image = result['public_id']
                 variation.save(update_fields=['color_image'])
-                
-                print(f"  ✅ [DEBUG] Color Image uploaded! Public ID: {result['public_id']}")
+
+                print(
+                    f"  ✅ [DEBUG] Color Image uploaded! "
+                    f"Public ID: {result['public_id']}"
+                )
+
             except Exception as e:
                 print(f"❌ [ERROR] Color Image upload failed: {e}")
                 print(traceback.format_exc())
 
         print("🏁 [DEBUG] ProductVariation creation finished.")
+
         return variation

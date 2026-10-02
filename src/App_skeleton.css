@@ -277,33 +277,34 @@
 .skeleton-cat-item.active {
   width: 40px;
 }
+
 /* ==============================================
-   DARK MODE SUPPORT - SKELETON LAYOUT
+   DARK MODE SUPPORT - SKELETON LAYOUT (PURE BLACK)
    ============================================== */
 
 @media (prefers-color-scheme: dark) {
 
   /* 1. MAIN WRAPPER - Background ya skeleton */
   .skeleton-layout-wrapper {
-    background: #0f172a !important; /* Dark Blue Background */
+    background: #000000 !important; /* ✅ NYEUSI KABISA */
   }
 
   /* 2. SKELETON CARDS - Background na Shadows */
   .skeleton-card {
-    background: #1e293b !important; /* Dark Blue Card */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+    background: #0a0a0a !important; /* ✅ Nyeusi kidogo kwa cards */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8) !important;
   }
 
   /* 3. SKELETON SIDEBAR (Desktop) */
   .skeleton-sidebar {
-    background: #1e293b !important; /* Dark Blue Sidebar */
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+    background: #0a0a0a !important; /* ✅ Nyeusi kidogo */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
   }
 
   /* 4. SKELETON CATEGORY SLIDER (Mobile) */
   .skeleton-category-slider {
-    background: #0f172a !important; /* Dark Blue Background */
-    border-bottom-color: #334155 !important;
+    background: #000000 !important; /* ✅ NYEUSI KABISA */
+    border-bottom-color: #1f1f1f !important; /* Border nyeusi */
   }
 
   /* 5. LOADING BARS (Pulse animation) - Zinabadilika kuwa Dark Grey */
@@ -312,17 +313,15 @@
   .skeleton-sidebar-item,
   .skeleton-image,
   .skeleton-text,
-  .skeleton-cat-item,
-  .skeleton-banner-mobile,
-  .skeleton-banner-desktop {
-    background: #334155 !important; /* Dark Grey Loading Bar */
+  .skeleton-cat-item {
+    background: #1a1a1a !important; /* ✅ Kijivu cheusi kwa loading bars */
   }
 
   /* 6. ANIMATION - Pulse inabadilika kwa dark mode */
   @keyframes pulse {
-    0% { background-color: #334155; }
-    50% { background-color: #4b5563; }
-    100% { background-color: #334155; }
+    0% { background-color: #1a1a1a; }
+    50% { background-color: #2a2a2a; } /* ✅ Inang'aa kidogo */
+    100% { background-color: #1a1a1a; }
   }
 
   /* 7. GRID CONTAINERS - Hakikisha background inabadilika */
@@ -348,9 +347,9 @@
 
   /* 11. SCROLLBAR (Ikiwa inaonekana) */
   .skeleton-category-slider::-webkit-scrollbar-track {
-    background: #1e293b !important;
+    background: #0a0a0a !important;
   }
   .skeleton-category-slider::-webkit-scrollbar-thumb {
-    background: #4b5563 !important;
+    background: #2a2a2a !important;
   }
 }

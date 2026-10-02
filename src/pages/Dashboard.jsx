@@ -29,7 +29,7 @@ import {
   Star, Shirt, Headphones, Dribbble, Sparkles, Gem, ChevronRight, 
   ShoppingBag, Home, Bike, Car, Wrench, Sun, Battery, ShieldCheck, 
   Truck, Sprout, Layers, Settings, Baby, HeartPulse, Gift, Dog, 
-  PenTool, Factory, HardHat, Warehouse, Plus, ChevronLeft , X // 🔥 ONGEZA X HAPA!
+  PenTool, Factory, HardHat, Warehouse, Plus, ChevronLeft , X 
 } from "lucide-react";
 
 const placeholderImg = "https://via.placeholder.com/100?text=Skyfall";
@@ -481,7 +481,7 @@ useEffect(() => {
     return () => {
       window.removeEventListener('online', handleOnline);
     };
-  }, [selectedCategory?.id, selectedSubCategory?.id, viewMode]); // ✅ Inategemea hali hizi
+  }, [selectedCategory?.id, selectedSubCategory?.id, viewMode]); 
 
 useEffect(() => {
   // 🔥 ANGALIA KAMA MTUMIAJI AMESIGNUP

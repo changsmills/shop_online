@@ -1,364 +1,787 @@
-/* ============================================ */
-/* 1. CSS VARIABLES (USAHAJI WA HARAKA)         */
-/* ============================================ */
-
+/* ============================================== */
+/* 1. DASHBOARD WRAPPER (MZIZI)                   */
+/* ============================================== */
 
 :root {
-  --primary: #f97316;
-  --primary-dark: #ea580c;
-  --primary-light: #fff7ed;
-  --primary-border: #ffedd5;
-  
-  --gray-50: #f9fafb;
-  --gray-100: #f3f4f6;
-  --gray-200: #e5e7eb;
-  --gray-400: #9ca3af;
-  --gray-600: #6b7280;
-  --gray-800: #1f2937;
-  
-  --red-500: #ef4444;
-  --red-50: #fef2f2;
-  --blue-600: #2563eb;
-
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-md: 0 8px 15px rgba(0,0,0,0.06);
-  --shadow-lg: 0 20px 35px rgba(0,0,0,0.15);
-  
-  --radius-card: 12px;
-  --radius-modal: 35px;
+  --dash-bg: #f5f7fa;
+  --dash-header-bg: #ffffff;
+  --dash-sidebar-bg: #ffffff;
+  --dash-card-bg: #ffffff;
+  --dash-text: #1a1a1a;
+  --dash-text-muted: #6b7280;
+  --dash-border: #e5e7eb;
+  --dash-orange: #ff6a00;
+  --dash-orange-hover: #e55a00;
+  --dash-hover: #f3f4f6;
+  --dash-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--gray-50); }
-
-.dashboard-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
-
-/* ============================================ */
-/* HEADER                                       */
-/* ============================================ */
-.dashboard-header {
-  height: 70px; background: white; border-bottom: 1px solid var(--gray-200);
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 24px; flex-shrink: 0; position: sticky; top: 0; z-index: 100;
-}
-.header-brand { display: flex; align-items: center; gap: 16px; }
-.header-brand-inner { display: flex; align-items: center; }
-.mobile-menu-btn { display: none; background: transparent; border: none; cursor: pointer; padding: 4px; }
-
-.header-title { font-weight: 900; color: var(--primary); font-size: 20px; letter-spacing: -0.5px; }
-.header-badge { background: var(--primary); color: white; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; margin-left: 8px; }
-.header-center { flex: 1; display: flex; justify-content: center; align-items: center; padding: 0 20px; }
-.header-welcome { font-size: 14px; font-weight: 500; color: var(--gray-600); letter-spacing: 0.5px; }
-
-.header-actions { display: flex; align-items: center; gap: 12px; position: relative; }
-.header-actions-wrap { position: relative; }
-.header-icon-btn { position: relative; cursor: pointer; transition: transform 0.2s ease; background: transparent; border: none; padding: 4px; }
-.header-icon-btn:hover { transform: scale(1.1); }
-
-.header-unread-badge {
-  position: absolute; top: -6px; right: -6px;
-  background: var(--red-500); color: white;
-  border-radius: 50%; width: 18px; height: 18px;
-  font-size: 10px; font-weight: bold;
-  display: flex; align-items: center; justify-content: center;
-  border: 2px solid white;
-}
-
-/* Avatar na Dropdown */
-.header-avatar-btn {
-  width: 36px; height: 36px; border-radius: 50%; border: none;
-  background: var(--primary); display: flex; align-items: center; justify-content: center;
-  color: white; cursor: pointer; transition: transform 0.2s ease; font-weight: bold; font-size: 16px;
-}
-.header-avatar-btn:hover { transform: scale(1.05); }
-
-.account-dropdown {
-  position: absolute; top: 55px; right: 0; width: 240px;
-  background: white; border-radius: 16px; box-shadow: var(--shadow-lg);
-  border: 1px solid var(--gray-100); padding: 12px 0; z-index: 200;
-  overflow: hidden; display: none;
-}
-.account-dropdown.open { display: block; }
-
-.account-dropdown-header { padding: 12px 16px 16px 16px; border-bottom: 1px solid var(--gray-100); }
-.account-dropdown-name { font-weight: bold; font-size: 14px; margin: 0; color: var(--gray-800); }
-.account-dropdown-email { font-size: 12px; color: var(--gray-600); margin: 4px 0 0 0; word-break: break-all; }
-.dropdown-section { padding: 8px 0; }
-.dropdown-divider { border-top: 1px solid var(--gray-100); padding: 8px 0; }
-.dropdown-unread-badge { margin-left: auto; background-color: #ef4444; color: white; font-size: 10px; padding: 2px 8px; border-radius: 10px; }
-
-.account-dropdown-item {
-  padding: 10px 16px; cursor: pointer; display: flex; align-items: center; gap: 10px;
-  color: var(--gray-600); font-size: 14px; transition: background 0.2s;
-}
-.account-dropdown-item:hover { background: var(--gray-100); }
-.account-dropdown-item.logout { color: var(--red-500); font-weight: 500; }
-.account-dropdown-item.logout:hover { background: var(--red-50); }
-
-/* ============================================ */
-/* MAIN WRAPPER (SIDEBAR + CONTENT)              */
-/* ============================================ */
-.dashboard-main-wrapper { display: flex; flex-direction: row; height: calc(100vh - 70px); }
-
-/* ============================================ */
-/* SIDEBAR                                      */
-/* ============================================ */
-.dashboard-sidebar {
-  width: 260px; background: white; border-right: 1px solid var(--gray-100);
-  height: 100%; overflow-y: auto; transition: transform 0.3s ease;
-  flex-shrink: 0; padding: 20px 0;
-}
-.sidebar-header { padding: 0 20px 20px 20px; border-bottom: 1px solid var(--gray-100); }
-.sidebar-header h3 { font-weight: 900; color: var(--primary); margin: 0; }
-.sidebar-menu { list-style: none; padding: 10px 10px; margin: 0; }
-
-.sidebar-menu-item {
-  display: flex; align-items: center; padding: 12px 16px; border-radius: 14px;
-  cursor: pointer; transition: all 0.2s ease; color: var(--gray-600);
-  font-weight: 600; font-size: 14px; margin-bottom: 4px; border: 1px solid transparent;
-}
-.sidebar-menu-item:hover { background: var(--gray-100); color: var(--gray-800); }
-.sidebar-menu-item.active { background: var(--primary-light); border-color: var(--primary-border); color: var(--primary-dark); }
-.sidebar-menu-item.logout { color: var(--red-500); }
-.sidebar-menu-item.logout:hover { background: var(--red-50); }
-.sidebar-menu-item > span { margin-left: 12px; }
-
-/* ============================================ */
-/* MAIN CONTENT                                  */
-/* ============================================ */
-.dashboard-content { flex: 1; padding: 20px; background: var(--gray-50); overflow-y: auto; }
-.dashboard-content-inner { max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-
-/* ============================================ */
-/* SECTION WRAPPERS & COMPONENTS                */
-/* ============================================ */
-.store-header-wrapper { position: relative; z-index: 9998; margin-bottom: 60px; }
-.analytics-section { margin-bottom: 16px; margin-top: 16px; }
-.store-mgmt-wrapper { margin-top: 24px; }
-.advertise-wrapper { margin-top: 24px; }
-
-.product-creation-wrapper {
-  background: white; padding: 24px; border-radius: 35px;
-  border: 1px solid var(--gray-100); box-shadow: var(--shadow-sm); margin-bottom: 32px;
-}
-.product-section-title { font-size: 20px; font-weight: 900; color: var(--gray-800); margin: 0 0 24px 0; }
-
-.existing-products-wrapper { margin-top: 32px; }
-.existing-products-title { font-size: 18px; font-weight: 700; color: var(--gray-800); margin-bottom: 16px; }
-
-.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
-.product-card { background: white; border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-sm); transition: all 0.2s ease-in-out; position: relative; display: flex; flex-direction: column; border: 1px solid var(--gray-200); }
-.product-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: #bfdbfe; }
-.product-card-img-wrap { width: 100%; height: 160px; background: var(--gray-100); }
-.product-card-img { width: 100%; height: 100%; object-fit: cover; }
-.product-card-body { padding: 10px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-.product-card-title { font-size: 13px; font-weight: 600; color: var(--gray-800); margin: 0 0 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.product-card-price { font-weight: 700; font-size: 14px; color: var(--blue-600); margin: 0; }
-
-.product-card-edit-btn {
-  position: absolute; top: 10px; right: 10px; background: rgba(37, 99, 235, 0.95); color: white; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer; display: flex; align-items: center; gap: 4px; z-index: 10; backdrop-filter: blur(2px); transition: opacity 0.2s ease; opacity: 0;
-}
-.product-card:hover .product-card-edit-btn { opacity: 1; }
-
-.offers-container { background: white; padding: 24px; border-radius: 35px; border: 1px solid var(--gray-100); box-shadow: var(--shadow-sm); }
-.advertise-icon { margin: 0 auto 16px auto; color: var(--primary); display: block; }
-.advertise-title { font-size: 24px; font-weight: 700; color: var(--gray-800); margin-bottom: 8px; }
-.advertise-text { color: var(--gray-600); margin-bottom: 24px; }
-.advertise-cta-btn { background: var(--primary); color: white; padding: 12px 24px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; }
-
-.advertise-banner { background: linear-gradient(135deg, #ff4e00 0%, #ec2f4b 100%); border-radius: 20px; padding: 20px; color: white; cursor: pointer; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; }
-.advertise-banner h3 { display: flex; align-items: center; gap: 8px; margin: 0; }
-.advertise-banner p { font-size: 12px; opacity: 0.9; margin: 4px 0 0 0; }
-.advertise-btn { background: white; color: #ff4e00; padding: 10px 20px; border-radius: 12px; font-weight: bold; border: none; cursor: pointer; }
-
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; display: flex; align-items: flex-end; justify-content: center; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
-.modal-backdrop { position: absolute; inset: 0; }
-.modal-container { position: relative; background: white; width: 100%; max-width: 500px; border-radius: var(--radius-modal) var(--radius-modal) 0 0; overflow: hidden; display: flex; flex-direction: column; max-height: 85vh; box-shadow: 0 -10px 25px rgba(0,0,0,0.2); }
-.modal-slide-up { animation: slideUp 0.3s ease-out forwards; }
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-.modal-drag-handle { display: none; width: 40px; height: 4px; background: var(--gray-200); border-radius: 2px; margin: 12px auto 0; }
-.modal-header { padding: 20px; border-bottom: 1px solid var(--gray-100); display: flex; justify-content: space-between; align-items: center; background: white; flex-shrink: 0; }
-.modal-header-title { font-weight: 900; color: var(--gray-800); font-style: italic; text-transform: uppercase; letter-spacing: -0.5px; margin: 0; font-size: 16px; }
-.modal-header-sub { font-size: 9px; color: var(--gray-400); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
-.modal-close-btn { width: 32px; height: 32px; background: var(--gray-100); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--gray-400); border: none; cursor: pointer; }
-
-.modal-body { flex: 1; overflow-y: auto; padding: 15px; -webkit-overflow-scrolling: touch; }
-.modal-cat-list { display: flex; flex-direction: column; gap: 10px; }
-.modal-cat-btn { display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; border-radius: 18px; border: 1.5px solid var(--gray-100); width: 100%; background: white; cursor: pointer; transition: border-color 0.2s; }
-.modal-cat-btn:disabled { background: var(--gray-50); border-color: var(--gray-200); cursor: not-allowed; }
-.modal-cat-btn:not(:disabled):hover { border-color: var(--primary); }
-.modal-cat-name { font-weight: 700; font-size: 13px; color: var(--gray-600); }
-.modal-cat-btn:disabled .modal-cat-name { color: var(--gray-400); }
-.modal-plus-icon { color: var(--primary); }
-
-.modal-empty-state { text-align: center; padding: 40px 20px; }
-.modal-empty-text { color: var(--gray-400); font-size: 13px; font-weight: 600; }
-
-.modal-footer { padding: 16px; background: white; border-top: 1px solid var(--gray-50); flex-shrink: 0; }
-.modal-confirm-btn { width: 100%; padding: 16px; background: black; color: white; border-radius: 16px; font-weight: 900; border: none; font-size: 14px; cursor: pointer; }
-
-/* ============================================ */
-/* MEDIA QUERIES - Mobile Responsive (Sahihi)    */
-/* ============================================ */
-
-@media (max-width: 1024px) {
-  .dashboard-content { padding: 16px; }
-  .product-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
-}
-
-/* 🔥 MOBILE QUERY (IMEUNGANISHWA HAPA, HAKUNA DUPLICATE TENSA!) */
-@media (max-width: 768px) {
-  .dashboard-header { padding: 0 16px; }
-  .header-center { display: none !important; } /* Hii ndio inaficha text na kupunguza urefu wa header */
-  .mobile-menu-btn { display: flex !important; }
-
-  .dashboard-sidebar {
-    position: fixed;
-    left: -100% !important;
-    top: 70px;
-    width: 280px !important;
-    max-width: 280px !important;
-    min-width: 280px !important;
-    height: calc(100vh - 70px);
-    z-index: 99999 !important;
-    transition: left 0.3s ease;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-    will-change: left;
-    backface-visibility: hidden;
-  }
-
-  .dashboard-sidebar.open { left: 0 !important; }
-
-  /* ✅ Sidebar Overlay imehamishwa hapa (Sio mwishoni) */
-  .sidebar-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 99998;
-    backdrop-filter: blur(3px);
-    animation: fadeIn 0.2s ease;
-  }
-
-  .dashboard-content { padding: 12px; }
-  .store-header-wrapper { margin-bottom: 45px !important; }
-  .product-creation-wrapper { padding: 16px !important; }
-  .product-section-title { font-size: 18px !important; }
-
-  .product-grid { grid-template-columns: 1fr 1fr !important; gap: 10px; }
-  .product-card-img-wrap { height: 120px; }
-  .product-card-title { font-size: 12px; }
-  .product-card-edit-btn { opacity: 1; top: 5px; right: 5px; padding: 5px 8px; font-size: 10px; }
-
-  .modal-container { border-radius: 30px 30px 0 0; max-height: 92vh; }
-  .modal-drag-handle { display: block !important; }
-  .modal-footer { padding-bottom: 30px; }
-}
-
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-/* ============================================ */
-/* DARK MODE SUPPORT - PHYSICAL DASHBOARD        */
-/* ============================================ */
+/* Dark Mode */
 @media (prefers-color-scheme: dark) {
-  body { background: #0f172a !important; color: #e2e8f0 !important; }
-  .dashboard-wrapper { background: #0f172a !important; }
-  .dashboard-header { background: #1e293b !important; border-bottom-color: #334155 !important; }
-  .header-title { color: #ff6a00 !important; }
-  .header-badge { background: #ff6a00 !important; color: #ffffff !important; }
-  .header-welcome { color: #94a3b8 !important; }
-  .dashboard-sidebar { background: #1e293b !important; border-right-color: #334155 !important; }
-  .sidebar-header { border-bottom-color: #334155 !important; }
-  .sidebar-header h3 { color: #ff6a00 !important; }
-  .sidebar-menu-item { color: #94a3b8 !important; }
-  .sidebar-menu-item:hover { background: #334155 !important; color: #e2e8f0 !important; }
-  .sidebar-menu-item.active { background: #2d3748 !important; border-color: #ff6a00 !important; color: #ff6a00 !important; }
-  .sidebar-menu-item.logout { color: #f87171 !important; }
-  .sidebar-menu-item.logout:hover { background: #2d1a1a !important; }
-  .dashboard-content { background: #0f172a !important; }
-  .dashboard-content-inner { background: transparent !important; }
-  .product-creation-wrapper, .offers-container, .advertise-banner { background: #1e293b !important; border-color: #334155 !important; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important; color: #e2e8f0 !important; }
-  .product-section-title, .existing-products-title, .advertise-title { color: #e2e8f0 !important; }
-  .advertise-text { color: #94a3b8 !important; }
-  .product-card { background: #1e293b !important; border-color: #334155 !important; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important; color: #e2e8f0 !important; }
-  .product-card:hover { border-color: #ff6a00 !important; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important; }
-  .product-card-img-wrap { background: #334155 !important; }
-  .product-card-title { color: #e2e8f0 !important; }
-  .product-card-price { color: #60a5fa !important; }
-  .product-card-edit-btn { background: rgba(37, 99, 235, 0.8) !important; }
-  .advertise-banner { background: linear-gradient(135deg, #ff4e00 0%, #ec2f4b 100%) !important; }
-  .advertise-banner h3 { color: #ffffff !important; }
-  .advertise-banner p { color: rgba(255, 255, 255, 0.9) !important; }
-  .advertise-btn { background: #ffffff !important; color: #ff4e00 !important; }
-  .modal-overlay { background: rgba(0, 0, 0, 0.85) !important; }
-  .modal-container { background: #1e293b !important; box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.6) !important; }
-  .modal-header { background: #1e293b !important; border-bottom-color: #334155 !important; }
-  .modal-header-title { color: #e2e8f0 !important; }
-  .modal-header-sub { color: #94a3b8 !important; }
-  .modal-close-btn { background: #334155 !important; color: #94a3b8 !important; }
-  .modal-cat-btn { background: #1e293b !important; border-color: #334155 !important; }
-  .modal-cat-btn:not(:disabled):hover { border-color: #ff6a00 !important; }
-  .modal-cat-name { color: #e2e8f0 !important; }
-  .modal-cat-btn:disabled .modal-cat-name { color: #6b7280 !important; }
-  .modal-empty-text { color: #94a3b8 !important; }
-  .modal-footer { background: #1e293b !important; border-top-color: #334155 !important; }
-  .modal-confirm-btn { background: #ff6a00 !important; color: #ffffff !important; }
-  .account-dropdown { background: #1e293b !important; border-color: #334155 !important; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6) !important; }
-  .account-dropdown-header { border-bottom-color: #334155 !important; }
-  .account-dropdown-name { color: #e2e8f0 !important; }
-  .account-dropdown-email { color: #94a3b8 !important; }
-  .dropdown-section { color: #e2e8f0 !important; }
-  .dropdown-divider { border-top-color: #334155 !important; }
-  .account-dropdown-item { color: #94a3b8 !important; }
-  .account-dropdown-item:hover { background: #334155 !important; }
-  .account-dropdown-item.logout { color: #f87171 !important; }
-  .account-dropdown-item.logout:hover { background: #2d1a1a !important; }
-  .header-icon-btn { color: #94a3b8 !important; }
-  .header-icon-btn:hover { color: #e2e8f0 !important; }
-  .header-avatar-btn { background: #ff6a00 !important; color: #ffffff !important; }
-  .store-header-wrapper, .analytics-section, .store-mgmt-wrapper, .advertise-wrapper { background: transparent !important; }
+  :root {
+    --dash-bg: #000000;            /* Nyeusi kabisa */
+    --dash-header-bg: #0a0a0a;
+    --dash-sidebar-bg: #0a0a0a;
+    --dash-card-bg: #111111;       /* Kadi nyeusi kidogo */
+    --dash-text: #ffffff;
+    --dash-text-muted: #9ca3af;
+    --dash-border: #1f1f1f;
+    --dash-hover: #1a1a1a;
+    --dash-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  }
 }
-/* ============================================ */
-/* 🔥 FIX YA MWISHO - LAZIMISHA HEADER NA HAMBURGER KUONEKANA KWENYE MOBILE */
-/* ============================================ */
+
+.dashboard-wrapper {
+  min-height: 100vh;
+  background: var(--dash-bg);
+  color: var(--dash-text);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================== */
+/* 2. HEADER                                      */
+/* ============================================== */
 
 .dashboard-header {
-  display: flex !important;
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 999999 !important; /* Inazidi kila kitu! */
-  background-color: #ffffff !important;
-  height: 70px !important;
-  padding: 0 16px !important;
-  border-bottom: 1px solid #eee !important;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: var(--dash-header-bg);
+  border-bottom: 1px solid var(--dash-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  z-index: 1000;
+  box-shadow: var(--dash-shadow);
 }
 
 .header-brand {
-  display: flex !important;
-  align-items: center !important;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .mobile-menu-btn {
-  display: flex !important;
-  z-index: 999999 !important;
-  color: #333 !important;
-  background: transparent !important;
-  border: none !important;
-  margin-right: 10px !important;
+  display: none;
+  background: none;
+  border: none;
+  color: var(--dash-text);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.header-brand-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-title {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--dash-orange);
+  letter-spacing: -0.5px;
+}
+
+.header-badge {
+  background: var(--dash-orange);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.header-center {
+  flex: 1;
+  text-align: center;
+}
+
+.header-welcome {
+  font-size: 14px;
+  color: var(--dash-text-muted);
+  font-weight: 500;
 }
 
 .header-actions {
-  display: flex !important;
-  z-index: 999999 !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-/* 🔥 FIX YA OVERLAY - INAANZA CHINI YA HEADER (SI JUU!) */
-/* Hii inazuia overlay kufunika header na hamburger unapofungua sidebar */
+.header-icon-btn {
+  background: none;
+  border: none;
+  color: var(--dash-text);
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.header-icon-btn:hover {
+  background: var(--dash-hover);
+}
+
+.header-unread-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--dash-orange);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 50%;
+  min-width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+.header-actions-wrap {
+  position: relative;
+}
+
+.header-avatar-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--dash-orange);
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.account-dropdown {
+  position: absolute;
+  top: 52px;
+  right: 0;
+  background: var(--dash-card-bg);
+  border: 1px solid var(--dash-border);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  width: 240px;
+  padding: 8px 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: all 0.2s;
+  z-index: 1001;
+}
+
+.account-dropdown.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.account-dropdown-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--dash-border);
+}
+
+.account-dropdown-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dash-text);
+  margin: 0;
+}
+
+.account-dropdown-email {
+  font-size: 12px;
+  color: var(--dash-text-muted);
+  margin: 2px 0 0 0;
+}
+
+.account-dropdown-item {
+  padding: 10px 16px;
+  font-size: 14px;
+  color: var(--dash-text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.account-dropdown-item:hover {
+  background: var(--dash-hover);
+}
+
+.account-dropdown-item.logout {
+  color: #dc2626;
+}
+
+.dropdown-unread-badge {
+  margin-left: auto;
+  background: var(--dash-orange);
+  color: #fff;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+/* ============================================== */
+/* 3. MAIN WRAPPER (Sidebar + Content)            */
+/* ============================================== */
+
+.dashboard-main-wrapper {
+  display: flex;
+  margin-top: 64px; /* Chini ya header */
+  min-height: calc(100vh - 64px);
+}
+
+/* ============================================== */
+/* 4. SIDEBAR                                     */
+/* ============================================== */
+
+.dashboard-sidebar {
+  width: 260px;
+  background: var(--dash-sidebar-bg);
+  border-right: 1px solid var(--dash-border);
+  position: fixed;
+  top: 64px;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 900;
+  transition: transform 0.3s ease;
+  padding: 16px 0;
+}
+
+.sidebar-header {
+  padding: 12px 24px;
+  margin-bottom: 8px;
+}
+
+.sidebar-header h3 {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--dash-orange);
+  margin: 0;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--dash-text);
+  cursor: pointer;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+}
+
+.sidebar-menu-item:hover {
+  background: var(--dash-hover);
+}
+
+.sidebar-menu-item.active {
+  background: rgba(255, 106, 0, 0.08);
+  color: var(--dash-orange);
+  border-left-color: var(--dash-orange);
+  font-weight: 700;
+}
+
+.sidebar-menu-item.logout {
+  color: #dc2626;
+  margin-top: 16px;
+  border-top: 1px solid var(--dash-border);
+  padding-top: 16px;
+}
+
+/* Overlay ya mobile */
 .sidebar-overlay {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 899;
+  display: none;
+}
+
+/* ============================================== */
+/* 5. MAIN CONTENT                                */
+/* ============================================== */
+
+.dashboard-content {
+  flex: 1;
+  margin-left: 260px; /* Nafasi ya sidebar */
+  padding: 24px;
+  min-width: 0;
+}
+
+.dashboard-content-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================== */
+/* 6. STORE HEADER WRAPPER                        */
+/* ============================================== */
+
+.store-header-wrapper {
+  margin-bottom: 24px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--dash-card-bg);
+  border: 1px solid var(--dash-border);
+}
+
+/* ============================================== */
+/* 7. ANALYTICS / MANAGEMENT WRAPPER              */
+/* ============================================== */
+
+.analytics-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.store-mgmt-wrapper {
+  background: var(--dash-card-bg);
+  border-radius: 16px;
+  border: 1px solid var(--dash-border);
+  padding: 20px;
+}
+
+/* ============================================== */
+/* 8. ADVERTISE BANNER                            */
+/* ============================================== */
+
+.advertise-wrapper {
+  margin-top: 8px;
+}
+
+.advertise-banner {
+  background: linear-gradient(135deg, var(--dash-orange), #ff8c33);
+  border-radius: 16px;
+  padding: 28px;
+  color: #ffffff;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.advertise-banner:hover {
+  transform: translateY(-2px);
+}
+
+.advertise-banner h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  color: #ffffff;
+}
+
+.advertise-banner p {
+  font-size: 14px;
+  margin: 0 0 16px 0;
+  opacity: 0.95;
+}
+
+.advertise-btn {
+  background: #ffffff;
+  color: var(--dash-orange);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* ============================================== */
+/* 9. RESPONSIVE (Mobile)                         */
+/* ============================================== */
+
+@media (max-width: 768px) {
+  .mobile-menu-btn {
+    display: flex;
+  }
+
+  .header-center {
+    display: none; /* Ficha welcome message kwenye mobile */
+  }
+
+  .header-title {
+    font-size: 18px;
+  }
+
+  .dashboard-sidebar {
+    transform: translateX(-100%);
+    width: 280px;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .dashboard-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-overlay {
+    display: block;
+  }
+
+  .dashboard-content {
+    margin-left: 0;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header {
+    padding: 0 12px;
+    height: 56px;
+  }
+
+  .dashboard-main-wrapper {
+    margin-top: 56px;
+  }
+
+  .dashboard-sidebar {
+    top: 56px;
+  }
+
+  .dashboard-content {
+    padding: 12px;
+  }
+
+  .advertise-banner {
+    padding: 20px;
+  }
+
+  .advertise-banner h3 {
+    font-size: 16px;
+  }
+}
+/* ============================================ */
+/* 🔥 FIX YA MWISHO - HEADER STATIC NA PAGE INASCROLL */
+/* ============================================ */
+
+/* 1. Header iwe FIXED (sio sticky) ili ibaki juu */
+.dashboard-header {
+  position: fixed !important;   /* ✅ FIXED, sio sticky */
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  z-index: 999999 !important;
+  background-color: var(--dash-header-bg, #ffffff) !important;
+  height: 70px !important;
+  padding: 0 16px !important;
+  border-bottom: 1px solid var(--dash-border, #eee) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+/* 2. Main wrapper iwe na margin-top sawa na urefu wa header */
+.dashboard-main-wrapper {
+  display: flex !important;
+  flex-direction: row !important;
+  margin-top: 70px !important;        /* ✅ Nafasi ya header iliyofichwa */
+  min-height: calc(100vh - 70px) !important;
+  height: auto !important;             /* ✅ Ondoa height iliyowekwa */
+  align-items: stretch !important;
+}
+
+/* 3. Sidebar iwe FIXED (ibaki upande) */
+.dashboard-sidebar {
+  position: fixed !important;
   top: 70px !important;
-  height: calc(100vh - 70px) !important;
+  left: 0 !important;
+  bottom: 0 !important;                 /* ✅ Inashuka hadi chini */
+  width: 260px !important;
+  height: auto !important;             /* ✅ Badala ya 100%, tumia top/bottom */
+  overflow-y: auto !important;
+  z-index: 99998 !important;
+  background: var(--dash-sidebar-bg, #ffffff) !important;
+  border-right: 1px solid var(--dash-border, #eee) !important;
+}
+
+/* 4. Content iwe na margin-left ya sidebar, na i-scroll na page */
+.dashboard-content {
+  flex: 1 !important;
+  margin-left: 260px !important;       /* ✅ Nafasi ya sidebar */
+  padding: 20px !important;
+  background: var(--dash-bg, var(--gray-50)) !important;
+  overflow: visible !important;         /* ✅ Ondoa overflow-y: auto */
+  min-height: calc(100vh - 70px) !important;
+  height: auto !important;
+}
+
+.dashboard-content-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+}
+
+/* 5. Mobile - sidebar inaingia na kutoka, header inabaki fixed */
+@media (max-width: 768px) {
+  .dashboard-header {
+    padding: 0 16px !important;
+    height: 70px !important;
+  }
+
+  .mobile-menu-btn {
+    display: flex !important;
+    z-index: 999999 !important;
+    color: var(--dash-text, #333) !important;
+    background: transparent !important;
+    border: none !important;
+    margin-right: 10px !important;
+  }
+
+  .dashboard-main-wrapper {
+    margin-top: 70px !important;
+    min-height: calc(100vh - 70px) !important;
+    height: auto !important;
+  }
+
+  /* Sidebar inatoka nje ya screen kwa default */
+  .dashboard-sidebar {
+    position: fixed !important;
+    top: 70px !important;
+    left: -100% !important;
+    bottom: 0 !important;
+    width: 280px !important;
+    max-width: 280px !important;
+    height: auto !important;
+    z-index: 99999 !important;
+    transition: left 0.3s ease !important;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .dashboard-sidebar.open {
+    left: 0 !important;
+  }
+
+  /* Content haina margin-left kwenye mobile */
+  .dashboard-content {
+    margin-left: 0 !important;
+    padding: 12px !important;
+  }
+
+  /* Overlay inaanza chini ya header */
+  .sidebar-overlay {
+    position: fixed !important;
+    top: 70px !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 70px) !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    z-index: 99998 !important;
+    backdrop-filter: blur(3px);
+  }
+}
+
+/* ============================================ */
+/* PRODUCT GRID - SAHIHI KWA DESKTOP NA MOBILE  */
+/* ============================================ */
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* ✅ Desktop: kadi 4-5 */
+  gap: 16px;
+  width: 100%;
+}
+
+.product-card {
+  background: var(--dash-card-bg, white);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--dash-border, #e5e7eb);
+}
+
+.product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  border-color: var(--dash-orange, #f97316);
+}
+
+/* ✅ PICHA - IMEWEKWA SAHIHI ILI ISIWE KUBWA */
+.product-card-img-wrap {
+  width: 100%;
+  height: 180px;              /* ✅ Urefu maalum kwa picha */
+  background: var(--gray-100, #f3f4f6);
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;             /* ✅ Haibadiliki ukubwa */
+}
+
+.product-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;          /* ✅ Inajaza vizuri bila kubadilika */
+  display: block;
+}
+
+.product-card-body {
+  padding: 10px 12px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.product-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dash-text, #1f2937);
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.product-card-price {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--dash-orange, #2563eb);
+  margin: 0;
+}
+
+.product-card-edit-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(37, 99, 235, 0.95);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 10;
+  backdrop-filter: blur(2px);
+  transition: opacity 0.2s ease;
+  opacity: 0;
+}
+
+.product-card:hover .product-card-edit-btn {
+  opacity: 1;
+}
+
+/* ============================================ */
+/* TABLET (≤1024px) - Kadi 3 kwa mstari         */
+/* ============================================ */
+@media (max-width: 1024px) {
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 14px;
+  }
+  
+  .product-card-img-wrap {
+    height: 160px;
+  }
+}
+
+/* ============================================ */
+/* MOBILE (≤768px) - Kadi 2 kwa mstari         */
+/* ============================================ */
+@media (max-width: 768px) {
+  .product-grid {
+    grid-template-columns: 1fr 1fr !important;  /* ✅ Kadi 2 kwa mstari */
+    gap: 10px;
+  }
+
+  .product-card-img-wrap {
+    height: 140px;              /* ✅ Picha ndogo kwa mobile */
+  }
+
+  .product-card-title {
+    font-size: 12px;
+  }
+
+  .product-card-price {
+    font-size: 13px;
+  }
+
+  /* ✅ Kwenye mobile, kitufe cha Edit kinaonekana kila wakati */
+  .product-card-edit-btn {
+    opacity: 1;
+    top: 5px;
+    right: 5px;
+    padding: 5px 8px;
+    font-size: 10px;
+  }
+}
+
+/* ============================================ */
+/* SMALL MOBILE (≤480px) - Kadi 2 kwa mstari    */
+/* ============================================ */
+@media (max-width: 480px) {
+  .product-grid {
+    grid-template-columns: 1fr 1fr !important;  /* ✅ Kadi 2 kwa mstari */
+    gap: 8px;
+  }
+
+  .product-card-img-wrap {
+    height: 120px;              /* ✅ Picha ndogo zaidi */
+  }
+
+  .product-card-body {
+    padding: 8px 10px;
+  }
+
+  .product-card-title {
+    font-size: 11px;
+  }
+
+  .product-card-price {
+    font-size: 12px;
+  }
 }

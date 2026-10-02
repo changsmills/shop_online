@@ -8,6 +8,7 @@ import { Lock, ShieldCheck, CheckCircle, Eye, EyeOff, Mail, KeyRound } from 'luc
 import '../Login.css';
 
 const Login = () => {
+
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,6 +26,7 @@ const Login = () => {
   }, []);
 
   useEffect(() => {
+  
     const checkAuth = async () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
@@ -114,6 +116,7 @@ const Login = () => {
         localStorage.removeItem('refresh_token');
         setIsCheckingAuth(false);
       }
+
     };
 
     checkAuth();
@@ -121,6 +124,7 @@ const Login = () => {
 
    // 🔥 KAZI YA KUANDAA LOGIN YA KAWAIDA
   const handleLogin = async (e) => {
+    
     e.preventDefault();
     setLoading(true);
 
@@ -150,10 +154,10 @@ const Login = () => {
         // 1. Kama hajaverify OTP, mpeleke kwenye verify page
         if (!userProfile.is_otp_verified) {
           // ✅ Tumia toast.success au toast()
-toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
-  icon: '🔐',
-  duration: 4000,
-});
+          toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
+           icon: '🔐',
+           duration: 4000,
+           });
           setTimeout(() => {
             navigate('/verify-seller-otp', { replace: true });
           }, 4000);
@@ -380,6 +384,7 @@ toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
       
        {/* 🔥 BADILISHA HAPA NA CLIENT ID YAKO! */}
       <div className="login-container">
+
         <Toaster position="top-center" reverseOrder={false} />
 
         {/* LEFT PANEL */}
@@ -390,7 +395,7 @@ toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
             </p>
             <div className="login-testimonial-footer">
               <span className="login-testimonial-author">Andrea Vitello</span>
-              <span className="login-testimonial-brand">Skyfall.com</span>
+              <span className="login-testimonial-brand">Skyfall.co.tz</span>
             </div>
           </div>
         </div>
@@ -503,7 +508,9 @@ toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", {
               Sign up here
             </span>
           </div>
+
         </div>
+
       </div>
     </GoogleOAuthProvider>
   );

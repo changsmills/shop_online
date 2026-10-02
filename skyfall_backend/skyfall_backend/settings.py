@@ -21,7 +21,9 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-default-key-change-this')
 #DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 # 🔥 BADILISHA KUWA TRUE ILI UONE ERRORS KWENYE RENDER LOGS!
-DEBUG = False 
+#DEBUG = False 
+
+DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
 #ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
@@ -205,6 +207,7 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 # ==================== REST FRAMEWORK CONFIGURATION ====================
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -212,14 +215,13 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ),
-    # 🔥 Rate limiting
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle'
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/day',
-        'user': '1000/day'
+        'anon': '1000/hour',     # ✅ Mtumiaji asiyeingia: 1000 kwa saa
+        'user': '5000/hour'      # ✅ Mtumiaji aliyeingia: 5000 kwa saa
     }
 }
 
@@ -275,48 +277,128 @@ else:
     SESSION_COOKIE_SECURE = True    
     CSRF_COOKIE_SECURE = True       
 
-
-    # ============================================================
-# 🔥 ULTIMATE SECURITY SETTINGS - ONGEZA HIZI ZOTE!
+# ============================================================
+# 🔐 SKYFALL SECURITY SETTINGS
+# LOCAL DEVELOPMENT + PRODUCTION (RENDER)
 # ============================================================
 
-# 1. HTTPS na HSTS
+# 1. HTTPS AND HSTS CONFIGURATION
+# ============================================================
+
+# Render uses HTTPS through its reverse proxy
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 if not DEBUG:
+
+    # Force HTTPS in production only
     SECURE_SSL_REDIRECT = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    
-    # HSTS - Force browser kutumia HTTPS
-    SECURE_HSTS_SECONDS = 31536000  # Mwaka 1
+
+    # HSTS - Force browser to use HTTPS
+    SECURE_HSTS_SECONDS = 31536000  # 1 Year
+
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
     SECURE_HSTS_PRELOAD = True
 
-# 2. Cookies zote ziwe safe
+else:
+
+    # Local development - Allow HTTP
+    SECURE_SSL_REDIRECT = False
+
+    SECURE_HSTS_SECONDS = 0
+
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+
+    SECURE_HSTS_PRELOAD = False
+
+
+# 2. SECURE COOKIE CONFIGURATION
+# ============================================================
+
 SESSION_COOKIE_HTTPONLY = True
+
 CSRF_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SAMESITE = 'Lax'  # Au 'Strict' kwa usalama zaidi
+
+SESSION_COOKIE_SAMESITE = 'Lax'
+
 CSRF_COOKIE_SAMESITE = 'Lax'
 
-# 3. Zuia directory listing
-# (Ikiwa unatumia Apache/Nginx, weka kwenye server config, lakini hii ni backup)
-import os
-if not DEBUG:
-    # Hakikisha hakuna folder inayoonyeshwa
-    pass
 
-# 4. Logging security (Ili kufuatilia mashambulizi)
+# Secure cookies only in production
+if not DEBUG:
+
+    SESSION_COOKIE_SECURE = True
+
+    CSRF_COOKIE_SECURE = True
+
+else:
+
+    SESSION_COOKIE_SECURE = False
+
+    CSRF_COOKIE_SECURE = False
+
+
+# 3. SECURITY HEADERS
+# ============================================================
+
+# Prevent MIME type sniffing
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Prevent clickjacking
+X_FRAME_OPTIONS = 'DENY'
+
+# Referrer policy
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+
+# 4. DIRECTORY LISTING PROTECTION
+# ============================================================
+
+# Django does not enable directory listing by default.
+# No additional setting is required here.
+
+
+# 5. SECURITY LOGGING
+# ============================================================
+
 LOGGING = {
+
     'version': 1,
+
     'disable_existing_loggers': False,
+
+    'formatters': {
+
+        'verbose': {
+            'format': '{levelname} {asctime} {name} {message}',
+            'style': '{',
+        },
+
+    },
+
     'handlers': {
+
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
         },
+
     },
+
     'loggers': {
+
         'django.security': {
             'handlers': ['console'],
             'level': 'WARNING',
             'propagate': True,
         },
+
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+
     },
+
 }

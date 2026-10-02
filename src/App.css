@@ -71,17 +71,18 @@
                'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
 
-  /* Type Scale */
-  --fs-xs:   11px;
-  --fs-sm:   13px;
-  --fs-base: 14px;
-  --fs-md:   15px;
-  --fs-lg:   16px;
-  --fs-xl:   18px;
-  --fs-2xl:  22px;
-  --fs-3xl:  28px;
-  --fs-4xl:  36px;
+  /* Type Scale — IMEBADILISHWA */
+  --fs-xs:   12px;   /* ilikuwa 11px */
+  --fs-sm:   14px;   /* ilikuwa 13px */
+  --fs-base: 16px;   /* ilikuwa 14px — HII NDIO MSINGI */
+  --fs-md:   17px;   /* ilikuwa 15px */
+  --fs-lg:   18px;   /* ilikuwa 16px */
+  --fs-xl:   20px;   /* ilikuwa 18px */
+  --fs-2xl:  24px;   /* ilikuwa 22px */
+  --fs-3xl:  30px;   /* ilikuwa 28px */
+  --fs-4xl:  40px;   /* ilikuwa 36px */
 
+  
   /* Line Heights */
   --lh-tight:   1.2;
   --lh-snug:    1.35;
@@ -343,6 +344,7 @@ img, video, svg {
     color: #ffffff;
   }
 }
+
 /* ========================================= */
 /* ULTIMATE GLOBAL FORCE - DARK MODE */
 /* ========================================= */
@@ -352,8 +354,8 @@ img, video, svg {
     .header-left-group, 
     .logo-wrapper, 
     .search-bar-wrapper {
-        background: #1a1a2e !important;
-        background-color: #1a1a2e !important;
+        background: black !important;
+        background-color: black !important;
     }
     
     .logo-wrapper,

@@ -391,50 +391,7 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
 
       <div className="dashboard-main">
         
-        {/* SIDEBAR */}
-        <aside 
-          className={`dashboard-sidebar ${isExpanded ? 'sidebar-expanded' : 'sidebar-collapsed'}`}
-          onMouseEnter={() => setIsExpanded(true)} 
-          onMouseLeave={() => setIsExpanded(false)} 
-        >
-                    {sidebarItems.map((item) => {
-            if (item.path === '/dashboard/seller') {
-              // 🔥 Badilisha kuwa Button ili tuweze kukagua approval!
-              return (
-                <button
-                  key={item.path}
-                  className={`sidebar-link ${location.pathname === item.path ? 'active' : ''}`}
-                  onClick={handleSellNavigation}
-                  style={{ 
-                    background: 'none', 
-                    border: 'none', 
-                    width: '100%', 
-                    textAlign: 'left', 
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    fontSize: 'inherit'
-                  }}
-                  data-tooltip={item.label}
-                >
-                  {item.icon}
-                  <span className="sidebar-label">{item.label}</span>
-                </button>
-              );
-            }
-            return (
-              <Link 
-                key={item.path} 
-                to={item.path} 
-                className={`sidebar-link ${location.pathname === item.path ? 'active' : ''}`}
-                data-tooltip={item.label}
-              >
-                {item.icon}
-                <span className="sidebar-label">{item.label}</span>
-              </Link>
-            );
-          })}
-
-        </aside>
+        
 
         {/* SETTINGS CONTENT */}
         <div className="settings-container">
@@ -629,7 +586,7 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
               </div>
               
               <div className="footer-copyright">
-                <p>Skyfall.com © 2024 • All rights reserved</p>
+                <p>Skyfall.co.tz © 2024 • All rights reserved</p>
               </div>
             </div>
           </div>

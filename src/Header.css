@@ -680,7 +680,7 @@
 /* ========================================= */
 @media (prefers-color-scheme: dark) {
   .main-header {
-    background: var(--bg-header, #000000);
+    background: #000000 !important;
     color: var(--text-primary, #ffffff);
     border-top: 2px solid var(--border-color, #1f1f1f);
     border-bottom: 1px solid var(--border-color, #1f1f1f);
@@ -688,10 +688,10 @@
   }
 
   .header-container,
-  .header-top-bar,
-  .header-left-group,
-  .header-navigation-row {
-    background: var(--bg-header, #000000);
+.header-top-bar,
+.header-left-group,
+.header-navigation-row {
+    background: #000000 !important;
     color: var(--text-primary, #ffffff);
     border-color: var(--border-color, #1f1f1f);
   }

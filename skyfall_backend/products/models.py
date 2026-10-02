@@ -1,8 +1,63 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 import uuid
+from PIL import Image                    
+from io import BytesIO                   
+from django.core.files.base import ContentFile 
 
 User = get_user_model()
+
+
+
+def convert_to_webp(image_field):
+    """
+    Convert uploaded images to WebP format.
+    Preserves transparency where possible.
+    """
+
+    if not image_field:
+        return None
+
+    # Kama ni URL au tayari ni WebP, usibadilishe
+    if isinstance(image_field, str):
+        return image_field
+
+    if image_field.name.lower().endswith('.webp'):
+        return image_field
+
+    try:
+        # Rudisha file pointer mwanzo
+        image_field.seek(0)
+
+        img = Image.open(image_field)
+
+        # Hifadhi transparency kwa PNG/GIF zenye transparency
+        if img.mode not in ("RGB", "RGBA"):
+            if "transparency" in img.info:
+                img = img.convert("RGBA")
+            else:
+                img = img.convert("RGB")
+
+        output = BytesIO()
+
+        img.save(
+            output,
+            format="WEBP",
+            quality=80,
+            optimize=True
+        )
+
+        output.seek(0)
+
+        # Tengeneza jina jipya la .webp
+        original_name = image_field.name.rsplit(".", 1)[0]
+        new_name = original_name + ".webp"
+
+        return ContentFile(output.read(), name=new_name)
+
+    except Exception as e:
+        print(f"WebP conversion error: {e}")
+        return image_field
 
 
 # --- CATEGORY ---
@@ -266,6 +321,12 @@ class ProductsEngine(models.Model):
             # 6. Partial Indexes (Kwa cover_image)
             models.Index(fields=['cover_image'])  # Django handles NULL automatically
         ]
+
+    def save(self, *args, **kwargs):
+        if self.cover_image:
+            self.cover_image = convert_to_webp(self.cover_image)
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -685,6 +746,19 @@ class StoreEngine(models.Model):
             models.Index(fields=['category', '-average_rating']),
             models.Index(fields=['is_verified', '-average_rating']),
         ]
+
+    def save(self, *args, **kwargs):
+
+        if self.store_logo:
+            self.store_logo = convert_to_webp(self.store_logo)
+
+        if self.store_banner:
+            self.store_banner = convert_to_webp(self.store_banner)
+
+        if self.tin_image:
+            self.tin_image = convert_to_webp(self.tin_image)
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.store_name

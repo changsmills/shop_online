@@ -164,6 +164,7 @@
   box-sizing: border-box;
   gap: 12px;
   padding: 0;
+
 }
 
 @media (max-width: 768px) {
@@ -187,7 +188,7 @@
     grid-template-columns: repeat(6, 1fr); 
     gap: 16px; 
     padding: 0 16px; 
-  
+    
   }
 }
 

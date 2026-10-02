@@ -91,7 +91,7 @@ export default function Footer() {
           <div className="footer-column">
             <h3>{t('support')}</h3>
             <ul>
-              <li><a href="https://wa.me/255700000000">{t('whatsapp_support')}</a></li>
+              <li><a href="https://wa.me/255754394845">{t('whatsapp_support')}</a></li>
               <li><Link to="/contact-us">{t('email_us')}</Link></li>
               <li><Link to="/office-location">{t('our_offices')}</Link></li>
               <li><Link to="/shipping-info">{t('shipping_info')}</Link></li>
@@ -102,10 +102,10 @@ export default function Footer() {
           <div className="footer-column">
             <h3>{t('follow_us')}</h3>
             <div className="social-icons">
-              <a href="https://facebook.com" target="_blank" rel="noreferrer"><FaFacebook className="icon" /></a>
-              <a href="https://instagram.com" target="_blank" rel="noreferrer"><FaInstagram className="icon" /></a>
-              <a href="https://twitter.com" target="_blank" rel="noreferrer"><FaTwitter className="icon" /></a>
-              <a href="https://youtube.com" target="_blank" rel="noreferrer"><FaYoutube className="icon" /></a>
+              <a href="https://facebook.com/skyfall_tz" target="_blank" rel="noreferrer"><FaFacebook className="icon" /></a>
+              <a href="https://instagram.com/skyfall_tz" target="_blank" rel="noreferrer"><FaInstagram className="icon" /></a>
+              <a href="https://twitter.com/skyfall_tz" target="_blank" rel="noreferrer"><FaTwitter className="icon" /></a>
+              <a href="https://youtube.com/skyfall_tz" target="_blank" rel="noreferrer"><FaYoutube className="icon" /></a>
             </div>
             
           </div>

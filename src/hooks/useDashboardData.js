@@ -7,8 +7,8 @@ export const useDashboardData = () => {
     categories: [],
     trendingProducts: [],
     ads: [],
-    featuredProducts: [],   // Sasa tupu, Dashboard itafetch kwa category
-    subCategories: [],      // Sasa tupu, Dashboard itafetch kwa category
+    featuredProducts: [],
+    subCategories: [],      
     leafsForSub: [],
     loading: true,
     error: null
