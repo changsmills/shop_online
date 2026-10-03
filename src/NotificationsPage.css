@@ -1,670 +1,813 @@
-.notif-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  border-color: #ff6a0033 !important;
+/* ============================================ */
+/* NOTIFICATIONS PAGE - LAYOUT                  */
+/* ============================================ */
+.notifications-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f7f8fa;
 }
 
-.tab-container button:hover {
-  opacity: 0.9;
-}
-
-/* Scrollbar safi */
-main::-webkit-scrollbar {
-  width: 6px;
-}
-main::-webkit-scrollbar-thumb {
-  background-color: #ddd;
-  border-radius: 10px;
-}
-/* Box la maelezo (Tooltip) */
-.sidebar-link::after {
-  content: attr(data-label); /* Inasoma jina kutoka kwenye data-label */
-  position: absolute;
-  left: 55px; /* Inasukuma maandishi nje ya sidebar */
-  top: 50%;
-  transform: translateY(-50%) scale(0.8);
-  background-color: #333;
-  color: #fff;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-  opacity: 0; /* Inakuwa haionekani mwanzoni */
-  pointer-events: none;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  z-index: 999;
-}
-
-/* Inatokea pale mouse inapopitishwa (Hover) */
-.sidebar-link:hover::after {
-  opacity: 1;
-  transform: translateY(-50%) scale(1);
-  left: 60px; /* Inasogea kidogo kuleta effect ya kuvutia */
-}
-
-/* Kakishale kadogo kuelekea kwenye icon (Optional) */
-.sidebar-link:hover::before {
-  content: '';
-  position: absolute;
-  left: 50px;
-  top: 50%;
-  transform: translateY(-50%);
-  border: 5px solid transparent;
-  border-right-color: #333;
-  transition: all 0.2s;
-}
-/* Tab Buttons */
-.tab-btn {
-  padding: 10px 20px;
-  border-radius: 30px;
-  border: none;
-  cursor: pointer;
-  font-weight: 700;
+/* ============================================ */
+/* HEADER                                       */
+/* ============================================ */
+.notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 24px;
+  border-bottom: 1px solid #eee;
   background-color: #fff;
-  color: #666;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  transition: 0.3s;
+  z-index: 100;
+  position: relative;
+  flex-shrink: 0;
 }
 
-.tab-btn.active {
+.notifications-header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.notifications-menu-icon {
+  cursor: pointer;
+  color: #666;
+}
+
+.notifications-logo {
+  font-size: 20px;
+  font-weight: 800;
+  color: #ff6a00;
+  text-decoration: none;
+}
+
+.notifications-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: #f4f4f4;
+  padding: 6px 12px;
+  border-radius: 8px;
+  margin-left: 10px;
+}
+
+.notifications-search-input {
+  border: none;
+  background: none;
+  outline: none;
+  margin-left: 8px;
+  font-size: 14px;
+  width: 200px;
+}
+
+.notifications-header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* ============================================ */
+/* BODY (SIDEBAR + MAIN)                        */
+/* ============================================ */
+.notifications-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ============================================ */
+/* SIDEBAR                                      */
+/* ============================================ */
+.notifications-sidebar {
+  width: 70px;
+  border-right: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+  background-color: #fff;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.notifications-sidebar.expanded {
+  width: 240px;
+}
+
+.notifications-sidebar-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #666;
+  padding: 12px 24px;
+  margin: 4px 8px;
+  border-radius: 8px;
+  background-color: transparent;
+  transition: 0.2s;
+}
+
+.notifications-sidebar-link.active {
+  color: #ff6a00;
+  background-color: #fff5ed;
+}
+
+.notifications-sidebar-icon {
+  min-width: 22px;
+  display: flex;
+  justify-content: center;
+}
+
+.notifications-sidebar-label {
+  margin-left: 15px;
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.notifications-sidebar.expanded .notifications-sidebar-label {
+  opacity: 1;
+}
+
+/* ============================================ */
+/* MAIN CONTENT                                 */
+/* ============================================ */
+.notifications-main {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.notifications-content {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.notifications-title {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 24px;
+  color: #222;
+}
+
+/* ============================================ */
+/* TABS                                         */
+/* ============================================ */
+.notifications-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.notifications-tab {
+  padding: 8px 20px;
+  border-radius: 24px;
+  border: none;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.notifications-tab.active-buyer {
   background-color: #ff6a00;
   color: #fff;
 }
 
-/* Notification Cards */
-.notif-card {
+.notifications-tab.active-seller {
+  background-color: #00a65a;
+  color: #fff;
+}
+
+/* ============================================ */
+/* LOADING STATE                                */
+/* ============================================ */
+.notifications-loading {
+  text-align: center;
+  padding: 60px;
+}
+
+.notifications-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f4f6;
+  border-top: 3px solid #ff6a00;
+  border-radius: 50%;
+  margin: 0 auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.notifications-loading-text {
+  margin-top: 16px;
+  color: #6b7280;
+}
+
+/* ============================================ */
+/* EMPTY STATE                                  */
+/* ============================================ */
+.notifications-empty {
+  text-align: center;
+  padding: 60px;
+  background-color: #fff;
+  border-radius: 16px;
+}
+
+.notifications-empty-text {
+  margin-top: 16px;
+  color: #9ca3af;
+}
+
+/* ============================================ */
+/* ORDER CARD                                   */
+/* ============================================ */
+.notifications-order-card {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  align-items: center;
+  padding: 16px;
   background-color: #fff;
   border-radius: 12px;
-  border: 1px solid #eee;
-  transition: 0.3s;
+  margin-bottom: 12px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s;
 }
 
-.notif-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  border-color: #ff6a0044;
+.notifications-order-card:hover {
+  transform: translateX(4px);
 }
 
-.notif-icon-circle {
-  background-color: #fff5ed;
+.notifications-order-card.seller {
+  border-left: 4px solid #00a65a;
+}
+
+.notifications-order-card.buyer {
+  border-left: 4px solid #ff6a00;
+}
+
+.notifications-order-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+}
+
+.notifications-order-icon-wrapper {
   padding: 10px;
   border-radius: 50%;
 }
 
-.empty-state {
-  text-align: center;
-  padding: 60px;
-  background: #fff;
-  border-radius: 16px;
-  color: #999;
+.notifications-order-icon-wrapper.seller {
+  background-color: #e6fff0;
 }
 
-/* Sidebar Item Hover */
-.sidebar-item:hover {
-  background-color: #f8f8f8 !important;
-}
-.notif-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  cursor: pointer;
-  border: 1px solid #eee;
-  background: white;
-  padding: 15px;
-  border-radius: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.notifications-order-icon-wrapper.buyer {
+  background-color: #fff5ed;
 }
 
-.notif-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+.notifications-order-details {
+  flex: 1;
 }
 
-.tab-btn.active {
-  background-color: #ff6a00;
-  color: white;
-  border-color: #ff6a00;
+.notifications-order-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
 }
 
-.badge-seller {
-  background: #00a65a;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 10px;
+.notifications-order-subtitle {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.notifications-order-meta {
+  margin: 2px 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.notifications-order-total {
+  margin: 4px 0 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ff6a00;
+}
+
+.notifications-order-status-wrapper {
+  text-align: right;
+}
+
+.notifications-order-arrow {
+  margin-top: 8px;
+}
+
+/* ============================================ */
+/* STATUS BADGE                                 */
+/* ============================================ */
+.notifications-status-badge {
   font-size: 11px;
-  margin-left: 5px;
-}
-/* ============================================ */
-/* RESPONSIVE DESIGN - NOTIFICATIONS PAGE */
-/* ============================================ */
-
-/* Kwa tablets (max-width: 1024px) */
-@media (max-width: 1024px) {
-  .notif-card {
-    padding: 14px 16px !important;
-  }
-  
-  .notif-card h4 {
-    font-size: 15px !important;
-  }
-  
-  .notif-card p {
-    font-size: 13px !important;
-  }
-  
-  main {
-    padding: 20px !important;
-  }
-  
-  main > div {
-    max-width: 100% !important;
-  }
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  display: inline-block;
 }
 
-/* Kwa simu (max-width: 768px) */
+.notifications-status-badge.pending {
+  background-color: #fff7ed;
+  color: #ff6a00;
+}
+
+.notifications-status-badge.received {
+  background-color: #e8f4fd;
+  color: #2196f3;
+}
+
+.notifications-status-badge.delivered {
+  background-color: #e6fff0;
+  color: #00a65a;
+}
+
+.notifications-status-badge.cancelled {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+/* ============================================ */
+/* MOBILE BOTTOM NAV                            */
+/* ============================================ */
+.notifications-mobile-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px 0 20px;
+  border-top: 1px solid #eee;
+  z-index: 1000;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.notifications-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  color: #666;
+}
+
+.notifications-nav-item.active {
+  color: #ff6a00;
+}
+
+.notifications-nav-item span {
+  font-size: 10px;
+}
+
+.notifications-mobile-spacer {
+  height: 70px;
+}
+
+/* ============================================ */
+/* MOBILE RESPONSIVE                            */
+/* ============================================ */
 @media (max-width: 768px) {
-  /* Dashboard layout */
-  .dashboard-layout {
-    height: 100vh !important;
+  .notifications-header {
+    padding: 10px 16px;
   }
-  
-  /* Header adjustments */
-  .dashboard-header {
-    padding: 8px 12px !important;
+
+  .notifications-header-left {
+    gap: 10px;
   }
-  
-  .header-left {
-    gap: 8px !important;
+
+  .notifications-header-right {
+    gap: 10px;
   }
-  
-  .header-left a {
-    font-size: 16px !important;
+
+  .notifications-logo {
+    font-size: 18px;
   }
-  
-  .header-left > div {
-    display: none !important; /* Hide search on mobile */
+
+  .notifications-main {
+    padding: 16px;
+    padding-bottom: 90px;
   }
-  
-  .header-right {
-    gap: 10px !important;
+
+  .notifications-title {
+    font-size: 20px;
   }
-  
-  /* Sidebar - fixed positioning on mobile */
-  aside {
-    position: fixed !important;
-    left: 0 !important;
-    top: 60px !important;
-    bottom: 0 !important;
-    z-index: 200 !important;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1) !important;
-    width: 70px !important;
+
+  .notifications-tabs {
+    gap: 8px;
   }
-  
-  aside:hover {
-    width: 200px !important;
+
+  .notifications-tab {
+    padding: 6px 16px;
+    font-size: 13px;
   }
-  
-  .sidebar-item {
-    padding: 10px 16px !important;
-    margin: 2px 6px !important;
+
+  .notifications-order-card {
+    padding: 12px;
+    flex-wrap: wrap;
   }
-  
-  .sidebar-item span {
-    font-size: 13px !important;
-    margin-left: 12px !important;
+
+  .notifications-order-info {
+    gap: 12px;
   }
-  
-  /* Main content */
-  main {
-    padding: 16px !important;
-    margin-left: 0 !important;
-    flex: 1 !important;
+
+  .notifications-order-icon-wrapper {
+    padding: 8px;
   }
-  
-  main > div {
-    padding: 0 !important;
+
+  .notifications-order-title {
+    font-size: 14px;
   }
-  
-  /* Page title */
-  main h2 {
-    font-size: 20px !important;
-    margin-bottom: 16px !important;
+
+  .notifications-order-subtitle {
+    font-size: 12px;
   }
-  
-  /* Tabs container */
-  .tab-container, 
-  div[style*="display: flex; gap: 12px"] {
-    gap: 8px !important;
-    margin-bottom: 16px !important;
-    padding-bottom: 10px !important;
-    flex-wrap: wrap !important;
+
+  .notifications-order-meta {
+    font-size: 10px;
   }
-  
-  .tab-btn,
-  button[style*="borderRadius: '24px'"] {
-    padding: 6px 14px !important;
-    font-size: 13px !important;
+
+  .notifications-order-total {
+    font-size: 13px;
   }
-  
-  /* Notification cards */
-  .notif-card,
-  div[style*="display: flex; justifyContent: space-between; alignItems: center; padding: 16px"] {
-    padding: 12px !important;
-    margin-bottom: 10px !important;
-    flex-wrap: wrap !important;
+
+  .notifications-order-status-wrapper {
+    margin-top: 8px;
   }
-  
-  .notif-card > div:first-child {
-    flex-wrap: wrap !important;
-  }
-  
-  .notif-card > div:first-child > div:first-child {
-    width: 40px !important;
-    height: 40px !important;
-    margin-right: 10px !important;
-  }
-  
-  .notif-card > div:first-child > div:first-child svg {
-    width: 20px !important;
-    height: 20px !important;
-  }
-  
-  .notif-card h4 {
-    font-size: 14px !important;
-    margin-bottom: 2px !important;
-  }
-  
-  .notif-card p {
-    font-size: 11px !important;
-    margin: 2px 0 !important;
-  }
-  
-  .notif-card p strong {
-    font-size: 12px !important;
-  }
-  
-  .notif-card p:last-of-type {
-    font-size: 13px !important;
-    margin-top: 4px !important;
-  }
-  
-  /* Status badge */
-  .notif-card > div:last-child {
-    text-align: right !important;
-  }
-  
-  .notif-card span[style*="borderRadius: '20px'"],
-  .notif-card span[style*="borderRadius: '20px'"] {
-    font-size: 9px !important;
-    padding: 3px 8px !important;
-    white-space: nowrap !important;
-  }
-  
-  .chevron-icon {
-    width: 16px !important;
-    height: 16px !important;
-    margin-top: 6px !important;
-  }
-  
-  /* Empty state */
-  .empty-state,
-  div[style*="textAlign: 'center'; padding: '60px'"] {
-    padding: 40px 20px !important;
-  }
-  
-  .empty-state svg,
-  div[style*="textAlign: 'center'"] svg {
-    width: 50px !important;
-    height: 50px !important;
-  }
-  
-  .empty-state p,
-  div[style*="textAlign: 'center'"] p {
-    font-size: 13px !important;
-  }
-  
-  /* Loading spinner */
-  div[style*="textAlign: 'center'; padding: '60px'"] div {
-    width: 30px !important;
-    height: 30px !important;
+
+  .notifications-status-badge {
+    font-size: 10px;
+    padding: 3px 10px;
   }
 }
+/* ============================================ */
+/* DARK MODE                                    */
+/* ============================================ */
+@media (prefers-color-scheme: dark) {
 
-/* Kwa simu ndogo (max-width: 480px) */
-@media (max-width: 480px) {
-  .dashboard-header {
-    padding: 6px 10px !important;
+  /* LAYOUT */
+  .notifications-layout {
+    background-color: #0f172a;
   }
-  
-  .header-left a {
-    font-size: 14px !important;
+
+  /* HEADER */
+  .notifications-header {
+    background-color: #1e293b;
+    border-bottom-color: #334155;
   }
-  
-  .header-right svg {
-    width: 18px !important;
-    height: 18px !important;
+
+  .notifications-menu-icon {
+    color: #cbd5e1;
   }
-  
-  main {
-    padding: 12px !important;
+
+  .notifications-logo {
+    color: #ff8533;
   }
-  
-  main h2 {
-    font-size: 18px !important;
-    margin-bottom: 12px !important;
+
+  .notifications-search {
+    background-color: #0f172a;
   }
-  
-  /* Tabs - full width on mobile */
-  .tab-container,
-  div[style*="display: flex; gap: 12px"] {
-    display: flex !important;
-    gap: 6px !important;
+
+  .notifications-search-input {
+    color: #e2e8f0;
   }
-  
-  .tab-btn,
-  button[style*="borderRadius: '24px'"] {
-    flex: 1 !important;
-    text-align: center !important;
-    padding: 8px 12px !important;
-    font-size: 12px !important;
+
+  .notifications-search-input::placeholder {
+    color: #64748b;
   }
-  
-  /* Notification cards - stacked layout */
-  .notif-card,
-  div[style*="display: flex; justifyContent: space-between; alignItems: center; padding: 16px"] {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 10px !important;
+
+  /* SIDEBAR */
+  .notifications-sidebar {
+    background-color: #1e293b;
+    border-right-color: #334155;
   }
-  
-  .notif-card > div:first-child {
-    width: 100% !important;
+
+  .notifications-sidebar-link {
+    color: #94a3b8;
   }
-  
-  .notif-card > div:last-child {
-    width: 100% !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
+
+  .notifications-sidebar-link:hover {
+    background-color: #334155;
+    color: #e2e8f0;
   }
-  
-  .chevron-icon {
-    display: none !important;
+
+  .notifications-sidebar-link.active {
+    color: #ff8533;
+    background-color: #2d2419;
   }
-  
-  /* Status badge on mobile */
-  .notif-card span[style*="borderRadius: '20px'"] {
-    font-size: 10px !important;
-    padding: 4px 12px !important;
+
+  .notifications-sidebar-label {
+    color: inherit;
   }
-  
-  /* Order details on mobile */
-  .notif-card p:first-of-type {
-    margin-top: 6px !important;
+
+  /* MAIN */
+  .notifications-main {
+    background-color: #0f172a;
   }
-  
-  .notif-card p:first-of-type strong {
-    display: block !important;
-    margin-top: 2px !important;
+
+  .notifications-title {
+    color: #f1f5f9;
+  }
+
+  /* TABS */
+  .notifications-tabs {
+    border-bottom-color: #334155;
+  }
+
+  .notifications-tab {
+    background-color: #1e293b;
+    color: #94a3b8;
+  }
+
+  .notifications-tab:hover {
+    background-color: #334155;
+    color: #e2e8f0;
+  }
+
+  .notifications-tab.active-buyer {
+    background-color: #ff6a00;
+    color: #fff;
+  }
+
+  .notifications-tab.active-seller {
+    background-color: #00a65a;
+    color: #fff;
+  }
+
+  /* LOADING */
+  .notifications-loading-text {
+    color: #94a3b8;
+  }
+
+  .notifications-spinner {
+    border-color: #1e293b;
+    border-top-color: #ff8533;
+  }
+
+  /* EMPTY STATE */
+  .notifications-empty {
+    background-color: #1e293b;
+  }
+
+  .notifications-empty-text {
+    color: #64748b;
+  }
+
+  /* ORDER CARD */
+  .notifications-order-card {
+    background-color: #1e293b;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .notifications-order-card.seller {
+    border-left-color: #10b981;
+  }
+
+  .notifications-order-card.buyer {
+    border-left-color: #ff8533;
+  }
+
+  .notifications-order-icon-wrapper.seller {
+    background-color: #064e3b;
+  }
+
+  .notifications-order-icon-wrapper.buyer {
+    background-color: #7c2d12;
+  }
+
+  .notifications-order-title {
+    color: #f1f5f9;
+  }
+
+  .notifications-order-subtitle {
+    color: #cbd5e1;
+  }
+
+  .notifications-order-subtitle strong {
+    color: #e2e8f0;
+  }
+
+  .notifications-order-meta {
+    color: #94a3b8;
+  }
+
+  .notifications-order-total {
+    color: #ff8533;
+  }
+
+  .notifications-order-arrow {
+    color: #64748b;
+  }
+
+  /* STATUS BADGES */
+  .notifications-status-badge.pending {
+    background-color: #7c2d12;
+    color: #fdba74;
+  }
+
+  .notifications-status-badge.received {
+    background-color: #1e3a8a;
+    color: #93c5fd;
+  }
+
+  .notifications-status-badge.delivered {
+    background-color: #064e3b;
+    color: #6ee7b7;
+  }
+
+  .notifications-status-badge.cancelled {
+    background-color: #7f1d1d;
+    color: #fca5a5;
+  }
+
+  /* MOBILE BOTTOM NAV */
+  .notifications-mobile-nav {
+    background-color: #1e293b;
+    border-top-color: #334155;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .notifications-nav-item {
+    color: #94a3b8;
+  }
+
+  .notifications-nav-item.active {
+    color: #ff8533;
   }
 }
+/* ============================================ */
+/* ICON VISIBILITY FIX                          */
+/* ============================================ */
 
-/* Kwa tablets (landscape) */
-@media (min-width: 769px) and (max-width: 1024px) and (orientation: landscape) {
-  .dashboard-header {
-    padding: 8px 16px !important;
-  }
-  
-  .header-left > div {
-    width: 160px !important;
-  }
-  
-  main {
-    padding: 20px !important;
-  }
-  
-  .notif-card {
-    padding: 12px 16px !important;
-  }
+/* Sidebar icons */
+.notifications-sidebar-link svg {
+  color: #666;
+  stroke: currentColor;
+  flex-shrink: 0;
 }
 
-/* Kwa desktop kubwa (min-width: 1400px) */
-@media (min-width: 1400px) {
-  main > div {
-    max-width: 1100px !important;
-  }
-  
-  .notif-card {
-    padding: 18px 24px !important;
-  }
-  
-  .notif-card h4 {
-    font-size: 17px !important;
-  }
-  
-  .notif-card p {
-    font-size: 14px !important;
-  }
+.notifications-sidebar-link.active svg {
+  color: #ff6a00;
+}
+
+/* Header icons (Bell, Menu) */
+.notifications-header svg {
+  stroke: currentColor;
+}
+
+.notifications-menu-icon svg,
+.notifications-menu-icon {
+  color: #666;
+}
+
+/* Search icon */
+.notifications-search svg {
+  color: #999;
+  stroke: currentColor;
+}
+
+/* Order card icons */
+.notifications-order-icon-wrapper svg {
+  stroke: currentColor;
+}
+
+.notifications-order-icon-wrapper.seller svg {
+  color: #00a65a;
+}
+
+.notifications-order-icon-wrapper.buyer svg {
+  color: #ff6a00;
+}
+
+/* Order arrow */
+.notifications-order-arrow,
+.notifications-order-status-wrapper svg {
+  color: #9ca3af;
+  stroke: currentColor;
+}
+
+/* Empty state icons */
+.notifications-empty svg {
+  color: #ddd;
+  stroke: currentColor;
+}
+
+/* Mobile bottom nav icons */
+.notifications-nav-item svg {
+  color: #666;
+  stroke: currentColor;
+}
+
+.notifications-nav-item.active svg {
+  color: #ff6a00;
 }
 
 /* ============================================ */
-/* SIDEBAR TOOLTIP FIXES */
+/* DARK MODE ICON FIX                           */
 /* ============================================ */
+@media (prefers-color-scheme: dark) {
 
-@media (max-width: 768px) {
-  /* Hide tooltips on mobile (they get cut off) */
-  .sidebar-link::after,
-  .sidebar-link::before,
-  [class*="sidebar"]::after,
-  [class*="sidebar"]::before {
-    display: none !important;
+  .notifications-sidebar-link svg {
+    color: #94a3b8;
+  }
+
+  .notifications-sidebar-link.active svg {
+    color: #ff8533;
+  }
+
+  .notifications-menu-icon,
+  .notifications-menu-icon svg {
+    color: #cbd5e1;
+  }
+
+  .notifications-search svg {
+    color: #64748b;
+  }
+
+  .notifications-order-icon-wrapper.seller svg {
+    color: #34d399;
+  }
+
+  .notifications-order-icon-wrapper.buyer svg {
+    color: #ff8533;
+  }
+
+  .notifications-order-arrow,
+  .notifications-order-status-wrapper svg {
+    color: #64748b;
+  }
+
+  .notifications-empty svg {
+    color: #475569;
+  }
+
+  .notifications-nav-item svg {
+    color: #94a3b8;
+  }
+
+  .notifications-nav-item.active svg {
+    color: #ff8533;
   }
 }
-
 /* ============================================ */
-/* TOUCH OPTIMIZATIONS */
+/* HEADER ICON FIX                              */
 /* ============================================ */
+.notifications-header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
 
-@media (hover: none) and (pointer: coarse) {
-  .notif-card {
-    cursor: pointer !important;
-    -webkit-tap-highlight-color: transparent !important;
+.notifications-header-right svg {
+  color: #666;
+  stroke: #666;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  display: block;
+}
+
+.notifications-header-right > * {
+  color: #666;
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .notifications-header-right svg {
+    color: #cbd5e1;
+    stroke: #cbd5e1;
   }
-  
-  .notif-card:active {
-    transform: scale(0.99) !important;
-    transition: transform 0.05s ease !important;
-  }
-  
-  .tab-btn,
-  button[style*="borderRadius: '24px'"],
-  .sidebar-item {
-    cursor: pointer !important;
-    -webkit-tap-highlight-color: transparent !important;
-  }
-  
-  .tab-btn:active,
-  button[style*="borderRadius: '24px'"]:active {
-    transform: scale(0.97) !important;
-  }
-  
-  /* Increase tap targets */
-  .sidebar-item {
-    min-height: 44px !important;
-  }
-  
-  .notif-card {
-    min-height: 70px !important;
+
+  .notifications-header-right > * {
+    color: #cbd5e1;
   }
 }
-
-/* ============================================ */
-/* SCROLLBAR IMPROVEMENTS */
-/* ============================================ */
-
-/* Custom scrollbar for main content */
-main::-webkit-scrollbar {
-  width: 5px !important;
+.notifications-header-right * {
+  color: #666;
 }
-
-main::-webkit-scrollbar-track {
-  background: #f1f1f1 !important;
-  border-radius: 10px !important;
-}
-
-main::-webkit-scrollbar-thumb {
-  background: #ff6a00 !important;
-  border-radius: 10px !important;
-}
-
-main::-webkit-scrollbar-thumb:hover {
-  background: #e55a00 !important;
-}
-
-/* For Firefox */
-main {
-  scrollbar-width: thin !important;
-  scrollbar-color: #ff6a00 #f1f1f1 !important;
-}
-
-/* ============================================ */
-/* ANIMATIONS */
-/* ============================================ */
-
-.notif-card {
-  transition: all 0.2s ease !important;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.notif-card {
-  animation: slideIn 0.3s ease forwards;
-}
-
-/* Staggered animation for multiple cards */
-.notif-card:nth-child(1) { animation-delay: 0.05s; }
-.notif-card:nth-child(2) { animation-delay: 0.1s; }
-.notif-card:nth-child(3) { animation-delay: 0.15s; }
-.notif-card:nth-child(4) { animation-delay: 0.2s; }
-.notif-card:nth-child(5) { animation-delay: 0.25s; }
-
-/* ============================================ */
-/* PRINT STYLES */
-/* ============================================ */
-
-@media print {
-  .dashboard-header,
-  aside,
-  .tab-container,
-  button,
-  .chevron-icon {
-    display: none !important;
-  }
-  
-  main {
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-  
-  .notif-card {
-    break-inside: avoid !important;
-    border: 1px solid #ddd !important;
-    box-shadow: none !important;
-  }
-  
-  .notif-card span[style*="backgroundColor"] {
-    border: 1px solid #999 !important;
-    background: white !important;
-    color: #000 !important;
-  }
-}
-
-/* ============================================ */
-/* SAFE AREA FOR NOTCH DEVICES */
-/* ============================================ */
-
-@supports (padding: max(0px)) {
-  @media (max-width: 768px) {
-    main {
-      padding-left: max(16px, env(safe-area-inset-left)) !important;
-      padding-right: max(16px, env(safe-area-inset-right)) !important;
-      padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
-    }
-  }
-}
-
-/* ============================================ */
-/* FIX FOR BOTTOM NAVIGATION OVERLAP */
-/* ============================================ */
-
-@media (max-width: 768px) {
-  main {
-    padding-bottom: 80px !important;
-  }
-}
-
-/* ============================================ */
-/* STATUS BADGE COLORS (Maintained from original) */
-/* ============================================ */
-
-.badge-pending {
-  background-color: #fff7ed !important;
-  color: #ff6a00 !important;
-}
-
-.badge-received {
-  background-color: #e8f4fd !important;
-  color: #2196f3 !important;
-}
-
-.badge-delivered {
-  background-color: #e6fff0 !important;
-  color: #00a65a !important;
-}
-
-.badge-cancelled {
-  background-color: #fee2e2 !important;
-  color: #ef4444 !important;
-}
-
-/* ============================================ */
-/* DARK MODE SUPPORT (Optional) */
-/* ============================================ */
 
 @media (prefers-color-scheme: dark) {
-  /* Add dark mode styles if needed */
-}
-
-/* ============================================ */
-/* RESPONSIVE TABLE FOR ORDERS (If any) */
-/* ============================================ */
-
-@media (max-width: 768px) {
-  .orders-table,
-  [class*="orders-table"] {
-    display: block !important;
-    overflow-x: auto !important;
-    white-space: nowrap !important;
-  }
-  
-  .orders-table table,
-  [class*="orders-table"] table {
-    width: 100% !important;
-    min-width: 600px !important;
+  .notifications-header-right * {
+    color: #cbd5e1 !important;
   }
 }

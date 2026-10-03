@@ -46,29 +46,47 @@ const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/rlgqgsnv/image/upload";
   const audience = useMemo(() => parseJsonData(product?.target_audience, []), [product]);
 
   const variationsByColor = useMemo(() => {
-    const grouped = {};
-    productVariations.forEach(v => {
-      // 🔥 KINGA YA MWISHO: Hakikisha variation hii ni ya bidhaa hii tu!
-      if (String(v.product) !== String(product?.id)) return; 
+  const grouped = {};
+  productVariations.forEach(v => {
+    if (String(v.product) !== String(product?.id)) return;
 
-      const colorName = v.color_name;
-      if (!grouped[colorName]) {
-        let fullImageUrl = v.color_image_url;
-        if (!fullImageUrl && v.color_image) {
-            fullImageUrl = `${CLOUDINARY_BASE_URL}/${v.color_image}`;
-        }
+    const colorName = v.color_name;
+    
+    let fullImageUrl = v.color_image_url;
+    if (!fullImageUrl && v.color_image) {
+      fullImageUrl = `${CLOUDINARY_BASE_URL}/${v.color_image}`;
+    }
 
-        grouped[colorName] = {
-          variation: v,
-          color_image: fullImageUrl || v.color_image, 
-          size_stock: v.size_stock || {},
-          price: v.price,
-          stock_quantity: v.stock_quantity
-        };
-      }
-    });
-    return grouped;
-  }, [productVariations, product?.id]);
+    // 🔥 Kama rangi haipo bado, anzisha
+    if (!grouped[colorName]) {
+      grouped[colorName] = {
+        variation: v,
+        color_image: fullImageUrl || v.color_image,
+        size_stock: v.size_stock || {},
+        price: v.price,
+        stock_quantity: v.stock_quantity,
+        // 🔥 ONGEZA: Ramani ya size → {price, stock, variationId}
+        sizesMap: {}
+      };
+    }
+
+    // 🔥 Ongeza size hii kwenye sizesMap ya rangi
+    const sizeKey = v.size_value;
+    if (sizeKey) {
+      // Chukua stock kutoka size_stock (kama ipo) au stock_quantity ya variation
+      const stockForSize = (v.size_stock && v.size_stock[sizeKey] !== undefined)
+        ? v.size_stock[sizeKey]
+        : (v.stock_quantity || 0);
+
+      grouped[colorName].sizesMap[sizeKey] = {
+        price: Number(v.price) || 0,
+        stock: stockForSize,
+        variationId: v.id,
+      };
+    }
+  });
+  return grouped;
+}, [productVariations, product?.id]);
 
   const openDrawer = (color, size) => {
     setActiveColor(color);
@@ -77,38 +95,57 @@ const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/rlgqgsnv/image/upload";
   };
 
   const availableSizesForColor = useMemo(() => {
-    if (!selectedColor) return [];
-    const colorData = variationsByColor[selectedColor];
-    if (!colorData) return [];
-    const sizeStock = colorData.size_stock || {};
-    const sizes = Object.keys(sizeStock);
-    return sizes.sort((a, b) => {
-      const order = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
-      return (order.indexOf(a) - order.indexOf(b));
-    });
-  }, [selectedColor, variationsByColor]);
+  if (!selectedColor) return [];
+  const colorData = variationsByColor[selectedColor];
+  if (!colorData) return [];
+  // 🔥 Chukua sizes kutoka sizesMap
+  const sizes = Object.keys(colorData.sizesMap || {});
+  return sizes.sort((a, b) => {
+    const order = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+    const ai = order.indexOf(a);
+    const bi = order.indexOf(b);
+    if (ai === -1 && bi === -1) return a.localeCompare(b);
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+}, [selectedColor, variationsByColor]);
 
-  const getStockForSize = (color, size) => {
-    const colorData = variationsByColor[color];
-    if (!colorData) return 0;
-    const sizeStock = colorData.size_stock || {};
-    return sizeStock[size] || 0;
-  };
+
+  // 🔥 Bei sahihi kwa size
+const getPriceForSize = (color, size) => {
+  const colorData = variationsByColor[color];
+  if (!colorData?.sizesMap?.[size]) return Number(product?.price) || 0;
+  return colorData.sizesMap[size].price;
+};
+
+// 🔥 Stock sahihi kwa size (badilisha `getStockForSize`)
+const getStockForSize = (color, size) => {
+  const colorData = variationsByColor[color];
+  if (!colorData?.sizesMap?.[size]) return 0;
+  return colorData.sizesMap[size].stock;
+};
 
   const getCurrentVariation = (color, size) => {
-    const found = productVariations.find(v => 
-      String(v.product) === String(product?.id) && // 🔥 KINGA YA MWISHO!
-      v.color_name === color && 
-      (size ? (v.size_stock && v.size_stock[size] !== undefined) : true)
-    );
-    if (!found) return null;
-    return {
-      ...found,
-      size_value: size || null,
-      stock_quantity: size ? (found.size_stock?.[size] || 0) : found.stock_quantity,
-      id: found.id 
-    };
+  // 🔥 Tafuta kwa size_value PEKEE (sio size_stock keys)
+  const found = productVariations.find(v => 
+    String(v.product) === String(product?.id) &&
+    v.color_name === color && 
+    (size ? String(v.size_value) === String(size) : true)
+  );
+  if (!found) return null;
+  
+  const specificStock = (found.size_stock && found.size_stock[size] !== undefined)
+    ? found.size_stock[size]
+    : (found.stock_quantity || 0);
+  
+  return {
+    ...found,
+    size_value: size || found.size_value,
+    stock_quantity: specificStock,
+    id: found.id 
   };
+};
 
   const currentStock = useMemo(() => {
     if (selectedSize && selectedColor) {
@@ -118,14 +155,16 @@ const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/rlgqgsnv/image/upload";
   }, [selectedVariationObj, product, selectedColor, selectedSize]);
 
     const currentPrice = useMemo(() => {
-    // 🔥 SULUHISHO: Thibitisha kama variation ina bei halali (kubwa kuliko 0)
-    const variationPrice = parseFloat(selectedVariationObj?.price);
-    if (variationPrice > 0) {
-      return variationPrice;
-    }
-    // Kama variation haina bei, tumia bei ya bidhaa kuu
-    return parseFloat(product?.price) || 0;
-  }, [selectedVariationObj, product]);
+  // 🔥 Kama tuna color + size, tumia bei kutoka sizesMap
+  if (selectedColor && selectedSize) {
+    const priceFromMap = getPriceForSize(selectedColor, selectedSize);
+    if (priceFromMap > 0) return priceFromMap;
+  }
+  // Fallback
+  const variationPrice = parseFloat(selectedVariationObj?.price);
+  if (variationPrice > 0) return variationPrice;
+  return parseFloat(product?.price) || 0;
+}, [selectedColor, selectedSize, variationsByColor, selectedVariationObj, product]);
 
   const currentSpecs = useMemo(() => {
     if (selectedVariationObj && selectedVariationObj.attributes) {
@@ -181,18 +220,21 @@ const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/rlgqgsnv/image/upload";
   };
 
   const handleColorSelect = async (color) => {
-    const colorData = variationsByColor[color];
-    if (colorData) {
-      const sizes = Object.keys(colorData.size_stock || {});
-      const firstSize = sizes.length > 0 ? sizes[0] : "";
-      
-      setActiveColor(color);
-      setActiveSize(firstSize);
-      
-      const variation = getCurrentVariation(color, firstSize || null);
-      await selectVariationAndOpenDrawer(variation, 'order');
-    }
-  };
+  const colorData = variationsByColor[color];
+  if (colorData) {
+    // 🔥 Chukua sizes kutoka sizesMap
+    const sizes = Object.keys(colorData.sizesMap || {});
+    const firstSize = sizes.length > 0 ? sizes[0] : "";
+    
+    setActiveColor(color);
+    setActiveSize(firstSize);
+    setSelectedColor(color);
+    setSelectedSize(firstSize);
+    
+    const variation = getCurrentVariation(color, firstSize || null);
+    await selectVariationAndOpenDrawer(variation, 'order');
+  }
+};
 
   const handleSizeSelect = async (size) => {
     if (selectedColor) {
@@ -414,20 +456,25 @@ const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/rlgqgsnv/image/upload";
           // 🔥 KINGA YA 2: Chuja tena upande wa Frontend kwa usalama
           const filteredData = varData.filter(v => String(v.product) === String(product.id));
           setProductVariations(filteredData);
+
           
           const defaultVar = filteredData.find(v => v.stock_quantity > 0) || filteredData[0];
-          setSelectedColor(defaultVar.color_name);
-          
-          const sizes = Object.keys(defaultVar.size_stock || {});
-          const firstSize = sizes.length > 0 ? sizes[0] : "";
-          
-          setSelectedSize(firstSize);
+setSelectedColor(defaultVar.color_name);
 
-          setSelectedVariationObj({
-            ...defaultVar,
-            size_value: firstSize || null,
-            stock_quantity: firstSize ? (defaultVar.size_stock?.[firstSize] || 0) : defaultVar.stock_quantity
-          });
+// 🔥 Chukua size kutoka size_value ya variation PEKEE
+const firstSize = defaultVar.size_value || "";
+
+setSelectedSize(firstSize);
+
+setSelectedVariationObj({
+  ...defaultVar,
+  size_value: firstSize || null,
+  stock_quantity: (defaultVar.size_stock && defaultVar.size_stock[firstSize] !== undefined)
+    ? defaultVar.size_stock[firstSize]
+    : (defaultVar.stock_quantity || 0)
+});
+
+
         }
       } catch (error) {
         console.error("Error fetching product media/variations:", error);
@@ -505,7 +552,9 @@ const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/rlgqgsnv/image/upload";
               <div className="color-options">
                 {Object.keys(variationsByColor).map((color) => {
                   const colorData = variationsByColor[color];
-                  const totalStock = colorData.stock_quantity || 0;
+                    const totalStock = Object.values(colorData.sizesMap || {}).reduce(
+                    (sum, s) => sum + (Number(s.stock) || 0), 0
+                            );
                   return (
                     <div key={color} onClick={() => handleColorSelect(color)} className={`color-item ${selectedColor === color ? 'active' : ''}`}>
                       <div className={`color-square ${selectedColor === color ? 'active' : ''}`}>

@@ -85,6 +85,7 @@ function ProductAttributes({ attributes, setAttributes, subCategoryId, leafCateg
       enable_dimensions: false,
       enable_variations: false,
       size_stock: {},
+      size_prices: {}, 
       size_format: leaf?.size_format || 'standard',
       shipping_method: "fixed",
       shipping_cost: "",
@@ -149,8 +150,23 @@ function ProductAttributes({ attributes, setAttributes, subCategoryId, leafCateg
   };
 
   const removeColorTag = (colorToRemove) => {
-    setAttributes({ ...attributes, colors: attributes.colors.filter(c => c !== colorToRemove) });
-  };
+    const newColors = attributes.colors.filter(c => c !== colorToRemove);
+    const newSizeStock = { ...(attributes.size_stock || {}) };
+    const newSizePrices = { ...(attributes.size_prices || {}) };
+    const newColorImages = { ...(attributes.color_images || {}) };
+    
+    delete newSizeStock[colorToRemove];
+    delete newSizePrices[colorToRemove];
+    delete newColorImages[colorToRemove];
+    
+    setAttributes({ 
+      ...attributes, 
+      colors: newColors, 
+      size_stock: newSizeStock, 
+      size_prices: newSizePrices,
+      color_images: newColorImages
+    });
+};
 
   useEffect(() => {
     if (!attributes.has_colors) {
@@ -158,14 +174,17 @@ function ProductAttributes({ attributes, setAttributes, subCategoryId, leafCateg
       return;
     }
     const selectedColors = attributes.colors || [];
-    const selectedSizes = attributes.sizes || [];
     if (selectedColors.length === 0) {
       if (productVariations.length !== 0) { setProductVariations([]); setAttributes(prev => ({ ...prev, variations: [] })); }
       return;
     }
-    const sizesToUse = selectedSizes.length > 0 ? selectedSizes : [null];
     const newVariations = [];
     selectedColors.forEach(color => {
+      // 🔥 CHUKUA UKUBWA KUTOKA size_stock YA RANGI HII
+      const colorStock = attributes.size_stock?.[color] || {};
+      const colorSizes = Object.keys(colorStock);
+      const sizesToUse = colorSizes.length > 0 ? colorSizes : [null];
+
       sizesToUse.forEach(size => {
         const existing = (attributes.variations || []).find(v => v.color_name === color && v.size_value === size);
         const dynamicSpecsForVariation = { ...(attributes.specifications || {}) };
@@ -177,13 +196,13 @@ function ProductAttributes({ attributes, setAttributes, subCategoryId, leafCateg
           newVariations.push({
             color_name: color,
             size_value: size || null,
-            stock_quantity: 0,
-            price: attributes.price || 0,
+            stock_quantity: colorStock[size] || 0,
+            price: (attributes.size_prices?.[color]?.[size]) || attributes.price || 0,
             variant_image_url: "",
             color_image: "",
             image_file: null,
             marketplace_stock: 0,
-            marketplace_price: attributes.price || 0,
+            marketplace_price: (attributes.size_prices?.[color]?.[size]) || attributes.price || 0,
             marketplace_image: null,
             attributes: dynamicSpecsForVariation
           });
@@ -196,7 +215,7 @@ function ProductAttributes({ attributes, setAttributes, subCategoryId, leafCateg
       setProductVariations(newVariations);
       setAttributes(prev => ({ ...prev, variations: newVariations, has_colors: newVariations.length > 0 ? true : prev.has_colors }));
     }
-  }, [attributes.has_colors, attributes.colors, attributes.sizes, attributes.price, attributes.specifications]);
+  }, [attributes.has_colors, attributes.colors, attributes.sizes, attributes.price, attributes.specifications, attributes.size_stock, attributes.size_prices]);
 
   useEffect(() => {
     if (attributes.has_colors) return;
@@ -242,6 +261,7 @@ function ProductAttributes({ attributes, setAttributes, subCategoryId, leafCateg
   };
 
   return (
+
     <div className="product-attributes-container">
       {/* SECTION 1: BASIC INFORMATION */}
       <div className="form-section-header">
@@ -337,25 +357,29 @@ function ProductAttributes({ attributes, setAttributes, subCategoryId, leafCateg
             <h3>Vipengele vya Bidhaa (Chagua Unavyohitaji)</h3>
           </div>
           <div className="customization-controls">
+
+
             {/* Size Format */}
             <div className="size-format-selector-wrapper">
               <label className="field-label-small">📏 Mfumo wa Ukubwa / Vipimo</label>
+
               <select className="select-input size-format-select" value={attributes.size_format || 'standard'} onChange={(e) => {
-                const format = e.target.value;
-                setAttributes({ 
-                  ...attributes, 
-                  size_format: format,
-                  ...(format === 'length' ? { dimensions: { length: '', width: '', height: '' }, sizes: [], size_stock: {} } : {}),
-                  ...(format === 'dimensions' ? { price_per_meter: '', price_per_foot: '', sizes: [], size_stock: {} } : {}),
-                  ...(format === 'free' ? { sizes: [], size_stock: {}, dimensions: { length: '', width: '', height: '' }, price_per_meter: '', price_per_foot: '' } : {}),
-                });
-              }}>
-                <option value="standard">📏 Kawaida (S, M, L, XL)</option>
-                <option value="numeric">🔢 Nambari (36, 37, 38...)</option>
-                <option value="free">📦 Hakuna Ukubwa</option>
-                <option value="dimensions">📐 Vipimo (Makabati, Meza)</option>
-                <option value="length">📏 Urefu (Mazulia, Vitambaa)</option>
-              </select>
+  const format = e.target.value;
+  setAttributes({ 
+    ...attributes, 
+    size_format: format,
+    ...(format === 'length' ? { dimensions: { length: '', width: '', height: '' }, sizes: [], size_stock: {}, size_prices: {} } : {}),
+    ...(format === 'dimensions' ? { price_per_meter: '', price_per_foot: '', sizes: [], size_stock: {}, size_prices: {} } : {}),
+    ...(format === 'free' ? { sizes: [], size_stock: {}, size_prices: {}, dimensions: { length: '', width: '', height: '' }, price_per_meter: '', price_per_foot: '' } : {}),
+  });
+ }}>
+  <option value="standard">📏 Kawaida (S, M, L, XL)</option>
+  <option value="numeric">🔢 Nambari (36, 37, 38...)</option>
+  <option value="free">📦 Hakuna Ukubwa</option>
+  <option value="dimensions">📐 Vipimo (Makabati, Meza)</option>
+  <option value="length">📏 Urefu (Mazulia, Vitambaa)</option>
+ </select>
+
               <small className="helper-text">💡 Chagua mfumo unaofaa kwa aina ya bidhaa yako</small>
             </div>
 
@@ -411,18 +435,24 @@ function ProductAttributes({ attributes, setAttributes, subCategoryId, leafCateg
           <option value="">Hakuna Dhamana</option><option value="3">Miezi 3</option><option value="6">Miezi 6</option><option value="12">Mwaka 1</option><option value="24">Miaka 2</option><option value="36">Miaka 3</option><option value="60">Miaka 5</option>
         </select></div></div></div></>
       )}
+
       {selectedLeaf && attributes.enable_weight && (
         <><div className="form-section-header"><Weight size={20} /><h3>Uzito wa Bidhaa</h3></div>
         <div className="dynamic-specs-container"><div className="specs-grid"><div className="spec-full-width"><div className="flex-row gap-10"><input type="number" step="0.1" className="text-input" placeholder="Uzito" value={attributes.weight || ""} onChange={(e) => setAttributes({ ...attributes, weight: e.target.value })} /> <select className="select-input width-100" value={weightUnit} onChange={(e) => setWeightUnit(e.target.value)}><option value="kg">Kilogramu (kg)</option><option value="g">Gramu (g)</option><option value="lb">Pound (lb)</option></select></div></div></div></div></>
       )}
-      {selectedLeaf && attributes.enable_dimensions && (
-        <><div className="form-section-header"><Ruler size={20} /><h3>Vipimo vya Bidhaa</h3></div>
-        <div className="dynamic-specs-container"><div className="specs-grid"><div className="spec-full-width"><div className="flex-row gap-10 flex-wrap"><input type="number" step="0.1" className="text-input" placeholder="Urefu (cm)" value={attributes.dimensions?.length || ""} onChange={(e) => setAttributes({ ...attributes, dimensions: { ...attributes.dimensions, length: e.target.value } })} /><input type="number" step="0.1" className="text-input" placeholder="Upana (cm)" value={attributes.dimensions?.width || ""} onChange={(e) => setAttributes({ ...attributes, dimensions: { ...attributes.dimensions, width: e.target.value } })} /><input type="number" step="0.1" className="text-input" placeholder="Kimo (cm)" value={attributes.dimensions?.height || ""} onChange={(e) => setAttributes({ ...attributes, dimensions: { ...attributes.dimensions, height: e.target.value } })} /></div><small className="helper-text">{selectedLeaf.measurement_unit === 'metric' ? 'Sentimita (cm)' : 'Inchi (in)'}</small></div></div></div></>
-      )}
-      {selectedLeaf && attributes.enable_gender && (
+
+   {selectedLeaf && attributes.enable_dimensions && (
+     <><div className="form-section-header"><Ruler size={20} /><h3>Vipimo vya Bidhaa</h3></div>
+     <div className="dynamic-specs-container"><div className="specs-grid"><div className="spec-full-width"><div className="flex-row gap-10 flex-wrap"><input type="number" step="0.1" className="text-input" placeholder="Urefu (cm)" value={attributes.dimensions?.length || ""} onChange={(e) => setAttributes({ ...attributes, dimensions: { ...attributes.dimensions, length: e.target.value } })} /><input type="number" step="0.1" className="text-input" placeholder="Upana (cm)" value={attributes.dimensions?.width || ""} onChange={(e) => setAttributes({ ...attributes, dimensions: { ...attributes.dimensions, width: e.target.value } })} /><input type="number" step="0.1" className="text-input" placeholder="Kimo (cm)" value={attributes.dimensions?.height || ""} onChange={(e) => setAttributes({ ...attributes, dimensions: { ...attributes.dimensions, height: e.target.value } })} /></div><small className="helper-text">{selectedLeaf.measurement_unit === 'metric' ? 'Sentimita (cm)' : 'Inchi (in)'}</small></div></div></div></>
+   )}
+
+
+       {selectedLeaf && attributes.enable_gender && (
         <><div className="form-section-header"><Heart size={20} /><h3>Lengo la Bidhaa</h3></div>
         <div className="dynamic-specs-container"><div className="specs-grid"><div className="spec-full-width"><label className="spec-label">Jinsia:</label><div className="spec-buttons-group">{["Male", "Female", "Unisex"].map((g) => <button key={g} type="button" className={`spec-pill-button ${(attributes.gender || []).includes(g) ? "selected" : ""}`} onClick={() => { const current = attributes.gender || []; const next = current.includes(g) ? current.filter((i) => i !== g) : [...current, g]; setAttributes({ ...attributes, gender: next }); }}>{g === 'Male' && '👨 Wanaume'}{g === 'Female' && '👩 Wanawake'}{g === 'Unisex' && '👥 Wote'}</button>)}</div></div><div className="spec-full-width"><label className="spec-label">Kikundi cha Umri:</label><div className="spec-buttons-group">{["Kids", "Youth", "Adults", "All"].map((a) => <button key={a} type="button" className={`spec-pill-button ${(attributes.target_audience || []).includes(a) ? "selected" : ""}`} onClick={() => { const current = attributes.target_audience || []; const next = current.includes(a) ? current.filter((i) => i !== a) : [...current, a]; setAttributes({ ...attributes, target_audience: next }); }}>{a === 'Kids' && '🧒 Watoto'}{a === 'Youth' && '🧑 Vijana'}{a === 'Adults' && '👨‍🦱 Watu Wazima'}{a === 'All' && '👨‍👩‍👧‍👦 Wote'}</button>)}</div></div></div></div></>
       )}
+
+     
 
       {/* SECTION 9: RANGI NA UKUBWA */}
       {selectedLeaf && attributes.enable_variations && (
@@ -473,12 +503,14 @@ function ProductAttributes({ attributes, setAttributes, subCategoryId, leafCateg
                           <div className="color-swatch" style={{ backgroundColor: color }} />
                           <div><span className="color-title">{color.toUpperCase()}</span><div className="color-status">{attributes.color_images?.[color] ? "✅ Imepakiwa" : "❌ Hajapakiwa"}</div></div>
                         </div>
+
                         <button type="button" className="btn-delete-color" onClick={() => {
                           const newColors = attributes.colors.filter(c => c !== color);
                           const newSizeStock = { ...(attributes.size_stock || {}) }; delete newSizeStock[color];
+                          const newSizePrices = { ...(attributes.size_prices || {}) }; delete newSizePrices[color]; 
                           const newColorImages = { ...(attributes.color_images || {}) }; delete newColorImages[color];
-                          setAttributes({ ...attributes, colors: newColors, size_stock: newSizeStock, color_images: newColorImages });
-                        }}><Trash2 size={14} /> Futa Rangi</button>
+                          setAttributes({ ...attributes, colors: newColors, size_stock: newSizeStock, size_prices: newSizePrices, color_images: newColorImages });                        }}><Trash2 size={14} /> Futa Rangi</button>
+
                       </div>
 
                       <div className="size-add-wrapper">
@@ -518,37 +550,66 @@ function ProductAttributes({ attributes, setAttributes, subCategoryId, leafCateg
                         </div>
                       </div>
 
-                      {/* JEDWALI LA STOCK KWA RANGI HII */}
-                      {Object.keys(colorStock).length > 0 && (
-                        <div className="stock-grid-wrapper">
-                          <label>📊 Stock kwa Kila Ukubwa:</label>
-                          <div className="stock-grid">
-                            {Object.entries(colorStock).map(([size, stock]) => (
-                              <div key={size} className="stock-item">
-                                <span className="stock-size">{size}</span>
-                                <div className="stock-controls">
-                                  <input type="number" min="0" className="stock-input" placeholder="Stock" value={stock} onChange={(e) => {
-                                    const newStock = parseInt(e.target.value) || 0;
-                                    const newSizeStock = { ...(attributes.size_stock || {}) };
-                                    if (!newSizeStock[color]) newSizeStock[color] = {};
-                                    newSizeStock[color][size] = newStock;
-                                    setAttributes({ ...attributes, size_stock: newSizeStock });
-                                  }} />
-                                  <button type="button" className="btn-remove-stock" onClick={() => {
-                                    const newSizeStock = { ...(attributes.size_stock || {}) };
-                                    if (newSizeStock[color]) { delete newSizeStock[color][size]; if (Object.keys(newSizeStock[color]).length === 0) delete newSizeStock[color]; }
-                                    setAttributes({ ...attributes, size_stock: newSizeStock });
-                                  }}>×</button>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                          <div className="stock-total color-total">
-                            <span>📦 Jumla ya {color.toUpperCase()}:</span>
-                            <strong>{Object.values(colorStock).reduce((sum, val) => sum + (Number(val) || 0), 0)} pcs</strong>
-                          </div>
-                        </div>
-                      )}
+                      {/* JEDWALI LA STOCK NA BEI KWA RANGI HII */}
+ {Object.keys(colorStock).length > 0 && (
+  <div className="stock-grid-wrapper">
+    <label>📊 Stock na Bei kwa Kila Ukubwa:</label>
+    <div className="stock-grid">
+      {Object.entries(colorStock).map(([size, stock]) => (
+        <div key={size} className="stock-item">
+          <span className="stock-size">{size}</span>
+          <div className="stock-controls">
+            {/* Input ya Stock */}
+            <input type="number" min="0" className="stock-input" placeholder="Stock" value={stock} onChange={(e) => {
+              const newStock = parseInt(e.target.value) || 0;
+              const newSizeStock = { ...(attributes.size_stock || {}) };
+              if (!newSizeStock[color]) newSizeStock[color] = {};
+              newSizeStock[color][size] = newStock;
+              setAttributes({ ...attributes, size_stock: newSizeStock });
+            }} />
+
+            {/* 🔥 INPUT YA BEI KWA KILA UKUBWA 🔥 */}
+            <input 
+              type="number" 
+              min="0" 
+              className="stock-input" 
+              placeholder="Bei (TZS)" 
+              value={attributes.size_prices?.[color]?.[size] || ""} 
+              onChange={(e) => {
+                const newPrice = parseFloat(e.target.value) || 0;
+                const newSizePrices = { ...(attributes.size_prices || {}) };
+                if (!newSizePrices[color]) newSizePrices[color] = {};
+                newSizePrices[color][size] = newPrice;
+                setAttributes({ ...attributes, size_prices: newSizePrices });
+              }} 
+            />
+
+            {/* Button ya Kufuta */}
+            <button type="button" className="btn-remove-stock" onClick={() => {
+              const newSizeStock = { ...(attributes.size_stock || {}) };
+              const newSizePrices = { ...(attributes.size_prices || {}) };
+              
+              if (newSizeStock[color]) { 
+                delete newSizeStock[color][size]; 
+                if (Object.keys(newSizeStock[color]).length === 0) delete newSizeStock[color]; 
+              }
+              if (newSizePrices[color]) { 
+                delete newSizePrices[color][size]; 
+                if (Object.keys(newSizePrices[color]).length === 0) delete newSizePrices[color]; 
+              }
+              
+              setAttributes({ ...attributes, size_stock: newSizeStock, size_prices: newSizePrices });
+            }}>×</button>
+          </div>
+        </div>
+      ))}
+    </div>
+    <div className="stock-total color-total">
+      <span>📦 Jumla ya {color.toUpperCase()}:</span>
+      <strong>{Object.values(colorStock).reduce((sum, val) => sum + (Number(val) || 0), 0)} pcs</strong>
+    </div>
+  </div>
+ )}
 
                       {/* PICHA YA RANGI */}
                       <div className="color-image-upload">
@@ -584,57 +645,122 @@ function ProductAttributes({ attributes, setAttributes, subCategoryId, leafCateg
           </div></div></div></>
       )}
 
-      {/* SECTION 10: MARKETPLACE LISTING */}
-      {selectedLeaf && (
-        <>
-          <div className="form-section-header"><ShoppingBag size={20} /><h3>Mauzo Sokoni (Marketplace Listing) - {selectedLeaf.name}</h3><span className="required-badge">* Lazima kujaza</span></div>
-          <div className="marketplace-container">
-            <div className="marketplace-warning"><AlertCircle size={18} /><span>⚠️ Taarifa za Marketplace ni lazima zijazwe kwa bidhaa hii!</span></div>
-            <div className="marketplace-card">
-              <h4>📦 Listing ya {selectedLeaf.name}</h4>
-              <div className="form-group"><label className="field-label-small required">Jina la Bidhaa Sokoni <span className="required-star">*</span></label><input type="text" className="text-input" placeholder="Mfano: Nike Air Max 2024" value={attributes.marketplace_product_name || ""} onChange={(e) => setAttributes({ ...attributes, marketplace_product_name: e.target.value })} /></div>
-              <div className="form-group"><label className="field-label-small required">Bei ya Msingi (TZS) <span className="required-star">*</span></label><input type="number" className="text-input" placeholder="Bei ya kuuza sokoni" value={attributes.marketplace_base_price || attributes.price || ""} onChange={(e) => setAttributes({ ...attributes, marketplace_base_price: e.target.value })} /><small>Bei ya kuuza kwa bidhaa hii</small></div>
-              
-              {attributes.has_colors && attributes.colors?.length > 0 && (
-                <div className="form-group"><label className="field-label-small required">Picha za Rangi <span className="required-star">*</span></label>
-                  <div className="color-image-grid">
-                    {attributes.colors.map(color => {
-                      const colorImage = attributes.color_images?.[color] || null;
-                      const colorStock = attributes.size_stock?.[color] || {};
-                      const totalStock = Object.values(colorStock).reduce((sum, val) => sum + (Number(val) || 0), 0);
-                      return (
-                        <div key={color} className="color-image-grid-item">
-                          <div className="flex-col items-center"><div className="small-color-swatch" style={{ backgroundColor: color }} /><div className="color-grid-text">{color.toUpperCase()}</div><div className="stock-mini-text">Stock: {totalStock} pcs</div></div>
-                          <div><input id={`marketplace-color-${color}`} type="file" accept="image/*" hidden onChange={(e) => { const file = e.target.files[0]; if (file) { const imageUrl = URL.createObjectURL(file); setAttributes(prev => ({ ...prev, color_images: { ...(prev.color_images || {}), [color]: imageUrl }, color_image_files: { ...(prev.color_image_files || {}), [color]: file } })); } }} /><label htmlFor={`marketplace-color-${color}`} className={`image-upload-box small-upload ${colorImage ? 'uploaded' : ''}`}>{colorImage ? <img src={colorImage} alt={color} /> : <><Camera size={16} /><span>Weka</span></>}</label></div>
-                          <div className="image-status-text">{colorImage ? "✅ Picha imepakiwa" : "⚠️ Inahitajika"}</div>
+ {/* SECTION 10: MARKETPLACE LISTING - COMPLETE SUMMARY */}
+{selectedLeaf && (
+  <>
+    <div className="form-section-header">
+      <ShoppingBag size={20} />
+      <h3>Listing Summary - {selectedLeaf.name}</h3>
+      <span className="required-badge">* Auto-generated</span>
+    </div>
+    <div className="marketplace-container">
+      <div className="marketplace-card">
+        <h4>📦 Summary</h4>
+        
+        {/* Marketplace Product Name */}
+        <div className="form-group">
+          <label className="field-label-small">Marketplace Product Name</label>
+          <input 
+            type="text" 
+            className="text-input" 
+            value={attributes.marketplace_product_name || attributes.name || ""} 
+            onChange={(e) => setAttributes({ ...attributes, marketplace_product_name: e.target.value })} 
+            placeholder="Will use product name if left empty"
+          />
+        </div>
+
+        {/* COLOR IMAGES + STOCK + PRICE PER SIZE */}
+        {attributes.has_colors && attributes.colors?.length > 0 && (
+          <div className="form-group">
+            <label className="field-label-small">Color Images (Uploaded)</label>
+            <div className="color-image-grid">
+              {attributes.colors.map(color => {
+                const colorImage = attributes.color_images?.[color] || null;
+                const colorStock = attributes.size_stock?.[color] || {};
+                const colorPrices = attributes.size_prices?.[color] || {};
+                const totalStock = Object.values(colorStock).reduce((sum, val) => sum + (Number(val) || 0), 0);
+
+                return (
+                  <div key={color} className="color-image-grid-item summary-item">
+                    {/* Color Header */}
+                    <div className="summary-color-header">
+                      <div className="small-color-swatch" style={{ backgroundColor: color }} />
+                      <div className="summary-color-info">
+                        <div className="color-grid-text">{color.toUpperCase()}</div>
+                        <div className="stock-mini-text">
+                          Total: {totalStock} pcs | Sizes: {Object.keys(colorStock).length}
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+                      </div>
+                      <div className="image-status-text">
+                        {colorImage ? "✅ Image" : "⚠️ Missing"}
+                      </div>
+                    </div>
 
-              {!attributes.has_colors && (
-                <div className="form-group"><label className="field-label-small required">Picha ya Bidhaa <span className="required-star">*</span></label>
-                  <div className="main-image-upload-wrapper">
-                    <input id="marketplace-main-image" type="file" accept="image/*" hidden onChange={(e) => { const file = e.target.files[0]; if (file) setAttributes({ ...attributes, marketplace_main_image: URL.createObjectURL(file), marketplace_main_image_file: file }); }} />
-                    <label htmlFor="marketplace-main-image" className={`image-upload-box main-image-box ${attributes.marketplace_main_image ? 'uploaded' : ''}`}>
-                      {attributes.marketplace_main_image ? <img src={attributes.marketplace_main_image} alt="Product" /> : <><Camera size={24} /><span>Weka Picha</span></>}
-                    </label>
-                    <div className="main-image-info"><div className="img-info-title">Picha ya Bidhaa</div><div className="img-info-sub">{attributes.marketplace_main_image ? "Picha imepakiwa" : "Bonyeza kuweka picha ya bidhaa"}</div>{attributes.enable_sizes && attributes.sizes?.length > 0 && <div className="img-info-sizes">📏 Ukubwa: {attributes.sizes.join(", ")}</div>}{!attributes.enable_sizes && <div className="img-info-sizes">✅ Bidhaa haina ukubwa tofauti (Standard size)</div>}</div>
+                    {/* SIZE GRID - STOCK & PRICE */}
+                    {Object.keys(colorStock).length > 0 && (
+                      <div className="summary-size-grid">
+                        {Object.entries(colorStock).map(([size, stock]) => {
+                          const price = colorPrices[size] || 0;
+                          return (
+                            <div key={size} className="summary-size-card">
+                              <div className="summary-size-header">
+                                <span className="summary-size-badge">{size}</span>
+                                <span className={`summary-size-stock ${stock > 0 ? 'in-stock' : 'out-stock'}`}>
+                                  {stock > 0 ? `${stock} pcs` : 'Out'}
+                                </span>
+                              </div>
+                              <div className="summary-size-price">
+                                <span className="summary-price-label">Price:</span>
+                                <span className="summary-price-value">
+                                  TZS {Number(price).toLocaleString()}
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
-                </div>
-              )}
-
-              <div className="stock-summary-box">
-                <div><span>📦 Jumla ya Stock:</span><span className="highlight-blue">{attributes.has_colors && attributes.colors?.length > 0 ? attributes.colors.reduce((total, color) => { const colorStock = attributes.size_stock?.[color] || {}; return total + Object.values(colorStock).reduce((sum, val) => sum + (Number(val) || 0), 0); }, 0) : attributes.enable_sizes ? Object.values(attributes.size_stock || {}).reduce((acc, val) => acc + (Number(val) || 0), 0) : attributes.stock || 0} pcs</span></div>
-                {attributes.has_colors && <div><span>🖼️ Rangi zilizo na picha:</span><span className="highlight-green">{Object.values(attributes.color_images || {}).filter(img => img).length} / {(attributes.colors || []).length}</span></div>}
-              </div>
-              <small className="helper-text">{attributes.has_colors ? "📌 Kila rangi ina picha yake. Mteja atachagua kwanza RANGI, kisha UKUBWA." : attributes.enable_sizes ? "📌 Picha moja inayowakilisha bidhaa. Mteja atachagua UKUBWA anao hitaji." : "📌 Picha moja inayowakilisha bidhaa yako."}</small>
+                );
+              })}
             </div>
           </div>
-        </>
-      )}
+        )}
+
+        {/* STOCK SUMMARY */}
+        <div className="stock-summary-box">
+          <div>
+            <span>📦 Total Stock:</span>
+            <span className="highlight-blue">
+              {attributes.colors?.reduce((total, color) => {
+                const colorStock = attributes.size_stock?.[color] || {};
+                return total + Object.values(colorStock).reduce((sum, val) => sum + (Number(val) || 0), 0);
+              }, 0) || 0} pcs
+            </span>
+          </div>
+          <div>
+            <span>🖼️ Colors with images:</span>
+            <span className="highlight-green">
+              {Object.values(attributes.color_images || {}).filter(img => img).length} / {(attributes.colors || []).length}
+            </span>
+          </div>
+          <div>
+            <span>💰 Sizes with prices:</span>
+            <span className="highlight-green">
+              {Object.values(attributes.size_prices || {}).reduce((total, colorPrices) => {
+                return total + Object.keys(colorPrices || {}).length;
+              }, 0)}
+            </span>
+          </div>
+        </div>
+
+        <small className="helper-text">
+          📌 This summary shows all info you entered in SECTION 9. No need to fill in again.
+        </small>
+      </div>
+    </div>
+  </>
+)}
 
       {/* SALES MODE & PRICING */}
       <div className="form-section-header"><DollarSign size={20} /><h3>Mfumo wa Uuzaji na Bei</h3></div>
@@ -665,41 +791,49 @@ function ProductAttributes({ attributes, setAttributes, subCategoryId, leafCateg
         </div>
       </div>
 
-      {/* PRICE & STOCK */}
-      <div className="form-section-header"><ShoppingBag size={20} /><h3>Bei na Stock</h3></div>
-      <div className="form-grid-two">
-        {attributes.is_retail && (
-          <div className="form-group"><label className="field-label-main">Bei ya Rejareja (TZS) <span className="required-star">*</span></label><input type="number" className="text-input" placeholder="Mfano: 25000" value={attributes.price || ""} onChange={(e) => setAttributes({ ...attributes, price: e.target.value })} /><small>Bei ya kuuza kwa rejareja kwa kila bidhaa</small></div>
-        )}
-        <div className="form-group"><label className="field-label-main">Jumla ya Stock <span className="required-star">*</span></label><input type="number" className="text-input" placeholder="Idadi ya bidhaa zilizopo" value={attributes.stock || ""} onChange={(e) => setAttributes({ ...attributes, stock: e.target.value })} min="0" />{productVariations.length > 0 && <small className="success-text">✅ Stock inahesabiwa moja kwa moja kutoka variations ({productVariations.reduce((acc, v) => acc + (Number(v.stock_quantity) || 0), 0)})</small>}</div>
-      </div>
+{/* PRICE & STOCK */}
+<div className="form-section-header"><ShoppingBag size={20} /><h3>Price & Stock</h3></div>
+<div className="form-grid-two">
+  {attributes.is_retail && (
+    <div className="form-group">
+      <label className="field-label-main">
+        {attributes.has_colors ? "Starting Price (TZS)" : "Retail Price (TZS)"}
+        {!attributes.has_colors && <span className="required-star">*</span>}
+      </label>
+      <input 
+        type="number" 
+        className="text-input" 
+        placeholder={attributes.has_colors ? "Auto-filled from lowest size price" : "e.g. 25000"}
+        value={attributes.price || ""} 
+        onChange={(e) => setAttributes({ ...attributes, price: e.target.value })} 
+        disabled={attributes.has_colors && Object.keys(attributes.size_prices || {}).length > 0}
+      />
+      <small>
+        {attributes.has_colors 
+          ? "📌 This price is not used. Each size uses its own price in SECTION 9." 
+          : "Retail selling price per item"}
+      </small>
+    </div>
+  )}
+  <div className="form-group">
+    <label className="field-label-main">Total Stock <span className="required-star">*</span></label>
+    <input 
+      type="number" 
+      className="text-input" 
+      placeholder="Number of items available" 
+      value={attributes.stock || ""} 
+      onChange={(e) => setAttributes({ ...attributes, stock: e.target.value })} 
+      min="0" 
+    />
+    {productVariations.length > 0 && (
+      <small className="success-text">
+        ✅ Stock is auto-calculated from variations ({productVariations.reduce((acc, v) => acc + (Number(v.stock_quantity) || 0), 0)})
+      </small>
+    )}
+  </div>
+</div>
 
-      {/* COST & PROFIT */}
-      <div className="form-section-header"><Award size={20} /><h3>Gharama na Faida</h3></div>
-      <div className="form-grid-two footer-section">
-        <div className="form-group"><label className="field-label-main">Gharama ya Jumla ya Stock (TZS)</label><input type="number" className="text-input" placeholder="Gharama uliyotumia kununua stock zote" value={attributes.total_stock_cost || ""} onChange={(e) => setAttributes({ ...attributes, total_stock_cost: e.target.value })} /><small>Gharama uliyolipa kwa ajili ya stock zote</small></div>
-        <div className="form-group"><label className="field-label-main">Faida Inayotarajiwa (TZS)</label><input type="number" className="text-input" placeholder="Faida unayotarajia kupata" value={attributes.expected_total_profit || ""} onChange={(e) => setAttributes({ ...attributes, expected_total_profit: e.target.value })} /><small>Mapato - Gharama = Faida</small></div>
-      </div>
-
-      {/* SHIPPING INFORMATION */}
-      <div className="form-section-header"><Truck size={20} /><h3>Taarifa za Usafirishaji</h3></div>
-      <div className="shipping-container">
-        <div className="form-group"><label className="field-label-small">Mfumo wa Usafirishaji</label><select className="select-input" value={attributes.shipping_method || "fixed"} onChange={(e) => setAttributes({ ...attributes, shipping_method: e.target.value })}><option value="fixed">💰 Gharama Imara (Fixed)</option><option value="distance">📏 Kwa Umbali (Distance Based)</option><option value="zone">📍 Kwa Kanda (Zone Based)</option><option value="free">🎉 Usafirishaji Bure (Free Shipping)</option></select></div>
-        {attributes.shipping_method === "fixed" && <div className="form-group"><label className="field-label-small">Gharama ya Usafirishaji (TZS)</label><input type="number" className="text-input" placeholder="Mfano: 5000" value={attributes.shipping_cost || ""} onChange={(e) => setAttributes({ ...attributes, shipping_cost: e.target.value })} /><small>Gharama moja kwa maeneo yote (kawaida Dar es Salaam)</small></div>}
-        {attributes.shipping_method === "distance" && (
-          <div className="distance-shipping"><div className="form-group"><label className="field-label-small">Gharama kwa Kilomita (TZS/km)</label><input type="number" className="text-input" placeholder="Mfano: 500 kwa km" value={attributes.shipping_rate_per_km || ""} onChange={(e) => setAttributes({ ...attributes, shipping_rate_per_km: e.target.value })} /></div><div className="form-group"><label className="field-label-small">Gharama ya Msingi (Base Fee)</label><input type="number" className="text-input" placeholder="Mfano: 2000" value={attributes.shipping_base_fee || ""} onChange={(e) => setAttributes({ ...attributes, shipping_base_fee: e.target.value })} /><small>Gharama ya kuanzia (kwa km 0)</small></div><div className="form-group"><label className="field-label-small">Umbali wa Kawaida (km)</label><input type="number" className="text-input" placeholder="Mfano: 10" value={attributes.shipping_default_distance || ""} onChange={(e) => setAttributes({ ...attributes, shipping_default_distance: e.target.value })} /><small>Umbali wa kawaida kutoka duka lako</small></div><div className="shipping-formula-box"><p><strong>Mfumo:</strong> Gharama = Gharama Msingi + (Umbali × Gharama kwa km)</p><p>Mfano: 2,000 + (10 × 500) = 7,000 TZS</p></div></div>
-        )}
-        {attributes.shipping_method === "zone" && (
-          <div className="zone-shipping"><label className="field-label-small">Viwango kwa Kanda</label>
-            <div className="zone-box"><div className="flex-row gap-8"><span>📍 Dar es Salaam</span><span>(Kanda 1)</span></div><input type="number" className="text-input" placeholder="Gharama ya usafirishaji Dar" value={attributes.shipping_dar_cost || ""} onChange={(e) => setAttributes({ ...attributes, shipping_dar_cost: e.target.value })} /><small>Kinondoni, Ilala, Ubungo, Temeke, Kigamboni</small></div>
-            <div className="zone-box"><div className="flex-row gap-8"><span>🚚 Nje ya Dar es Salaam</span><span>(Kanda 2)</span></div><input type="number" className="text-input" placeholder="Gharama ya usafirishaji nje ya Dar" value={attributes.shipping_outside_dar_cost || ""} onChange={(e) => setAttributes({ ...attributes, shipping_outside_dar_cost: e.target.value })} /><small>Pwani, Morogoro, Tanga, na mikoa mingine</small></div>
-            <div className="zone-box"><div className="flex-row gap-8"><span>🏔️ Mikoa ya Mbali</span><span>(Kanda 3)</span></div><input type="number" className="text-input" placeholder="Gharama ya usafirishaji mikoa ya mbali" value={attributes.shipping_remote_cost || ""} onChange={(e) => setAttributes({ ...attributes, shipping_remote_cost: e.target.value })} /><small>Mwanza, Arusha, Mbeya, Dodoma, n.k.</small></div>
-          </div>
-        )}
-        {attributes.shipping_method === "free" && <div className="free-shipping-box"><p>🎉 Usafirishaji Bure kwa maeneo yote!</p><small>Gharama za usafirishaji zinalipwa na muuzaji</small></div>}
-        <div className="form-group mt-15"><label className="checkbox-label"><input type="checkbox" checked={attributes.enable_pickup || false} onChange={(e) => setAttributes({ ...attributes, enable_pickup: e.target.checked })} /><span>✅ Washa chaguo la "Kuchukua Mwenyewe" (Pickup)</span></label>{attributes.enable_pickup && <div className="pickup-address-box"><p>📍 Mteja atajulishwa anwani ya duka lako.<br /><strong>Anwani ya Duka:</strong> <input type="text" className="text-input" placeholder="Weka anwani ya duka lako" value={attributes.store_address || ""} onChange={(e) => setAttributes({ ...attributes, store_address: e.target.value })} /></p></div>}</div>
-        <small className="helper-text">💡 Chagua mfumo unaofaa kwa biashara yako. Kwa Dar es Salaam, tumia "Gharama Imara" au "Kwa Kanda".</small>
-      </div>
+      
 
       {/* Warning for low stock */}
       {selectedLeaf && selectedLeaf.min_stock_warning && (
@@ -714,5 +848,5 @@ function ProductAttributes({ attributes, setAttributes, subCategoryId, leafCateg
       )}
     </div>
   );
-}
+  }
 export default React.memo(ProductAttributes);

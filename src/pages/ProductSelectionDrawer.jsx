@@ -136,24 +136,30 @@ const ProductSelectionDrawer = ({
     const sizes = currentColorVar ? getSizesFromVariation(currentColorVar) : [];
     const hasSizes = sizes.length > 0;
 
-    useEffect(() => {
-        if (isOpen && variations.length > 0) {
-            const colorToSelect = initialColor || Object.keys(colorVariations)[0];
-            if (colorToSelect) {
-                handleColorSelect(colorToSelect);
-                if (initialSize) {
-                    const colorData = colorVariations[colorToSelect];
-                    if (colorData) {
-                        const stockQty = getStockForSize(colorData, initialSize);
-                        const itemKey = `${colorData.id}::${initialSize}`;
-                        if (!selectedItems[itemKey] || selectedItems[itemKey] === 0) {
-                            handleQtyChange({ id: itemKey, stock_quantity: stockQty }, 1);
-                        }
+useEffect(() => {
+    if (isOpen && variations.length > 0) {
+        const colorToSelect = initialColor || Object.keys(colorVariations)[0];
+        if (colorToSelect) {
+            handleColorSelect(colorToSelect);
+            if (initialSize) {
+                const colorData = colorVariations[colorToSelect];
+                if (colorData) {
+                    const stockQty = getStockForSize(colorData, initialSize);
+                    // 🔥 Tafuta variation sahihi kwa size hii
+                    const specificVariation = variations.find(v => 
+                        String(v.color_name) === String(colorData.color_name) && 
+                        String(v.size_value) === String(initialSize)
+                    );
+                    const variantId = specificVariation?.id || colorData.id;
+                    const itemKey = `${variantId}::${initialSize}`;
+                    if (!selectedItems[itemKey] || selectedItems[itemKey] === 0) {
+                        handleQtyChange({ id: itemKey, stock_quantity: stockQty }, 1);
                     }
                 }
             }
         }
-    }, [isOpen, initialColor, initialSize, variations]);
+    }
+}, [isOpen, initialColor, initialSize, variations]);
 
     useEffect(() => {
         document.body.style.overflow = isOpen ? 'hidden' : 'unset';
@@ -182,10 +188,16 @@ const ProductSelectionDrawer = ({
     }, [selectedItems, variations, currentColorVar, currentUnitPrice, product?.price]);
 
     const getQuantityForSize = (size) => {
-        if (!currentColorVar) return 0;
-        const itemKey = `${currentColorVar.id}::${size}`;
-        return selectedItems[itemKey] || 0;
-    };
+    if (!currentColorVar) return 0;
+    // 🔥 Tafuta variation ya size hii
+    const specificVariation = variations.find(v => 
+        String(v.color_name) === String(currentColorVar.color_name) && 
+        String(v.size_value) === String(size)
+    );
+    const variantId = specificVariation?.id || currentColorVar.id;
+    const itemKey = `${variantId}::${size}`;
+    return selectedItems[itemKey] || 0;
+};
 
     const handleConfirmOrder = () => {
         const itemsToOrder = [];
@@ -415,13 +427,22 @@ const ProductSelectionDrawer = ({
                             <div className="section">
                                 <div className="section-title">Size</div>
                                 <div className="sizes-list">
+
                                     {sizes.map(size => {
-                                        const stockQty = getStockForSize(currentColorVar, size);
-                                        const variantId = `${currentColorVar.id}::${size}`;
-                                        const qty = getQuantityForSize(size);
-                                        const isOutOfStock = stockQty === 0;
-                                        const unitPrice = currentColorVar.price || product?.price || 0;
-                                        return (
+   const stockQty = getStockForSize(currentColorVar, size);
+   const qty = getQuantityForSize(size);
+   const isOutOfStock = stockQty === 0;
+
+   // 🔥 Tafuta variation maalum kwa size hii KABLA ya kuitumia
+   const specificVariation = variations.find(v => 
+     String(v.color_name) === String(currentColorVar.color_name) && 
+     String(v.size_value) === String(size)
+   );
+   const variantId = specificVariation ? `${specificVariation.id}::${size}` : `${currentColorVar.id}::${size}`;
+   const unitPrice = Number(specificVariation?.price) || Number(currentColorVar.price) || Number(product?.price) || 0;
+
+   return (
+
                                             <div key={size} className={`size-item ${qty > 0 ? 'active' : ''}`}>
                                                 <div className="size-info">
                                                     <div className="size-name">{size}</div>
@@ -513,13 +534,23 @@ const ProductSelectionDrawer = ({
                             <div className="section">
                                 <div className="section-title">Size</div>
                                 <div className="sizes-list">
-                                    {sizes.map(size => {
-                                        const stockQty = getStockForSize(currentColorVar, size);
-                                        const variantId = `${currentColorVar.id}::${size}`;
-                                        const qty = getQuantityForSize(size);
-                                        const isOutOfStock = stockQty === 0;
-                                        const unitPrice = currentColorVar.price || product?.price || 0;
-                                        return (
+
+{sizes.map(size => {
+    const stockQty = getStockForSize(currentColorVar, size);
+    const qty = getQuantityForSize(size);
+    const isOutOfStock = stockQty === 0;
+    
+    // 🔥 Tafuta variation maalum kwa size hii KABLA ya kuitumia
+    const specificVariation = variations.find(v => 
+        String(v.color_name) === String(currentColorVar.color_name) && 
+        String(v.size_value) === String(size)
+    );
+    const variantId = specificVariation ? `${specificVariation.id}::${size}` : `${currentColorVar.id}::${size}`;
+    const unitPrice = Number(specificVariation?.price) || Number(currentColorVar.price) || Number(product?.price) || 0;
+    
+    return (
+
+
                                             <div key={size} className={`size-item ${qty > 0 ? 'active' : ''}`}>
                                                 <div className="size-info">
                                                     <div className="size-name">{size}</div>

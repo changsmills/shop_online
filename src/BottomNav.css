@@ -3,7 +3,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 65px;
+  height: 78px;
   background-color: #ffffff;
   display: flex;
   justify-content: space-around;
@@ -11,7 +11,8 @@
   border-top: 0.5px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.03);
   z-index: 1000;
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-top: 10px;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom));
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -21,18 +22,28 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   color: #94a3b8;
   cursor: pointer;
   transition: color 0.2s ease;
   flex: 1;
+  gap: 4px;
+  padding: 2px 0;
   -webkit-tap-highlight-color: transparent;
 }
 
+.nav-item svg {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
 .nav-item span {
-  font-size: 10px;
-  margin-top: 2px;
+  font-size: 11px;
+  margin-top: 0;
   font-weight: 500;
   letter-spacing: 0.02em;
+  line-height: 1.2;
 }
 
 .nav-item.active {
@@ -41,24 +52,28 @@
 
 .cart-icon-wrapper {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .cart-badge {
   position: absolute;
-  top: -4px;
-  right: -7px;
+  top: -6px;
+  right: -8px;
   background-color: #ff4d4f;
   color: white;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
-  padding: 1px;
+  padding: 1px 4px;
   border-radius: 50%;
-  min-width: 14px;
-  height: 14px;
+  min-width: 16px;
+  height: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 1.5px solid #ffffff;
+  line-height: 1;
 }
 
 @media (min-width: 768px) {

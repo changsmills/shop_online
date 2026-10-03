@@ -7,6 +7,35 @@ const BottomNav = ({ activeMenu, onOpenCategories, session }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // 🔥 State ya cart count
+  const [cartCount, setCartCount] = React.useState(0);
+
+  // 🔥 Sasisha cart count kila cart inapobadilika
+  React.useEffect(() => {
+    const updateCartCount = () => {
+      try {
+        const cart = JSON.parse(localStorage.getItem('alibaba_cart') || '[]');
+        const total = cart.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+        setCartCount(total);
+      } catch (e) {
+        setCartCount(0);
+      }
+    };
+
+    // Kimbiza mara moja
+    updateCartCount();
+
+    // 🔥 Sikiliza event ya cartUpdated (kutoka ProductSelectionDrawer na Cart page)
+    window.addEventListener('cartUpdated', updateCartCount);
+    // 🔥 Sikiliza mabadiliko ya localStorage (kutoka tab nyingine)
+    window.addEventListener('storage', updateCartCount);
+
+    return () => {
+      window.removeEventListener('cartUpdated', updateCartCount);
+      window.removeEventListener('storage', updateCartCount);
+    };
+  }, []);
+
   const isActive = (path) => location.pathname === path;
 
   return (
@@ -34,7 +63,7 @@ const BottomNav = ({ activeMenu, onOpenCategories, session }) => {
         <span>Categories</span>
       </div>
 
-      {/* 3. MESSENGER (badala ya Alerts) */}
+      {/* 3. MESSENGER */}
       <div 
         className={`nav-item ${isActive("/dashboard/messages") ? "active" : ""}`} 
         onClick={() => navigate("/dashboard/messages")}
@@ -50,7 +79,12 @@ const BottomNav = ({ activeMenu, onOpenCategories, session }) => {
       >
         <div className="cart-icon-wrapper">
           <ShoppingCart size={22} strokeWidth={2.5} />
-          <span className="cart-badge">3</span> 
+          {/* 🔥 Onyesha badge TU kama cart ina bidhaa */}
+          {cartCount > 0 && (
+            <span className="cart-badge">
+              {cartCount > 99 ? '99+' : cartCount}
+            </span>
+          )}
         </div>
         <span>Cart</span>
       </div>

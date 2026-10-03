@@ -249,16 +249,9 @@
 /* STOCK GRID PER COLOR */
 .stock-grid-wrapper { margin-top: 10px; }
 .stock-grid-wrapper label { font-size: 12px; font-weight: 500; margin-bottom: 8px; display: block; }
-.stock-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px;
-}
-.stock-item {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 12px; background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;
-}
-.stock-size { font-weight: 500; font-size: 13px; }
-.stock-controls { display: flex; align-items: center; gap: 5px; }
-.stock-input { width: 70px; padding: 6px; border-radius: 6px; border: 1px solid #cbd5e1; text-align: center; font-size: 13px; }
+
+
+
 .btn-remove-stock {
   background: #ef4444; color: white; border: none; border-radius: 4px; width: 22px; height: 22px; cursor: pointer; font-size: 12px;
 }
@@ -697,4 +690,304 @@
   .product-attributes-container::-webkit-scrollbar-track { background: #1e293b !important; }
   .product-attributes-container::-webkit-scrollbar-thumb { background: #4b5563 !important; border-radius: 8px !important; }
   .product-attributes-container::-webkit-scrollbar-thumb:hover { background: #3b82f6 !important; }
+}
+
+.stock-grid {
+  display: grid; 
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
+  gap: 10px;
+}
+.stock-item {
+  display: flex; 
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px; 
+  background-color: #f8fafc; 
+  border-radius: 8px; 
+  border: 1px solid #e2e8f0;
+}
+.stock-size { 
+  font-weight: 600; 
+  font-size: 13px; 
+  color: #1e293b;
+  padding-bottom: 4px;
+  border-bottom: 1px dashed #cbd5e1;
+}
+.stock-controls { 
+  display: flex; 
+  align-items: center; 
+  gap: 6px; 
+  flex-wrap: nowrap;
+}
+.stock-input { 
+  flex: 1;
+  min-width: 0;
+  padding: 7px 6px; 
+  border-radius: 6px; 
+  border: 1px solid #cbd5e1; 
+  text-align: center; 
+  font-size: 13px; 
+}
+/* 🔥 Input ya Bei iwe na rangi tofauti kidogo */
+.stock-input:nth-of-type(2) {
+  background-color: #f0fdf4;
+  border-color: #86efac;
+}
+
+/* ============================================ */
+/* LAYER 13: MARKETPLACE SUMMARY (SECTION 10)   */
+/* ============================================ */
+
+/* Container ya kila rangi */
+.color-image-grid-item.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  padding: 16px;
+  background-color: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  height: fit-content;
+  align-self: flex-start;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Header ya rangi */
+.summary-color-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed #cbd5e1;
+}
+
+.summary-color-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.summary-color-info .color-grid-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 2px;
+}
+
+.summary-color-info .stock-mini-text {
+  font-size: 11px;
+  color: #64748b;
+}
+
+/* Grid ya sizes */
+.summary-size-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  align-items: start;
+  width: 100%;
+}
+
+/* Kadi ya kila size */
+.summary-size-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: fit-content;
+  align-self: start;
+  transition: all 0.2s ease;
+}
+
+.summary-size-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+/* Header ya size (badge + stock) */
+.summary-size-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #cbd5e1;
+}
+
+.summary-size-badge {
+  font-weight: 700;
+  font-size: 13px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  padding: 3px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+}
+
+.summary-size-stock {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.summary-size-stock.in-stock {
+  color: #16a34a;
+  background-color: #dcfce7;
+}
+
+.summary-size-stock.out-stock {
+  color: #dc2626;
+  background-color: #fee2e2;
+}
+
+/* Bei */
+.summary-size-price {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.summary-price-label {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.summary-price-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #16a34a;
+  white-space: nowrap;
+}
+
+/* ============================================ */
+/* DARK MODE FOR SUMMARY                        */
+/* ============================================ */
+@media (prefers-color-scheme: dark) {
+  .color-image-grid-item.summary-item {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+  }
+  
+  .summary-color-header {
+    border-bottom-color: #334155 !important;
+  }
+  
+  .summary-color-info .color-grid-text {
+    color: #f1f5f9 !important;
+  }
+  
+  .summary-color-info .stock-mini-text {
+    color: #94a3b8 !important;
+  }
+  
+  .summary-size-card {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+    border-color: #334155 !important;
+  }
+  
+  .summary-size-card:hover {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2) !important;
+  }
+  
+  .summary-size-header {
+    border-bottom-color: #334155 !important;
+  }
+  
+  .summary-size-badge {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    color: #ffffff !important;
+  }
+  
+  .summary-size-stock.in-stock {
+    color: #4ade80 !important;
+    background-color: #1a3a2a !important;
+  }
+  
+  .summary-size-stock.out-stock {
+    color: #f87171 !important;
+    background-color: #2d1a1a !important;
+  }
+  
+  .summary-price-label {
+    color: #94a3b8 !important;
+  }
+  
+  .summary-price-value {
+    color: #4ade80 !important;
+  }
+}
+
+/* ============================================ */
+/* MOBILE FIXES FOR SUMMARY                     */
+/* ============================================ */
+@media (max-width: 768px) {
+  .color-image-grid-item.summary-item {
+    padding: 12px;
+    gap: 10px;
+  }
+  
+  .summary-color-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .summary-size-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+  }
+  
+  .summary-size-card {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+  
+  .summary-size-badge {
+    font-size: 12px;
+    padding: 2px 8px;
+  }
+  
+  .summary-size-stock {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+  
+  .summary-price-value {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .summary-size-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  
+  .summary-size-card {
+    padding: 8px;
+  }
+  
+  .summary-size-badge {
+    font-size: 11px;
+    padding: 2px 6px;
+  }
+  
+  .summary-size-stock {
+    font-size: 9px;
+    padding: 2px 5px;
+  }
+  
+  .summary-price-label {
+    font-size: 10px;
+  }
+  
+  .summary-price-value {
+    font-size: 11px;
+  }
 }

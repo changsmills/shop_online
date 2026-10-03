@@ -27,6 +27,7 @@ const ProductCreationFlow = ({
   const initialAttributes = {
     name: '', 
     price: '', 
+    size_prices: {}, // 🔥 ONGEZA HII
     stock: '', 
     description: '', 
     category_id: null,       
@@ -249,7 +250,25 @@ const ProductCreationFlow = ({
         // === Taarifa za msingi ===
         formData.append("store_id", storeId);
         formData.append("name", p.name);
-        formData.append("price", parseFloat(p.price) || 0);
+
+        // 🔥 Hesabu bei ya chini kutoka size_prices kama kuna variations
+let productPrice = parseFloat(p.price) || 0;
+if (p.has_colors && p.size_prices) {
+  const allPrices = [];
+  Object.values(p.size_prices).forEach(colorPrices => {
+    Object.values(colorPrices || {}).forEach(price => {
+      const num = parseFloat(price);
+      if (num > 0) allPrices.push(num);
+    });
+  });
+  if (allPrices.length > 0) {
+    productPrice = Math.min(...allPrices);
+  }
+}
+formData.append("price", productPrice);
+console.log("💰 [PRICE] Product price sent to backend:", productPrice);
+
+
         formData.append("original_price", parseFloat(p.compare_at_price) || 0);
 
         // === Kategoria ===
@@ -296,6 +315,7 @@ if (parentCategoryId) {
         formData.append("colors", JSON.stringify(p.colors || []));
         formData.append("available_sizes", JSON.stringify(p.sizes || []));
         formData.append("size_stock", JSON.stringify(p.size_stock || {}));
+        formData.append("size_prices", JSON.stringify(p.size_prices || {}));
         formData.append("target_audience", JSON.stringify(p.target_audience || []));
         formData.append("dimensions", JSON.stringify(p.dimensions || {}));
         formData.append("gender", JSON.stringify(p.gender || []));
@@ -373,19 +393,34 @@ if (parentCategoryId) {
               // === 🔥 BADILISHA HAPA (KWA KILA VARIATION) ===
 
                   // 1. Chukua tu size_stock inayolingana na rangi ya variation hii (p.size_stock[variant.color_name])
-              const specificSizeStock = (p.size_stock && p.size_stock[variant.color_name]) 
-                          ? p.size_stock[variant.color_name] 
-                          : {};
+              // === 🔥 BADILISHA HAPA (KWA KILA VARIATION) ===
+// 1. Chukua size_stock na size_prices kwa rangi hii
+const specificSizeStock = (p.size_stock && p.size_stock[variant.color_name]) 
+            ? p.size_stock[variant.color_name] 
+            : {};
+const specificSizePrices = (p.size_prices && p.size_prices[variant.color_name]) 
+            ? p.size_prices[variant.color_name] 
+            : {};
 
-                    // 2. Tuma size_stock sahihi kwa variation hii!
-                  varFormData.append("size_stock", JSON.stringify(specificSizeStock));
+// 2. Tuma size_stock sahihi
+varFormData.append("size_stock", JSON.stringify(specificSizeStock));
 
-                 // 3. Hesabu stock_quantity kwa rangi hii kwa kuunganisha sizes zake (Badala ya kutuma variant.stock_quantity)
-                   const totalStockForColor = Object.values(specificSizeStock).reduce((acc, val) => acc + (Number(val) || 0), 0);
-                       varFormData.append("stock_quantity", totalStockForColor || 0); // 📦 Hii ndiyo stock halisi kwa rangi hii!
+// 3. Hesabu stock_quantity
+const totalStockForColor = Object.values(specificSizeStock).reduce((acc, val) => acc + (Number(val) || 0), 0);
+varFormData.append("stock_quantity", totalStockForColor || 0); 
 
-                       // 4. Endelea na bei (hii haibadiliki)
-                        varFormData.append("price", variant.price || 0);
+// 4. 🔥 BADILISHA BEI HAPA
+// Kama kuna bei maalum kwa ukubwa huu, tumia hiyo. Kama hakuna, tumia bei ya jumla.
+let finalPrice = variant.price || 0; // Bei ya default
+if (variant.size_value && specificSizePrices[variant.size_value] !== undefined) {
+    finalPrice = specificSizePrices[variant.size_value];
+} else if (Object.keys(specificSizePrices).length > 0 && !variant.size_value) {
+     // Kama haina size specific lakini kuna bei za size, chukua ya kwanza (optional)
+     // Kwa sasa, tunaacha tu variant.price
+}
+
+varFormData.append("price", finalPrice); 
+// === 🔥 ISHIA BADILISHA HAPA ===
 
                             // === 🔥 ISHIA BADILISHA HAPA ===
               
@@ -583,12 +618,31 @@ if (parentCategoryId) {
                 onClick={() => {
 
                   if (!attributes.name) return alert("Please fill in the product name!");
-                  if (attributes.is_retail && !attributes.price) {
-                    return alert("You selected Retail, please add a unit price!");
-                  }
-                  if (attributes.is_wholesale && (!attributes.price_tiers || attributes.price_tiers.length === 0)) {
-                    return alert("You selected Wholesale, please add at least one price range!");
-                  }
+
+// 🔥 RETAIL validation
+if (attributes.is_retail) {
+  if (attributes.has_colors) {
+    // Kama kuna variations, hakikisha angalau ukubwa mmoja una bei
+    const colorPrices = attributes.size_prices || {};
+    const hasAnyPrice = Object.values(colorPrices).some(prices => 
+      Object.values(prices || {}).some(p => Number(p) > 0)
+    );
+    if (!hasAnyPrice) {
+      return alert("Please add prices for at least one size in SECTION 9!");
+    }
+  } else {
+    // Kama haina variations, lazima bei iwepo
+    if (!attributes.price) {
+      return alert("Please add a retail price!");
+    }
+  }
+}
+
+if (attributes.is_wholesale && (!attributes.price_tiers || attributes.price_tiers.length === 0)) {
+  return alert("You selected Wholesale, please add at least one price range!");
+}
+
+
                   if (attributes.is_wholesale && !attributes.moq) {
                     return alert("Please fill in the Minimum Order Quantity (MOQ) for wholesale!");
                   }
@@ -622,7 +676,8 @@ if (parentCategoryId) {
                     color_images: attributes.color_images || {},               
                     color_image_files: attributes.color_image_files || {},     
                     sizes: attributes.sizes || [],                             
-                    size_stock: attributes.size_stock || {},                   
+                    size_stock: attributes.size_stock || {},
+                    size_prices: attributes.size_prices || {},                  
                     specifications: {
                         ...(attributes.specifications || {}),
                         ...(attributes.dynamic_specs || {})
