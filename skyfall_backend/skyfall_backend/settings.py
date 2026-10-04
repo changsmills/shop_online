@@ -88,11 +88,11 @@ SITE_ID = 1
 
 # ==================== DJ-REST-AUTH CONFIGURATION ====================
 REST_AUTH = {
-    'TOKEN_MODEL': None,          # 🔥 Sio lazima tupate token table
-    'USE_JWT': True,              # 🔥 Tumia JWT badala ya default token
+    'TOKEN_MODEL': None,
+    'USE_JWT': True,
     'JWT_AUTH_COOKIE': 'access_token',
     'JWT_AUTH_REFRESH_COOKIE': 'refresh_token',
-    'REGISTER_SERIALIZER': None,  # Au unaweza kuweka custom serializer
+    'REGISTER_SERIALIZER': 'dj_rest_auth.registration.serializers.RegisterSerializer',  # ✅ HII SAHIHI
 }
 
 AUTHENTICATION_BACKENDS = [
