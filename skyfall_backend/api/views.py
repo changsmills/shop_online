@@ -28,6 +28,8 @@ import google.auth
 import google.auth.transport.requests
 import google.oauth2.id_token
 
+import requests
+
 
 
 
@@ -1088,13 +1090,26 @@ class GoogleAuthView(APIView):
         try:
             from rest_framework_simplejwt.tokens import RefreshToken
 
-            # 1. Thibitisha token kutoka Google
-            idinfo = google.oauth2.id_token.verify_oauth2_token(
-                access_token, google.auth.transport.requests.Request(), CLIENT_ID
+            # 🔥 BADILISHA: Tumia userinfo endpoint badala ya verify_oauth2_token
+            # Kwa sababu tunapokea access_token (sio id_token)
+            userinfo_response = requests.get(
+                'https://www.googleapis.com/oauth2/v3/userinfo',
+                headers={'Authorization': f'Bearer {access_token}'},
+                timeout=10
             )
 
-            email = idinfo['email']
+            if userinfo_response.status_code != 200:
+                print(f"❌ [GoogleAuth] Userinfo failed: {userinfo_response.status_code} - {userinfo_response.text}")
+                return Response({'error': 'Invalid Google Token'}, status=400)
+
+            idinfo = userinfo_response.json()
+            email = idinfo.get('email')
             full_name = idinfo.get('name', '')
+
+            if not email:
+                return Response({'error': 'Email not provided by Google'}, status=400)
+
+            print(f"✅ [GoogleAuth] Google user verified: {email}")
 
             # 2. Tafuta au unda User
             user, created = User.objects.get_or_create(
@@ -1102,41 +1117,43 @@ class GoogleAuthView(APIView):
                 defaults={'email': email}
             )
 
-            # 🔥 BADILISHA HAPA: Tumia get_or_create kwa Profile
+            # 3. Tafuta au unda Profile
             profile, profile_created = Profile.objects.get_or_create(
                 user=user,
                 defaults={
-                    'full_name': full_name, 
-                    'role': 'buyer'  # Hii ni default TU kama ni mtumiaji mpya kabisa
+                    'full_name': full_name,
+                    'role': 'buyer'  # Default tu kwa mtumiaji mpya
                 }
             )
 
-            # 🔥 MUHIMU SANA: Kama profile ilikuwa ipo (user ni wa zamani),
-            # hakikisha unachukua ROLE Yake HALISI (si default ya buyer)
+            # 🔥 Kama profile ilikuwa ipo (user wa zamani), sasisha jina kama halipo
             if not profile_created:
-                # Sasisha jina kamili kama halipo kwenye profile
                 if full_name and not profile.full_name:
                     profile.full_name = full_name
                     profile.save()
 
-            # 🔥 Pata role halisi kutoka kwenye profile (iwe ni buyer au supplier)
             user_role = profile.role
+            print(f"✅ [GoogleAuth] User role: {user_role}")
 
-            # 3. Tengeneza JWT Tokens
+            # 4. Tengeneza JWT Tokens
             refresh = RefreshToken.for_user(user)
             return Response({
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
                 'user': {
-                    'email': email, 
-                    'role': user_role,  # 🔥 HAPA NDIPO ROLE HALISI INARUDISHWA!
+                    'email': email,
+                    'role': user_role,
                     'id': user.id,
-                    'is_otp_verified': profile.is_otp_verified  # 🔥 Muhimu kwa Supplier!
+                    'is_otp_verified': profile.is_otp_verified
                 }
             }, status=200)
 
-        except ValueError:
-            return Response({'error': 'Invalid Google Token'}, status=400)
+        except requests.RequestException as e:
+            print(f"❌ [GoogleAuth] Network error: {e}")
+            return Response({'error': f'Network error: {str(e)}'}, status=500)
+        except Exception as e:
+            print(f"❌ [GoogleAuth] Unexpected error: {e}")
+            return Response({'error': f'Unexpected error: {str(e)}'}, status=500)
         
 
 class ProductVariationViewSet(viewsets.ModelViewSet):

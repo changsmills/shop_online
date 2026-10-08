@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { CartProvider } from "./context/CartContext"; 
 import BottomNav from "./components/BottomNav";
 import { Toaster, toast } from 'react-hot-toast';
@@ -299,30 +300,32 @@ function App() {
     </div>
   );
 
-  return (
-    <LanguageProvider>
-      <CartProvider>
-        <Toaster 
-          position="top-right" 
-          reverseOrder={false} 
-          gutter={8}
-          toastOptions={{
-            style: {
-              zIndex: 9999,
-              borderRadius: '8px',
-              background: '#333',
-              color: '#fff',
-            },
-            duration: 2000, 
-            success: { duration: 2000 },
-            error: { duration: 3000 },
-          }}
-        />
-        <BrowserRouter>
-          <AppContent session={session} />
-        </BrowserRouter>
-      </CartProvider>
-    </LanguageProvider>
+   return (
+    <GoogleOAuthProvider clientId="897025267638-ef196t913o7kt77dbgld9d7tmv01ftbp.apps.googleusercontent.com">
+      <LanguageProvider>
+        <CartProvider>
+          <Toaster 
+            position="top-right" 
+            reverseOrder={false} 
+            gutter={8}
+            toastOptions={{
+              style: {
+                zIndex: 9999,
+                borderRadius: '8px',
+                background: '#333',
+                color: '#fff',
+              },
+              duration: 2000, 
+              success: { duration: 2000 },
+              error: { duration: 3000 },
+            }}
+          />
+          <BrowserRouter>
+            <AppContent session={session} />
+          </BrowserRouter>
+        </CartProvider>
+      </LanguageProvider>
+    </GoogleOAuthProvider>
   );
 }
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
 import api from '../axiosConfig';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, Toaster } from 'react-hot-toast';
@@ -275,7 +275,7 @@ const Login = () => {
           // 🔥 MUHIMU SANA: Angalia kama ana store KWANZA!
           try {
             const storeRes = await api.get('/stores/', {
-              params: { owner_id: user.id }, // 🔥 Tumia user.id kutoka response ya Google
+              params: { owner: user.id }, // 🔥 Tumia user.id kutoka response ya Google
               headers: { Authorization: `Bearer ${access}` }
             });
 
@@ -347,6 +347,82 @@ const Login = () => {
     }
   };
 
+
+    // 🔥 HOOK YA GOOGLE LOGIN - Badala ya <GoogleLogin /> iframe
+  const loginWithGoogle = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      console.log("🔍 Google Token Response:", tokenResponse);
+      
+      try {
+        // Tuma access_token kwa backend
+        const res = await api.post('/auth/google/', {
+          access_token: tokenResponse.access_token,
+        });
+
+        const { access, refresh } = res.data;
+        localStorage.setItem('access_token', access);
+        localStorage.setItem('refresh_token', refresh);
+
+        // 🔥 PATA PROFILE HALISI (sio user.id kutoka response)
+        const profileRes = await api.get('/profile/', {
+          headers: { Authorization: `Bearer ${access}` }
+        });
+        const userProfile = profileRes.data;
+        const role = userProfile.role;
+
+        toast.success(`Karibu ${userProfile.email || 'Mteja'}!`, { duration: 3000 });
+
+        if (role === 'supplier') {
+          if (userProfile.is_otp_verified === false || userProfile.is_otp_verified === undefined) {
+            toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", { icon: '🔐', duration: 4000 });
+            setTimeout(() => navigate('/verify-seller-otp', { replace: true }), 4000);
+            return;
+          }
+
+          // ✅ TUMIA 'owner' (sio owner_id) + userProfile.id (sio user.id)
+          const storeRes = await api.get('/stores/', {
+            params: { owner: userProfile.id },
+            headers: { Authorization: `Bearer ${access}` }
+          });
+
+          console.log("🔍 Store data (Google):", storeRes.data);
+
+          if (storeRes.data && storeRes.data.length > 0) {
+            // ✅ Chuja kwa owner badala ya kuchukua data[0] kipofu
+            const myStore = storeRes.data.find(
+              s => s.owner === userProfile.id || s.owner_id === userProfile.id
+            ) || storeRes.data[0];
+
+            const storeId = myStore.id;
+            const verificationStatus = myStore.verification_status || myStore.status;
+
+            if (verificationStatus === 'pending' || verificationStatus === 'unverified') {
+              toast("Store yako inasubiri kupitishwa na Admin.", { icon: '⏳', duration: 3000 });
+              setTimeout(() => navigate(`/store-pending/${storeId}`, { replace: true }), 3000);
+            } else {
+              toast.success("Karibu Muuzaji!", { duration: 3000 });
+              setTimeout(() => navigate(`/dashboard/sellerboard/${storeId}`, { replace: true }), 3000);
+            }
+          } else {
+            toast.success("Karibu Muuzaji! Tafadhali unda duka lako kwanza.", { duration: 3000 });
+            setTimeout(() => navigate('/create-store', { replace: true }), 3000);
+          }
+        } else {
+          toast.success("Karibu Mteja!", { duration: 3000 });
+          setTimeout(() => navigate('/dashboard', { replace: true }), 3000);
+        }
+      } catch (error) {
+        console.error("❌ Google Login Error:", error);
+        toast.error("Google login imeshindwa. Jaribu tena.", { duration: 4000 });
+      }
+    },
+    onError: (error) => {
+      console.error("❌ Google Login Error:", error);
+      toast.error("Google login imeshindwa.", { duration: 4000 });
+    },
+    flow: 'implicit', // Muhimu kwa SPA
+  });
+
   // 🔥 KAZI MPYA: Google Login Error
   const handleGoogleError = () => {
     console.error("❌ Google Login Error");
@@ -378,141 +454,137 @@ const Login = () => {
     );
   }
 
-  // 🔥 BADILISHA: GoogleOAuthProvider lazima ifunge component nzima!
   return (
-    <GoogleOAuthProvider clientId="897025267638-ef196t913o7kt77dbgld9d7tmv01ftbp.apps.googleusercontent.com">
-      
-       {/* 🔥 BADILISHA HAPA NA CLIENT ID YAKO! */}
-      <div className="login-container">
+    <div className="login-container">
+      <Toaster position="top-center" reverseOrder={false} />
 
-        <Toaster position="top-center" reverseOrder={false} />
+      {/* LEFT PANEL */}
+      <div className="login-left-panel">
+        <div className="login-testimonial-box">
+          <p className="login-testimonial-text">
+            "In just 1 year, LTA International generated 14 new customers with new sales growth totaling $1.5 million."
+          </p>
+          <div className="login-testimonial-footer">
+            <span className="login-testimonial-author">Andrea Vitello</span>
+            <span className="login-testimonial-brand">Skyfall.co.tz</span>
+          </div>
+        </div>
+      </div>
 
-        {/* LEFT PANEL */}
-        <div className="login-left-panel">
-          <div className="login-testimonial-box">
-            <p className="login-testimonial-text">
-              “In just 1 year, LTA International generated 14 new customers with new sales growth totaling $1.5 million.”
-            </p>
-            <div className="login-testimonial-footer">
-              <span className="login-testimonial-author">Andrea Vitello</span>
-              <span className="login-testimonial-brand">Skyfall.co.tz</span>
-            </div>
+      {/* RIGHT PANEL */}
+      <div className="login-right-panel">
+
+        {/* SECURITY BADGES */}
+        <div className="login-security-badges">
+          <div className="security-badge-item">
+            <ShieldCheck size={16} color="#28a745" />
+            <span className="security-text">SSL 256-bit Encryption</span>
+          </div>
+          <div className="security-badge-item">
+            <Lock size={16} color="#28a745" />
+            <span className="security-text">2FA Enabled</span>
           </div>
         </div>
 
-        {/* RIGHT PANEL */}
-        <div className="login-right-panel">
-          
-          {/* 🔥 ONGEZA HII: SECURITY BADGES - REAL ICONS */}
-          <div className="login-security-badges">
-            <div className="security-badge-item">
-              <ShieldCheck size={16} color="#28a745" />
-              <span className="security-text">SSL 256-bit Encryption</span>
-            </div>
-            <div className="security-badge-item">
-              <Lock size={16} color="#28a745" />
-              <span className="security-text">2FA Enabled</span>
+        <div className="login-header">
+          <h2 className="login-title">Sign in to your account</h2>
+          <p className="login-subtitle">
+            <Lock size={14} color="#28a745" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '14px' }} />
+            <span className="secure-text">We Secure Your Data</span>
+          </p>
+        </div>
+
+                {/* GOOGLE LOGIN BUTTON - Custom Button */}
+        <div className="login-social-buttons">
+          <button
+            type="button"
+            onClick={() => loginWithGoogle()}
+            className="google-custom-btn"
+          >
+            <GoogleIcon />
+            <span>Continue with Google</span>
+          </button>
+        </div>
+
+        {/* Divider */}
+        <div className="login-divider">
+          <hr className="login-divider-line" />
+          <span className="login-divider-text">Or</span>
+          <hr className="login-divider-line" />
+        </div>
+
+        {/* Login Form */}
+        <form onSubmit={handleLogin} className="login-form">
+          <div className="login-form-group">
+            <label className="login-label">Email</label>
+            <div className="login-input-wrapper">
+              <Mail size={18} color="#999" className="login-input-icon" />
+              <input 
+                type="email" 
+                required 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="login-input"
+                placeholder="Enter your email"
+              />
             </div>
           </div>
 
-          <div className="login-header">
-            <h2 className="login-title">Sign in to your account</h2>
-            <p className="login-subtitle">
-              <Lock size={14} color="#28a745" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '14px' }} />
-              <span className="secure-text">We Secure Your Data</span>
-            </p>
+          <div className="login-form-group">
+            <label className="login-label">Password</label>
+            <div className="login-input-wrapper">
+              <KeyRound size={18} color="#999" className="login-input-icon" />
+              <input 
+                type="password" 
+                required 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="login-input"
+                placeholder="Enter your password"
+              />
+            </div>
           </div>
 
-          {/* 🔥 BADILISHA: Google Login Button */}
-          <div className="login-social-buttons">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={handleGoogleError}
-              useOneTap
-            />
-          </div>
-
-          {/* Divider */}
-          <div className="login-divider">
-            <hr className="login-divider-line" />
-            <span className="login-divider-text">Or</span>
-            <hr className="login-divider-line" />
-          </div>
-
-          {/* Login Form */}
-          <form onSubmit={handleLogin} className="login-form">
-            <div className="login-form-group">
-              <label className="login-label">Email</label>
-              <div className="login-input-wrapper">
-                <Mail size={18} color="#999" className="login-input-icon" />
-                <input 
-                  type="email" 
-                  required 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="login-input"
-                  placeholder="Enter your email"
-                />
-              </div>
-            </div>
-
-            <div className="login-form-group">
-              <label className="login-label">Password</label>
-              <div className="login-input-wrapper">
-                <KeyRound size={18} color="#999" className="login-input-icon" />
-                <input 
-                  type="password" 
-                  required 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="login-input"
-                  placeholder="Enter your password"
-                />
-              </div>
-            </div>
-
-            <div className="login-forgot-password">
-              <span 
-                onClick={handleForgotPassword}
-                className="login-forgot-link"
-              >
-                Forgot your password?
-              </span>
-            </div>
-
-            <button 
-              type="submit" 
-              disabled={loading}
-              className="login-submit-btn"
-            >
-              {loading ? 'Inachakata...' : 'Sign in'}
-            </button>
-          </form>
-
-          {/* 🔥 ONGEZA HII: TRUST MESSAGE CHINI */}
-          <div className="login-trust-message">
-            <div className="trust-icon-wrapper">
-              <ShieldCheck size={20} color="#28a745" />
-            </div>
-            <p className="trust-text">
-              Your information is protected with 256-bit SSL encryption.
-            </p>
-          </div>
-
-          <div className="login-footer">
-            Don't have an account? 
+          <div className="login-forgot-password">
             <span 
-              onClick={() => navigate("/dashboard/register")}
-              className="login-register-link"
+              onClick={handleForgotPassword}
+              className="login-forgot-link"
             >
-              Sign up here
+              Forgot your password?
             </span>
           </div>
 
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="login-submit-btn"
+          >
+            {loading ? 'Inachakata...' : 'Sign in'}
+          </button>
+        </form>
+
+        {/* TRUST MESSAGE */}
+        <div className="login-trust-message">
+          <div className="trust-icon-wrapper">
+            <ShieldCheck size={20} color="#28a745" />
+          </div>
+          <p className="trust-text">
+            Your information is protected with 256-bit SSL encryption.
+          </p>
+        </div>
+
+        <div className="login-footer">
+          Don't have an account? 
+          <span 
+            onClick={() => navigate("/dashboard/register")}
+            className="login-register-link"
+          >
+            Sign up here
+          </span>
         </div>
 
       </div>
-    </GoogleOAuthProvider>
+    </div>
   );
 };
 

@@ -92,7 +92,7 @@ REST_AUTH = {
     'USE_JWT': True,
     'JWT_AUTH_COOKIE': 'access_token',
     'JWT_AUTH_REFRESH_COOKIE': 'refresh_token',
-    'REGISTER_SERIALIZER': 'dj_rest_auth.registration.serializers.RegisterSerializer',  # ✅ HII SAHIHI
+    'REGISTER_SERIALIZER': 'dj_rest_auth.registration.serializers.RegisterSerializer', 
 }
 
 AUTHENTICATION_BACKENDS = [
