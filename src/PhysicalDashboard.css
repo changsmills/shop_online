@@ -435,43 +435,6 @@
   cursor: pointer;
 }
 
-/* ============================================== */
-/* 9. RESPONSIVE (Mobile)                         */
-/* ============================================== */
-
-@media (max-width: 768px) {
-  .mobile-menu-btn {
-    display: flex;
-  }
-
-  .header-center {
-    display: none; /* Ficha welcome message kwenye mobile */
-  }
-
-  .header-title {
-    font-size: 18px;
-  }
-
-  .dashboard-sidebar {
-    transform: translateX(-100%);
-    width: 280px;
-    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
-  }
-
-  .dashboard-sidebar.open {
-    transform: translateX(0);
-  }
-
-  .sidebar-overlay {
-    display: block;
-  }
-
-  .dashboard-content {
-    margin-left: 0;
-    padding: 16px;
-  }
-}
-
 @media (max-width: 480px) {
   .dashboard-header {
     padding: 0 12px;
@@ -560,62 +523,153 @@
   padding-bottom: 80px;
 }
 
-/* 5. Mobile - sidebar inaingia na kutoka, header inabaki fixed */
+/* ============================================ */
+/* MOBILE SIDEBAR + HEADER                      */
+/* ============================================ */
+
 @media (max-width: 768px) {
+
+  /* =========================
+     HEADER
+     ========================= */
+
   .dashboard-header {
-    padding: 0 16px !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
     height: 70px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    padding: 0 16px !important;
+
+    z-index: 100000 !important;
   }
 
+  /* Hamburger iwe juu kabisa */
   .mobile-menu-btn {
     display: flex !important;
-    z-index: 999999 !important;
-    color: var(--dash-text, #333) !important;
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+    z-index: 100001 !important;
+
+    width: 42px;
+    height: 42px;
+
     background: transparent !important;
     border: none !important;
-    margin-right: 10px !important;
+
+    color: var(--dash-text, #333) !important;
+
+    cursor: pointer;
   }
 
+  .header-center {
+    display: none !important;
+  }
+
+
+  /* =========================
+     MAIN WRAPPER
+     ========================= */
+
   .dashboard-main-wrapper {
+    display: flex !important;
+    flex-direction: row !important;
+
     margin-top: 70px !important;
+
     min-height: calc(100vh - 70px) !important;
     height: auto !important;
   }
 
-  /* Sidebar inatoka nje ya screen kwa default */
-  .dashboard-sidebar {
-    position: fixed !important;
-    top: 70px !important;
-    left: -100% !important;
-    bottom: 0 !important;
-    width: 280px !important;
-    max-width: 280px !important;
-    height: auto !important;
-    z-index: 99999 !important;
-    transition: left 0.3s ease !important;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-  }
 
-  .dashboard-sidebar.open {
-    left: 0 !important;
-  }
+ /* =========================
+   MOBILE SIDEBAR
+   ========================= */
 
-  /* Content haina margin-left kwenye mobile */
+.dashboard-sidebar {
+  position: fixed !important;
+  top: 70px !important;
+  left: 0 !important;
+  bottom: 0 !important;
+
+  width: 280px !important;
+  height: calc(100vh - 70px) !important;
+
+  overflow-y: auto !important;
+
+  background: var(--dash-sidebar-bg, #ffffff) !important;
+  border-right: 1px solid var(--dash-border, #eee) !important;
+
+  /* CLOSED */
+  transform: translate3d(-100%, 0, 0) !important;
+
+  transition: transform 0.3s ease !important;
+
+  /* JUU YA OVERLAY */
+  z-index: 100002 !important;
+
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25);
+}
+
+
+/* OPEN */
+.dashboard-sidebar.open {
+  transform: translate3d(0, 0, 0) !important;
+}
+
+
+/* =========================
+   MOBILE OVERLAY
+   ========================= */
+
+.sidebar-overlay {
+  position: fixed !important;
+
+  top: 70px !important;
+  left: 0 !important;
+
+  width: 100vw !important;
+  height: calc(100vh - 70px) !important;
+
+  background: rgba(0, 0, 0, 0.5) !important;
+
+  /* CHINI YA SIDEBAR */
+  z-index: 100001 !important;
+
+  display: block !important;
+
+  backdrop-filter: blur(3px);
+}
+
+
+  /* =========================
+     CONTENT
+     ========================= */
+
   .dashboard-content {
-    margin-left: 0 !important;
-    padding: 12px !important;
-  }
+    flex: 1 !important;
 
-  /* Overlay inaanza chini ya header */
-  .sidebar-overlay {
-    position: fixed !important;
-    top: 70px !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: calc(100vh - 70px) !important;
-    background: rgba(0, 0, 0, 0.5) !important;
-    z-index: 99998 !important;
-    backdrop-filter: blur(3px);
+    /*
+      MUHIMU:
+      Mobile haina nafasi ya sidebar
+    */
+    margin-left: 0 !important;
+
+    padding: 12px !important;
+
+    min-width: 0;
+
+    min-height: calc(100vh - 70px) !important;
+
+    overflow: visible !important;
   }
 }
 
@@ -783,5 +837,35 @@
 
   .product-card-price {
     font-size: 12px;
+  }
+}
+@media (max-width: 768px) {
+  .dashboard-sidebar {
+    position: fixed !important;
+    top: 70px !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 280px !important;
+    max-width: 85% !important;
+    z-index: 1001 !important;
+    background: var(--dash-sidebar-bg, #ffffff) !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.3s ease-in-out !important;
+    display: block !important;
+  }
+
+  .dashboard-sidebar.open {
+    transform: translateX(0) !important;
+  }
+
+  .sidebar-overlay {
+    position: fixed !important;
+    top: 70px !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 70px) !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+    z-index: 1000 !important;
+    display: block !important;
   }
 }

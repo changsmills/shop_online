@@ -75,31 +75,6 @@ export default function PhysicalDashboard() {
 
   useEffect(() => { fetchDashboardData(); }, [paramId]);
 
- useEffect(() => {
-  let timeoutId; // Kwenye hii tunahifadhi kitambulisho cha timeout
-  const handleResize = () => {
-    clearTimeout(timeoutId); // 1. Futa timeout iliyopita (usiruhusu kufanya kazi nyingi)
-    timeoutId = setTimeout(() => {
-      // 2. Kama skrini ni ndogo kuliko 768px (Mobile), funga sidebar
-      if (window.innerWidth < 768) {
-        setIsSidebarOpen(false);
-      } else {
-        // 3. Kama skrini ni kubwa (Desktop), fungua sidebar
-        setIsSidebarOpen(true);
-      }
-    }, 250); // Subiri skrini itulie kabla ya kufanya kitendo (250 milliseconds)
-  };
-
-  // 4. Sikiliza mabadiliko ya ukubwa wa dirisha
-  window.addEventListener("resize", handleResize);
-
-  // 5. Safisha (Cleanup) - ondoa listener na timeout wakati component inafutwa
-  return () => {
-    window.removeEventListener("resize", handleResize);
-    clearTimeout(timeoutId);
-  };
-}, []); // 6. [] ina maana effect hii inafanya kazi mara moja tu (wakati page inafunguliwa)
-
   useEffect(() => {
     if (!myStore?.id) return;
     const fetchUnreadMessages = async () => {
@@ -596,10 +571,9 @@ export default function PhysicalDashboard() {
         </ul>
       </aside>
 
-      {/* Overlay ya mobile */}
-      {isSidebarOpen && window.innerWidth < 768 && (
-        <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />
-      )}
+      {isSidebarOpen && (
+      <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />
+            )}
 
       {/* ============ MAIN CONTENT ============ */}
       <main className="dashboard-content">
