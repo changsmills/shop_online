@@ -105,9 +105,9 @@ AUTH_USER_MODEL = 'users.User'  # Sio 'products.Profile'!
 
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'skyfall_backend.middleware.RemoveServerHeaderMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware', # 🔥 ONGEZA HII! (Inapaswa kuwa chini ya SecurityMiddleware)
-    'corsheaders.middleware.CorsMiddleware',  # Must be at the top!
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -193,6 +193,10 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:5173',
     'http://localhost:3000',
     'https://shop-online-tan.vercel.app',
+    'https://skyfall.co.tz',                    # 🔥
+    'https://www.skyfall.co.tz',                # 🔥
+    'https://shop-online-r9z4.onrender.com',    # 🔥
+    'https://skyfall-admin-ten.vercel.app',
 ]
 
 # ==================== SOCIALACCOUNT PROVIDERS ====================
