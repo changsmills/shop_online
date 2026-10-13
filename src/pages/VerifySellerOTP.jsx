@@ -84,8 +84,8 @@ export default function VerifySellerOTP() {
       const profileRes = await api.get('/profile/');
       const role = profileRes.data.role;
 
-           if (role === 'supplier') {
-        const storeRes = await api.get('/stores/', { params: { owner_id: profileRes.data.id } });
+        if (role === 'supplier') {
+        const storeRes = await api.get('/stores/', { params: { owner: profileRes.data.id } });
         if (storeRes.data && storeRes.data.length > 0) {
           const store = storeRes.data[0];
           const status = store.verification_status || store.status;
@@ -101,6 +101,7 @@ export default function VerifySellerOTP() {
       }
 
     } catch (err) {
+
       console.error("❌ [FRONTEND] OTP verify error:", err.response?.data || err.message);
       toast.error(err.response?.data?.detail || "OTP si sahihi au imeisha muda.");
     } finally {

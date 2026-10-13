@@ -84,7 +84,7 @@ const handleCheckout = () => {
             onClick={() => setIsExpanded(!isExpanded)} 
           />
           <Link to="/dashboard" className="brand-logo">
-            Skyfall.com
+            Skyfall
           </Link>
           
           <div className="header-search-bar desktop-only">
@@ -165,7 +165,7 @@ const handleCheckout = () => {
                 <div className="cart-items-list-wrapper">
                   <div className="cart-items-header">
                     <Store size={18} className="store-icon" />
-                    <span>Skyfall.com Verified Items</span>
+                    <span>Skyfall Verified Items</span>
                   </div>
 
                   {cartItems.map((item) => (

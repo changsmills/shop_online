@@ -121,7 +121,7 @@ export default function Dashboard() {
 
   const activeAd = cachedAds[currentAdIndex] || {
     media_url: "https://picsum.photos/seed/promo/800/400",
-    business_name: "Karibu Skyfall",
+    business_name: "Welome Skyfall",
     description: "Pata bidhaa bora kutoka kwa wauzaji waliohakikiwa nchi nzima."
   };
 
