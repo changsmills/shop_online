@@ -23,7 +23,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-default-key-change-this')
 # 🔥 BADILISHA KUWA TRUE ILI UONE ERRORS KWENYE RENDER LOGS!
 #DEBUG = False 
 
-DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 #ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
@@ -181,6 +181,7 @@ CORS_ALLOWED_ORIGINS = [
     'https://shop-online-tan.vercel.app',
     'https://skyfall.co.tz',           
     'https://www.skyfall.co.tz',  
+    'https://shop-online-r9z4.onrender.com',
     'https://skyfall-admin-ten.vercel.app',
    
 ]

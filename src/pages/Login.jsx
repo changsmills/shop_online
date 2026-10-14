@@ -63,7 +63,7 @@ const Login = () => {
 
           // 2. Kama ameverify, endelea kupata store
           const storeRes = await api.get('/stores/', {
-            params: { owner_id: userProfile.id },
+            params: { owner: userProfile.id },
             headers: { Authorization: `Bearer ${token}` }
           });
           
