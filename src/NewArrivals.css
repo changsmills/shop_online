@@ -127,7 +127,7 @@
   gap: 12px;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-  background: var(--bg-color) !important; /* ✅ Inajibadilisha! */
+  background: var(--bg-color) !important; 
   color: var(--text-color) !important;
 }
 

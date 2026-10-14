@@ -690,7 +690,7 @@ const handleSubCategoryHover = (subCategory) => {
           Allow Now
         </button>
         <button 
-          className="location-modal-btn cancel"
+          className="location-modal-btn cancel"   
           onClick={() => setShowLocationPrompt(false)}
         >
           Not Now
