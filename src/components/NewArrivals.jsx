@@ -5,7 +5,7 @@ import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
 import SkeletonCardz from "./SkeletonCardz";
 import { useTranslation } from 'react-i18next';
-import '../NewArrivals.css';
+//import '../NewArrivals.css';
 
 export default function NewArrivals({ navigate, selectedCategory }) {
   const { t, i18n } = useTranslation();
@@ -100,28 +100,28 @@ export default function NewArrivals({ navigate, selectedCategory }) {
   // 🔥 RENDER HEADER (Inajumuisha mshale na peach background)
   // ============================================================
   const renderHeader = () => (
-    <div className="na-header">
-      <div className="na-header-left">
+    <div className="flex justify-between items-center px-3 py-3 bg-[#fff7ed] dark:bg-[#1e293b] dark:border-b dark:border-[#334155] rounded-t-xl mb-4 text-black dark:text-white mt-50">
+      <div className="flex flex-col">
         
         {/* 🔥 1. Title na Icon ziko kwenye kikundi chake (zitakaa upande kwa upande) */}
-        <div className="na-title-group">
-          <Sparkles className="na-sparkle-icon" />
-          <h2 className="na-title">
+        <div className="flex items-center gap-2.5">
+          <Sparkles className="text-[#f973161] dark:text-[#fbbf24] w-[18px] h-[18px] md:w-6 md:h-6" />
+          <h2 className="text-sm md:text-base lg:text-xl font-bold m-0">
             {t('new_arrivals')}
           </h2>
         </div>
         
         {/* 🔥 2. Subtitle sasa iko NJE ya kikundi hicho, kwa hiyo itakaa CHINI ya title! */}
-        <p className="na-subtitle">
+        <p className="text-[10px] md:text-xs lg:text-sm text-[#888] dark:text-[#94a3b8] m-0 mt-1 lg:mt-0 lg:pl-[34px]">
           {t('discover_latest_arrivals')}
         </p>
         
       </div>
       
       {/* 🔥 UPANDE WA KULIA: MSHALE TU */}
-      <div className="na-header-right">
+      <div className="flex items-center">
         <button 
-          className="na-arrow-link-btn"
+          className="bg-transparent border-none cursor-pointer flex items-center justify-center text-black dark:text-white p-1 transition-transform hover:translate-x-1 hover:text-[#f97316] active:scale-95"
           onClick={() => {
             const url = '/products?sectionName=New+Arrivals'; 
             
@@ -145,14 +145,14 @@ export default function NewArrivals({ navigate, selectedCategory }) {
   // ============================================================
   if (loading) {
     return (
-      <div className="new-arrivals-main-wrapper">
+      <div className="relative w-full bg-white dark:bg-[#1e293b] border-y border-[#e5e7eb] dark:border-[#334155] py-4">
 
         {renderHeader()}
 
-        <div className="na-desktop-wrapper">
-          <div className="na-scroll-wrapper hide-scrollbar">
+        <div className="relative flex items-center px-2">
+          <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-4 w-full gap-2 md:gap-3 snap-mandatory [&::-webkit-scrollbar]:hidden[-ms-overflow-style:none] [scrollbar-width:none]">
             {Array.from({ length: 5 }).map((_, index) => (
-              <div key={`skeleton-${index}`} className="na-card-wrapper">
+              <div key={`skeleton-${index}`} className="flex-[0_0_calc((100%-17.6px)/2.2)] min-w-[calc((100%-17.6px)/2.2)] sm:flex-[0_0_calc((100%-35px)/3.5)] sm:min-w-[calc((100%-35px)/3.5)] md:flex-[0_0_calc((100%-54px)/4.5)] md:min-w-[calc((100%-54px)/4.5)] lg:flex-[0_0_calc((100%-78px)/6.5)] lg:min-w-[calc((100%-78px)/6.5)] snap-start">
                 <SkeletonCardz />
               </div>
             ))}
@@ -171,22 +171,25 @@ export default function NewArrivals({ navigate, selectedCategory }) {
   // SUCCESS STATE
   // ============================================================
   return (
-    <div className="new-arrivals-main-wrapper">
+    <div className="relative w-full bg-white dark:bg-[#1e293b] border-y border-[#e5e7eb] dark:border-[#334155] py-4">
       
             {renderHeader()}
 
-
-      {/* Horizontal Scroll */}
-      <div className="na-desktop-wrapper">
+           {/* Horizontal Scroll */}
+      <div className="relative flex items-center px-2">
+        {/* LEFT ARROW */}
         {showLeftArrow && (
-          <button className="na-arrow-btn na-arrow-left" onClick={() => scroll('left')}>
-            <ChevronLeft size={24} />
+          <button 
+            className="absolute z-20 w-8 h-8 md:w-9 md:h-9 bg-white dark:bg-[#1e293b] border border-[#e2e8f0] dark:border-[#334155] rounded-full flex items-center justify-center cursor-pointer shadow-lg transition-all top-1/2 -translate-y-1/2 text-black dark:text-white hover:bg-[#eab308] hover:text-white hover:border-[#eab308] hover:scale-105 active:scale-95 left-3 md:left-4" 
+            onClick={() => scroll('left')}
+          >
+            <ChevronLeft size={20} className="md:w-6 md:h-6" />
           </button>
         )}
         
-        <div ref={scrollContainerRef} className="na-scroll-wrapper hide-scrollbar">
+        <div ref={scrollContainerRef} className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-4 w-full gap-2 md:gap-3 snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {products.map((product) => (
-            <div key={product.id} className="na-card-wrapper">
+            <div key={product.id} className="flex-[0_0_calc((100%-17.6px)/2.2)] min-w-[calc((100%-17.6px)/2.2)] sm:flex-[0_0_calc((100%-35px)/3.5)] sm:min-w-[calc((100%-35px)/3.5)] md:flex-[0_0_calc((100%-54px)/4.5)] md:min-w-[calc((100%-54px)/4.5)] lg:flex-[0_0_calc((100%-78px)/6.5)] lg:min-w-[calc((100%-78px)/6.5)] snap-start">
               <DashboardCard
                 image={product.cover_image_url || product.cover_image || ''}
                 //title={product.name || ''}
@@ -209,9 +212,13 @@ export default function NewArrivals({ navigate, selectedCategory }) {
           ))}
         </div>
         
+        {/* RIGHT ARROW */}
         {showRightArrow && (
-          <button className="na-arrow-btn na-arrow-right" onClick={() => scroll('right')}>
-            <ChevronRight size={24} />
+          <button 
+            className="absolute z-20 w-8 h-8 md:w-9 md:h-9 bg-white dark:bg-[#1e293b] border border-[#e2e8f0] dark:border-[#334155] rounded-full flex items-center justify-center cursor-pointer shadow-lg transition-all top-1/2 -translate-y-1/2 text-black dark:text-white hover:bg-[#eab308] hover:text-white hover:border-[#eab308] hover:scale-105 active:scale-95 right-3 md:right-4" 
+            onClick={() => scroll('right')}
+          >
+            <ChevronRight size={20} className="md:w-6 md:h-6" />
           </button>
         )}
       </div>

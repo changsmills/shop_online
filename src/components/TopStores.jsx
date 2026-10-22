@@ -6,7 +6,7 @@ import DashboardCard from "./DashboardCard";
 import SkeletonCardz from "./SkeletonCardz";
 import { useTranslation } from 'react-i18next';
 import { useUserLocation } from '../hooks/useUserLocation,js';  // 🔥 ONGEZA HII
-import '../TopStores.css';
+//import '../TopStores.css';
 
 export default function TopStores({ navigate }) {
   const { t, i18n } = useTranslation();
@@ -82,28 +82,28 @@ export default function TopStores({ navigate }) {
    // ============================================================
   // 🔥 RENDER HEADER (Imejumuishwa kwa pande zote)
   // ============================================================
-  const renderHeader = () => (
-    <div className="ts-header">
-      <div className="ts-header-left">
-        <div className="ts-title-group">
-          <Factory className="ts-factory-icon" />
-          <h2 className="ts-title">{t('top_suppliers')}</h2>
+   const renderHeader = () => (
+    <div className="flex justify-between items-center px-4 py-4 md:px-6 md:py-5 mb-2 bg-transparent border-b border-gray-100 dark:border-gray-800 text-black dark:text-white">
+      <div className="flex flex-col">
+        <div className="flex items-center gap-2 md:gap-3">
+          {/* Icon ya Factory ikiwa na rangi ya brand */}
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-orange-50 dark:bg-orange-500/10 flex items-center justify-center">
+            <Factory className="text-orange-500 dark:text-orange-400 w-4 h-4 md:w-5 md:h-5" />
+          </div>
+          <h2 className="text-base md:text-xl font-bold m-0 text-black dark:text-white">{t('top_suppliers')}</h2>
         </div>
         
-        {/* ✅ ONGEZA SUBTITLE HAPA CHINI YA TITLE */}
-        <p className="ts-subtitle">
+        {/* Maelezo (Subtitle) yakiwa na nafasi ya kutosha chini ya icon */}
+        <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 m-0 mt-1 md:mt-1.5 md:pl-[52px]">
           {t('verified_wholesale_stores')}
         </p>
       </div>
       
-      <div className="ts-header-right">
+      <div className="flex items-center">
         <button 
-          className="ts-arrow-link-btn"
+          className="group bg-transparent border-none cursor-pointer flex items-center justify-center text-black dark:text-white p-2 rounded-full transition-all hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-95"
           onClick={() => {
             const url = '/stores?section=top-suppliers'; 
-            
-            // ✅ MUHIMU: Angalia kama ni Desktop (>768px), fungua tab mpya.
-            // Ikiwa ni Mobile, fungua kwenye tab hii hii (kama kawaida).
             if (window.innerWidth > 768) {
               window.open(url, '_blank'); 
             } else {
@@ -111,7 +111,7 @@ export default function TopStores({ navigate }) {
             }
           }}
         >
-          <ArrowRight size={24} />
+          <ArrowRight className="w-5 h-5 md:w-6 md:h-6 transition-transform group-hover:translate-x-1" />
         </button>
       </div>
     </div>
@@ -122,14 +122,15 @@ export default function TopStores({ navigate }) {
   // ============================================================
   if (loading) {
     return (
-      <div className="top-stores-main-wrapper">
-        
+      <div className="relative w-full bg-white dark:bg-[#1e293b] border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border">
         {renderHeader()}
-
-        <div className="ts-desktop-wrapper">
-          <div className="ts-scroll-wrapper hide-scrollbar">
+        <div className="relative flex items-center px-2">
+          <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-4 md:pb-5 w-full gap-2 md:gap-3 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {Array.from({ length: 5 }).map((_, index) => (
-              <div key={`skeleton-${index}`} className="ts-card-wrapper">
+              <div 
+                key={`skeleton-${index}`} 
+                className="flex-[0_0_calc((100%-17.6px)/2.2)] min-w-[calc((100%-17.6px)/2.2)] sm:flex-[0_0_calc((100%-35px)/3.5)] sm:min-w-[calc((100%-35px)/3.5)] md:flex-[0_0_calc((100%-54px)/4.5)] md:min-w-[calc((100%-54px)/4.5)] lg:flex-[0_0_calc((100%-78px)/6.5)] lg:min-w-[calc((100%-78px)/6.5)] snap-start"
+              >
                 <SkeletonCardz />
               </div>
             ))}
@@ -148,20 +149,26 @@ export default function TopStores({ navigate }) {
   // SUCCESS STATE
   // ============================================================
   return (
-    <div className="top-stores-main-wrapper">
+
+    <div className="relative w-full bg-white dark:bg-[#1e293b] border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border">
       
             {renderHeader()}
 
 
       {/* Horizontal Scroll */}
-      <div className="ts-desktop-wrapper">
+      <div className="relative flex items-center px-2">
         {showLeftArrow && (
-          <button className="ts-arrow-btn ts-arrow-left" onClick={() => scroll('left')}>
-            <ChevronLeft size={24} />
+         <button 
+            className="absolute z-10 w-6 h-6 md:w-9 md:h-9 bg-white dark:bg-[#1e293b] border border-[#e2e8f0] dark:border-[#334155] rounded-full flex items-center justify-center cursor-pointer shadow-md transition-all top-1/2 -translate-y-1/2 text-black dark:text-white hover:bg-[#f97316] hover:text-white hover:border-[#f97316] hover:scale-105 active:scale-95 left-0 md:-left-1" 
+            onClick={() => scroll('left')}
+          >
+           <ChevronLeft size={16} className="md:w-6 md:h-6" />
+
           </button>
         )}
         
-        <div ref={scrollContainerRef} className="ts-scroll-wrapper hide-scrollbar">
+        <div ref={scrollContainerRef} className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-4 md:pb-5 w-full gap-2 md:gap-3 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        >
           {stores.map((store) => {
             let officeImg = 'https://via.placeholder.com/300x150?text=Verified+Store';
             try {
@@ -172,7 +179,8 @@ export default function TopStores({ navigate }) {
             } catch (e) { officeImg = officeImg; }
 
             return (
-              <div key={store.id} className="ts-card-wrapper">
+              <div key={store.id}  className="flex-[0_0_calc((100%-17.6px)/2.2)] min-w-[calc((100%-17.6px)/2.2)] sm:flex-[0_0_calc((100%-35px)/3.5)] sm:min-w-[calc((100%-35px)/3.5)] md:flex-[0_0_calc((100%-54px)/4.5)] md:min-w-[calc((100%-54px)/4.5)] lg:flex-[0_0_calc((100%-78px)/6.5)] lg:min-w-[calc((100%-78px)/6.5)] snap-start"
+              >
                 <DashboardCard
                    image={store.office_image_1_url || store.office_image_2_url || 'https://via.placeholder.com/300x150?text=Verified+Store'}
                   title={store.store_name}
@@ -212,8 +220,12 @@ export default function TopStores({ navigate }) {
         </div>
         
         {showRightArrow && (
-          <button className="ts-arrow-btn ts-arrow-right" onClick={() => scroll('right')}>
-            <ChevronRight size={24} />
+            <button 
+            className="absolute z-10 w-6 h-6 md:w-9 md:h-9 bg-white dark:bg-[#1e293b] border border-[#e2e8f0] dark:border-[#334155] rounded-full flex items-center justify-center cursor-pointer shadow-md transition-all top-1/2 -translate-y-1/2 text-black dark:text-white hover:bg-[#f97316] hover:text-white hover:border-[#f97316] hover:scale-105 active:scale-95 right-0 md:-right-1" 
+            onClick={() => scroll('right')}
+          > 
+               <ChevronRight size={16} className="md:w-6 md:h-6" />
+
           </button>
         )}
       </div>

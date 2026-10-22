@@ -28,48 +28,53 @@ export default function HelpCenter() {
   ];
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '40px 20px' }}>
-      <h1 style={{ fontSize: '32px', fontWeight: '700', marginBottom: '10px' }}>
-        <LucideIcons.HelpCircle size={28} style={{ color: '#ff6a00', marginRight: '10px' }} />
+    <div className="max-w-[800px] mx-auto px-4 sm:px-5 py-8 sm:py-10 dark:bg-slate-900 min-h-screen">
+
+      {/* ===== TITLE ===== */}
+      <h1 className="text-2xl sm:text-[32px] font-bold mb-2.5 text-gray-900 dark:text-white flex items-center gap-2.5">
+        <LucideIcons.HelpCircle size={28} className="text-[#ff6a00] flex-shrink-0" />
         Kituo cha Msaada (FAQ)
       </h1>
-      <p style={{ fontSize: '16px', color: '#666', marginBottom: '40px' }}>
+      <p className="text-sm sm:text-base text-gray-500 dark:text-slate-400 mb-8 sm:mb-10">
         Maswali yanayoulizwa mara kwa mara
       </p>
 
-      {faqs.map((faq, index) => (
-        <div key={index} style={{ 
-          marginBottom: '15px', 
-          border: '1px solid #eee', 
-          borderRadius: '8px',
-          overflow: 'hidden'
-        }}>
-          <button
-            onClick={() => setOpenFaq(openFaq === index ? null : index)}
-            style={{
-              width: '100%',
-              padding: '15px 20px',
-              textAlign: 'left',
-              backgroundColor: openFaq === index ? '#fff7f2' : 'white',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              fontWeight: '500',
-              fontSize: '16px'
-            }}
+      {/* ===== FAQ LIST ===== */}
+      {faqs.map((faq, index) => {
+        const isOpen = openFaq === index;
+        return (
+          <div
+            key={index}
+            className="mb-3.5 border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden"
           >
-            {faq.q}
-            {openFaq === index ? <LucideIcons.ChevronUp size={18} /> : <LucideIcons.ChevronDown size={18} />}
-          </button>
-          {openFaq === index && (
-            <div style={{ padding: '15px 20px', backgroundColor: '#f9fafb', borderTop: '1px solid #eee' }}>
-              {faq.a}
-            </div>
-          )}
-        </div>
-      ))}
+            {/* Question Button */}
+            <button
+              onClick={() => setOpenFaq(isOpen ? null : index)}
+              className={`w-full px-4 sm:px-5 py-3.5 sm:py-4 text-left border-none cursor-pointer flex justify-between items-center font-medium text-sm sm:text-base transition-colors ${
+                isOpen
+                  ? 'bg-orange-50 dark:bg-orange-950/30 text-gray-900 dark:text-white'
+                  : 'bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700/50'
+              }`}
+            >
+              <span className="pr-3">{faq.q}</span>
+              <span className="flex-shrink-0 text-gray-500 dark:text-slate-400">
+                {isOpen ? (
+                  <LucideIcons.ChevronUp size={18} />
+                ) : (
+                  <LucideIcons.ChevronDown size={18} />
+                )}
+              </span>
+            </button>
+
+            {/* Answer Panel */}
+            {isOpen && (
+              <div className="px-4 sm:px-5 py-3.5 sm:py-4 bg-gray-50 dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700 text-sm sm:text-base text-gray-600 dark:text-slate-300 leading-relaxed animate-[fadeIn_0.2s_ease]">
+                {faq.a}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

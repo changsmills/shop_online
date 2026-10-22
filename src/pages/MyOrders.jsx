@@ -8,7 +8,7 @@ import {
 import { toast, Toaster } from 'react-hot-toast';
 import api from '../axiosConfig'; // 🔥 Badilisha: tumia api!
 import UserTools from '../components/UserTools';
-import '../MyOrders.css';
+//import '../MyOrders.css';
 import messageImage from "../images/orderAhead.svg"; 
 
 const MyOrders = () => { // 🔥 Imeondolewa { session }
@@ -201,297 +201,234 @@ const MyOrders = () => { // 🔥 Imeondolewa { session }
     { icon: <Settings size={20} />, path: '/dashboard/settings', label: 'Settings' },
   ];
 
-// 🔥 SKELETON LOADING - Inafanana na muonekano halisi!
-if (loading) {
-  return (
-    <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      
-      {/* Header Skeleton (Inafanana na Header halisi) */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        padding: '10px 24px', 
-        borderBottom: '1px solid #eee', 
-        backgroundColor: '#fff' 
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <div style={{ width: '30px', height: '30px', borderRadius: '8px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
-          <div style={{ width: '120px', height: '20px', borderRadius: '8px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
+ // ===== SKELETON LOADING =====
+  if (loading) {
+    return (
+      <div className="flex flex-col h-screen bg-white dark:bg-[#1e293b]">
+        {/* Header Skeleton */}
+        <div className="flex justify-between items-center px-4 md:px-6 py-2.5 border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-[#1e293b]">
+          <div className="flex items-center gap-4">
+            <div className="w-[30px] h-[30px] rounded-lg bg-gray-200 dark:bg-slate-700 animate-pulse" />
+            <div className="w-[120px] h-5 rounded-lg bg-gray-200 dark:bg-slate-700 animate-pulse" />
+          </div>
+        </div>
+
+        {/* Main Content Skeleton */}
+        <div className="flex flex-1 overflow-hidden">
+          <main className="flex-1 p-4 md:p-6 bg-gray-50 dark:bg-[#0f172a] overflow-y-auto">
+            <div className="max-w-[1100px] mx-auto">
+              <div className="w-[200px] h-[30px] rounded-lg bg-gray-200 dark:bg-slate-700 mb-5 animate-pulse" />
+
+              <div className="grid gap-4 md:gap-5">
+                {[1, 2].map((i) => (
+                  <div key={i} className="bg-white dark:bg-[#1e293b] rounded-2xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+                    <div className="p-4 md:p-5 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-[#0f172a]">
+                      <div className="flex justify-between items-center flex-wrap gap-2.5">
+                        <div className="space-y-2">
+                          <div className="w-[100px] h-3 rounded-md bg-gray-200 dark:bg-slate-700 animate-pulse" />
+                          <div className="w-[150px] h-3 rounded-md bg-gray-200 dark:bg-slate-700 animate-pulse" />
+                        </div>
+                        <div className="flex gap-2.5 items-center">
+                          <div className="w-[60px] h-6 rounded-xl bg-gray-200 dark:bg-slate-700 animate-pulse" />
+                          <div className="w-[80px] h-6 rounded-lg bg-gray-200 dark:bg-slate-700 animate-pulse" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4 md:p-5">
+                      <div className="flex gap-4 items-center">
+                        <div className="w-[70px] h-[70px] rounded-xl bg-gray-200 dark:bg-slate-700 animate-pulse" />
+                        <div className="flex-1 space-y-2">
+                          <div className="w-[70%] h-3.5 rounded-lg bg-gray-200 dark:bg-slate-700 animate-pulse" />
+                          <div className="w-[50%] h-3 rounded-lg bg-gray-200 dark:bg-slate-700 animate-pulse" />
+                          <div className="w-[30%] h-3 rounded-lg bg-gray-200 dark:bg-slate-700 animate-pulse" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </main>
         </div>
       </div>
+    );
+  }
 
-      {/* Main Content Skeleton */}
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        <main style={{ flex: 1, padding: '24px', backgroundColor: '#f7f8fa' }}>
-          <div className="orders-content-wrapper" style={{ maxWidth: '1100px', margin: '0 auto' }}>
-            
-            {/* Title Skeleton */}
-            <div style={{ width: '200px', height: '30px', borderRadius: '8px', backgroundColor: '#e0e0e0', marginBottom: '20px', animation: 'pulse 1.5s infinite' }}></div>
-
-            {/* Order Cards Skeleton */}
-            <div className="orders-list-grid" style={{ display: 'grid', gap: '20px' }}>
-              {[1, 2].map((i) => (
-                <div key={i} style={{ backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #eee', overflow: 'hidden' }}>
-                  
-                  {/* Header ya Card (Order no & Status) */}
-                  <div style={{ padding: '20px', borderBottom: '1px solid #eee', backgroundColor: '#fafafa' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                      <div>
-                        <div style={{ width: '100px', height: '12px', borderRadius: '6px', backgroundColor: '#e0e0e0', marginBottom: '8px', animation: 'pulse 1.5s infinite' }}></div>
-                        <div style={{ width: '150px', height: '12px', borderRadius: '6px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
-                      </div>
-                      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                        <div style={{ width: '60px', height: '24px', borderRadius: '12px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
-                        <div style={{ width: '80px', height: '24px', borderRadius: '8px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
-                      </div>
-                    </div>
-                    <div style={{ marginTop: '15px', textAlign: 'right' }}>
-                      <div style={{ width: '120px', height: '20px', borderRadius: '8px', backgroundColor: '#e0e0e0', marginLeft: 'auto', animation: 'pulse 1.5s infinite' }}></div>
-                    </div>
-                  </div>
-
-                  {/* Items Skeleton (Picha + Maelezo) */}
-                  <div style={{ padding: '20px' }}>
-                    <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-                      <div style={{ width: '70px', height: '70px', borderRadius: '10px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
-                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        <div style={{ width: '70%', height: '14px', borderRadius: '8px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
-                        <div style={{ width: '50%', height: '12px', borderRadius: '8px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
-                        <div style={{ width: '30%', height: '12px', borderRadius: '8px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
-                      </div>
-                    </div>
-
-                    {/* Buttons Skeleton */}
-                    <div style={{ marginTop: '20px', paddingTop: '15px', borderTop: '1px solid #f5f5f5', display: 'flex', gap: '10px' }}>
-                      <div style={{ width: '100px', height: '34px', borderRadius: '8px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
-                      <div style={{ width: '100px', height: '34px', borderRadius: '8px', backgroundColor: '#e0e0e0', animation: 'pulse 1.5s infinite' }}></div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </main>
-      </div>
-    </div>
-  );
-}
   return (
-    <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    <div className="flex flex-col h-screen bg-gray-50 dark:bg-[#0f172a]">
       <Toaster position="top-center" />
-      
-      <header className="dashboard-header" style={{ 
-  display: 'flex', 
-  justifyContent: 'space-between', 
-  alignItems: 'center',
-  padding: isMobile ? '10px 15px' : '10px 24px', 
-  borderBottom: '1px solid #eee', 
-  backgroundColor: '#fff' 
-}}>
-  <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-    
-    {/* 🔥 ONGEZA BACK ARROW (Inaonekana Mobile tu) */}
-    {isMobile && (
-      <button 
-        onClick={() => navigate(-1)}
-        style={{ 
-          background: 'none', 
-          border: 'none', 
-          cursor: 'pointer', 
-          padding: '4px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
-      >
-        <ChevronLeft size={24} color="#333" />
-      </button>
-    )}
 
-    {/* 🔥 Desktop tu: Menu ya Kufungua Sidebar */}
-    {!isMobile && (
-      <Menu size={22} style={{ cursor: 'pointer', color: '#666' }} onClick={() => setIsExpanded(!isExpanded)} />
-    )}
-
-    <Link to="/dashboard" style={{ 
-      fontSize: isMobile ? '18px' : '20px', 
-      fontWeight: '800', 
-      color: '#ff6a00', 
-      textDecoration: 'none' 
-    }}>
-      Skyfall.com
-    </Link>
-
-    {/* 🔥 Desktop tu: Search Box */}
-    {!isMobile && (
-      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', backgroundColor: '#f4f4f4', padding: '6px 12px', borderRadius: '8px' }}>
-        <Search size={16} color="#999" />
-        <input type="text" placeholder="Search orders..." style={{ border: 'none', background: 'none', outline: 'none', marginLeft: '8px', fontSize: '14px' }} />
-      </div>
-    )}
-  </div>
-  <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-    {!isMobile && (
-      <>
-        <Bell size={20} style={{ cursor: 'pointer', color: '#666' }} />
-        <UserTools /> {/* 🔥 Imeondolewa { session } */}
-      </>
-    )}
-  </div>
-</header>
-
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        
-        {/* Sidebar */}
+      {/* ===== HEADER ===== */}
+      <header className="sticky top-0 z-[100] flex justify-between items-center px-3 md:px-6 py-2.5 border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-[#1e293b]">
+        <div className="flex items-center gap-2.5 md:gap-4">
+          {isMobile && (
+            <button
+              onClick={() => navigate(-1)}
+              className="bg-transparent border-none cursor-pointer p-1 flex items-center justify-center text-gray-800 dark:text-white"
+            >
+              <ChevronLeft size={24} />
+            </button>
+          )}
+          {!isMobile && (
+            <Menu size={22} className="cursor-pointer text-gray-500 dark:text-slate-400 hover:text-[#ff6a00] transition-colors" onClick={() => setIsExpanded(!isExpanded)} />
+          )}
+          <Link to="/dashboard" className="text-base md:text-xl font-extrabold text-[#ff6a00] no-underline">
+            Skyfall.com
+          </Link>
+          {!isMobile && (
+            <div className="flex items-center bg-gray-100 dark:bg-slate-700 px-3 py-1.5 rounded-lg">
+              <Search size={16} className="text-gray-400 dark:text-slate-500" />
+              <input type="text" placeholder="Search orders..." className="border-none bg-transparent outline-none ml-2 text-sm text-gray-800 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500" />
+            </div>
+          )}
+        </div>
         {!isMobile && (
-          <aside 
+          <div className="flex items-center gap-4">
+            <Bell size={20} className="cursor-pointer text-gray-500 dark:text-slate-400" />
+            <UserTools />
+          </div>
+        )}
+      </header>
+
+      <div className="flex flex-1 overflow-hidden">
+
+        {/* ===== SIDEBAR (Desktop) ===== */}
+        {!isMobile && (
+          <aside
             onMouseEnter={() => setIsExpanded(true)}
             onMouseLeave={() => setIsExpanded(false)}
-            style={{ 
-              width: isExpanded ? '240px' : '70px', 
-              borderRight: '1px solid #eee', 
-              display: 'flex', 
-              flexDirection: 'column', 
-              paddingTop: '20px', 
-              backgroundColor: '#fff',
-              transition: 'width 0.3s ease',
-              overflow: 'hidden',
-              whiteSpace: 'nowrap',
-              zIndex: 10
-            }}
+            className={`flex flex-col pt-5 bg-white dark:bg-[#1e293b] border-r border-gray-200 dark:border-slate-700 overflow-hidden whitespace-nowrap z-10 transition-[width] duration-300 ease ${
+              isExpanded ? 'w-60' : 'w-[70px]'
+            }`}
           >
-            {sidebarItems.map((item) => (
-              <Link 
-                key={item.path} 
-                to={item.path} 
-                style={{ 
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '12px 24px',
-                  textDecoration: 'none',
-                  color: location.pathname === item.path ? '#ff6a00' : '#666',
-                  backgroundColor: location.pathname === item.path ? '#fff5ed' : 'transparent',
-                  margin: '4px 8px',
-                  borderRadius: '8px',
-                  transition: '0.2s'
-                }}
-              >
-                <div style={{ minWidth: '22px', display: 'flex', justifyContent: 'center' }}>
-                  {item.icon}
-                </div>
-                <span style={{ 
-                  marginLeft: '15px', 
-                  fontSize: '14px', 
-                  fontWeight: '600',
-                  opacity: isExpanded ? 1 : 0,
-                  transition: 'opacity 0.2s'
-                }}>
-                  {item.label}
-                </span>
-              </Link>
-            ))}
+            {sidebarItems.map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center px-6 py-3 mx-2 my-1 rounded-lg no-underline transition-colors ${
+                    isActive
+                      ? 'text-[#ff6a00] bg-orange-50 dark:bg-[#2d2d44]'
+                      : 'text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-700/50'
+                  }`}
+                >
+                  <div className="min-w-[22px] flex justify-center">{item.icon}</div>
+                  <span className={`ml-[15px] text-sm font-semibold transition-opacity duration-200 ${
+                    isExpanded ? 'opacity-100' : 'opacity-0'
+                  }`}>
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
           </aside>
         )}
 
-        <main style={{ flex: 1, padding: isMobile ? '15px' : '24px', backgroundColor: '#f7f8fa', overflowY: 'auto' }}>
-          <div className="orders-content-wrapper" style={{ maxWidth: '1100px', margin: '0 auto' }}>
-            <h1 className="orders-main-title" style={{ fontSize: '24px', fontWeight: '800', marginBottom: '20px' }}>Your orders</h1>
+        {/* ===== MAIN CONTENT ===== */}
+        <main className="flex-1 p-3 sm:p-4 md:p-6 bg-gray-50 dark:bg-[#0f172a] overflow-y-auto">
+          <div className="max-w-[1100px] mx-auto">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-extrabold mb-4 md:mb-5 text-gray-800 dark:text-white">
+              Your orders
+            </h1>
 
             {orders.length === 0 ? (
-              <div style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                padding: '80px 20px', textAlign: 'center', backgroundColor: '#fff',
-                borderRadius: '16px', border: '1px solid #eee', marginTop: '20px'
-              }}>
-                <img src={messageImage} alt="No orders" style={{ width: '280px', marginBottom: '24px' }} />
-                <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#1a1a1a', marginBottom: '12px' }}>Bado haujanunua kitu</h2>
-                <p style={{ color: '#666', maxWidth: '400px', marginBottom: '32px', fontSize: '15px' }}>
+              /* ===== EMPTY STATE ===== */
+              <div className="flex flex-col items-center justify-center px-4 py-12 sm:py-16 md:py-20 text-center bg-white dark:bg-[#1e293b] rounded-2xl border border-gray-200 dark:border-slate-700 mt-5">
+                <img src={messageImage} alt="No orders" className="w-[200px] sm:w-[240px] md:w-[280px] max-w-[80%] mb-6" />
+                <h2 className="text-lg sm:text-xl md:text-2xl font-extrabold text-gray-900 dark:text-white mb-3">
+                  Bado haujanunua kitu
+                </h2>
+                <p className="text-gray-500 dark:text-slate-400 max-w-[400px] mb-8 text-xs sm:text-sm md:text-[15px]">
                   Inaonekana bado haujaweka oda yoyote. Anza sasa kupata bidhaa bora kutoka kwetu.
                 </p>
-                <button 
+                <button
                   onClick={() => navigate('/')}
-                  style={{ backgroundColor: '#ff6a00', color: 'white', padding: '14px 40px', borderRadius: '30px', border: 'none', fontWeight: '700', cursor: 'pointer' }}
+                  className="bg-[#ff6a00] hover:bg-[#e55a00] hover:-translate-y-0.5 text-white px-8 sm:px-10 py-3 sm:py-3.5 rounded-full border-none font-bold cursor-pointer text-sm sm:text-base transition-all"
                 >
                   Anza Kununua Sasa
                 </button>
               </div>
             ) : (
-              <div className="orders-list-grid" style={{ display: 'grid', gap: '20px' }}>
+              /* ===== ORDERS LIST ===== */
+              <div className="grid gap-4 md:gap-6">
                 {orders.map((order) => {
                   const orderItems = order.order_items || [];
                   const totalItems = orderItems.reduce((sum, item) => sum + (item.quantity || 0), 0);
                   const isExpandedOrder = expandedOrders[order.id];
+                  const isDelivered = order.status === 'delivered';
 
                   return (
-                    <div key={order.id} style={{ backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #eee', overflow: 'hidden' }}>
-                      {/* ORDER HEADER */}
-                      <div style={{ padding: '20px', borderBottom: '1px solid #eee', backgroundColor: '#fafafa' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                    <div
+                      key={order.id}
+                      className="bg-white dark:bg-[#1e293b] rounded-2xl border border-gray-200 dark:border-slate-700 overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_15px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_4px_15px_rgba(0,0,0,0.4)]"
+                    >
+                      {/* Order Header */}
+                      <div className="p-4 md:p-5 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-[#0f172a]">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                           <div>
-                            <span style={{ fontSize: '12px', color: '#888' }}>Order #{order.order_number?.slice(0, 12)}</span>
-                            <p style={{ margin: '5px 0 0', fontSize: '13px', color: '#666' }}>
+                            <span className="text-xs text-gray-400 dark:text-slate-500">
+                              Order #{order.order_number?.slice(0, 12)}
+                            </span>
+                            <p className="mt-1.5 mb-0 text-xs md:text-[13px] text-gray-500 dark:text-slate-400">
                               {new Date(order.created_at).toLocaleDateString()} | Bidhaa: {totalItems}
                             </p>
                           </div>
-                          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                            <div style={{ 
-                              padding: '6px 12px', borderRadius: '20px', fontSize: '11px', fontWeight: '800',
-                              backgroundColor: order.status === 'delivered' ? '#e8f5e9' : '#fff3e0',
-                              color: order.status === 'delivered' ? '#2e7d32' : '#ef6c00',
-                              textTransform: 'uppercase'
-                            }}>
+                          <div className="flex gap-2.5 items-center flex-wrap">
+                            <div className={`px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase ${
+                              isDelivered
+                                ? 'bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-400'
+                                : 'bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400'
+                            }`}>
                               {order.status}
                             </div>
                             <button
                               onClick={() => toggleExpandOrder(order.id)}
-                              style={{
-                                background: 'none', border: '1px solid #ddd', borderRadius: '8px',
-                                padding: '6px 12px', fontSize: '12px', cursor: 'pointer',
-                                display: 'flex', alignItems: 'center', gap: '5px'
-                              }}
+                              className="bg-transparent hover:bg-gray-100 dark:hover:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg px-3 py-1.5 text-xs cursor-pointer flex items-center gap-1.5 text-gray-700 dark:text-slate-300 transition-colors"
                             >
                               {isExpandedOrder ? '▲ Punguza' : '▼ Onyesha Bidhaa'}
-                              <span style={{ fontSize: '11px', color: '#666' }}>({orderItems.length})</span>
+                              <span className="text-[11px] text-gray-500 dark:text-slate-400">({orderItems.length})</span>
                             </button>
                           </div>
                         </div>
-                        
-                        {/* JUMLA YA ODA */}
-                        <div style={{ marginTop: '12px', textAlign: 'right' }}>
-                          <span style={{ fontSize: '14px', color: '#666' }}>Jumla ya Oda: </span>
-                          <span style={{ fontSize: '20px', fontWeight: '800', color: '#ff6a00' }}>
+
+                        {/* Total */}
+                        <div className="mt-3 sm:text-right">
+                          <span className="text-xs md:text-sm text-gray-500 dark:text-slate-400">Jumla ya Oda: </span>
+                          <span className="text-base md:text-xl font-extrabold text-[#ff6a00]">
                             TZS {order.grand_total?.toLocaleString()}
                           </span>
                         </div>
                       </div>
 
-                      {/* ORDER ITEMS - LIST YA BIDHAA ZOTE KATIKA ODA HII */}
-                      <div style={{ padding: '20px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                      {/* Order Items */}
+                      <div className="p-4 md:p-5">
+                        <div className="flex flex-col gap-4">
                           {orderItems.map((item, idx) => (
-                            <div 
-                              key={item.id || idx} 
-                              style={{ 
-                                display: 'flex', gap: '15px', alignItems: 'center',
-                                paddingBottom: idx !== orderItems.length - 1 ? '15px' : 0,
-                                borderBottom: idx !== orderItems.length - 1 ? '1px solid #f0f0f0' : 'none'
-                              }}
+                            <div
+                              key={item.id || idx}
+                              className={`flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center ${
+                                idx !== orderItems.length - 1
+                                  ? 'pb-4 border-b border-gray-100 dark:border-slate-700'
+                                  : ''
+                              }`}
                             >
-                              <img 
-                                src={item.product_image || 'https://via.placeholder.com/80'} 
+                              <img
+                                src={item.product_image || 'https://via.placeholder.com/80'}
                                 alt={item.product_name}
-                                style={{ width: '70px', height: '70px', borderRadius: '10px', objectFit: 'cover', backgroundColor: '#f9f9f9' }} 
-                                onError={(e) => { e.target.src = 'https://via.placeholder.com/70' }}
+                                className="w-16 h-16 sm:w-[70px] sm:h-[70px] rounded-xl object-cover bg-gray-50 dark:bg-slate-700 flex-shrink-0 mx-auto sm:mx-0"
+                                onError={(e) => { e.target.src = 'https://via.placeholder.com/70'; }}
                               />
-                              <div style={{ flex: 1 }}>
-                                <h4 style={{ margin: 0, fontSize: '15px', fontWeight: '700', color: '#333' }}>{item.product_name}</h4>
-                                <p style={{ margin: '5px 0', fontSize: '13px', color: '#666' }}>
-                                  Rangi: <strong>{item.selected_color || 'N/A'}</strong> | 
-                                  Size: <strong>{item.selected_size || 'N/A'}</strong> | 
-                                  Quantity: <strong>{item.quantity || 1}</strong>
+                              <div className="flex-1 text-center sm:text-left">
+                                <h4 className="m-0 text-sm md:text-[15px] font-bold text-gray-800 dark:text-white">
+                                  {item.product_name}
+                                </h4>
+                                <p className="my-1 text-xs md:text-[13px] text-gray-500 dark:text-slate-400">
+                                  Rangi: <strong>{item.selected_color || 'N/A'}</strong> |
+                                  Size: <strong>{item.selected_size || 'N/A'}</strong> |
+                                  Qty: <strong>{item.quantity || 1}</strong>
                                 </p>
-                                <p style={{ margin: 0, fontSize: '14px', fontWeight: '700', color: '#ff6a00' }}>
+                                <p className="m-0 text-sm md:text-[14px] font-bold text-[#ff6a00]">
                                   TZS {(item.unit_price || item.price)?.toLocaleString()}
                                 </p>
                               </div>
@@ -499,19 +436,19 @@ if (loading) {
                           ))}
                         </div>
 
-                        {/* BUTTONS ZA ORDER */}
-                        <div style={{ marginTop: '20px', paddingTop: '15px', borderTop: '1px solid #f5f5f5', display: 'flex', gap: '10px' }}>
-                          {order.status !== 'delivered' && (
-                            <button 
+                        {/* Action Buttons */}
+                        <div className="mt-5 pt-4 border-t border-gray-100 dark:border-slate-700 flex flex-col sm:flex-row gap-2.5">
+                          {!isDelivered && (
+                            <button
                               onClick={() => handleConfirmDelivery(order.id)}
-                              style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', backgroundColor: '#4caf50', color: '#fff', fontWeight: '600', cursor: 'pointer', fontSize: '13px' }}
+                              className="bg-green-500 hover:bg-green-600 text-white border-none px-4 py-2.5 rounded-lg font-semibold cursor-pointer text-xs md:text-[13px] transition-colors"
                             >
                               ✓ Nimepokea
                             </button>
                           )}
-                          <button 
+                          <button
                             onClick={() => handleReportIssue(order.id, order.store_id, orderItems)}
-                            style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #ddd', backgroundColor: '#fff', color: '#666', fontWeight: '600', cursor: 'pointer', fontSize: '13px' }}
+                            className="bg-white dark:bg-transparent border border-gray-300 dark:border-slate-600 text-gray-600 dark:text-slate-300 px-4 py-2.5 rounded-lg font-semibold cursor-pointer text-xs md:text-[13px] hover:border-[#ff4e00] hover:text-[#ff4e00] transition-colors"
                           >
                             ⚠️ Ripoti Tatizo
                           </button>

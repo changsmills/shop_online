@@ -6,121 +6,57 @@ export default function CategoryCard({ item }) {
   const navigate = useNavigate();
   const [currentImgIndex, setCurrentImgIndex] = useState(0);
 
-// Badilisha mstari huu
-const placeholder = "https://placehold.co/400x400?text=Picha+Haipo";
-// --- WEKA KODI HAPA (MAHALI PAKE NI HAPA) ---
+  const placeholder = "https://placehold.co/400x400?text=Picha+Haipo";
 
-// --- 1. PICHA NA GALLERY LOGIC ---
-
-// 1. Chuchua picha zote za gallery na hakikisha tunapata .media_url pekee
-const galleryImages = item.product_media
+  // --- 1. PICHA NA GALLERY LOGIC ---
+  const galleryImages = item.product_media
     ?.map((m) => m.media_url)
     ?.filter((url) => url && typeof url === 'string' && !url.startsWith('blob:')) 
     || [];
 
-// 2. Tumia "Set" ili kuondoa marudio (Duplicates) kiotomatiki
-// Hii itahakikisha hata kama cover_image ipo ndani ya gallery, itachukuliwa mara moja tu.
-const uniqueImages = new Set();
-
-// Ongeza cover_image kwanza (kama ipo na ni halali)
-if (item.cover_image && typeof item.cover_image === 'string') {
+  const uniqueImages = new Set();
+  if (item.cover_image && typeof item.cover_image === 'string') {
     uniqueImages.add(item.cover_image);
-}
+  }
+  galleryImages.forEach(img => uniqueImages.add(img));
 
-// Ongeza picha za gallery
-galleryImages.forEach(img => uniqueImages.add(img));
+  const finalImages = Array.from(uniqueImages);
+  const imagesToDisplay = finalImages.length > 0 ? finalImages : [placeholder];
 
-// Badilisha Set kuwa Array tena
-const finalImages = Array.from(uniqueImages);
-
-// 3. Ikiwa hakuna picha yoyote, tumia placeholder
-const imagesToDisplay = finalImages.length > 0 ? finalImages : [placeholder];
-
-// --- 2. NAVIGATION FUNCTIONS ---
-
-// Tumia 'imagesToDisplay' badala ya 'finalImages' hapa ili logic iende sawa na dots
-const nextSlide = (e) => {
+  // --- 2. NAVIGATION FUNCTIONS ---
+  const nextSlide = (e) => {
     e.stopPropagation();
     if (imagesToDisplay.length <= 1) return;
     setCurrentImgIndex((prev) => (prev + 1) % imagesToDisplay.length);
-};
+  };
 
-const prevSlide = (e) => {
+  const prevSlide = (e) => {
     e.stopPropagation();
     if (imagesToDisplay.length <= 1) return;
     setCurrentImgIndex((prev) => (prev - 1 + imagesToDisplay.length) % imagesToDisplay.length);
-};
+  };
 
-return (
+  return (
     <div 
       onClick={() => navigate(`/product/${item.id}`)}
       onContextMenu={(e) => e.preventDefault()}
-      style={{
-        background: '#fff',
-        borderRadius: '16px',
-        overflow: 'hidden',
-        border: '1px solid #eee',
-        cursor: 'pointer',
-        display: 'flex',
-        flexDirection: 'column',
-            aspectRatio: '1 / 1',
-
-        transition: 'box-shadow 0.3s ease', 
-        position: 'relative',
-        // --- ONGEZA HIZI ---
-        WebkitTapHighlightColor: 'transparent',
-        WebkitUserSelect: 'none',
-        userSelect: 'none',
-        touchAction: 'manipulation'
-
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = '0 6px 15px rgba(0,0,0,0.1)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = 'none';
-      }}
+      className="
+        group relative flex flex-col w-full aspect-square bg-white rounded-2xl 
+        overflow-hidden border border-[#eee] cursor-pointer 
+        transition-shadow duration-300 hover:shadow-[0_6px_15px_rgba(0,0,0,0.1)]
+        [-webkit-tap-highlight-color:transparent] select-none touch-manipulation
+      "
     >
-     <div 
-        style={{ 
-          position: 'relative', 
-          height: '220px', 
-          overflow: 'hidden', 
-   width: '100%',         // Inachukua upana wote wa kadi
-    aspectRatio: '1 / 1',
-          background: '#f9f9f9' ,
-          WebkitTouchCallout: 'none'
-        }}
-        onMouseEnter={(e) => {
-          // 1. Zoom picha
-          const img = e.currentTarget.querySelector('img');
-          if (img) img.style.transform = 'scale(1.1)';
-          // 2. Onyesha vishale - Hakikisha unalenga class sahihi
-          const controls = e.currentTarget.querySelector('.slider-controls');
-          if (controls) controls.style.opacity = '1';
-        }}
-        onMouseLeave={(e) => {
-          const img = e.currentTarget.querySelector('img');
-          if (img) img.style.transform = 'scale(1.0)';
-          const controls = e.currentTarget.querySelector('.slider-controls');
-          if (controls) controls.style.opacity = '0';
-        }}
-      >
+      
+      {/* ========== IMAGE CONTAINER ========== */}
+      <div className="relative w-full h-[220px] bg-[#f9f9f9] overflow-hidden">
+        
         <img 
           src={imagesToDisplay[currentImgIndex]} 
           alt={item.name}
-          // 2. ZUIA PICHA ISIVUTWE NA ISIFUNGUE MENU
           draggable="false"
           onContextMenu={(e) => e.preventDefault()}
-          style={{ 
-            width: '100%', 
-            height: '100%', 
-            objectFit: 'cover',
-            transition: 'transform 0.5s ease-in-out'
-                          
-
-
-          }}
+          className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
           onError={(e) => {
             if (e.target.src !== placeholder) {
               e.target.src = placeholder;
@@ -128,100 +64,66 @@ return (
           }}
         />
 
-        {/* Vishale na Dots - Tumeongeza position absolute ya nje */}
+        {/* ========== VISHALE NA DOTS ========== */}
         {finalImages.length > 1 && (
-          <div 
-            className="slider-controls" 
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              opacity: 0, // Inaanza ikiwa haionekani
-              transition: 'opacity 0.3s ease',
-              pointerEvents: 'none', // Muhimu ili isizuie click ya picha
-              zIndex: 2
-            }}
-          >
-            {/* Vishale - pointerEvents: 'auto' inaruhusu vishale vibonyezeke */}
+          <div className="
+            absolute inset-0 z-10 opacity-0 group-hover:opacity-100 
+            transition-opacity duration-300 pointer-events-none
+          ">
+            {/* Left Arrow */}
             <button 
-               onClick={prevSlide} 
-               style={{ ...arrowStyle(true), pointerEvents: 'auto' }}
+              onClick={prevSlide} 
+              className="
+                absolute top-1/2 left-2.5 -translate-y-1/2 
+                bg-white/80 hover:bg-white border-none rounded-full 
+                w-[30px] h-[30px] flex items-center justify-center 
+                cursor-pointer z-20 shadow-[0_2px_5px_rgba(0,0,0,0.1)] 
+                pointer-events-auto transition-colors
+              "
             >
-              <ChevronLeft size={18} />
+              <ChevronLeft size={18} className="text-gray-800" />
             </button>
 
+            {/* Right Arrow */}
             <button 
-               onClick={nextSlide} 
-               style={{ ...arrowStyle(false), pointerEvents: 'auto' }}
+              onClick={nextSlide} 
+              className="
+                absolute top-1/2 right-2.5 -translate-y-1/2 
+                bg-white/80 hover:bg-white border-none rounded-full 
+                w-[30px] h-[30px] flex items-center justify-center 
+                cursor-pointer z-20 shadow-[0_2px_5px_rgba(0,0,0,0.1)] 
+                pointer-events-auto transition-colors
+              "
             >
-              <ChevronRight size={18} />
+              <ChevronRight size={18} className="text-gray-800" />
             </button>
             
-            <div style={dotsContainerStyle}>
+            {/* Dots */}
+            <div className="absolute bottom-2.5 w-full flex justify-center gap-1.5 z-20">
               {finalImages.map((_, i) => (
-                <div key={i} style={dotStyle(i === currentImgIndex)} />
+                <div 
+                  key={i} 
+                  className={`
+                    w-1.5 h-1.5 rounded-full transition-all duration-300
+                    ${i === currentImgIndex ? 'bg-[#ff6600] scale-125' : 'bg-white/50'}
+                  `} 
+                />
               ))}
             </div>
           </div>
         )}
       </div>
 
-      {/* PRODUCT INFO */}
-      <div style={{ padding: '15px' }}>
-        <h3 style={{ 
-          fontSize: '15px', 
-          fontWeight: '600', 
-          color: '#333', 
-          marginBottom: '8px',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis' 
-        }}>
+      {/* ========== PRODUCT INFO ========== */}
+      <div className="p-[15px] flex flex-col flex-1 justify-between">
+        <h3 className="text-[15px] font-semibold text-[#333] mb-2 truncate">
           {item.name}
         </h3>
-        <p style={{ color: '#ff6600', fontWeight: '800', fontSize: '18px' }}>
+        <p className="text-[#ff6600] font-extrabold text-[18px] m-0">
           TSh {item.price?.toLocaleString()}
         </p>
       </div>
+
     </div>
   );
 }
-
-// CSS-in-JS Styles
-const arrowStyle = (isLeft) => ({
-  position: 'absolute',
-  top: '50%',
-  [isLeft ? 'left' : 'right']: '10px',
-  transform: 'translateY(-50%)',
-  background: 'rgba(255,255,255,0.8)',
-  border: 'none',
-  borderRadius: '50%',
-  width: '30px',
-  height: '30px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  cursor: 'pointer',
-  zIndex: 2,
-  boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
-});
-
-const dotsContainerStyle = {
-  position: 'absolute',
-  bottom: '10px',
-  width: '100%',
-  display: 'flex',
-  justifyContent: 'center',
-  gap: '5px',
-  zIndex: 2
-};
-
-const dotStyle = (isActive) => ({
-  width: '6px',
-  height: '6px',
-  borderRadius: '50%',
-  background: isActive ? '#ff6600' : 'rgba(255,255,255,0.5)',
-  transition: '0.3s'
-});

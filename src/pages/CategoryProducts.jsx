@@ -6,7 +6,7 @@ import Footer from "../components/Footer";
 import DashboardCard from "../components/DashboardCard";
 import { Link } from "react-router-dom";
 import { ChevronRight, List } from "lucide-react";
-import "../CategoryProducts.css";
+//import "../CategoryProducts.css";
 
 export default function CategoryProducts() {
   const { leafId } = useParams();
@@ -177,42 +177,41 @@ export default function CategoryProducts() {
     return "https://placehold.co/400x400?text=No+Image";
   };
 
-  // ========== SKELETON LOADING ==========
-  if (loading) {
+   if (loading) {
     return (
-      <div className="cat-page">
-        <div className="sticky-header">
+      <div className="flex flex-col min-h-screen bg-[#f8f9fa] dark:bg-black">
+        <div className="sticky top-0 z-[100] w-full">
           <Header search="" setSearch={() => {}} />
         </div>
-        <div className="main-content">
-          <div className="content-container-simple">
-            <main className="cat-main-layout">
+        <div className="flex-1 flex justify-center p-5 pt-[80px] md:pt-[100px]">
+          <div className="w-full max-w-[1400px]">
+            <main className="flex flex-col lg:flex-row gap-6 md:gap-[30px] mb-10">
               {/* Skeleton Sidebar */}
-              <aside className="cat-filter-sidebar skeleton-sidebar">
-                <div className="filter-header skeleton-header">
-                  <div className="skeleton-line" style={{ width: '70%', height: '24px' }}></div>
+              <aside className="w-full lg:w-[30%] lg:max-w-[30%] bg-white dark:bg-[#111] rounded-xl p-5 shadow-sm">
+                <div className="pb-4 border-b-2 border-[#e9ecef] dark:border-[#1f1f1f] mb-4">
+                  <div className="h-6 w-[70%] bg-gray-200 dark:bg-[#1a1a1a] rounded animate-pulse"></div>
                 </div>
-                <ul className="filter-list">
+                <ul className="list-none p-0 m-0 flex flex-col gap-2">
                   {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <li key={i} className="filter-item skeleton-item">
-                      <div className="skeleton-line" style={{ width: '80%', height: '20px' }}></div>
+                    <li key={i} className="py-3 px-4">
+                      <div className="h-5 w-[80%] bg-gray-200 dark:bg-[#1a1a1a] rounded animate-pulse"></div>
                     </li>
                   ))}
                 </ul>
               </aside>
 
               {/* Skeleton Content */}
-              <div className="cat-products-content">
-                <div className="cat-breadcrumb skeleton-breadcrumb">
-                  <div className="skeleton-line" style={{ width: '40%', height: '20px' }}></div>
+              <div className="flex-1 min-w-0">
+                <div className="mb-6 p-4 bg-white dark:bg-[#111] rounded-xl shadow-sm">
+                  <div className="h-5 w-[40%] bg-gray-200 dark:bg-[#1a1a1a] rounded animate-pulse"></div>
                 </div>
-                <div className="cat-products-grid skeleton-grid">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
                   {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <div key={i} className="skeleton-card">
-                      <div className="skeleton-image"></div>
-                      <div className="skeleton-text">
-                        <div className="skeleton-line" style={{ width: '70%' }}></div>
-                        <div className="skeleton-line" style={{ width: '50%' }}></div>
+                    <div key={i} className="bg-white dark:bg-[#111] rounded-xl p-4 shadow-sm">
+                      <div className="w-full h-[200px] bg-gray-200 dark:bg-[#1a1a1a] rounded-lg mb-4 animate-pulse"></div>
+                      <div className="flex flex-col gap-2.5">
+                        <div className="h-4 w-[70%] bg-gray-200 dark:bg-[#1a1a1a] rounded animate-pulse"></div>
+                        <div className="h-4 w-[50%] bg-gray-200 dark:bg-[#1a1a1a] rounded animate-pulse"></div>
                       </div>
                     </div>
                   ))}
@@ -225,18 +224,17 @@ export default function CategoryProducts() {
     );
   }
 
-  // ========== ERROR ==========
   if (error) {
     return (
-      <div className="cat-page error">
-        <div className="sticky-header">
+      <div className="flex flex-col min-h-screen bg-[#f8f9fa] dark:bg-black">
+        <div className="sticky top-0 z-[100] w-full">
           <Header search="" setSearch={() => {}} />
         </div>
-        <div className="main-content">
-          <div className="content-container-simple">
-            <div className="cat-error-container">
-              <p className="cat-error-msg">{error}</p>
-              <button onClick={() => navigate('/')} className="error-back-btn">
+        <div className="flex-1 flex justify-center p-5 pt-[80px] md:pt-[100px]">
+          <div className="w-full max-w-[1400px]">
+            <div className="flex flex-col items-center justify-center p-10 md:p-20 bg-white dark:bg-[#111] rounded-xl text-center">
+              <p className="text-lg md:text-xl text-red-500 mb-5">{error}</p>
+              <button onClick={() => navigate('/')} className="px-8 py-3 bg-[#3182ce] hover:bg-[#2c5282] text-white border-none rounded-lg text-base cursor-pointer transition-colors">
                 Rudi Nyumbani
               </button>
             </div>
@@ -246,42 +244,39 @@ export default function CategoryProducts() {
     );
   }
 
-  // ========== RENDER ==========
   return (
-    <div className="cat-page">
-      {/* HEADER - Full width */}
-      <div className="sticky-header">
+    <div className="flex flex-col min-h-screen bg-[#f8f9fa] dark:bg-black">
+      {/* HEADER */}
+      <div className="sticky top-0 z-[100] w-full">
         <Header search="" setSearch={() => {}} />
       </div>
       
-      {/* MAIN CONTENT - Flexbox Layout */}
-      <div className="main-content">
-        <div className="content-container-simple">
-          <main className="cat-main-layout">
+      {/* MAIN CONTENT */}
+      <div className="flex-1 flex justify-center p-2.5 md:p-5 pt-[70px] md:pt-[90px]">
+        <div className="w-full max-w-[1400px]">
+          <main className="flex flex-col lg:flex-row gap-4 md:gap-[30px] mb-10">
             
-            {/* SIDEBAR - 30% upande wa kushoto */}
+            {/* SIDEBAR (Desktop tu) */}
             {!isMobile && (
-              <aside className="cat-filter-sidebar">
-                <div className="filter-header">
+              <aside className="w-full lg:w-[30%] lg:max-w-[30%] bg-white dark:bg-[#111] rounded-xl p-5 shadow-sm h-fit sticky top-[90px]">
+                <div className="flex items-center gap-2.5 font-semibold text-lg pb-4 border-b-2 border-[#e9ecef] dark:border-[#1f1f1f] mb-4 text-[#2d3748] dark:text-white">
                   <List size={16} /> 
                   <span>Kategoria Zote</span>
                 </div>
 
-                <ul className="filter-list">
-                  {/* Current category */}
+                <ul className="list-none p-0 m-0">
                   <li 
-                    className={`filter-item ${!activeFilterId || activeFilterId === leafId ? 'active' : ''}`}
+                    className={`py-3 px-4 mb-1 rounded-lg cursor-pointer transition-all duration-300 text-[15px] ${!activeFilterId || activeFilterId === leafId ? 'bg-[#ebf8ff] dark:bg-[#0f172a] text-[#2b6cb0] dark:text-[#60a5fa] font-semibold border-l-[3px] border-[#3182ce]' : 'text-[#4a5568] dark:text-[#94a3b8] hover:bg-[#f7fafc] dark:hover:bg-[#1a1a1a] hover:text-[#2b6cb0] dark:hover:text-[#60a5fa]'}`}
                     onClick={() => setActiveFilterId(leafId)}
                   >
                     {hierarchy.leaf}
                   </li>
                   
-                  {/* Other categories */}
                   {filters.map((filter) => (
                     filter.id !== leafId && (
                       <li 
                         key={filter.id}
-                        className={`filter-item ${activeFilterId === filter.id ? 'active' : ''}`}
+                        className={`py-3 px-4 mb-1 rounded-lg cursor-pointer transition-all duration-300 text-[15px] ${activeFilterId === filter.id ? 'bg-[#ebf8ff] dark:bg-[#0f172a] text-[#2b6cb0] dark:text-[#60a5fa] font-semibold border-l-[3px] border-[#3182ce]' : 'text-[#4a5568] dark:text-[#94a3b8] hover:bg-[#f7fafc] dark:hover:bg-[#1a1a1a] hover:text-[#2b6cb0] dark:hover:text-[#60a5fa]'}`}
                         onClick={() => setActiveFilterId(filter.id)}
                       >
                         {filter.name}
@@ -290,51 +285,51 @@ export default function CategoryProducts() {
                   ))}
                 </ul>
 
-                             {/* ✅ ONGEZA HAPA: Filter ya Bei */}
-    <div className="filter-price-section">
-      <div className="price-label">Bei (TSh)</div>
-      <div className="price-inputs">
-        <input 
-          type="number" 
-          placeholder="Min" 
-          value={minPrice} 
-          onChange={(e) => setMinPrice(e.target.value)}
-          className="price-input"
-        />
-        <span className="price-separator">-</span>
-        <input 
-          type="number" 
-          placeholder="Max" 
-          value={maxPrice} 
-          onChange={(e) => setMaxPrice(e.target.value)}
-          className="price-input"
-        />
-        <button onClick={handlePriceFilter} className="price-filter-btn">
-          Filter
-        </button>
-      </div>
-    </div>
+                {/* ✅ Filter ya Bei */}
+                <div className="mt-6 pt-4 border-t border-[#e9ecef] dark:border-[#1f1f1f]">
+                  <div className="text-sm font-semibold text-[#2d3748] dark:text-white mb-3">Bei (TSh)</div>
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="number" 
+                      placeholder="Min" 
+                      value={minPrice} 
+                      onChange={(e) => setMinPrice(e.target.value)}
+                      className="w-full p-2 border border-[#e2e8f0] dark:border-[#334155] rounded-md text-sm outline-none bg-white dark:bg-[#0f172a] text-black dark:text-white focus:border-[#ff6a00]"
+                    />
+                    <span className="text-gray-400">-</span>
+                    <input 
+                      type="number" 
+                      placeholder="Max" 
+                      value={maxPrice} 
+                      onChange={(e) => setMaxPrice(e.target.value)}
+                      className="w-full p-2 border border-[#e2e8f0] dark:border-[#334155] rounded-md text-sm outline-none bg-white dark:bg-[#0f172a] text-black dark:text-white focus:border-[#ff6a00]"
+                    />
+                  </div>
+                  <button onClick={handlePriceFilter} className="w-full mt-3 py-2 bg-[#3182ce] hover:bg-[#2c5282] text-white border-none rounded-md font-semibold text-sm cursor-pointer transition-colors">
+                    Filter
+                  </button>
+                </div>
               </aside>
             )}
 
-            {/* CONTENT - 70% upande wa kulia */}
-            <div className="cat-products-content">
+            {/* CONTENT */}
+            <div className="flex-1 min-w-0">
               
               {/* Breadcrumb */}
-              <nav className="cat-breadcrumb">
-                <div className="cat-breadcrumb-items">
-                  <Link to="/" className="breadcrumb-link">Home</Link>
-                  <ChevronRight size={14} />
+              <nav className="mb-4 md:mb-6 p-2.5 md:px-5 md:py-4 bg-white dark:bg-[#111] rounded-xl shadow-sm">
+                <div className="flex items-center gap-1 md:gap-2 text-xs md:text-sm text-[#718096] dark:text-[#94a3b8] flex-nowrap overflow-x-auto whitespace-nowrap [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                  <Link to="/" className="text-brand-orange hover:text-[#e55a00] transition-colors">Home</Link>
+                  <ChevronRight size={12} className="md:w-3.5 md:h-3.5 shrink-0" />
                   <span>{hierarchy.category}</span>
-                  <ChevronRight size={14} />
+                  <ChevronRight size={12} className="md:w-3.5 md:h-3.5 shrink-0" />
                   <span>{hierarchy.sub}</span>
-                  <ChevronRight size={14} />
-                  <span className="current">{hierarchy.leaf}</span>
+                  <ChevronRight size={12} className="md:w-3.5 md:h-3.5 shrink-0" />
+                  <span className="text-[#2d3748] dark:text-white font-semibold">{hierarchy.leaf}</span>
                 </div>
               </nav>
 
               {/* Products Grid */}
-              <div className="cat-products-grid">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 md:gap-4 lg:gap-[25px]">
                 {products.length > 0 ? (
                   products.map((item) => (
                     <DashboardCard
@@ -348,16 +343,16 @@ export default function CategoryProducts() {
                     />
                   ))
                 ) : (
-                  <div className="no-products-msg">
-                    <p>Hakuna bidhaa katika kategoria hii.</p>
+                  <div className="col-span-full text-center p-10 md:p-[60px_20px] bg-white dark:bg-[#111] rounded-xl text-[#718096] dark:text-[#94a3b8] text-base md:text-lg">
+                    <p className="m-0">Hakuna bidhaa katika kategoria hii.</p>
                   </div>
                 )}
               </div>
             </div>
           </main>
 
-          {/* FOOTER - Full width */}
-          <div className="footer-wrapper">
+          {/* FOOTER */}
+          <div className=" hidden md:block mt-auto">
             <Footer />
           </div>
         </div>

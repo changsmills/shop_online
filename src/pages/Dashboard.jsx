@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import "../Dashboard.css";
+//import "../Dashboard.css";
 import api from "../axiosConfig"; 
 import DashboardCard from "../components/DashboardCard";
 import { useUserLocation } from '../hooks/useUserLocation,js';
@@ -566,147 +566,45 @@ const handleSubCategoryHover = (subCategory) => {
   };
 
   const ComponentFallback = () => (
-    <div className="loading-container">
-      <div className="loading-dots">
-        <div className="dot"></div>
-        <div className="dot"></div>
-        <div className="dot"></div>
-      </div>
+  <div className="flex items-center justify-center p-5">
+    <div className="flex gap-1">
+      <div className="w-2 h-2 rounded-full bg-brand-orange animate-bounce [animation-delay:0ms]"></div>
+      <div className="w-2 h-2 rounded-full bg-brand-orange animate-bounce [animation-delay:150ms]"></div>
+      <div className="w-2 h-2 rounded-full bg-brand-orange animate-bounce [animation-delay:300ms]"></div>
     </div>
-  );
+  </div>
+);
 
  if (dataLoading || sessionLoading) {
   return (
-    <div className="dashboard-wrapper">
+    <div className="flex flex-col bg-bgPrimary min-h-screen relative">
       <Header search={search} setSearch={setSearch} />
-      {/* 🔥 BADILISHA HII: Ondoa div ya loading-container */}
       <SkeletonLayout />
     </div>
   );
 }
 
- if (dataLoading || sessionLoading) {
-  return (
-    <div className="dashboard-wrapper">
-      <Header search={search} setSearch={setSearch} />
-      <div className="loading-container">
-        <SkeletonLayout />
-      </div>
-    </div>
-  );
-} 
+return (
 
-  return (
-    <div key={i18n.language} className="dashboard-wrapper">
-      
-      <div className="sticky-header">
-        <Header search={search} setSearch={setSearch} />
-      </div>
-      
-      <div className="main-content">
 
-{session && !location && showLocationPrompt && ReactDOM.createPortal(
-  <div className="location-modal-overlay">
-    <div className="location-modal">
-      <div className="location-modal-icon">📍</div>
-      <h2 className="location-modal-title">Allow Location Access</h2>
-      <p className="location-modal-desc">We need your location to show products from stores near you. This helps you find the best deals in your area.</p>
-      <div className="location-modal-actions">
-        <button 
-          className="location-modal-btn allow"
-          onClick={() => {
-  setShowLocationPrompt(false);
-  
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        api.patch('/profile/', {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        })
-        .then(() => {
-          console.log("✅ Location saved to profile!");
-          localStorage.setItem('location_allowed', 'true');
-          window.location.reload();
-        })
-        .catch(err => {
-          console.error("❌ Error saving location:", err);
-          window.location.reload();
-        });
-      },
-      (err) => {
-        console.error("❌ Error getting location:", err);
-        // 🔥 FALLBACK: Tumia IP Address kupata location
-        fetch('https://ipapi.co/json/')
-          .then(response => response.json())
-          .then(data => {
-            if (data.latitude && data.longitude) {
-              return api.patch('/profile/', {
-                latitude: data.latitude,
-                longitude: data.longitude
-              });
-            }
-            throw new Error('IP location not available');
-          })
-          .then(() => {
-            console.log("✅ Location saved via IP!");
-            localStorage.setItem('location_allowed', 'true');
-            window.location.reload();
-          })
-          .catch(err => {
-            console.error("❌ Error saving location via IP:", err);
-            localStorage.setItem('location_allowed', 'true');
-            window.location.reload();
-          });
-      },
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
-  } else {
-    // 🔥 Browser haisupport GPS, tumia IP
-    fetch('https://ipapi.co/json/')
-      .then(response => response.json())
-      .then(data => {
-        if (data.latitude && data.longitude) {
-          return api.patch('/profile/', {
-            latitude: data.latitude,
-            longitude: data.longitude
-          });
-        }
-        throw new Error('IP location not available');
-      })
-      .then(() => {
-        console.log("✅ Location saved via IP!");
-        localStorage.setItem('location_allowed', 'true');
-        window.location.reload();
-      })
-      .catch(err => {
-        console.error("❌ Error saving location:", err);
-        localStorage.setItem('location_allowed', 'true');
-        window.location.reload();
-      });
-  }
-}}
-        >
-          Allow Now
-        </button>
-        <button 
-          className="location-modal-btn cancel"   
-          onClick={() => setShowLocationPrompt(false)}
-        >
-          Not Now
-        </button>
-      </div>
-    </div>
-  </div>,
-  document.body
-)}
+<div key={i18n.language} className="flex flex-col min-h-screen bg-white dark:bg-black relative">
 
-        <div className="content-container-simple">
+{/* Wrapper hii inafanya Header iwe fixed kwenye simu, sticky kwenye desktop */}
+<div className="fixed md:sticky top-0 left-0 w-full z-[9999]">
+  <Header search={search} setSearch={setSearch} />
+</div> 
+      {/* ✅ Content ina scroll yake yenyewe */}
+  <div className="flex-1 w-full">
 
-          {search && (
-            <div className="search-results-wrapper">
-              <h3 className="search-heading">{t('looking_for')}: {search}</h3>
-              <div className="alibaba-grid"> 
+<div className="w-full max-w-[1400px] mx-auto px-1 pt-[70px] md:pt-0 lg:px-1 lg:pt-6 pb-6">
+
+            {search && (
+            <div className="py-4">
+              <h3 className="mb-4 text-[1.1rem] text-textPrimary dark:text-white">{t('looking_for')}: {search}</h3>
+              <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-2.5
+               md:grid-cols-[repeat(auto-fill,minmax(160px,1fr))]
+                md:gap-3.5 lg:grid-cols-[repeat(auto-fill,minmax(190px,1fr))]
+                 lg:gap-4.5 bg-bgPrimary"> 
                 {trendingProducts
                   .filter(p => p.name?.toLowerCase().includes(search.toLowerCase()))
                   .map(product => (
@@ -721,32 +619,49 @@ const handleSubCategoryHover = (subCategory) => {
               </div>
             </div>
           )}
+               {/* 1. padding top ni hapa */}
 
-          {!search && (
+    {!search && (
 
-            <div className="alibaba-top-layout">
+    <div className="block w-full mt-1 lg:mt-4.5 lg:grid
+       lg:grid-cols-[250px_1fr_280px] lg:gap-4 lg:h-[350px] pl-4">
 
-  {/* 1. SIDEBAR YA KATEGORIA (Kushoto) */}
-  <aside className="side-categories">
-    <div className="side-header">
-      <Star size={18} /> <span>{t('categories')}</span>
-    </div>
-    <ul className="categories-list">
-      {categories.map(cat => (
-        <li key={cat.id} onClick={() => handleCategoryClick(cat)}>
-          <span className="cat-icon">
-            {getIcon(cat.icon_name)}
-            <span className="cat-name">{getCategoryDisplayName(cat)}</span>
-          </span>
-          <ChevronRight size={14} className="arrow" />
-        </li>
-      ))}
-    </ul>
-  </aside>
+{/* 1. SIDEBAR YA KATEGORIA (Kushoto) */}
+<aside className="hidden lg:flex lg:flex-col h-full max-h-full overflow-hidden bg-white dark:bg-[#111111] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
+  
+  {/* HEADER YA SIDEBAR */}
+  <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100 dark:border-gray-800 shrink-0">
+    {/* Star icon kama ilivyo kwenye picha (ina outline) */}
+    <Star size={18} className="text-gray-600 dark:text-gray-300" /> 
+    <span className="text-base font-bold text-gray-900 dark:text-white tracking-wide">
+      Categories for you
+    </span>
+  </div>
+
+  {/* LIST YA KATEGORIA */}
+  <ul className="list-none m-0 overflow-y-auto flex-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-thumb]:rounded-full">
+    {categories.map(cat => (
+      <li 
+        key={cat.id} 
+        onClick={() => handleCategoryClick(cat)}
+        className="flex justify-between items-center px-5 py-3.5 cursor-pointer transition-colors duration-200 border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+      >
+        {/* Upande wa kushoto: Icon na Jina */}
+        <div className="flex items-center gap-3.5 text-gray-800 dark:text-gray-200">
+          {getIcon(cat.icon_name)}
+          <span className="text-[15px] font-medium">{getCategoryDisplayName(cat)}</span>
+        </div>
+        
+        {/* Upande wa kulia: Chevron (Mshale) unaoonekana kila wakati */}
+        <ChevronRight size={18} className="text-gray-400 dark:text-gray-500 shrink-0" />
+      </li>
+    ))}
+  </ul>
+</aside>
 
   {/* 2. BANNER NA SLIDER (Kati) */}
-  <div className="alibaba-mobile-content">
-    <div className="category-slider-wrapper">
+  <div className="h-full">
+    <div className="block bg-white dark:bg-black w-full lg:hidden">
       {!search && categories.length > 0 && (
         <MobileCategorySlider 
           categories={categories}
@@ -768,71 +683,102 @@ const handleSubCategoryHover = (subCategory) => {
       )}
     </div>
 
-    <div className="hero-banners-container">
-      <div className="hot-picks-banner">
-        {activeAd && isVideoAd(activeAd) ? (
-          <video
-            src={activeAd.media_url}
-            autoPlay
-            muted
-            playsInline
-            onEnded={() => {
-              if (cachedAds.length) setCurrentAdIndex((prev) => (prev + 1) % cachedAds.length);
-            }}
-            className="banner-media"
-          />
-        ) : (
-          activeAd && (
-            <img
-              src={activeAd.media_url}
-              className="banner-media"
-              alt="promo"
-              loading="lazy"
-            />
-          )
-        )}
-        {activeAd && (
-          <div className="banner-overlay-text">
-            <span className="ad-tag">{t('sponsored')}</span>
-            <h2 className="banner-title">{activeAd.business_name}</h2>
-            <p className="banner-desc">{activeAd.description}</p>
-           <button 
-             className="view-more-banner" 
-                onClick={() => {
-                 // Kama ni Desktop (zaidi ya 1024px), fungua kwenye tab mpya
-                 if (window.innerWidth > 1024) {
-                  window.open(`/store/${activeAd.store_id}`, '_blank');
-                   } else {
-                    // Kama ni Mobile, navigate kama kawaida
-                     navigate(`/store/${activeAd.store_id}`);
-                }
-                      }}
-                       >
-            {t('source_now')} →
-                    </button>
-          </div>
-        )}
+    <div className="w-full overflow-hidden m-0 p-0 leading-none">
+    <div className="relative w-full aspect-[16/9] md:aspect-[16/7] lg:aspect-auto lg:h-[350px] bg-gradient-to-br from-[#1a1a2e] to-[#16213e] overflow-hidden rounded-xl max-h-[350px]">   
+      {activeAd && isVideoAd(activeAd) ? (
+  <video
+    src={activeAd.media_url}
+    autoPlay
+    muted
+    playsInline
+    onEnded={() => {
+      if (cachedAds.length) setCurrentAdIndex((prev) => (prev + 1) % cachedAds.length);
+    }}
+    className="w-full h-full object-cover object-center block bg-[#1a1a2e]"
+  />
+) : (
+  activeAd && (
+    <img
+      src={activeAd.media_url}
+      className="w-full h-full object-cover object-center block bg-[#1a1a2e]"
+      alt="promo"
+      loading="lazy"
+    />
+  )
+)}
+
+
+{activeAd && (
+  // HAPA: Nimebadilisha pl-6 kuwa pl-4 (nafasi ndogo kushoto) na kuongeza gradient nyeusi zaidi kwa ajili ya kusomeka
+  <div className="absolute inset-0 flex flex-col justify-center items-start pl-4 pr-3 py-4 sm:pl-10 sm:pr-8 lg:pl-12 lg:pr-10 text-white bg-gradient-to-r from-black/90 via-black/60 to-transparent pointer-events-none">
+    
+    {/* 1. SPONSORED BADGE - Imeongezwa ukubwa kidogo */}
+    <span className="bg-brand-orange px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold w-fit mb-2 tracking-wide uppercase shadow-sm">
+      {t('sponsored')}
+    </span>
+
+    {/* 2. TITLE - Imeongezwa ukubwa kuwa text-lg (18px) kwa simu */}
+    <h2 className="text-lg sm:text-2xl lg:text-3xl font-extrabold leading-tight mb-1.5 sm:mb-2 max-w-[95%] sm:max-w-[80%] drop-shadow-md">
+      {activeAd.business_name}
+    </h2>
+
+    {/* 3. DESCRIPTION - Imeongezwa ukubwa kuwa text-xs (12px) kwa simu */}
+    <p className="text-xs sm:text-sm text-gray-100 max-w-[95%] sm:max-w-[75%] leading-snug sm:leading-relaxed mb-4 line-clamp-2 sm:line-clamp-3 drop-shadow-sm font-medium">
+      {activeAd.description}
+    </p>
+
+    {/* 4. BUTTON - Imeongezwa ukubwa kidogo kwa simu */}
+    <button 
+      className="
+        bg-[#FF6A00] hover:bg-[#e55a00] 
+        text-white font-bold 
+        px-5 py-2.5 sm:px-6 sm:py-2.5 
+        rounded-full w-fit 
+        pointer-events-auto 
+        transition-all duration-300 ease-in-out 
+        shadow-[0_4px_10px_rgba(255,106,0,0.4)] 
+        hover:shadow-[0_6px_20px_rgba(255,106,0,0.6)] 
+        hover:-translate-y-0.5 
+        active:translate-y-0 active:scale-95 
+        text-sm sm:text-base
+        flex items-center gap-1.5
+      "
+      onClick={() => {
+        if (window.innerWidth > 1024) {
+          window.open(`/store/${activeAd.store_id}`, '_blank');
+        } else {
+          navigate(`/store/${activeAd.store_id}`);
+        }
+      }}
+    >
+      {t('source_now')} <span>→</span>
+    </button>
+
+  </div>
+)}
+
+
       </div>
     </div>
   </div>
 
-  {/* 3. RECENTLY VIEWED MINI (Kulia) - IKO NJE YA KOLAMU YA KATI! */}
-  <div className="recently-viewed-mini">
-    <Suspense fallback={<ComponentFallback />}>
-      <RecentlyViewed 
-        key={`mini-${i18n.language}`} 
-        navigate={navigate}
-        compact={true} 
-      />
-    </Suspense>
-  </div>
+ {/* 3. RECENTLY VIEWED MINI (Kulia) - Imepewa muonekano wa Card */}
+<div className="hidden lg:flex lg:flex-col h-full bg-white dark:bg-[#1a1a2e] rounded-xl border border-gray-200 dark:border-gray-800 p-3 overflow-hidden shadow-sm">
+  <Suspense fallback={<ComponentFallback />}>
+    <RecentlyViewed 
+      key={`mini-${i18n.language}`} 
+      navigate={navigate}
+      compact={true} 
+    />
+  </Suspense>
+</div>
 
 </div>
           )}
 
-<div className="components-wrapper">
-  {/* 🔥 RECENTLY VIEWED - IONEKANE MOBILE TU (Imezungukwa na div) */}
-<div className="mobile-only-recently-viewed">
+<div className="flex flex-col pt-4">
+    {/* 🔥 RECENTLY VIEWED - IONEKANE MOBILE TU (Imezungukwa na div) */}
+<div className="block lg:hidden">
   <Suspense fallback={<ComponentFallback />}>
     <RecentlyViewed key={i18n.language} navigate={navigate} />
   </Suspense>
@@ -864,13 +810,7 @@ const handleSubCategoryHover = (subCategory) => {
     />
   </Suspense>
 
-  <Suspense fallback={<ComponentFallback />}>
-    <LocationFilter 
-      key={i18n.language}
-      navigate={navigate} 
-      selectedCategory={selectedCategoryForComponents}  
-    />
-  </Suspense>
+
 
   <Suspense fallback={<ComponentFallback />}>
     <TopStores 
@@ -890,14 +830,14 @@ const handleSubCategoryHover = (subCategory) => {
   </Suspense>
 </div>
 
-          <div className="footer-wrapper">
+      <div className="block mt-0 hidden lg:block">
             <Footer />
           </div>
 
         </div>
       </div>
 
-      <div className="bottom-nav-wrapper">
+   <div className="hidden max-lg:block relative z-50">
         <BottomNav 
           session={session} 
           activeMenu={activeMenu}
@@ -905,306 +845,267 @@ const handleSubCategoryHover = (subCategory) => {
         />
       </div>
 
-      {activeMenu === 'categories' && selectedCategory && ReactDOM.createPortal(
-        <div 
-          className="mega-menu-container"
-          onMouseEnter={() => handleMouseEnter('categories')}
-          onMouseLeave={handleMouseLeave}
-        >
-          <div className="mega-menu-inner">
-            <aside className="mega-menu-sidebar">
-              {viewMode === 'products' ? (
-                categories.map((cat) => (
-                  <div 
-                    key={cat.id} 
-                    className={`sidebar-item ${selectedCategory?.id === cat.id ? 'active' : ''}`} 
-                    onMouseEnter={() => setSelectedCategory(cat)}
-                  >
-                    <div className="sidebar-item-content">
-                      {getIcon(cat.icon_name)}
-                      <span>{getCategoryDisplayName(cat)}</span>
+{activeMenu === 'categories' && selectedCategory && ReactDOM.createPortal(
+
+  <div 
+  className="fixed inset-0 top-[105px] z-[99999] bg-black/60 flex justify-center items-start"
+  onMouseEnter={() => handleMouseEnter('categories')}
+  onMouseLeave={handleMouseLeave}
+>
+  
+<div className="w-full h-full max-h-[calc(100vh-180px)] bg-white dark:bg-black border-b border-gray-200 dark:border-[#1f1f1f] overflow-hidden flex shadow-2xl">
+        {/* ========== SIDEBAR (KUSHOTO) ========== */}
+      <aside className="w-[250px] shrink-0 bg-gray-50 dark:bg-[#0a0a0a] border-r border-gray-200 dark:border-[#1f1f1f] overflow-y-auto py-2">
+        {viewMode === 'products' ? (
+          categories.map((cat) => (
+            <div 
+              key={cat.id} 
+              onMouseEnter={() => setSelectedCategory(cat)}
+              className={`flex items-center justify-between px-3.5 py-2.5 cursor-pointer text-[13px] leading-tight border-b border-gray-100 dark:border-[#1a1a1a] transition-all duration-150 ${
+                selectedCategory?.id === cat.id 
+                  ? 'bg-white dark:bg-[#0a0a0a] text-brand-orange font-bold border-l-[3px] border-brand-orange' 
+                  : 'text-black dark:text-white hover:bg-white dark:hover:bg-[#0a0a0a]'
+              }`}
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className="shrink-0">{getIcon(cat.icon_name)}</span>
+                <span className="truncate">{getCategoryDisplayName(cat)}</span>
+              </div>
+              <ChevronRight size={14} className="shrink-0 text-gray-400" />
+            </div>
+          ))
+        ) : (
+          <>
+            <div 
+              onClick={handleBack} 
+              className="flex items-center gap-2 px-3.5 py-3 cursor-pointer text-[13px] font-bold text-brand-orange border-b border-gray-100 dark:border-[#1a1a1a] bg-white dark:bg-black"
+            >
+              <ChevronLeft size={16} /> {t('back_to')} {getCategoryDisplayName(selectedCategory)}
+            </div>
+            {subCategories.map((sub) => (
+              <div 
+                key={sub.id} 
+                onMouseEnter={() => handleSubCategoryHover(sub)} 
+                className={`px-3.5 py-2.5 cursor-pointer text-[13px] leading-tight border-b border-gray-100 dark:border-[#1a1a1a] transition-all duration-150 ${
+                  selectedSubCategory?.id === sub.id 
+                    ? 'bg-white dark:bg-[#0a0a0a] text-brand-orange font-bold border-l-[3px] border-brand-orange' 
+                    : 'text-black dark:text-white hover:bg-white dark:hover:bg-[#0a0a0a]'
+                }`}
+              >
+                {i18n.language === 'sw' ? (sub.name_sw || sub.name) : sub.name}
+              </div>
+            ))}
+          </>
+        )}
+      </aside>
+
+      {/* ========== CONTENT (KULIA) ========== */}
+      <main className="flex-1 min-w-0 overflow-y-auto p-5 lg:p-6 bg-white dark:bg-black">
+        
+        {/* HEADER YA CONTENT */}
+        <div className="flex items-center justify-between mb-5 pb-3 border-b border-gray-100 dark:border-[#1a1a1a]">
+          <h3 className="text-base lg:text-lg font-extrabold text-black dark:text-white m-0 truncate pr-3">
+            {viewMode === 'products' 
+              ? `${t('top_categories')}: ${getCategoryDisplayName(selectedCategory)}` 
+              : (i18n.language === 'sw' ? (selectedSubCategory?.name_sw || selectedSubCategory?.name) : selectedSubCategory?.name)}
+          </h3>
+          
+          <button 
+            onClick={() => {
+              setActiveMenu(null);
+              setSelectedCategory(null);
+            }}
+            className="w-9 h-9 shrink-0 rounded-full border border-gray-200 dark:border-[#1f1f1f] flex items-center justify-center cursor-pointer text-gray-700 dark:text-white transition-all duration-200 hover:bg-brand-orange hover:border-brand-orange hover:text-white hover:scale-105 active:scale-95"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* ========== CATEGORY GRID ========== */}
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2 sm:gap-3">
+          
+          {viewMode === 'products' ? (
+            <>
+              {/* 1. SKELETON LOADING */}
+              {loadingLeafs ? (
+                [...Array(8)].map((_, idx) => (
+                  <div key={`skeleton-${idx}`} className="flex flex-col items-center gap-1.5 animate-pulse">
+                    <div className="w-16 h-16 sm:w-[68px] sm:h-[68px] rounded-full bg-gray-200 dark:bg-[#1a1a1a]"></div>
+                    <div className="h-3 w-14 bg-gray-200 dark:bg-[#1a1a1a] rounded"></div>
+                  </div>
+                ))
+              ) : featuredProducts.length > 0 ? (
+                // 2. DATA IPO
+                <>
+                  {featuredProducts.map((leaf) => (
+                    <div 
+                      key={leaf.id} 
+                      onClick={() => {
+                        // ... code yako ya onClick ...
+                      }}
+                      className="flex flex-col items-center text-center cursor-pointer p-1 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-[#0a0a0a]"
+                    >
+                      <div className="w-16 h-16 sm:w-[68px] sm:h-[68px] rounded-full overflow-hidden bg-gray-100 dark:bg-[#1a1a1a] mb-1.5 flex items-center justify-center shrink-0">
+                        <img src={leaf.cover_image_url || placeholderImg} alt={leaf.name} className="w-full h-full object-cover" />
+                      </div>
+                      <p className="text-[11px] sm:text-xs text-black dark:text-white m-0 leading-tight line-clamp-2 w-full">
+                        {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
+                      </p>
                     </div>
-                    <ChevronRight size={16} />
+                  ))}
+
+                  {/* 3. SEE ALL CARD */}
+                  <div 
+                    onClick={handleViewAll} 
+                    className="flex flex-col items-center text-center cursor-pointer p-1 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-[#0a0a0a]"
+                  >
+                    <div className="w-16 h-16 sm:w-[68px] sm:h-[68px] rounded-full border-2 border-dashed border-brand-orange bg-orange-50 dark:bg-[#1a1000] mb-1.5 flex items-center justify-center shrink-0">
+                      <Plus size={26} className="text-brand-orange" />
+                    </div>
+                    <p className="text-[11px] sm:text-xs text-brand-orange font-bold m-0">{t('see_all')}</p>
+                  </div>
+                </>
+              ) : (
+                // 4. EMPTY STATE
+                <div className="col-span-full text-center py-10">
+                  <div className="text-5xl mb-3">📦</div>
+                  <p className="text-base font-bold text-black dark:text-white m-0">Tap a category to browse its products.</p>
+                  <p className="text-sm text-gray-500 mt-1">Tafadhali chagua kategoria nyingine</p>
+                </div>
+              )}
+            </>
+          ) : (
+            // ========== SUBCATEGORIES VIEW ==========
+            <>
+              {loadingLeafs ? (
+                [...Array(8)].map((_, idx) => (
+                  <div key={`skeleton-sub-${idx}`} className="flex flex-col items-center gap-1.5 animate-pulse">
+                    <div className="w-16 h-16 sm:w-[68px] sm:h-[68px] rounded-full bg-gray-200 dark:bg-[#1a1a1a]"></div>
+                    <div className="h-3 w-14 bg-gray-200 dark:bg-[#1a1a1a] rounded"></div>
+                  </div>
+                ))
+              ) : leafsForSub.length > 0 ? (
+                leafsForSub.map((leaf) => (
+                  <div 
+                    key={leaf.id} 
+                    onClick={() => {
+                      // ... code yako ya onClick ...
+                    }}
+                    className="flex flex-col items-center text-center cursor-pointer p-1 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-[#0a0a0a]"
+                  >
+                    <div className="w-16 h-16 sm:w-[68px] sm:h-[68px] rounded-full overflow-hidden bg-gray-100 dark:bg-[#1a1a1a] mb-1.5 flex items-center justify-center shrink-0">
+                      <img src={leaf.cover_image_url || leaf.cover_image || placeholderImg} alt={leaf.name} className="w-full h-full object-cover" />
+                    </div>
+                    <p className="text-[11px] sm:text-xs text-black dark:text-white m-0 leading-tight line-clamp-2 w-full">
+                      {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
+                    </p>
                   </div>
                 ))
               ) : (
-                <>
-                  <div onClick={handleBack} className="sidebar-back-header">
-                    <ChevronLeft size={18} /> {t('back_to')} {getCategoryDisplayName(selectedCategory)}
-                  </div>
-                  {subCategories.map((sub) => (
-                    <div 
-                      key={sub.id} 
-                      onMouseEnter={() => handleSubCategoryHover(sub)} 
-                      className={`sidebar-item ${selectedSubCategory?.id === sub.id ? 'active' : ''}`}
-                    >
-                      {i18n.language === 'sw' ? (sub.name_sw || sub.name) : sub.name}
-                    </div>
-                  ))}
-                </>
+                <div className="col-span-full text-center py-10">
+                  <div className="text-5xl mb-3">📦</div>
+                  <p className="text-base font-bold text-black dark:text-white m-0">Tap a subcategory to browse its products.</p>
+                </div>
               )}
-            </aside>
-            <main className="mega-menu-content">
+            </>
+          )}
 
-              <div className="content-header">
-  <h3>
-    {viewMode === 'products' 
-      ? `${t('top_categories')}: ${getCategoryDisplayName(selectedCategory)}` 
-      : (i18n.language === 'sw' ? (selectedSubCategory?.name_sw || selectedSubCategory?.name) : selectedSubCategory?.name)}
-  </h3>
-  <div className="content-header-actions">
-    
-    {/* 🔥 ONGEZA X YA KUFUNGA MEGA MENU */}
-    <button 
-      onClick={() => {
-        setActiveMenu(null);
-        setSelectedCategory(null); // Safisha kategoria iliyochaguliwa
-      }}
-      className="mega-menu-close-btn"
-    >
-      <X size={20} />
-    </button>
-  </div>
-</div>
-              
-<div className="category-grid">
-
-{viewMode === 'products' ? (
-  <>
-    {loadingLeafs ? (
-      // ✅ SKELETON LOADING
-      <>
-        {[...Array(8)].map((_, idx) => (
-          <div key={`skeleton-${idx}`} className="grid-item skeleton-item">
-            <div className="image-circle skeleton-circle"></div>
-            <p className="skeleton-text"></p>
-          </div>
-        ))}
-      </>
-    ) : featuredProducts.length > 0 ? (
-      // ✅ DATA IPO
-      featuredProducts.map((leaf) => (
-        <div 
-          key={leaf.id} 
-          className="grid-item" 
-          onClick={() => {
-            try {
-              const targetId = leaf.leaf_category_id || leaf.id;
-              console.log(`🔍 [LeafClick] Attempting to navigate for leaf: ${leaf.name}, targetId: ${targetId}`);
-
-              if (!targetId || targetId === 'undefined' || targetId === 'null' || targetId === '') {
-                console.error("❌ [LeafClick] Invalid target ID detected:", targetId);
-                return;
-              }
-
-              if (window.innerWidth > 1024) {
-                console.log(`🖥️ [LeafClick] Desktop: Opening new tab for ${targetId}`);
-                const newWindow = window.open(`/category/${targetId}`, '_blank');
-                
-                if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-                  console.warn("⚠️ [LeafClick] Popup blocked by browser. Falling back to navigate.");
-                  handleLeafClick(targetId);
-                } else {
-                  console.log(`✅ [LeafClick] New tab opened successfully for ${targetId}`);
-                }
-              } else {
-                console.log(`📱 [LeafClick] Mobile: Navigating in same tab for ${targetId}`);
-                handleLeafClick(targetId);
-                console.log(`✅ [LeafClick] Navigation successful.`);
-              }
-            } catch (error) {
-              console.error("❌ [LeafClick] Unexpected error on featured leaf click:", error);
-            }
-          }}
-        >
-          <div className="image-circle">
-            <img src={leaf.cover_image_url || placeholderImg} alt={leaf.name} />
-          </div>
-          <p className="grid-text">
-            {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
-          </p>
         </div>
-      ))
-    ) : (
-      // ✅ EMPTY STATE
-      <div className="empty-state" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
-        <div style={{ fontSize: '48px', marginBottom: '16px' }}>📦</div>
-        <p style={{ fontSize: '16px', color: '#666', fontWeight: 'bold' }}>
-          Tap a category to browse its products.
-        </p>
-        <p style={{ fontSize: '14px', color: '#999' }}>
-          Tafadhali chagua kategoria nyingine
-        </p>
-      </div>
-    )}
-
-    {/* See All - Onyesha tu kama kuna data */}
-    {!loadingLeafs && featuredProducts.length > 0 && (
-      <div onClick={handleViewAll} className="grid-item see-all-card">
-        <div className="image-circle see-all-circle">
-          <Plus size={30} color="#ff6a00" />
-        </div>
-        <p className="see-all-text">{t('see_all')}</p>
-      </div>
-    )}
-  </>
-) : (
-  // ✅ KWA SUBCATEGORIES
-  loadingLeafs ? (
-    // Skeleton
-    <>
-      {[...Array(8)].map((_, idx) => (
-        <div key={`skeleton-sub-${idx}`} className="grid-item skeleton-item">
-          <div className="image-circle skeleton-circle"></div>
-          <p className="skeleton-text"></p>
-        </div>
-      ))}
-    </>
-  ) : leafsForSub.length > 0 ? (
-    leafsForSub.map((leaf) => (
-      <div 
-        key={leaf.id} 
-        className="grid-item" 
-        onClick={() => {
-          try {
-            const targetId = leaf.id || leaf.leaf_category_id;
-            console.log(`🔍 [LeafClick] Attempting to navigate for sub-leaf: ${leaf.name}, targetId: ${targetId}`);
-
-            if (!targetId || targetId === 'undefined' || targetId === 'null' || targetId === '') {
-              console.error("❌ [LeafClick] Invalid target ID detected:", targetId);
-              return;
-            }
-
-            if (window.innerWidth > 1024) {
-              console.log(`🖥️ [LeafClick] Desktop: Opening new tab for ${targetId}`);
-              const newWindow = window.open(`/category/${targetId}`, '_blank');
-              
-              if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-                console.warn("⚠️ [LeafClick] Popup blocked by browser. Falling back to navigate.");
-                handleLeafClick(targetId);
-              } else {
-                console.log(`✅ [LeafClick] New tab opened successfully for ${targetId}`);
-              }
-            } else {
-              console.log(`📱 [LeafClick] Mobile: Navigating in same tab for ${targetId}`);
-              handleLeafClick(targetId);
-              console.log(`✅ [LeafClick] Navigation successful.`);
-            }
-          } catch (error) {
-            console.error("❌ [LeafClick] Unexpected error on sub-leaf click:", error);
-          }
-        }}
-      >
-        <div className="image-circle">
-          <img 
-            src={leaf.cover_image_url || leaf.cover_image || placeholderImg}
-            alt={leaf.name} 
-          />
-        </div>
-        <p>
-          {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
-        </p>
-      </div>
-    ))
-  ) : (
-    // Empty state kwa subcategories
-    <div className="empty-state" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
-      <div style={{ fontSize: '48px', marginBottom: '16px' }}>📦</div>
-      <p style={{ fontSize: '16px', color: '#666', fontWeight: 'bold' }}>
-        Tap a subcategory to browse its products.
-      </p>
+      </main>
     </div>
-  )
+  </div>,
+  document.body
 )}
-
-</div>
-            </main>
-          </div>
-        </div>,
-        document.body
-      )}
 
 {mobileMenuOpen && ReactDOM.createPortal(
   <div 
-    className="mobile-categories-overlay"
+    className="fixed inset-0 bg-black/60 z-[99999] flex justify-center items-end"
     onClick={() => setMobileMenuOpen(false)}
   >
-    <div className="mobile-categories-modal" onClick={(e) => e.stopPropagation()}>
+    <div 
+      className="w-full h-full bg-white dark:bg-[#0a0a0a] flex flex-col overflow-hidden"
+      onClick={(e) => e.stopPropagation()}
+    >
       
-      {/* 1. HEADER ya Juu */}
-      <div className="mc-header">
-        <button className="mc-back-btn" onClick={() => setMobileMenuOpen(false)}>
+      {/* ========== HEADER ========== */}
+      <div className="flex items-center justify-between px-3 h-14 bg-white dark:bg-black border-b border-gray-200 dark:border-[#1f1f1f] shrink-0">
+        <button 
+          className="bg-transparent border-none cursor-pointer text-gray-800 dark:text-white p-1.5 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-[#1a1a1a]"
+          onClick={() => setMobileMenuOpen(false)}
+        >
           <ChevronLeft size={24} />
         </button>
-        <h2 className="mc-title">{t('categories')}</h2>
-        <button className="mc-close-btn" onClick={() => setMobileMenuOpen(false)}>
-          <span className="close-x">✕</span>
+        <h2 className="text-base font-bold text-black dark:text-white m-0 flex-1 text-center truncate">
+          {t('categories')}
+        </h2>
+        <button 
+          className="bg-transparent border-none cursor-pointer text-gray-800 dark:text-white p-1.5 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-[#1a1a1a] text-xl font-bold"
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          ✕
         </button>
       </div>
 
-      {/* 2. BODY (Sidebar + Content) */}
-      <div className="mc-body">
+            {/* ========== BODY ========== */}
+      <div className="flex flex-row flex-1 w-full overflow-hidden relative">
         
-        {/* SIDEBAR (Kushoto) - Inabadilika kulingana na mobileActiveMenu */}
-        <aside className="mc-sidebar">
+        {/* SIDEBAR (KUSHOTO) */}
+        <aside className="w-[90px] min-w-[90px] max-w-[90px] bg-[#fafafa] dark:bg-[#0a0a0a] overflow-y-auto border-r border-gray-200 dark:border-[#1f1f1f] py-1 shrink-0 relative z-10">
           
           {mobileActiveMenu === 'subcategories' ? (
             <>
               <div 
-                className="mc-sidebar-back"
                 onClick={() => {
-                  setSelectedSubCategory(null);       // ✅ UPDATE 1: Safisha subcategory
-                  setMobileActiveMenu('categories');   // Badilisha menu ya mobile
-                  setViewMode('products');             // ✅ UPDATE 2: Badilisha viewMode ili Desktop na Mobile zilingane
+                  setSelectedSubCategory(null);
+                  setMobileActiveMenu('categories');
+                  setViewMode('products');
                   if (selectedCategory?.id) {
                     fetchFeaturedLeafs(selectedCategory.id);
                   }
                 }}
-                style={{ 
-                  padding: '15px', 
-                  cursor: 'pointer', 
-                  color: '#ff6a00', 
-                  fontWeight: 'bold',
-                  borderBottom: '1px solid #eee',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
+                className="px-2 py-3 cursor-pointer text-brand-orange font-bold border-b border-gray-200 dark:border-[#1f1f1f] flex items-center gap-1.5 text-[11px] leading-tight"
               >
-                <ChevronLeft size={18} /> Back to Categories
+                <ChevronLeft size={14} className="shrink-0" /> 
+                <span>Back</span>
               </div>
 
               {subCategories && subCategories.length > 0 ? (
                 subCategories.map((sub) => (
                   <div 
                     key={sub.id} 
-                    className={`mc-sidebar-item ${selectedSubCategory?.id === sub.id ? 'active' : ''}`}
                     onClick={() => {
                       setSelectedSubCategory(sub);
                       fetchLeafsForSub(sub.id);
                     }}
+                    className={`px-2 py-2.5 text-[11px] cursor-pointer text-left leading-tight transition-colors ${
+                      selectedSubCategory?.id === sub.id 
+                        ? 'text-brand-orange font-bold border-l-[3px] border-brand-orange bg-white dark:bg-black' 
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-black'
+                    }`}
                   >
                     {i18n.language === 'sw' ? (sub.name_sw || sub.name) : sub.name}
                   </div>
                 ))
               ) : (
-                <div style={{ padding: '20px', color: '#999', textAlign: 'center' }}>
-                  Hakuna Subcategories
-                </div>
+                <div className="p-3 text-gray-400 text-center text-[10px]">Hakuna</div>
               )}
             </>
           ) : (
             categories.map((cat) => (
               <div 
                 key={cat.id} 
-                className={`mc-sidebar-item ${selectedCategory?.id === cat.id ? 'active' : ''}`}
                 onClick={() => {
                   setSelectedCategory(cat);
                   setSelectedCategoryForComponents(cat);
-                  setMobileActiveMenu('categories');   // Reset mobile menu
-                  setViewMode('products');             // ✅ UPDATE 2: Rudisha viewMode kwa products
-                  fetchFeaturedLeafs(cat.id);          // Pakia data mpya
+                  setMobileActiveMenu('categories');
+                  setViewMode('products');
+                  fetchFeaturedLeafs(cat.id);
                 }}
+                className={`px-2 py-2.5 text-[11px] cursor-pointer text-left leading-tight transition-colors ${
+                  selectedCategory?.id === cat.id 
+                    ? 'text-brand-orange font-bold border-l-[3px] border-brand-orange bg-white dark:bg-black' 
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-black'
+                }`}
               >
                 {getCategoryDisplayName(cat)}
               </div>
@@ -1212,111 +1113,98 @@ const handleSubCategoryHover = (subCategory) => {
           )}
         </aside>
 
-        {/* CONTENT (Kulia) */}
-        <main className="mc-content">
+        {/* CONTENT (KULIA) */}
+        {/* 🔥 Tumeongeza px-4 (padding kushoto na kulia) na kuondoa kabisa left-4 */}
+        <main className="flex-1 min-w-0 overflow-y-auto px-1 py-1 bg-white dark:bg-black box-border relative z-0 ml-1">
           
-          {/* SEHEMU YA 1: BIDHAA ZA CATEGORY/SUBCATEGORY */}
-          <div className="mc-section">
-            <h3 className="mc-section-title">
-              {mobileActiveMenu === 'categories' ? 'Category Products' : 'Subcategory Products'}
-            </h3>
-            <div className="mc-recommendations-grid">
-              {loadingLeafs ? (
-                // SKELETON LOADING
-                <>
-                  {[...Array(6)].map((_, idx) => (
-                    <div key={`mobile-skeleton-${idx}`} className="mc-recommendation-item skeleton-item">
-                      <div className="mc-rec-image skeleton-circle"></div>
-                      <p className="skeleton-text"></p>
-                    </div>
-                  ))}
-                </>
-              ) : mobileActiveMenu === 'categories' ? (
-                // ✅ CATEGORY PRODUCTS
-                featuredProducts && featuredProducts.length > 0 ? (
-                  featuredProducts.slice(0, 9).map((leaf) => (
-                    <div 
-                      key={leaf.id} 
-                      className="mc-recommendation-item"
-                      onClick={() => {
-                        handleLeafClick(leaf.leaf_category_id || leaf.id);
-                        setMobileMenuOpen(false);
-                      }}
-                    >
-                      <div className="mc-rec-image">
-                        <img src={leaf.cover_image_url || placeholderImg} alt={leaf.name} />
-                      </div>
-                      <p>{i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}</p>
-                    </div>
-                  ))
-                ) : (
-                  <div className="empty-state" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
-                    <div style={{ fontSize: '48px', marginBottom: '16px' }}>📦</div>
-                    <p style={{ fontSize: '16px', color: '#666', fontWeight: 'bold' }}>
-                      Tap a category to browse its products.
-                    </p>
-                  </div>
-                )
-              ) : (
-                // ✅ SUBCATEGORY PRODUCTS (HAPA NDIO DATA INAPAKIA)
-                leafsForSub && leafsForSub.length > 0 ? (
-                  leafsForSub.slice(0, 9).map((leaf) => (
-                    <div 
-                      key={leaf.id} 
-                      className="mc-recommendation-item"
-                      onClick={() => {
-                        handleLeafClick(leaf.leaf_category_id || leaf.id);
-                        setMobileMenuOpen(false);
-                      }}
-                    >
-                      <div className="mc-rec-image">
-                        <img src={leaf.cover_image_url || placeholderImg} alt={leaf.name} />
-                      </div>
-                      <p>{i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}</p>
-                    </div>
-                  ))
-                ) : (
-                  <div className="empty-state" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
-                    <div style={{ fontSize: '48px', marginBottom: '16px' }}>📦</div>
-                    <p style={{ fontSize: '16px', color: '#666', fontWeight: 'bold' }}>
-                      Hakuna bidhaa katika subcategory hii
-                    </p>
-                  </div>
-                )
-              )}
-
-              {/* ✅ SEE ALL BUTTON - Inaonekana TU kama mobileActiveMenu === 'categories' */}
-              {mobileActiveMenu === 'categories' && !loadingLeafs && featuredProducts && featuredProducts.length > 0 && (
-                <div 
-                  className="mc-recommendation-item" 
-                  onClick={() => {
-                    setMobileActiveMenu('subcategories');     // Badilisha UI ya mobile
-                    setViewMode('subcategories');             // ✅ UPDATE 3: Badilisha viewMode ili data ipakie!
-                    setSelectedSubCategory(null);             // ✅ UPDATE 4: Safisha ili ipakie category nzima
-                    if (selectedCategory?.id) {
-                      fetchLeafsForSub(selectedCategory.id);  // Pakia data ya subcategory
-                    }
-                  }}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <div 
-                    className="mc-rec-image" 
-                    style={{ 
-                      border: '2px dashed #ff6a00', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center', 
-                      backgroundColor: '#fff8f0' 
-                    }}
-                  >
-                    <Plus size={28} color="#ff6a00" />
-                  </div>
-                  <p style={{ color: '#ff6a00', fontWeight: 'bold' }}>{t('see_all')}</p>
+          {/* TITLE */}
+          <h3 className="text-[13px] font-bold text-black dark:text-white m-0 mb-3 text-left">
+            {mobileActiveMenu === 'categories' ? 'Category Products' : 'Subcategory Products'}
+          </h3>
+          
+          {/* GRID YA BIDHAA */}
+          {/* 🔥 Tumebadilisha gap-3 kuwa gap-x-2 (usawa) na gap-y-4 (wima) */}
+          <div className="grid grid-cols-4 gap-x-1 gap-y-1 w-full">
+            
+            {loadingLeafs ? (
+              [...Array(6)].map((_, idx) => (
+                <div key={`mobile-skeleton-${idx}`} className="flex flex-col items-center gap-1.5 animate-pulse min-w-0">
+                  <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-[#1a1a1a] shrink-0"></div>
+                  <div className="h-2.5 w-full max-w-[48px] bg-gray-200 dark:bg-[#1a1a1a] rounded"></div>
                 </div>
-              )}
-            </div>
+              ))
+            ) : mobileActiveMenu === 'categories' ? (
+              featuredProducts && featuredProducts.length > 0 ? (
+                featuredProducts.slice(0, 9).map((leaf) => (
+                  <div 
+                    key={leaf.id} 
+                    onClick={() => {
+                      handleLeafClick(leaf.leaf_category_id || leaf.id);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex flex-col items-center text-center cursor-pointer w-full min-w-0"
+                  >
+                    <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 dark:bg-[#1a1a1a] mb-1.5 flex items-center justify-center shrink-0">
+                      <img src={leaf.cover_image_url || placeholderImg} alt={leaf.name} className="w-full h-full object-cover" />
+                    </div>
+                    <p className="text-[9px] text-gray-700 dark:text-white m-0 leading-tight line-clamp-2 w-full break-words">
+                      {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-10">
+                  <div className="text-4xl mb-3 ml-8">📦</div>
+                  <p className="text-sm font-bold text-black dark:text-white m-0 px-8">Tap a category to browse its products.</p>
+                </div>
+              )
+            ) : (
+              leafsForSub && leafsForSub.length > 0 ? (
+                leafsForSub.slice(0, 9).map((leaf) => (
+                  <div 
+                    key={leaf.id} 
+                    onClick={() => {
+                      handleLeafClick(leaf.leaf_category_id || leaf.id);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex flex-col items-center text-center cursor-pointer w-full min-w-0"
+                  >
+                    <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 dark:bg-[#1a1a1a] mb-1.5 flex items-center justify-center shrink-0">
+                      <img src={leaf.cover_image_url || placeholderImg} alt={leaf.name} className="w-full h-full object-cover" />
+                    </div>
+                    <p className="text-[9px] text-gray-700 dark:text-white m-0 leading-tight line-clamp-2 w-full break-words">
+                      {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-10">
+                  <div className="text-4xl mb-3 ml-8">📦</div>
+                  <p className="text-sm font-bold text-black dark:text-white m-0 px-8">Hakuna bidhaa katika subcategory hii</p>
+                </div>
+              )
+            )}
+
+            {/* SEE ALL BUTTON */}
+            {mobileActiveMenu === 'categories' && !loadingLeafs && featuredProducts && featuredProducts.length > 0 && (
+              <div 
+                onClick={() => {
+                  setMobileActiveMenu('subcategories');
+                  setViewMode('subcategories');
+                  setSelectedSubCategory(null);
+                  if (selectedCategory?.id) {
+                    fetchLeafsForSub(selectedCategory.id);
+                  }
+                }}
+                className="flex flex-col items-center text-center cursor-pointer w-full min-w-0"
+              >
+                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-1.5 border-2 border-dashed border-brand-orange bg-orange-50 dark:bg-[#1a1000] shrink-0">
+                  <Plus size={22} className="text-brand-orange" />
+                </div>
+                <p className="text-[9px] text-brand-orange font-bold m-0 line-clamp-2">{t('see_all')}</p>
+              </div>
+            )}
           </div>
-          
         </main>
       </div>
 

@@ -1,9 +1,9 @@
+// src/components/ProductGallery.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Maximize2, X, ChevronLeft, ChevronRight, Play, Pause, Volume2, VolumeX, Maximize } from 'lucide-react';
-import '../ProductGallery.css';
 
-const ProductGallery = ({ product }) => { // 🔥 IMEBADILISHWA: isMobile imeondolewa
+const ProductGallery = ({ product }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [bgPos, setBgPos] = useState('0% 0%');
   const [isZooming, setIsZooming] = useState(false);
@@ -18,7 +18,7 @@ const ProductGallery = ({ product }) => { // 🔥 IMEBADILISHWA: isMobile imeond
   const [photoIndex, setPhotoIndex] = useState(0);
   const videoRef = useRef(null);
   
- // ========== PREPARE MEDIA LIST (FIRST!) ==========
+ // ========== PREPARE MEDIA LIST ==========
   const mediaList = React.useMemo(() => {
     if (!product?.media_list) return [];
     return [...product.media_list]
@@ -30,15 +30,11 @@ const ProductGallery = ({ product }) => { // 🔥 IMEBADILISHWA: isMobile imeond
       });
   }, [product?.media_list]);
   
-  // ========== VIDEO DATA ==========
   const videoItem = mediaList.find(item => item.type === 'video');
   const photoItems = mediaList.filter(item => item.type !== 'video');
   
   // ========== RESET MEDIA TYPE ==========
   useEffect(() => {
-    // 🔥 IMEBADILISHWA: Mobile detection sasa inafanywa kwa CSS (Media Query), 
-    // lakini bado tunahitaji logic hii kwa media type logic kwa mobile.
-    // Tutachukulia kuwa ni mobile kwa kupitia window width (badala ya prop).
     const isMobile = window.innerWidth <= 768;
     if (isMobile) {
       if (videoItem) {
@@ -53,7 +49,6 @@ const ProductGallery = ({ product }) => { // 🔥 IMEBADILISHWA: isMobile imeond
   const nextImage = (e) => {
     e?.stopPropagation();
     setCurrentIndex((prev) => (prev + 1) % mediaList.length);
-    
     if (mediaType === 'photos' && photoItems.length > 0) {
       setPhotoIndex((prev) => (prev + 1) % photoItems.length);
     }
@@ -62,7 +57,6 @@ const ProductGallery = ({ product }) => { // 🔥 IMEBADILISHWA: isMobile imeond
   const prevImage = (e) => {
     e?.stopPropagation();
     setCurrentIndex((prev) => (prev - 1 + mediaList.length) % mediaList.length);
-    
     if (mediaType === 'photos' && photoItems.length > 0) {
       setPhotoIndex((prev) => (prev - 1 + photoItems.length) % photoItems.length);
     }
@@ -125,7 +119,7 @@ const ProductGallery = ({ product }) => { // 🔥 IMEBADILISHWA: isMobile imeond
     }
   }, [isModalOpen]);
 
-  // ========== MOUSE ZOOM HANDLERS (Desktop) ==========
+  // ========== MOUSE ZOOM HANDLERS ==========
   const handleMouseMove = (e) => {
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - left) / width) * 100;
@@ -135,7 +129,6 @@ const ProductGallery = ({ product }) => { // 🔥 IMEBADILISHWA: isMobile imeond
     setBgPos(`${clampedX}% ${clampedY}%`);
   };
 
-  // ========== ZOOM TOUCH HANDLERS (KWA MOBILE) ==========
   const handleTouchMove = (e) => {
     const touch = e.touches[0];
     if (!touch) return;
@@ -149,211 +142,146 @@ const ProductGallery = ({ product }) => { // 🔥 IMEBADILISHWA: isMobile imeond
   };
 
   const handleTouchEnd = () => {
-    setIsZooming(false); // Zoom inatoweka mkono ukiondolewa
+    setIsZooming(false);
   };
 
   if (!product || mediaList.length === 0) {
-    return <div className="loading">Inapakia...</div>;
+    return <div className="p-10 text-center text-gray-500">Inapakia...</div>;
   }
 
   const currentPhoto = photoItems[photoIndex];
   const currentMedia = mediaList[currentIndex];
   const progressPercent = duration ? (currentTime / duration) * 100 : 0;
 
-  // ========== MOBILE VIEW (VIDEO/PHOTO TOGGLE) - HII CLASS ITACHUKUA CSS ==========
   return (
     <>
-      {/* ===== DESKTOP VIEW (Media Query inaficha kwenye Mobile) ===== */}
-      <div className="gallery-main-container">
-        <div className="gallery-wrapper">
+      {/* ===== DESKTOP VIEW ===== */}
+      <div className="hidden md:block max-w-[1200px] mx-auto p-5 bg-white dark:bg-black">
+        <div className="flex gap-5 mb-10 items-start">
           
-          {/* Thumbnails - Vertical on desktop */}
-          <div className="thumbnails-container">
-            <button className="nav-btn prev" onClick={() => setCurrentIndex(prev => (prev > 0 ? prev - 1 : mediaList.length - 1))}>
-              ^
-            </button>
-
-            <div className="thumbnails-list">
+          {/* Thumbnails */}
+          <div className="w-[80px] shrink-0">
+            <div className="flex flex-col gap-3">
               {mediaList.map((item, i) => (
                 <div 
                   key={i} 
-                  className={`thumb-item ${currentIndex === i ? 'active' : ''}`} 
+                  className={`w-[70px] h-[70px] rounded-lg overflow-hidden cursor-pointer transition-all duration-200 border-2 ${currentIndex === i ? 'border-brand-orange scale-105 shadow-md' : 'border-gray-200 hover:border-brand-orange'}`}
                   onMouseEnter={() => setCurrentIndex(i)}
                 >
-                  {item.type === 'video' && <div className="video-badge">▶️</div>}
-                  <img src={item.type === 'video' ? `${item.url}#t=0.5` : item.url} alt={`Thumbnail ${i}`} />
+                  {item.type === 'video' && <div className="absolute z-10 bg-black/50 text-white p-1 rounded">▶️</div>}
+                  <img src={item.type === 'video' ? `${item.url}#t=0.5` : item.url} alt={`Thumb ${i}`} className="w-full h-full object-cover" />
                 </div>
               ))}
             </div>
-
-            <button className="nav-btn next" onClick={() => setCurrentIndex(prev => (prev < mediaList.length - 1 ? prev + 1 : 0))}>
-              ^
-            </button>
           </div>
 
           {/* Main Stage */}
-          <div className="main-stage-container">
-            <div className="main-stage">
-              <div className="main-display">
+          <div className="flex-1 flex items-center gap-4">
+            <div className="relative flex-1 h-[550px] bg-white dark:bg-[#0a0a0a] rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden flex items-center justify-center">
+              <div className="w-full h-full flex items-center justify-center relative cursor-zoom-in">
                 {currentMedia?.type === 'video' ? (
-                  <video 
-                    key={currentMedia.url} 
-                    src={currentMedia.url} 
-                    controls 
-                    autoPlay 
-                    muted 
-                    className="base-image"
-                  />
+                  <video key={currentMedia.url} src={currentMedia.url} controls autoPlay muted className="max-w-full max-h-full object-contain" />
                 ) : (
                   <div 
-                    className="zoom-container"
+                    className="w-full h-full relative"
                     onMouseMove={handleMouseMove}
                     onMouseEnter={() => setIsZooming(true)}
                     onMouseLeave={() => setIsZooming(false)}
                     onClick={() => setIsModalOpen(true)}
                   >
-                    <img src={currentMedia?.url} alt={product.name} className="base-image" />
+                    <img src={currentMedia?.url} alt={product.name} className="w-full h-full object-contain" />
                     {isZooming && (
-                      <div className="zoom-result" style={{ backgroundImage: `url(${currentMedia?.url})`, backgroundPosition: bgPos }} />
+                      <div 
+                        className="absolute inset-0 bg-no-repeat bg-[length:250%] pointer-events-none z-10"
+                        style={{ backgroundImage: `url(${currentMedia?.url})`, backgroundPosition: bgPos }}
+                      />
                     )}
                   </div>
                 )}
               </div>
-              
-              <div className="action-icons-overlay">
-                <button className="icon-btn" onClick={() => setIsModalOpen(true)}>
-                  <Maximize2 size={20} />
-                </button>
-              </div>
+              <button className="absolute top-4 right-4 bg-white dark:bg-black p-2 rounded-full shadow-md hover:bg-brand-orange hover:text-white transition-colors" onClick={() => setIsModalOpen(true)}>
+                <Maximize2 size={20} />
+              </button>
             </div>
           </div>
         </div>
-        
+
         {/* Full List View */}
-        <div className="kbc-full-view-list">
+        <div className="flex flex-col w-full bg-white dark:bg-black">
           {mediaList.map((item, idx) => (
-            <div key={idx} className="kbc-full-view-item">
+            <div key={idx} className="w-full border-b border-gray-200 dark:border-gray-800">
               {item.type === 'video' ? (
-                <video src={item.url} controls className="kbc-full-view-media" muted />
+                <video src={item.url} controls className="w-full h-auto object-contain" muted />
               ) : (
-                <img src={item.url} alt={`Product detail ${idx}`} className="kbc-full-view-media" />
+                <img src={item.url} alt={`Detail ${idx}`} className="w-full h-auto object-contain" />
               )}
             </div>
           ))}
         </div>
 
-        {/* Lightbox Modal - Desktop */}
+        {/* Lightbox Modal */}
         {isModalOpen && createPortal(
-          <div className="lightbox-overlay" onClick={() => setIsModalOpen(false)}>
-            <button className="close-lightbox" onClick={() => setIsModalOpen(false)}>
-              <X size={35} color="#0c0b0b" />
+          <div className="fixed inset-0 bg-black/95 z-[10000] flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}>
+            <button className="absolute top-5 right-5 bg-white/20 text-white p-2 rounded-full hover:bg-brand-orange transition-colors z-20" onClick={() => setIsModalOpen(false)}>
+              <X size={35} />
             </button>
+            <button className="absolute left-5 top-1/2 -translate-y-1/2 bg-white/20 text-white p-3 rounded-full hover:bg-brand-orange transition-colors z-20" onClick={prevImage}><ChevronLeft size={30} /></button>
+            <button className="absolute right-5 top-1/2 -translate-y-1/2 bg-white/20 text-white p-3 rounded-full hover:bg-brand-orange transition-colors z-20" onClick={nextImage}><ChevronRight size={30} /></button>
 
-            <button className="modal-nav-btn prev" onClick={prevImage} />
-            <button className="modal-nav-btn next" onClick={nextImage} />
-
-            <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
-              <div className="lightbox-main-view">
-                {currentMedia?.type === 'video' ? (
-                  <video key={currentMedia.url} src={currentMedia.url} controls autoPlay className="modal-base-img" />
-                ) : (
-                  <div className="modal-zoom-wrapper" 
-                       onMouseMove={handleMouseMove}
-                       onMouseEnter={() => setIsZooming(true)} 
-                       onMouseLeave={() => setIsZooming(false)}
-                       onTouchMove={handleTouchMove}      /* 🔥 IMEONGEWA KWA MOBILE ZOOM */
-                       onTouchStart={handleTouchMove}     /* 🔥 IMEONGEWA KWA MOBILE ZOOM */
-                       onTouchEnd={handleTouchEnd}        /* 🔥 IMEONGEWA KWA MOBILE ZOOM */
-                  >
-                    <img key={currentMedia?.url} src={currentMedia?.url} alt="View" className="modal-base-img" />
-                    {isZooming && (
-                      <div className="modal-zoom-overlay" style={{
-                        backgroundImage: `url(${currentMedia?.url})`, backgroundPosition: bgPos,
-                        backgroundSize: '250%', pointerEvents: 'none'
-                      }} />
-                    )}
-                  </div>
-                )}
-              </div>
+            <div className="w-full max-w-[1200px] h-[85vh] bg-black border border-gray-800 rounded-xl overflow-hidden relative flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+              {currentMedia?.type === 'video' ? (
+                <video key={currentMedia.url} src={currentMedia.url} controls autoPlay className="max-w-full max-h-full object-contain" />
+              ) : (
+                <div className="w-full h-full p-5 flex items-center justify-center relative cursor-crosshair" 
+                  onMouseMove={handleMouseMove} onMouseEnter={() => setIsZooming(true)} onMouseLeave={() => setIsZooming(false)}
+                  onTouchMove={handleTouchMove} onTouchStart={handleTouchMove} onTouchEnd={handleTouchEnd}
+                >
+                  <img key={currentMedia?.url} src={currentMedia?.url} alt="View" className="max-w-full max-h-full object-contain" />
+                  {isZooming && (
+                    <div className="absolute inset-0 bg-no-repeat bg-[length:250%] pointer-events-none" style={{ backgroundImage: `url(${currentMedia?.url})`, backgroundPosition: bgPos }} />
+                  )}
+                </div>
+              )}
             </div>
-
-            <div className="modal-footer-caption">
-              <div className="counter">{currentIndex + 1} / {mediaList.length}</div>
+            <div className="absolute bottom-5 bg-black/50 text-white px-4 py-1.5 rounded-full text-sm">
+              {currentIndex + 1} / {mediaList.length}
             </div>
           </div>,
           document.body
         )}
       </div>
 
-      {/* ===== MOBILE VIEW (Imehamishiwa kwenye CSS) ===== */}
-      <div className="gallery-mobile-simple">
-        <div className="mobile-main-display">
-          {/* VIDEO MODE */}
+      {/* ===== MOBILE VIEW ===== */}
+      <div className="block md:hidden w-full bg-black rounded-none overflow-hidden">
+        <div className="relative w-full bg-black flex items-center justify-center min-h-[350px]">
           {mediaType === 'video' && videoItem && (
-            <div className="mobile-video-wrapper">
-              <video
-                ref={videoRef}
-                src={videoItem.url}
-                className="mobile-video"
-                onTimeUpdate={handleTimeUpdate}
-                onLoadedMetadata={handleTimeUpdate}
-                onPlay={() => setIsPlaying(true)}
-                onPause={() => setIsPlaying(false)}
-                playsInline
-              />
-              
-              <div className="video-controls-overlay">
-                <div className="video-progress-row">
-                  <span className="time-text">{formatTime(currentTime)}</span>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={progressPercent}
-                    onChange={handleSeek}
-                    className="video-progress-bar"
-                  />
-                  <span className="time-text">{formatTime(duration)}</span>
+            <div className="relative w-full">
+              <video ref={videoRef} src={videoItem.url} className="w-full h-auto max-h-[400px] object-contain" onTimeUpdate={handleTimeUpdate} onLoadedMetadata={handleTimeUpdate} onPlay={() => setIsPlaying(true)} onPause={() => setIsPlaying(false)} playsInline />
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-white text-xs">{formatTime(currentTime)}</span>
+                  <input type="range" min="0" max="100" value={progressPercent} onChange={handleSeek} className="flex-1 h-1 rounded bg-gray-500 accent-brand-orange" />
+                  <span className="text-white text-xs">{formatTime(duration)}</span>
                 </div>
-                
-                <div className="video-control-buttons">
-                  <button onClick={handlePlayPause} className="control-btn">
-                    {isPlaying ? <Pause size={20} /> : <Play size={20} />}
-                  </button>
-                  <button onClick={handleMute} className="control-btn">
-                    {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-                  </button>
-                  <button onClick={handleFullscreen} className="control-btn ml-auto">
-                    <Maximize size={18} />
-                  </button>
+                <div className="flex items-center gap-4">
+                  <button onClick={handlePlayPause} className="text-white">{isPlaying ? <Pause size={20} /> : <Play size={20} />}</button>
+                  <button onClick={handleMute} className="text-white">{isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}</button>
+                  <button onClick={handleFullscreen} className="text-white ml-auto"><Maximize size={18} /></button>
                 </div>
               </div>
             </div>
           )}
 
-          {/* PHOTO MODE */}
           {mediaType === 'photos' && currentPhoto && (
             <>
-              <img 
-                src={currentPhoto.url} 
-                alt={product.name} 
-                className="mobile-image"
-                onClick={() => setIsModalOpen(true)}
-                 onContextMenu={(e) => e.preventDefault()}
-              />
-              
+              <img src={currentPhoto.url} alt={product.name} className="w-full h-auto max-h-[400px] object-contain block" onClick={() => setIsModalOpen(true)} onContextMenu={(e) => e.preventDefault()} />
               {photoItems.length > 1 && (
                 <>
-                  <button className="mobile-nav-arrow prev" onClick={prevImage}>
-                    <ChevronLeft size={20} />
-                  </button>
-                  <button className="mobile-nav-arrow next" onClick={nextImage}>
-                    <ChevronRight size={20} />
-                  </button>
+                  <button className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full" onClick={prevImage}><ChevronLeft size={20} /></button>
+                  <button className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full" onClick={nextImage}><ChevronRight size={20} /></button>
                 </>
               )}
-              
-              <div className="mobile-counter">
+              <div className="absolute bottom-3 right-3 bg-black/60 text-white px-3 py-1 rounded-full text-xs">
                 {photoIndex + 1} / {photoItems.length}
               </div>
             </>
@@ -361,37 +289,42 @@ const ProductGallery = ({ product }) => { // 🔥 IMEBADILISHWA: isMobile imeond
         </div>
 
         {videoItem && (
-          <div className="mobile-toggle-buttons">
-            <button
-              onClick={() => setMediaType('video')}
-              className={mediaType === 'video' ? 'active' : ''}
-            >
-              🎬 Video
-            </button>
-            <button
-              onClick={() => setMediaType('photos')}
-              className={mediaType === 'photos' ? 'active' : ''}
-            >
-              📷 Photos ({photoItems.length})
-            </button>
+          <div className="flex gap-3 mt-3 justify-center">
+            <button onClick={() => setMediaType('video')} className={`px-5 py-2 rounded-full border-none font-bold text-sm cursor-pointer transition-all ${mediaType === 'video' ? 'bg-brand-orange text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>🎬 Video</button>
+            <button onClick={() => setMediaType('photos')} className={`px-5 py-2 rounded-full border-none font-bold text-sm cursor-pointer transition-all ${mediaType === 'photos' ? 'bg-brand-orange text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>📷 Photos ({photoItems.length})</button>
           </div>
         )}
 
-        <div className="product-long-description">
+        <div className="mt-5 flex flex-col gap-0 w-full p-0">
           {mediaList.map((item, idx) => (
-            <div key={idx} className="product-long-desc-item">
+            <div key={idx} className="w-full bg-transparent relative overflow-hidden m-0 p-0">
               {item.type === 'video' ? (
-                <video src={item.url} controls className="long-desc-media" />
+                <video src={item.url} controls className="w-full h-auto block object-contain" />
               ) : (
-                <img src={item.url} alt={`Product detail ${idx}`} className="long-desc-media" />
+                <img src={item.url} alt={`Detail ${idx}`} className="w-full h-auto block object-contain" />
               )}
             </div>
           ))}
-          <div className="long-desc-footer">
-            {/* Kitufe cha View More kinaweza kuwekwa hapa kama class */}
-          </div>
         </div>
       </div>
+
+      {/* Mobile Lightbox Modal */}
+      {isModalOpen && createPortal(
+        <div className="fixed inset-0 bg-black/98 z-[10000] flex items-center justify-center p-0" onClick={() => setIsModalOpen(false)}>
+          <button className="fixed top-4 right-4 bg-white/15 text-white p-2 rounded-full z-[10001]" onClick={() => setIsModalOpen(false)}><X size={24} /></button>
+          <button className="fixed left-3 top-1/2 -translate-y-1/2 bg-white/15 text-white p-2.5 rounded-full z-[10001]" onClick={prevImage}><ChevronLeft size={24} /></button>
+          <button className="fixed right-3 top-1/2 -translate-y-1/2 bg-white/15 text-white p-2.5 rounded-full z-[10001]" onClick={nextImage}><ChevronRight size={24} /></button>
+          
+          <div className="w-screen h-screen flex items-center justify-center relative" onClick={(e) => e.stopPropagation()}>
+            {currentMedia?.type === 'video' ? (
+              <video key={currentMedia.url} src={currentMedia.url} controls autoPlay className="max-w-full max-h-full object-contain" />
+            ) : (
+              <img key={currentMedia?.url} src={currentMedia?.url} alt="View" className="max-w-full max-h-full object-contain" />
+            )}
+          </div>
+        </div>,
+        document.body
+      )}
     </>
   );
 };

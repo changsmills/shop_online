@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback, Suspense } fr
 import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
 import { ArrowUp, ChevronLeft, ChevronRight, ArrowLeft, Search } from "lucide-react";
 import api from "../axiosConfig";
-import "../ProductsAll.css";
+//import "../ProductsAll.css";
 import ProductList from "./ProductList";
 import SearchDialog from "../components/SearchDialog";
 
@@ -307,10 +307,10 @@ const incomingSection = normalizeSection(
 
   if (error) {
     return (
-      <div className="products-all-page error-page">
-        <h2 className="error-title">Error</h2>
-        <p className="error-message">{error}</p>
-        <button className="error-retry-btn" onClick={() => window.location.reload()}>
+      <div className="min-h-screen flex flex-col items-center justify-center p-5 bg-white dark:bg-[#1e293b] text-black dark:text-white">
+        <h2 className="text-2xl font-bold text-red-600 dark:text-red-500 mb-2">Error</h2>
+        <p className="text-gray-600 dark:text-gray-400">{error}</p>
+        <button className="bg-brand-orange text-white px-8 py-2.5 rounded-lg cursor-pointer mt-5 hover:bg-brand-hover transition-colors" onClick={() => window.location.reload()}>
           Jaribu Tena
         </button>
       </div>
@@ -319,20 +319,20 @@ const incomingSection = normalizeSection(
 
   if (loading) {
     return (
-      <Suspense fallback={<div className="loading-placeholder">Inapakia...</div>}>
+      <Suspense fallback={<div className="p-10 text-center">Inapakia...</div>}>
         <SkeletonProductsAll isMobile={isMobile} />
       </Suspense>
     );
   }
 
   return (
-    <div className="products-all-page">
+    <div className="min-h-screen w-full bg-white dark:bg-[#1e293b] text-black dark:text-[#e2e8f0] overflow-x-hidden transition-colors duration-300 font-sans">
       
       {/* ========== BANNER ========== */}
-      <div className="alibaba-style-banner">
+      <div className="bg-gradient-to-br from-[#FF8C00] dark:from-[#1e293b] dark:to-[#0f172a] text-white text-center py-8 md:py-10 px-4 md:px-5 relative">
         {/* ✅ BACK ARROW - KUREJEA DASHBOARD */}
         <button 
-          className="banner-back-btn" 
+          className="hidden max-md:flex absolute top-5 w-9 h-9 rounded-full items-center justify-center bg-white/15 border border-white/20 backdrop-blur-md transition-all hover:bg-white/25 hover:scale-105 active:scale-95 z-10" 
           onClick={handleBackToDashboard}
           aria-label="Rudi Dashboard"
         >
@@ -341,15 +341,15 @@ const incomingSection = normalizeSection(
         
         {/* ✅ SEARCH BUTTON - KULIA */}
         <button 
-          className="banner-search-btn" 
+          className="flex absolute top-5 right-4 md:right-5 w-9 h-9 md:w-10 md:h-10 rounded-full items-center justify-center bg-white/15 border border-white/20 backdrop-blur-md transition-all hover:bg-white/25 hover:scale-105 active:scale-95 z-10" 
           onClick={() => setIsSearchOpen(true)}
           aria-label="Tafuta"
         >
           <Search size={22} />
         </button>
         
-        <h1 className="banner-title">{bannerTitle}</h1>
-        <p className="banner-desc">{bannerDesc}</p>
+        <h1 className="text-3xl lg:text-[32px] font-extrabold m-0">{bannerTitle}</h1>
+        <p className="text-xs md:text-sm lg:text-base mt-2 opacity-90">{bannerDesc}</p>
       </div>
 
       {/* ========== SEARCH DIALOG ========== */}
@@ -359,20 +359,34 @@ const incomingSection = normalizeSection(
         onSearch={handleSearchSubmit}
       />
 
-      {/* ========== CATEGORY TABS ========== */}
-      <div className="category-tabs-wrapper">
-        <button className="nav-arrow left" onClick={() => scroll("left")}>
+           {/* ========== CATEGORY TABS ========== */}
+      <div className="sticky top-[60px] md:top-0 z-[100] bg-white dark:bg-[#1e293b] border-b border-gray-200 dark:border-gray-700 flex items-center w-full h-[54px] md:h-[64px] overflow-hidden px-2 md:px-4 shadow-sm mb-2">
+        
+        {/* LEFT ARROW */}
+        <button 
+          className="hidden md:flex absolute z-20 w-8 h-8 bg-white dark:bg-[#1e293b] border border-gray-300 dark:border-gray-600 rounded-full items-center justify-center shadow-md top-1/2 -translate-y-1/2 left-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" 
+          onClick={() => scroll("left")}
+        >
           <ChevronLeft size={20} />
         </button>
         
-        <div className="category-tabs-scroll" ref={scrollRef}>
+        {/* TABS CONTAINER */}
+        <div 
+          className="flex flex-row overflow-x-auto scroll-smooth whitespace-nowrap w-full px-1 md:px-12 gap-2 md:gap-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" 
+          ref={scrollRef}
+        >
           {loading ? (
-            <div className="tab-item loading-tab">Inapakia...</div>
+            <div className="text-gray-400 text-sm px-4 py-2 animate-pulse">Inapakia kategoria...</div>
           ) : (
             categories.map((cat) => (
               <button
                 key={cat.id || 'all'}
-                className={`tab-item ${activeCategory.id === cat.id ? "active" : ""}`}
+                // 🔥 HAPA NDIPO TULIPOWEKA MAREKEBISHO YA RANGI NA PADDING
+                className={`px-4 py-2 md:px-5 md:py-2.5 text-sm md:text-[15px] font-medium rounded-full transition-all duration-200 border whitespace-nowrap ${
+                  activeCategory.id === cat.id 
+                    ? "bg-[#ff6a00] text-white border-[#ff6a00] shadow-md shadow-orange-500/20" 
+                    : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-200 dark:hover:bg-gray-700"
+                }`}
                 onClick={() => handleCategoryClick(cat)}
               >
                 {cat.name}
@@ -381,14 +395,18 @@ const incomingSection = normalizeSection(
           )}
         </div>
         
-        <button className="nav-arrow right" onClick={() => scroll("right")}>
+        {/* RIGHT ARROW */}
+        <button 
+          className="hidden md:flex absolute z-20 w-8 h-8 bg-white dark:bg-[#1e293b] border border-gray-300 dark:border-gray-600 rounded-full items-center justify-center shadow-md top-1/2 -translate-y-1/2 right-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" 
+          onClick={() => scroll("right")}
+        >
           <ChevronRight size={20} />
         </button>
       </div>
 
       {/* ========== PRODUCT LIST ========== */}
-      <div className="all-products-container">
-        <main className="products-main-content">
+      <div className="w-full block p-0 md:p-0">
+        <main className="w-full block p-0 md:p-0">
           <ProductList 
             // ✅ IMEBADILISHWA: Ongeza -${fetchTrigger} mwishoni mwa key!
             key={`${incomingStoreId}-${activeCategory.id}-${activeSection}-${search}-${priorityId}-${fetchTrigger}`}
@@ -411,11 +429,11 @@ const incomingSection = normalizeSection(
 
       {/* ========== BACK TO TOP - FLOATING BUTTON ========== */}
       <button 
-        className={`back-to-top-btn ${showBackToTop ? 'visible' : ''}`} 
+        className={`fixed bottom-[80px] md:bottom-[120px] right-3 md:right-6 w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#ff6a00] hover:bg-[#e55a00] text-white shadow-[0_4px_16px_gba(255,106,0,0.35)] flex items-center justify-center transition-all duration-300 z[1000] border-none cursor-pointer
+         ${showBackToTop ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto visible animate-[bounceIn_0.4s_ease_forwards]' : 'opacity-0 translate-y-5 scale-75 pointer-events-nome invisible'}`} 
         onClick={scrollToTop}
-        aria-label="Rudi Juu"
       >
-        <ArrowUp className="back-to-top-icon" />
+        <ArrowUp className="w-5 h-5 md:w-6 md:h-6 stroke-[2.5]" />
       </button>
     </div>
   );

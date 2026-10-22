@@ -1,12 +1,12 @@
+// src/pages/SupplierOrders.jsx
 import React, { useEffect, useState } from 'react';
-import api from '../axiosConfig'; // 🔥 Tumia api
+import api from '../axiosConfig';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, MessageSquare, ClipboardList, 
-  Settings, Bell, Search, Menu, Home, Megaphone, ShoppingBag, ChevronRight
+  Settings, Bell, Search, Menu, Home, Megaphone, ShoppingBag
 } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
-import '../MyOrders.css';
 
 const SupplierOrders = ({ session }) => {
   const [orders, setOrders] = useState([]);
@@ -37,7 +37,6 @@ const SupplierOrders = ({ session }) => {
       }
       const headers = { Authorization: `Bearer ${token}` };
 
-      // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
       const storeRes = await api.get('/stores/', {
         params: { owner_id: session.user.id },
         headers
@@ -52,7 +51,6 @@ const SupplierOrders = ({ session }) => {
 
       const storeId = storeData.id;
 
-      // 🔥 MABADILIKO: api.get na kuondoa API_BASE_URL
       const ordersRes = await api.get('/orders/', {
         params: { store_id: storeId, ordering: '-created_at' },
         headers
@@ -87,115 +85,76 @@ const SupplierOrders = ({ session }) => {
   ];
 
   const getStatusStyle = (status) => {
-    const styles = {
-      pending: { backgroundColor: '#fff7ed', color: '#ff6a00', label: 'Inasubiri' },
-      received: { backgroundColor: '#e8f4fd', color: '#2196f3', label: 'Imepokelewa' },
-      delivered: { backgroundColor: '#e6fff0', color: '#00a65a', label: 'Imewasilishwa' },
-      cancelled: { backgroundColor: '#fee2e2', color: '#ef4444', label: 'Imefutwa' }
-    };
-    const style = styles[status] || styles.pending;
-    return {
-      fontSize: isMobile ? '10px' : '11px',
-      padding: isMobile ? '3px 10px' : '4px 12px',
-      borderRadius: '20px',
-      fontWeight: '700',
-      textTransform: 'uppercase',
-      ...style
-    };
+    const base = "px-3 py-1 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wide";
+    switch(status) {
+      case 'pending': return `${base} bg-orange-50 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400`;
+      case 'received': return `${base} bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400`;
+      case 'delivered': return `${base} bg-green-50 text-green-600 dark:bg-green-950/30 dark:text-green-400`;
+      case 'cancelled': return `${base} bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-400`;
+      default: return `${base} bg-orange-50 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400`;
+    }
   };
 
-  if (loading) return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-      <div style={{ width: '40px', height: '40px', border: '3px solid #f3f4f6', borderTop: '3px solid #ff6a00', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-    </div>
-  );
+  const getStatusLabel = (status) => {
+    switch(status) {
+      case 'pending': return 'Inasubiri';
+      case 'received': return 'Imepokelewa';
+      case 'delivered': return 'Imewasilishwa';
+      case 'cancelled': return 'Imefutwa';
+      default: return 'Inasubiri';
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-black">
+        <div className="w-10 h-10 border-4 border-gray-200 dark:border-gray-800 border-t-brand-orange rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#f7f8fa' }}>
+    <div className="flex flex-col h-[100dvh] bg-gray-50 dark:bg-black font-sans overflow-hidden">
       <Toaster position="top-center" />
       
-      <header className="dashboard-header" style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        padding: isMobile ? '10px 15px' : '10px 24px', 
-        borderBottom: '1px solid #eee', 
-        backgroundColor: '#fff' 
-      }}>
-        <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+      {/* HEADER */}
+      <header className="sticky top-0 z-[100] h-[60px] bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-4 md:px-6 shrink-0">
+        <div className="flex items-center gap-4">
           {!isMobile && (
-            <Menu size={22} style={{ cursor: 'pointer', color: '#666' }} onClick={() => setIsExpanded(!isExpanded)} />
+            <Menu size={22} className="cursor-pointer text-gray-500 hover:text-brand-orange transition-colors" onClick={() => setIsExpanded(!isExpanded)} />
           )}
-          
-          <Link to="/dashboard/sellerboard" style={{ 
-            fontSize: isMobile ? '18px' : '20px', 
-            fontWeight: '800', 
-            color: '#ff6a00', 
-            textDecoration: 'none' 
-          }}>
+          <Link to="/dashboard/sellerboard" className="text-lg md:text-xl font-extrabold text-brand-orange tracking-tight">
             Skyfall.com
           </Link>
-
           {!isMobile && (
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', backgroundColor: '#f4f4f4', padding: '6px 12px', borderRadius: '8px' }}>
-              <Search size={16} color="#999" />
-              <input type="text" placeholder="Tafuta oda..." style={{ border: 'none', background: 'none', outline: 'none', marginLeft: '8px', fontSize: '14px' }} />
+            <div className="flex items-center bg-gray-100 dark:bg-gray-900 px-3 py-1.5 rounded-lg ml-4">
+              <Search size={16} className="text-gray-400" />
+              <input type="text" placeholder="Tafuta oda..." className="bg-transparent border-none outline-none ml-2 text-sm text-gray-800 dark:text-white placeholder:text-gray-400 w-40" />
             </div>
           )}
         </div>
-
-        <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          {!isMobile && (
-            <Bell size={20} style={{ cursor: 'pointer', color: '#666' }} />
-          )}
+        <div className="flex items-center gap-4">
+          {!isMobile && <Bell size={20} className="cursor-pointer text-gray-500 hover:text-brand-orange transition-colors" />}
         </div>
       </header>
 
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div className="flex flex-1 overflow-hidden">
         
+        {/* DESKTOP SIDEBAR */}
         {!isMobile && (
           <aside 
             onMouseEnter={() => setIsExpanded(true)}
             onMouseLeave={() => setIsExpanded(false)}
-            style={{ 
-              width: isExpanded ? '240px' : '70px', 
-              borderRight: '1px solid #eee', 
-              display: 'flex', 
-              flexDirection: 'column', 
-              paddingTop: '20px', 
-              backgroundColor: '#fff',
-              transition: 'width 0.3s ease',
-              overflow: 'hidden',
-              whiteSpace: 'nowrap',
-              zIndex: 10
-            }}
+            className={`${isExpanded ? 'w-[240px]' : 'w-[70px]'} transition-all duration-300 flex flex-col bg-white dark:bg-black border-r border-gray-200 dark:border-gray-800 pt-5 shrink-0 z-10 overflow-hidden whitespace-nowrap`}
           >
             {sidebarItems.map((item) => (
               <Link 
                 key={item.path} 
                 to={item.path} 
-                style={{ 
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '12px 24px',
-                  textDecoration: 'none',
-                  color: location.pathname === item.path ? '#ff6a00' : '#666',
-                  backgroundColor: location.pathname === item.path ? '#fff5ed' : 'transparent',
-                  margin: '4px 8px',
-                  borderRadius: '8px',
-                  transition: '0.2s'
-                }}
+                className={`flex items-center mx-2 my-1 p-3 rounded-lg transition-colors ${location.pathname === item.path ? 'bg-orange-50 dark:bg-orange-950/30 text-brand-orange' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900'}`}
               >
-                <div style={{ minWidth: '22px', display: 'flex', justifyContent: 'center' }}>
-                  {item.icon}
-                </div>
-                <span style={{ 
-                  marginLeft: '15px', 
-                  fontSize: '14px', 
-                  fontWeight: '600',
-                  opacity: isExpanded ? 1 : 0,
-                  transition: 'opacity 0.2s'
-                }}>
+                <div className="min-w-[22px] flex justify-center">{item.icon}</div>
+                <span className={`ml-4 text-sm font-semibold transition-opacity duration-200 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
                   {item.label}
                 </span>
               </Link>
@@ -203,106 +162,98 @@ const SupplierOrders = ({ session }) => {
           </aside>
         )}
 
-        <main style={{ flex: 1, padding: isMobile ? '15px' : '24px', backgroundColor: '#f7f8fa', overflowY: 'auto' }}>
-          <div className="orders-content-wrapper" style={{ maxWidth: '1100px', margin: '0 auto' }}>
-            <h1 className="orders-main-title" style={{ fontSize: '24px', fontWeight: '800', marginBottom: '20px', color: '#1a1a1a' }}>
+        {/* MAIN CONTENT */}
+        <main className="flex-1 p-4 md:p-6 bg-gray-50 dark:bg-black overflow-y-auto">
+          <div className="max-w-[1100px] mx-auto">
+            <h1 className="text-xl md:text-2xl font-extrabold mb-5 text-gray-900 dark:text-white">
               Oda za Wateja
             </h1>
 
             {orders.length === 0 ? (
-              <div style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                padding: '80px 20px', textAlign: 'center', backgroundColor: '#fff',
-                borderRadius: '16px', border: '1px solid #eee', marginTop: '20px'
-              }}>
-                <ShoppingBag size={64} color="#ddd" style={{ marginBottom: '20px' }} />
-                <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#1a1a1a', marginBottom: '12px' }}>Bado hamna oda</h2>
-                <p style={{ color: '#666', maxWidth: '400px', marginBottom: '32px', fontSize: '15px' }}>
+              <div className="flex flex-col items-center justify-center p-10 md:p-20 text-center bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-gray-800 mt-5">
+                <ShoppingBag size={64} className="text-gray-300 dark:text-gray-700 mb-5" />
+                <h2 className="text-xl md:text-2xl font-extrabold text-gray-900 dark:text-white mb-3">Bado hamna oda</h2>
+                <p className="text-gray-500 dark:text-gray-400 max-w-[400px] mb-8 text-sm md:text-base">
                   Wateja bado hawajaweka oda. Tangaza bidhaa zako ili kuanza kupata oda.
                 </p>
                 <button 
                   onClick={() => navigate('/advertise')}
-                  style={{ backgroundColor: '#ff6a00', color: 'white', padding: '14px 40px', borderRadius: '30px', border: 'none', fontWeight: '700', cursor: 'pointer' }}
+                  className="bg-brand-orange hover:bg-brand-hover text-white px-8 py-3.5 rounded-full font-bold transition-colors"
                 >
                   Tangaza Sasa
                 </button>
               </div>
             ) : (
-              <div className="orders-list-grid" style={{ display: 'grid', gap: '20px' }}>
+              <div className="flex flex-col gap-5">
                 {orders.map((order) => {
                   const orderItems = order.order_items || [];
                   const totalItems = orderItems.reduce((sum, item) => sum + (item.quantity || 0), 0);
                   const isExpandedOrder = expandedOrders[order.id];
 
                   return (
-                    <div key={order.id} style={{ backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #eee', overflow: 'hidden' }}>
-                      <div style={{ padding: '20px', borderBottom: '1px solid #eee', backgroundColor: '#fafafa' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                    <div key={order.id} className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm">
+                      
+                      {/* ORDER HEADER */}
+                      <div className="p-4 md:p-5 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                           <div>
-                            <span style={{ fontSize: '12px', color: '#888' }}>Oda #{order.order_number?.slice(0, 12)}</span>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '5px' }}>
-                              <span style={{ fontSize: '13px', fontWeight: '600', color: '#333' }}>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">Oda #{order.order_number?.slice(0, 12)}</span>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">
                                 {order.profiles?.full_name || order.customer?.full_name || 'Mteja Asiyejulikana'}
                               </span>
                               {(order.profiles?.avatar_url || order.customer?.avatar_url) && (
-                                <img src={order.profiles?.avatar_url || order.customer?.avatar_url} alt="" style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover' }} />
+                                <img src={order.profiles?.avatar_url || order.customer?.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover" />
                               )}
                             </div>
-                            <p style={{ margin: '3px 0 0', fontSize: '12px', color: '#666' }}>
+                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                               📅 {new Date(order.created_at).toLocaleDateString()} | Bidhaa: {totalItems}
                             </p>
                           </div>
-                          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                            <div style={getStatusStyle(order.status)}>
-                              {getStatusStyle(order.status).label}
+                          <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+                            <div className={getStatusStyle(order.status)}>
+                              {getStatusLabel(order.status)}
                             </div>
                             <button
                               onClick={() => toggleExpandOrder(order.id)}
-                              style={{
-                                background: 'none', border: '1px solid #ddd', borderRadius: '8px',
-                                padding: '6px 12px', fontSize: '12px', cursor: 'pointer',
-                                display: 'flex', alignItems: 'center', gap: '5px'
-                              }}
+                              className="bg-transparent border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center gap-1"
                             >
                               {isExpandedOrder ? '▲ Punguza' : '▼ Onyesha Bidhaa'}
-                              <span style={{ fontSize: '11px', color: '#666' }}>({orderItems.length})</span>
+                              <span className="text-[11px] text-gray-500">({orderItems.length})</span>
                             </button>
                           </div>
                         </div>
                         
-                        <div style={{ marginTop: '12px', textAlign: 'right' }}>
-                          <span style={{ fontSize: '14px', color: '#666' }}>Jumla ya Oda: </span>
-                          <span style={{ fontSize: '20px', fontWeight: '800', color: '#ff6a00' }}>
+                        <div className="mt-3 text-right">
+                          <span className="text-sm text-gray-500 dark:text-gray-400">Jumla ya Oda: </span>
+                          <span className="text-lg md:text-xl font-extrabold text-brand-orange">
                             TZS {order.grand_total?.toLocaleString()}
                           </span>
                         </div>
                       </div>
 
-                      <div style={{ padding: '20px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                      {/* ORDER ITEMS */}
+                      <div className="p-4 md:p-5">
+                        <div className="flex flex-col gap-4">
                           {orderItems.map((item, idx) => (
                             <div 
                               key={item.id || idx} 
-                              style={{ 
-                                display: 'flex', gap: '15px', alignItems: 'center',
-                                paddingBottom: idx !== orderItems.length - 1 ? '15px' : 0,
-                                borderBottom: idx !== orderItems.length - 1 ? '1px solid #f0f0f0' : 'none'
-                              }}
+                              className={`flex flex-col md:flex-row items-center md:items-start gap-4 ${idx !== orderItems.length - 1 ? 'pb-4 border-b border-gray-100 dark:border-gray-800' : ''}`}
                             >
                               <img 
                                 src={item.product_image || 'https://via.placeholder.com/80'} 
                                 alt={item.product_name}
-                                style={{ width: '70px', height: '70px', borderRadius: '10px', objectFit: 'cover', backgroundColor: '#f9f9f9' }} 
+                                className="w-20 h-20 rounded-xl object-cover bg-gray-50 dark:bg-gray-900 shrink-0" 
                                 onError={(e) => { e.target.src = 'https://via.placeholder.com/70' }}
                               />
-                              <div style={{ flex: 1 }}>
-                                <h4 style={{ margin: 0, fontSize: '15px', fontWeight: '700', color: '#333' }}>{item.product_name}</h4>
-                                <p style={{ margin: '5px 0', fontSize: '13px', color: '#666' }}>
+                              <div className="flex-1 text-center md:text-left">
+                                <h4 className="m-0 text-sm md:text-base font-bold text-gray-900 dark:text-white">{item.product_name}</h4>
+                                <p className="my-1 text-xs md:text-sm text-gray-500 dark:text-gray-400">
                                   Rangi: <strong>{item.selected_color || 'N/A'}</strong> | 
                                   Size: <strong>{item.selected_size || 'N/A'}</strong> | 
-                                  Quantity: <strong>{item.quantity || 1}</strong>
+                                  Qty: <strong>{item.quantity || 1}</strong>
                                 </p>
-                                <p style={{ margin: 0, fontSize: '14px', fontWeight: '700', color: '#ff6a00' }}>
+                                <p className="m-0 text-sm md:text-base font-bold text-brand-orange">
                                   TZS {(item.unit_price || item.price)?.toLocaleString()}
                                 </p>
                               </div>
@@ -319,48 +270,28 @@ const SupplierOrders = ({ session }) => {
         </main>
       </div>
 
+      {/* MOBILE BOTTOM NAV */}
       {isMobile && (
-        <nav style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: 'white',
-          display: 'flex',
-          justifyContent: 'space-around',
-          alignItems: 'center',
-          padding: '10px 0 20px',
-          borderTop: '1px solid #eee',
-          zIndex: 1000,
-          boxShadow: '0 -2px 10px rgba(0,0,0,0.05)'
-        }}>
-          <button onClick={() => navigate('/dashboard/sellerboard')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', flex: 1, color: location.pathname.startsWith('/dashboard/sellerboard') ? '#ff6600' : '#666' }}>
-            <Home size={22} color={location.pathname.startsWith('/dashboard/sellerboard') ? '#ff6600' : '#666'} />
-            <span style={{ fontSize: '10px', color: location.pathname.startsWith('/dashboard/sellerboard') ? '#ff6600' : '#666' }}>Duka</span>
+        <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-black flex justify-around items-center pt-3 pb-5 border-t border-gray-200 dark:border-gray-800 z-[1000] shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+          <button onClick={() => navigate('/dashboard/sellerboard')} className={`flex flex-col items-center bg-transparent border-none flex-1 ${location.pathname.startsWith('/dashboard/sellerboard') ? 'text-brand-orange' : 'text-gray-500'}`}>
+            <Home size={22} />
+            <span className="text-[10px] mt-1">Duka</span>
           </button>
-          <button onClick={() => navigate('/dashboard/supplier-orders')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', flex: 1, color: location.pathname === '/dashboard/supplier-orders' ? '#ff6600' : '#666' }}>
-            <ClipboardList size={22} color={location.pathname === '/dashboard/supplier-orders' ? '#ff6600' : '#666'} />
-            <span style={{ fontSize: '10px', color: location.pathname === '/dashboard/supplier-orders' ? '#ff6600' : '#666' }}>Oda</span>
+          <button onClick={() => navigate('/dashboard/supplier-orders')} className={`flex flex-col items-center bg-transparent border-none flex-1 ${location.pathname === '/dashboard/supplier-orders' ? 'text-brand-orange' : 'text-gray-500'}`}>
+            <ClipboardList size={22} />
+            <span className="text-[10px] mt-1">Oda</span>
           </button>
-          <button onClick={() => navigate('/advertise')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', flex: 1, color: location.pathname === '/advertise' ? '#ff6600' : '#666' }}>
-            <Megaphone size={22} color={location.pathname === '/advertise' ? '#ff6600' : '#666'} />
-            <span style={{ fontSize: '10px', color: location.pathname === '/advertise' ? '#ff6600' : '#666' }}>Ads</span>
+          <button onClick={() => navigate('/advertise')} className={`flex flex-col items-center bg-transparent border-none flex-1 ${location.pathname === '/advertise' ? 'text-brand-orange' : 'text-gray-500'}`}>
+            <Megaphone size={22} />
+            <span className="text-[10px] mt-1">Ads</span>
           </button>
-          <button onClick={() => navigate('/dashboard/supplier-notifications')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', flex: 1, color: location.pathname === '/dashboard/supplier-notifications' ? '#ff6600' : '#666' }}>
-            <Bell size={22} color={location.pathname === '/dashboard/supplier-notifications' ? '#ff6600' : '#666'} />
-            <span style={{ fontSize: '10px', color: location.pathname === '/dashboard/supplier-notifications' ? '#ff6600' : '#666' }}>Arifa</span>
+          <button onClick={() => navigate('/dashboard/supplier-notifications')} className={`flex flex-col items-center bg-transparent border-none flex-1 ${location.pathname === '/dashboard/supplier-notifications' ? 'text-brand-orange' : 'text-gray-500'}`}>
+            <Bell size={22} />
+            <span className="text-[10px] mt-1">Arifa</span>
           </button>
         </nav>
       )}
-
-      {isMobile && <div style={{ height: '70px' }} />}
-      
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
+      {isMobile && <div className="h-[70px]"></div>}
     </div>
   );
 };

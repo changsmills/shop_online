@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import api from "../axiosConfig"; // 🔥 Tumia api
 import ProductAttributes from '../pages/ProductAttribute';
-import '../ProductCreationFlow.css';
+//import '../ProductCreationFlow.css';
 import speedDashboardImg from "../images/SpeedDashboard.svg";
 
 const ProductCreationFlow = ({ 
@@ -506,142 +506,233 @@ varFormData.append("price", finalPrice);
 };
   
   return (
-    <section className="product-creation-flow">
-      <div className="flow-steps-header">
-
+       <section className="w-full max-w-full mx-auto p-2 sm:p-4 box-border font-sans text-gray-800 min-h-screen">  
+       
+        {/* STEP HEADER */}
+      <div className="flex items-center justify-between gap-1 sm:gap-2 bg-gray-50 p-3 sm:p-6 rounded-2xl sm:rounded-3xl border border-gray-100 mb-4 sm:mb-10 overflow-x-auto">
         {[
           { id: 1, label: "Category" },
           { id: 2, label: "Media" },
           { id: 3, label: "Details" }
         ].map((s) => (
-
-          <div key={s.id} className={`step-item ${currentStep >= s.id ? "active" : ""}`}>
-            <div className={`step-circle ${currentStep > s.id ? "completed" : ""}`}>
+          <div
+            key={s.id}
+            className="flex-1 flex flex-col items-center relative z-10 min-w-[70px] sm:min-w-0"
+          >
+            <div
+              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 flex items-center justify-center font-bold text-xs sm:text-sm transition-all duration-300 ${
+                currentStep > s.id
+                  ? "bg-green-500 border-green-500 text-white"
+                  : currentStep >= s.id
+                  ? "bg-orange-500 border-orange-500 text-white shadow-lg shadow-orange-500/30"
+                  : "bg-white border-gray-100 text-gray-400"
+              }`}
+            >
               {currentStep > s.id ? "✓" : s.id}
             </div>
-            <span className="step-label">{s.label}</span>
-            {s.id < 3 && <div className={`step-line ${currentStep > s.id ? "filled" : ""}`} />}
+            <span
+              className={`text-[9px] sm:text-[11px] font-extrabold uppercase mt-2 sm:mt-3 tracking-wide text-center ${
+                currentStep >= s.id ? "text-orange-500" : "text-gray-500"
+              }`}
+            >
+              {s.label}
+            </span>
+            {s.id < 3 && (
+              <div
+                className={`hidden sm:block absolute top-5 left-1/2 w-full h-0.5 -z-10 ${
+                  currentStep > s.id ? "bg-orange-500" : "bg-gray-100"
+                }`}
+              />
+            )}
           </div>
         ))}
       </div>
 
+ {/* STEP 1: CATEGORY */}
       {currentStep === 1 && (
-        <div className="category-selection-step">
-          <div className="step-title-area">
-            <h3 className="main-title">Select Category</h3>
-            <p className="sub-title">Click one category to continue adding products</p>
+        <div className="w-full">
+          <div className="text-center mb-4 sm:mb-8">
+            <h3 className="text-lg sm:text-2xl font-black mb-1 sm:mb-2">Select Category</h3>
+            <p className="text-gray-500 text-xs sm:text-sm">
+              Click one category to continue adding products
+            </p>
           </div>
-          <div className="category-grid">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 lg:gap-6">
             {filteredStoreSubCats.map((sub) => (
-              <div 
+              <div
                 key={sub.id}
                 onClick={() => {
                   console.log(`\n🗂️ [STEP 1] SubCategory Clicked!`);
                   console.log("  - Sub ID (sub.id):", sub.id);
                   console.log("  - Category ID (sub.category):", sub.category);
                   console.log("  - Name:", sub.name);
-                  
-                  setAttributes({ 
-                    ...attributes, 
-                    sub_category_id: sub.id, 
-                    category_id: sub.category 
+
+                  setAttributes({
+                    ...attributes,
+                    sub_category_id: sub.id,
+                    category_id: sub.category
                   });
                   setCurrentStep(2);
                 }}
-                className={`category-card ${attributes.sub_category_id === sub.id ? "selected" : ""}`}
+                className={`bg-white p-2 sm:p-4 rounded-2xl sm:rounded-3xl border-2 flex flex-col items-center cursor-pointer transition-all duration-300 shadow-sm hover:-translate-y-1 hover:shadow-md active:scale-[0.98] ${
+                  attributes.sub_category_id === sub.id
+                    ? "border-orange-500 bg-orange-50"
+                    : "border-transparent hover:border-orange-100"
+                }`}
               >
-                <div className="category-image-container">
-                  <img 
-                    src={sub.image_url || speedDashboardImg} 
-                    alt={sub.name} 
+                <div className="w-12 h-12 sm:w-20 sm:h-20 rounded-full overflow-hidden mb-2 sm:mb-3 border-2 sm:border-4 border-white shadow-inner">
+                  <img
+                    src={sub.image_url || speedDashboardImg}
+                    alt={sub.name}
+                    className="w-full h-full object-cover"
                   />
                 </div>
-                <p className="category-name">{sub.name}</p>
+                <p className="text-[10px] sm:text-xs font-extrabold uppercase text-gray-800 text-center">
+                  {sub.name}
+                </p>
               </div>
             ))}
           </div>
         </div>
       )}
 
+
+       {/* STEP 2: MEDIA */}
       {currentStep === 2 && (
-        <div className="media-upload-step">
-          <div className="step-navigation">
-            <button onClick={() => setCurrentStep(1)} className="back-button"><ArrowLeft size={20} /></button>
-            <h3 className="step-heading">2. Media for {filteredStoreSubCats.find(s => s.id === attributes.sub_category_id)?.name}</h3>          </div>
-          <div className="main-media-grid">
-            <div className="upload-box-main" onClick={() => coverInputRef.current.click()}>
-              <div className={`upload-area cover-area ${coverPreview ? "has-content" : ""}`}>
-                {coverPreview ? <img src={coverPreview} className="preview-image" /> : <div className="placeholder"><Camera size={32} /><span>Main Image *</span></div>}
+        <div className="w-full">
+          <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-6">
+            <button
+              onClick={() => setCurrentStep(1)}
+              className="bg-gray-50 border-none p-2 rounded-full cursor-pointer hover:bg-gray-100 transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
+            >
+              <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
+            </button>
+            <h3 className="text-sm sm:text-lg font-bold">
+              2. Media for {filteredStoreSubCats.find(s => s.id === attributes.sub_category_id)?.name}
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            {/* Cover upload */}
+            <div onClick={() => coverInputRef.current.click()}>
+              <div
+                className={`h-40 sm:h-52 border-2 border-dashed rounded-2xl sm:rounded-3xl flex items-center justify-center cursor-pointer bg-gray-50 overflow-hidden relative transition-colors hover:border-orange-500 ${
+                  coverPreview ? "border-solid border-gray-200" : "border-gray-100"
+                }`}
+              >
+                {coverPreview ? (
+                  <img src={coverPreview} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="text-center text-gray-500">
+                    <Camera size={24} className="mx-auto sm:w-8 sm:h-8" />
+                    <span className="block text-[10px] sm:text-xs font-bold mt-1 sm:mt-2">Main Image *</span>
+                  </div>
+                )}
                 <input ref={coverInputRef} type="file" hidden onChange={handleCoverChange} accept="image/*" />
               </div>
             </div>
-            <div className="upload-box-main" onClick={() => videoInputRef.current.click()}>
-              <div className={`upload-area video-area ${videoPreview ? "has-content" : ""}`}>
-                {videoPreview ? <video src={videoPreview} className="preview-video" /> : <div className="placeholder"><PlayCircle size={32} /><span>Promo Video</span></div>}
+
+            {/* Video upload */}
+            <div onClick={() => videoInputRef.current.click()}>
+              <div
+                className={`h-40 sm:h-52 border-2 border-dashed rounded-2xl sm:rounded-3xl flex items-center justify-center cursor-pointer bg-gray-50 overflow-hidden relative transition-colors hover:border-orange-500 ${
+                  videoPreview ? "border-solid border-gray-200" : "border-gray-100"
+                }`}
+              >
+                {videoPreview ? (
+                  <video src={videoPreview} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="text-center text-gray-500">
+                    <PlayCircle size={24} className="mx-auto sm:w-8 sm:h-8" />
+                    <span className="block text-[10px] sm:text-xs font-bold mt-1 sm:mt-2">Promo Video</span>
+                  </div>
+                )}
                 <input ref={videoInputRef} type="file" hidden onChange={handleVideoChange} accept="video/*" />
               </div>
             </div>
           </div>
-          <div className="gallery-upload-section">
-            <p className="section-title">Gallery (Max 5)</p>
-            <div className="gallery-flex">
-              <div onClick={() => galleryInputRef.current.click()} className="gallery-add-button">
-                <Plus size={24} />
+
+          {/* Gallery */}
+          <div className="mt-3 sm:mt-6 bg-gray-50 p-3 sm:p-6 rounded-2xl sm:rounded-3xl">
+            <p className="text-xs sm:text-sm font-bold mb-2 sm:mb-3">Gallery (Max 5)</p>
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              <div
+                onClick={() => galleryInputRef.current.click()}
+                className="w-12 h-12 sm:w-16 sm:h-16 border-2 border-dashed border-gray-400 rounded-lg sm:rounded-2xl flex items-center justify-center text-gray-500 cursor-pointer hover:border-orange-500 transition-colors"
+              >
+                <Plus size={18} className="sm:w-6 sm:h-6" />
                 <input ref={galleryInputRef} type="file" multiple hidden onChange={handleGalleryChange} accept="image/*" />
               </div>
               {galleryPreviews.map((url, i) => (
-                <div key={i} className="gallery-item">
-                  <img src={url} className="gallery-preview" />
-                  <button onClick={() => removeGalleryImage(i)} className="remove-button"><X size={10} /></button>
+                <div key={i} className="relative w-12 h-12 sm:w-16 sm:h-16">
+                  <img src={url} className="w-full h-full rounded-lg sm:rounded-2xl object-cover" />
+                  <button
+                    onClick={() => removeGalleryImage(i)}
+                    className="absolute -top-1 -right-1 bg-white text-red-500 rounded-full p-0.5 shadow border-none cursor-pointer min-w-[18px] min-h-[18px] flex items-center justify-center"
+                  >
+                    <X size={10} />
+                  </button>
                 </div>
               ))}
             </div>
           </div>
-          <button onClick={() => coverPreview ? setCurrentStep(3) : alert("Weka Picha Kuu!")} className="step-primary-button">CONTINUE →</button>
+
+          <button
+            onClick={() => coverPreview ? setCurrentStep(3) : alert("Weka Picha Kuu!")}
+            className="w-full mt-4 sm:mt-8 py-3 sm:py-5 px-4 bg-orange-500 text-white border-none rounded-2xl font-black text-sm sm:text-base cursor-pointer shadow-lg shadow-orange-500/20 hover:bg-orange-600 active:scale-[0.98] transition-all"
+          >
+            CONTINUE →
+          </button>
         </div>
       )}
 
+      
+         {/* ===== STEP 3: DETAILS ===== */}
       {currentStep === 3 && (
-        <div className="attributes-step">
-          <div className="step-navigation">
-            <button onClick={() => setCurrentStep(2)} className="back-button"><ArrowLeft size={20} /></button>
-            <h3 className="step-heading">3. Details for {filteredStoreSubCats.find(s => s.id === attributes.sub_category_id)?.name}</h3>          </div>
-          <div className="form-container">
-            <ProductAttributes 
-              attributes={attributes} 
+        <div>
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-4 mb-3 sm:mb-4 md:mb-6">
+            <button
+              onClick={() => setCurrentStep(2)}
+              className="min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center bg-gray-50 dark:bg-slate-800 rounded-full cursor-pointer border-none text-gray-800 dark:text-slate-200 [-webkit-tap-highlight-color:transparent] active:scale-95 transition-transform"
+            >
+              <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
+            </button>
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 dark:text-slate-200">
+              3. Details for {filteredStoreSubCats.find(s => s.id === attributes.sub_category_id)?.name}
+            </h3>
+          </div>
+
+          <div className="w-full max-w-full">
+            <ProductAttributes
+              attributes={attributes}
               setAttributes={setAttributes}
               subCategoryId={attributes.sub_category_id}
-              leafCategories={allLeafCategories} 
+              leafCategories={allLeafCategories}
             />
-            <div className="form-actions">
-              <button 
+            <div className="mt-4 sm:mt-6">
+              <button
                 onClick={() => {
-
                   if (!attributes.name) return alert("Please fill in the product name!");
 
-// 🔥 RETAIL validation
-if (attributes.is_retail) {
-  if (attributes.has_colors) {
-    // Kama kuna variations, hakikisha angalau ukubwa mmoja una bei
-    const colorPrices = attributes.size_prices || {};
-    const hasAnyPrice = Object.values(colorPrices).some(prices => 
-      Object.values(prices || {}).some(p => Number(p) > 0)
-    );
-    if (!hasAnyPrice) {
-      return alert("Please add prices for at least one size in SECTION 9!");
-    }
-  } else {
-    // Kama haina variations, lazima bei iwepo
-    if (!attributes.price) {
-      return alert("Please add a retail price!");
-    }
-  }
-}
+                  if (attributes.is_retail) {
+                    if (attributes.has_colors) {
+                      const colorPrices = attributes.size_prices || {};
+                      const hasAnyPrice = Object.values(colorPrices).some(prices =>
+                        Object.values(prices || {}).some(p => Number(p) > 0)
+                      );
+                      if (!hasAnyPrice) {
+                        return alert("Please add prices for at least one size in SECTION 9!");
+                      }
+                    } else {
+                      if (!attributes.price) {
+                        return alert("Please add a retail price!");
+                      }
+                    }
+                  }
 
-if (attributes.is_wholesale && (!attributes.price_tiers || attributes.price_tiers.length === 0)) {
-  return alert("You selected Wholesale, please add at least one price range!");
-}
-
+                  if (attributes.is_wholesale && (!attributes.price_tiers || attributes.price_tiers.length === 0)) {
+                    return alert("You selected Wholesale, please add at least one price range!");
+                  }
 
                   if (attributes.is_wholesale && !attributes.moq) {
                     return alert("Please fill in the Minimum Order Quantity (MOQ) for wholesale!");
@@ -651,12 +742,12 @@ if (attributes.is_wholesale && (!attributes.price_tiers || attributes.price_tier
                   }
                   if (!coverFile) return alert("Please add the main image!");
 
-                  const newEntry = { 
-                    ...attributes, 
+                  const newEntry = {
+                    ...attributes,
                     id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                    previewImg: coverPreview, 
-                    cover_file: coverFile, 
-                    video_file: videoFile, 
+                    previewImg: coverPreview,
+                    cover_file: coverFile,
+                    video_file: videoFile,
                     gallery_files: [...galleryFiles],
                     name: attributes.name.trim().toLowerCase(),
                     description: attributes.description,
@@ -664,23 +755,23 @@ if (attributes.is_wholesale && (!attributes.price_tiers || attributes.price_tier
                     stock: attributes.stock,
                     brand_id: attributes.brand_id,
                     condition: attributes.condition,
-                    
+
                     category_id: attributes.category_id,
                     sub_category_id: attributes.sub_category_id,
                     leaf_category_id: attributes.leaf_category_id,
-                    
+
                     has_colors: attributes.has_colors || false,
                     enable_sizes: attributes.enable_sizes || false,
                     enable_variations: attributes.enable_variations || false,
-                    colors: attributes.colors || [],                           
-                    color_images: attributes.color_images || {},               
-                    color_image_files: attributes.color_image_files || {},     
-                    sizes: attributes.sizes || [],                             
+                    colors: attributes.colors || [],
+                    color_images: attributes.color_images || {},
+                    color_image_files: attributes.color_image_files || {},
+                    sizes: attributes.sizes || [],
                     size_stock: attributes.size_stock || {},
-                    size_prices: attributes.size_prices || {},                  
+                    size_prices: attributes.size_prices || {},
                     specifications: {
-                        ...(attributes.specifications || {}),
-                        ...(attributes.dynamic_specs || {})
+                      ...(attributes.specifications || {}),
+                      ...(attributes.dynamic_specs || {})
                     },
                     gender: attributes.gender || [],
                     target_audience: attributes.target_audience || [],
@@ -714,47 +805,66 @@ if (attributes.is_wholesale && (!attributes.price_tiers || attributes.price_tier
                     ...initialAttributes,
                     category_id: attributes.category_id,
                     sub_category_id: attributes.sub_category_id,
-                    leaf_category_id: null, 
+                    leaf_category_id: null,
                     brand_id: null,
                     colors: [],
-                    total_stock_cost: '', 
-                    expected_total_profit: '', 
+                    total_stock_cost: '',
+                    expected_total_profit: '',
                     price_tiers: [],
-                    moq: '', 
+                    moq: '',
                     is_retail: false,
                     target_audience: [],
                     is_wholesale: false
                   });
-                  setCoverFile(null); setCoverPreview(null); 
-                  setVideoFile(null); setVideoPreview(null); 
+                  setCoverFile(null); setCoverPreview(null);
+                  setVideoFile(null); setVideoPreview(null);
                   setGalleryFiles([]); setGalleryPreviews([]);
                   alert(`✅ ${newEntry.name} added to the queue!`);
-                  }}
-                className="add-to-queue-button"
+                }}
+                className="w-full p-3 sm:p-4 bg-orange-50 dark:bg-slate-700 text-orange-500 dark:text-orange-500 border-2 border-dashed border-orange-200 dark:border-slate-600 rounded-2xl sm:rounded-[1.25rem] font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer [-webkit-tap-highlight-color:transparent] active:scale-[0.98] transition-transform"
               >
-              <PlusCircle size={20} /> SAVE AND ADD ANOTHER
+                <PlusCircle size={18} className="sm:w-5 sm:h-5" /> SAVE AND ADD ANOTHER
               </button>
             </div>
           </div>
 
+          {/* ===== QUEUE ===== */}
           {addedProducts.length > 0 && (
-            <div className="queue-section">
-              <h4 className="queue-title">📦 Products Ready ({addedProducts.length})</h4>
-              <div className="queue-list">
+            <div className="mt-6 sm:mt-8 md:mt-12 border-t-2 border-dashed border-gray-100 dark:border-slate-700 pt-4 sm:pt-6 md:pt-8 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+              <h4 className="text-xs sm:text-sm font-black uppercase mb-3 sm:mb-4 text-gray-800 dark:text-slate-200">
+                📦 Products Ready ({addedProducts.length})
+              </h4>
+              <div>
                 {addedProducts.map((prod) => (
-                  <div key={prod.id} className="queue-card">
-                    <div className="queue-card-info">
-                      <img src={prod.previewImg} className="queue-thumb" />
-                      <p className="queue-product-name">{prod.name}</p>
+                  <div
+                    key={prod.id}
+                    className="bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 p-2 sm:p-3 md:p-4 rounded-xl sm:rounded-[1.25rem] flex justify-between items-center mb-2 sm:mb-3"
+                  >
+                    <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
+                      <img
+                        src={prod.previewImg}
+                        className="w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl object-cover"
+                      />
+                      <p className="text-xs sm:text-sm font-bold text-gray-800 dark:text-slate-200">
+                        {prod.name}
+                      </p>
                     </div>
-                    <button onClick={() => setAddedProducts(addedProducts.filter(p => p.id !== prod.id))} className="queue-remove-button">
+                    <button
+                      onClick={() => setAddedProducts(addedProducts.filter(p => p.id !== prod.id))}
+                      className="min-w-[32px] min-h-[32px] flex items-center justify-center bg-transparent border-none cursor-pointer text-red-500 [-webkit-tap-highlight-color:transparent] active:scale-90 transition-transform"
+                    >
                       <Trash2 size={14} />
                     </button>
                   </div>
                 ))}
               </div>
-              <button onClick={handleFinalPublishAll} disabled={loading || !storeId} className="publish-all-button">
-                <CheckCircle size={24} /> {loading ? "LOADING..." : "FINISH AND PUBLISH ALL"}
+              <button
+                onClick={handleFinalPublishAll}
+                disabled={loading || !storeId}
+                className="w-full mt-4 sm:mt-6 p-3 sm:p-4 md:p-6 bg-green-500 hover:bg-green-600 disabled:opacity-70 disabled:cursor-not-allowed text-white border-none rounded-2xl sm:rounded-[1.5rem] font-black text-sm sm:text-base flex items-center justify-center gap-2 sm:gap-3 cursor-pointer shadow-[0_10px_20px_rgba(34,197,94,0.2)] [-webkit-tap-highlight-color:transparent] active:scale-[0.98] transition-all duration-200"
+              >
+                <CheckCircle size={20} className="sm:w-6 sm:h-6" />
+                {loading ? "LOADING..." : "FINISH AND PUBLISH ALL"}
               </button>
             </div>
           )}

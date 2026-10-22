@@ -1,10 +1,10 @@
+// src/pages/SupplierAuth.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google'; // 🔥 ONGEZA HII!
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import api from '../axiosConfig';
-import { Lock, ShieldCheck, CheckCircle, Mail, Eye, EyeOff, ChevronDown } from 'lucide-react';
+import { Lock, ShieldCheck, Mail, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import toast from 'react-hot-toast';
-import '../SupplierAuth.css';
 
 const SupplierAuth = () => {
   const navigate = useNavigate();
@@ -14,14 +14,6 @@ const SupplierAuth = () => {
   const [loading, setLoading] = useState(false);
   const [country, setCountry] = useState('TZ');
   const [showPassword, setShowPassword] = useState(false);
-
-  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth <= 900 : false);
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 900);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -118,110 +110,114 @@ const SupplierAuth = () => {
 
   return (
     <GoogleOAuthProvider clientId="897025267638-ef196t913o7kt77dbgld9d7tmv01ftbp.apps.googleusercontent.com">
-      <div className={`supplier-auth-container ${isMobile ? 'mobile' : ''}`}>
+      <div className="flex min-h-screen bg-white font-sans flex-col lg:flex-row">
         
-        {/* LEFT PANEL */}
-        <div className="supplier-auth-left-panel">
-          <div className="supplier-auth-overlay-box">
-            <p className="supplier-auth-testimonial-text">
+        {/* LEFT PANEL (Inaonekana kwenye Desktop tu) */}
+        <div 
+          className="hidden lg:flex flex-1 relative bg-cover bg-center"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1000&auto=format&fit=crop')" }}
+        >
+          <div className="absolute bottom-10 left-10 right-10 bg-white/85 p-6 md:p-8 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.1)]">
+            <p className="m-0 mb-3 text-base italic font-medium text-gray-900 leading-relaxed">
               “In just 1 year, LTA International generated 14 new customers with new sales growth totaling $1.5 million.”
             </p>
-            <div className="supplier-auth-testimonial-footer">
-              <span className="supplier-auth-testimonial-author">Andrea Vitello</span>
-              <span className="supplier-auth-testimonial-brand">Skyfall.com</span>
+            <div className="flex items-center justify-between border-t border-gray-200 pt-3">
+              <span className="font-semibold text-sm text-gray-800">Andrea Vitello</span>
+              <span className="font-bold text-xs text-[#FF6600]">Skyfall.com</span>
             </div>
           </div>
         </div>
 
         {/* RIGHT PANEL */}
-        <div className="supplier-auth-right-panel">
+        <div className="flex-1 flex flex-col justify-center px-5 py-8 md:px-12 lg:px-20 md:py-10 bg-white w-full">
           
-          {/* 🔥 SECURITY BADGES */}
-          <div className="supplier-auth-security-badges">
-            <div className="security-badge-item">
-              <ShieldCheck size={16} color="#28a745" />
-              <span className="security-text">SSL 256-bit Encryption</span>
+          {/* SECURITY BADGES */}
+          <div className="flex flex-col md:flex-row justify-center items-center gap-2 md:gap-4 mb-6 p-3 md:p-2.5 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="flex items-center gap-1.5 text-xs text-gray-600 font-medium">
+              <ShieldCheck size={16} className="text-[#28a745]" />
+              <span>SSL 256-bit Encryption</span>
             </div>
-            <div className="security-badge-item">
-              <Lock size={16} color="#28a745" />
-              <span className="security-text">2FA Enabled</span>
+            <div className="flex items-center gap-1.5 text-xs text-gray-600 font-medium">
+              <Lock size={16} className="text-[#28a745]" />
+              <span>2FA Enabled</span>
             </div>
           </div>
 
-          <h2 className="supplier-auth-title">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
             {isLogin ? 'Sign in as a supplier' : 'Sign up as a supplier'}
           </h2>
           
-          <p className="supplier-auth-subtitle">
-            <Lock size={14} color="#28a745" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
-            <span className="secure-text">We Secure Your Data</span>
+          <p className="text-[13px] md:text-sm text-gray-600 mb-6 md:mb-8 flex items-center gap-1">
+            <Lock size={14} className="text-[#28a745] inline" />
+            <span className="text-[#28a745] font-semibold">We Secure Your Data</span>
           </p>
 
-          <div className="supplier-auth-location">
+          <div className="flex items-center gap-2 mb-6 md:mb-8 text-sm text-gray-600 flex-wrap">
             <span>Company location:</span>
-            <div className="supplier-auth-location-select">
+            <div className="relative flex items-center">
               <select 
                 value={country} 
                 onChange={(e) => setCountry(e.target.value)}
-                className="supplier-auth-country-select"
+                className="appearance-none border-none bg-transparent font-semibold text-gray-900 cursor-pointer outline-none text-sm pr-6"
               >
                 <option value="TZ">🇹🇿 Tanzania</option>
                 <option value="KE">🇰🇪 Kenya</option>
                 <option value="UG">🇺🇬 Uganda</option>
                 <option value="US">🇺🇸 United States</option>
               </select>
-              <ChevronDown size={16} className="supplier-auth-country-arrow" />
+              <ChevronDown size={16} className="absolute right-0 pointer-events-none text-gray-500" />
             </div>
           </div>
 
-          {/* 🔥 GOOGLE PEKEE - HAKUNA FACEBOOK AU LINKEDIN */}
-          <div className="supplier-auth-social-buttons">
+          {/* GOOGLE LOGIN */}
+          <div className="flex flex-col gap-3 mb-6 md:mb-8 w-full justify-center items-center overflow-hidden">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={handleGoogleError}
               useOneTap
+              width="100%"
             />
           </div>
 
           {/* DIVIDER */}
-          <div className="supplier-auth-divider">
-            <hr className="supplier-auth-divider-line" />
-            <span className="supplier-auth-divider-text">Or</span>
-            <hr className="supplier-auth-divider-line" />
+          <div className="flex items-center mb-6 md:mb-8 text-gray-400 text-sm">
+            <hr className="flex-1 border-t border-gray-200 m-0" />
+            <span className="px-4">Or</span>
+            <hr className="flex-1 border-t border-gray-200 m-0" />
           </div>
 
           {/* FORM */}
-          <form onSubmit={handleSubmit} className="supplier-auth-form">
-            <div className="supplier-auth-form-group">
-              <label className="supplier-auth-label">Email</label>
-              <div className="supplier-auth-input-wrapper">
-                <Mail size={18} color="#999" className="supplier-auth-input-icon" />
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4 md:gap-5">
+            <div className="flex flex-col">
+              <label className="block text-sm font-medium mb-1.5 text-gray-800">Email</label>
+              <div className="relative flex items-center">
+                <Mail size={18} className="absolute left-3.5 text-gray-400" />
                 <input 
                   type="email" 
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="supplier-auth-input"
+                  className="w-full py-3 pl-10 pr-4 rounded-lg border border-gray-300 text-[15px] outline-none focus:border-[#FF6600] transition-colors bg-white text-gray-900 placeholder-gray-400"
                   placeholder="Enter your email"
                 />
               </div>
             </div>
 
-            <div className="supplier-auth-form-group">
-              <label className="supplier-auth-label">Password</label>
-              <div className="supplier-auth-input-wrapper">
+            <div className="flex flex-col">
+              <label className="block text-sm font-medium mb-1.5 text-gray-800">Password</label>
+              <div className="relative flex items-center">
                 <input 
                   type={showPassword ? "text" : "password"} 
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="supplier-auth-input"
+                  className="w-full py-3 pl-4 pr-10 rounded-lg border border-gray-300 text-[15px] outline-none focus:border-[#FF6600] transition-colors bg-white text-gray-900 placeholder-gray-400"
                   placeholder="Enter your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="supplier-auth-password-toggle"
+                  className="absolute right-3.5 bg-transparent border-none cursor-pointer text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -231,27 +227,25 @@ const SupplierAuth = () => {
             <button 
               type="submit" 
               disabled={loading}
-              className="supplier-auth-submit-btn"
+              className="w-full py-3.5 mt-2 bg-[#FF6600] hover:bg-[#e55a00] text-white border-none rounded-full text-[15px] md:text-base font-bold cursor-pointer transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {loading ? 'Processing...' : isLogin ? 'Sign in' : 'Create account'}
             </button>
           </form>
 
           {/* TRUST MESSAGE */}
-          <div className="supplier-auth-trust-message">
-            <div className="trust-icon-wrapper">
-              <ShieldCheck size={20} color="#28a745" />
-            </div>
-            <p className="trust-text">
+          <div className="mt-4 text-center p-2.5 bg-blue-50 rounded-lg border border-blue-100 flex flex-col items-center">
+            <ShieldCheck size={20} className="text-[#28a745] mb-1" />
+            <p className="text-xs text-gray-800 font-medium m-0">
               Your information is protected with 256-bit SSL encryption.
             </p>
           </div>
 
-          <div className="supplier-auth-footer">
+          <div className="text-center mt-5 text-[15px] text-gray-800">
             {isLogin ? "Don't have an account? " : "Already have an account? "}
             <span 
               onClick={() => setIsLogin(!isLogin)}
-              className="supplier-auth-toggle-link"
+              className="font-bold text-[#FF6600] cursor-pointer underline hover:text-[#e55a00] transition-colors"
             >
               {isLogin ? 'Sign up' : 'Sign in'}
             </span>

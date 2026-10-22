@@ -4,7 +4,7 @@ import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
 import SkeletonCardz from "./SkeletonCardz"; // 🔥 IMPORT SAHIHI (SkeletonCardz)
 import { useTranslation } from 'react-i18next';
-import '../TrendingNow.css';
+//import '../TrendingNow.css';
 
 export default function TrendingNow({ navigate, selectedCategory, getCategoryDisplayName }) {
   const { t, i18n } = useTranslation();
@@ -79,30 +79,26 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
   // ============================================================
   // 🔥 RENDER HEADER (Imejumuishwa kwa pande zote)
   // ============================================================
-  const renderHeader = () => (
-    <div className="trend-header">
-      <div className="trend-header-left">
-        <div className="trend-title-group">
-          <TrendingUp className="trend-icon" />
-          <h2 className="trend-title">
+   const renderHeader = () => (
+    <div className="flex justify-between items-center px-3 md:px-5 py-2 md:py-3 bg-[#fff7ed] dark:bg-[#1e293b] dark:border-b dark:border-[#334155] rounded-t-xl mb-2.5 md:mb-4 text-black dark:text-white">
+      <div className="flex flex-col">
+        <div className="flex items-center gap-1.5 md:gap-2.5">
+          <TrendingUp className="text-[#8b5cf6] dark:text-[#a78bfa] w-[18px] h-[18px] md:w-6 md:h-6" />
+          <h2 className="text-sm md:text-base lg:text-xl font-bold m-0 text-black dark:text-white">
             {t('hot_picks')}
           </h2>
         </div>
         
-        {/* ✅ ONGEZA SUBTITLE HAPA CHINI YA TITLE */}
-        <p className="trend-subtitle">
+        <p className="text-[10px] md:text-xs lg:text-sm text-[#888] dark:text-[#94a3b8] m-0 mt-1 lg:mt-0 lg:pl-[34px]">
           {t('check_popular_items')}
         </p>
       </div>
       
-      <div className="trend-header-right">
+      <div className="flex items-center">
         <button 
-          className="trend-arrow-link-btn"
+          className="bg-transparent border-none cursor-pointer flex items-center justify-center text-black dark:text-white p-1 transition-transform hover:translate-x-1 hover:text-[#8b5cf6] active:scale-95"
           onClick={() => {
             const url = '/products?sectionName=Hot+Picks';
-            
-            // ✅ MUHIMU: Angalia kama ni Desktop (>768px), fungua tab mpya.
-            // Ikiwa ni Mobile, fungua kwenye tab hii hii (kama kawaida).
             if (window.innerWidth > 768) {
               window.open(url, '_blank'); 
             } else {
@@ -110,7 +106,7 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
             }
           }}
         >
-          <ArrowRight size={24} />
+          <ArrowRight size={20} className="md:w-6 md:h-6" />
         </button>
       </div>
     </div>
@@ -121,17 +117,17 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
   // ============================================================
   if (loading) {
     return (
-      <div className="trending-main-wrapper">
-        
-              {renderHeader()}
+      <div className="relative w-full bg-white dark:bg-[#1e293b] border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border">
+        {renderHeader()}
 
-
-        {/* 🔥 SKELETON SCROLL - Inaonyesha skeleton 5 kwa horizontal scroll */}
-        <div className="trend-desktop-wrapper">
-          <div className="trend-scroll-wrapper hide-scrollbar">
+        <div className="relative flex items-center px-2">
+          <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-4 w-full gap-2 md:gap-3 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {Array.from({ length: 5 }).map((_, index) => (
-              <div key={`skeleton-${index}`} className="trend-card-wrapper">
-                <SkeletonCardz /> {/* ✅ SkeletonCardz */}
+              <div 
+                key={`skeleton-${index}`} 
+                className="flex-[0_0_calc((100%-17.6px)/2.2)] min-w-[calc((100%-17.6px)/2.2)] sm:flex-[0_0_calc((100%-35px)/3.5)] sm:min-w-[calc((100%-35px)/3.5)] md:flex-[0_0_calc((100%-54px)/4.5)] md:min-w-[calc((100%-54px)/4.5)] lg:flex-[0_0_calc((100%-78px)/6.5)] lg:min-w-[calc((100%-78px)/6.5)] snap-start"
+              >
+                <SkeletonCardz />
               </div>
             ))}
           </div>
@@ -150,21 +146,27 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
   // ============================================================
   return (
   
-    <div className="trending-main-wrapper">
+    <div className="relative w-full bg-white dark:bg-[#1e293b] border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border">
       
      {renderHeader()}
 
       {/* Horizontal Scroll */}
-      <div className="trend-desktop-wrapper">
-        {showLeftArrow && (
-          <button className="trend-arrow-btn trend-arrow-left" onClick={() => scroll('left')}>
-            <ChevronLeft size={24} />
+      <div className="relative flex items-center px-2">
+         {showLeftArrow && (
+          <button 
+            className="absolute z-10 w-6 h-6 md:w-9 md:h-9 bg-white dark:bg-[#1e293b] border border-[#e2e8f0] dark:border-[#334155] rounded-full flex items-center justify-center cursor-pointer shadow-md transition-all top-1/2 -translate-y-1/2 text-black dark:text-white hover:bg-[#8b5cf6] hover:text-white hover:border-[#8b5cf6] hover:scale-105 active:scale-95 left-0 md:-left-1" 
+            onClick={() => scroll('left')}
+          >
+          <ChevronLeft size={16} className="md:w-6 md:h-6" />
+
           </button>
         )}
         
-        <div ref={scrollContainerRef} className="trend-scroll-wrapper hide-scrollbar">
+        <div ref={scrollContainerRef} className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-4 w-full gap-2 md:gap-3 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        >
           {products.map((item, index) => (
-            <div key={item.id} className="trend-card-wrapper">
+            <div key={item.id} className="flex-[0_0_calc((100%-17.6px)/2.2)] min-w-[calc((100%-17.6px)/2.2)] sm:flex-[0_0_calc((100%-35px)/3.5)] sm:min-w-[calc((100%-35px)/3.5)] md:flex-[0_0_calc((100%-54px)/4.5)] md:min-w-[calc((100%-54px)/4.5)] lg:flex-[0_0_calc((100%-78px)/6.5)] lg:min-w-[calc((100%-78px)/6.5)] snap-start"
+            >
               <DashboardCard
                 image={item.cover_image_url || item.cover_image}
                // title={item.name}
@@ -191,8 +193,12 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
         </div>
         
         {showRightArrow && (
-          <button className="trend-arrow-btn trend-arrow-right" onClick={() => scroll('right')}>
-            <ChevronRight size={24} />
+          <button 
+            className="absolute z-10 w-6 h-6 md:w-9 md:h-9 bg-white dark:bg-[#1e293b] border border-[#e2e8f0] dark:border-[#334155] rounded-full flex items-center justify-center cursor-pointer shadow-md transition-all top-1/2 -translate-y-1/2 text-black dark:text-white hover:bg-[#8b5cf6] hover:text-white hover:border-[#8b5cf6] hover:scale-105 active:scale-95 right-0 md:-right-1" 
+            onClick={() => scroll('right')}
+          >                       
+           <ChevronRight size={16} className="md:w-6 md:h-6" />
+
           </button>
         )}
       </div>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import * as LucideIcons from "lucide-react";
+import { PlayCircle, X } from "lucide-react";
 
 export default function Tutorials() {
   const [selectedVideo, setSelectedVideo] = useState(null);
@@ -50,41 +50,40 @@ export default function Tutorials() {
   ];
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 20px' }}>
-      <h1 style={{ fontSize: '32px', fontWeight: '700', marginBottom: '10px', textAlign: 'center' }}>
-        <LucideIcons.PlayCircle size={28} style={{ color: '#ff6a00', marginRight: '10px' }} />
+    <div className="max-w-[1200px] mx-auto py-10 px-5 font-sans">
+      
+      <h1 className="text-[32px] font-bold mb-2.5 text-center text-gray-900 dark:text-white flex items-center justify-center gap-2.5">
+        <PlayCircle size={28} className="text-[#ff6a00]" />
         Video Tutorials
       </h1>
-      <p style={{ fontSize: '16px', color: '#666', marginBottom: '40px', textAlign: 'center' }}>
+      
+      <p className="text-base text-gray-500 dark:text-gray-400 mb-10 text-center">
         Tazama video fupi za jinsi ya kutumia Skyfall kupata bidhaa bora kwa bei ya jumla
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '30px' }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-[30px]">
         {tutorials.map((tutorial) => (
           <div 
             key={tutorial.id}
-            style={{
-              backgroundColor: 'white',
-              borderRadius: '12px',
-              overflow: 'hidden',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-              border: '1px solid #eee',
-              cursor: 'pointer',
-              transition: 'transform 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+            className="bg-white dark:bg-[#111111] rounded-xl overflow-hidden shadow-sm border border-gray-200 dark:border-gray-800 cursor-pointer transition-transform duration-200 hover:-translate-y-1"
             onClick={() => setSelectedVideo(tutorial)}
           >
-            <div style={{ position: 'relative', backgroundColor: '#f0f0f0', height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <LucideIcons.PlayCircle size={50} color="#ff6a00" style={{ opacity: 0.8 }} />
-              <span style={{ position: 'absolute', bottom: '10px', right: '10px', backgroundColor: 'rgba(0,0,0,0.7)', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' }}>
+            {/* Thumbnail Area */}
+            <div className="relative bg-gray-100 dark:bg-gray-800 h-[200px] flex items-center justify-center">
+              <PlayCircle size={50} className="text-[#ff6a00] opacity-80" />
+              <span className="absolute bottom-2.5 right-2.5 bg-black/70 text-white px-2 py-0.5 rounded text-xs">
                 {tutorial.duration}
               </span>
             </div>
-            <div style={{ padding: '15px' }}>
-              <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px' }}>{tutorial.title}</h3>
-              <p style={{ fontSize: '13px', color: '#666' }}>{tutorial.description}</p>
+            
+            {/* Content Area */}
+            <div className="p-4">
+              <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-white">
+                {tutorial.title}
+              </h3>
+              <p className="text-[13px] text-gray-500 dark:text-gray-400 m-0">
+                {tutorial.description}
+              </p>
             </div>
           </div>
         ))}
@@ -92,36 +91,37 @@ export default function Tutorials() {
 
       {/* Video Modal */}
       {selectedVideo && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.8)',
-          zIndex: 100000,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }} onClick={() => setSelectedVideo(null)}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '12px',
-            maxWidth: '800px',
-            width: '90%',
-            overflow: 'hidden'
-          }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ padding: '15px', backgroundColor: '#f5f5f5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: '600' }}>{selectedVideo.title}</h3>
-              <button onClick={() => setSelectedVideo(null)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                <LucideIcons.X size={24} />
+        <div 
+          className="fixed inset-0 bg-black/80 z-[100000] flex items-center justify-center p-4"
+          onClick={() => setSelectedVideo(null)}
+        >
+          <div 
+            className="bg-white dark:bg-[#111111] rounded-xl max-w-[800px] w-full overflow-hidden shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-4 bg-gray-50 dark:bg-gray-900 flex justify-between items-center border-b border-gray-200 dark:border-gray-800">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white m-0">
+                {selectedVideo.title}
+              </h3>
+              <button 
+                onClick={() => setSelectedVideo(null)} 
+                className="bg-transparent border-none cursor-pointer text-gray-500 hover:text-gray-800 dark:hover:text-white transition-colors p-1"
+              >
+                <X size={24} />
               </button>
             </div>
-            <div style={{ padding: '20px', textAlign: 'center' }}>
-              <div style={{ backgroundColor: '#f0f0f0', padding: '60px 20px', borderRadius: '8px' }}>
-                <LucideIcons.PlayCircle size={80} color="#ff6a00" />
-                <p style={{ marginTop: '20px', color: '#666' }}>Video inaandaliwa ...</p>
-                <p style={{ fontSize: '14px', color: '#999', marginTop: '10px' }}>Tazama mwongozo wa {selectedVideo.title}</p>
+            
+            {/* Modal Body */}
+            <div className="p-5 text-center">
+              <div className="bg-gray-100 dark:bg-gray-800 py-[60px] px-5 rounded-lg flex flex-col items-center justify-center">
+                <PlayCircle size={80} className="text-[#ff6a00]" />
+                <p className="mt-5 text-gray-500 dark:text-gray-400 mb-0">
+                  Video inaandaliwa ...
+                </p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 mt-2.5 mb-0">
+                  Tazama mwongozo wa {selectedVideo.title}
+                </p>
               </div>
             </div>
           </div>

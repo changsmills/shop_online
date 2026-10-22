@@ -2,14 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import { useEffect, useState } from "react";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { CartProvider } from "./context/CartContext"; 
-import BottomNav from "./components/BottomNav";
 import { Toaster, toast } from 'react-hot-toast';
 import { LanguageProvider } from './context/LanguageContext.jsx'; 
-import ProductCreationFlow from './components/ProductCreationFlow';
-import QuickInventoryManager from './components/QuickInventoryManager';
-import BusinessAnalytics from './components/BusinessAnalytics';
-import TopDealsSection from './components/TopDealsSection';
-import StoreManagement from './components/StoreManagement';
 import SupplierMessages from './pages/SupplierMessages'; 
 import SupplierNotifications from './pages/SupplierNotifications'; 
 import SupplierOrders from './pages/SupplierOrders';
@@ -25,7 +19,6 @@ import CreateStore from "./pages/CreateStore";
 import Dashboard from "./pages/Dashboard";
 import ProductManagement from "./pages/ProductManagement";
 import Analytics from "./pages/Analytics";
-import VirtualDashboard from "./pages/VirtualDashboard";
 import PhysicalDashboard from "./pages/PhysicalDashboard";
 import ProductDetails from "./pages/ProductDetails"; 
 import CartPage from "./pages/CartPage"; 
@@ -64,7 +57,7 @@ import AllStores from './pages/AllStores';
 import SupplierAccountSettings from './pages/SupplierAccountSettings'; 
 import SellerDashboard from './pages/SellerDashboard'; 
 import VerifySellerOTP from './pages/VerifySellerOTP';
-import StorePending from './pages/StorePending'; // 🔥 Ongoza Import!
+import StorePending from './pages/StorePending';
 import AdminStores from './pages/AdminStores';
 
 
@@ -168,8 +161,8 @@ function AppContent({ session }) {
  {/* 🔥 ONGEZA HII HAPA: BANNER YA ONYO LA MTANDAO */}
         {!isOnline && (
          <div className="offline-banner">
-            <span className="offline-icon">📶</span> 
-           <span className="offline-text">⚠️ Connection lost. Please check your internet connection...</span>
+           {/* <span className="offline-icon">📶</span> */}
+          {/* <span className="offline-text">⚠️ Connection lost. Please check your internet connection...</span>*/}
          </div>
        )}
 
@@ -237,7 +230,6 @@ function AppContent({ session }) {
 
         {/* DASHBOARD SUB-PAGES */}
         <Route path="/dashboard/analytics" element={<Analytics session={session} />} />
-        <Route path="/dashboard/virtual" element={<VirtualDashboard session={session} />} />
         <Route path="/dashboard/products" element={<ProductManagement session={session} />} />
         <Route path="/create-store" element={<CreateStore session={session} />} />
         <Route path="/dashboard/supplier-orders" element={<SupplierOrders session={session} />} />

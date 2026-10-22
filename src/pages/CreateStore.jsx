@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../axiosConfig"; // 🔥 Tumia api
 import StoreForm from "./StoreForm"; 
-import "../CreateStore.css";
+//import "../CreateStore.css";
 
 export default function CreateStore() {
   const navigate = useNavigate();
@@ -133,15 +133,20 @@ export default function CreateStore() {
     }
   };
 
-   if (isSuccess) {
+   // ===== SUCCESS SCREEN =====
+  if (isSuccess) {
     return (
-      <div className="create-store-page">
-        <div className="premium-success-card">
-          <div className="success-lottie">🏢</div>
-          <h2 className="gradient-text">Store Registered!</h2>
-          <p>Preparing your store: <strong>{formData.name}</strong>...</p>
-          <div className="progress-bar-container">
-            <div className="progress-fill"></div>
+      <div className="font-sans min-h-screen bg-gray-50 dark:bg-[#0f172a] px-4 sm:px-5 pt-[100px] pb-10 flex justify-center items-start">
+        <div className="bg-white dark:bg-[#1e293b] p-8 sm:p-12 rounded-3xl text-center shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] dark:shadow-[0_40px_100px_-20px_rgba(0,0,0,0.6)] max-w-[500px] mx-auto border border-gray-100 dark:border-slate-700">
+          <div className="text-6xl mb-5">🏢</div>
+          <h2 className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-[#ff6a00] to-[#ffb800] bg-clip-text text-transparent mb-3">
+            Store Registered!
+          </h2>
+          <p className="text-sm sm:text-base text-gray-500 dark:text-slate-400 mb-5">
+            Preparing your store: <strong className="text-gray-800 dark:text-white">{formData.name}</strong>...
+          </p>
+          <div className="bg-gray-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden mt-6">
+            <div className="h-full bg-[#ff6a00] w-0 animate-[fill_2.5s_forwards]" />
           </div>
         </div>
       </div>
@@ -149,32 +154,55 @@ export default function CreateStore() {
   }
 
   return (
-    <div className="create-store-page">
-      <div className="bg-decoration">
-        <div className="circle circle-1"></div>
-        <div className="circle circle-2"></div>
+    <div className="font-sans min-h-screen bg-gray-50 dark:bg-[#0f172a] px-4 sm:px-5 pt-[100px] sm:pt-[120px] pb-10 relative overflow-x-hidden flex justify-center">
+
+      {/* ===== Background Decorations ===== */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute w-[400px] h-[400px] bg-orange-500/8 blur-[80px] rounded-full -top-[100px] -left-[100px]" />
+        <div className="absolute w-[300px] h-[300px] bg-blue-500/8 blur-[80px] rounded-full -bottom-[50px] -right-[50px]" />
       </div>
 
-      <div className="main-container">
-        {!storeType ? (
+      <div className="w-full max-w-[1000px] relative z-[1]">
 
-            <div className="selection-view animate-fade">
-            <div className="text-center mb-5">
-              <h1 className="hero-title">Start Your Business</h1>
-              <p className="hero-subtitle">Choose the business model that suits you</p>
+        {!storeType ? (
+          /* ===== SELECTION VIEW ===== */
+          <div className="animate-[fadeIn_0.4s_ease-in-out]">
+            <div className="text-center mb-8 sm:mb-10">
+              <h1 className="text-2xl sm:text-3xl md:text-[2.8rem] font-extrabold text-gray-900 dark:text-white tracking-tight mb-2.5">
+                Start Your Business
+              </h1>
+              <p className="text-sm sm:text-base md:text-[1.1rem] text-gray-500 dark:text-slate-400">
+                Choose the business model that suits you
+              </p>
             </div>
 
-            <div className="card-grid">
-              <div onClick={() => setStoreType("physical")} className="choice-card-premium virtual">
-                <div className="badge">Free Trial</div>
-                <div className="icon-wrapper">🌐</div>
-                <h3>VIRTUAL STORE</h3>
-                <p>Reach thousands of customers without boundaries anywhere on Skyfall.com. <strong>Free for now.</strong></p>
-                <button className="select-btn">Start Free Trial</button>
+            <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4 sm:gap-5 md:gap-[30px] mt-8 sm:mt-10 md:mt-[50px]">
+              <div
+                onClick={() => setStoreType("physical")}
+                className="bg-white dark:bg-[#1e293b] px-5 sm:px-6 md:px-[25px] py-8 sm:py-10 md:py-[40px] rounded-3xl border border-gray-200 dark:border-slate-700 text-center cursor-pointer transition-all duration-[400ms] ease-[cubic-bezier(0.175,0.885,0.32,1.275)] relative flex flex-col items-center hover:-translate-y-3 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1)] hover:border-[#ff6a00] active:scale-[0.98] [-webkit-tap-highlight-color:transparent]"
+              >
+                <div className="absolute top-4 right-4 bg-gray-100 dark:bg-slate-700 px-3 py-1.5 rounded-full text-xs font-bold text-gray-600 dark:text-slate-300">
+                  Free Trial
+                </div>
+
+                <div className="text-[2.5rem] sm:text-[3rem] md:text-[4rem] bg-gray-50 dark:bg-slate-700 w-[70px] h-[70px] sm:w-[85px] sm:h-[85px] md:w-[100px] md:h-[100px] flex items-center justify-center rounded-2xl mb-4 sm:mb-5 md:mb-[25px]">
+                  🌐
+                </div>
+
+                <h3 className="text-lg sm:text-xl md:text-[1.5rem] font-bold mb-3 text-gray-900 dark:text-white">
+                  VIRTUAL STORE
+                </h3>
+                <p className="text-xs sm:text-sm md:text-[0.95rem] text-gray-500 dark:text-slate-400 leading-relaxed mb-5 sm:mb-6 md:mb-[30px]">
+                  Reach thousands of customers without boundaries anywhere on Skyfall.com.{" "}
+                  <strong className="text-gray-800 dark:text-white">Free for now.</strong>
+                </p>
+
+                <button className="px-5 sm:px-6 md:px-[30px] py-2.5 sm:py-3 rounded-xl border-2 border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 font-semibold text-sm sm:text-base text-gray-900 dark:text-white cursor-pointer transition-colors duration-300 group-hover:bg-[#ff6a00] group-hover:text-white group-hover:border-[#ff6a00]">
+                  Start Free Trial
+                </button>
               </div>
             </div>
           </div>
-
         ) : (
           <StoreForm
             storeType={storeType}
@@ -182,10 +210,10 @@ export default function CreateStore() {
             handleChange={handleChange}
             setStoreType={setStoreType}
             isLoading={isLoading}
-            setIsLoading={setIsLoading} 
-            setIsSuccess={setIsSuccess} 
-            navigate={navigate} 
-            handleSubmit={handleSubmitToDjango} 
+            setIsLoading={setIsLoading}
+            setIsSuccess={setIsSuccess}
+            navigate={navigate}
+            handleSubmit={handleSubmitToDjango}
           />
         )}
       </div>

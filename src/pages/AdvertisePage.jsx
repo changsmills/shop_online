@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../axiosConfig";
-import "../AdvertisePage.css";
+//import "../AdvertisePage.css";
 import {
   Send,
   CheckCircle,
@@ -454,173 +454,126 @@ const handleSubmit = async (e) => {
     };
   }, [preview]);
 
-  // ============================================================
-  // 8. LOADING STATE
-  // ============================================================
-    // ============================================================
-  // 8. SKELETON LOADING (Badala ya Loading)
-  // ============================================================
-  if (loadingStores) {
+   if (loadingStores) {
     return (
-      <div className="advertise-container">
-        {/* Skeleton ya Header */}
-        <div className="skeleton-block" style={{ width: '400px', height: '60px', marginBottom: '20px', borderRadius: '8px' }}></div>
-        <div className="skeleton-block" style={{ width: '250px', height: '20px', marginBottom: '40px', borderRadius: '8px' }}></div>
-
-        {/* Skeleton ya Form */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div className="skeleton-block" style={{ width: '100%', height: '50px', borderRadius: '8px' }}></div>
-          <div className="skeleton-block" style={{ width: '100%', height: '50px', borderRadius: '8px' }}></div>
-          <div className="skeleton-block" style={{ width: '100%', height: '50px', borderRadius: '8px' }}></div>
-          <div className="skeleton-block" style={{ width: '100%', height: '120px', borderRadius: '8px' }}></div>
-          
-          {/* Skeleton ya Media Upload */}
-          <div className="skeleton-block" style={{ width: '100%', height: '180px', borderRadius: '12px' }}></div>
-
-          {/* Skeleton ya Submit Button */}
-          <div className="skeleton-block" style={{ width: '100%', height: '50px', borderRadius: '8px' }}></div>
+      <div className="max-w-[900px] mx-auto my-2.5 md:my-10 p-4 md:p-[30px] bg-white dark:bg-[#1e293b] rounded-xl md:rounded-[20px] shadow-[0_10px_30px_rgba(0,0,0,0.08)] font-sans">
+        <div className="skeleton-block w-[400px] max-w-full h-[60px] mb-5 rounded-lg"></div>
+        <div className="skeleton-block w-[250px] max-w-full h-5 mb-10 rounded-lg"></div>
+        <div className="flex flex-col gap-5">
+          <div className="skeleton-block w-full h-[50px] rounded-lg"></div>
+          <div className="skeleton-block w-full h-[50px] rounded-lg"></div>
+          <div className="skeleton-block w-full h-[50px] rounded-lg"></div>
+          <div className="skeleton-block w-full h-[120px] rounded-lg"></div>
+          <div className="skeleton-block w-full h-[180px] rounded-xl"></div>
+          <div className="skeleton-block w-full h-[50px] rounded-lg"></div>
         </div>
       </div>
     );
   }
 
-  // ============================================================
-  // 9. RENDER
-  // ============================================================
   return (
-    <div className="advertise-container">
-            <div className="advertise-header" style={{ position: 'relative' }}>
-        {/* 🔥 BACK ARROW BUTTON */}
+    <div className="max-w-[900px] mx-auto my-2.5 md:my-10 p-4 md:p-[30px] bg-white dark:bg-[#1e293b] rounded-xl md:rounded-[20px] shadow-[0_10px_30px_rgba(0,0,0,0.08)] font-sans">
+      
+      <div className="text-center mb-6 md:mb-10 relative">
         <button
-          onClick={() => navigate(-1)} // Inarudi nyuma kwenye ukurasa uliotoka
-          style={{
-            position: 'absolute',
-            left: '0',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            background: '#f0f0f0',
-            border: 'none',
-            borderRadius: '50%',
-            width: '40px',
-            height: '40px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            zIndex: 10
-          }}
+          onClick={() => navigate(-1)}
+          className="absolute left-0 top-1/2 -translate-y-1/2 bg-[#f0f0f0] dark:bg-[#334155] border-none rounded-full w-9 h-9 md:w-10 md:h-10 flex items-center justify-center cursor-pointer z-10 hover:bg-[#e0e0e0] dark:hover:bg-[#475569] transition-colors"
         >
-          <ChevronLeft size={24} color="#333" />
+          <ChevronLeft size={24} className="text-[#333] dark:text-white" />
         </button>
-
-        {/* Ongeza padding-left ili maandishi yasigongane na button */}
-        <div style={{ paddingLeft: '50px' }}>
-          <h2>📢 Broadcasting Center</h2>
-              <p>Advertise your business on the big Skyfall platform</p>
+        <div className="pl-[50px]">
+          <h2 className="text-xl md:text-[2rem] font-bold text-[#1a1a1a] dark:text-white mb-2.5 m-0">📢 Broadcasting Center</h2>
+          <p className="text-sm md:text-base text-[#666] dark:text-[#94a3b8] m-0">Advertise your business on the big Skyfall platform</p>
         </div>
       </div>
 
       {status.msg && (
-        <div className={`status-alert ${status.type}`}>
+        <div className={`col-span-full p-3.5 md:p-[15px] rounded-[10px] flex items-center gap-2.5 mb-5 font-medium animate-[fadeIn_0.3s_ease_forwards] ${status.type === 'success' ? 'bg-[#dcfce7] text-[#166534] border border-[#bbf7d0]' : status.type === 'error' ? 'bg-[#fee2e2] text-[#991b1b] border border-[#fecaca]' : 'bg-[#e0f2fe] text-[#075985] border border-[#bae6fd]'}`}>
           {status.type === "success" ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
-          <span>{status.msg}</span>
+          <span className="text-sm">{status.msg}</span>
           {status.type === "success" && (
-            <button
-              onClick={() => setStatus({ type: "", msg: "" })}
-              style={{
-                marginLeft: "auto",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              ✕
-            </button>
+            <button onClick={() => setStatus({ type: "", msg: "" })} className="ml-auto bg-transparent border-none cursor-pointer text-lg font-bold">✕</button>
           )}
         </div>
       )}
 
-      <form className="ad-form" onSubmit={handleSubmit}>
+      <form className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-[25px]" onSubmit={handleSubmit}>
         {/* STORE SELECTION */}
-        <div className="input-group full-width">
-          <label>
-              Select Your Store <span style={{ color: "#ff6a00" }}>*</span>
+        <div className="col-span-full flex flex-col gap-2">
+          <label className="font-semibold text-[#444] dark:text-[#cbd5e1] text-sm md:text-[0.95rem]">
+            Select Your Store <span className="text-brand-orange">*</span>
           </label>
-          <div className="store-select-wrapper">
-            <Store size={18} className="store-icon" />
+          <div className="relative flex items-center">
+            <Store size={18} className="absolute left-3 text-brand-orange z-10" />
             <select
               required
               value={formData.store_id}
               onChange={(e) => handleStoreChange(e.target.value)}
-              className="store-select"
+              className="w-full p-2.5 md:p-3.5 pl-[38px] border-[1.5px] border-[#e0e0e0] dark:border-[#334155] rounded-[10px] text-sm md:text-base bg-white dark:bg-[#0f172a] text-black dark:text-white appearance-none cursor-pointer outline-none focus:border-brand-orange focus:ring-4 focus:ring-brand-orange/10 transition-all"
             >
-             <option value="">-- Select the store you want to advertise --</option>
+              <option value="">-- Select the store you want to advertise --</option>
               {stores.map((store) => (
-                <option key={store.id} value={store.id}>
-                  🏪 {store.store_name}
-                </option>
+                <option key={store.id} value={store.id}>🏪 {store.store_name}</option>
               ))}
             </select>
-            <ChevronDown size={16} className="dropdown-icon" />
+            <ChevronDown size={16} className="absolute right-3 text-[#888] pointer-events-none" />
           </div>
           {stores.length > 1 && (
-            <small className="form-hint">
-               You have {stores.length} stores. Select one to advertise.
-            </small>
+            <small className="text-[11px] text-[#888] mt-1">You have {stores.length} stores. Select one to advertise.</small>
           )}
         </div>
 
         {/* BUSINESS NAME */}
-        <div className="input-group full-width">
-          <label>Business Name</label>
+        <div className="col-span-full flex flex-col gap-2">
+          <label className="font-semibold text-[#444] dark:text-[#cbd5e1] text-sm md:text-[0.95rem]">Business Name</label>
           <input
             type="text"
             required
             value={formData.business_name}
             readOnly
-            className="readonly-input"
-            style={{ backgroundColor: "#f5f5f5", cursor: "not-allowed" }}
+            className="w-full p-2.5 md:p-3.5 border-[1.5px] border-[#e0e0e0] dark:border-[#334155] rounded-[10px] text-sm md:text-base bg-[#f5f5f5] dark:bg-[#334155] text-[#666] dark:text-[#94a3b8] cursor-not-allowed outline-none"
           />
-            <small className="form-hint">Name is taken from your store.</small>
+          <small className="text-[11px] text-[#888] mt-1">Name is taken from your store.</small>
         </div>
 
         {/* AD TYPE */}
-        <div className="input-group full-width">
-              <label>Advertisement Type</label>
+        <div className="col-span-full flex flex-col gap-2">
+          <label className="font-semibold text-[#444] dark:text-[#cbd5e1] text-sm md:text-[0.95rem]">Advertisement Type</label>
           <select
             value={formData.ad_type}
             onChange={(e) => setFormData({ ...formData, ad_type: e.target.value })}
+            className="w-full p-2.5 md:p-3.5 border-[1.5px] border-[#e0e0e0] dark:border-[#334155] rounded-[10px] text-sm md:text-base bg-white dark:bg-[#0f172a] text-black dark:text-white outline-none focus:border-brand-orange focus:ring-4 focus:ring-brand-orange/10 transition-all cursor-pointer"
           >
             <option value="banner">Main Hero Banner (Appears at top of page)</option>
             <option value="side">Side Ad (Side Card)</option>
             <option value="popup">Popup Ad (Appears when page opens)</option>
-
           </select>
         </div>
 
         {/* DESCRIPTION */}
-        <div className="input-group full-width">
-          <label>Advertisement Description (Broadcasting Text)</label>
+        <div className="col-span-full flex flex-col gap-2">
+          <label className="font-semibold text-[#444] dark:text-[#cbd5e1] text-sm md:text-[0.95rem]">Advertisement Description (Broadcasting Text)</label>
           <textarea
             rows="3"
             required
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             placeholder="Write the message that will appear in your advertisement. Make it short and catchy..."
+            className="w-full p-2.5 md:p-3.5 border-[1.5px] border-[#e0e0e0] dark:border-[#334155] rounded-[10px] text-sm md:text-base bg-white dark:bg-[#0f172a] text-black dark:text-white outline-none focus:border-brand-orange focus:ring-4 focus:ring-brand-orange/10 transition-all resize-y"
           />
-            <small className="form-hint">A good message can increase sales by up to 40%</small>
+          <small className="text-[11px] text-[#888] mt-1">A good message can increase sales by up to 40%</small>
         </div>
 
-        {/* MEDIA PREVIEW */}
-        <div className="media-preview-container full-width">
+        {/* MEDIA PREVIEW / UPLOAD */}
+        <div className="col-span-full">
           {preview ? (
-            <div className="preview-wrapper">
+            <div className="flex flex-col items-center gap-4 p-5 bg-[#f8fafc] dark:bg-[#0f172a] rounded-xl border border-[#e2e8f0] dark:border-[#334155]">
               {file?.type?.startsWith("video") ? (
-                <video src={preview} controls className="media-preview-item" />
+                <video src={preview} controls className="max-w-full max-h-[250px] rounded-[10px] object-contain" />
               ) : (
-                <img src={preview} alt="Preview" className="media-preview-item" />
+                <img src={preview} alt="Preview" className="max-w-full max-h-[250px] rounded-[10px] object-contain" />
               )}
-              <div className="preview-actions">
+              <div className="flex gap-2.5">
                 <button
                   type="button"
                   onClick={() => {
@@ -628,26 +581,26 @@ const handleSubmit = async (e) => {
                     setPreview(null);
                     setFile(null);
                   }}
-                  className="change-file-btn"
+                  className="bg-transparent border border-brand-orange text-brand-orange px-5 py-2 rounded-lg font-semibold cursor-pointer hover:bg-[#fff0e6] transition-colors"
                 >
-                   Change File
+                  Change File
                 </button>
               </div>
             </div>
           ) : (
-            <label className="file-upload-zone">
-              <div className="icon-box">
-                <UploadCloud size={40} />
+            <label className="col-span-full border-2 border-dashed border-brand-orange bg-[#fff9f5] dark:bg-[#0f172a] p-5 md:p-10 rounded-[15px] text-center cursor-pointer hover:bg-[#fff0e6] dark:hover:bg-[#1a1a1a] flex flex-col items-center gap-3 transition-colors">
+              <div className="text-brand-orange bg-white dark:bg-[#1e293b] p-3 rounded-full shadow-[0_4px_10px_rgba(255,102,0,0.2)]">
+                <UploadCloud size={40} className="text-brand-orange" />
               </div>
-               <p>Click here to upload an Image or short Video</p>
-              <span>Upload a high quality file (Max 10MB)</span>
-              <span className="file-types">Types: JPEG, PNG, GIF, WebP, MP4</span>
+              <p className="font-semibold text-[#333] dark:text-[#e2e8f0] m-0 text-sm md:text-base">Click here to upload an Image or short Video</p>
+              <span className="font-medium text-brand-orange text-xs md:text-[0.85rem]">Upload a high quality file (Max 10MB)</span>
+              <span className="text-[0.75rem] text-[#999] dark:text-[#64748b]">Types: JPEG, PNG, GIF, WebP, MP4</span>
               <input type="file" hidden onChange={handleFileChange} accept="image/*,video/*" />
             </label>
           )}
         </div>
 
-        <button type="submit" className="submit-ad-btn" disabled={loading}>
+        <button type="submit" className="col-span-full bg-gradient-to-br from-[#ff8800] to-[#ff6600] text-white p-3.5 md:p-4 border-none rounded-xl text-sm md:text-base font-bold cursor-pointer flex justify-center items-center gap-3 transition-all mt-2.5 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(255,102,0,0.3)] disabled:opacity-70 disabled:cursor-not-allowed" disabled={loading}>
           {loading ? (
             <>
               <Loader2 size={20} className="animate-spin" /> Submitting advertisement...
@@ -661,9 +614,9 @@ const handleSubmit = async (e) => {
       </form>
 
       {/* INFO BOX */}
-      <div className="ad-info-box">
-        <h4>📌 Remember:</h4>
-        <ul>
+      <div className="mt-6 md:mt-[30px] p-4 md:p-5 bg-[#f8fafc] dark:bg-[#0f172a] rounded-xl border-l-4 border-brand-orange">
+        <h4 className="m-0 mb-3 text-[#333] dark:text-[#e2e8f0] text-sm md:text-base font-semibold">📌 Remember:</h4>
+        <ul className="m-0 pl-5 text-xs md:text-[0.85rem] text-[#666] dark:text-[#94a3b8] space-y-2">
           <li>Your advertisement will be reviewed by Admin within 24 hours</li>
           <li>Make sure the image/video is high quality</li>
           <li>Your description must be true and accurate</li>

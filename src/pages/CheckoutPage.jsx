@@ -8,7 +8,7 @@ import {
 import UserTools from '../components/UserTools';
 import api from '../axiosConfig';
 import { toast, Toaster } from 'react-hot-toast'; 
-import '../CheckoutPage.css';
+//import '../CheckoutPage.css';
 import { useCart } from '../context/CartContext';
 
 const CheckoutPage = () => {
@@ -184,93 +184,147 @@ const CheckoutPage = () => {
     { icon: <Settings size={20} />, path: '/dashboard/settings', label: 'Settings' },
   ];
 
-  return (
-    <div className="checkout-page-root">
+ return (
+    <div className="flex flex-col h-screen bg-white dark:bg-[#1e293b] text-gray-800 dark:text-slate-200">
       <Toaster position="top-center" />
 
-      {/* HEADER */}
-      <header className="checkout-header">
-        <div className="header-left">
-          <Link to="/dashboard" className="brand-logo">
+      {/* ===== HEADER ===== */}
+      <header className="flex justify-between items-center px-3 sm:px-4 md:px-6 py-2.5 border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-[#1e293b] z-20">
+        <div className="flex items-center gap-3 md:gap-5">
+          <Link
+            to="/dashboard"
+            className="text-base sm:text-lg md:text-xl font-extrabold text-[#ff6a00] no-underline"
+          >
             Skyfall.com
           </Link>
-          <div className="header-search-bar desktop-only">
-            <Search size={16} className="search-icon" />
-            <input type="text" placeholder="Search order details..." className="header-search-input" />
+          <div className="hidden md:flex items-center bg-gray-100 dark:bg-slate-700 px-3 py-1.5 rounded-lg">
+            <Search size={16} className="text-gray-400 dark:text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search order details..."
+              className="border-none bg-transparent outline-none ml-2 text-sm text-gray-800 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-500"
+            />
           </div>
         </div>
-        <div className="header-right">
-          <Bell size={20} className="bell-icon desktop-only" />
+        <div className="flex items-center gap-2.5 md:gap-4">
+          <Bell size={20} className="hidden md:block cursor-pointer text-gray-500 dark:text-slate-400" />
           <UserTools />
         </div>
       </header>
 
-      <div className="checkout-layout-container">
-        {/* SIDEBAR - Desktop only */}
-        <aside 
-          className={`checkout-sidebar desktop-only ${isSidebarHovered ? 'expanded' : 'collapsed'}`}
+      <div className="flex flex-1 overflow-hidden">
+
+        {/* ===== SIDEBAR (Desktop only) ===== */}
+        <aside
+          className={`hidden md:flex flex-col px-3 py-5 gap-2 bg-white dark:bg-[#1e293b] border-r border-gray-200 dark:border-slate-700 overflow-hidden z-[100] transition-[width] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+            isSidebarHovered ? 'w-60' : 'w-[75px]'
+          }`}
           onMouseEnter={() => setIsSidebarHovered(true)}
           onMouseLeave={() => setIsSidebarHovered(false)}
         >
-          {sidebarItems.map((item) => (
-            <Link 
-              key={item.path} 
-              to={item.path} 
-              className={`sidebar-link ${location.pathname === item.path ? 'active' : ''}`}
-            >
-              <div className="sidebar-icon-wrapper">{item.icon}</div>
-              <span className="sidebar-label">{item.label}</span>
-            </Link>
-          ))}
+          {sidebarItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center gap-4 min-w-[210px] px-4 py-3 rounded-xl no-underline text-[15px] font-medium transition-all ${
+                  isActive
+                    ? 'text-[#ff6a00] font-bold bg-orange-50 dark:bg-[#2d2d44]'
+                    : 'text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-700/50'
+                }`}
+              >
+                <div className="min-w-[24px] flex justify-center">
+                  {item.icon}
+                </div>
+                <span
+                  className={`whitespace-nowrap transition-opacity duration-200 ${
+                    isSidebarHovered ? 'opacity-100 visible' : 'opacity-0 invisible md:invisible'
+                  }`}
+                >
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
         </aside>
 
-        {/* MAIN CONTENT */}
-        <main className="checkout-main-content">
-          <div className="checkout-content-container">
-            <div className="back-to-shop-row" onClick={() => navigate(-1)}>
+        {/* ===== MAIN CONTENT ===== */}
+        <main className="flex-1 p-4 md:p-8 bg-white dark:bg-[#1e293b] overflow-y-auto">
+          <div className="max-w-[1100px] mx-auto">
+
+            <div
+              className="flex items-center gap-2 mb-5 cursor-pointer text-gray-500 dark:text-slate-400 hover:text-[#ff6a00] transition-colors"
+              onClick={() => navigate(-1)}
+            >
               <ChevronLeft size={20} />
-              <span className="back-text">Back to shop</span>
+              <span className="font-semibold text-sm">Back to shop</span>
             </div>
 
-            <h1 className="checkout-title">Checkout</h1>
+            <h1 className="text-xl sm:text-2xl md:text-[28px] font-black mb-6 text-gray-800 dark:text-slate-200">
+              Checkout
+            </h1>
 
-            <div className="checkout-grid-layout">
-              
-              {/* SHIPPING ADDRESS SECTION */}
-              <div className="shipping-section-card">
-                <div className="shipping-header">
-                  <MapPin size={22} className="map-icon" />
-                  <h3 className="shipping-title">Shipping address</h3>
+            <div className="flex flex-col md:flex-row gap-5 md:gap-6 items-start">
+
+              {/* ===== SHIPPING ADDRESS SECTION ===== */}
+              <div className="flex-1 w-full md:flex-[1.5] bg-white dark:bg-[#1e293b] p-4 md:p-6 rounded-2xl border border-gray-200 dark:border-slate-700">
+                <div className="flex items-center gap-2.5 mb-5">
+                  <MapPin size={22} className="text-[#ff6a00]" />
+                  <h3 className="m-0 font-extrabold text-base md:text-lg text-gray-800 dark:text-slate-200">
+                    Shipping address
+                  </h3>
                 </div>
-                
-                <form onSubmit={(e) => e.preventDefault()} className="shipping-form">
-                  <div className="form-group">
-                    <label className="form-label">Full name *</label>
-                    <input type="text" placeholder="Joshua Julius" value={customerInfo.fullName}
-                      onChange={(e) => setCustomerInfo({...customerInfo, fullName: e.target.value})}
-                      className="form-input" />
+
+                <form onSubmit={(e) => e.preventDefault()} className="flex flex-col">
+
+                  <div className="mt-0">
+                    <label className="text-[13px] font-semibold text-gray-600 dark:text-slate-300 block mb-1.5">
+                      Full name *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Joshua Julius"
+                      value={customerInfo.fullName}
+                      onChange={(e) => setCustomerInfo({ ...customerInfo, fullName: e.target.value })}
+                      className="w-full px-3 py-3 border border-gray-300 dark:border-slate-600 rounded-lg text-sm text-gray-800 dark:text-slate-200 bg-white dark:bg-[#1e293b] placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    />
                   </div>
 
-                  <div className="form-group">
-                    <label className="form-label">Phone number *</label>
-                    <input type="text" placeholder="07XXXXXXXX" value={customerInfo.phone}
-                      onChange={(e) => setCustomerInfo({...customerInfo, phone: e.target.value})}
-                      className="form-input" />
+                  <div className="mt-4">
+                    <label className="text-[13px] font-semibold text-gray-600 dark:text-slate-300 block mb-1.5">
+                      Phone number *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="07XXXXXXXX"
+                      value={customerInfo.phone}
+                      onChange={(e) => setCustomerInfo({ ...customerInfo, phone: e.target.value })}
+                      className="w-full px-3 py-3 border border-gray-300 dark:border-slate-600 rounded-lg text-sm text-gray-800 dark:text-slate-200 bg-white dark:bg-[#1e293b] placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    />
                   </div>
 
-                  <div className="form-group">
-                    <label className="form-label">Street address *</label>
-                    <input type="text" placeholder="Makongo Juu, House No. 12" value={customerInfo.address}
-                      onChange={(e) => setCustomerInfo({...customerInfo, address: e.target.value})}
-                      className="form-input" />
+                  <div className="mt-4">
+                    <label className="text-[13px] font-semibold text-gray-600 dark:text-slate-300 block mb-1.5">
+                      Street address *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Makongo Juu, House No. 12"
+                      value={customerInfo.address}
+                      onChange={(e) => setCustomerInfo({ ...customerInfo, address: e.target.value })}
+                      className="w-full px-3 py-3 border border-gray-300 dark:border-slate-600 rounded-lg text-sm text-gray-800 dark:text-slate-200 bg-white dark:bg-[#1e293b] placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    />
                   </div>
 
-                  <div className="form-group">
-                    <label className="form-label">City / Region *</label>
+                  <div className="mt-4">
+                    <label className="text-[13px] font-semibold text-gray-600 dark:text-slate-300 block mb-1.5">
+                      City / Region *
+                    </label>
                     <select
                       value={customerInfo.city}
-                      onChange={(e) => setCustomerInfo({...customerInfo, city: e.target.value})}
-                      className="form-select"
+                      onChange={(e) => setCustomerInfo({ ...customerInfo, city: e.target.value })}
+                      className="w-full px-3 py-3 border border-gray-300 dark:border-slate-600 rounded-lg text-sm text-gray-800 dark:text-slate-200 bg-white dark:bg-[#1e293b] focus:outline-none focus:ring-2 focus:ring-orange-500"
                     >
                       <option value="Dar es Salaam">Dar es Salaam (Local)</option>
                       <option value="Arusha">Arusha (National)</option>
@@ -280,108 +334,149 @@ const CheckoutPage = () => {
                     </select>
                   </div>
 
-                  {/* SHIPPING METHODS */}
-                  <div className="shipping-methods-section">
-                    <label className="shipping-label">Select Shipping Method *</label>
-                    <div className="shipping-methods-list">
+                  {/* Shipping Methods */}
+                  <div className="mt-6">
+                    <label className="font-bold block mb-3 text-gray-600 dark:text-slate-200 text-sm">
+                      Select Shipping Method *
+                    </label>
+                    <div className="flex flex-col gap-2.5">
                       {shippingMethods.map((method) => {
                         const calculatedPrice = getPrice(method);
+                        const isSelected = selectedShipping?.id === method.id;
                         return (
-                          <div key={method.id} onClick={() => setSelectedShipping(method)}
-                            className={`shipping-method-item ${selectedShipping?.id === method.id ? 'selected' : ''}`}
+                          <div
+                            key={method.id}
+                            onClick={() => setSelectedShipping(method)}
+                            className={`flex justify-between items-center px-3 md:px-4 py-2.5 md:py-3 rounded-xl cursor-pointer transition-all ${
+                              isSelected
+                                ? 'border-2 border-[#ff6a00] bg-orange-50 dark:bg-[#2d2d44]'
+                                : 'border border-gray-200 dark:border-slate-600 bg-white dark:bg-[#1e293b] hover:border-orange-300'
+                            }`}
                           >
-                            <div className="shipping-radio-wrapper">
-                              <div className="shipping-radio-circle">
-                                {selectedShipping?.id === method.id && <div className="shipping-radio-dot" />}
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-[18px] h-[18px] rounded-full border-2 border-[#ff6a00] flex items-center justify-center flex-shrink-0">
+                                {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-[#ff6a00]" />}
                               </div>
-                              <span className="shipping-method-name">{method.method_name || method.label}</span>
+                              <span className="text-xs md:text-sm font-semibold text-gray-800 dark:text-slate-200">
+                                {method.method_name || method.label}
+                              </span>
                             </div>
-                            <span className="shipping-method-price">
+                            <span className="text-xs md:text-sm font-extrabold text-gray-800 dark:text-slate-200">
                               {calculatedPrice === 0 ? 'Free' : `TZS ${calculatedPrice.toLocaleString()}`}
                             </span>
                           </div>
                         );
                       })}
                       {shippingMethods.length === 0 && (
-                        <p className="no-shipping-msg">No shipping methods available</p>
+                        <p className="text-center text-gray-400 dark:text-slate-500 p-5 text-sm">
+                          No shipping methods available
+                        </p>
                       )}
                     </div>
                   </div>
                 </form>
               </div>
 
-              {/* ORDER SUMMARY SECTION */}
-              <div className="summary-section-card">
-                <h3 className="summary-title">Order Summary</h3>
-                
+              {/* ===== ORDER SUMMARY SECTION ===== */}
+              <div className="flex-1 w-full bg-white dark:bg-[#1e293b] p-4 md:p-6 rounded-2xl border border-gray-200 dark:border-slate-700 md:sticky md:top-5">
+                <h3 className="font-extrabold mb-5 text-base md:text-lg text-gray-800 dark:text-slate-200">
+                  Order Summary
+                </h3>
+
                 {orderItems.length > 0 && (
-                  <div className="summary-items-list">
+                  <div className="mb-4 max-h-[200px] overflow-y-auto">
                     {orderItems.slice(0, 3).map((item, idx) => (
-                      <div key={idx} className="summary-item-row">
-                        <img 
-                          src={item.cover_image_url || item.image || item.product_image || '/placeholder-image.jpg'} 
-                          alt={item.name} 
-                          className="summary-item-img" 
+                      <div
+                        key={idx}
+                        className="flex gap-2.5 py-2 border-b border-gray-100 dark:border-slate-700"
+                      >
+                        <img
+                          src={item.cover_image_url || item.image || item.product_image || '/placeholder-image.jpg'}
+                          alt={item.name}
+                          className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
                         />
-                        <div className="summary-item-info">
-                          <p className="summary-item-name">{item.name?.slice(0, 30)}</p>
-                          <p className="summary-item-qty">Qty: {item.quantity}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold m-0 text-gray-800 dark:text-slate-200 truncate">
+                            {item.name?.slice(0, 30)}
+                          </p>
+                          <p className="text-[11px] text-gray-500 dark:text-slate-400 m-0">
+                            Qty: {item.quantity}
+                          </p>
                         </div>
-                        <span className="summary-item-price">
+                        <span className="text-xs font-bold text-[#ff6a00] flex-shrink-0">
                           TZS {(Number(item.price) * item.quantity).toLocaleString()}
                         </span>
                       </div>
                     ))}
-                    {orderItems.length > 3 && <p className="summary-more-items">+{orderItems.length - 3} more items</p>}
+                    {orderItems.length > 3 && (
+                      <p className="text-[11px] text-gray-400 dark:text-slate-500 text-center mt-2">
+                        +{orderItems.length - 3} more items
+                      </p>
+                    )}
                   </div>
                 )}
-                
-                <div className="summary-row">
-                  <span className="summary-label">Subtotal ({orderItems.length} items)</span>
-                  <span className="summary-value">TZS {subtotal.toLocaleString()}</span>
+
+                <div className="flex justify-between mb-3">
+                  <span className="text-sm text-gray-500 dark:text-slate-400">
+                    Subtotal ({orderItems.length} items)
+                  </span>
+                  <span className="font-bold text-sm text-gray-800 dark:text-slate-200">
+                    TZS {subtotal.toLocaleString()}
+                  </span>
                 </div>
 
-                <div className="summary-row">
-                  <span className="summary-label">{selectedShipping?.method_name || selectedShipping?.label || 'Shipping'}</span>
-                  <span className="summary-value">
+                <div className="flex justify-between mb-3">
+                  <span className="text-sm text-gray-500 dark:text-slate-400">
+                    {selectedShipping?.method_name || selectedShipping?.label || 'Shipping'}
+                  </span>
+                  <span className="font-bold text-sm text-gray-800 dark:text-slate-200">
                     {currentShippingPrice === 0 ? 'Free' : `TZS ${currentShippingPrice.toLocaleString()}`}
                   </span>
                 </div>
-                
-                <hr className="summary-divider" />
-                
-                <div className="summary-total-row">
-                  <strong className="summary-total-label">Total</strong>
-                  <strong className="summary-total-amount">TZS {totalAmount.toLocaleString()}</strong>
+
+                <hr className="my-4 border-none border-t border-gray-200 dark:border-slate-700" />
+
+                <div className="flex justify-between items-center mb-5">
+                  <strong className="text-base md:text-lg text-gray-800 dark:text-slate-200">
+                    Total
+                  </strong>
+                  <strong className="text-xl md:text-2xl text-[#ff6a00] font-black">
+                    TZS {totalAmount.toLocaleString()}
+                  </strong>
                 </div>
-                
-                                {/* 🔥 BUTTON YA KUWEKA ODA */}
-                <button onClick={handlePlaceOrder} disabled={orderItems.length === 0 || loading}
-                  className="btn-place-order">
+
+                <button
+                  onClick={handlePlaceOrder}
+                  disabled={orderItems.length === 0 || loading}
+                  className="w-full py-3.5 md:py-4 bg-gradient-to-r from-[#ff9000] to-[#ff6a00] hover:from-[#ffa020] hover:to-[#ff7a10] text-white rounded-full border-none font-extrabold text-sm md:text-base cursor-pointer shadow-[0_4px_15px_rgba(255,106,0,0.3)] active:scale-[0.98] transition-all disabled:bg-gray-300 dark:disabled:bg-slate-600 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
+                >
                   {loading ? 'Processing...' : 'Place Order'}
                 </button>
-                
-                {/* 🔥 PAYMENT INFO BOX (MPYA) */}
-                <div className="payment-info-box">
-                  <div className="payment-info-icon">💵</div>
-                  <div className="payment-info-text">
-                    <strong>Payment Method: Cash on Delivery</strong>
-                    <p>
-                      Kwa sasa, malipo yanafanyika <strong>baada ya kupokea bidhaa (Pay on Delivery)</strong>. 
+
+                {/* Payment Info Box */}
+                <div className="mt-4 mb-4 flex gap-3 items-start bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/60 rounded-xl p-3">
+                  <div className="text-2xl leading-none flex-shrink-0">💵</div>
+                  <div className="flex-1">
+                    <strong className="block text-sm text-green-800 dark:text-green-400 mb-1">
+                      Payment Method: Cash on Delivery
+                    </strong>
+                    <p className="m-0 text-[13px] text-gray-700 dark:text-slate-300 leading-relaxed">
+                      Kwa sasa, malipo yanafanyika <strong>baada ya kupokea bidhaa (Pay on Delivery)</strong>.
                       Hii inahakikisha unalipa pale tu bidhaa inapofika mikononi mwako.
                     </p>
-                    <p style={{ fontSize: '12px', color: '#999', marginTop: '8px' }}>
+                    <p className="text-xs text-gray-400 dark:text-slate-500 mt-2">
                       💳 Mfumo wa malipo mtandaoni (Online Payment) utakuja kwenye toleo lijalo.
                     </p>
                   </div>
                 </div>
-                
-                {/* 🔥 BADILISHA HII: Ondoa "Secure payment" ya zamani */}
-                <div className="secure-badge-row">
-                  <Lock size={14} className="lock-icon" />
-                  <span className="secure-text">Order protected by Skyfall.com</span>
-                </div>
 
+                {/* Secure badge */}
+                <div className="flex items-center justify-center gap-1.5 mt-4">
+                  <Lock size={14} className="text-emerald-500" />
+                  <span className="text-[11px] text-gray-500 dark:text-slate-400">
+                    Order protected by Skyfall.com
+                  </span>
+                </div>
               </div>
             </div>
           </div>

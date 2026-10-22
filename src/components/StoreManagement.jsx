@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { Settings, CheckCircle, X, Plus, Phone, Instagram, Truck, Edit2, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import api from "../axiosConfig"; // 🔥 Tumia api
-import '../StoreManagement.css';
+//import '../StoreManagement.css';
 
 // 🔥 FUTE HII LINE (haifai tena kwa Cloudinary):
 // const BACKEND_BASE_URL = "https://shop-online-r9z4.onrender.com";
@@ -139,39 +139,53 @@ const StoreManagement = ({
     return url;
   };
 
-  return (
-    <section className="sm-section">
-      <div className="sm-card">
-        
-        <div className="sm-header">
+ return (
+    <section className="mt-6">
+      <div className="bg-white dark:bg-slate-800 rounded-[20px] p-4 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_25px_-5px_rgba(0,0,0,0.4)] border border-gray-100 dark:border-slate-700">
+
+        {/* ===== HEADER ===== */}
+        <div className="flex justify-between items-center mb-4">
           <div>
-            <h3 className="sm-header-title">🏷️ Store Categories</h3>
-            <p className="sm-header-sub">Choose the product category you want to add</p>
+            <h3 className="font-bold text-gray-800 dark:text-slate-200 text-sm m-0">
+              🏷️ Store Categories
+            </h3>
+            <p className="text-[10px] text-gray-500 dark:text-slate-400 mt-1 mb-0">
+              Choose the product category you want to add
+            </p>
           </div>
-          <button 
+          <button
             onClick={() => setIsManageMode(!isManageMode)}
-            className={`sm-toggle-btn ${isManageMode ? 'active' : ''}`}
+            className={`text-[10px] px-3 py-1.5 rounded-lg font-bold border transition-all duration-200 flex items-center gap-1 shadow-none cursor-pointer ${
+              isManageMode
+                ? 'bg-red-500 text-white border-red-500 shadow-md'
+                : 'bg-gray-50 dark:bg-slate-700 text-gray-600 dark:text-slate-200 border-gray-200 dark:border-slate-600'
+            }`}
           >
-          <Settings size={12} /> {isManageMode ? "FINISH" : "MANAGE"}
+            <Settings size={12} /> {isManageMode ? "FINISH" : "MANAGE"}
           </button>
         </div>
 
-        <div className="sm-cat-wrapper">
+        {/* ===== CATEGORY BADGES ===== */}
+        <div className="flex flex-wrap gap-2 mb-6">
           {actualStoreSubCats.length > 0 ? (
             actualStoreSubCats.map((sub) => (
-              <div key={sub.id} className="sm-cat-item-wrap">
+              <div key={sub.id} className="relative">
                 <button
                   type="button"
                   onClick={() => setAttributes({ ...attributes, category_id: sub.id })}
-                  className={`sm-cat-item ${attributes.category_id === sub.id ? 'active' : ''}`}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-semibold transition-all duration-200 cursor-pointer ${
+                    attributes.category_id === sub.id
+                      ? 'bg-orange-500 text-white border-orange-500'
+                      : 'bg-white dark:bg-slate-700 text-gray-700 dark:text-slate-200 border-gray-100 dark:border-slate-600'
+                  }`}
                 >
                   {sub.name}
                   {attributes.category_id === sub.id && <CheckCircle size={12} />}
                 </button>
                 {isManageMode && (
-                  <button 
+                  <button
                     onClick={() => handleRemoveCategoryFromStore(sub.id)}
-                    className="sm-cat-remove"
+                    className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full p-0.5 shadow-md z-10 border-none cursor-pointer w-4 h-4 flex items-center justify-center"
                   >
                     <X size={10} />
                   </button>
@@ -179,108 +193,169 @@ const StoreManagement = ({
               </div>
             ))
           ) : (
-            <div className="sm-empty-cat">
-              <p>You haven't selected any categories yet.</p>
+            <div className="w-full py-4 text-center border-2 border-dashed border-gray-100 dark:border-slate-700 rounded-xl">
+              <p className="text-gray-400 dark:text-slate-400 text-[10px] italic m-0">
+                You haven't selected any categories yet.
+              </p>
             </div>
           )}
-          <button 
+          <button
             onClick={() => setShowCategoryManager(true)}
-            className="sm-add-cat-btn"
+            className="w-8 h-8 rounded-full bg-orange-50 dark:bg-slate-700 text-orange-600 dark:text-orange-500 border border-orange-100 dark:border-slate-600 flex items-center justify-center cursor-pointer p-0"
           >
             <Plus size={16} />
           </button>
         </div>
 
-        <div className="sm-shipping-section">
-          <div className="sm-shipping-header">
-            <div className="sm-shipping-title-wrap">
-              <div className="sm-shipping-icon-wrap">
-                <Truck size={20} className="sm-shipping-icon" />
+        {/* ===== SHIPPING METHODS ===== */}
+        <div className="mt-6 pt-4 border-t border-gray-100 dark:border-slate-700">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-orange-50 dark:bg-slate-700 rounded-xl">
+                <Truck size={20} className="text-orange-500" />
               </div>
-                <h3 className="sm-shipping-title">🚚 Shipping Methods</h3>
+              <h3 className="font-bold text-gray-800 dark:text-slate-200 text-base m-0">
+                🚚 Shipping Methods
+              </h3>
             </div>
-            <button 
+            <button
               onClick={() => setShowAddForm(!showAddForm)}
-              className="sm-shipping-toggle-btn"
+              className="text-xs bg-orange-50 dark:bg-slate-700 text-orange-600 dark:text-orange-500 px-3 py-1.5 rounded-full border-none cursor-pointer flex items-center gap-1"
             >
               {showAddForm ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
               {showAddForm ? "Hide form" : "Add method"}
             </button>
           </div>
 
-          <div className="sm-shipping-grid">
+          <div className="grid grid-cols-1 gap-4 mb-4">
             {shippingMethods.length === 0 ? (
-              <div className="sm-shipping-empty">
-                <Truck size={32} className="sm-shipping-empty-icon" />
-
-                <p className="sm-shipping-empty-text">No shipping methods available</p>
-                <button onClick={() => setShowAddForm(true)} className="sm-shipping-empty-btn">
+              <div className="text-center py-8 bg-gray-50 dark:bg-slate-900 rounded-xl border border-dashed border-gray-200 dark:border-slate-700">
+                <Truck size={32} className="mx-auto mb-2 text-gray-300 dark:text-slate-600" />
+                <p className="text-gray-400 dark:text-slate-400 text-sm m-0 mb-2">
+                  No shipping methods available
+                </p>
+                <button
+                  onClick={() => setShowAddForm(true)}
+                  className="text-orange-500 text-xs font-medium bg-transparent border-none cursor-pointer"
+                >
                   + Add the first method
                 </button>
-
               </div>
             ) : (
               shippingMethods.map((method) => (
-                <div key={method.id} className="sm-shipping-item">
+                <div
+                  key={method.id}
+                  className="bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-700"
+                >
                   {editingShippingId === method.id ? (
-                    <div className="sm-shipping-edit">
-                      <input type="text" className="sm-input-full" value={method.label}
+                    <div className="p-4 flex flex-col gap-3">
+                      <input
+                        type="text"
+                        className="w-full p-2 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-800 dark:text-slate-200 box-border focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        value={method.label}
                         onChange={(e) => {
                           const updated = { ...method, label: e.target.value };
                           setShippingMethods(shippingMethods.map(m => m.id === method.id ? updated : m));
-                        }} />
-                                            <textarea rows="1" className="sm-input-full" placeholder="Description" value={method.description || ''}
+                        }}
+                      />
+                      <textarea
+                        rows="1"
+                        className="w-full p-2 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-800 dark:text-slate-200 box-border focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        placeholder="Description"
+                        value={method.description || ''}
                         onChange={(e) => {
                           const updated = { ...method, description: e.target.value };
                           setShippingMethods(shippingMethods.map(m => m.id === method.id ? updated : m));
-                        }} />
-                      <div className="sm-input-half-grid">
-                          <input type="number" placeholder="Dar es Salaam" className="sm-input-full" value={method.price_local}
+                        }}
+                      />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <input
+                          type="number"
+                          placeholder="Dar es Salaam"
+                          className="w-full p-2 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-800 dark:text-slate-200 box-border focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          value={method.price_local}
                           onChange={(e) => {
                             const updated = { ...method, price_local: e.target.value };
                             setShippingMethods(shippingMethods.map(m => m.id === method.id ? updated : m));
-                          }} />
-                          <input type="number" placeholder="Regions" className="sm-input-full" value={method.price_national}
+                          }}
+                        />
+                        <input
+                          type="number"
+                          placeholder="Regions"
+                          className="w-full p-2 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-800 dark:text-slate-200 box-border focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          value={method.price_national}
                           onChange={(e) => {
                             const updated = { ...method, price_national: e.target.value };
                             setShippingMethods(shippingMethods.map(m => m.id === method.id ? updated : m));
-                          }} />
+                          }}
+                        />
                       </div>
-                      <div className="sm-edit-actions">
-                          <button onClick={() => handleUpdateShipping(method.id, {
-                          label: method.label, description: method.description,
-                          price_local: method.price_local, price_national: method.price_national
-                        })} className="sm-btn-success">Save</button>
-                        <button onClick={() => setEditingShippingId(null)} className="sm-btn-cancel">Cancel</button>
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => handleUpdateShipping(method.id, {
+                            label: method.label, description: method.description,
+                            price_local: method.price_local, price_national: method.price_national
+                          })}
+                          className="bg-green-500 text-white px-3 py-1 rounded-lg text-xs border-none cursor-pointer"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => setEditingShippingId(null)}
+                          className="bg-gray-200 dark:bg-slate-600 text-gray-800 dark:text-slate-200 px-3 py-1 rounded-lg text-xs border-none cursor-pointer"
+                        >
+                          Cancel
+                        </button>
                       </div>
                     </div>
                   ) : (
-                    <div className="sm-shipping-view">
-                      <div className="sm-shipping-view-content">
-                        <div className="sm-shipping-label-row">
-                          <span className="sm-shipping-label">{method.label}</span>
-
-                           <span className={`sm-shipping-status ${method.is_active ? 'active' : 'inactive'}`}>
+                    <div className="p-4 flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-semibold text-gray-800 dark:text-slate-200">
+                            {method.label}
+                          </span>
+                          <span
+                            className={`text-[10px] px-2 py-0.5 rounded-full ${
+                              method.is_active
+                                ? 'bg-green-100 text-green-600 dark:bg-[#1a3a2a] dark:text-[#4ade80]'
+                                : 'bg-red-100 text-red-500 dark:bg-[#2d1a1a] dark:text-[#f87171]'
+                            }`}
+                          >
                             {method.is_active ? 'Active' : 'Hidden'}
                           </span>
-
                         </div>
-                        {method.description && <p className="sm-shipping-desc">{method.description}</p>}
-
-                       <div className="sm-shipping-prices">
+                        {method.description && (
+                          <p className="text-xs text-gray-400 dark:text-slate-400 mt-1">
+                            {method.description}
+                          </p>
+                        )}
+                        <div className="flex gap-3 mt-2 text-xs text-gray-600 dark:text-slate-400">
                           <span>Dar es Salaam: TZS {Number(method.price_local).toLocaleString()}</span>
                           <span>Regions: TZS {Number(method.price_national).toLocaleString()}</span>
                         </div>
-
                       </div>
-                      <div className="sm-shipping-actions">
-                        <button onClick={() => setEditingShippingId(method.id)} className="sm-action-btn edit">
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => setEditingShippingId(method.id)}
+                          className="p-1.5 rounded-full border-none cursor-pointer bg-blue-50 text-blue-600 dark:bg-[#1e3a5f] dark:text-[#60a5fa]"
+                        >
                           <Edit2 size={14} />
                         </button>
-                        <button onClick={() => toggleActive(method.id, method.is_active)} className={`sm-action-btn ${method.is_active ? 'toggle-off' : 'toggle-on'}`}>
+                        <button
+                          onClick={() => toggleActive(method.id, method.is_active)}
+                          className={`p-1.5 rounded-full border-none cursor-pointer ${
+                            method.is_active
+                              ? 'bg-gray-100 text-gray-500 dark:bg-slate-700 dark:text-slate-400'
+                              : 'bg-green-100 text-green-600 dark:bg-[#1a3a2a] dark:text-[#4ade80]'
+                          }`}
+                        >
                           {method.is_active ? <X size={14} /> : <CheckCircle size={14} />}
                         </button>
-                        <button onClick={() => handleDeleteShipping(method.id)} className="sm-action-btn delete">
+                        <button
+                          onClick={() => handleDeleteShipping(method.id)}
+                          className="p-1.5 rounded-full border-none cursor-pointer bg-red-50 text-red-500 dark:bg-[#2d1a1a] dark:text-[#f87171]"
+                        >
                           <Trash2 size={14} />
                         </button>
                       </div>
@@ -292,182 +367,280 @@ const StoreManagement = ({
           </div>
 
           {showAddForm && (
-            <div className="sm-shipping-form-wrap">
-
-                <h4 className="sm-shipping-form-title">➕ New Shipping Method</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <input type="text" placeholder="Method name *" className="sm-input-full" value={newShipping.label} onChange={e => setNewShipping({...newShipping, label: e.target.value})} />
-                <textarea rows="1" placeholder="Description (optional)" className="sm-input-full" value={newShipping.description} onChange={e => setNewShipping({...newShipping, description: e.target.value})} />
-                <div className="sm-input-half-grid">
-                  <input type="number" placeholder="Dar es Salaam price" className="sm-input-full" value={newShipping.price_local} onChange={e => setNewShipping({...newShipping, price_local: e.target.value})} />
-                  <input type="number" placeholder="Regions price" className="sm-input-full" value={newShipping.price_national} onChange={e => setNewShipping({...newShipping, price_national: e.target.value})} />
+            <div className="bg-orange-50 dark:bg-slate-700 rounded-xl p-4 border border-orange-100 dark:border-slate-600 mt-2">
+              <h4 className="font-semibold text-orange-900 dark:text-orange-500 text-sm m-0 mb-3">
+                ➕ New Shipping Method
+              </h4>
+              <div className="flex flex-col gap-3">
+                <input
+                  type="text"
+                  placeholder="Method name *"
+                  className="w-full p-2 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 box-border focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  value={newShipping.label}
+                  onChange={e => setNewShipping({ ...newShipping, label: e.target.value })}
+                />
+                <textarea
+                  rows="1"
+                  placeholder="Description (optional)"
+                  className="w-full p-2 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 box-border focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  value={newShipping.description}
+                  onChange={e => setNewShipping({ ...newShipping, description: e.target.value })}
+                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <input
+                    type="number"
+                    placeholder="Dar es Salaam price"
+                    className="w-full p-2 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 box-border focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    value={newShipping.price_local}
+                    onChange={e => setNewShipping({ ...newShipping, price_local: e.target.value })}
+                  />
+                  <input
+                    type="number"
+                    placeholder="Regions price"
+                    className="w-full p-2 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 box-border focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    value={newShipping.price_national}
+                    onChange={e => setNewShipping({ ...newShipping, price_national: e.target.value })}
+                  />
                 </div>
-                <button onClick={handleAddShipping} className="sm-shipping-submit-btn">Add Method</button>
+                <button
+                  onClick={handleAddShipping}
+                  className="w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-semibold border-none cursor-pointer hover:bg-orange-600 transition-colors"
+                >
+                  Add Method
+                </button>
               </div>
-
             </div>
           )}
         </div>
 
-        <div className="sm-details-section">
-          <div className="sm-office-grid">
+        {/* ===== OFFICE IMAGES & STORE DETAILS ===== */}
+        <div className="mt-8 pt-6 border-t border-gray-100 dark:border-slate-700">
+          <div className="grid grid-cols-3 gap-3">
             {officePreviews.map((url, index) => (
-              <div 
+              <div
                 key={`${index}-${url || index}`}
-                className="sm-office-box"
+                className="relative w-full aspect-square bg-gray-100 dark:bg-slate-900 border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-xl overflow-hidden cursor-pointer flex items-center justify-center"
                 onClick={() => officeInputRefs.current[index]?.click()}
               >
                 {url ? (
-                  <img src={getFullImageUrl(url)} alt="Office" />
+                  <img src={getFullImageUrl(url)} alt="Office" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="sm-office-box-placeholder">📸 Photo {index + 1}</div>
+                  <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-slate-400 text-[11px]">
+                    📸 Photo {index + 1}
+                  </div>
                 )}
-                <input 
-                  type="file" 
-                  style={{ display: 'none' }} 
-                  ref={(el) => (officeInputRefs.current[index] = el)} 
+                <input
+                  type="file"
+                  style={{ display: 'none' }}
+                  ref={(el) => (officeInputRefs.current[index] = el)}
                   onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
                       if (officePreviews[index] && officePreviews[index].startsWith('blob:')) {
-                        try {
-                          URL.revokeObjectURL(officePreviews[index]);
-                        } catch (err) {
-                          console.warn("Could not revoke blob URL");
-                        }
+                        try { URL.revokeObjectURL(officePreviews[index]); } catch (err) {}
                       }
                       const safeOfficeFiles = Array.isArray(officeFiles) ? officeFiles : [null, null, null];
-                      const nF = [...safeOfficeFiles]; const nP = [...officePreviews];
-                      nF[index] = file; nP[index] = URL.createObjectURL(file);
-                      setOfficeFiles(nF); setOfficePreviews(nP);
-                      e.target.value = null; 
+                      const nF = [...safeOfficeFiles];
+                      const nP = [...officePreviews];
+                      nF[index] = file;
+                      nP[index] = URL.createObjectURL(file);
+                      setOfficeFiles(nF);
+                      setOfficePreviews(nP);
+                      e.target.value = null;
                     }
-                  }} 
+                  }}
                 />
               </div>
             ))}
           </div>
 
-         <div className="sm-details-form">
-  <div className="sm-form-row">
-    <div className="sm-input-group">
-      <label className="sm-label">Store Name</label>
-      <input type="text" className="sm-input" value={storeMeta.store_name} onChange={(e) => setStoreMeta({ ...storeMeta, store_name: e.target.value })} />
-    </div>
-    <div className="sm-input-group">
-      <label className="sm-label">Business Phone</label>
-      <input type="text" className="sm-input" value={storeMeta.phone_number} onChange={(e) => setStoreMeta({ ...storeMeta, phone_number: e.target.value })} />
-    </div>
-  </div>
+          {/* ===== DETAILS FORM ===== */}
+          <div className="mt-5">
+            {/* Row 1 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5 mb-5">
+              <div className="flex flex-col flex-1">
+                <label className="text-[13px] font-semibold mb-2 text-gray-800 dark:text-slate-200">
+                  Store Name
+                </label>
+                <input
+                  type="text"
+                  className="w-full p-3 border-[1.5px] border-gray-200 dark:border-slate-600 rounded-[10px] text-sm bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-slate-200 box-border focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white dark:focus:bg-slate-800"
+                  value={storeMeta.store_name}
+                  onChange={(e) => setStoreMeta({ ...storeMeta, store_name: e.target.value })}
+                />
+              </div>
+              <div className="flex flex-col flex-1">
+                <label className="text-[13px] font-semibold mb-2 text-gray-800 dark:text-slate-200">
+                  Business Phone
+                </label>
+                <input
+                  type="text"
+                  className="w-full p-3 border-[1.5px] border-gray-200 dark:border-slate-600 rounded-[10px] text-sm bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-slate-200 box-border focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white dark:focus:bg-slate-800"
+                  value={storeMeta.phone_number}
+                  onChange={(e) => setStoreMeta({ ...storeMeta, phone_number: e.target.value })}
+                />
+              </div>
+            </div>
 
-  <div className="sm-form-row">
-    <div className="sm-input-group">
-      <label className="sm-label"><Phone size={14} className="sm-icon" /> WhatsApp</label>
-      <input type="text" className="sm-input" placeholder="255..." value={storeMeta.whatsapp_number} onChange={(e) => setStoreMeta({ ...storeMeta, whatsapp_number: e.target.value })} />
-    </div>
-    <div className="sm-input-group">
-      <label className="sm-label"><Instagram size={14} className="sm-icon" /> Instagram</label>
-      <input type="text" className="sm-input" placeholder="@handle" value={storeMeta.instagram_handle} onChange={(e) => setStoreMeta({ ...storeMeta, instagram_handle: e.target.value })} />
-    </div>
-  </div>
+            {/* Row 2 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5 mb-5">
+              <div className="flex flex-col flex-1">
+                <label className="text-[13px] font-semibold mb-2 text-gray-800 dark:text-slate-200 flex items-center">
+                  <Phone size={14} className="inline mr-1" /> WhatsApp
+                </label>
+                <input
+                  type="text"
+                  placeholder="255..."
+                  className="w-full p-3 border-[1.5px] border-gray-200 dark:border-slate-600 rounded-[10px] text-sm bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-slate-200 box-border focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white dark:focus:bg-slate-800"
+                  value={storeMeta.whatsapp_number}
+                  onChange={(e) => setStoreMeta({ ...storeMeta, whatsapp_number: e.target.value })}
+                />
+              </div>
+              <div className="flex flex-col flex-1">
+                <label className="text-[13px] font-semibold mb-2 text-gray-800 dark:text-slate-200 flex items-center">
+                  <Instagram size={14} className="inline mr-1" /> Instagram
+                </label>
+                <input
+                  type="text"
+                  placeholder="@handle"
+                  className="w-full p-3 border-[1.5px] border-gray-200 dark:border-slate-600 rounded-[10px] text-sm bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-slate-200 box-border focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white dark:focus:bg-slate-800"
+                  value={storeMeta.instagram_handle}
+                  onChange={(e) => setStoreMeta({ ...storeMeta, instagram_handle: e.target.value })}
+                />
+              </div>
+            </div>
 
-  <div className="sm-form-row full">
-    <div className="sm-input-group">
-      <label className="sm-label">Physical Address</label>
-      <input type="text" className="sm-input" value={storeMeta.physical_address} onChange={(e) => setStoreMeta({ ...storeMeta, physical_address: e.target.value })} />
-    </div>
-  </div>
+            {/* Row 3 (full) */}
+            <div className="grid grid-cols-1 gap-3 md:gap-5 mb-5">
+              <div className="flex flex-col flex-1">
+                <label className="text-[13px] font-semibold mb-2 text-gray-800 dark:text-slate-200">
+                  Physical Address
+                </label>
+                <input
+                  type="text"
+                  className="w-full p-3 border-[1.5px] border-gray-200 dark:border-slate-600 rounded-[10px] text-sm bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-slate-200 box-border focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white dark:focus:bg-slate-800"
+                  value={storeMeta.physical_address}
+                  onChange={(e) => setStoreMeta({ ...storeMeta, physical_address: e.target.value })}
+                />
+              </div>
+            </div>
 
-  <div className="sm-form-row">
-    <div className="sm-input-group">
-      <label className="sm-label">TIN Number 🔒</label>
-      <input type="text" value={storeMeta.tin_number || "Loading..."} readOnly className="sm-input disabled" />
-    </div>
-    <div className="sm-input-group">
-      <label className="sm-label">TikTok Handle</label>
-      <input type="text" className="sm-input" placeholder="@username" value={storeMeta.tiktok_handle || ""} onChange={(e) => setStoreMeta({ ...storeMeta, tiktok_handle: e.target.value })} />
-    </div>
-  </div>
+            {/* Row 4 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5 mb-5">
+              <div className="flex flex-col flex-1">
+                <label className="text-[13px] font-semibold mb-2 text-gray-800 dark:text-slate-200">
+                  TIN Number 🔒
+                </label>
+                <input
+                  type="text"
+                  value={storeMeta.tin_number || "Loading..."}
+                  readOnly
+                  className="w-full p-3 border-[1.5px] border-gray-200 dark:border-slate-600 rounded-[10px] text-sm bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 box-border cursor-not-allowed opacity-80 font-mono"
+                />
+              </div>
+              <div className="flex flex-col flex-1">
+                <label className="text-[13px] font-semibold mb-2 text-gray-800 dark:text-slate-200">
+                  TikTok Handle
+                </label>
+                <input
+                  type="text"
+                  placeholder="@username"
+                  className="w-full p-3 border-[1.5px] border-gray-200 dark:border-slate-600 rounded-[10px] text-sm bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-slate-200 box-border focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white dark:focus:bg-slate-800"
+                  value={storeMeta.tiktok_handle || ""}
+                  onChange={(e) => setStoreMeta({ ...storeMeta, tiktok_handle: e.target.value })}
+                />
+              </div>
+            </div>
 
-  <div className="sm-form-row full">
-    <div className="sm-input-group">
-      <label className="sm-label" style={{ fontSize: '14px', fontWeight: '500' }}>Store Description</label>
-      <textarea rows="3" className="sm-textarea" value={storeMeta.description || ""} onChange={(e) => setStoreMeta({ ...storeMeta, description: e.target.value })} />
-    </div>
-  </div>
+            {/* Row 5 (full) - Description */}
+            <div className="grid grid-cols-1 gap-3 md:gap-5 mb-5">
+              <div className="flex flex-col flex-1">
+                <label className="text-sm font-medium mb-2 text-gray-800 dark:text-slate-200">
+                  Store Description
+                </label>
+                <textarea
+                  rows="3"
+                  className="w-full p-3 rounded-lg border border-gray-200 dark:border-slate-600 text-gray-800 dark:text-slate-200 bg-gray-50 dark:bg-slate-700 font-[inherit] box-border resize-y focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  value={storeMeta.description || ""}
+                  onChange={(e) => setStoreMeta({ ...storeMeta, description: e.target.value })}
+                />
+              </div>
+            </div>
 
-  {/* 🔥 ONGEZA HAPA: LOCATION SETTINGS */}
-  <div className="sm-form-row full">
-    <div className="sm-input-group">
-      <label className="sm-label">📍 Store Location (GPS)</label>
-      <button
-        onClick={() => {
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-              (position) => {
-                setStoreMeta({
-                  ...storeMeta,
-                  latitude: position.coords.latitude,
-                  longitude: position.coords.longitude
-                });
-                alert("✅ Location imepatikana!");
-              },
-              (err) => {
-                console.error("Error getting location:", err);
-                alert("❌ Imeshindwa kupata location. Hakikisha browser inaruhusu location.");
-              },
-              { enableHighAccuracy: true, timeout: 10000 }
-            );
-          } else {
-            alert("Geolocation not supported!");
-          }
-        }}
-        style={{
-          padding: '10px 20px',
-          backgroundColor: '#ff6a00',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '8px',
-          cursor: 'pointer',
-          fontWeight: '600',
-          marginBottom: '12px',
-          width: '100%'
-        }}
-      >
-        📍 Get My Location
-      </button>
-    </div>
-  </div>
+            {/* Row 6 - Location */}
+            <div className="grid grid-cols-1 gap-3 md:gap-5 mb-5">
+              <div className="flex flex-col flex-1">
+                <label className="text-[13px] font-semibold mb-2 text-gray-800 dark:text-slate-200">
+                  📍 Store Location (GPS)
+                </label>
+                <button
+                  onClick={() => {
+                    if (navigator.geolocation) {
+                      navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                          setStoreMeta({
+                            ...storeMeta,
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                          });
+                          alert("✅ Location imepatikana!");
+                        },
+                        (err) => {
+                          console.error("Error getting location:", err);
+                          alert("❌ Imeshindwa kupata location. Hakikisha browser inaruhusu location.");
+                        },
+                        { enableHighAccuracy: true, timeout: 10000 }
+                      );
+                    } else {
+                      alert("Geolocation not supported!");
+                    }
+                  }}
+                  className="w-full py-2.5 px-5 bg-orange-500 hover:bg-orange-600 text-white border-none rounded-lg cursor-pointer font-semibold mb-3 transition-colors"
+                >
+                  📍 Get My Location
+                </button>
+              </div>
+            </div>
 
-  <div className="sm-form-row">
-    <div className="sm-input-group">
-      <label className="sm-label">Latitude</label>
-      <input
-        type="text"
-        className="sm-input"
-        placeholder="-6.7924"
-        value={storeMeta.latitude || ""}
-        onChange={(e) => setStoreMeta({ ...storeMeta, latitude: e.target.value })}
-        readOnly
-      />
-    </div>
-    <div className="sm-input-group">
-      <label className="sm-label">Longitude</label>
-      <input
-        type="text"
-        className="sm-input"
-        placeholder="39.2083"
-        value={storeMeta.longitude || ""}
-        onChange={(e) => setStoreMeta({ ...storeMeta, longitude: e.target.value })}
-        readOnly
-      />
-    </div>
-  </div>
+            {/* Row 7 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5 mb-5">
+              <div className="flex flex-col flex-1">
+                <label className="text-[13px] font-semibold mb-2 text-gray-800 dark:text-slate-200">
+                  Latitude
+                </label>
+                <input
+                  type="text"
+                  className="w-full p-3 border-[1.5px] border-gray-200 dark:border-slate-600 rounded-[10px] text-sm bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 box-border"
+                  placeholder="-6.7924"
+                  value={storeMeta.latitude || ""}
+                  onChange={(e) => setStoreMeta({ ...storeMeta, latitude: e.target.value })}
+                  readOnly
+                />
+              </div>
+              <div className="flex flex-col flex-1">
+                <label className="text-[13px] font-semibold mb-2 text-gray-800 dark:text-slate-200">
+                  Longitude
+                </label>
+                <input
+                  type="text"
+                  className="w-full p-3 border-[1.5px] border-gray-200 dark:border-slate-600 rounded-[10px] text-sm bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 box-border"
+                  placeholder="39.2083"
+                  value={storeMeta.longitude || ""}
+                  onChange={(e) => setStoreMeta({ ...storeMeta, longitude: e.target.value })}
+                  readOnly
+                />
+              </div>
+            </div>
 
-  <button onClick={handleUpdateStoreDetails} disabled={isUpdatingStore} className="sm-submit-btn">
-    {isUpdatingStore ? "Saving..." : "Save Store Changes ✅"}
-  </button>
-</div>
+            {/* Submit */}
+            <button
+              onClick={handleUpdateStoreDetails}
+              disabled={isUpdatingStore}
+              className="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white border-none rounded-xl font-bold cursor-pointer mt-6 transition-all"
+            >
+              {isUpdatingStore ? "Saving..." : "Save Store Changes ✅"}
+            </button>
+          </div>
         </div>
       </div>
     </section>

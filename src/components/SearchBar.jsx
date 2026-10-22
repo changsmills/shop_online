@@ -3,7 +3,7 @@ import api from "../axiosConfig";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import "../SearchBar.css";
+import { Search } from "lucide-react"; // Tumia icon kutoka lucide-react
 
 export default function SearchBar({ search = "", setSearch }) {
   const { t } = useTranslation();
@@ -15,30 +15,18 @@ export default function SearchBar({ search = "", setSearch }) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
-  // ✅ 1. PAKIA PLACEHOLDERS (Tunaangalia data ya kwanza)
+  // Pakia placeholders
   useEffect(() => {
     const fetchLeafCategoryNames = async () => {
       try {
-        console.log("🔍 [DEBUG 1] Inapakia Leaf Categories kwa placeholders...");
         const response = await api.get('/leaf-categories/', { params: { limit: 15 } });
-        
-        console.log("✅ [DEBUG 1] Response imefika! Full response:", response);
-
-        // Tumia 'results' ikiwa ipo, vinginevyo tumia 'data'
         const data = response.data.results || response.data || [];
-        console.log("✅ [DEBUG 1] Data iliyopatikana:", data);
-
         if (Array.isArray(data)) {
-          console.log(`✅ [DEBUG 1] Data ni array. Idadi ya items: ${data.length}`);
           const names = data.map(item => item.name);
-          console.log("✅ [DEBUG 1] Majina yaliyopatikana:", names);
           if (names.length > 0) setPlaceholders(names);
-        } else {
-          console.warn("⚠️ [DEBUG 1] Data HAIPO kama array! Tazama hapa:", data);
         }
       } catch (err) {
-        console.error("❌ [DEBUG 1] Error wakati wa fetch:", err);
-        console.error("❌ [DEBUG 1] Error details:", err.response || err.message);
+        console.error("❌ Error fetching placeholders:", err);
       }
     };
     fetchLeafCategoryNames();
@@ -53,45 +41,22 @@ export default function SearchBar({ search = "", setSearch }) {
     return () => clearInterval(timer);
   }, [placeholders]);
 
-  // ✅ 2. SEARCH EFFECT (Hapa ndio muhimu zaidi!)
+  // Tafuta suggestions
   useEffect(() => {
     const getCombinedSuggestions = async () => {
       if (!search || typeof search !== "string" || search.trim().length < 2) {
-        console.log("ℹ️ [DEBUG 2] Search ni fupi sana au tupu. Inafuta suggestions.");
         setSuggestions([]);
         setShowSuggestions(false);
         return;
       }
 
       const query = search.trim();
-      console.log(`🔍 [DEBUG 2] Mtumiaji amechapa: "${query}"`);
-
       try {
-        console.log("⏳ [DEBUG 2] Inatuma requests kwa API...");
         const [catRes, prodRes] = await Promise.allSettled([
           api.get('/leaf-categories/', { params: { search: query, limit: 4 } }),
           api.get('/products/', { params: { search: query, limit: 4 } })
         ]);
 
-        // ✅ Angalia kama Categories API imefanikiwa
-        if (catRes.status === 'fulfilled') {
-          console.log("✅ [DEBUG 2] Categories API imefanikiwa!");
-          const catData = catRes.value.data.results || catRes.value.data || [];
-          console.log("  📦 Data za Categories:", catData);
-        } else {
-          console.error("❌ [DEBUG 2] Categories API imeshindwa:", catRes.reason);
-        }
-
-        // ✅ Angalia kama Products API imefanikiwa
-        if (prodRes.status === 'fulfilled') {
-          console.log("✅ [DEBUG 2] Products API imefanikiwa!");
-          const prodData = prodRes.value.data.results || prodRes.value.data || [];
-          console.log("  📦 Data za Products:", prodData);
-        } else {
-          console.error("❌ [DEBUG 2] Products API imeshindwa:", prodRes.reason);
-        }
-
-        // Changanya data
         const categories = catRes.status === 'fulfilled' ? (catRes.value.data.results || catRes.value.data || []) : [];
         const products = prodRes.status === 'fulfilled' ? (prodRes.value.data.results || prodRes.value.data || []) : [];
 
@@ -100,20 +65,15 @@ export default function SearchBar({ search = "", setSearch }) {
           ...categories.map(item => ({ ...item, type: 'category' }))
         ];
 
-        console.log(`✅ [DEBUG 2] Combined data (Jumla: ${combined.length}):`, combined);
-
         if (combined.length > 0) {
-          console.log("✅ [DEBUG 2] Data ipo! Inaweka suggestions na kufungua portal.");
           setSuggestions(combined);
           setShowSuggestions(true);
         } else {
-          console.log("⚠️ [DEBUG 2] Data imerudi tupu! (Hakuna categories au products).");
           setSuggestions([]);
           setShowSuggestions(false);
         }
-
       } catch (err) {
-        console.error("❌ [DEBUG 2] Search Error:", err);
+        console.error("❌ Search Error:", err);
       }
     };
 
@@ -142,12 +102,20 @@ export default function SearchBar({ search = "", setSearch }) {
   };
 
   return (
-    <div className="search-wrapper-main">
-      <div className={`search-bar-container ${isFocused ? 'focused' : ''}`}>
+    <div className="relative w-full max-w-[800px] mx-auto flex-1 px-2 md:px-4 z-[1000]">
+      
+      {/* Search Bar Container */}
+      <div 
+        className={`flex items-center bg-white dark:bg-[#2d2d44] border-2 rounded-full h-[36px] sm:h-[40px] md:h-[44px] pl-3 sm:pl-4 pr-1 transition-all duration-300 ${
+          isFocused 
+            ? 'border-brand-orange shadow-[0_0_0_4px_rgba(255,102,0,0.1)]' 
+            : 'border-gray-300 dark:border-gray-600 hover:border-brand-orange'
+        }`}
+      >
         <input
           type="text"
           placeholder={placeholders[placeholderIndex]}
-          className="search-input"
+          className="flex-1 bg-transparent border-none outline-none text-[13px] sm:text-[14px] md:text-[15px] text-gray-800 dark:text-white placeholder:text-gray-400 w-full min-w-0"
           value={search}
           onChange={handleInputChange}
           onFocus={() => {
@@ -163,38 +131,34 @@ export default function SearchBar({ search = "", setSearch }) {
           }}
         />
 
-        <div className="search-tools">
-          <button className="search-submit-btn" onClick={handleSearchSubmit}>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <span className="search-btn-text">Search</span>
-          </button>
-        </div>
+        <button 
+          className="bg-brand-orange hover:bg-brand-hover text-white h-[28px] sm:h-[32px] md:h-[36px] px-3 sm:px-4 md:px-5 rounded-full font-bold text-[12px] sm:text-[13px] md:text-[14px] flex items-center justify-center gap-1.5 shrink-0 transition-transform active:scale-95"
+          onClick={handleSearchSubmit}
+        >
+          <Search size={16} className="sm:w-[18px] sm:h-[18px] md:w-[20px] md:h-[20px]" />
+          <span className="hidden md:inline">Search</span>
+        </button>
       </div>
 
-     {/* Portal - Inaonyesha majina tu! */}
-{showSuggestions && suggestions.length > 0 && createPortal(
-  <div className="search-portal">
-    <div className="suggestion-scroll-area">
+{showSuggestions && suggestions.length > 0 && (
+  <div className="absolute top-full left-0 right-0 mt-2 w-full bg-white dark:bg-[#1e293b] z-[9999] rounded-b-2xl shadow-xl border border-gray-200 dark:border-gray-700 border-t-0 overflow-hidden animate-smooth-dropdown">
+    <div className="max-h-[380px] overflow-y-auto scrollbar-thin scrollbar-thumb-brand-orange scrollbar-track-gray-100 dark:scrollbar-track-gray-800">
       {suggestions.map((item) => (
         <div 
           key={`${item.type}-${item.id}`} 
-          className="suggestion-item"
+          className="flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-gray-50 dark:border-gray-800 hover:bg-brand-light dark:hover:bg-gray-700 transition-colors"
           onMouseDown={() => {
             if (typeof setSearch === "function") setSearch(item.name);
             navigateToSearchResults(item.name);
           }}
         >
-          <div className="suggestion-info">
-            <span className="suggestion-name">{item.name}</span>
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <span className="text-[14px] text-gray-700 dark:text-gray-200 truncate">{item.name}</span>
           </div>
         </div>
       ))}
     </div>
-  </div>,
-  document.body
+  </div>
 )}
 
     </div>

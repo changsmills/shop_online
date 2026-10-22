@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-//import { supabase } from "../supabaseClient";
 import * as LucideIcons from "lucide-react";
 
 export default function AdRequest() {
@@ -9,41 +8,33 @@ export default function AdRequest() {
   const [submitted, setSubmitted] = useState(false);
   const [userProfile, setUserProfile] = useState({ name: "", phone: "", email: "" });
   const navigate = useNavigate();
-  
+
   const [formData, setFormData] = useState({
-    // Taarifa za mtu anayetangaza
     fullName: "",
     phoneNumber: "",
     email: "",
     businessName: "",
     businessType: "",
-    
-    // Taarifa za tangazo
     adType: "keyword",
     productName: "",
     productDescription: "",
     productLink: "",
     productImages: [],
     targetCategory: "",
-    
-    // Bajeti na muda
     budget: "",
     duration: "30",
     targetLocation: "Tanzania",
     targetAudience: "",
-    
-    // Maelezo ya ziada
     specialRequests: "",
     hearAboutUs: ""
   });
 
-  // Check if user is logged in and get profile
   useEffect(() => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) {
-        navigate("/dashboard/login", { 
-          state: { message: "Tafadhali ingia ili kuweza kutuma ombi la tangazo!" } 
+        navigate("/dashboard/login", {
+          state: { message: "Tafadhali ingia ili kuweza kutuma ombi la tangazo!" }
         });
       } else {
         setUser(session.user);
@@ -53,14 +44,13 @@ export default function AdRequest() {
           fullName: session.user.user_metadata?.full_name || "",
           phoneNumber: session.user.user_metadata?.phone || ""
         }));
-        
-        // Fetch user profile from database
+
         const { data: profile } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
           .single();
-          
+
         if (profile) {
           setFormData(prev => ({
             ...prev,
@@ -85,12 +75,12 @@ export default function AdRequest() {
   ];
 
   const businessTypes = [
-    "Biashara Ndogo", "Biashara ya Kati", "Biashara Kubwa", 
+    "Biashara Ndogo", "Biashara ya Kati", "Biashara Kubwa",
     "Mtengenezaji", "Muuzaji Jumla", "Muuzaji Rejareja", "Mtu Binafsi"
   ];
 
   const categories = [
-    "Electronics", "Fashion", "Furniture", "Food & Beverages", 
+    "Electronics", "Fashion", "Furniture", "Food & Beverages",
     "Construction", "Automotive", "Health & Beauty", "Agriculture", "Other"
   ];
 
@@ -100,7 +90,6 @@ export default function AdRequest() {
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-    // Simulate image upload (you can implement actual upload to Supabase storage)
     setFormData({ ...formData, productImages: files.map(f => f.name) });
   };
 
@@ -108,33 +97,25 @@ export default function AdRequest() {
     e.preventDefault();
     setLoading(true);
 
-    // Save ad request to database
     const { error } = await supabase
       .from('ad_requests')
       .insert([
         {
           user_id: user?.id,
-          // Taarifa za mtu
           full_name: formData.fullName,
           phone_number: formData.phoneNumber,
           email: formData.email,
           business_name: formData.businessName,
           business_type: formData.businessType,
-          
-          // Taarifa za tangazo
           ad_type: formData.adType,
           product_name: formData.productName,
           product_description: formData.productDescription,
           product_link: formData.productLink,
           target_category: formData.targetCategory,
-          
-          // Bajeti
           budget: parseInt(formData.budget),
           duration: parseInt(formData.duration),
           target_location: formData.targetLocation,
           target_audience: formData.targetAudience,
-          
-          // Maelezo
           special_requests: formData.specialRequests,
           hear_about_us: formData.hearAboutUs,
           status: 'pending',
@@ -151,75 +132,136 @@ export default function AdRequest() {
     setLoading(false);
   };
 
+  // ===== SUCCESS SCREEN =====
   if (submitted) {
     return (
-      <div style={{ maxWidth: '600px', margin: '0 auto', padding: '60px 20px', textAlign: 'center' }}>
-        <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#e8f5e9', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-          <LucideIcons.CheckCircle size={50} color="#27ae60" />
+      <div className="max-w-[600px] mx-auto px-5 py-12 sm:py-[60px] text-center font-sans">
+
+        {/* Success Icon */}
+        <div className="w-20 h-20 rounded-full bg-green-50 dark:bg-green-950/40 flex items-center justify-center mx-auto mb-5">
+          <LucideIcons.CheckCircle size={50} className="text-green-600 dark:text-green-500" />
         </div>
-        <h1 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '15px' }}>Ombi Limetumwa!</h1>
-        <p style={{ fontSize: '16px', color: '#666', marginBottom: '30px' }}>
+
+        <h1 className="text-2xl sm:text-[28px] font-bold mb-4 text-gray-900 dark:text-white">
+          Ombi Limetumwa!
+        </h1>
+
+        <p className="text-sm sm:text-base text-gray-500 dark:text-slate-400 mb-8">
           Asante {formData.fullName || user?.email}. Tumepokea ombi lako la tangazo.
         </p>
-        <div style={{ backgroundColor: '#f9fafb', padding: '20px', borderRadius: '8px', marginBottom: '30px', textAlign: 'left' }}>
-          <p><strong>📋 Muhtasari wa Ombi:</strong></p>
-          <p>✓ Aina ya Tangazo: {adTypes.find(t => t.value === formData.adType)?.label}</p>
-          <p>✓ Bidhaa: {formData.productName}</p>
-          <p>✓ Bajeti: TSh {parseInt(formData.budget).toLocaleString()}</p>
-          <p>✓ Muda: {formData.duration} siku</p>
+
+        {/* Summary Box */}
+        <div className="bg-gray-50 dark:bg-slate-800 p-5 rounded-lg mb-8 text-left border border-gray-100 dark:border-slate-700">
+          <p className="font-bold text-sm mb-2 text-gray-800 dark:text-white">📋 Muhtasari wa Ombi:</p>
+          <p className="text-sm text-gray-700 dark:text-slate-300 my-1">✓ Aina ya Tangazo: {adTypes.find(t => t.value === formData.adType)?.label}</p>
+          <p className="text-sm text-gray-700 dark:text-slate-300 my-1">✓ Bidhaa: {formData.productName}</p>
+          <p className="text-sm text-gray-700 dark:text-slate-300 my-1">✓ Bajeti: TSh {parseInt(formData.budget).toLocaleString()}</p>
+          <p className="text-sm text-gray-700 dark:text-slate-300 my-1">✓ Muda: {formData.duration} siku</p>
         </div>
-        <p style={{ fontSize: '14px', color: '#888', marginBottom: '20px' }}>
+
+        <p className="text-xs sm:text-sm text-gray-400 dark:text-slate-500 mb-5">
           Tutakujiana ndani ya saa 24 kwa maelezo zaidi kupitia {formData.phoneNumber} au {formData.email}
         </p>
-        <Link to="/" style={{ backgroundColor: '#ff6a00', color: 'white', padding: '12px 30px', borderRadius: '8px', textDecoration: 'none', display: 'inline-block', marginRight: '10px' }}>
-          Rudi Nyumbani
-        </Link>
-        <Link to="/ads/my-requests" style={{ backgroundColor: 'transparent', color: '#ff6a00', padding: '12px 30px', borderRadius: '8px', textDecoration: 'none', display: 'inline-block', border: '1px solid #ff6a00' }}>
-          Tazama Maombi Yangu
-        </Link>
+
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link
+            to="/"
+            className="bg-[#ff6a00] hover:bg-[#e55a00] text-white px-8 py-3 rounded-lg no-underline inline-block font-semibold text-sm transition-colors"
+          >
+            Rudi Nyumbani
+          </Link>
+          <Link
+            to="/ads/my-requests"
+            className="bg-transparent border border-[#ff6a00] text-[#ff6a00] hover:bg-orange-50 dark:hover:bg-orange-950/30 px-8 py-3 rounded-lg no-underline inline-block font-semibold text-sm transition-colors"
+          >
+            Tazama Maombi Yangu
+          </Link>
+        </div>
       </div>
     );
   }
 
+  // ===== MAIN FORM =====
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '40px 20px' }}>
-      <h1 style={{ fontSize: '32px', fontWeight: '700', marginBottom: '10px' }}>
-        <LucideIcons.Megaphone size={28} style={{ color: '#ff6a00', marginRight: '10px' }} />
+    <div className="max-w-[1000px] mx-auto px-4 sm:px-5 py-6 sm:py-10 font-sans dark:bg-slate-900">
+
+      {/* Header */}
+      <h1 className="text-2xl sm:text-[32px] font-bold mb-2.5 text-gray-900 dark:text-white flex items-center gap-2">
+        <LucideIcons.Megaphone size={28} className="text-[#ff6a00]" />
         Ombi la Tangazo
       </h1>
-      <p style={{ fontSize: '16px', color: '#666', marginBottom: '30px' }}>
+      <p className="text-sm sm:text-base text-gray-500 dark:text-slate-400 mb-8">
         Jaza fomu hii kwa undani. Tutakujiana na bei kamili na maelekezo ya malipo.
       </p>
 
-      <form onSubmit={handleSubmit} style={{ backgroundColor: 'white', borderRadius: '12px' }}>
-        
-        {/* SEHEMU YA 1: TAARIFA ZAKO */}
-        <div style={{ marginBottom: '30px', border: '1px solid #eee', borderRadius: '12px', overflow: 'hidden' }}>
-          <div style={{ backgroundColor: '#f9fafb', padding: '15px 20px', borderBottom: '1px solid #eee' }}>
-            <h3 style={{ fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <LucideIcons.User size={18} color="#ff6a00" /> Taarifa Zako (Mtangazaji)
+      <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-800 rounded-xl">
+
+        {/* ===== SECTION 1: TAARIFA ZAKO ===== */}
+        <div className="mb-7 border border-gray-100 dark:border-slate-700 rounded-xl overflow-hidden">
+          <div className="bg-gray-50 dark:bg-slate-900 px-4 sm:px-5 py-4 border-b border-gray-100 dark:border-slate-700">
+            <h3 className="font-semibold text-sm sm:text-base flex items-center gap-2.5 text-gray-800 dark:text-white">
+              <LucideIcons.User size={18} className="text-[#ff6a00]" /> Taarifa Zako (Mtangazaji)
             </h3>
           </div>
-          <div style={{ padding: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+          <div className="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+
             <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Jina Kamili *</label>
-              <input type="text" name="fullName" required value={formData.fullName} onChange={handleChange} style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }} />
+              <label className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-slate-300">Jina Kamili *</label>
+              <input
+                type="text"
+                name="fullName"
+                required
+                value={formData.fullName}
+                onChange={handleChange}
+                className="w-full px-3 py-3 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
             </div>
+
             <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Namba ya Simu *</label>
-              <input type="tel" name="phoneNumber" required value={formData.phoneNumber} onChange={handleChange} placeholder="07XX XXX XXX" style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }} />
+              <label className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-slate-300">Namba ya Simu *</label>
+              <input
+                type="tel"
+                name="phoneNumber"
+                required
+                value={formData.phoneNumber}
+                onChange={handleChange}
+                placeholder="07XX XXX XXX"
+                className="w-full px-3 py-3 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
             </div>
+
             <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Barua Pepe *</label>
-              <input type="email" name="email" required value={formData.email} onChange={handleChange} style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }} />
+              <label className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-slate-300">Barua Pepe *</label>
+              <input
+                type="email"
+                name="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-3 py-3 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
             </div>
+
             <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Jina la Biashara</label>
-              <input type="text" name="businessName" value={formData.businessName} onChange={handleChange} placeholder="Mfano: Skyfall Enterprises" style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }} />
+              <label className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-slate-300">Jina la Biashara</label>
+              <input
+                type="text"
+                name="businessName"
+                value={formData.businessName}
+                onChange={handleChange}
+                placeholder="Mfano: Skyfall Enterprises"
+                className="w-full px-3 py-3 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
             </div>
+
             <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Aina ya Biashara</label>
-              <select name="businessType" value={formData.businessType} onChange={handleChange} style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }}>
+              <label className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-slate-300">Aina ya Biashara</label>
+              <select
+                name="businessType"
+                value={formData.businessType}
+                onChange={handleChange}
+                className="w-full px-3 py-3 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+              >
                 <option value="">Chagua...</option>
                 {businessTypes.map(type => <option key={type} value={type}>{type}</option>)}
               </select>
@@ -227,63 +269,128 @@ export default function AdRequest() {
           </div>
         </div>
 
-        {/* SEHEMU YA 2: TAARIFA ZA TANGAZO */}
-        <div style={{ marginBottom: '30px', border: '1px solid #eee', borderRadius: '12px', overflow: 'hidden' }}>
-          <div style={{ backgroundColor: '#f9fafb', padding: '15px 20px', borderBottom: '1px solid #eee' }}>
-            <h3 style={{ fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <LucideIcons.Megaphone size={18} color="#ff6a00" /> Taarifa za Tangazo
+        {/* ===== SECTION 2: TAARIFA ZA TANGAZO ===== */}
+        <div className="mb-7 border border-gray-100 dark:border-slate-700 rounded-xl overflow-hidden">
+          <div className="bg-gray-50 dark:bg-slate-900 px-4 sm:px-5 py-4 border-b border-gray-100 dark:border-slate-700">
+            <h3 className="font-semibold text-sm sm:text-base flex items-center gap-2.5 text-gray-800 dark:text-white">
+              <LucideIcons.Megaphone size={18} className="text-[#ff6a00]" /> Taarifa za Tangazo
             </h3>
           </div>
-          <div style={{ padding: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+          <div className="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+
             <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Aina ya Tangazo *</label>
-              <select name="adType" value={formData.adType} onChange={handleChange} style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }}>
-                {adTypes.map(type => <option key={type.value} value={type.value}>{type.label} - {type.price}</option>)}
+              <label className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-slate-300">Aina ya Tangazo *</label>
+              <select
+                name="adType"
+                value={formData.adType}
+                onChange={handleChange}
+                className="w-full px-3 py-3 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+              >
+                {adTypes.map(type => (
+                  <option key={type.value} value={type.value}>{type.label} - {type.price}</option>
+                ))}
               </select>
-              <small style={{ color: '#666' }}>{adTypes.find(t => t.value === formData.adType)?.desc}</small>
+              <small className="text-xs text-gray-500 dark:text-slate-400 mt-1 block">
+                {adTypes.find(t => t.value === formData.adType)?.desc}
+              </small>
             </div>
+
             <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Kategoria ya Bidhaa</label>
-              <select name="targetCategory" value={formData.targetCategory} onChange={handleChange} style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }}>
+              <label className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-slate-300">Kategoria ya Bidhaa</label>
+              <select
+                name="targetCategory"
+                value={formData.targetCategory}
+                onChange={handleChange}
+                className="w-full px-3 py-3 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+              >
                 <option value="">Chagua kategoria...</option>
                 {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
             </div>
-            <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Jina la Bidhaa / Huduma *</label>
-              <input type="text" name="productName" required value={formData.productName} onChange={handleChange} placeholder="Mfano: Simu za Samsung, Vifaa vya ujenzi..." style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }} />
+
+            <div className="md:col-span-2">
+              <label className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-slate-300">Jina la Bidhaa / Huduma *</label>
+              <input
+                type="text"
+                name="productName"
+                required
+                value={formData.productName}
+                onChange={handleChange}
+                placeholder="Mfano: Simu za Samsung, Vifaa vya ujenzi..."
+                className="w-full px-3 py-3 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
             </div>
-            <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Maelezo ya Bidhaa</label>
-              <textarea name="productDescription" rows="3" value={formData.productDescription} onChange={handleChange} placeholder="Eleza kwa undani bidhaa unayotaka kutangaza..." style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }} />
+
+            <div className="md:col-span-2">
+              <label className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-slate-300">Maelezo ya Bidhaa</label>
+              <textarea
+                name="productDescription"
+                rows="3"
+                value={formData.productDescription}
+                onChange={handleChange}
+                placeholder="Eleza kwa undani bidhaa unayotaka kutangaza..."
+                className="w-full px-3 py-3 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-y"
+              />
             </div>
+
             <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Link ya Bidhaa</label>
-              <input type="url" name="productLink" value={formData.productLink} onChange={handleChange} placeholder="https://skyfall.com/product/..." style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }} />
+              <label className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-slate-300">Link ya Bidhaa</label>
+              <input
+                type="url"
+                name="productLink"
+                value={formData.productLink}
+                onChange={handleChange}
+                placeholder="https://skyfall.com/product/..."
+                className="w-full px-3 py-3 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
             </div>
+
             <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Picha za Bidhaa</label>
-              <input type="file" accept="image/*" multiple onChange={handleImageUpload} style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }} />
-              <small style={{ color: '#666' }}>Unaweza kupakia picha 5 (JPEG, PNG)</small>
+              <label className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-slate-300">Picha za Bidhaa</label>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageUpload}
+                className="w-full px-3 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-orange-500 file:text-white file:text-xs file:font-semibold file:cursor-pointer hover:file:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+              <small className="text-xs text-gray-500 dark:text-slate-400 mt-1 block">
+                Unaweza kupakia picha 5 (JPEG, PNG)
+              </small>
             </div>
           </div>
         </div>
 
-        {/* SEHEMU YA 3: BAJETI NA MUDU */}
-        <div style={{ marginBottom: '30px', border: '1px solid #eee', borderRadius: '12px', overflow: 'hidden' }}>
-          <div style={{ backgroundColor: '#f9fafb', padding: '15px 20px', borderBottom: '1px solid #eee' }}>
-            <h3 style={{ fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <LucideIcons.CreditCard size={18} color="#ff6a00" /> Bajeti na Muda
+        {/* ===== SECTION 3: BAJETI NA MUDA ===== */}
+        <div className="mb-7 border border-gray-100 dark:border-slate-700 rounded-xl overflow-hidden">
+          <div className="bg-gray-50 dark:bg-slate-900 px-4 sm:px-5 py-4 border-b border-gray-100 dark:border-slate-700">
+            <h3 className="font-semibold text-sm sm:text-base flex items-center gap-2.5 text-gray-800 dark:text-white">
+              <LucideIcons.CreditCard size={18} className="text-[#ff6a00]" /> Bajeti na Muda
             </h3>
           </div>
-          <div style={{ padding: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+          <div className="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+
             <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Bajeti Yako (TSh) *</label>
-              <input type="number" name="budget" required value={formData.budget} onChange={handleChange} placeholder="Mfano: 100000" style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }} />
+              <label className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-slate-300">Bajeti Yako (TSh) *</label>
+              <input
+                type="number"
+                name="budget"
+                required
+                value={formData.budget}
+                onChange={handleChange}
+                placeholder="Mfano: 100000"
+                className="w-full px-3 py-3 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
             </div>
+
             <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Muda wa Tangazo (Siku) *</label>
-              <select name="duration" value={formData.duration} onChange={handleChange} style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }}>
+              <label className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-slate-300">Muda wa Tangazo (Siku) *</label>
+              <select
+                name="duration"
+                value={formData.duration}
+                onChange={handleChange}
+                className="w-full px-3 py-3 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+              >
                 <option value="7">Siku 7</option>
                 <option value="14">Siku 14</option>
                 <option value="30">Siku 30</option>
@@ -291,9 +398,15 @@ export default function AdRequest() {
                 <option value="90">Siku 90</option>
               </select>
             </div>
+
             <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Eneo Lengwa</label>
-              <select name="targetLocation" value={formData.targetLocation} onChange={handleChange} style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }}>
+              <label className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-slate-300">Eneo Lengwa</label>
+              <select
+                name="targetLocation"
+                value={formData.targetLocation}
+                onChange={handleChange}
+                className="w-full px-3 py-3 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+              >
                 <option value="Tanzania">Tanzania Nzima</option>
                 <option value="Dar es Salaam">Dar es Salaam</option>
                 <option value="Arusha">Arusha</option>
@@ -302,28 +415,48 @@ export default function AdRequest() {
                 <option value="Zanzibar">Zanzibar</option>
               </select>
             </div>
+
             <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Wateja Lengwa</label>
-              <input type="text" name="targetAudience" value={formData.targetAudience} onChange={handleChange} placeholder="Mfano: Wauzaji jumla, Wanunuzi wa simu..." style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }} />
+              <label className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-slate-300">Wateja Lengwa</label>
+              <input
+                type="text"
+                name="targetAudience"
+                value={formData.targetAudience}
+                onChange={handleChange}
+                placeholder="Mfano: Wauzaji jumla, Wanunuzi wa simu..."
+                className="w-full px-3 py-3 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
             </div>
           </div>
         </div>
 
-        {/* SEHEMU YA 4: MAELEZO YA ZIADA */}
-        <div style={{ marginBottom: '30px', border: '1px solid #eee', borderRadius: '12px', overflow: 'hidden' }}>
-          <div style={{ backgroundColor: '#f9fafb', padding: '15px 20px', borderBottom: '1px solid #eee' }}>
-            <h3 style={{ fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <LucideIcons.Edit3 size={18} color="#ff6a00" /> Maelezo ya Ziada
+        {/* ===== SECTION 4: MAELEZO YA ZIADA ===== */}
+        <div className="mb-7 border border-gray-100 dark:border-slate-700 rounded-xl overflow-hidden">
+          <div className="bg-gray-50 dark:bg-slate-900 px-4 sm:px-5 py-4 border-b border-gray-100 dark:border-slate-700">
+            <h3 className="font-semibold text-sm sm:text-base flex items-center gap-2.5 text-gray-800 dark:text-white">
+              <LucideIcons.Edit3 size={18} className="text-[#ff6a00]" /> Maelezo ya Ziada
             </h3>
           </div>
-          <div style={{ padding: '20px' }}>
-            <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Maombi Maalum</label>
-              <textarea name="specialRequests" rows="3" value={formData.specialRequests} onChange={handleChange} placeholder="Mfano: Nataka tangazo lionekane weekends tu, au nimpe muundo maalum..." style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }} />
+          <div className="p-4 sm:p-5">
+            <div className="mb-4">
+              <label className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-slate-300">Maombi Maalum</label>
+              <textarea
+                name="specialRequests"
+                rows="3"
+                value={formData.specialRequests}
+                onChange={handleChange}
+                placeholder="Mfano: Nataka tangazo lionekane weekends tu, au nimpe muundo maalum..."
+                className="w-full px-3 py-3 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-y"
+              />
             </div>
             <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Umetupataje?</label>
-              <select name="hearAboutUs" value={formData.hearAboutUs} onChange={handleChange} style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }}>
+              <label className="block mb-1.5 font-medium text-sm text-gray-700 dark:text-slate-300">Umetupataje?</label>
+              <select
+                name="hearAboutUs"
+                value={formData.hearAboutUs}
+                onChange={handleChange}
+                className="w-full px-3 py-3 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+              >
                 <option value="">Chagua...</option>
                 <option value="facebook">Facebook</option>
                 <option value="instagram">Instagram</option>
@@ -336,12 +469,19 @@ export default function AdRequest() {
           </div>
         </div>
 
-        {/* BUTTONS */}
-        <div style={{ display: 'flex', gap: '15px', marginTop: '20px' }}>
-          <button type="submit" disabled={loading} style={{ backgroundColor: '#ff6a00', color: 'white', padding: '14px 30px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '600', flex: 1 }}>
+        {/* ===== BUTTONS ===== */}
+        <div className="flex flex-col sm:flex-row gap-4 mt-5">
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-[#ff6a00] hover:bg-[#e55a00] text-white px-8 py-3.5 rounded-lg border-none cursor-pointer font-semibold flex-1 disabled:opacity-60 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
+          >
             {loading ? "Inatuma..." : "Tuma Ombi la Tangazo"}
           </button>
-          <Link to="/" style={{ backgroundColor: '#f0f0f0', color: '#333', padding: '14px 30px', borderRadius: '8px', textDecoration: 'none', textAlign: 'center', fontWeight: '500', flex: 0.3 }}>
+          <Link
+            to="/"
+            className="bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-800 dark:text-white px-8 py-3.5 rounded-lg no-underline text-center font-medium flex-none sm:flex-[0.3] transition-colors text-sm sm:text-base"
+          >
             Ghairi
           </Link>
         </div>

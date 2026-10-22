@@ -2,135 +2,118 @@ import * as LucideIcons from "lucide-react";
 
 export default function ContactUs() {
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 20px' }}>
-      <h1 style={{ fontSize: '32px', fontWeight: '700', marginBottom: '10px', textAlign: 'center' }}>
-        <LucideIcons.MessageCircle size={28} style={{ color: '#ff6a00', marginRight: '10px' }} />
+    <div className="max-w-[1200px] mx-auto px-4 sm:px-5 py-8 sm:py-10 dark:bg-slate-900 min-h-screen">
+
+      {/* ===== HEADER ===== */}
+      <h1 className="text-2xl sm:text-[32px] font-bold mb-2.5 text-center text-gray-900 dark:text-white flex items-center justify-center gap-2.5">
+        <LucideIcons.MessageCircle size={28} className="text-[#ff6a00]" />
         Wasiliana Nasi
       </h1>
-      <p style={{ fontSize: '16px', color: '#666', marginBottom: '40px', textAlign: 'center' }}>
+      <p className="text-sm sm:text-base text-gray-500 dark:text-slate-400 mb-8 sm:mb-10 text-center">
         Tupo hapa kukusaidia 24/7
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', marginBottom: '50px' }}>
-        {/* WhatsApp */}
-        <div style={{ 
-          padding: '30px', 
-          backgroundColor: 'white', 
-          borderRadius: '12px', 
-          boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-          textAlign: 'center',
-          border: '1px solid #eee',
-          transition: 'transform 0.2s'
-        }}
-        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
-          <div style={{ width: '70px', height: '70px', borderRadius: '50%', backgroundColor: '#e8f5e9', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-            <LucideIcons.MessageCircle size={35} color="#128c7e" />
+      {/* ===== CONTACT CARDS GRID ===== */}
+      <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-5 sm:gap-6 lg:gap-[30px] mb-10 sm:mb-12">
+
+        {/* WhatsApp Card */}
+        <div className="p-6 sm:p-8 bg-white dark:bg-slate-800 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)] text-center border border-gray-100 dark:border-slate-700 transition-transform duration-200 hover:-translate-y-[5px]">
+          <div className="w-[70px] h-[70px] rounded-full bg-green-50 dark:bg-green-950/40 flex items-center justify-center mx-auto mb-5">
+            <LucideIcons.MessageCircle size={35} className="text-[#128c7e]" />
           </div>
-          <h3 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '10px' }}>Chat na Msaidizi</h3>
-          <p style={{ fontSize: '14px', color: '#666', marginBottom: '20px' }}>Jibu la haraka kwa ujumbe wa WhatsApp</p>
-          <a 
-            href="https://wa.me/255700000000" 
-            target="_blank" 
+          <h3 className="text-lg sm:text-xl font-semibold mb-2.5 text-gray-900 dark:text-white">
+            Chat na Msaidizi
+          </h3>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">
+            Jibu la haraka kwa ujumbe wa WhatsApp
+          </p>
+          <a
+            href="https://wa.me/255754394845"
+            target="_blank"
             rel="noreferrer"
-            style={{ 
-              backgroundColor: '#128c7e', 
-              color: 'white', 
-              padding: '12px 30px', 
-              borderRadius: '40px', 
-              textDecoration: 'none', 
-              display: 'inline-block',
-              fontWeight: '500'
-            }}
+            className="inline-flex items-center justify-center bg-[#128c7e] hover:bg-[#0e6e63] text-white px-6 sm:px-[30px] py-3 rounded-[40px] no-underline font-medium text-sm sm:text-base transition-colors"
           >
-            <LucideIcons.MessageCircle size={16} style={{ marginRight: '8px' }} />
+            <LucideIcons.MessageCircle size={16} className="mr-2" />
             WhatsApp Sasa
           </a>
         </div>
 
-        {/* Barua Pepe */}
-        <div style={{ 
-          padding: '30px', 
-          backgroundColor: 'white', 
-          borderRadius: '12px', 
-          boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-          textAlign: 'center',
-          border: '1px solid #eee',
-          transition: 'transform 0.2s'
-        }}
-        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
-          <div style={{ width: '70px', height: '70px', borderRadius: '50%', backgroundColor: '#fff7f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-            <LucideIcons.Mail size={35} color="#ff6a00" />
+        {/* Email Card */}
+        <div className="p-6 sm:p-8 bg-white dark:bg-slate-800 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)] text-center border border-gray-100 dark:border-slate-700 transition-transform duration-200 hover:-translate-y-[5px]">
+          <div className="w-[70px] h-[70px] rounded-full bg-orange-50 dark:bg-orange-950/40 flex items-center justify-center mx-auto mb-5">
+            <LucideIcons.Mail size={35} className="text-[#ff6a00]" />
           </div>
-          <h3 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '10px' }}>Tutumie Barua Pepe</h3>
-          <p style={{ fontSize: '14px', color: '#666', marginBottom: '20px' }}>Tutajibu ndani ya saa 24</p>
-          <a 
-            href="mailto:support@skyfall.com" 
-            style={{ 
-              backgroundColor: '#ff6a00', 
-              color: 'white', 
-              padding: '12px 30px', 
-              borderRadius: '40px', 
-              textDecoration: 'none', 
-              display: 'inline-block',
-              fontWeight: '500'
-            }}
+          <h3 className="text-lg sm:text-xl font-semibold mb-2.5 text-gray-900 dark:text-white">
+            Tutumie Barua Pepe
+          </h3>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">
+            Tutajibu ndani ya saa 24
+          </p>
+          <a
+            href="mailto:support@skyfall.com"
+            className="inline-flex items-center justify-center bg-[#ff6a00] hover:bg-[#e55a00] text-white px-6 sm:px-[30px] py-3 rounded-[40px] no-underline font-medium text-sm sm:text-base transition-colors break-all"
           >
-            <LucideIcons.Mail size={16} style={{ marginRight: '8px' }} />
+            <LucideIcons.Mail size={16} className="mr-2 flex-shrink-0" />
             support@skyfall.com
           </a>
         </div>
 
-        {/* Ofisi */}
-        <div style={{ 
-          padding: '30px', 
-          backgroundColor: 'white', 
-          borderRadius: '12px', 
-          boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-          textAlign: 'center',
-          border: '1px solid #eee',
-          transition: 'transform 0.2s'
-        }}
-        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
-          <div style={{ width: '70px', height: '70px', borderRadius: '50%', backgroundColor: '#e3f2fd', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-            <LucideIcons.Building size={35} color="#0071dc" />
+        {/* Office Card */}
+        <div className="p-6 sm:p-8 bg-white dark:bg-slate-800 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)] text-center border border-gray-100 dark:border-slate-700 transition-transform duration-200 hover:-translate-y-[5px]">
+          <div className="w-[70px] h-[70px] rounded-full bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center mx-auto mb-5">
+            <LucideIcons.Building size={35} className="text-[#0071dc]" />
           </div>
-          <h3 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '10px' }}>Ofisi zetu zilipo</h3>
-          <p style={{ fontSize: '14px', color: '#666', marginBottom: '20px' }}>Tembelea ofisi yetu</p>
-          <button 
+          <h3 className="text-lg sm:text-xl font-semibold mb-2.5 text-gray-900 dark:text-white">
+            Ofisi zetu zilipo
+          </h3>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">
+            Tembelea ofisi yetu
+          </p>
+          <button
             onClick={() => window.open('https://maps.google.com/?q=Dar+es+Salaam+Tanzania', '_blank')}
-            style={{ 
-              backgroundColor: '#0071dc', 
-              color: 'white', 
-              padding: '12px 30px', 
-              borderRadius: '40px', 
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: '500'
-            }}
+            className="inline-flex items-center justify-center bg-[#0071dc] hover:bg-[#005bb0] text-white px-6 sm:px-[30px] py-3 rounded-[40px] border-none cursor-pointer font-medium text-sm sm:text-base transition-colors"
           >
-            <LucideIcons.MapPin size={16} style={{ marginRight: '8px' }} />
+            <LucideIcons.MapPin size={16} className="mr-2" />
             Tazama Mahali
           </button>
         </div>
       </div>
 
-      {/* Contact Form */}
-      <div style={{ backgroundColor: '#f9fafb', padding: '30px', borderRadius: '12px', marginTop: '20px' }}>
-        <h3 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '20px', textAlign: 'center' }}>Tutumie Ujumbe</h3>
-        <form style={{ maxWidth: '600px', margin: '0 auto' }}>
-          <div style={{ marginBottom: '15px' }}>
-            <input type="text" placeholder="Jina lako" style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }} />
+      {/* ===== CONTACT FORM ===== */}
+      <div className="bg-gray-50 dark:bg-slate-800 p-5 sm:p-8 rounded-xl mt-5">
+        <h3 className="text-lg sm:text-xl font-semibold mb-5 text-center text-gray-900 dark:text-white">
+          Tutumie Ujumbe
+        </h3>
+        <form className="max-w-[600px] mx-auto">
+
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Jina lako"
+              className="w-full px-3 py-3 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            />
           </div>
-          <div style={{ marginBottom: '15px' }}>
-            <input type="email" placeholder="Barua pepe yako" style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }} />
+
+          <div className="mb-4">
+            <input
+              type="email"
+              placeholder="Barua pepe yako"
+              className="w-full px-3 py-3 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            />
           </div>
-          <div style={{ marginBottom: '15px' }}>
-            <textarea rows="4" placeholder="Ujumbe wako..." style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }}></textarea>
+
+          <div className="mb-4">
+            <textarea
+              rows="4"
+              placeholder="Ujumbe wako..."
+              className="w-full px-3 py-3 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-y"
+            ></textarea>
           </div>
-          <button type="submit" style={{ backgroundColor: '#ff6a00', color: 'white', padding: '12px 30px', borderRadius: '8px', border: 'none', cursor: 'pointer', width: '100%', fontWeight: '600' }}>
+
+          <button
+            type="submit"
+            className="w-full bg-[#ff6a00] hover:bg-[#e55a00] text-white px-6 sm:px-[30px] py-3 rounded-lg border-none cursor-pointer font-semibold text-sm sm:text-base transition-colors"
+          >
             Tuma Ujumbe
           </button>
         </form>

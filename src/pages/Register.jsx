@@ -3,8 +3,7 @@ import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import api from '../axiosConfig';
 import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
-import { Lock, ShieldCheck, CheckCircle, Mail, Eye, EyeOff, User } from 'lucide-react'; // 🔥 ONGEZA HII!
-import '../Register.css';
+import { Lock, Mail, Eye, EyeOff } from 'lucide-react';
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -30,7 +29,7 @@ const Register = () => {
       const timer = setTimeout(() => {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        toast.dismiss(); // 🔥 Futa toasts zilizopo kabla ya navigate
+        toast.dismiss();
         navigate("/dashboard/login", { replace: true });
       }, 1500);
       return () => clearTimeout(timer);
@@ -92,7 +91,6 @@ const Register = () => {
     setLoading(true);
     
     try {
-      // 🔥 BADILISHA HAPA: endpoint ya `dj-rest-auth` ni `/auth/registration/`
       const response = await api.post('/auth/registration/', {
         email: email.trim(),
         password1: password,
@@ -132,7 +130,6 @@ const Register = () => {
     }
   };
   
-  // 🔥 KAZI MPYA: Google Login Success (Kama Login.jsx)
   const handleGoogleSuccess = async (credentialResponse) => {
     console.log("🔍 Google Credential Response:", credentialResponse);
     const token = credentialResponse.credential;
@@ -160,131 +157,122 @@ const Register = () => {
   };
 
   return (
-    // 🔥 Wrap with GoogleOAuthProvider
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || "897025267638-4uq34ithcduiblhn0qfb1cdspl2uovn6.apps.googleusercontent.com"}>
-      <div className="register-container">
+      <div className="flex min-h-screen bg-white dark:bg-[#1a1a2e] font-sans">
         <Toaster position="top-center" reverseOrder={false} />
 
-        {/* LEFT PANEL */}
-        <div className="register-left-panel">
-          <div className="register-testimonial-box">
-            <p className="register-testimonial-text">
+        {/* LEFT PANEL (Desktop only) */}
+        <div 
+          className="hidden lg:flex flex-1 relative items-end p-10 bg-cover bg-center"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1000&auto=format&fit=crop')" }}
+        >
+          <div className="bg-white/90 dark:bg-[#1e293b]/90 p-6 md:p-8 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] backdrop-blur-md w-full max-w-[500px]">
+            <p className="m-0 mb-3 text-base italic font-medium text-[#1a1a1a] dark:text-[#e2e8f0] leading-relaxed">
               “In just 1 year, LTA International generated 14 new customers with new sales growth totaling $1.5 million.”
             </p>
-            <div className="register-testimonial-footer">
-              <span className="register-testimonial-author">Andrea Vitello</span>
-              <span className="register-testimonial-brand">Skyfall.com</span>
+            <div className="flex items-center justify-between border-t border-gray-200 dark:border-[#334155] pt-3">
+              <span className="font-semibold text-sm text-[#333] dark:text-[#f1f5f9]">Andrea Vitello</span>
+              <span className="font-bold text-xs text-[#FF6600]">Skyfall.com</span>
             </div>
           </div>
         </div>
 
         {/* RIGHT PANEL */}
-        <div className="register-right-panel">
+        <div className="flex-1 flex flex-col justify-center px-5 py-8 md:px-[60px] md:py-[40px] bg-white dark:bg-[#1a1a2e] max-w-[600px] mx-auto w-full">
           
-          {/* 🔥 ONGEZA HII: SECURITY BADGES */}
-          <div className="register-security-badges">
-            <div className="security-badge-item">
-              <ShieldCheck size={16} color="#28a745" />
-              <span className="security-text">SSL 256-bit Encryption</span>
-            </div>
-            <div className="security-badge-item">
-              <Lock size={16} color="#28a745" />
-              <span className="security-text">2FA Enabled</span>
-            </div>
-          </div>
-
-          <div className="register-header">
-            <h2 className="register-title">Create your account</h2>
-            <p className="register-subtitle">
-              <Lock size={14} color="#28a745" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
-              <span className="secure-text">We Secure Your Data</span>
+          <div className="mb-6 md:mb-8">
+            <h2 className="text-[26px] md:text-[32px] font-bold text-[#1a1a1a] dark:text-[#e2e8f0] m-0 mb-2">Create your account</h2>
+            <p className="m-0 text-[13px] md:text-sm text-[#666] dark:text-[#94a3b8] flex items-center gap-1">
+              <Lock size={14} className="text-[#28a745]" />
+              <span className="text-[#28a745] font-semibold">We Secure Your Data</span>
             </p>
           </div>
 
-          {/* 🔥 Social Login Buttons - Google pekee */}
-          <div className="register-social-buttons">
+          {/* Google Login */}
+          <div className="flex flex-col gap-3 mb-6 w-full justify-center overflow-hidden">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={handleGoogleError}
               useOneTap
+              width="100%"
             />
           </div>
 
           {/* Divider */}
-          <div className="register-divider">
-            <hr className="register-divider-line" />
-            <span className="register-divider-text">Or</span>
-            <hr className="register-divider-line" />
+          <div className="flex items-center mb-6 text-[#999] dark:text-[#64748b] text-sm">
+            <hr className="flex-1 border-t border-gray-200 dark:border-[#334155] m-0" />
+            <span className="px-4">Or</span>
+            <hr className="flex-1 border-t border-gray-200 dark:border-[#334155] m-0" />
           </div>
 
           {/* Error Message */}
           {errorMessage && (
-            <div className="register-error-message">
+            <div className="bg-red-50 dark:bg-[#2d1a1a] text-red-600 dark:text-[#f87171] border border-red-200 dark:border-[#4a1a1a] px-4 py-3 rounded-lg mb-5 text-sm text-center">
               ⚠️ {errorMessage}
             </div>
           )}
 
           {/* Register Form */}
-          <form onSubmit={handleSignup} className="register-form">
-            <div className="register-form-group">
-              <label className="register-label">Email Address</label>
-              <div className="register-input-wrapper">
-                <Mail size={18} color="#999" className="register-input-icon" />
+          <form onSubmit={handleSignup} className="flex flex-col gap-5">
+            <div className="flex flex-col">
+              <label className="block text-sm font-medium mb-1.5 text-[#333] dark:text-[#e2e8f0]">Email Address</label>
+              <div className="relative flex items-center">
+                <Mail size={18} className="absolute left-3.5 text-gray-400" />
                 <input 
                   type="email" 
                   required 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)} 
                   disabled={loading}
-                  className="register-input"
+                  className="w-full px-4 py-3.5 pl-10 rounded-lg border border-gray-300 dark:border-[#334155] bg-white dark:bg-[#1e293b] text-[#333] dark:text-[#e2e8f0] text-[15px] outline-none transition-all focus:border-[#FF6600] focus:ring-4 focus:ring-[#FF6600]/10 placeholder:text-gray-400 dark:placeholder:text-[#64748b] disabled:opacity-60 disabled:cursor-not-allowed"
                   placeholder="Enter your email"
                 />
               </div>
-              <div className="register-name-preview">
-                Your default name will be: <strong>{email ? generateDefaultNameFromEmail(email) : '...'}</strong>
+              <div className="text-xs text-gray-500 dark:text-[#94a3b8] mt-1.5">
+                Your default name will be: <strong className="text-[#333] dark:text-[#e2e8f0]">{email ? generateDefaultNameFromEmail(email) : '...'}</strong>
               </div>
             </div>
 
-            <div className="register-form-group">
-              <label className="register-label">Password</label>
-              <div className="register-password-wrapper">
+            <div className="flex flex-col">
+              <label className="block text-sm font-medium mb-1.5 text-[#333] dark:text-[#e2e8f0]">Password</label>
+              <div className="relative flex items-center">
                 <input 
                   type={showPassword ? "text" : "password"} 
                   required 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)} 
                   disabled={loading}
-                  className="register-input"
+                  className="w-full px-4 py-3.5 rounded-lg border border-gray-300 dark:border-[#334155] bg-white dark:bg-[#1e293b] text-[#333] dark:text-[#e2e8f0] text-[15px] outline-none transition-all focus:border-[#FF6600] focus:ring-4 focus:ring-[#FF6600]/10 placeholder:text-gray-400 dark:placeholder:text-[#64748b] disabled:opacity-60 disabled:cursor-not-allowed"
                   placeholder="Enter your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={loading}
-                  className="register-password-toggle"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 bg-none border-none cursor-pointer text-gray-500 dark:text-gray-400 p-1 hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>
 
-            <div className="register-form-group">
-              <label className="register-label">Confirm Password</label>
-              <div className="register-password-wrapper">
+            <div className="flex flex-col">
+              <label className="block text-sm font-medium mb-1.5 text-[#333] dark:text-[#e2e8f0]">Confirm Password</label>
+              <div className="relative flex items-center">
                 <input 
                   type={showConfirmPassword ? "text" : "password"} 
                   required 
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)} 
                   disabled={loading}
-                  className="register-input"
+                  className="w-full px-4 py-3.5 rounded-lg border border-gray-300 dark:border-[#334155] bg-white dark:bg-[#1e293b] text-[#333] dark:text-[#e2e8f0] text-[15px] outline-none transition-all focus:border-[#FF6600] focus:ring-4 focus:ring-[#FF6600]/10 placeholder:text-gray-400 dark:placeholder:text-[#64748b] disabled:opacity-60 disabled:cursor-not-allowed"
                   placeholder="Confirm your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   disabled={loading}
-                  className="register-password-toggle"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 bg-none border-none cursor-pointer text-gray-500 dark:text-gray-400 p-1 hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -294,27 +282,17 @@ const Register = () => {
             <button 
               type="submit" 
               disabled={loading}
-              className="register-submit-btn"
+              className="w-full py-3.5 mt-2.5 bg-[#FF6600] text-white rounded-full text-base font-bold cursor-pointer transition-all hover:bg-[#e55a00] hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(255,102,0,0.3)] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
             >
               {loading ? 'Creating Account...' : 'Create Account'}
             </button>
           </form>
 
-          {/* 🔥 ONGEZA HII: TRUST MESSAGE CHINI */}
-          <div className="register-trust-message">
-            <div className="trust-icon-wrapper">
-              <ShieldCheck size={20} color="#28a745" />
-            </div>
-            <p className="trust-text">
-              Your information is protected with 256-bit SSL encryption.
-            </p>
-          </div>
-
-          <div className="register-footer">
+          <div className="text-center mt-5 text-[15px] text-[#333] dark:text-[#e2e8f0]">
             Already have an account? 
             <span 
               onClick={() => navigate("/dashboard/login")}
-              className="register-login-link"
+              className="font-bold text-[#FF6600] cursor-pointer underline ml-1 hover:text-[#e55a00] transition-colors"
             >
               Sign in here
             </span>
@@ -325,12 +303,12 @@ const Register = () => {
   );
 };
 
-// 🔥 Google Social Button pekee!
+// 🔥 Google Social Button pekee! (Imehifadhiwa kama ilivyokuwa kwenye code yako ya awali)
 const SocialButton = ({ className, icon, text, onClick }) => (
   <button 
     type="button" 
     onClick={onClick}
-    className={`register-social-btn ${className}`}
+    className={`w-full flex items-center justify-center gap-3 px-4 py-3 rounded-[10px] text-[15px] font-medium cursor-pointer transition-all border-none hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] active:scale-95 ${className}`}
   >
     {icon}
     {text}

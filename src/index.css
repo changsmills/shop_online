@@ -1,72 +1,146 @@
-:root {
-  /* Roboto imewekwa mbele, fallback ikiwa fail */
-  font-family: 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+@theme {
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* ============================================
+     RANGI ZA BRAND (Orange)
+     ============================================ */
+  --color-brand-orange: #FF6600;
+  --color-brand-hover: #e55a00;
+  --color-brand-light: #fff5f0;
+
+  /* ============================================
+     BACKGROUNDS
+     ============================================ */
+  --color-bg-body: #ffffff;
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f5f5f5;
+  --color-bg-card: #ffffff;
+  --color-bg-header: #ffffff;
+  --color-bg-sidebar: #ffffff;
+  --color-bg-footer: #fafafa;
+  --color-bg-input: #ffffff;
+
+  /* ============================================
+     TEXT
+     ============================================ */
+  --color-text-primary: #000000;
+  --color-text-secondary: #4a4a4a;
+  --color-text-muted: #808080;
+  --color-text-cat: #1a1a1a;
+  --color-text-white: #ffffff;
+
+  /* ============================================
+     BORDERS
+     ============================================ */
+  --color-border-color: #e0e0e0;
+  --color-border-light: #f0f0f0;
+  --color-border-dark: #c0c0c0;
+
+  /* ============================================
+     INPUTS
+     ============================================ */
+  --color-input-bg: #ffffff;
+  --color-input-border: #e0e0e0;
+  --color-input-text: #000000;
+
+  /* ============================================
+     FONT
+     ============================================ */
+  --font-sans: 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+
+  /* ============================================
+     BORDER RADIUS
+     ============================================ */
+  --radius-card: 12px;
+  --radius-modal: 20px;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
+/* ============================================
+   BASE STYLES (Global Reset + Body)
+   ============================================ */
+@layer base {
 
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-
-button:hover {
-  border-color: #646cff;
-}
-
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+  /* ❌ Futa hii block nzima hapa chini */
+  /*
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
-  a:hover {
-    color: #747bff;
+  */
+
+  /* ✅ Acha hii ipite kama ilivyo */
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-sans);
+    background-color: var(--color-bg-body);
+    color: var(--color-text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
-  button {
-    background-color: #f9f9f9;
+
+  /* Dark Mode */
+  @media (prefers-color-scheme: dark) {
+    html, body {
+      background-color: #000000;
+      color: #ffffff;
+    }
   }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  0% { opacity: 0; transform: translateY(20px) scale(0.98); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+@keyframes mainFadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+/* index.css */
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+@keyframes slideDownSmooth {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-smooth-dropdown {
+  animation: slideDownSmooth 0.25s ease-out forwards;
 }

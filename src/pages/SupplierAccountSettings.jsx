@@ -1,3 +1,4 @@
+// src/pages/SupplierAccountSettings.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import api from '../axiosConfig';
@@ -7,7 +8,6 @@ import {
   Camera, Save, HelpCircle, FileText, Shield, Phone, Mail, Globe, Truck, Store, Home, Megaphone, X, Eye, EyeOff
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import '../SupplierAccountSettings.css';
 
 const SupplierAccountSettings = ({ session }) => {
   const navigate = useNavigate();
@@ -143,16 +143,16 @@ const SupplierAccountSettings = ({ session }) => {
   // ============ SKELETON LOADING ============
   if (loading) {
     return (
-      <div className="dashboard-layout">
-        <div className="skeleton-header" />
-        <div className="settings-main">
-          {!isMobile && <div className="skeleton-sidebar" />}
-          <div className="settings-container">
-            <div className="settings-wrapper">
-              <div className="skeleton-box skeleton-profile-card" />
-              <div className="skeleton-settings-grid">
-                <div className="skeleton-box" />
-                <div className="skeleton-box" />
+      <div className="flex flex-col h-screen bg-gray-50 dark:bg-black overflow-hidden font-sans">
+        <div className="h-[60px] bg-white dark:bg-[#0a0a0a] border-b border-gray-200 dark:border-gray-800 animate-pulse" />
+        <div className="flex flex-1 overflow-hidden">
+          {!isMobile && <div className="w-[72px] bg-white dark:bg-[#0a0a0a] border-r border-gray-200 dark:border-gray-800 animate-pulse" />}
+          <div className="flex-1 p-6 overflow-y-auto">
+            <div className="max-w-[1000px] mx-auto w-full">
+              <div className="h-[120px] bg-gray-200 dark:bg-gray-800 rounded-xl mb-5 animate-pulse" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="h-[200px] bg-gray-200 dark:bg-gray-800 rounded-xl animate-pulse" />
+                <div className="h-[200px] bg-gray-200 dark:bg-gray-800 rounded-xl animate-pulse" />
               </div>
             </div>
           </div>
@@ -163,106 +163,134 @@ const SupplierAccountSettings = ({ session }) => {
 
   // ============ MAIN RENDER ============
   return (
-    <div className="dashboard-layout">
+    <div className="flex flex-col h-screen w-full overflow-hidden font-sans bg-gray-50 dark:bg-black text-gray-900 dark:text-white">
       
       {/* HEADER */}
-      <header className="settings-header">
-        <div className="settings-header-left">
+      <header className="h-[60px] bg-white dark:bg-[#0a0a0a] border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-4 md:px-6 z-[100] shrink-0">
+        <div className="flex items-center gap-4">
           {!isMobile && (
             <Settings 
               size={22} 
-              style={{ cursor: 'pointer', color: 'var(--text-secondary)' }} 
+              className="cursor-pointer text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors" 
               onClick={() => setIsExpanded(!isExpanded)} 
             />
           )}
-          <Link to="/dashboard/sellerboard" className="settings-header-logo">
+          <Link to="/dashboard/sellerboard" className="text-xl font-extrabold text-[#ff6a00] hover:opacity-80">
             Skyfall.com
           </Link>
           {!isMobile && (
-            <div className="settings-header-search">
-              <Search size={16} color="var(--text-muted)" />
-              <input type="text" placeholder="Search..." />
+            <div className="flex items-center bg-gray-100 dark:bg-gray-900 px-3 py-1.5 rounded-lg ml-2">
+              <Search size={16} className="text-gray-400" />
+              <input type="text" placeholder="Search..." className="bg-transparent border-none outline-none ml-2 text-sm text-gray-900 dark:text-white w-44" />
             </div>
           )}
         </div>
-        <div className="settings-header-right">
-          {!isMobile && <Bell size={20} className="settings-icon-btn" />}
+        <div className="flex items-center gap-4">
+          {!isMobile && <Bell size={20} className="text-gray-500 hover:text-[#ff6a00] cursor-pointer" />}
         </div>
       </header>
 
-      <div className="settings-main">
+      <div className="flex flex-1 overflow-hidden">
         
         {/* SIDEBAR (Desktop) */}
         {!isMobile && (
           <aside 
-            className={`settings-sidebar ${isExpanded ? 'expanded' : ''}`}
+            className={`bg-white dark:bg-[#0a0a0a] border-r border-gray-200 dark:border-gray-800 flex flex-col pt-2.5 transition-all duration-300 overflow-hidden shrink-0 z-10 ${
+              isExpanded ? 'w-[240px]' : 'w-[72px]'
+            }`}
             onMouseEnter={() => setIsExpanded(true)}
             onMouseLeave={() => setIsExpanded(false)}
           >
-            {sidebarItems.map((item) => (
-              <Link 
-                key={item.path} 
-                to={item.path} 
-                className={`settings-sidebar-link ${location.pathname === item.path ? 'active' : ''}`}
-              >
-                <div className="settings-sidebar-icon">{item.icon}</div>
-                <span className="settings-sidebar-label">{item.label}</span>
-              </Link>
-            ))}
+            {sidebarItems.map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <Link 
+                  key={item.path} 
+                  to={item.path} 
+                  className={`flex items-center h-12 mx-2.5 my-1 rounded-lg transition-colors ${
+                    isActive 
+                      ? 'text-[#ff6a00] bg-[#fff5ed] dark:bg-[#ff6a00]/10' 
+                      : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-900 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                >
+                  <div className="min-w-[52px] flex justify-center items-center">
+                    {item.icon}
+                  </div>
+                  <span className={`text-sm font-semibold whitespace-nowrap transition-opacity duration-200 ml-1 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
           </aside>
         )}
 
         {/* MAIN CONTENT */}
-        <div className="settings-container">
-          <div className="settings-wrapper">
+        <div className="flex-1 bg-gray-50 dark:bg-black p-4 md:p-6 overflow-y-auto pb-24 md:pb-6">
+          <div className="max-w-[1000px] mx-auto w-full">
 
             {/* PROFILE HEADER */}
-            <div className="profile-header-card">
-              <div className="profile-info-main">
-                <div className="avatar-circle">
+            <div className="bg-white dark:bg-[#111111] p-5 md:p-6 rounded-xl border border-gray-200 dark:border-gray-800 mb-5 shadow-sm">
+              <div className="flex flex-col md:flex-row items-center md:items-start gap-5">
+                <div className="w-[70px] h-[70px] rounded-full bg-[#ff6a00] text-white flex items-center justify-center text-2xl font-bold overflow-hidden shrink-0">
                   {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt="Profile" />
+                    <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
                     (profile?.full_name || profile?.email || 'U')?.charAt(0).toUpperCase()
                   )}
                 </div>
-                <div className="user-details-text">
-                  <h2 className="user-full-name">{profile?.full_name || "Mtumiaji"}</h2>
-                  <p className="user-email-sub">{profile?.email || "Hakuna Email"}</p>
-                  {profile?.username && <p className="user-username">@{profile.username}</p>}
+                <div className="flex-1 text-center md:text-left min-w-0">
+                  <h2 className="m-0 text-xl md:text-2xl font-bold text-gray-900 dark:text-white truncate">
+                    {profile?.full_name || "Mtumiaji"}
+                  </h2>
+                  <p className="text-gray-500 dark:text-gray-400 mt-1 mb-0 text-sm truncate">
+                    {profile?.email || "Hakuna Email"}
+                  </p>
+                  {profile?.username && (
+                    <p className="text-gray-400 dark:text-gray-500 text-xs mt-0.5 mb-0">
+                      @{profile.username}
+                    </p>
+                  )}
                 </div>
-                <button className="btn-edit-profile" onClick={() => setIsEditingProfile(true)}>
+                <button 
+                  className="w-full md:w-auto px-6 py-2.5 bg-[#ff6a00] hover:bg-[#e55a00] text-white font-semibold text-sm rounded-lg transition-colors" 
+                  onClick={() => setIsEditingProfile(true)}
+                >
                   Edit Profile
                 </button>
               </div>
             </div>
 
             {/* SETTINGS GRID */}
-            <div className="settings-grid">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               
               {/* Account Information */}
-              <div className="settings-card">
-                <h3><User size={18} /> Account information</h3>
-                <ul className="settings-list">
-                  <li className="settings-list-item" onClick={() => setIsEditingProfile(true)}>
+              <div className="bg-white dark:bg-[#111111] p-5 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
+                <h3 className="flex items-center gap-2 text-base font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-800 pb-3 mb-3">
+                  <User size={18} /> Account information
+                </h3>
+                <ul className="list-none p-0 m-0">
+                  <li className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-800 cursor-pointer text-sm text-gray-900 dark:text-white hover:text-[#ff6a00] transition-colors" onClick={() => setIsEditingProfile(true)}>
                     My profile <ChevronRight size={14} />
                   </li>
-                  <li className="settings-list-item" onClick={() => setIsEditingEmail(!isEditingEmail)}>
+                  <li className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-800 cursor-pointer text-sm text-gray-900 dark:text-white hover:text-[#ff6a00] transition-colors" onClick={() => setIsEditingEmail(!isEditingEmail)}>
                     <span>Change email</span>
-                    <span className="sub-text">{profile?.email}</span>
+                    <span className="text-xs text-gray-400 dark:text-gray-500">{profile?.email}</span>
                   </li>
+                  
                   {isEditingEmail && (
-                    <li>
-                      <div className="inline-form">
+                    <li className="py-2">
+                      <div className="flex flex-col gap-2 mt-3 p-3 bg-gray-50 dark:bg-black rounded-lg border border-gray-200 dark:border-gray-800">
                         <input 
                           type="email" 
                           placeholder="Andika email mpya" 
                           value={newEmail} 
                           onChange={(e) => setNewEmail(e.target.value)} 
+                          className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#111111] text-sm text-gray-900 dark:text-white outline-none focus:border-[#ff6a00]"
                         />
-                        <div className="inline-form-actions">
-                          <button className="btn-secondary" onClick={() => setIsEditingEmail(false)}>Cancel</button>
-                          <button className="btn-primary" onClick={handleUpdateEmail} disabled={emailLoading}>
+                        <div className="flex gap-2 justify-end">
+                          <button className="px-4 py-2 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-700" onClick={() => setIsEditingEmail(false)}>Cancel</button>
+                          <button className="px-4 py-2 bg-[#ff6a00] text-white rounded-lg text-sm font-semibold hover:bg-[#e55a00] disabled:opacity-50" onClick={handleUpdateEmail} disabled={emailLoading}>
                             {emailLoading ? 'Saving...' : 'Save'}
                           </button>
                         </div>
@@ -273,51 +301,54 @@ const SupplierAccountSettings = ({ session }) => {
               </div>
 
               {/* Account Security */}
-              <div className="settings-card">
-                <h3><Settings size={18} /> Account security</h3>
-                <ul className="settings-list">
-                  <li className="settings-list-item" onClick={() => setIsEditingPassword(!isEditingPassword)}>
+              <div className="bg-white dark:bg-[#111111] p-5 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
+                <h3 className="flex items-center gap-2 text-base font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-800 pb-3 mb-3">
+                  <Settings size={18} /> Account security
+                </h3>
+                <ul className="list-none p-0 m-0">
+                  <li className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-800 cursor-pointer text-sm text-gray-900 dark:text-white hover:text-[#ff6a00] transition-colors" onClick={() => setIsEditingPassword(!isEditingPassword)}>
                     Change password <ChevronRight size={14} />
                   </li>
+                  
                   {isEditingPassword && (
-                    <li>
-                      <div className="inline-form">
-                        {/* Password ya sasa */}
-                        <div className="password-input-wrap">
+                    <li className="py-2">
+                      <div className="flex flex-col gap-2 mt-3 p-3 bg-gray-50 dark:bg-black rounded-lg border border-gray-200 dark:border-gray-800">
+                        <div className="relative">
                           <input 
                             type={showCurrentPassword ? "text" : "password"} 
                             placeholder="Password ya sasa" 
                             value={currentPassword} 
                             onChange={(e) => setCurrentPassword(e.target.value)} 
+                            className="w-full p-2.5 pr-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#111111] text-sm text-gray-900 dark:text-white outline-none focus:border-[#ff6a00]"
                           />
                           <button 
                             type="button" 
-                            className="toggle-password"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                             onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                           >
                             {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                           </button>
                         </div>
                         
-                        {/* Password mpya */}
                         <input 
                           type={showNewPassword ? "text" : "password"} 
                           placeholder="Password mpya (min 6)" 
                           value={newPassword} 
                           onChange={(e) => setNewPassword(e.target.value)} 
+                          className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#111111] text-sm text-gray-900 dark:text-white outline-none focus:border-[#ff6a00]"
                         />
                         
-                        {/* Thibitisha password */}
                         <input 
                           type="password" 
                           placeholder="Thibitisha password mpya" 
                           value={confirmPassword} 
                           onChange={(e) => setConfirmPassword(e.target.value)} 
+                          className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#111111] text-sm text-gray-900 dark:text-white outline-none focus:border-[#ff6a00]"
                         />
                         
-                        <div className="inline-form-actions">
+                        <div className="flex gap-2 justify-end mt-1">
                           <button 
-                            className="btn-secondary" 
+                            className="px-4 py-2 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-700" 
                             onClick={() => { 
                               setIsEditingPassword(false); 
                               setCurrentPassword(''); 
@@ -328,7 +359,7 @@ const SupplierAccountSettings = ({ session }) => {
                             Cancel
                           </button>
                           <button 
-                            className="btn-primary" 
+                            className="px-4 py-2 bg-[#ff6a00] text-white rounded-lg text-sm font-semibold hover:bg-[#e55a00] disabled:opacity-50" 
                             onClick={handleUpdatePassword} 
                             disabled={passwordLoading}
                           >
@@ -338,10 +369,11 @@ const SupplierAccountSettings = ({ session }) => {
                       </div>
                     </li>
                   )}
-                  <li className="settings-list-item" onClick={handlePasswordReset}>
+                  
+                  <li className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-800 cursor-pointer text-sm text-gray-900 dark:text-white hover:text-[#ff6a00] transition-colors" onClick={handlePasswordReset}>
                     Forgot password? <ChevronRight size={14} />
                   </li>
-                  <li className="settings-list-item danger" onClick={handleDeleteAccount}>
+                  <li className="flex justify-between items-center py-3 cursor-pointer text-sm text-red-500 hover:text-red-600 transition-colors" onClick={handleDeleteAccount}>
                     Delete account <ChevronRight size={14} />
                   </li>
                 </ul>
@@ -349,36 +381,40 @@ const SupplierAccountSettings = ({ session }) => {
             </div>
 
             {/* STORE RETURN CARD */}
-            <div className="store-return-card" onClick={() => navigate('/dashboard/sellerboard')}>
-              <div className="store-return-icon"><Store size={20} /></div>
-              <div className="store-return-text">
-                <div className="store-return-title">Rudi kwenye Duka Lako</div>
-                <p className="store-return-sub">Dhibiti bidhaa, oda na taarifa za duka lako</p>
+            <div className="flex items-center gap-3 p-4 md:px-5 bg-orange-50 dark:bg-[#ff6a00]/10 rounded-xl border border-[#ff6a00] cursor-pointer mt-8 transition-transform hover:-translate-y-0.5" onClick={() => navigate('/dashboard/sellerboard')}>
+              <div className="w-10 h-10 rounded-full bg-[#ff6a00] flex items-center justify-center text-white shrink-0">
+                <Store size={20} />
               </div>
-              <ChevronRight size={18} color="var(--accent)" />
+              <div className="flex-1">
+                <div className="text-sm font-bold text-[#ff6a00]">Rudi kwenye Duka Lako</div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 mb-0">Dhibiti bidhaa, oda na taarifa za duka lako</p>
+              </div>
+              <ChevronRight size={18} className="text-[#ff6a00]" />
             </div>
 
             {/* HELPFUL LINKS */}
-            <div className="helpful-links-section">
-              <h3>Help & Information</h3>
-              <div className="helpful-links-grid">
+            <div className="mt-8">
+              <h3 className="text-base font-bold mb-4 text-gray-900 dark:text-white pl-1">Help & Information</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
                 {helpfulLinks.map((link, index) => (
-                  <div key={index} className="helpful-link-item" onClick={() => navigate(link.path)}>
-                    <div className="helpful-icon-box">{link.icon}</div>
-                    <span className="helpful-link-title">{link.title}</span>
-                    <ChevronRight size={14} color="var(--text-muted)" />
+                  <div key={index} className="flex items-center gap-3 p-3 bg-white dark:bg-[#111111] rounded-lg border border-gray-200 dark:border-gray-800 cursor-pointer transition-all hover:translate-x-1 hover:border-[#ff6a00]" onClick={() => navigate(link.path)}>
+                    <div className="w-8 h-8 rounded-full bg-orange-50 dark:bg-[#ff6a00]/10 flex items-center justify-center text-[#ff6a00] shrink-0">
+                      {link.icon}
+                    </div>
+                    <span className="text-sm font-medium text-gray-900 dark:text-white flex-1 truncate">{link.title}</span>
+                    <ChevronRight size={14} className="text-gray-400 shrink-0" />
                   </div>
                 ))}
               </div>
 
-              <div className="sign-out-wrapper">
-                <button className="sign-out-btn" onClick={handleSignOut}>
+              <div className="mt-6">
+                <button className="flex items-center justify-center gap-3 w-full p-3.5 bg-white dark:bg-[#111111] border border-red-500 rounded-xl text-red-500 font-semibold text-sm hover:bg-red-500 hover:text-white transition-colors" onClick={handleSignOut}>
                   <LogOut size={18} /> Sign Out
                 </button>
               </div>
 
-              <div className="footer-copyright">
-                <p>Skyfall.com © 2024 • All rights reserved</p>
+              <div className="text-center mt-6 p-4">
+                <p className="text-[11px] text-gray-400 dark:text-gray-500 m-0">Skyfall.com © 2024 • All rights reserved</p>
               </div>
             </div>
 
@@ -388,77 +424,79 @@ const SupplierAccountSettings = ({ session }) => {
 
       {/* MOBILE BOTTOM NAV */}
       {isMobile && (
-        <nav className="mobile-bottom-nav">
-          <button onClick={() => navigate('/dashboard/sellerboard')} className={location.pathname.startsWith('/dashboard/sellerboard') ? 'active' : ''}>
+        <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-[#111111] border-t border-gray-200 dark:border-gray-800 flex justify-around items-center pt-2.5 pb-[calc(10px+env(safe-area-inset-bottom))] z-[1000]">
+          <button onClick={() => navigate('/dashboard/sellerboard')} className={`flex flex-col items-center bg-transparent border-none flex-1 gap-1 cursor-pointer ${location.pathname.startsWith('/dashboard/sellerboard') ? 'text-[#ff6a00]' : 'text-gray-500'}`}>
             <Home size={22} />
-            <span>Duka</span>
+            <span className="text-[10px] font-medium">Duka</span>
           </button>
-          <button onClick={() => navigate('/dashboard/supplier-notifications')} className={location.pathname === '/dashboard/supplier-notifications' ? 'active' : ''}>
+          <button onClick={() => navigate('/dashboard/supplier-notifications')} className={`flex flex-col items-center bg-transparent border-none flex-1 gap-1 cursor-pointer ${location.pathname === '/dashboard/supplier-notifications' ? 'text-[#ff6a00]' : 'text-gray-500'}`}>
             <ClipboardList size={22} />
-            <span>Oda</span>
+            <span className="text-[10px] font-medium">Oda</span>
           </button>
-          <button onClick={() => navigate('/advertise')} className={location.pathname === '/advertise' ? 'active' : ''}>
+          <button onClick={() => navigate('/advertise')} className={`flex flex-col items-center bg-transparent border-none flex-1 gap-1 cursor-pointer ${location.pathname === '/advertise' ? 'text-[#ff6a00]' : 'text-gray-500'}`}>
             <Megaphone size={22} />
-            <span>Ads</span>
+            <span className="text-[10px] font-medium">Ads</span>
           </button>
-          <button onClick={() => navigate('/dashboard/supplier-notifications')} className={location.pathname === '/dashboard/supplier-notifications' ? 'active' : ''}>
+          <button onClick={() => navigate('/dashboard/supplier-notifications')} className={`flex flex-col items-center bg-transparent border-none flex-1 gap-1 cursor-pointer ${location.pathname === '/dashboard/supplier-notifications' ? 'text-[#ff6a00]' : 'text-gray-500'}`}>
             <Bell size={22} />
-            <span>Arifa</span>
+            <span className="text-[10px] font-medium">Arifa</span>
           </button>
         </nav>
       )}
 
       {/* EDIT PROFILE MODAL */}
       {isEditingProfile && (
-        <div className="modal-overlay">
-          <div className="modal-box">
-            <div className="modal-header">
-              <h3>Edit Profile</h3>
-              <button className="modal-close" onClick={() => setIsEditingProfile(false)}>
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4">
+          <div className="bg-white dark:bg-[#111111] rounded-2xl w-full max-w-[500px] max-h-[90vh] overflow-y-auto shadow-xl">
+            <div className="flex justify-between items-center p-5 border-b border-gray-200 dark:border-gray-800 sticky top-0 bg-white dark:bg-[#111111] z-10">
+              <h3 className="m-0 text-lg font-bold text-gray-900 dark:text-white">Edit Profile</h3>
+              <button className="bg-transparent border-none cursor-pointer text-gray-500 hover:text-[#ff6a00] p-1" onClick={() => setIsEditingProfile(false)}>
                 <X size={20} />
               </button>
             </div>
-            <div className="modal-body">
+            <div className="p-5">
               
               {/* Avatar */}
-              <div className="avatar-upload-area">
-                <div className="avatar-upload-circle">
+              <div className="text-center mb-5">
+                <div className="relative inline-block w-[110px] h-[110px] rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
                   {avatarPreview || profile?.avatar_url ? (
-                    <img src={avatarPreview || profile?.avatar_url} alt="Avatar" className="avatar-preview-img" />
+                    <img src={avatarPreview || profile?.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
-                    <div className="avatar-placeholder"><User size={50} /></div>
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                      <User size={50} />
+                    </div>
                   )}
-                  <label htmlFor="supplier-avatar-upload" className="avatar-upload-label">
+                  <label htmlFor="supplier-avatar-upload" className="absolute bottom-1 right-1 bg-[#ff6a00] rounded-full w-[34px] h-[34px] flex items-center justify-center cursor-pointer text-white border-[3px] border-white dark:border-[#111111] hover:scale-110 transition-transform">
                     <Camera size={16} />
                     <input 
                       id="supplier-avatar-upload" 
                       type="file" 
                       accept="image/*" 
-                      style={{ display: 'none' }} 
+                      className="hidden" 
                       onChange={handleAvatarChange} 
                     />
                   </label>
                 </div>
-                <p className="avatar-hint">Bonyeza kamera kubadilisha picha</p>
+                <p className="text-xs text-gray-400 mt-2.5">Bonyeza kamera kubadilisha picha</p>
               </div>
 
               {/* Form */}
-              <div className="form-group">
-                <label>Full Name *</label>
-                <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+              <div className="mb-4">
+                <label className="block mb-1.5 font-semibold text-sm text-gray-900 dark:text-white">Full Name *</label>
+                <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-black text-sm text-gray-900 dark:text-white outline-none focus:border-[#ff6a00]" />
               </div>
-              <div className="form-group">
-                <label>Username</label>
-                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+              <div className="mb-4">
+                <label className="block mb-1.5 font-semibold text-sm text-gray-900 dark:text-white">Username</label>
+                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-black text-sm text-gray-900 dark:text-white outline-none focus:border-[#ff6a00]" />
               </div>
-              <div className="form-group">
-                <label>Bio</label>
-                <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows="3" />
+              <div className="mb-4">
+                <label className="block mb-1.5 font-semibold text-sm text-gray-900 dark:text-white">Bio</label>
+                <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows="3" className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-black text-sm text-gray-900 dark:text-white outline-none focus:border-[#ff6a00] resize-y min-h-[80px]" />
               </div>
 
-              <div className="modal-actions">
-                <button className="btn-secondary" onClick={() => setIsEditingProfile(false)}>Cancel</button>
-                <button className="btn-primary" onClick={handleUpdateProfile} disabled={profileSaving}>
+              <div className="flex gap-2.5 justify-end mt-5">
+                <button className="px-4 py-2 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-700" onClick={() => setIsEditingProfile(false)}>Cancel</button>
+                <button className="px-4 py-2 bg-[#ff6a00] text-white rounded-lg text-sm font-semibold hover:bg-[#e55a00] disabled:opacity-50 flex items-center gap-2" onClick={handleUpdateProfile} disabled={profileSaving}>
                   <Save size={16} /> {profileSaving ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>

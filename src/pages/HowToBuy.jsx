@@ -49,113 +49,80 @@ export default function HowToBuy() {
   ];
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 20px' }}>
-      {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: '50px' }}>
-        <h1 style={{ fontSize: '36px', fontWeight: '700', color: '#111', marginBottom: '15px' }}>
-          Jinsi ya Kuanza Kununua <span style={{ color: '#ff6a00' }}>Skyfall</span>
+    <div className="max-w-[1200px] mx-auto px-4 sm:px-5 py-8 sm:py-10 dark:bg-slate-900 min-h-screen">
+
+      {/* ===== HEADER ===== */}
+      <div className="text-center mb-10 sm:mb-12">
+        <h1 className="text-2xl sm:text-3xl md:text-[36px] font-bold text-gray-900 dark:text-white mb-4">
+          Jinsi ya Kuanza Kununua <span className="text-[#ff6a00]">Skyfall</span>
         </h1>
-        <p style={{ fontSize: '18px', color: '#666', maxWidth: '600px', margin: '0 auto' }}>
+        <p className="text-sm sm:text-base md:text-lg text-gray-500 dark:text-slate-400 max-w-[600px] mx-auto">
           Fuata hatua hizi 6 rahisi kuanza kununua bidhaa kwa bei ya jumla
         </p>
       </div>
 
-      {/* Steps Grid */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', 
-        gap: '30px',
-        marginBottom: '60px'
-      }}>
+      {/* ===== STEPS GRID ===== */}
+      <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-5 sm:gap-6 md:gap-[30px] mb-12 sm:mb-[60px]">
+
         {steps.map((step, index) => {
           const IconComponent = LucideIcons[step.icon];
           return (
-            <div key={index} style={{
-              backgroundColor: 'white',
-              borderRadius: '12px',
-              padding: '25px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-              border: '1px solid #eee',
-              transition: 'transform 0.2s, box-shadow 0.2s',
-              cursor: 'pointer'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-5px)';
-              e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)';
-            }}>
-              <div style={{
-                width: '60px',
-                height: '60px',
-                borderRadius: '50%',
-                backgroundColor: `${step.color}15`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '20px'
-              }}>
-                {IconComponent && <IconComponent size={30} color={step.color} />}
+            <div
+              key={index}
+              className="bg-white dark:bg-slate-800 rounded-xl p-5 sm:p-6 shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)] border border-gray-100 dark:border-slate-700 transition-all duration-200 cursor-pointer hover:-translate-y-[5px] hover:shadow-[0_8px_25px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_8px_25px_rgba(0,0,0,0.6)]"
+            >
+              <div
+                className="w-[60px] h-[60px] rounded-full flex items-center justify-center mb-5"
+                style={{ backgroundColor: `${step.color}15` }}
+              >
+                {IconComponent && (
+                  <IconComponent size={30} style={{ color: step.color }} />
+                )}
               </div>
-              <h3 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '12px' }}>{step.title}</h3>
-              <p style={{ fontSize: '14px', color: '#666', lineHeight: '1.6' }}>{step.description}</p>
+              <h3 className="text-lg sm:text-xl font-semibold mb-3 text-gray-900 dark:text-white">
+                {step.title}
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-slate-400 leading-relaxed">
+                {step.description}
+              </p>
             </div>
           );
         })}
       </div>
 
-      {/* Benefits Section */}
-      <div style={{ backgroundColor: '#f9fafb', borderRadius: '16px', padding: '40px', marginBottom: '40px' }}>
-        <h2 style={{ textAlign: 'center', fontSize: '28px', fontWeight: '700', marginBottom: '40px' }}>
-          Kwanini Ununue <span style={{ color: '#ff6a00' }}>Skyfall?</span>
+      {/* ===== BENEFITS SECTION ===== */}
+      <div className="bg-gray-50 dark:bg-slate-800 rounded-2xl p-5 sm:p-8 md:p-10 mb-10">
+        <h2 className="text-center text-xl sm:text-2xl md:text-[28px] font-bold mb-8 sm:mb-10 text-gray-900 dark:text-white">
+          Kwanini Ununue <span className="text-[#ff6a00]">Skyfall?</span>
         </h2>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '30px'
-        }}>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-5 sm:gap-6 md:gap-[30px]">
+
           {benefits.map((benefit, index) => {
             const IconComponent = LucideIcons[benefit.icon];
             return (
-              <div key={index} style={{ textAlign: 'center' }}>
-                <div style={{
-                  width: '70px',
-                  height: '70px',
-                  borderRadius: '50%',
-                  backgroundColor: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: '0 auto 15px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-                }}>
-                  {IconComponent && <IconComponent size={32} color="#ff6a00" />}
+              <div key={index} className="text-center">
+                <div className="w-[70px] h-[70px] rounded-full bg-white dark:bg-slate-700 flex items-center justify-center mx-auto mb-4 shadow-[0_2px_8px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
+                  {IconComponent && <IconComponent size={32} className="text-[#ff6a00]" />}
                 </div>
-                <h4 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '10px' }}>{benefit.title}</h4>
-                <p style={{ fontSize: '13px', color: '#666' }}>{benefit.desc}</p>
+                <h4 className="text-base sm:text-lg font-semibold mb-2.5 text-gray-900 dark:text-white">
+                  {benefit.title}
+                </h4>
+                <p className="text-xs sm:text-[13px] text-gray-500 dark:text-slate-400">
+                  {benefit.desc}
+                </p>
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* CTA Button */}
-      <div style={{ textAlign: 'center' }}>
-        <Link to="/" style={{
-          backgroundColor: '#ff6a00',
-          color: 'white',
-          padding: '14px 40px',
-          borderRadius: '40px',
-          textDecoration: 'none',
-          fontWeight: '600',
-          fontSize: '16px',
-          display: 'inline-block',
-          transition: 'background 0.3s'
-        }}
-        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e55a00'}
-        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ff6a00'}>
+      {/* ===== CTA BUTTON ===== */}
+      <div className="text-center">
+        <Link
+          to="/"
+          className="inline-block bg-[#ff6a00] hover:bg-[#e55a00] text-white px-8 sm:px-10 py-3.5 rounded-[40px] no-underline font-semibold text-sm sm:text-base transition-colors duration-300"
+        >
           Anza Kununua Sasa
         </Link>
       </div>

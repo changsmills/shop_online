@@ -1,13 +1,10 @@
 // src/components/ProductDetails.jsx
 import React, { useState, useEffect, useRef, Suspense } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom"; // ✅ Ongeza useNavigate
+import { useParams, Link, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import RelatedProducts from "../components/RelatedProducts";
-import "../ProductDetails.css";
-
-import api from "../axiosConfig"; 
-
+import api from "../axiosConfig";
 import { toast } from 'react-hot-toast';
 import { 
   Package, Zap, Clock, Factory, MapPin, Phone, Instagram, 
@@ -29,14 +26,11 @@ export default function ProductDetails() {
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedImageTitle, setSelectedImageTitle] = useState("");
-  const headerRef = useRef(null);
-  const [headerHeight, setHeaderHeight] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  // ========== RELATED PRODUCTS STATE ==========
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loadingRelated, setLoadingRelated] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [fetchTrigger, setFetchTrigger] = useState(0); // Inalazimisha useEffect kurudia
+  const [fetchTrigger, setFetchTrigger] = useState(0);
   const [hideHeader, setHideHeader] = useState(false);
   const lastScrollYRef = useRef(0);
 
@@ -47,29 +41,24 @@ export default function ProductDetails() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
- useEffect(() => {
-  const incrementView = async () => {
-    if (!id) return;
-    const viewedProducts = JSON.parse(localStorage.getItem("viewed_products") || "[]");
-    if (!viewedProducts.includes(id)) {
-      // 🔥 ANGALIA KAMA TOKEN IPO KABLA YA KUTUMA
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        console.log("⚠️ Token haipo, view haitaongezwa.");
-        return; // Usitume request kama hakuna token
+  useEffect(() => {
+    const incrementView = async () => {
+      if (!id) return;
+      const viewedProducts = JSON.parse(localStorage.getItem("viewed_products") || "[]");
+      if (!viewedProducts.includes(id)) {
+        const token = localStorage.getItem("access_token");
+        if (!token) return;
+        try {
+          await api.post(`/products/${id}/increment_views/`);
+          viewedProducts.push(id);
+          localStorage.setItem("viewed_products", JSON.stringify(viewedProducts));
+        } catch (error) {
+          console.error("❌ [incrementView] Imeshindwa:", error.message);
+        }
       }
-      
-      try {
-        await api.post(`/products/${id}/increment_views/`);
-        viewedProducts.push(id);
-        localStorage.setItem("viewed_products", JSON.stringify(viewedProducts));
-      } catch (error) {
-        console.error("❌ [incrementView] Imeshindwa kuongeza views kwa bidhaa:", id, error.message);
-      }
-    }
-  };
-  incrementView();
-}, [id]);
+    };
+    incrementView();
+  }, [id]);
 
   useEffect(() => {
     async function getFullProductData() {
@@ -80,9 +69,8 @@ export default function ProductDetails() {
         try {
           const productRes = await api.get(`/products/${id}/`);
           productData = productRes.data;
-          console.log("✅ [Fetch 1] Product data imepatikana.");
         } catch (err) {
-          console.error("❌ [Fetch 1] Imeshindwa kupata product kwa ID:", id, err.message);
+          console.error("❌ [Fetch 1] Imeshindwa:", err.message);
           setProduct(null);
           setIsLoading(false);
           return; 
@@ -94,12 +82,8 @@ export default function ProductDetails() {
           return;
         }
 
-        // ==========================================================
-        // 🔥 BADILISHA HAPA: Tuma maombi yote yanayotegemea ID yake mara moja (Parallel)
-        // ==========================================================
         const fetchPromises = [];
 
-        // 1. Pata bidhaa za duka hili (Store Products)
         let sList = [];
         if (productData?.store_id) {
           fetchPromises.push(
@@ -108,14 +92,10 @@ export default function ProductDetails() {
                 sList = (res.data.results || res.data || []).filter(p => p.id !== id);
                 return sList;
               })
-              .catch(err => {
-                console.error("❌ [Fetch Store Products] Error:", err.message);
-                return [];
-              })
+              .catch(() => [])
           );
         }
 
-        // 2. Pata maelezo ya duka (Store Data)
         let storeData = null;
         if (productData.store_id) {
           fetchPromises.push(
@@ -124,14 +104,10 @@ export default function ProductDetails() {
                 storeData = res.data;
                 return storeData;
               })
-              .catch(err => {
-                console.error("❌ [Fetch Store Info] Error:", err.message);
-                return null;
-              })
+              .catch(() => null)
           );
         }
 
-        // 3. Pata picha na video (Media)
         let mediaData = [];
         fetchPromises.push(
           api.get(`/product-media/?product_id=${id}`)
@@ -139,20 +115,11 @@ export default function ProductDetails() {
               mediaData = res.data.results || res.data || [];
               return mediaData;
             })
-            .catch(err => {
-              console.error("❌ [Fetch Media] Error:", err.message);
-              return [];
-            })
+            .catch(() => [])
         );
 
-        // ==========================================================
-        // 🔥 Subiri yote yakamilike kwa wakati mmoja (Parallel)
-        // ==========================================================
-        console.log("⏳ [Parallel] Inasubiri maombi yote yakamilike...");
         await Promise.all(fetchPromises);
-        console.log("✅ [Parallel] Maombi yote yamekamilika!");
 
-        // Panga bidhaa za duka (Store Products) na Kategoria zake
         setStoreProducts(sList.slice(0, 10));
         if (sList.length > 0) {
           const uniqueCats = [...new Set(sList.map(p => p.sub_category_name).filter(Boolean))];
@@ -160,19 +127,15 @@ export default function ProductDetails() {
           setActiveCategory(productData.sub_category_name);
         }
 
-        // 4. Pata Variations (Bidhaa za kategoria hii) - Hii inaweza kufanywa baada ya mzigo mkuu
         let variationsData = [];
         if (productData?.leaf_category_id) {
           try {
             const variationsRes = await api.get(`/products/?leaf_category_id=${productData.leaf_category_id}`);
             let vList = variationsRes.data.results || variationsRes.data || [];
             variationsData = vList.filter(p => p.id !== id).slice(0, 5);
-          } catch (err) {
-            console.error("❌ [Fetch Variations] Error:", err.message);
-          }
+          } catch (err) {}
         }
 
-        // Panga Bidhaa zote (Product)
         setProduct({
           ...productData,
           stores: storeData,
@@ -183,9 +146,7 @@ export default function ProductDetails() {
             productData.promo_video_url ? { url: productData.promo_video_url, type: 'video' } : null
           ].filter(Boolean)
         });
-        console.log("✅ [State] Product state imewekwa sawa.");
 
-        // Hifadhi kwenye Recently Viewed
         try {
           if (productData?.id) {
             const recentlyViewed = JSON.parse(localStorage.getItem("recentlyViewed") || "[]");
@@ -193,12 +154,10 @@ export default function ProductDetails() {
             const updated = [productData.id, ...filtered].slice(0, 10);
             localStorage.setItem("recentlyViewed", JSON.stringify(updated));
           }
-        } catch (err) {
-          console.error("❌ [LocalStorage] Imeshindwa kuhifadhi recentlyViewed.", err.message);
-        }
+        } catch (err) {}
 
       } catch (err) {
-        console.error("❌ [Main Catcher] getFullProductData imeanguka kwa ujumla:", err.message);
+        console.error("❌ [Main Catcher]:", err.message);
       } finally {
         setIsLoading(false);
       }
@@ -207,109 +166,35 @@ export default function ProductDetails() {
   }, [id, fetchTrigger]);
 
   useEffect(() => {
-    const updateHeaderHeight = () => {
-      if (headerRef.current) {
-        setHeaderHeight(headerRef.current.offsetHeight);
-      }
-    };
-    updateHeaderHeight();
-    window.addEventListener('resize', updateHeaderHeight);
-    return () => window.removeEventListener('resize', updateHeaderHeight);
-  }, []);
-
-  // ============================================================
-  // 🔥 FETCH RELATED PRODUCTS (Kulingana na Leaf Category)
-  // ============================================================
-  useEffect(() => {
     const fetchRelatedProducts = async () => {
       if (!product?.leaf_category_id) return;
-      
       setLoadingRelated(true);
       try {
         const response = await api.get('/products/', {
-          params: {
-            leaf_category_id: product.leaf_category_id,
-            ordering: '-views',  // Panga kwa bidhaa maarufu
-            limit: 8            // Chukua 8 tu
-          }
+          params: { leaf_category_id: product.leaf_category_id, ordering: '-views', limit: 8 }
         });
-
-        
-        // Chuja ili usionyeshe bidhaa hiyo yenyewe
         const data = response.data.results || response.data || [];
         const filtered = data.filter(p => p.id !== product.id);
         setRelatedProducts(filtered.slice(0, 8));
-        
-        console.log("✅ [Related] Bidhaa zinazofanana zimepatikana:", filtered.length);
       } catch (err) {
-        console.error("❌ [Related] Imeshindwa kupata bidhaa zinazofanana:", err.message);
         setRelatedProducts([]);
       } finally {
         setLoadingRelated(false);
       }
     };
-
-    if (product?.id) {
-      fetchRelatedProducts();
-    }
+    if (product?.id) fetchRelatedProducts();
   }, [product?.id, product?.leaf_category_id]);
 
-    // 🔥 KAGUA MTANDAO NA KUAMUA KUPANDA REFETCH
   useEffect(() => {
-    const handleOnline = () => {
-      setIsOnline(true);
-      console.log("🌐 Mtandao umeunganishwa! Inapakia data za bidhaa upya...");
-      // Hii itaongeza namba na kulazimisha useEffect kuu kuendesha tena!
-      setFetchTrigger(prev => prev + 1); 
-    };
+    const handleOnline = () => { setIsOnline(true); setFetchTrigger(prev => prev + 1); };
     const handleOffline = () => setIsOnline(false);
-
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
   }, []);
-
-
-  // 🔥 FICHA HEADER UKIENDA CHINI, IONEKANE UKIRUDI JUU (DESKTOP TU)
-  useEffect(() => {
-    if (!product) return; // Subiri bidhaa ipakie kwanza
-
-    const handleScroll = () => {
-      if (window.innerWidth <= 768) return;
-
-      // Soma scroll kutoka kwenye boxes za kushoto (Gallery) na kulia (Info)
-      const leftScroll = document.querySelector('.left-content')?.scrollTop || 0;
-      const rightScroll = document.querySelector('.right-sidebar')?.scrollTop || 0;
-      const currentScrollY = Math.max(leftScroll, rightScroll, window.scrollY || document.documentElement.scrollTop);
-
-      if (currentScrollY > lastScrollYRef.current && currentScrollY > 100) {
-        setHideHeader(true);
-      } else if (currentScrollY < lastScrollYRef.current) {
-        setHideHeader(false);
-      }
-
-      lastScrollYRef.current = currentScrollY;
-    };
-
-    // Chagua vitu vinavyoscroll
-    const leftContent = document.querySelector('.left-content');
-    const rightContent = document.querySelector('.right-sidebar');
-
-    // Weka listeners kwenye hizo boxes na window
-    leftContent?.addEventListener('scroll', handleScroll);
-    rightContent?.addEventListener('scroll', handleScroll);
-    window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      leftContent?.removeEventListener('scroll', handleScroll);
-      rightContent?.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [product]); // Inategemea product, ina run baada ya kuchora DOM
 
   const handleRateProduct = async (stars) => {
     const loadingToast = toast.loading("Tunahifadhi rating yako...");
@@ -324,7 +209,6 @@ export default function ProductDetails() {
       });
     } catch (err) {
       toast.dismiss(loadingToast);
-      console.error("❌ [Rate] Imeshindwa kutuma rating kwa product:", id, err.message);
       toast.error("Tatizo la mtandao limetokea.");
     }
   };
@@ -340,151 +224,153 @@ export default function ProductDetails() {
   }
 
   if (!product) {
-    return <div className="text-center py-10 text-gray-500">Bidhaa haijapatikana. (Angalia console kwa makosa ❌)</div>;
+    return <div className="text-center py-10 text-gray-500">Bidhaa haijapatikana.</div>;
   }
 
   return (
-    <div className={`product-page-root ${hideHeader ? 'no-header-space' : ''}`}>
-
-       <div ref={headerRef} className={`header-wrapper ${hideHeader ? 'header-hidden' : ''}`}>
-        <Header showBack={true} /> 
+    <div className="min-h-screen bg-white dark:bg-black flex flex-col pt-0 md:pt-[100px]">
+      
+      <div className="md:fixed md:top-0 md:left-0 md:w-full md:z-[1000]">
+            <Header showBack={true} /> 
       </div>
 
-      <div className="product-details-container">
-        {/* ✅ BREADCRUMB IMEONDOLIWA KABISA */}
+   <div className="w-full max-w-full mx-auto px-0 md:px-0 pb-24 md:pb-0">
 
-        <main className="product-main-layout">
-          <div className="main-grid-container">
-            <div className="left-content">
-              <section className="product-hero-section">
-                <Suspense fallback={<div className="skeleton-loader">Inapakia picha...</div>}>
-                  <ProductGallery product={product} isMobile={isMobile} />
-                </Suspense>
-              </section>
+        <main className="flex flex-col md:flex-row w-full items-start">
+          
+         {/* LEFT CONTENT (Gallery) */}
+<div className="w-full md:w-[65%] md:sticky md:top-[100px] md:max-h-[calc(100vh-100px)] md:overflow-y-auto bg-white dark:bg-black md:border-r border-gray-200 dark:border-gray-800">
+  
+  {/* Section ya Gallery - Tumeongeza padding kwenye simu na rounded corners */}
+  <section className="w-full bg-white dark:bg-black pt-3 md:pt-6 px-1 md:px-6">
+    <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800">
+      <Suspense fallback={<div className="p-10 text-center text-gray-500">Inapakia picha...</div>}>
+        <ProductGallery product={product} isMobile={isMobile} />
+      </Suspense>
+    </div>
+  </section>
 
-              <div className="product-description-section">
-                <h3 className="text-lg font-bold mb-3 text-gray-800">Maelezo ya Bidhaa</h3>
-                <div className="prose prose-sm max-w-none text-gray-600">
-                  <p>{product?.description || "Hakuna maelezo ya ziada kwa bidhaa hii."}</p>
-                </div>
-              </div>
+  {/* Maelezo ya Bidhaa - Tumeongeza nafasi (margin) kati ya picha na maelezo */}
+  <div className="mx-3 md:mx-6 my-4 p-4 md:p-5 bg-gray-50 dark:bg-[#0a0a0a] rounded-2xl border border-gray-100 dark:border-gray-800">
+    <h3 className="text-lg font-bold mb-2 text-gray-800 dark:text-white">Maelezo ya Bidhaa</h3>
+    <div className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+      <p>{product?.description || "Hakuna maelezo ya ziada kwa bidhaa hii."}</p>
+    </div>
+  </div>
+  
+</div>
+
+          {/* RIGHT SIDEBAR (Product Info) */}
+          <div className="w-full md:w-[35%] md:sticky md:top-[100px] md:max-h-[calc(100vh-100px)] md:overflow-y-auto bg-[#fafbfc] dark:bg-[#0a0a0a] border-l border-gray-200 dark:border-gray-800">
+            <div className="px-4 py-4 md:px-6 md:py-6">
+              <Suspense fallback={<div className="p-10 text-center text-gray-500">Inapakia maelezo...</div>}>
+                <ProductInfo 
+                  product={product} 
+                  storeProducts={storeProducts} 
+                  onRate={handleRateProduct} 
+                  isMobile={isMobile} 
+                />
+              </Suspense>
             </div>
-
-            <div className="right-sidebar">
-              <div className="sticky-info-wrapper">
-                <Suspense fallback={<div className="skeleton-loader">Inapakia maelezo...</div>}>
-                  <ProductInfo 
-                    product={product} 
-                    storeProducts={storeProducts} 
-                    onRate={handleRateProduct} 
-                    isMobile={isMobile} 
-                  />
-                </Suspense>
-              </div>
-            </div>
-
           </div>
+
         </main>
 
-        {/* 🔥 SEHEMU YA STORE DETAILS */}
+        {/* STORE DETAILS SECTION */}
         {product.stores ? (
-          <section className="product-bottom-details">
-            <div className="verification-header-box">
-              <div className="header-text">
-                <div className="verified-store-badge">
-                  <ShieldCheck size={20} />
-                  <span>Official Verified Store</span>
-                </div>
-                <h2>Store Showroom & Verification</h2>
-                <p>
-                  Gundua bidhaa nyingine na uhakiki wa duka la <strong>{product.stores?.store_name}</strong>
-                </p>
+          <section className="bg-white dark:bg-black px-4 md:px-6 py-6 border-t border-gray-200 dark:border-gray-800">
+            
+            <div className="bg-[#f8faff] dark:bg-[#0a0a0a] p-4 md:p-5 rounded-xl border-l-4 border-blue-500 mb-5">
+              <div className="flex items-center gap-2 text-green-500 font-bold text-xs uppercase tracking-wide mb-1">
+                <ShieldCheck size={20} />
+                <span>Official Verified Store</span>
               </div>
+              <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-1">Store Showroom & Verification</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Gundua bidhaa nyingine na uhakiki wa duka la <strong>{product.stores?.store_name}</strong>
+              </p>
             </div>
 
-            <div className="showroom-horizontal-scroll">
-              <div className="showroom-header">
-                <h4>Bidhaa za Duka hili ({storeProducts.length})</h4>
-                <Link to={`/store/${product.store_id}`} className="showroom-view-all">Ona zote →</Link>
+            <div className="mb-5">
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300">Bidhaa za Duka hili ({storeProducts.length})</h4>
+                <Link to={`/store/${product.store_id}`} className="text-sm text-brand-orange font-semibold hover:underline">Ona zote →</Link>
               </div>
-              <div className="no-scrollbar showroom-scroll">
+              <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
                 {storeProducts.map(item => (
-                  <Link key={item.id} to={`/product/${item.id}`} className="showroom-item"
+                  <Link key={item.id} to={`/product/${item.id}`} className="flex-shrink-0 w-[100px] md:w-[120px] text-center"
                     onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-                    <div className={`showroom-item-img ${item.id === id ? 'active-border' : ''}`}>
-                      <img src={item.cover_image_url} alt={item.name} />
+                    <div className={`relative w-full aspect-square rounded-xl overflow-hidden border-2 ${item.id === id ? 'border-brand-orange' : 'border-gray-200 dark:border-gray-700'}`}>
+                      <img src={item.cover_image_url} alt={item.name} className="w-full h-full object-cover" />
                       {item.id === id && (
-                        <div className="showroom-item-badge">INATAZAMWA</div>
+                        <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 bg-brand-orange text-white text-[8px] font-bold px-2 py-0.5 rounded whitespace-nowrap">INATAZAMWA</div>
                       )}
                     </div>
-                    <p className="showroom-item-name">{item.name}</p>
+                    <p className="text-[10px] md:text-xs text-gray-700 dark:text-gray-300 mt-1.5 font-medium truncate">{item.name}</p>
                   </Link>
                 ))}
               </div>
             </div>
 
-            <div className="details-content-vertical">
-              <div className="store-visuals-section">
+            <div className="flex flex-col">
+              <div className="mb-4">
                 {product.stores?.office_images?.length > 0 && (
-                  <div className="store-office-wrapper">
-                    <div className="location-verified-badge">
+                  <div className="relative rounded-xl overflow-hidden">
+                    <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-md text-[11px] font-semibold flex items-center gap-1.5">
                       <MapPin size={14} /> Physical Location Verified
                     </div>
-                    <img src={product.stores.office_images[0]} alt="Verified Office" className="store-office-img" />
+                    <img src={product.stores.office_images[0]} alt="Verified Office" className="w-full h-[180px] md:h-[280px] object-cover block" />
                   </div>
                 )}
               </div>
-              <div className="store-full-details-card">
-               <div className="store-card-header">
-  <div className="store-card-title">
-    <h3>{product.stores?.store_name}</h3>
-    <div className="store-card-meta">
-      <span>TIN: {product.stores?.tin_number}</span>
-      <span>•</span>
-      <span>{product.stores?.business_type}</span>
-    </div>
-  </div>
-  
-  {/* ✅ IMEBADILISHWA: Tumia onClick na window.open kwa Desktop */}
-  <Link 
-    to={`/store/${product.store_id}`} 
-    className="store-card-btn"
-    onClick={(e) => {
-      // Ikiwa ni desktop (zaidi ya 768px), fungua kwenye tab mpya
-      if (window.innerWidth > 768) {
-        e.preventDefault(); // Zuia navigation ya kawaida kwenye desktop
-        window.open(`/store/${product.store_id}`, '_blank');
-      }
-      // Kama ni mobile, hapa haitazuia default navigation, inaenda kwa kawaida
-    }}
-  >
-    Tembelea Duka
-  </Link>
-</div>
+
+              <div className="bg-white dark:bg-black pt-4 mt-4 border-t border-gray-200 dark:border-gray-800">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4 pb-4 border-b border-gray-200 dark:border-gray-800">
+                  <div>
+                    <h3 className="text-base md:text-lg font-bold text-gray-900 dark:text-white">{product.stores?.store_name}</h3>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">TIN: {product.stores?.tin_number}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">•</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">{product.stores?.business_type}</span>
+                    </div>
+                  </div>
+                  <Link 
+                    to={`/store/${product.store_id}`} 
+                    className="w-full md:w-auto text-center px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-black rounded-lg text-sm font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+                    onClick={(e) => {
+                      if (window.innerWidth > 768) {
+                        e.preventDefault();
+                        window.open(`/store/${product.store_id}`, '_blank');
+                      }
+                    }}
+                  >
+                    Tembelea Duka
+                  </Link>
+                </div>
 
                 {product.stores?.tin_image_url && (
-                  <div className="tin-cert-box">
-                    <div className="tin-cert-header">
-                      <FileText size={16} /> Hati ya TIN (Verified)
+                  <div className="mb-4 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden bg-gray-50 dark:bg-gray-900 p-3">
+                    <div className="flex items-center gap-2 mb-2 text-gray-700 dark:text-gray-300">
+                      <FileText size={16} /> <span className="text-xs font-bold uppercase">Hati ya TIN (Verified)</span>
                     </div>
-                    <img src={product.stores.tin_image_url} className="tin-cert-img" alt="TIN Certificate" />
+                    <img src={product.stores.tin_image_url} className="w-full h-auto max-h-[150px] object-contain rounded-lg" alt="TIN Certificate" />
                   </div>
                 )}
 
-                <div className="store-social-row">
+                <div className="flex flex-wrap gap-3 my-4 pt-4 border-t border-gray-200 dark:border-gray-800">
                   {product.stores?.google_maps_url && (
-                    <a href={product.stores.google_maps_url} target="_blank" rel="noreferrer" className="social-btn maps">
+                    <a href={product.stores.google_maps_url} target="_blank" rel="noreferrer" className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-sm font-semibold text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
                       <MapPin size={16} /> Google Maps
                     </a>
                   )}
                   {product.stores?.instagram_handle && (
-                    <a href={`https://instagram.com/${product.stores.instagram_handle.replace('@','')}`} target="_blank" rel="noreferrer" className="social-btn insta">
+                    <a href={`https://instagram.com/${product.stores.instagram_handle.replace('@','')}`} target="_blank" rel="noreferrer" className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-sm font-semibold text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
                       <Instagram size={16} /> Instagram
                     </a>
                   )}
                 </div>
 
-                <div className="store-metrics-grid">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 my-4">
                   {[
                     { icon: <Package size={18} />, label: 'MOQ', value: product.stores?.moq },
                     { icon: <Zap size={18} />, label: 'LEAD TIME', value: product.stores?.lead_time },
@@ -492,27 +378,27 @@ export default function ProductDetails() {
                     { icon: <Factory size={18} />, label: 'CAPACITY', value: product.stores?.supply_capacity },
                     { icon: <Box size={18} />, label: 'PACKAGING', value: product.stores?.packaging_type }
                   ].map((stat, i) => (
-                    <div key={i} className="metric-box">
-                      <div className="metric-icon">{stat.icon}</div>
-                      <span className="metric-label">{stat.label}</span>
-                      <p className="metric-value">{stat.value || 'N/A'}</p>
+                    <div key={i} className="bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-100 dark:border-gray-800">
+                      <div className="text-gray-400 mb-1">{stat.icon}</div>
+                      <span className="block text-[10px] text-gray-400 font-bold tracking-wide">{stat.label}</span>
+                      <p className="text-sm font-bold text-gray-800 dark:text-gray-200 m-0">{stat.value || 'N/A'}</p>
                     </div>
                   ))}
                 </div>
 
-                <div className="store-contact-grid">
-                  <div className="contact-box">
-                    <div className="contact-icon"><MapPin size={20} /></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-800">
+                  <div className="flex gap-3">
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400"><MapPin size={20} /></div>
                     <div>
-                      <span className="contact-label">OFFICE ADDRESS</span>
-                      <p className="contact-text">{product.stores?.physical_address}, {product.stores?.city}</p>
+                      <span className="block text-[10px] font-bold text-gray-400 tracking-wide">OFFICE ADDRESS</span>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mt-0.5 leading-snug">{product.stores?.physical_address}, {product.stores?.city}</p>
                     </div>
                   </div>
-                  <div className="contact-box">
-                    <div className="contact-icon"><Phone size={20} /></div>
+                  <div className="flex gap-3">
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400"><Phone size={20} /></div>
                     <div>
-                      <span className="contact-label">CONTACT US</span>
-                      <p className="contact-text">{product.stores?.phone_number}</p>
+                      <span className="block text-[10px] font-bold text-gray-400 tracking-wide">CONTACT US</span>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mt-0.5 leading-snug">{product.stores?.phone_number}</p>
                     </div>
                   </div>
                 </div>
@@ -520,37 +406,35 @@ export default function ProductDetails() {
             </div>
           </section>
         ) : (
-          <div className="text-center py-4 text-gray-400 text-sm border-t mt-8">
-            (Taarifa za duka zinapakuliwa...)
-          </div>
+          <div className="text-center py-4 text-sm text-gray-400 border-t border-gray-200 dark:border-gray-800 mt-8">(Taarifa za duka zinapakuliwa...)</div>
         )}
 
- {relatedProducts.length > 0 && (
-  <RelatedProducts 
-    relatedProducts={relatedProducts}
-    leafCategoryId={product.leaf_category_id}
-    loadingRelated={loadingRelated}
-    navigate={navigate}
-  />
-)}
+        {relatedProducts.length > 0 && (
+          <RelatedProducts 
+            relatedProducts={relatedProducts}
+            leafCategoryId={product.leaf_category_id}
+            loadingRelated={loadingRelated}
+            navigate={navigate}
+          />
+        )}
 
       </div>
 
-      {!isMobile && <Footer />}
+      {/* Footer (Imefichwa kwenye simu) */}
+      <div className="hidden md:block">
+        <Footer />
+      </div>
 
+      {/* Image Viewer Modal */}
       {isImageViewerOpen && selectedImage && (
-        <div className="image-viewer-overlay" onClick={() => setIsImageViewerOpen(false)}>
-          <div className="image-viewer-content" onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => setIsImageViewerOpen(false)} className="viewer-close-btn">
+        <div className="fixed inset-0 bg-black/95 z-[10000] flex items-center justify-center p-4" onClick={() => setIsImageViewerOpen(false)}>
+          <div className="relative max-w-[90%] max-h-[90%]" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setIsImageViewerOpen(false)} className="absolute -top-10 right-0 bg-white/20 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/30 transition">
               <X size={20} />
             </button>
-            <img 
-              src={selectedImage} 
-              alt={selectedImageTitle}
-              className="viewer-image"
-            />
+            <img src={selectedImage} alt={selectedImageTitle} className="max-w-full max-h-[85vh] object-contain rounded-lg" />
             {selectedImageTitle && (
-              <div className="viewer-title">{selectedImageTitle}</div>
+              <div className="absolute -bottom-8 left-0 right-0 text-center text-sm text-white">{selectedImageTitle}</div>
             )}
           </div>
         </div>

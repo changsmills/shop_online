@@ -7,7 +7,7 @@ import { Filter } from 'lucide-react';
 // 🔥 TUMIA HEADER COMPONENT ILEILE!
 import Header from "../components/Header";
 
-import "../SearchResults.css";
+//import "../SearchResults.css";
 
 export default function SearchResults({ session }) {
 
@@ -131,42 +131,52 @@ export default function SearchResults({ session }) {
     setSearch(initialQuery);
   }, [initialQuery]);
 
-  // ========== SKELETON ==========
-  if (loading && products.length === 0) {
+ if (loading && products.length === 0) {
     return (
-      <div className="alibaba-container skeleton">
-        {/* 🔥 TUMIA HEADER KWENYE SKELETON PIA */}
+      <div className="min-h-screen bg-[#f7f8fa] dark:bg-black pt-[60px] md:pt-[80px]">
         <Header showBack={true} />
-        <div className="search-skeleton-layout">
-          <div className="skeleton-sidebar"></div>
-          <div className="skeleton-main-grid"></div>
+        
+        <div className="max-w-[1400px] mx-auto p-4 md:p-5 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-6">
+          {/* Skeleton Sidebar (Desktop) */}
+          <div className="hidden md:block bg-white dark:bg-[#111] rounded-xl p-5 h-[500px] animate-pulse"></div>
+          
+          {/* Skeleton Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 lg:gap-5">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+              <div key={i} className="bg-white dark:bg-[#111] rounded-xl overflow-hidden shadow-sm">
+                <div className="w-full aspect-square bg-gray-200 dark:bg-[#1a1a1a] animate-pulse"></div>
+                <div className="p-3 flex flex-col gap-2">
+                  <div className="h-3 w-[90%] bg-gray-200 dark:bg-[#1a1a1a] rounded animate-pulse"></div>
+                  <div className="h-4 w-[60%] bg-gray-200 dark:bg-[#1a1a1a] rounded animate-pulse"></div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 
-  // ========== RENDER ==========
   return (
-    <div className="alibaba-container">
+    <div className="min-h-screen bg-[#f7f8fa] dark:bg-black pt-[60px] md:pt-[80px]">
       
-      {/* 🔥 TUMIA HEADER COMPONENT ILEILE - NA BACK ARROW + LOGO + SEARCH */}
       <Header showBack={true} />
 
-      {/* MAIN LAYOUT */}
-      <main className="search-main-layout">
+      <main className="max-w-[1400px] mx-auto p-3 md:p-5 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-4 md:gap-6">
         
-        {/* SIDEBAR */}
-        <aside className="search-filter-sidebar">
-          <div className="filter-header">
+        {/* SIDEBAR (Desktop Only) */}
+        <aside className="hidden md:block bg-white dark:bg-[#111] rounded-xl border border-[#e5e7eb] dark:border-[#1f1f1f] p-5 sticky top-[90px] max-h-[calc(100vh-120px)] overflow-y-auto h-fit">
+          
+          <div className="flex items-center gap-2 text-lg font-bold text-[#1a1a1a] dark:text-white border-b-2 border-[#f0f0f0] dark:border-[#1f1f1f] pb-4 mb-4">
             <Filter size={16} />
             <span>Filters</span>
           </div>
 
-          <div className="filter-section">
-            <h4 className="filter-section-title">Kategoria</h4>
-            <ul className="filter-list">
+          <div className="mb-6">
+            <h4 className="text-sm font-semibold text-[#333] dark:text-gray-300 mb-3">Kategoria</h4>
+            <ul className="list-none p-0 m-0">
               <li 
-                className={`filter-item ${!selectedCategoryId ? 'active' : ''}`}
+                className={`py-2 px-3 rounded-md text-[13px] cursor-pointer transition-all mb-0.5 ${!selectedCategoryId ? 'bg-[#fff5f0] dark:bg-[#2d1a0a] text-brand-orange font-semibold border-l-[3px] border-brand-orange' : 'text-[#4b5563] dark:text-[#94a3b8] hover:bg-gray-100 dark:hover:bg-[#1a1a1a]'}`}
                 onClick={() => setSelectedCategoryId(null)}
               >
                 Zote
@@ -174,7 +184,7 @@ export default function SearchResults({ session }) {
               {categories.map((cat) => (
                 <li 
                   key={cat.id}
-                  className={`filter-item ${selectedCategoryId === cat.id ? 'active' : ''}`}
+                  className={`py-2 px-3 rounded-md text-[13px] cursor-pointer transition-all mb-0.5 ${selectedCategoryId === cat.id ? 'bg-[#fff5f0] dark:bg-[#2d1a0a] text-brand-orange font-semibold border-l-[3px] border-brand-orange' : 'text-[#4b5563] dark:text-[#94a3b8] hover:bg-gray-100 dark:hover:bg-[#1a1a1a]'}`}
                   onClick={() => setSelectedCategoryId(cat.id)}
                 >
                   {cat.name}
@@ -183,45 +193,44 @@ export default function SearchResults({ session }) {
             </ul>
           </div>
 
-          <div className="filter-section">
-            <h4 className="filter-section-title">Bei (TSh)</h4>
-            <div className="price-filter-wrapper">
+          <div className="mb-6">
+            <h4 className="text-sm font-semibold text-[#333] dark:text-gray-300 mb-3">Bei (TSh)</h4>
+            <div className="flex items-center gap-1.5">
               <input 
                 type="number" 
                 placeholder="Min" 
                 value={minPrice}
                 onChange={(e) => setMinPrice(e.target.value)}
-                className="price-input"
+                className="flex-1 p-2 border border-[#d1d5db] dark:border-[#334155] rounded-md text-sm outline-none bg-white dark:bg-[#0f172a] text-black dark:text-white focus:border-brand-orange min-w-0"
               />
-              <span className="price-sep">-</span>
+              <span className="text-[#999] font-bold">-</span>
               <input 
                 type="number" 
                 placeholder="Max" 
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
-                className="price-input"
+                className="flex-1 p-2 border border-[#d1d5db] dark:border-[#334155] rounded-md text-sm outline-none bg-white dark:bg-[#0f172a] text-black dark:text-white focus:border-brand-orange min-w-0"
               />
-              <button className="price-ok-btn" onClick={() => fetchProducts(1, true)}>
+              <button className="px-3.5 py-1.5 border border-[#333] dark:border-gray-500 bg-transparent rounded-full text-xs font-semibold cursor-pointer transition-colors hover:bg-[#1a1a1a] hover:text-white dark:hover:bg-white dark:hover:text-black whitespace-nowrap" onClick={() => fetchProducts(1, true)}>
                 OK
               </button>
             </div>
           </div>
         </aside>
 
-            {/* PRODUCTS CONTENT */}
-        <div className="search-products-content">
+        {/* PRODUCTS CONTENT */}
+        <div className="w-full">
       
-          <div className="search-products-grid">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4 lg:gap-[16px]">
             {products.length > 0 ? (
               products.map((product, index) => (
                 <div 
                   key={product.id} 
-                  className="alibaba-card"
+                  className="bg-white dark:bg-[#111] border border-[#eee] dark:border-[#1f1f1f] rounded-xl overflow-hidden transition-all duration-300 h-full flex flex-col group hover:-translate-y-1 hover:shadow-[0_8px_25px_rgba(0,0,0,0.1)] hover:border-brand-orange"
                   ref={index === products.length - 1 ? lastProductRef : null}
                 >
                   <div 
-                    className="card-link-container"
-                    style={{ cursor: 'pointer' }}
+                    className="cursor-pointer flex flex-col h-full"
                     onClick={() => {
                       if (window.innerWidth > 1024) {
                         window.open(`/product/${product.id}`, '_blank');
@@ -230,29 +239,30 @@ export default function SearchResults({ session }) {
                       }
                     }}
                   >
-                    <div className="card-image">
+                    <div className="w-full aspect-square overflow-hidden bg-[#f8fafc] dark:bg-[#0a0a0a]">
                       <img 
                         src={getProductImage(product)} 
                         alt={product.name}
-                        onError={(e) => { 
-                          e.target.src = '/placeholder-image.jpg'; 
-                        }}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        onError={(e) => { e.target.src = '/placeholder-image.jpg'; }}
                       />
                     </div>
-                    <div className="card-body">
-                      <h3 className="product-title">{product.name}</h3>
-                      <div className="price-tag">
-                        <span className="currency">TSH</span>
-                        <span className="amount">{Number(product.price).toLocaleString()}</span>
+                    <div className="p-2.5 md:p-3 flex-1 flex flex-col">
+                      <h3 className="text-xs md:text-sm font-semibold text-[#333] dark:text-white m-0 mb-1.5 md:mb-2 leading-[1.4] line-clamp-2">
+                        {product.name}
+                      </h3>
+                      <div className="flex items-baseline gap-1 mt-auto">
+                        <span className="text-[11px] md:text-xs text-[#666] dark:text-[#94a3b8] font-medium">TSH</span>
+                        <span className="text-sm md:text-base font-extrabold text-brand-orange">{Number(product.price).toLocaleString()}</span>
                       </div>
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="not-found">
-                <p>Samahani, hatukupata bidhaa zozote.</p>
-                <button onClick={() => navigate('/')} className="browse-all-btn">
+              <div className="col-span-full text-center p-10 md:p-[60px_20px] bg-white dark:bg-[#111] rounded-2xl m-2">
+                <p className="text-sm md:text-base text-[#666] dark:text-[#94a3b8] mb-3">Samahani, hatukupata bidhaa zozote.</p>
+                <button onClick={() => navigate('/')} className="mt-4 px-6 md:px-8 py-2.5 md:py-3 bg-brand-orange hover:bg-brand-hover text-white border-none rounded-full cursor-pointer font-semibold text-sm md:text-base transition-all hover:scale-105">
                   Rudi Kwenye Duka
                 </button>
               </div>
@@ -260,14 +270,14 @@ export default function SearchResults({ session }) {
           </div>
           
           {loadingMore && (
-            <div className="loading-more">
-              <div className="loader-small"></div>
+            <div className="flex justify-center items-center gap-3 py-10 text-[#666] dark:text-[#94a3b8]">
+              <div className="w-6 h-6 border-[3px] border-[#f3f3f3] dark:border-[#334155] border-t-brand-orange rounded-full animate-spin"></div>
               <span>Inapakia bidhaa zaidi...</span>
             </div>
           )}
           
           {!hasMore && products.length > 0 && (
-            <div className="end-of-results">
+            <div className="text-center py-10 text-[#999] dark:text-[#64748b] text-sm">
               <p>✨ Umeifikia mwisho wa matokeo ✨</p>
             </div>
           )}

@@ -12,7 +12,7 @@ import UserTools from '../components/UserTools';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import toast from 'react-hot-toast';
-import '../AccountSettings.css';
+//import '../AccountSettings.css';
 
 const AccountSettings = () => { // 🔥 Imeondolewa { session }!
   const { t } = useTranslation();
@@ -325,130 +325,152 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
     toast.success('Umefanikiwa kutoka!');
   };
 
+// ===== LOADING SKELETON =====
   if (loading) {
     return (
-      <div className="dashboard-layout">
-        {/* 🔥 Skeleton Header */}
-        <div className="skeleton-header"></div>
-
-        <div className="dashboard-main">
-          {/* 🔥 Skeleton Sidebar (Inaonekana Desktop tu) */}
-          <div className="skeleton-sidebar-account"></div>
-
-          {/* 🔥 Skeleton Content */}
-          <div className="settings-container">
-            <div className="settings-wrapper">
-              <div className="skeleton-profile-card"></div>
-              <div className="skeleton-settings-grid"></div>
+      <div className="flex flex-col h-screen w-full overflow-hidden font-sans bg-white dark:bg-black">
+        <div className="h-[60px] bg-white dark:bg-[#111] border-b border-gray-200 dark:border-[#1f1f1f] animate-pulse" />
+        <div className="flex flex-1 overflow-hidden">
+          <div className="hidden md:block w-[72px] bg-white dark:bg-[#111] border-r border-gray-200 dark:border-[#1f1f1f] animate-pulse flex-shrink-0" />
+          <div className="flex-1 bg-gray-50 dark:bg-black p-4 pt-6 md:pt-[50px] overflow-y-auto">
+            <div className="max-w-[1000px] mx-auto">
+              <div className="h-[120px] bg-white dark:bg-[#111] rounded-xl mb-5 animate-pulse" />
+              <div className="h-[200px] bg-white dark:bg-[#111] rounded-xl animate-pulse" />
             </div>
           </div>
         </div>
       </div>
     );
-}
+  }
 
   return (
-    <div className="dashboard-layout">
-      
-      {/* HEADER */}
-      <header className="dashboard-header">
-        <div className="header-left">
-  {/* 🔥 BACK ARROW - Ipo kabla ya Menu na Logo */}
-  <button 
-    className="icon-btn back-arrow-btn" 
-    onClick={() => navigate(-1)} // Inarudi nyuma kwenye ukurasa uliopita
-    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ff5722' }} // Rangi ya chungwa kama logo
-    title="Back"
-  >
-    <ArrowLeft size={22} />
-  </button>
+    <div className="flex flex-col h-screen w-full overflow-hidden font-sans bg-white dark:bg-black text-gray-900 dark:text-white">
 
-  {/* Menu ya Sidebar (Inabaki kama ilivyo) */}
-  {!isExpanded && (
-    <Menu 
-      size={22} 
-      className="icon-btn menu-toggle" 
-      onClick={() => setIsExpanded(!isExpanded)} 
-    />
-  )}
+      {/* ===== HEADER ===== */}
+      <header className="h-[60px] bg-white dark:bg-[#0a0a0a] border-b border-gray-200 dark:border-[#1f1f1f] flex items-center justify-between px-3 md:px-5 z-[100] flex-shrink-0 relative">
 
-  <Link to="/dashboard" className="logo-text">
-    Skyfall.com
-  </Link>
-  
-  <div className="search-box">
-    <Search size={16} color="#999" />
-    <input type="text" placeholder="Search in cart..." />
-  </div>
-</div>
+        <div className="flex items-center gap-3 md:gap-5">
+          {/* Back Arrow - mobile only */}
+          <button
+            className="md:hidden flex items-center justify-center bg-transparent border-none cursor-pointer text-[#ff5722] p-1"
+            onClick={() => navigate(-1)}
+            title="Back"
+          >
+            <ArrowLeft size={22} />
+          </button>
 
-        <div className="header-right">
-          <Bell size={20} className="icon-btn" />
-          {/* 🔥 UserTools sasa inaweza kupokea profile kupitia prop au context */}
-          <UserTools profile={profile} /> 
+          {/* Menu toggle - desktop only */}
+          {!isExpanded && (
+            <Menu
+              size={22}
+              className="hidden md:flex items-center text-gray-500 dark:text-slate-400 cursor-pointer hover:text-[#ff6a00] transition-colors p-1"
+              onClick={() => setIsExpanded(!isExpanded)}
+            />
+          )}
+
+          <Link to="/dashboard" className="text-lg md:text-[22px] font-extrabold text-[#ff6a00] no-underline tracking-tight whitespace-nowrap">
+            Skyfall.com
+          </Link>
+
+          {/* Search - hidden mobile */}
+          <div className="hidden md:flex bg-gray-100 dark:bg-[#111] items-center px-3.5 py-1.5 rounded-full w-[280px] text-gray-500 dark:text-[#b0b0b0] border dark:border-[#1f1f1f]">
+            <Search size={16} className="text-gray-400 dark:text-slate-500" />
+            <input
+              type="text"
+              placeholder="Search in cart..."
+              className="bg-transparent border-none outline-none ml-2.5 text-sm w-full text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#6b7280]"
+            />
+          </div>
+        </div>
+
+        {/* Right - hidden on mobile */}
+        <div className="hidden md:flex items-center gap-5">
+          <Bell size={20} className="text-gray-500 dark:text-slate-400 cursor-pointer hover:text-[#ff6a00] transition-colors" />
+          <UserTools profile={profile} />
         </div>
       </header>
 
-      <div className="dashboard-main">
-        
-        
+      <div className="flex flex-1 overflow-hidden relative w-full">
 
-        {/* SETTINGS CONTENT */}
-        <div className="settings-container">
-          <div className="settings-wrapper">
-            
-            {/* PROFILE CARD */}
-            <div className="settings-card profile-header-card">
-              <div className="profile-info-main">
-                <div className="avatar-circle">
+        {/* ===== SETTINGS CONTENT ===== */}
+        <div className="flex-1 bg-gray-50 dark:bg-black px-3 md:px-6 pt-4 md:pt-6 pb-[80px] md:pb-6 overflow-y-auto min-w-0 w-full mt-0 md:mt-[50px] [scrollbar-width:thin] [scrollbar-color:#ff6a00_#f1f1f1] dark:[scrollbar-color:#333_#111] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-[#111] [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#ff6a00] [&::-webkit-scrollbar-thumb]:rounded-full">
+          <div className="max-w-[1000px] lg:max-w-[1200px] mx-auto">
+
+            {/* ===== PROFILE CARD ===== */}
+            <div className="bg-white dark:bg-[#111] rounded-xl p-4 md:p-6 mb-5 shadow-sm dark:shadow-black/60 border dark:border-[#1f1f1f] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all duration-200 max-md:flex-col max-md:text-center md:flex md:justify-between md:items-center">
+              <div className="flex flex-col md:flex-row items-center gap-3 md:gap-5 w-full text-center md:text-left">
+                <div className="w-[60px] h-[60px] md:w-[70px] md:h-[70px] bg-gray-100 dark:bg-[#1a1a1a] rounded-full flex items-center justify-center text-2xl md:text-[28px] font-bold text-[#ff6a00] border-[3px] border-white dark:border-[#111] shadow-[0_2px_10px_rgba(0,0,0,0.1)] overflow-hidden flex-shrink-0">
                   {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt="Profile" className="avatar-img-real" />
+                    <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover block" />
                   ) : (
                     (profile?.full_name || profile?.email)?.charAt(0).toUpperCase()
                   )}
                 </div>
-                <div className="user-details-text">
-                  <h2 className="user-full-name">
+                <div className="flex-1 min-w-0">
+                  <h2 className="m-0 text-lg md:text-[22px] text-gray-900 dark:text-white capitalize">
                     {profile?.full_name || profile?.email?.split('@')[0]}
                   </h2>
-                  <p className="user-email-sub">{profile?.email}</p>
-                  {profile?.username && <p className="user-username">@{profile.username}</p>}
+                  <p className="my-1 text-xs md:text-sm text-gray-500 dark:text-[#b0b0b0]">
+                    {profile?.email}
+                  </p>
+                  {profile?.username && (
+                    <p className="text-xs text-gray-400 dark:text-[#6b7280] font-mono">
+                      @{profile.username}
+                    </p>
+                  )}
                 </div>
-                <button className="btn-edit-profile" onClick={() => setIsEditingProfile(true)}>
+                <button
+                  className="w-full md:w-auto px-5 py-2.5 bg-[#ff6a00] hover:bg-[#e55a00] hover:-translate-y-px text-white border-none rounded-lg font-semibold text-[13px] cursor-pointer transition-all whitespace-nowrap mt-2 md:mt-0"
+                  onClick={() => setIsEditingProfile(true)}
+                >
                   Edit Profile
                 </button>
               </div>
             </div>
 
-            <div className="settings-grid">
-              
+            {/* ===== SETTINGS GRID ===== */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5">
+
               {/* ACCOUNT INFORMATION */}
-              <div className="settings-card">
-                <h3 className="section-title">
+              <div className="bg-white dark:bg-[#111] rounded-xl p-4 md:p-6 mb-5 shadow-sm dark:shadow-black/60 border dark:border-[#1f1f1f] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all duration-200">
+                <h3 className="text-sm md:text-base font-bold mb-4 flex items-center gap-2 text-gray-700 dark:text-white">
                   <User size={18} /> Account information
                 </h3>
-                <ul className="settings-links-list">
-                  <li className="link-item" onClick={() => setIsEditingProfile(true)}>
-                    <span>My profile</span> <ChevronRight size={14} color="#ccc" />
+                <ul className="list-none p-0 m-0">
+                  <li
+                    className="flex items-center justify-between px-3 py-2.5 md:px-3.5 md:py-3 rounded-lg transition-colors cursor-pointer text-sm text-gray-700 dark:text-[#b0b0b0] hover:bg-gray-50 dark:hover:bg-[#1a1a1a] hover:text-[#ff6a00]"
+                    onClick={() => setIsEditingProfile(true)}
+                  >
+                    <span>My profile</span> <ChevronRight size={14} className="text-gray-300 dark:text-slate-600" />
                   </li>
-                  
-                  <li className="link-item flex-between" onClick={() => setIsEditingEmail(!isEditingEmail)}>
+
+                  <li
+                    className="flex items-center justify-between px-3 py-2.5 md:px-3.5 md:py-3 rounded-lg transition-colors cursor-pointer text-sm text-gray-700 dark:text-[#b0b0b0] hover:bg-gray-50 dark:hover:bg-[#1a1a1a] hover:text-[#ff6a00]"
+                    onClick={() => setIsEditingEmail(!isEditingEmail)}
+                  >
                     <span>Change email</span>
-                    <span className="sub-text">{profile?.email}</span>
+                    <span className="text-xs md:text-[13px] text-gray-500 dark:text-[#6b7280] flex items-center gap-1.5">{profile?.email}</span>
                   </li>
-                  
-                  {/* Language Switcher */}
-                  <li className="link-item flex-between">
+
+                  <li className="flex items-center justify-between px-3 py-2.5 md:px-3.5 md:py-3 rounded-lg text-sm text-gray-700 dark:text-[#b0b0b0]">
                     <span>{t('language')}</span>
-                    <div className="language-switcher">
+                    <div className="flex gap-1.5">
                       <button
-                        className={`lang-btn ${language === 'en' ? 'active' : ''}`}
+                        className={`px-3 py-1 rounded-md text-xs font-medium cursor-pointer border transition-all ${
+                          language === 'en'
+                            ? 'bg-[#ff6a00] text-white border-[#ff6a00]'
+                            : 'bg-transparent text-gray-500 dark:text-[#b0b0b0] border-gray-200 dark:border-[#333] hover:bg-gray-100 dark:hover:bg-[#1a1a1a]'
+                        }`}
                         onClick={() => changeLanguage('en')}
                       >
                         EN
                       </button>
                       <button
-                        className={`lang-btn ${language === 'sw' ? 'active' : ''}`}
+                        className={`px-3 py-1 rounded-md text-xs font-medium cursor-pointer border transition-all ${
+                          language === 'sw'
+                            ? 'bg-[#ff6a00] text-white border-[#ff6a00]'
+                            : 'bg-transparent text-gray-500 dark:text-[#b0b0b0] border-gray-200 dark:border-[#333] hover:bg-gray-100 dark:hover:bg-[#1a1a1a]'
+                        }`}
                         onClick={() => changeLanguage('sw')}
                       >
                         SW
@@ -457,27 +479,26 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
                   </li>
                 </ul>
 
-                {/* Email Edit Form - Inline */}
                 {isEditingEmail && (
-                  <div className="email-edit-form">
-                    <input 
-                      type="email" 
-                      placeholder="Andika email mpya" 
+                  <div className="mt-3 flex flex-col gap-2.5 p-3 bg-gray-50 dark:bg-[#0a0a0a] rounded-lg border border-gray-200 dark:border-[#1f1f1f]">
+                    <input
+                      type="email"
+                      placeholder="Andika email mpya"
                       value={newEmail}
                       onChange={(e) => setNewEmail(e.target.value)}
-                      className="modal-input"
-                      autoFocus 
+                      className="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-[#333] text-sm bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#6b7280] focus:outline-none focus:border-[#ff6a00]"
+                      autoFocus
                     />
-                    <div className="inline-actions">
-                      <button 
-                        className="btn-cancel"
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        className="px-4 py-2 bg-gray-100 dark:bg-[#1a1a1a] border border-gray-300 dark:border-[#333] rounded-lg text-xs font-medium text-gray-700 dark:text-white hover:bg-gray-200 dark:hover:bg-[#333] transition-colors cursor-pointer"
                         onClick={() => { setIsEditingEmail(false); setNewEmail(''); }}
                       >
                         Cancel
                       </button>
-                      <button 
-                        className="btn-save"
-                        onClick={handleUpdateEmail} 
+                      <button
+                        className="px-4 py-2 bg-[#ff6a00] hover:bg-[#e55a00] text-white rounded-md text-xs font-semibold cursor-pointer transition-colors disabled:opacity-70"
+                        onClick={handleUpdateEmail}
                         disabled={emailLoading}
                       >
                         {emailLoading ? 'Saving...' : 'Save'}
@@ -488,58 +509,60 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
               </div>
 
               {/* ACCOUNT SECURITY */}
-              <div className="settings-card">
-                <h3 className="section-title">
+              <div className="bg-white dark:bg-[#111] rounded-xl p-4 md:p-6 mb-5 shadow-sm dark:shadow-black/60 border dark:border-[#1f1f1f] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all duration-200">
+                <h3 className="text-sm md:text-base font-bold mb-4 flex items-center gap-2 text-gray-700 dark:text-white">
                   <Settings size={18} /> Account security
                 </h3>
-                <ul className="settings-links-list">
-                  <li className="link-item flex-between" onClick={() => setIsEditingPassword(!isEditingPassword)}>
-                    <span>Change password</span> <ChevronRight size={14} color="#ccc" />
+                <ul className="list-none p-0 m-0">
+                  <li
+                    className="flex items-center justify-between px-3 py-2.5 md:px-3.5 md:py-3 rounded-lg transition-colors cursor-pointer text-sm text-gray-700 dark:text-[#b0b0b0] hover:bg-gray-50 dark:hover:bg-[#1a1a1a] hover:text-[#ff6a00]"
+                    onClick={() => setIsEditingPassword(!isEditingPassword)}
+                  >
+                    <span>Change password</span> <ChevronRight size={14} className="text-gray-300 dark:text-slate-600" />
                   </li>
 
-                  {/* Password Edit Form - Inline */}
                   {isEditingPassword && (
-                    <div className="password-edit-form">
-                      <div className="input-group">
-                        <input 
-                          type={showCurrentPassword ? "text" : "password"} 
+                    <div className="mt-3 flex flex-col gap-2.5 p-3 bg-gray-50 dark:bg-[#0a0a0a] rounded-lg border border-gray-200 dark:border-[#1f1f1f]">
+                      <div className="relative">
+                        <input
+                          type={showCurrentPassword ? "text" : "password"}
                           placeholder="Password ya sasa"
-                          value={currentPassword} 
+                          value={currentPassword}
                           onChange={(e) => setCurrentPassword(e.target.value)}
-                          className="modal-input"
+                          className="w-full px-3 py-2.5 pr-10 rounded-lg border border-gray-300 dark:border-[#333] text-sm bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white focus:outline-none focus:border-[#ff6a00]"
                         />
-                        <button 
-                          type="button" 
-                          className="toggle-password"
+                        <button
+                          type="button"
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer text-gray-400 p-0 flex items-center"
                           onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                         >
                           {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                         </button>
                       </div>
-                      <input 
-                        type={showNewPassword ? "text" : "password"} 
+                      <input
+                        type={showNewPassword ? "text" : "password"}
                         placeholder="Password mpya (min 6)"
-                        value={newPassword} 
+                        value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className="modal-input"
+                        className="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-[#333] text-sm bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white focus:outline-none focus:border-[#ff6a00]"
                       />
-                      <input 
-                        type="password" 
+                      <input
+                        type="password"
                         placeholder="Thibitisha password mpya"
-                        value={confirmPassword} 
+                        value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="modal-input"
+                        className="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-[#333] text-sm bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white focus:outline-none focus:border-[#ff6a00]"
                       />
-                      <div className="inline-actions">
-                        <button 
-                          className="btn-cancel"
+                      <div className="flex gap-2 justify-end">
+                        <button
+                          className="px-4 py-2 bg-gray-100 dark:bg-[#1a1a1a] border border-gray-300 dark:border-[#333] rounded-lg text-xs font-medium text-gray-700 dark:text-white hover:bg-gray-200 dark:hover:bg-[#333] transition-colors cursor-pointer"
                           onClick={() => { setIsEditingPassword(false); setCurrentPassword(''); setNewPassword(''); setConfirmPassword(''); }}
                         >
                           Cancel
                         </button>
-                        <button 
-                          className="btn-save"
-                          onClick={handleUpdatePassword} 
+                        <button
+                          className="px-4 py-2 bg-[#ff6a00] hover:bg-[#e55a00] text-white rounded-md text-xs font-semibold cursor-pointer transition-colors disabled:opacity-70"
+                          onClick={handleUpdatePassword}
                           disabled={passwordLoading}
                         >
                           {passwordLoading ? 'Updating...' : 'Update Password'}
@@ -548,106 +571,140 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
                     </div>
                   )}
 
-                  <li className="link-item" onClick={handlePasswordReset}>
-                    <span>Forgot password?</span> <ChevronRight size={14} color="#ccc" />
+                  <li
+                    className="flex items-center justify-between px-3 py-2.5 md:px-3.5 md:py-3 rounded-lg transition-colors cursor-pointer text-sm text-gray-700 dark:text-[#b0b0b0] hover:bg-gray-50 dark:hover:bg-[#1a1a1a] hover:text-[#ff6a00]"
+                    onClick={handlePasswordReset}
+                  >
+                    <span>Forgot password?</span> <ChevronRight size={14} className="text-gray-300 dark:text-slate-600" />
                   </li>
-                  
-                  <li className="link-item delete-acc" onClick={handleDeleteAccount}>
-                    <span>Delete account</span> <ChevronRight size={14} color="#ccc" />
+
+                  <li
+                    className="flex items-center justify-between px-3 py-2.5 md:px-3.5 md:py-3 rounded-lg transition-colors cursor-pointer text-sm text-red-500 dark:text-[#f87171] hover:bg-red-50 dark:hover:bg-[#2d1a1a]"
+                    onClick={handleDeleteAccount}
+                  >
+                    <span>Delete account</span> <ChevronRight size={14} className="text-gray-300 dark:text-slate-600" />
                   </li>
                 </ul>
               </div>
             </div>
 
-            {/* HELPFUL LINKS */}
-            <div className="helpful-links-section">
-              <h3 className="section-title">Help & Information</h3>
-              <div className="helpful-links-grid">
+            {/* ===== HELPFUL LINKS ===== */}
+            <div className="mt-8">
+              <h3 className="text-sm md:text-base font-bold mb-4 text-gray-700 dark:text-white">
+                Help & Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-2 md:gap-2.5">
                 {helpfulLinks.map((link, index) => (
-                  <div 
+                  <div
                     key={index}
-                    className="helpful-link-item"
+                    className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-[#111] rounded-[10px] border border-gray-200 dark:border-[#1f1f1f] cursor-pointer transition-all hover:translate-x-[3px] hover:border-[#ff6a00]"
                     onClick={() => link.path === '/dashboard/seller' ? handleSellNavigation() : navigate(link.path)}
                   >
-                    <div className="helpful-icon-box">
+                    <div className="w-8 h-8 rounded-full bg-orange-50 dark:bg-[#1a1a1a] flex items-center justify-center text-[#ff6a00] flex-shrink-0">
                       {link.icon}
                     </div>
-                    <span className="helpful-link-title">{link.title}</span>
-                    <ChevronRight size={14} color="#ccc" className="helpful-arrow" />
+                    <span className="text-sm font-medium text-gray-800 dark:text-white flex-1">{link.title}</span>
+                    <ChevronRight size={14} className="text-gray-300 dark:text-slate-600 ml-auto" />
                   </div>
                 ))}
               </div>
 
-              {/* SIGN OUT BUTTON */}
-              <div className="sign-out-wrapper">
-                <button className="sign-out-btn" onClick={handleSignOut}>
+              <div className="mt-6">
+                <button
+                  className="flex items-center justify-center gap-3 px-5 py-3.5 bg-white dark:bg-[#111] border border-[#ff4d4f] dark:border-[#f87171] rounded-xl text-[#ff4d4f] dark:text-[#f87171] font-semibold text-sm cursor-pointer transition-all hover:bg-[#ff4d4f] hover:text-white dark:hover:bg-[#dc2626] w-full md:w-auto"
+                  onClick={handleSignOut}
+                >
                   <LogOut size={18} /> Sign Out
                 </button>
               </div>
-              
-              <div className="footer-copyright">
-                <p>Skyfall.co.tz © 2024 • All rights reserved</p>
+
+              <div className="text-center mt-6 p-4">
+                <p className="text-[11px] text-gray-400 dark:text-[#6b7280]">
+                  Skyfall.co.tz © 2024 • All rights reserved
+                </p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* EDIT PROFILE MODAL */}
+      {/* ===== EDIT PROFILE MODAL ===== */}
       {isEditingProfile && (
-        <div className="modal-overlay">
-          <div className="modal-box">
-            <div className="modal-header">
-              <h3>Edit Profile</h3>
-              <button 
-                className="modal-close"
-                onClick={() => { setIsEditingProfile(false); setAvatarFile(null); if(avatarPreview) URL.revokeObjectURL(avatarPreview); }}
+        <div className="fixed inset-0 bg-black/50 dark:bg-black/85 flex items-center justify-center z-[1000] p-5">
+          <div className="bg-white dark:bg-[#111] rounded-2xl w-[95%] md:w-full max-w-[500px] max-h-[85vh] md:max-h-[90vh] overflow-y-auto pb-5 text-gray-900 dark:text-white">
+
+            <div className="flex justify-between items-center px-4 md:px-5 py-4 border-b border-gray-200 dark:border-[#1f1f1f] sticky top-0 bg-white dark:bg-[#111] z-10 rounded-t-2xl">
+              <h3 className="m-0 text-base font-bold">Edit Profile</h3>
+              <button
+                className="bg-transparent border-none cursor-pointer p-1 transition-transform hover:scale-110 text-gray-500 dark:text-[#b0b0b0] hover:text-[#ff6a00] flex items-center"
+                onClick={() => { setIsEditingProfile(false); setAvatarFile(null); if (avatarPreview) URL.revokeObjectURL(avatarPreview); }}
               >
                 <X size={20} />
               </button>
             </div>
-            
-            <div className="modal-body">
-              <div className="avatar-upload-area">
-                <div className="avatar-upload-circle">
+
+            <div className="p-4 md:p-5">
+              {/* Avatar Upload */}
+              <div className="text-center mb-5 relative">
+                <div className="relative inline-block w-[80px] h-[80px] md:w-[110px] md:h-[110px] rounded-full bg-gray-100 dark:bg-[#1a1a1a] border-[3px] border-[#ff6a00] shadow-[0_4px_12px_rgba(0,0,0,0.15)] overflow-visible">
                   {avatarPreview || profile?.avatar_url ? (
-                    <img src={avatarPreview || profile?.avatar_url} alt="Avatar" className="avatar-preview-img" />
+                    <img src={avatarPreview || profile?.avatar_url} alt="Avatar" className="w-full h-full object-cover rounded-full block" />
                   ) : (
-                    <User size={50} color="#ccc" />
+                    <User size={50} className="text-gray-300 dark:text-slate-600 m-auto mt-2.5 md:mt-5" />
                   )}
+                  <label
+                    htmlFor="avatar-upload"
+                    className="absolute bottom-0 right-0 bg-[#ff6a00] hover:bg-[#e55a00] hover:scale-110 rounded-full w-9 h-9 flex items-center justify-center cursor-pointer text-white border-[3px] border-white dark:border-[#111] shadow-[0_2px_6px_rgba(0,0,0,0.2)] transition-all z-[5]"
+                  >
+                    <Camera size={16} />
+                    <input id="avatar-upload" type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+                  </label>
                 </div>
-                <label htmlFor="avatar-upload" className="avatar-upload-label">
-                  <Camera size={16} />
-                  <input id="avatar-upload" type="file" accept="image/*" onChange={handleAvatarChange} className="hidden-input" />
-                </label>
-                <p className="avatar-hint">Bonyeza kamera kubadilisha picha</p>
+                <p className="text-xs md:text-[13px] text-gray-500 dark:text-[#6b7280] mt-3 font-medium">
+                  Bonyeza kamera kubadilisha picha
+                </p>
               </div>
-              
-              <div className="form-group">
-                <label>Full Name *</label>
-                <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} className="modal-input" />
+
+              <div className="mb-4">
+                <label className="block mb-1.5 font-semibold text-sm text-gray-700 dark:text-white">Full Name *</label>
+                <input
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-[#333] text-sm bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white focus:outline-none focus:border-[#ff6a00]"
+                />
               </div>
-              
-              <div className="form-group">
-                <label>Username</label>
-                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="modal-input" />
+
+              <div className="mb-4">
+                <label className="block mb-1.5 font-semibold text-sm text-gray-700 dark:text-white">Username</label>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-[#333] text-sm bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white focus:outline-none focus:border-[#ff6a00]"
+                />
               </div>
-              
-              <div className="form-group">
-                <label>Bio</label>
-                <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows="3" className="modal-textarea" />
+
+              <div className="mb-4">
+                <label className="block mb-1.5 font-semibold text-sm text-gray-700 dark:text-white">Bio</label>
+                <textarea
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  rows="3"
+                  className="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-[#333] text-sm bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white font-[inherit] focus:outline-none focus:border-[#ff6a00] resize-y"
+                />
               </div>
-              
-              <div className="modal-actions">
-                <button 
-                  className="btn-cancel"
-                  onClick={() => { setIsEditingProfile(false); setAvatarFile(null); if(avatarPreview) URL.revokeObjectURL(avatarPreview); }}
+
+              <div className="flex flex-col md:flex-row gap-2 md:gap-2.5 justify-end pt-2.5">
+                <button
+                  className="w-full md:w-auto px-5 py-2.5 bg-gray-100 dark:bg-[#1a1a1a] border border-gray-300 dark:border-[#333] rounded-lg text-sm font-medium text-gray-700 dark:text-white hover:bg-gray-200 dark:hover:bg-[#333] transition-colors cursor-pointer"
+                  onClick={() => { setIsEditingProfile(false); setAvatarFile(null); if (avatarPreview) URL.revokeObjectURL(avatarPreview); }}
                 >
                   Cancel
                 </button>
-                <button 
-                  className="btn-save-primary"
-                  onClick={handleUpdateProfile} 
+                <button
+                  className="w-full md:w-auto px-5 py-2.5 bg-[#ff6a00] hover:bg-[#e55a00] hover:-translate-y-px text-white border-none rounded-lg cursor-pointer flex items-center justify-center gap-2 text-sm font-semibold transition-all disabled:opacity-70"
+                  onClick={handleUpdateProfile}
                   disabled={profileSaving}
                 >
                   <Save size={16} /> {profileSaving ? 'Saving...' : 'Save Changes'}

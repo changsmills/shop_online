@@ -7,7 +7,7 @@ import {
   Settings, Menu, Megaphone
 } from "lucide-react";
 import toast from 'react-hot-toast';
-import "../NotificationsPage.css"; 
+//import "../NotificationsPage.css"; 
 
 export default function SupplierNotifications({ session }) {
   const navigate = useNavigate();

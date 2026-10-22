@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../axiosConfig";
 import { Camera, Trash2, Save, ArrowLeft, Loader2, Plus, X, Edit3, Palette } from "lucide-react";
-import "../UpdateProduct.css"; // <--- HAPA UNAINGIZA CSS
 
 const UpdateProductPage = () => {
   const { productId } = useParams();
@@ -36,7 +35,7 @@ const UpdateProductPage = () => {
     marketplace_image_preview: null,
   });
 
-  // ========== FETCH DATA (same as before) ==========
+  // ========== FETCH DATA ==========
   useEffect(() => {
     if (productId) {
       fetchAllData();
@@ -59,7 +58,6 @@ const UpdateProductPage = () => {
       const mediaRes = await api.get(`/product-media/?product_id=${productId}`, { headers });
       setGallery(mediaRes.data.results || mediaRes.data || []);
 
-      const cleanProductId = productId.replace(/-/g, ''); // 🔥 Ondoa hyphens
       const varRes = await api.get(`/product-variations/?product_id=${encodeURIComponent(productId)}`, { headers });
       setVariations(varRes.data.results || varRes.data || []);
 
@@ -174,7 +172,7 @@ const UpdateProductPage = () => {
     }
   };
 
-  // ========== VARIATION HANDLERS (same) ==========
+  // ========== VARIATION HANDLERS ==========
   const resetVariationForm = () => {
     setVariationForm({
       color_name: "",
@@ -275,91 +273,86 @@ const UpdateProductPage = () => {
   // ========== LOADING STATE (SKELETON) ==========
   if (loading) {
     return (
-      <div className="up-container up-skeleton-wrapper">
-        {/* 1. HEADER SKELETON */}
-        <div className="up-header">
-          <div className="up-skeleton up-skeleton-back-btn"></div>
-          <div className="up-header-title">
-            <div className="up-skeleton up-skeleton-title"></div>
-            <div className="up-skeleton up-skeleton-subtitle"></div>
+      <div className="max-w-[1400px] mx-auto p-4 md:p-6 min-h-screen bg-gray-50 dark:bg-gray-900 font-sans pointer-events-none">
+        {/* HEADER SKELETON */}
+        <div className="flex flex-wrap justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-xl mb-6 shadow-sm border border-gray-200 dark:border-gray-700 gap-3">
+          <div className="w-20 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+          <div className="text-center flex flex-col items-center">
+            <div className="w-40 h-6 bg-gray-200 dark:bg-gray-700 rounded mb-2 animate-pulse" />
+            <div className="w-24 h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
           </div>
-          <div className="up-skeleton up-skeleton-save-btn"></div>
+          <div className="w-28 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
         </div>
 
-        <div className="up-content">
-          {/* 2. PICHA ZA BIDHAA SKELETON */}
-          <div className="up-card">
-            <div className="up-skeleton up-skeleton-section-title"></div>
-            <div className="up-media-section skeleton-media-section">
-              <div className="up-main-img-wrapper">
-                <div className="up-skeleton up-skeleton-main-img"></div>
-              </div>
-              <div className="up-gallery-wrapper">
-                <div className="up-gallery-grid skeleton-gallery-grid">
-                  {[...Array(3)].map((_, i) => (
-                    <div key={i} className="up-skeleton up-skeleton-gallery-img"></div>
-                  ))}
-                  <div className="up-skeleton up-skeleton-add-box"></div>
-                </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* PICHA SKELETON */}
+          <div className="bg-white dark:bg-gray-800 p-5 rounded-[20px] border border-gray-200 dark:border-gray-700 shadow-md">
+            <div className="w-1/3 h-5 bg-gray-200 dark:bg-gray-700 rounded mb-4 animate-pulse" />
+            <div className="flex flex-col gap-6">
+              <div className="w-full aspect-square bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
+              <div className="grid grid-cols-3 gap-3">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="w-full aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+                ))}
               </div>
             </div>
           </div>
 
-          {/* 3. MAELEZO YA BIDHAA SKELETON */}
-          <div className="up-card">
-            <div className="up-skeleton up-skeleton-section-title"></div>
-            <div className="up-form">
-              <div className="up-form-row">
-                <div className="up-input-group">
-                  <div className="up-skeleton up-skeleton-label"></div>
-                  <div className="up-skeleton up-skeleton-select"></div>
+          {/* MAELEZO SKELETON */}
+          <div className="bg-white dark:bg-gray-800 p-5 rounded-[20px] border border-gray-200 dark:border-gray-700 shadow-md">
+            <div className="w-1/3 h-5 bg-gray-200 dark:bg-gray-700 rounded mb-4 animate-pulse" />
+            <div className="flex flex-col gap-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <div className="w-16 h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <div className="w-full h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
                 </div>
-                <div className="up-input-group">
-                  <div className="up-skeleton up-skeleton-label"></div>
-                  <div className="up-skeleton up-skeleton-select"></div>
-                </div>
-              </div>
-              <div className="up-input-group">
-                <div className="up-skeleton up-skeleton-label"></div>
-                <div className="up-skeleton up-skeleton-input"></div>
-              </div>
-              <div className="up-form-row">
-                <div className="up-input-group">
-                  <div className="up-skeleton up-skeleton-label"></div>
-                  <div className="up-skeleton up-skeleton-input"></div>
-                </div>
-                <div className="up-input-group">
-                  <div className="up-skeleton up-skeleton-label"></div>
-                  <div className="up-skeleton up-skeleton-input"></div>
+                <div className="flex flex-col gap-2">
+                  <div className="w-16 h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <div className="w-full h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
                 </div>
               </div>
-              <div className="up-input-group">
-                <div className="up-skeleton up-skeleton-label"></div>
-                <div className="up-skeleton up-skeleton-textarea"></div>
+              <div className="flex flex-col gap-2">
+                <div className="w-20 h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                <div className="w-full h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <div className="w-16 h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <div className="w-full h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <div className="w-16 h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <div className="w-full h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+                </div>
+              </div>
+              <div className="flex flex-col gap-2">
+                <div className="w-24 h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                <div className="w-full h-24 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
               </div>
             </div>
           </div>
         </div>
 
-        {/* 4. VARIATIONS SKELETON */}
-        <div className="up-card up-variations-card">
-          <div className="up-variations-header">
-            <div className="up-skeleton up-skeleton-section-title"></div>
-            <div className="up-skeleton up-skeleton-add-btn"></div>
+        {/* VARIATIONS SKELETON */}
+        <div className="mt-6 bg-white dark:bg-gray-800 p-5 rounded-[20px] border border-gray-200 dark:border-gray-700 shadow-md">
+          <div className="flex justify-between items-center mb-4">
+            <div className="w-48 h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="w-32 h-9 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
           </div>
-          <div className="up-variations-list skeleton-variations-list">
+          <div className="flex flex-col gap-3">
             {[...Array(2)].map((_, i) => (
-              <div key={i} className="up-variation-item">
-                <div className="up-variation-info">
-                  <div className="up-skeleton up-skeleton-variation-img"></div>
-                  <div>
-                    <div className="up-skeleton up-skeleton-variation-name"></div>
-                    <div className="up-skeleton up-skeleton-variation-details"></div>
+              <div key={i} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+                  <div className="flex flex-col gap-2">
+                    <div className="w-28 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    <div className="w-40 h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                   </div>
                 </div>
-                <div className="up-variation-actions">
-                  <div className="up-skeleton up-skeleton-action-btn"></div>
-                  <div className="up-skeleton up-skeleton-action-btn"></div>
+                <div className="flex gap-2">
+                  <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+                  <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
                 </div>
               </div>
             ))}
@@ -370,35 +363,48 @@ const UpdateProductPage = () => {
   }
 
   return (
-    <div className="up-container">
+    <div className="max-w-[1400px] mx-auto p-4 md:p-6 min-h-screen bg-gray-50 dark:bg-gray-900 font-sans">
+      
       {/* HEADER */}
-      <div className="up-header">
-        <button onClick={() => navigate(-1)} className="up-back-btn">
+      <div className="flex flex-wrap justify-between items-center bg-white dark:bg-gray-800 p-4 md:px-6 rounded-xl mb-6 shadow-sm border border-gray-200 dark:border-gray-700 gap-3">
+        <button 
+          onClick={() => navigate(-1)} 
+          className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-all active:scale-95"
+        >
           <ArrowLeft size={18} /> Rudi
         </button>
-        <div className="up-header-title">
-          <h2>Hariri Bidhaa</h2>
-          <p>ID: {productId}</p>
+        <div className="text-center">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white m-0">Hariri Bidhaa</h2>
+          <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-widest m-0">ID: {productId}</p>
         </div>
-        <button onClick={handleUpdateInfo} disabled={saving} className="up-save-btn">
-          {saving ? <Loader2 className="up-spinner" size={18} /> : "Hifadhi Zote"}
+        <button 
+          onClick={handleUpdateInfo} 
+          disabled={saving} 
+          className="flex items-center gap-2 bg-[#ff4e00] text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-[#e64600] transition-all shadow-[0_4px_14px_rgba(255,78,0,0.3)] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {saving ? <Loader2 className="animate-spin" size={18} /> : "Hifadhi Zote"}
         </button>
       </div>
 
-      <div className="up-content">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+        
         {/* PICHA ZA BIDHAA */}
-        <div className="up-card">
-          <h3><Camera size={16} /> Picha za Bidhaa</h3>
-          <div className="up-media-section">
+        <div className="bg-white dark:bg-gray-800 p-5 md:p-6 rounded-[20px] border border-gray-200 dark:border-gray-700 shadow-md transition-transform hover:-translate-y-1">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-5 flex items-center gap-2 m-0">
+            <Camera size={16} /> Picha za Bidhaa
+          </h3>
+          
+          <div className="flex flex-col gap-6">
             {/* Main Cover */}
-            <div className="up-main-img-wrapper">
-              <label className="up-main-img-label">Picha Kuu (Cover)</label>
-              <div className="up-main-img">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Picha Kuu (Cover)</label>
+              <div className="relative overflow-hidden rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 aspect-square group">
                 <img
                   src={product?.cover_image_url || "https://via.placeholder.com/400x400?text=No+Image"}
                   alt="Main"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
-                <label className="up-edit-label">
+                <label className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer gap-2 font-semibold text-sm">
                   <Camera size={28} />
                   <span>Badilisha Picha</span>
                   <input type="file" hidden onChange={(e) => handleFileUpload(e, "cover")} accept="image/*" />
@@ -407,20 +413,23 @@ const UpdateProductPage = () => {
             </div>
 
             {/* Gallery */}
-            <div className="up-gallery-wrapper">
-              <label className="up-gallery-label">Picha za Nyongeza (Gallery)</label>
-              <div className="up-gallery-grid">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Picha za Nyongeza (Gallery)</label>
+              <div className="grid grid-cols-3 gap-3 mt-1">
                 {gallery.map((m) => (
-                  <div key={m.id} className="up-gallery-item">
-                    <img src={m.media_url} alt="Gallery" />
-                    <button onClick={() => deleteMedia(m.id)} className="up-del-btn">
+                  <div key={m.id} className="relative rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 aspect-square group">
+                    <img src={m.media_url} alt="Gallery" className="w-full h-full object-cover" />
+                    <button 
+                      onClick={() => deleteMedia(m.id)} 
+                      className="absolute top-1.5 right-1.5 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
                       <X size={12} />
                     </button>
                   </div>
                 ))}
                 {gallery.length < 5 && (
-                  <label className="up-add-box">
-                    {uploading ? <Loader2 className="up-spinner" /> : <Plus />}
+                  <label className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center aspect-square cursor-pointer transition-all hover:border-[#ff4e00] hover:bg-orange-50 dark:hover:bg-orange-950/30 text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-900">
+                    {uploading ? <Loader2 className="animate-spin" /> : <Plus />}
                     <input type="file" hidden onChange={(e) => handleFileUpload(e, "gallery")} accept="image/*" />
                   </label>
                 )}
@@ -430,16 +439,20 @@ const UpdateProductPage = () => {
         </div>
 
         {/* MAELEZO YA BIDHAA */}
-        <div className="up-card">
-          <h3>Maelezo ya Bidhaa</h3>
-          <div className="up-form">
+        <div className="bg-white dark:bg-gray-800 p-5 md:p-6 rounded-[20px] border border-gray-200 dark:border-gray-700 shadow-md transition-transform hover:-translate-y-1">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-5 flex items-center gap-2 m-0">
+            Maelezo ya Bidhaa
+          </h3>
+          
+          <div className="flex flex-col gap-5">
             {/* Kategoria */}
-            <div className="up-form-row">
-              <div className="up-input-group">
-                <label>Kategoria Ndogo (Sub-category)</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Kategoria Ndogo (Sub-category)</label>
                 <select
                   value={selectedSubCategory}
                   onChange={handleSubCategoryChange}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:border-[#ff4e00] focus:ring-2 focus:ring-[#ff4e00]/20 appearance-none transition-all"
                 >
                   <option value="">-- Chagua Sub-category --</option>
                   {storeSubCats.map((sub) => (
@@ -447,12 +460,13 @@ const UpdateProductPage = () => {
                   ))}
                 </select>
               </div>
-              <div className="up-input-group">
-                <label>Aina Maalum (Leaf Category)</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Aina Maalum (Leaf Category)</label>
                 <select
                   value={selectedLeafCategory}
                   onChange={handleLeafChange}
                   disabled={!selectedSubCategory || leafCategories.length === 0}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:border-[#ff4e00] focus:ring-2 focus:ring-[#ff4e00]/20 appearance-none transition-all disabled:opacity-60 disabled:bg-gray-50 disabled:dark:bg-gray-800"
                 >
                   <option value="">-- Chagua Aina --</option>
                   {leafCategories.map((leaf) => (
@@ -460,55 +474,60 @@ const UpdateProductPage = () => {
                   ))}
                 </select>
                 {selectedSubCategory && leafCategories.length === 0 && (
-                  <p className="up-warning">Hakuna aina maalum kwa kategoria hii.</p>
+                  <p className="text-xs text-amber-500 mt-1 m-0">Hakuna aina maalum kwa kategoria hii.</p>
                 )}
               </div>
             </div>
 
-            <div className="up-input-group">
-              <label>Jina la Bidhaa</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Jina la Bidhaa</label>
               <input
                 value={product?.name || ""}
                 onChange={(e) => setProduct({...product, name: e.target.value})}
                 placeholder="Mf: iPhone 15 Pro Max"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:border-[#ff4e00] focus:ring-2 focus:ring-[#ff4e00]/20 transition-all"
               />
             </div>
 
-            <div className="up-form-row">
-              <div className="up-input-group">
-                <label>Bei ya Ofa (TZS)</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Bei ya Ofa (TZS)</label>
                 <input
                   type="number"
                   value={product?.original_price || ""}
                   onChange={(e) => setProduct({...product, original_price: e.target.value})}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:border-[#ff4e00] focus:ring-2 focus:ring-[#ff4e00]/20 transition-all"
                 />
               </div>
-              <div className="up-input-group">
-                <label>Bei ya Zamani</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Bei ya Zamani</label>
                 <input
                   type="number"
                   value={product?.price || ""}
                   onChange={(e) => setProduct({...product, price: e.target.value})}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:border-[#ff4e00] focus:ring-2 focus:ring-[#ff4e00]/20 transition-all"
                 />
               </div>
             </div>
 
-            <div className="up-input-group">
-              <label>Stock (Idadi Iliyopo)</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Stock (Idadi Iliyopo)</label>
               <input
                 type="number"
                 value={product?.stock_quantity || ""}
                 onChange={(e) => setProduct({...product, stock_quantity: e.target.value})}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:border-[#ff4e00] focus:ring-2 focus:ring-[#ff4e00]/20 transition-all"
               />
             </div>
 
-            <div className="up-input-group">
-              <label>Maelezo Kamili</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Maelezo Kamili</label>
               <textarea
                 rows="5"
                 value={product?.description || ""}
                 onChange={(e) => setProduct({...product, description: e.target.value})}
                 placeholder="Andika sifa za bidhaa..."
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:border-[#ff4e00] focus:ring-2 focus:ring-[#ff4e00]/20 transition-all resize-y min-h-[120px]"
               />
             </div>
           </div>
@@ -516,39 +535,41 @@ const UpdateProductPage = () => {
       </div>
 
       {/* ========== SEHEMU YA VARIATIONS ========== */}
-      <div className="up-card up-variations-card">
-        <div className="up-variations-header">
-          <h3><Palette size={16} /> Rangi na Ukubwa (Variations)</h3>
+      <div className="mt-6 bg-white dark:bg-gray-800 p-5 md:p-6 rounded-[20px] border border-gray-200 dark:border-gray-700 shadow-md">
+        <div className="flex flex-wrap justify-between items-center mb-5 gap-3">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2 m-0">
+            <Palette size={16} /> Rangi na Ukubwa (Variations)
+          </h3>
           <button
             onClick={() => { resetVariationForm(); setShowVariationForm(true); }}
-            className="up-add-variation-btn"
+            className="flex items-center gap-1.5 bg-[#ff4e00] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#e64600] transition-all shadow-sm active:scale-95"
           >
             <Plus size={14} /> Ongeza Variation
           </button>
         </div>
 
         {variations.length === 0 ? (
-          <p className="up-empty-text">Hakuna variations bado. Bonyeza "Ongeza Variation" kuweka rangi na ukubwa.</p>
+          <p className="text-center text-gray-400 dark:text-gray-500 text-sm py-6 m-0">Hakuna variations bado. Bonyeza "Ongeza Variation" kuweka rangi na ukubwa.</p>
         ) : (
-          <div className="up-variations-list">
+          <div className="flex flex-col gap-3">
             {variations.map((v) => (
-              <div key={v.id} className="up-variation-item">
-                <div className="up-variation-info">
+              <div key={v.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3.5 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-[#ff4e00] dark:hover:border-[#ff4e00] transition-colors gap-3">
+                <div className="flex items-center gap-4">
                   {v.color_image_url ? (
-                    <img src={v.color_image_url} alt={v.color_name} className="up-variation-image" />
+                    <img src={v.color_image_url} alt={v.color_name} className="w-12 h-12 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700" />
                   ) : (
-                    <div className="up-variation-noimg">No img</div>
+                    <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-[10px] text-gray-500">No img</div>
                   )}
                   <div>
-                    <p className="up-variation-name">{v.color_name || "N/A"}</p>
-                    <p className="up-variation-details">Ukubwa: {v.size_value || "N/A"} | Stock: {v.stock_quantity} | Bei: TZS {v.price}</p>
+                    <p className="font-semibold text-sm text-gray-900 dark:text-white m-0 mb-0.5">{v.color_name || "N/A"}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 m-0">Ukubwa: {v.size_value || "N/A"} | Stock: {v.stock_quantity} | Bei: TZS {v.price}</p>
                   </div>
                 </div>
-                <div className="up-variation-actions">
-                  <button onClick={() => openEditVariation(v)} className="up-edit-variation-btn">
+                <div className="flex gap-1.5 self-end sm:self-auto">
+                  <button onClick={() => openEditVariation(v)} className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors">
                     <Edit3 size={16} />
                   </button>
-                  <button onClick={() => handleDeleteVariation(v.id)} className="up-delete-variation-btn">
+                  <button onClick={() => handleDeleteVariation(v.id)} className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors">
                     <Trash2 size={16} />
                   </button>
                 </div>
@@ -560,53 +581,60 @@ const UpdateProductPage = () => {
 
       {/* ========== MODAL YA VARIATION FORM ========== */}
       {showVariationForm && (
-        <div className="up-modal-overlay">
-          <div className="up-modal">
-            <div className="up-modal-header">
-              <h3>{editingVariationId ? "Hariri Variation" : "Ongeza Variation"}</h3>
-              <button onClick={resetVariationForm} className="up-modal-close">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-[fadeIn_0.2s_ease]">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-[500px] w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl relative">
+            
+            <div className="flex justify-between items-center mb-5 pb-3 border-b border-gray-100 dark:border-gray-700">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white m-0">
+                {editingVariationId ? "Hariri Variation" : "Ongeza Variation"}
+              </h3>
+              <button onClick={resetVariationForm} className="text-gray-400 hover:text-red-500 bg-transparent border-none cursor-pointer p-1 rounded-full transition-colors">
                 <X size={20} />
               </button>
             </div>
 
-            <div className="up-modal-body">
-              <div className="up-input-group">
-                <label>Jina la Rangi</label>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Jina la Rangi</label>
                 <input
                   value={variationForm.color_name}
                   onChange={(e) => setVariationForm({ ...variationForm, color_name: e.target.value })}
                   placeholder="Mf: Red, Blue, White"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:border-[#ff4e00] focus:ring-2 focus:ring-[#ff4e00]/20 transition-all"
                 />
               </div>
-              <div className="up-input-group">
-                <label>Ukubwa (Size)</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Ukubwa (Size)</label>
                 <input
                   value={variationForm.size_value}
                   onChange={(e) => setVariationForm({ ...variationForm, size_value: e.target.value })}
                   placeholder="Mf: M, L, XL, 42, N/A"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:border-[#ff4e00] focus:ring-2 focus:ring-[#ff4e00]/20 transition-all"
                 />
               </div>
-              <div className="up-form-row">
-                <div className="up-input-group">
-                  <label>Stock</label>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Stock</label>
                   <input
                     type="number"
                     value={variationForm.stock_quantity}
                     onChange={(e) => setVariationForm({ ...variationForm, stock_quantity: parseInt(e.target.value) || 0 })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:border-[#ff4e00] focus:ring-2 focus:ring-[#ff4e00]/20 transition-all"
                   />
                 </div>
-                <div className="up-input-group">
-                  <label>Bei (TZS)</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Bei (TZS)</label>
                   <input
                     type="number"
                     value={variationForm.price}
                     onChange={(e) => setVariationForm({ ...variationForm, price: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:border-[#ff4e00] focus:ring-2 focus:ring-[#ff4e00]/20 transition-all"
                   />
                 </div>
               </div>
 
-              <div className="up-input-group">
-                <label>Sifa za Ziada (JSON)</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Sifa za Ziada (JSON)</label>
                 <textarea
                   rows="2"
                   value={JSON.stringify(variationForm.attributes || {}, null, 2)}
@@ -618,30 +646,37 @@ const UpdateProductPage = () => {
                     }
                   }}
                   placeholder='{"Material": "Cotton", "Style": "Sport"}'
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:border-[#ff4e00] focus:ring-2 focus:ring-[#ff4e00]/20 transition-all font-mono min-h-[60px]"
                 />
               </div>
 
-              <div className="up-input-group">
-                <label>Picha ya Rangi</label>
-                <div className="up-image-upload">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Picha ya Rangi</label>
+                <div className="flex items-center gap-4 flex-wrap">
                   {variationForm.color_image_preview ? (
-                    <img src={variationForm.color_image_preview} alt="Color" className="up-image-preview" />
+                    <img src={variationForm.color_image_preview} alt="Color" className="w-16 h-16 rounded-xl object-cover border-2 border-gray-200 dark:border-gray-700" />
                   ) : (
-                    <div className="up-image-placeholder">No img</div>
+                    <div className="w-16 h-16 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center text-[10px] text-gray-400 bg-gray-50 dark:bg-gray-900">No img</div>
                   )}
-                  <label className="up-image-upload-btn">
+                  <label className="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-xs font-medium cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                     Chagua Picha
                     <input type="file" hidden onChange={handleVariationImageChange} accept="image/*" />
                   </label>
                 </div>
               </div>
 
-              <div className="up-modal-actions">
-                <button onClick={handleVariationSubmit} className="up-modal-submit">
-                  {editingVariationId ? "Sasisha" : "Hifadhi"}
-                </button>
-                <button onClick={resetVariationForm} className="up-modal-cancel">
+              <div className="flex gap-3 mt-2 pt-4 border-t border-gray-100 dark:border-gray-700">
+                <button 
+                  onClick={resetVariationForm} 
+                  className="flex-1 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl font-semibold text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                >
                   Ghairi
+                </button>
+                <button 
+                  onClick={handleVariationSubmit} 
+                  className="flex-1 py-2.5 bg-[#ff4e00] text-white rounded-xl font-semibold text-sm hover:bg-[#e64600] transition-colors shadow-sm active:scale-95"
+                >
+                  {editingVariationId ? "Sasisha" : "Hifadhi"}
                 </button>
               </div>
             </div>

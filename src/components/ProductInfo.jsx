@@ -5,7 +5,6 @@ import { toast } from 'react-hot-toast';
 import api from '../axiosConfig';
 import ProductSelectionDrawer from '../pages/ProductSelectionDrawer';
 import { MessageSquare, Star, ChevronRight, ShoppingCart, Zap } from 'lucide-react';
-import '../ProductInfo.css';
 import { useCart } from '../context/CartContext';
 
 const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) => {
@@ -29,7 +28,7 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
   const [isSelectionOpen, setIsSelectionOpen] = useState(false);
 
   // 🔥 BADILISHA HAPA NA JINA LAKO HALISI LA CLOUDINARY
-const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/rlgqgsnv/image/upload";
+  const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/rlgqgsnv/image/upload";
 
   const moq = product?.moq || 1;
   const productImage = product?.cover_image || "https://via.placeholder.com/150";
@@ -46,47 +45,47 @@ const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/rlgqgsnv/image/upload";
   const audience = useMemo(() => parseJsonData(product?.target_audience, []), [product]);
 
   const variationsByColor = useMemo(() => {
-  const grouped = {};
-  productVariations.forEach(v => {
-    if (String(v.product) !== String(product?.id)) return;
+    const grouped = {};
+    productVariations.forEach(v => {
+      if (String(v.product) !== String(product?.id)) return;
 
-    const colorName = v.color_name;
-    
-    let fullImageUrl = v.color_image_url;
-    if (!fullImageUrl && v.color_image) {
-      fullImageUrl = `${CLOUDINARY_BASE_URL}/${v.color_image}`;
-    }
+      const colorName = v.color_name;
+      
+      let fullImageUrl = v.color_image_url;
+      if (!fullImageUrl && v.color_image) {
+        fullImageUrl = `${CLOUDINARY_BASE_URL}/${v.color_image}`;
+      }
 
-    // 🔥 Kama rangi haipo bado, anzisha
-    if (!grouped[colorName]) {
-      grouped[colorName] = {
-        variation: v,
-        color_image: fullImageUrl || v.color_image,
-        size_stock: v.size_stock || {},
-        price: v.price,
-        stock_quantity: v.stock_quantity,
-        // 🔥 ONGEZA: Ramani ya size → {price, stock, variationId}
-        sizesMap: {}
-      };
-    }
+      // 🔥 Kama rangi haipo bado, anzisha
+      if (!grouped[colorName]) {
+        grouped[colorName] = {
+          variation: v,
+          color_image: fullImageUrl || v.color_image,
+          size_stock: v.size_stock || {},
+          price: v.price,
+          stock_quantity: v.stock_quantity,
+          // 🔥 ONGEZA: Ramani ya size → {price, stock, variationId}
+          sizesMap: {}
+        };
+      }
 
-    // 🔥 Ongeza size hii kwenye sizesMap ya rangi
-    const sizeKey = v.size_value;
-    if (sizeKey) {
-      // Chukua stock kutoka size_stock (kama ipo) au stock_quantity ya variation
-      const stockForSize = (v.size_stock && v.size_stock[sizeKey] !== undefined)
-        ? v.size_stock[sizeKey]
-        : (v.stock_quantity || 0);
+      // 🔥 Ongeza size hii kwenye sizesMap ya rangi
+      const sizeKey = v.size_value;
+      if (sizeKey) {
+        // Chukua stock kutoka size_stock (kama ipo) au stock_quantity ya variation
+        const stockForSize = (v.size_stock && v.size_stock[sizeKey] !== undefined)
+          ? v.size_stock[sizeKey]
+          : (v.stock_quantity || 0);
 
-      grouped[colorName].sizesMap[sizeKey] = {
-        price: Number(v.price) || 0,
-        stock: stockForSize,
-        variationId: v.id,
-      };
-    }
-  });
-  return grouped;
-}, [productVariations, product?.id]);
+        grouped[colorName].sizesMap[sizeKey] = {
+          price: Number(v.price) || 0,
+          stock: stockForSize,
+          variationId: v.id,
+        };
+      }
+    });
+    return grouped;
+  }, [productVariations, product?.id]);
 
   const openDrawer = (color, size) => {
     setActiveColor(color);
@@ -95,57 +94,56 @@ const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/rlgqgsnv/image/upload";
   };
 
   const availableSizesForColor = useMemo(() => {
-  if (!selectedColor) return [];
-  const colorData = variationsByColor[selectedColor];
-  if (!colorData) return [];
-  // 🔥 Chukua sizes kutoka sizesMap
-  const sizes = Object.keys(colorData.sizesMap || {});
-  return sizes.sort((a, b) => {
-    const order = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
-    const ai = order.indexOf(a);
-    const bi = order.indexOf(b);
-    if (ai === -1 && bi === -1) return a.localeCompare(b);
-    if (ai === -1) return 1;
-    if (bi === -1) return -1;
-    return ai - bi;
-  });
-}, [selectedColor, variationsByColor]);
-
+    if (!selectedColor) return [];
+    const colorData = variationsByColor[selectedColor];
+    if (!colorData) return [];
+    // 🔥 Chukua sizes kutoka sizesMap
+    const sizes = Object.keys(colorData.sizesMap || {});
+    return sizes.sort((a, b) => {
+      const order = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+      const ai = order.indexOf(a);
+      const bi = order.indexOf(b);
+      if (ai === -1 && bi === -1) return a.localeCompare(b);
+      if (ai === -1) return 1;
+      if (bi === -1) return -1;
+      return ai - bi;
+    });
+  }, [selectedColor, variationsByColor]);
 
   // 🔥 Bei sahihi kwa size
-const getPriceForSize = (color, size) => {
-  const colorData = variationsByColor[color];
-  if (!colorData?.sizesMap?.[size]) return Number(product?.price) || 0;
-  return colorData.sizesMap[size].price;
-};
+  const getPriceForSize = (color, size) => {
+    const colorData = variationsByColor[color];
+    if (!colorData?.sizesMap?.[size]) return Number(product?.price) || 0;
+    return colorData.sizesMap[size].price;
+  };
 
-// 🔥 Stock sahihi kwa size (badilisha `getStockForSize`)
-const getStockForSize = (color, size) => {
-  const colorData = variationsByColor[color];
-  if (!colorData?.sizesMap?.[size]) return 0;
-  return colorData.sizesMap[size].stock;
-};
+  // 🔥 Stock sahihi kwa size (badilisha `getStockForSize`)
+  const getStockForSize = (color, size) => {
+    const colorData = variationsByColor[color];
+    if (!colorData?.sizesMap?.[size]) return 0;
+    return colorData.sizesMap[size].stock;
+  };
 
   const getCurrentVariation = (color, size) => {
-  // 🔥 Tafuta kwa size_value PEKEE (sio size_stock keys)
-  const found = productVariations.find(v => 
-    String(v.product) === String(product?.id) &&
-    v.color_name === color && 
-    (size ? String(v.size_value) === String(size) : true)
-  );
-  if (!found) return null;
-  
-  const specificStock = (found.size_stock && found.size_stock[size] !== undefined)
-    ? found.size_stock[size]
-    : (found.stock_quantity || 0);
-  
-  return {
-    ...found,
-    size_value: size || found.size_value,
-    stock_quantity: specificStock,
-    id: found.id 
+    // 🔥 Tafuta kwa size_value PEKEE (sio size_stock keys)
+    const found = productVariations.find(v => 
+      String(v.product) === String(product?.id) &&
+      v.color_name === color && 
+      (size ? String(v.size_value) === String(size) : true)
+    );
+    if (!found) return null;
+    
+    const specificStock = (found.size_stock && found.size_stock[size] !== undefined)
+      ? found.size_stock[size]
+      : (found.stock_quantity || 0);
+    
+    return {
+      ...found,
+      size_value: size || found.size_value,
+      stock_quantity: specificStock,
+      id: found.id 
+    };
   };
-};
 
   const currentStock = useMemo(() => {
     if (selectedSize && selectedColor) {
@@ -154,17 +152,17 @@ const getStockForSize = (color, size) => {
     return selectedVariationObj?.stock_quantity || product?.stock_quantity || 0;
   }, [selectedVariationObj, product, selectedColor, selectedSize]);
 
-    const currentPrice = useMemo(() => {
-  // 🔥 Kama tuna color + size, tumia bei kutoka sizesMap
-  if (selectedColor && selectedSize) {
-    const priceFromMap = getPriceForSize(selectedColor, selectedSize);
-    if (priceFromMap > 0) return priceFromMap;
-  }
-  // Fallback
-  const variationPrice = parseFloat(selectedVariationObj?.price);
-  if (variationPrice > 0) return variationPrice;
-  return parseFloat(product?.price) || 0;
-}, [selectedColor, selectedSize, variationsByColor, selectedVariationObj, product]);
+  const currentPrice = useMemo(() => {
+    // 🔥 Kama tuna color + size, tumia bei kutoka sizesMap
+    if (selectedColor && selectedSize) {
+      const priceFromMap = getPriceForSize(selectedColor, selectedSize);
+      if (priceFromMap > 0) return priceFromMap;
+    }
+    // Fallback
+    const variationPrice = parseFloat(selectedVariationObj?.price);
+    if (variationPrice > 0) return variationPrice;
+    return parseFloat(product?.price) || 0;
+  }, [selectedColor, selectedSize, variationsByColor, selectedVariationObj, product]);
 
   const currentSpecs = useMemo(() => {
     if (selectedVariationObj && selectedVariationObj.attributes) {
@@ -220,21 +218,21 @@ const getStockForSize = (color, size) => {
   };
 
   const handleColorSelect = async (color) => {
-  const colorData = variationsByColor[color];
-  if (colorData) {
-    // 🔥 Chukua sizes kutoka sizesMap
-    const sizes = Object.keys(colorData.sizesMap || {});
-    const firstSize = sizes.length > 0 ? sizes[0] : "";
-    
-    setActiveColor(color);
-    setActiveSize(firstSize);
-    setSelectedColor(color);
-    setSelectedSize(firstSize);
-    
-    const variation = getCurrentVariation(color, firstSize || null);
-    await selectVariationAndOpenDrawer(variation, 'order');
-  }
-};
+    const colorData = variationsByColor[color];
+    if (colorData) {
+      // 🔥 Chukua sizes kutoka sizesMap
+      const sizes = Object.keys(colorData.sizesMap || {});
+      const firstSize = sizes.length > 0 ? sizes[0] : "";
+      
+      setActiveColor(color);
+      setActiveSize(firstSize);
+      setSelectedColor(color);
+      setSelectedSize(firstSize);
+      
+      const variation = getCurrentVariation(color, firstSize || null);
+      await selectVariationAndOpenDrawer(variation, 'order');
+    }
+  };
 
   const handleSizeSelect = async (size) => {
     if (selectedColor) {
@@ -355,21 +353,20 @@ const getStockForSize = (color, size) => {
       }
 
       itemsToProcess.push({
-  id: product.id,
-  variant_id: variant.id,
-  name: product.name,
-  selected_color: variant.color_name || 'Standard',
-  selected_size: selectedSizeFromKey || 'Free Size',
-  quantity: qty,
-  
-  // 🔥 MUHIMU SANA: Hakikisha hizi zipo!
-  price: Number(variant.price) || Number(product?.price) || 0, 
-  cover_image_url: fullImageUrl || product?.cover_image_url || product?.cover_image,
-  image: fullImageUrl || product?.cover_image_url || product?.cover_image,
-  
-  store_id: product.store_id
-});
-
+        id: product.id,
+        variant_id: variant.id,
+        name: product.name,
+        selected_color: variant.color_name || 'Standard',
+        selected_size: selectedSizeFromKey || 'Free Size',
+        quantity: qty,
+        
+        // 🔥 MUHIMU SANA: Hakikisha hizi zipo!
+        price: Number(variant.price) || Number(product?.price) || 0, 
+        cover_image_url: fullImageUrl || product?.cover_image_url || product?.cover_image,
+        image: fullImageUrl || product?.cover_image_url || product?.cover_image,
+        
+        store_id: product.store_id
+      });
     });
 
     if (itemsToProcess.length === 0) {
@@ -459,22 +456,20 @@ const getStockForSize = (color, size) => {
 
           
           const defaultVar = filteredData.find(v => v.stock_quantity > 0) || filteredData[0];
-setSelectedColor(defaultVar.color_name);
+          setSelectedColor(defaultVar.color_name);
 
-// 🔥 Chukua size kutoka size_value ya variation PEKEE
-const firstSize = defaultVar.size_value || "";
+          // 🔥 Chukua size kutoka size_value ya variation PEKEE
+          const firstSize = defaultVar.size_value || "";
 
-setSelectedSize(firstSize);
+          setSelectedSize(firstSize);
 
-setSelectedVariationObj({
-  ...defaultVar,
-  size_value: firstSize || null,
-  stock_quantity: (defaultVar.size_stock && defaultVar.size_stock[firstSize] !== undefined)
-    ? defaultVar.size_stock[firstSize]
-    : (defaultVar.stock_quantity || 0)
-});
-
-
+          setSelectedVariationObj({
+            ...defaultVar,
+            size_value: firstSize || null,
+            stock_quantity: (defaultVar.size_stock && defaultVar.size_stock[firstSize] !== undefined)
+              ? defaultVar.size_stock[firstSize]
+              : (defaultVar.stock_quantity || 0)
+          });
         }
       } catch (error) {
         console.error("Error fetching product media/variations:", error);
@@ -485,168 +480,183 @@ setSelectedVariationObj({
   }, [product?.id]);
 
   return (
-    <div className="info-main-container">
-      <ProductSelectionDrawer
-        isOpen={isSelectionOpen}
-        initialColor={activeColor}
-        initialSize={activeSize}
-        onClose={() => { setIsSelectionOpen(false); setSelectedItems({}); }}
-        product={product}
-        variations={productVariations}
-        productMedia={productMedia}
-        selectedItems={selectedItems}
-        setSelectedItems={setSelectedItems}
-        selectedVariation={selectedVariationObj}
-        handleQtyChange={handleQtyChange}
-        purchaseQty={purchaseQty}
-        setPurchaseQty={setPurchaseQty}
-        totalQuantity={Object.values(selectedItems).reduce((sum, qty) => sum + qty, 0)}
-        currentUnitPrice={currentUnitPrice}
-        formatPrice={formatPrice}
-        productImage={productImage}
-        actionType={drawerAction}
-        onConfirm={handleDrawerConfirm}
-        addToCart={addToCart}
-        handleAddToCart={handleAddToCartLocal}
-        isLoading={loading}
-      />
+    <>
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
 
-      {isMobile && (
-        <div className="mobile-bottom-order-nav">
-          <button onClick={handleWhatsAppOrder} disabled={!selectedVariationObj || loading} className="mobile-whatsapp-btn">
-            <MessageSquare size={20} />
-            <span>WhatsApp</span>
-          </button>
-          <button onClick={() => handleOpenDrawer('order')} disabled={!selectedVariationObj || currentStock === 0 || loading} className="mobile-order-now-btn">
-            <Zap size={20} />
-            <span>Order Now</span>
-          </button>
-          <button onClick={() => handleOpenDrawer('cart')} disabled={!selectedVariationObj || currentStock === 0 || loading} className="mobile-add-to-cart-btn">
-            <ShoppingCart size={20} />
-            <span>Cart</span>
-          </button>
-          <button onClick={handleChatWithSeller} className="mobile-chat-btn">
-            <MessageSquare size={20} />
-            <span>Chat</span>
-          </button>
-        </div>
-      )}
+      <div className="bg-white dark:bg-black flex flex-col w-full h-auto max-h-none overflow-y-visible md:sticky md:top-[100px] text-gray-900 dark:text-white">
+        <ProductSelectionDrawer
+          isOpen={isSelectionOpen}
+          initialColor={activeColor}
+          initialSize={activeSize}
+          onClose={() => { setIsSelectionOpen(false); setSelectedItems({}); }}
+          product={product}
+          variations={productVariations}
+          productMedia={productMedia}
+          selectedItems={selectedItems}
+          setSelectedItems={setSelectedItems}
+          selectedVariation={selectedVariationObj}
+          handleQtyChange={handleQtyChange}
+          purchaseQty={purchaseQty}
+          setPurchaseQty={setPurchaseQty}
+          totalQuantity={Object.values(selectedItems).reduce((sum, qty) => sum + qty, 0)}
+          currentUnitPrice={currentUnitPrice}
+          formatPrice={formatPrice}
+          productImage={productImage}
+          actionType={drawerAction}
+          onConfirm={handleDrawerConfirm}
+          addToCart={addToCart}
+          handleAddToCart={handleAddToCartLocal}
+          isLoading={loading}
+        />
 
-      <div className="info-content-wrapper">
-        
-        <div className="info-card">
-          <h1 className="product-title-main">{product?.name}</h1>
-          <div className="rating-section">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <Star key={star} size={18} fill={(hover || product.average_rating) >= star ? "#ffc107" : "none"} color="#ffc107" 
-                className="star-icon" onMouseEnter={() => setHover(star)} onMouseLeave={() => setHover(0)} onClick={() => onRate && onRate(star)} />
-            ))}
-            <span className="rating-count">({product.total_reviews || 0} reviews)</span>
-          </div>
-        </div>
-
-        <div className="info-card">
-          {Object.keys(variationsByColor).length > 0 && (
-            <div className="attribute-group">
-              <span className="attribute-label">Rangi zinazopatikana:</span>
-              <div className="color-options">
-                {Object.keys(variationsByColor).map((color) => {
-                  const colorData = variationsByColor[color];
-                    const totalStock = Object.values(colorData.sizesMap || {}).reduce(
-                    (sum, s) => sum + (Number(s.stock) || 0), 0
-                            );
-                  return (
-                    <div key={color} onClick={() => handleColorSelect(color)} className={`color-item ${selectedColor === color ? 'active' : ''}`}>
-                      <div className={`color-square ${selectedColor === color ? 'active' : ''}`}>
-                        {colorData.color_image ? <img src={colorData.color_image} alt={color} /> :
-                          <div style={{ width: '100%', height: '100%', backgroundColor: color.toLowerCase() }} />}
-                      </div>
-                      <span className="color-name">{color}</span>
-                      <span className="color-stock">{totalStock} left</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {availableSizesForColor.length > 0 && (
-            <div className="attribute-group">
-              <span className="attribute-label">Ukubwa (Bonyeza kuchagua):</span>
-              <div className="size-options">
-                {availableSizesForColor.map((size) => {
-                  const sizeStock = getStockForSize(selectedColor, size);
-                  const isOutOfStock = sizeStock === 0;
-                  return (
-                    <button key={size} onClick={() => !isOutOfStock && handleSizeSelect(size)} disabled={isOutOfStock}
-                      className={`size-btn ${selectedSize === size ? 'active' : ''} ${isOutOfStock ? 'out-of-stock' : ''}`}>
-                      {size}{isOutOfStock && <span className="out-of-stock-label">(Imeisha)</span>}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          <div className="stock-status-row">
-            <span className="stock-label">Hali ya Stoo:</span>
-            <span className={`stock-badge ${currentStock > 0 ? 'in-stock' : 'out-of-stock'}`}>
-              {currentStock > 0 ? `✅ ${currentStock} Zimebaki` : '❌ Imeisha'}
-            </span>
-          </div>
-
-          {Object.keys(currentSpecs).length > 0 && (
-            <div className="specs-container">
-              <div className="specs-header">📋 Specifications</div>
-              <table>
-                <tbody>
-                  {Object.entries(currentSpecs).map(([key, value], index) => (
-                    <tr key={key} className={index % 2 === 0 ? 'even' : 'odd'}>
-                      <td className="spec-key">{key}</td>
-                      <td className="spec-value">{typeof value === 'object' ? JSON.stringify(value) : value}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          <div className="price-section">
-            <span>Bei:</span>
-            <span className="price-amount">TSH {formatPrice(currentUnitPrice)}</span>
-            {product?.is_wholesale && moq > 1 && (<div className="moq-info">📦 Minimum Order: {moq} pieces</div>)}
-          </div>
-        </div>
-
-        {audience && audience.length > 0 && (
-          <div className="info-card">
-            <span className="attribute-label">👥 Inafaa kwa:</span>
-            <div className="audience-tags">
-              {audience.map((a, i) => (<span key={i}>{a}</span>))}
-            </div>
+        {isMobile && (
+          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-black flex justify-around items-center px-3 pt-2 pb-5 border-t border-gray-200 dark:border-[#1f1f1f] shadow-[0_-2px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_-2px_10px_rgba(0,0,0,0.6)] z-[1000] gap-2">
+            <button onClick={handleWhatsAppOrder} disabled={!selectedVariationObj || loading} className="flex-1 flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-xl text-[11px] font-semibold cursor-pointer bg-[#25D366] text-white active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+              <MessageSquare size={20} />
+              <span>WhatsApp</span>
+            </button>
+            <button onClick={() => handleOpenDrawer('order')} disabled={!selectedVariationObj || currentStock === 0 || loading} className="flex-1 flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-xl text-[11px] font-semibold cursor-pointer bg-[#ff4e00] dark:bg-[#ff6a00] text-white active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+              <Zap size={20} />
+              <span>Order Now</span>
+            </button>
+            <button onClick={() => handleOpenDrawer('cart')} disabled={!selectedVariationObj || currentStock === 0 || loading} className="flex-1 flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-xl text-[11px] font-semibold cursor-pointer bg-white dark:bg-[#0a0a0a] text-[#ff4e00] dark:text-[#ff6a00] border border-[#ff4e00] dark:border-[#ff6a00] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+              <ShoppingCart size={20} />
+              <span>Cart</span>
+            </button>
+            <button onClick={handleChatWithSeller} className="flex-1 flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-xl text-[11px] font-semibold cursor-pointer bg-[#f3f4f6] dark:bg-[#0a0a0a] text-[#374151] dark:text-white border border-transparent dark:border-[#1f1f1f] active:scale-95">
+              <MessageSquare size={20} />
+              <span>Chat</span>
+            </button>
           </div>
         )}
 
-        <div className="footer-buttons-group">
-          <button onClick={handleWhatsAppOrder} disabled={!selectedVariationObj || loading} className="btn-whatsapp-full">
-            <MessageSquare size={18} /> Order via WhatsApp
-          </button>
-          <div className="action-row">
-            <button onClick={() => handleOpenDrawer('order')} disabled={!selectedVariationObj || currentStock === 0 || loading} className="btn-orange-full">
-              <Zap size={16} /> Order Now
-            </button>
-            <button onClick={() => handleOpenDrawer('cart')} disabled={!selectedVariationObj || currentStock === 0 || loading} className="btn-white-outline">
-              <ShoppingCart size={16} /> Add to Cart
-            </button>
-            <button onClick={handleChatWithSeller} className="btn-chat-icon">
-              <MessageSquare size={18} color="#374151" />
-            </button>
+        <div className="flex flex-col gap-3 p-0 pt-2.5 pb-5 md:p-3 w-full box-border overflow-y-visible flex-1 md:pb-[80px]">
+          
+          <div className="bg-white dark:bg-[#0a0a0a] rounded-[10px] md:rounded-xl p-3 md:p-4 shadow-sm border border-[#f0f0f0] dark:border-[#1f1f1f] flex flex-col h-auto animate-[fadeIn_0.3s_ease_forwards]">
+            <h1 className="text-[15px] md:text-[20px] max-lg:text-[18px] max-md:text-[16px] font-bold mb-1.5 md:mb-2 leading-[1.3] text-[#1a1a1a] dark:text-white">{product?.name}</h1>
+            <div className="flex items-center gap-1.5 mb-2.5 md:mb-[15px] flex-wrap">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star key={star} size={16} fill={(hover || product.average_rating) >= star ? "#ffc107" : "none"} color="#ffc107" 
+                  className="cursor-pointer md:w-[18px] md:h-[18px]" onMouseEnter={() => setHover(star)} onMouseLeave={() => setHover(0)} onClick={() => onRate && onRate(star)} />
+              ))}
+              <span className="text-[13px] text-[#666] dark:text-[#b0b0b0] ml-2">({product.total_reviews || 0} reviews)</span>
+            </div>
           </div>
-        </div>
 
-        {isMobile && <div className="mobile-spacer" />}
+          <div className="bg-white dark:bg-[#0a0a0a] rounded-[10px] md:rounded-xl p-3 md:p-4 shadow-sm border border-[#f0f0f0] dark:border-[#1f1f1f] flex flex-col h-auto animate-[fadeIn_0.3s_ease_forwards] [animation-delay:0.1s]">
+            {Object.keys(variationsByColor).length > 0 && (
+              <div className="mb-5">
+                <span className="text-[14px] text-[#333] dark:text-white block mb-3 font-semibold">Rangi zinazopatikana:</span>
+                <div className="flex gap-2 md:gap-3 flex-wrap">
+                  {Object.keys(variationsByColor).map((color) => {
+                    const colorData = variationsByColor[color];
+                    const totalStock = Object.values(colorData.sizesMap || {}).reduce(
+                      (sum, s) => sum + (Number(s.stock) || 0), 0
+                    );
+                    return (
+                      <div key={color} onClick={() => handleColorSelect(color)} className="cursor-pointer flex flex-col items-center gap-1.5">
+                        <div className={`w-[40px] h-[40px] md:w-[55px] md:h-[55px] rounded-[10px] md:rounded-xl border overflow-hidden bg-white dark:bg-[#0a0a0a] flex items-center justify-center transition-all duration-200 ${selectedColor === color ? 'border-2 border-[#ff4e00] dark:border-[#ff6a00] shadow-[0_0_0_2px_rgba(255,78,0,0.2)] dark:shadow-[0_0_0_2px_rgba(255,106,0,0.4)]' : 'border-[#ddd] dark:border-[#1f1f1f]'}`}>
+                          {colorData.color_image ? <img src={colorData.color_image} alt={color} className="w-full h-full object-cover" /> :
+                            <div style={{ width: '100%', height: '100%', backgroundColor: color.toLowerCase() }} />}
+                        </div>
+                        <span className={`text-[9px] md:text-[11px] ${selectedColor === color ? 'text-[#ff4e00] dark:text-[#ff6a00] font-bold' : 'text-[#666] dark:text-[#b0b0b0]'}`}>{color}</span>
+                        <span className="text-[10px] text-[#888] dark:text-[#6b6b6b]">{totalStock} left</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {availableSizesForColor.length > 0 && (
+              <div className="mb-5">
+                <span className="text-[14px] text-[#333] dark:text-white block mb-3 font-semibold">Ukubwa (Bonyeza kuchagua):</span>
+                <div className="flex gap-2 md:gap-2.5 flex-wrap">
+                  {availableSizesForColor.map((size) => {
+                    const sizeStock = getStockForSize(selectedColor, size);
+                    const isOutOfStock = sizeStock === 0;
+                    return (
+                      <button key={size} onClick={() => !isOutOfStock && handleSizeSelect(size)} disabled={isOutOfStock}
+                        className={`px-3 py-1.5 md:px-5 md:py-2.5 rounded-[10px] border text-[11px] md:text-[14px] transition-all duration-200 cursor-pointer 
+                          ${selectedSize === size ? 'border-2 border-[#ff4e00] dark:border-[#ff6a00] bg-[#fff4f0] dark:bg-[#1f1000] text-[#ff4e00] dark:text-[#ff6a00] font-bold' : 'border-[#ddd] dark:border-[#1f1f1f] bg-white dark:bg-[#0a0a0a] text-[#333] dark:text-white'} 
+                          ${isOutOfStock ? 'opacity-50 dark:opacity-40 cursor-not-allowed text-[#666] dark:text-[#6b6b6b]' : ''}`}>
+                        {size}{isOutOfStock && <span className="text-[10px] ml-1">(Imeisha)</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className="mb-3 md:mb-[15px] py-2 md:py-2.5 border-t border-b border-[#eee] dark:border-[#1f1f1f] flex items-center flex-wrap">
+              <span className="text-[12px] md:text-[13px] text-[#666] dark:text-[#b0b0b0]">Hali ya Stoo:</span>
+              <span className={`ml-2 font-bold ${currentStock > 0 ? 'text-[#10b981] dark:text-[#22c55e]' : 'text-[#ef4444]'}`}>
+                {currentStock > 0 ? `✅ ${currentStock} Zimebaki` : '❌ Imeisha'}
+              </span>
+            </div>
+
+            {Object.keys(currentSpecs).length > 0 && (
+              <div className="mt-[15px] border border-[#f0f0f0] dark:border-[#1f1f1f] rounded-lg overflow-hidden">
+                <div className="p-2.5 px-3 bg-[#fafafa] dark:bg-[#0a0a0a] border-b border-[#f0f0f0] dark:border-[#1f1f1f] text-[13px] font-semibold text-[#333] dark:text-white">📋 Specifications</div>
+                <table className="w-full border-collapse text-[11px] md:text-[12px]">
+                  <tbody>
+                    {Object.entries(currentSpecs).map(([key, value], index) => (
+                      <tr key={key} className={index % 2 === 0 ? 'bg-white dark:bg-[#0a0a0a]' : 'bg-[#fafafa] dark:bg-[#0f0f0f]'}>
+                        <td className="p-2 px-2.5 md:p-2.5 md:px-3 border-b border-[#f0f0f0] dark:border-[#1f1f1f] text-[#666] dark:text-[#b0b0b0] w-[45%] font-medium">{key}</td>
+                        <td className="p-2 px-2.5 md:p-2.5 md:px-3 border-b border-[#f0f0f0] dark:border-[#1f1f1f] text-[#333] dark:text-white font-medium">{typeof value === 'object' ? JSON.stringify(value) : value}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            <div className="mt-3 md:mt-[15px] p-2.5 md:p-3 bg-[#f9fafb] dark:bg-[#0a0a0a] dark:border dark:border-[#1f1f1f] rounded-lg">
+              <span className="text-[12px] md:text-[13px] text-[#666] dark:text-[#b0b0b0]">Bei:</span>
+              <span className="text-[18px] md:text-[24px] max-lg:text-[22px] max-md:text-[20px] font-extrabold text-[#ff4e00] dark:text-[#ff6a00] ml-2">TSH {formatPrice(currentUnitPrice)}</span>
+              {product?.is_wholesale && moq > 1 && (
+                <div className="text-[11px] text-[#666] dark:text-[#b0b0b0] mt-1">📦 Minimum Order: {moq} pieces</div>
+              )}
+            </div>
+          </div>
+
+          {audience && audience.length > 0 && (
+            <div className="bg-white dark:bg-[#0a0a0a] rounded-[10px] md:rounded-xl p-3 md:p-4 shadow-sm border border-[#f0f0f0] dark:border-[#1f1f1f] flex flex-col h-auto animate-[fadeIn_0.3s_ease_forwards] [animation-delay:0.15s]">
+              <span className="text-[14px] text-[#333] dark:text-white block mb-3 font-semibold">👥 Inafaa kwa:</span>
+              <div className="flex flex-wrap gap-1.5">
+                {audience.map((a, i) => (
+                  <span key={i} className="bg-[#f3f4f6] dark:bg-[#0a0a0a] dark:border dark:border-[#1f1f1f] px-2.5 py-[3px] md:px-3 md:py-1 rounded-[20px] text-[11px] md:text-[12px] text-[#4b5563] dark:text-white">{a}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="hidden md:block mt-2.5 p-[15px] bg-white dark:bg-black rounded-xl shadow-[0_-2px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_-2px_10px_rgba(0,0,0,0.6)]">
+            <button onClick={handleWhatsAppOrder} disabled={!selectedVariationObj || loading} className="bg-[#25D366] text-white flex items-center justify-center gap-2.5 font-semibold p-3.5 rounded-[10px] border-none w-full mb-3 cursor-pointer transition-all hover:bg-[#1da851] disabled:opacity-60 disabled:cursor-not-allowed">
+              <MessageSquare size={18} /> Order via WhatsApp
+            </button>
+            <div className="flex gap-2.5 w-full">
+              <button onClick={() => handleOpenDrawer('order')} disabled={!selectedVariationObj || currentStock === 0 || loading} className="bg-[#ff4e00] dark:bg-[#ff6a00] text-white border-none p-3 rounded-[10px] font-bold flex-[2] flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:bg-[#e04400] dark:hover:bg-[#e55a00] disabled:opacity-60 disabled:cursor-not-allowed max-sm:text-[12px]">
+                <Zap size={16} /> Order Now
+              </button>
+              <button onClick={() => handleOpenDrawer('cart')} disabled={!selectedVariationObj || currentStock === 0 || loading} className="bg-white dark:bg-[#0a0a0a] text-[#ff4e00] dark:text-[#ff6a00] border border-[#ff4e00] dark:border-[#ff6a00] p-3 rounded-[10px] font-bold flex-[2] flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:bg-[#fff4f0] dark:hover:bg-[#1f1000] disabled:opacity-60 disabled:cursor-not-allowed max-sm:text-[12px]">
+                <ShoppingCart size={16} /> Add to Cart
+              </button>
+              <button onClick={handleChatWithSeller} className="w-[50px] flex justify-center items-center border border-[#e5e7eb] dark:border-[#1f1f1f] rounded-[10px] bg-[#f9fafb] dark:bg-[#0a0a0a] cursor-pointer transition-all hover:bg-[#f3f4f6] dark:hover:bg-[#1f1f1f]">
+                <MessageSquare size={18} color="currentColor" className="text-[#374151] dark:text-white" />
+              </button>
+            </div>
+          </div>
+
+          {isMobile && <div className="h-20" />}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
