@@ -10,7 +10,6 @@ import { useUserLocation } from '../hooks/useUserLocation,js';
 
 
 const TopStores = lazy(() => import("../components/TopStores"));
-const LocationFilter = lazy(() => import("../components/LocationFilter"));
 const JustForYou = lazy(() => import("../components/JustForYou"));
 const TopDeals = lazy(() => import("../components/TopDeals"));
 const NewArrivals = lazy(() => import("../components/NewArrivals"));
