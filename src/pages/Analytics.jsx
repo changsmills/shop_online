@@ -174,18 +174,20 @@ export default function Analytics({ session }) {
     <div className="flex flex-col h-screen font-sans bg-white dark:bg-black">
 
       {/* ===== HEADER ===== */}
-      <header className="sticky top-0 z-[100] bg-white dark:bg-[#0a0a0a] border-b border-gray-200 dark:border-[#1f1f1f] flex items-center justify-between">
+      <header className="sticky top-0 z-[100] bg-white dark:bg-[#0a0a0a]
+       border-b border-gray-200 dark:border-[#1f1f1f] flex items-center justify-between">
         <div className="flex items-center gap-3 md:gap-4 px-3 md:px-6 py-2.5">
           <Menu
             size={22}
-            className="cursor-pointer text-gray-500 dark:text-slate-400 hover:text-[#ff6a00] transition-colors"
+            className="cursor-pointer text-gray-500 dark:text-slate-400 hover:text-[#ff6a00] 
+            transition-colors"
             onClick={() => setIsExpanded(!isExpanded)}
           />
           <Link
             to="/dashboard"
             className="text-lg md:text-xl font-extrabold text-[#ff6a00] no-underline"
           >
-            Changsmills
+            Skyfall
           </Link>
           <div className="hidden md:flex items-center bg-gray-100 dark:bg-[#111] px-3 py-1.5 rounded-lg">
             <Search size={16} className="text-gray-400 dark:text-slate-500" />

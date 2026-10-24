@@ -66,7 +66,8 @@ export default function CartPage({ session }) {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-[#0f172a] text-gray-900 dark:text-gray-100 font-sans">
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-[#0f172a]
+     text-gray-900 dark:text-gray-100 font-sans">
       
       {/* HEADER */}
       <header className="flex justify-between items-center px-4 py-3 md:px-6 border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-[#1e293b] z-[100]">

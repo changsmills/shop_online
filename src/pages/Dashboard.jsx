@@ -587,7 +587,8 @@ const handleSubCategoryHover = (subCategory) => {
 return (
 
 
-<div key={i18n.language} className="flex flex-col min-h-screen bg-white dark:bg-black relative">
+<div key={i18n.language} className="flex flex-col min-h-screen
+ bg-white dark:bg-black relative font-sans ">
 
 {/* Wrapper hii inafanya Header iwe fixed kwenye simu, sticky kwenye desktop */}
 <div className="fixed md:sticky top-0 left-0 w-full z-[9999]">
@@ -624,10 +625,12 @@ return (
     {!search && (
 
     <div className="block w-full mt-1 lg:mt-4.5 lg:grid
-       lg:grid-cols-[250px_1fr_280px] lg:gap-4 lg:h-[350px] pl-4">
+       lg:grid-cols-[250px_1fr_280px] lg:gap-4 lg:h-[350px] px-1">
 
 {/* 1. SIDEBAR YA KATEGORIA (Kushoto) */}
-<aside className="hidden lg:flex lg:flex-col h-full max-h-full overflow-hidden bg-white dark:bg-[#111111] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
+<aside className="hidden lg:flex lg:flex-col h-full 
+max-h-full overflow-hidden bg-white dark:bg-[#111111]
+ rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
   
   {/* HEADER YA SIDEBAR */}
   <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100 dark:border-gray-800 shrink-0">
@@ -684,7 +687,9 @@ return (
     </div>
 
     <div className="w-full overflow-hidden m-0 p-0 leading-none">
-    <div className="relative w-full aspect-[16/9] md:aspect-[16/7] lg:aspect-auto lg:h-[350px] bg-gradient-to-br from-[#1a1a2e] to-[#16213e] overflow-hidden rounded-xl max-h-[350px]">   
+
+    <div className="relative w-full aspect-[16/9] md:aspect-[16/7] lg:aspect-auto lg:h-[350px] 
+    bg-gradient-to-br from-[#1a1a2e] to-[#16213e] overflow-hidden rounded-xl max-h-[350px]">   
       {activeAd && isVideoAd(activeAd) ? (
   <video
     src={activeAd.media_url}
@@ -710,7 +715,7 @@ return (
 
 {activeAd && (
   // HAPA: Nimebadilisha pl-6 kuwa pl-4 (nafasi ndogo kushoto) na kuongeza gradient nyeusi zaidi kwa ajili ya kusomeka
-  <div className="absolute inset-0 flex flex-col justify-center items-start pl-4 pr-3 py-4 sm:pl-10 sm:pr-8 lg:pl-12 lg:pr-10 text-white bg-gradient-to-r from-black/90 via-black/60 to-transparent pointer-events-none">
+  <div className="absolute inset-0 flex flex-col justify-center items-start px-4 pr-3 py-4 sm:pl-10 sm:pr-8 lg:pl-12 lg:pr-10 text-white bg-gradient-to-r from-black/90 via-black/60 to-transparent pointer-events-none">
     
     {/* 1. SPONSORED BADGE - Imeongezwa ukubwa kidogo */}
     <span className="bg-brand-orange px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold w-fit mb-2 tracking-wide uppercase shadow-sm">
@@ -848,20 +853,26 @@ return (
 {activeMenu === 'categories' && selectedCategory && ReactDOM.createPortal(
 
   <div 
-  className="fixed inset-0 top-[105px] z-[99999] bg-black/60 flex justify-center items-start"
+  className="fixed inset-0 top-[104.9px] z-[999] bg-black/60 flex justify-center 
+  items-start font-sans"
   onMouseEnter={() => handleMouseEnter('categories')}
   onMouseLeave={handleMouseLeave}
 >
   
-<div className="w-full h-full max-h-[calc(100vh-180px)] bg-white dark:bg-black border-b border-gray-200 dark:border-[#1f1f1f] overflow-hidden flex shadow-2xl">
+<div className="w-full h-full max-h-[calc(100vh-180px)] bg-white dark:bg-black border-b 
+border-gray-200 dark:border-[#1f1f1f] overflow-hidden flex shadow-2xl">
+
         {/* ========== SIDEBAR (KUSHOTO) ========== */}
-      <aside className="w-[250px] shrink-0 bg-gray-50 dark:bg-[#0a0a0a] border-r border-gray-200 dark:border-[#1f1f1f] overflow-y-auto py-2">
+      <aside className="w-[250px] shrink-0 bg-gray-50 dark:bg-[#0a0a0a] 
+      border-r border-gray-200 dark:border-[#1f1f1f] overflow-y-auto py-2">
         {viewMode === 'products' ? (
           categories.map((cat) => (
             <div 
               key={cat.id} 
               onMouseEnter={() => setSelectedCategory(cat)}
-              className={`flex items-center justify-between px-3.5 py-2.5 cursor-pointer text-[13px] leading-tight border-b border-gray-100 dark:border-[#1a1a1a] transition-all duration-150 ${
+              className={`flex items-center justify-between px-3.5 py-2.5 cursor-pointer
+                 text-[13px] leading-tight border-b border-gray-100 dark:border-[#1a1a1a]
+                  transition-all duration-150 ${
                 selectedCategory?.id === cat.id 
                   ? 'bg-white dark:bg-[#0a0a0a] text-brand-orange font-bold border-l-[3px] border-brand-orange' 
                   : 'text-black dark:text-white hover:bg-white dark:hover:bg-[#0a0a0a]'
@@ -1019,7 +1030,7 @@ return (
 
 {mobileMenuOpen && ReactDOM.createPortal(
   <div 
-    className="fixed inset-0 bg-black/60 z-[99999] flex justify-center items-end"
+    className="fixed inset-0 bg-black/60 z-[9999] flex justify-center items-end font-sans"
     onClick={() => setMobileMenuOpen(false)}
   >
     <div 

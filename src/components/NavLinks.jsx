@@ -248,7 +248,7 @@ export default function NavLinks({ isMobile }) {
         
         {/* ALL CATEGORIES (Hii tunaiacha kama ilivyo kwa sababu inatumia logic ya kuchagua category) */}
         <div
-          className="relative inline-flex items-center py-2 cursor-pointer group px-3"
+          className="relative inline-flex items-center py-2 cursor-pointer group px-3 z-[999]"
           onMouseEnter={(e) => handleMouseEnter('categories', e)}
           onMouseLeave={handleMouseLeave}
         >
@@ -261,7 +261,8 @@ export default function NavLinks({ isMobile }) {
 
           {activeMenu === 'categories' && createPortal(
             <div
-              className="fixed top-[105px] left-0 right-0 h-[520px] z-[999] bg-white dark:bg-black shadow-[0_4px_20px_rgba(0,0,0,0.15)] border-t border-gray-100 dark:border-gray-800 animate-[fadeInDown_0.2s_ease]"
+              className="fixed top-[105px] left-0 right-0 h-[520px] z-[999] bg-white dark:bg-black shadow-[0_4px_20px_rgba(0,0,0,0.15)] 
+              border-t border-gray-100 dark:border-gray-800 animate-[fadeInDown_0.2s_ease]"
               onMouseEnter={() => handleMouseEnter('categories')}
               onMouseLeave={handleMouseLeave}
             >
@@ -413,7 +414,11 @@ export default function NavLinks({ isMobile }) {
           <div className="absolute -bottom-[1px] left-0 right-0 h-[3px] bg-orange-500 rounded-sm scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
 
           {/* FULL WIDTH DROPDOWN - Imeongezwa urefu na padding */}
-          <div className="fixed top-[105px] left-0 w-full bg-white dark:bg-black shadow-[0_15px_35px_rgba(0,0,0,0.4)] border-b border-gray-200 dark:border-gray-800 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:animate-smooth-dropdown z-[999]">
+          <div className="fixed top-[112px] 
+          left-0 w-full bg-white dark:bg-black
+           shadow-[0_15px_35px_rgba(0,0,0,0.4)] border-b border-gray-200 
+           dark:border-gray-800 opacity-0 invisible group-hover:opacity-100 
+           group-hover:visible group-hover:animate-smooth-dropdown z-[99]">
             
             {/* HAPA: Nimeongeza pb-12 (padding chini) na min-h ili isiwe fupi */}
             <div className="max-w-[1250px] mx-auto p-8  grid grid-cols-3 gap-10">
@@ -518,7 +523,7 @@ export default function NavLinks({ isMobile }) {
           <div className="absolute -bottom-[1px] left-0 right-0 h-[3px] bg-orange-500 rounded-sm scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
 
           {/* DROPDOWN YA BUYER CENTRAL - FIXED, top-[97px], right-0 */}
-          <div className="fixed top-[105px] right-0 w-[900px] 
+          <div className="fixed top-[112px] right-0 w-[900px] 
           bg-white dark:bg-black shadow-[0_15px_35px_rgba(0,0,0,0.4)] 
           border-b border-x border-gray-200 dark:border-gray-800 rounded-b-xl opacity-0 
           invisible group-hover:opacity-100 group-hover:visible group-hover:animate-smooth-dropdown z-[999]">
@@ -572,10 +577,15 @@ export default function NavLinks({ isMobile }) {
           </span>
           
           {/* Mstari wa chini unapogusa */}
-          <div className="absolute -bottom-[1px] left-0 right-0 h-[3px] bg-orange-500 rounded-sm scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+          <div className="absolute -bottom-[1px] left-0 right-0 h-[3px]
+           bg-orange-500 rounded-sm scale-x-0 group-hover:scale-x-100 
+           transition-transform duration-300 origin-left" />
 
           {/* DROPDOWN YA HELP CENTER - FIXED, top-[97px], right-0 */}
-          <div className="fixed top-[105px] right-0 w-[900px] bg-white dark:bg-black shadow-[0_15px_35px_rgba(0,0,0,0.4)] border-b border-x border-gray-200 dark:border-gray-800 rounded-b-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:animate-smooth-dropdown z-[9999]">
+          <div className="fixed top-[112px] right-0 w-[900px] bg-white 
+          dark:bg-black shadow-[0_15px_35px_rgba(0,0,0,0.4)] border-b border-x border-gray-200
+           dark:border-gray-800 rounded-b-xl opacity-0 invisible group-hover:opacity-100
+            group-hover:visible group-hover:animate-smooth-dropdown z-[999]">
             <div className="p-8 pb-12 grid grid-cols-4 gap-10">
               <div>
                 <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">{t('buyer_help')}</h4>

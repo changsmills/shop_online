@@ -184,7 +184,9 @@ const Header = ({ showBack = false, showSearch = true }) => {
   }, []);
 
   return (
-    <header className="w-full bg-white dark:bg-black text-black dark:text-white border-t-2 border-t-gray-200 dark:border-t-gray-800 border-b border-b-gray-200 dark:border-b-gray-800 shadow-sm transition-colors duration-300">
+    <header className="w-full bg-white dark:bg-black 
+    text-black dark:text-white border-t-2 border-t-gray-200 dark:border-t-gray-800 
+    border-b border-b-gray-200 dark:border-b-gray-800 shadow-sm transition-colors duration-300 z-[50]">
       
       <div className="max-w-[1440px] mx-auto px-4 py-1 lg:px-8 overflow-visible">
 
@@ -194,14 +196,16 @@ const Header = ({ showBack = false, showSearch = true }) => {
           <div className="flex items-center gap-4 lg:gap-5 max-[480px]:gap-[15px]">
             {showBack && (
               <button 
-                className="flex lg:hidden bg-transparent border-none p-[2px] pr-2 items-center justify-center cursor-pointer active:scale-95 transition-transform" 
+                className="flex lg:hidden bg-transparent border-none p-[2px] pr-2 items-center 
+                justify-center cursor-pointer active:scale-95 transition-transform" 
                 onClick={() => navigate(-1)}
                 aria-label="Rudi nyuma"
               >
                 <ArrowLeft size={24} className="text-black dark:text-white" />
               </button>
             )}
-            <div className="min-w-0 w-auto max-w-[130px] shrink-0 flex items-center lg:min-w-[140px] lg:max-w-none">
+            <div className="min-w-0 w-auto max-w-[130px] shrink-0 flex items-center 
+            lg:min-w-[140px] lg:max-w-none">
               <Logo />
             </div>
           </div>
@@ -220,7 +224,9 @@ const Header = ({ showBack = false, showSearch = true }) => {
             <div ref={locationDropdownRef} className="relative">
               <button 
                 onClick={() => setIsLocationOpen(!isLocationOpen)}
-                className="flex items-center gap-1 bg-transparent border-none cursor-pointer font-medium text-[13px] text-black dark:text-white hover:text-brand-orange transition-colors"
+                className="flex items-center gap-1 bg-transparent border-none cursor-pointer
+                 font-medium text-[13px] text-black dark:text-white hover:text-brand-orange
+                  transition-colors"
               >
                 <MapPin size={20} />
                 <span className="hidden lg:inline font-bold">
@@ -237,7 +243,9 @@ const Header = ({ showBack = false, showSearch = true }) => {
             <div ref={dropdownRef} className="relative">
               <button 
                 onClick={() => setIsLangOpen(!isLangOpen)}
-                className="flex items-center gap-1 bg-transparent border-none cursor-pointer font-medium text-[13px] text-black dark:text-white hover:text-brand-orange transition-colors"
+                className="flex items-center gap-1 bg-transparent border-none cursor-pointer 
+                font-medium text-[13px] text-black dark:text-white hover:text-brand-orange
+                 transition-colors"
               >
                 <Globe size={20} />
                 <span className="hidden lg:inline font-bold">
@@ -254,7 +262,7 @@ const Header = ({ showBack = false, showSearch = true }) => {
         <div 
           className={`hidden lg:block relative border-t border-gray-200 
             dark:border-gray-800 bg-white dark:bg-black items-center
-             mt-0 transition-all duration-300 ease-in-out lg:px-0 overflow-visible ${
+             mt-0 transition-all duration-300 ease-in-out lg:px-0 overflow-visible  ${
             isScrolled 
               ? 'lg:hidden'
               : 'lg:block'     

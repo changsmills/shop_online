@@ -152,7 +152,8 @@ export default function StorePage() {
             ))}
           </div>
         </div>
-        <Footer />
+        <div className='hidden md:block'><Footer /></div>
+        
       </div>
     );
   }
@@ -162,17 +163,18 @@ export default function StorePage() {
   // =======================================================
   if (!store) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-[#1a1a2e] pt-[70px] md:pt-[100px]">
+      <div className="min-h-screen bg-gray-50 dark:bg-[#1a1a2e] ">
         <Header />
         <div className="flex flex-col items-center justify-center h-[60vh] text-center">
           <Store size={64} className="text-gray-400 mb-4" />
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Duka Halijapatikana</h2>
-          <p className="text-gray-500 mb-6">Duka unalotafuta halipo au limefutwa</p>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Store not found</h2>
+          <p className="text-gray-500 mb-6">Store not found or check internent connection</p>
           <button onClick={() => navigate('/dashboard')} className="bg-brand-orange text-white px-6 py-2 rounded-lg font-bold hover:bg-brand-hover transition">
-            Rudi Nyumbani
+            Back Dashboard
           </button>
         </div>
-        <Footer />
+        <div className='hidden md:block'><Footer /></div>
+        
       </div>
     );
   }
@@ -181,10 +183,12 @@ export default function StorePage() {
   // 🔥 RENDER STORE PAGE
   // =======================================================
   return (
-<div className="min-h-screen bg-gray-50 dark:bg-[#1a1a2e] pt-0 pb-10">
-      <Header />
+<div className="min-h-screen bg-gray-50 dark:bg-[#1a1a2e] pt-0 pb-10 font-sans">
+
+        <Header />
       
-      <div className="max-w-[1200px] mx-auto px-1  mt-4 md:mt-6">
+      
+      <div className="max-w-[1200px] mx-auto px-1  mt-4 md:mt-4">
         
         {/* Store Header / Banner */}
         <div 
@@ -486,5 +490,6 @@ export default function StorePage() {
         document.body
       )}
     </div>
+  
   );
 }
