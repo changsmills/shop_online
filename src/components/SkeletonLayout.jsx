@@ -8,7 +8,9 @@ const SkeletonLayout = () => {
     // 🔥 Marekebisho: Tumia min-h-[100dvh] badala ya min-h-screen kuzuia kuruka kwa screen
     // 🔥 Marekebisho: Tumia pb-[calc(...)] ili kuzuia BottomNav kufunika content
     // 🔥 Marekebisho: Ongeza overflow-x-hidden kuzuia scroll isiyo ya lazima kwa upande
-    <div className="bg-[#f7f8fa] dark:bg-black min-h-[100dvh] w-full  pb-[calc(100px+env(safe-area-inset-bottom))] m-0 sm:pt-20 md:pt-24 md:pb-20 lg:pt-5 lg:pb-5 overflow-x-hidden">
+    <div className="bg-[#f7f8fa] dark:bg-black min-h-[100dvh] w-full 
+     pb-[calc(100px+env(safe-area-inset-bottom))] m-0 sm:pt-20 md:pt-24
+      md:pb-20 lg:pt-5 lg:pb-5 overflow-x-hidden font-sans">
       
       {/* ============================================== */}
       {/* MOBILE & TABLET LAYOUT */}
