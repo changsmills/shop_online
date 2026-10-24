@@ -1,23 +1,22 @@
 // src/components/LocationFilter.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronRight, ChevronLeft, MapPin, ArrowRight, Navigation } from "lucide-react";
+import { ChevronRight, ChevronLeft, MapPin, ArrowRight } from "lucide-react";
 import api from "../axiosConfig"; 
 import DashboardCard from "./DashboardCard";
-import SkeletonCardz from "./SkeletonCardz"; // 🔥 IMPORT SKELETON
+import SkeletonCardz from "./SkeletonCardz"; 
 import { useTranslation } from 'react-i18next';
-import { useUserLocation } from '../hooks/useUserLocation,js'; // 🔥 ONGEZA HII
-import '../LocationFilter.css';
+// 🔥 NIMEREKEBISHA HAPA: Koma imebadilishwa kuwa nukta
+import { useUserLocation } from '../hooks/useUserLocation.js'; 
 
 export default function LocationFilter({ navigate }) {
   const { t, i18n } = useTranslation();
-  const { location, error: locationError } = useUserLocation(); // 🔥 ONGEZA HII
+  const { location, error: locationError } = useUserLocation(); 
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const scrollContainerRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
 
-  // 🔥 BADILISHA: Tumia nearby-products API kulingana na GPS
   useEffect(() => {
     const fetchLocations = async () => {
       try {
@@ -26,7 +25,6 @@ export default function LocationFilter({ navigate }) {
         let response;
         
         if (location) {
-          // 🔥 Tumia Nearby Products API (bidhaa za maduka ya karibu)
           response = await api.get('/nearby-products/', {
             params: {
               lat: location.lat,
@@ -34,18 +32,15 @@ export default function LocationFilter({ navigate }) {
             }
           });
         } else {
-          // Fallback: Tumia products za kawaida
           response = await api.get('/products/');
         }
         
         const data = response.data.results || response.data || [];
 
-        // 🔥 Panga kulingana na umbali (kama data ina distance_km)
         if (location) {
           data.sort((a, b) => (a.distance_km || 0) - (b.distance_km || 0));
         }
 
-        // 🔥 Chuja kwa store zilizo na location (city au GPS)
         const uniqueStores = {};
         data.forEach(item => {
           const storeId = item.store?.id;
@@ -82,7 +77,7 @@ export default function LocationFilter({ navigate }) {
       }
     };
     fetchLocations();
-  }, [location, i18n.language]); // ✅ Ongeza location kwenye dependencies
+  }, [location, i18n.language]); 
 
   const checkScrollPosition = () => {
     if (scrollContainerRef.current) {
@@ -111,33 +106,30 @@ export default function LocationFilter({ navigate }) {
     }
   }, [locations]);
 
-   // ============================================================
-  // 🔥 RENDER HEADER (Imejumuishwa kwa pande zote)
+  // ============================================================
+  // 🔥 RENDER HEADER - Imebadilishwa kwenda Tailwind
   // ============================================================
   const renderHeader = () => (
-    <div className="loc-header">
-      <div className="loc-header-left">
-        <div className="loc-title-group">
-          <MapPin className="loc-map-icon" />
-          <h2 className="loc-title">{t('shop_by_location')}</h2>
+    <div className="flex items-start justify-between mb-4 px-2 md:px-0">
+      <div className="flex flex-col">
+        <div className="flex items-center gap-2">
+          <MapPin className="text-blue-600" size={24} />
+          <h2 className="text-lg md:text-xl font-bold text-gray-800">{t('shop_by_location')}</h2>
         </div>
         
-        {/* ✅ ONGEZA SUBTITLE HAPA CHINI YA TITLE */}
-        <p className="loc-subtitle">
+        <p className="text-sm text-gray-500 mt-1 ml-8">
           {location ? t('find_best_deals_near_you') : t('find_best_deals_across_tz')}
         </p>
       </div>
       
-      <div className="loc-header-right">
+      <div>
         <button 
-          className="loc-arrow-link-btn"
+          className="p-2 rounded-full hover:bg-gray-100 transition-colors text-blue-600"
           onClick={() => {
             const url = location 
               ? `/products?lat=${location.lat}&lng=${location.lng}&section=nearby`
               : '/products?section=location'; 
             
-            // ✅ MUHIMU: Angalia kama ni Desktop (>768px), fungua tab mpya.
-            // Ikiwa ni Mobile, fungua kwenye tab hii hii (kama kawaida).
             if (window.innerWidth > 768) {
               window.open(url, '_blank'); 
             } else {
@@ -152,19 +144,17 @@ export default function LocationFilter({ navigate }) {
   );
   
   // ============================================================
-  // 🔥 SKELETON LOADING - Inaonyesha skeleton cards wakati data inapakia
+  // 🔥 SKELETON LOADING - Imebadilishwa kwenda Tailwind
   // ============================================================
   if (loading) {
     return (
-      <div className="location-main-wrapper">
-        
+      <div className="w-full py-4">
         {renderHeader()}
 
-        {/* 🔥 SKELETON SCROLL - Inaonyesha skeleton 5 kwa horizontal scroll */}
-        <div className="loc-desktop-wrapper">
-          <div className="loc-scroll-wrapper hide-scrollbar">
+        <div className="relative w-full">
+          <div className="flex overflow-x-auto gap-4 pb-4 hide-scrollbar">
             {Array.from({ length: 5 }).map((_, index) => (
-              <div key={`skeleton-${index}`} className="loc-card-wrapper">
+              <div key={`skeleton-${index}`} className="min-w-[200px] md:min-w-[250px] flex-shrink-0">
                 <SkeletonCardz />
               </div>
             ))}
@@ -174,31 +164,33 @@ export default function LocationFilter({ navigate }) {
     );
   }
 
-  // ============================================================
-  // EMPTY STATE - Hakuna locations
-  // ============================================================
   if (locations.length === 0) return null;
 
   // ============================================================
-  // SUCCESS STATE - Onyesha locations
+  // 🔥 SUCCESS STATE - Imebadilishwa kwenda Tailwind
   // ============================================================
   return (
-    <div className="location-main-wrapper">
-      
-            {renderHeader()}
+    <div className="w-full py-4">
+      {renderHeader()}
 
-
-      {/* Horizontal Scroll */}
-      <div className="loc-desktop-wrapper">
+      <div className="relative w-full group">
+        {/* Left Arrow */}
         {showLeftArrow && (
-          <button className="loc-arrow-btn loc-arrow-left" onClick={() => scroll('left')}>
+          <button 
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 shadow-md rounded-full p-2 text-gray-700 hover:bg-white transition-all hidden md:block" 
+            onClick={() => scroll('left')}
+          >
             <ChevronLeft size={24} />
           </button>
         )}
         
-        <div ref={scrollContainerRef} className="loc-scroll-wrapper hide-scrollbar">
+        {/* Scroll Container */}
+        <div 
+          ref={scrollContainerRef} 
+          className="flex overflow-x-auto gap-4 pb-4 hide-scrollbar scroll-smooth"
+        >
           {locations.map((loc, index) => (
-            <div key={index} className="loc-card-wrapper">
+            <div key={index} className="min-w-[200px] md:min-w-[250px] flex-shrink-0">
               <DashboardCard 
                 image={loc.image || 'https://via.placeholder.com/300x200?text=Store'}
                 title={loc.name}
@@ -225,8 +217,12 @@ export default function LocationFilter({ navigate }) {
           ))}
         </div>
         
+        {/* Right Arrow */}
         {showRightArrow && (
-          <button className="loc-arrow-btn loc-arrow-right" onClick={() => scroll('right')}>
+          <button 
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 shadow-md rounded-full p-2 text-gray-700 hover:bg-white transition-all hidden md:block" 
+            onClick={() => scroll('right')}
+          >
             <ChevronRight size={24} />
           </button>
         )}
