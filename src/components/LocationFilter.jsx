@@ -5,7 +5,6 @@ import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
 import SkeletonCardz from "./SkeletonCardz"; 
 import { useTranslation } from 'react-i18next';
-// 🔥 NIMEREKEBISHA HAPA: Koma imebadilishwa kuwa nukta
 import { useUserLocation } from '../hooks/useUserLocation.js'; 
 
 export default function LocationFilter({ navigate }) {
@@ -106,9 +105,6 @@ export default function LocationFilter({ navigate }) {
     }
   }, [locations]);
 
-  // ============================================================
-  // 🔥 RENDER HEADER - Imebadilishwa kwenda Tailwind
-  // ============================================================
   const renderHeader = () => (
     <div className="flex items-start justify-between mb-4 px-2 md:px-0">
       <div className="flex flex-col">
@@ -143,9 +139,6 @@ export default function LocationFilter({ navigate }) {
     </div>
   );
   
-  // ============================================================
-  // 🔥 SKELETON LOADING - Imebadilishwa kwenda Tailwind
-  // ============================================================
   if (loading) {
     return (
       <div className="w-full py-4">
@@ -166,15 +159,11 @@ export default function LocationFilter({ navigate }) {
 
   if (locations.length === 0) return null;
 
-  // ============================================================
-  // 🔥 SUCCESS STATE - Imebadilishwa kwenda Tailwind
-  // ============================================================
   return (
     <div className="w-full py-4">
       {renderHeader()}
 
       <div className="relative w-full group">
-        {/* Left Arrow */}
         {showLeftArrow && (
           <button 
             className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 shadow-md rounded-full p-2 text-gray-700 hover:bg-white transition-all hidden md:block" 
@@ -184,7 +173,6 @@ export default function LocationFilter({ navigate }) {
           </button>
         )}
         
-        {/* Scroll Container */}
         <div 
           ref={scrollContainerRef} 
           className="flex overflow-x-auto gap-4 pb-4 hide-scrollbar scroll-smooth"
@@ -217,7 +205,6 @@ export default function LocationFilter({ navigate }) {
           ))}
         </div>
         
-        {/* Right Arrow */}
         {showRightArrow && (
           <button 
             className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 shadow-md rounded-full p-2 text-gray-700 hover:bg-white transition-all hidden md:block" 
