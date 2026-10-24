@@ -241,14 +241,14 @@ export default function NavLinks({ isMobile }) {
 
     <nav className="flex justify-between items-center 
     max-w-[1250px] mx-auto px-6 md:px-12 h-[48px]
-     w-full border-b border-gray-200 dark:border-gray-800">
+     w-full border-b border-gray-200 dark:border-gray-800 font-sans">
       
            {/* LEFT GROUP */}
       <div className="flex items-center gap-4 ">
         
         {/* ALL CATEGORIES (Hii tunaiacha kama ilivyo kwa sababu inatumia logic ya kuchagua category) */}
         <div
-          className="relative inline-flex items-center py-2 cursor-pointer group px-3 z-[999]"
+          className="relative inline-flex items-center py-2 cursor-pointer group px-3 z-[999] font-sans"
           onMouseEnter={(e) => handleMouseEnter('categories', e)}
           onMouseLeave={handleMouseLeave}
         >

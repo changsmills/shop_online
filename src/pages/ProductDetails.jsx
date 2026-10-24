@@ -228,7 +228,7 @@ export default function ProductDetails() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black flex flex-col pt-0 md:pt-[100px]">
+    <div className="min-h-screen bg-white dark:bg-black flex flex-col pt-0 md:pt-[100px] font-sans">
       
       <div className="md:fixed md:top-0 md:left-0 md:w-full md:z-[1000]">
             <Header showBack={true} /> 

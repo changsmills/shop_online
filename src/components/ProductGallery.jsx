@@ -156,7 +156,7 @@ const ProductGallery = ({ product }) => {
   return (
     <>
       {/* ===== DESKTOP VIEW ===== */}
-      <div className="hidden md:block max-w-[1200px] mx-auto p-5 bg-white dark:bg-black">
+      <div className="hidden md:block max-w-[1200px] mx-auto p-5 bg-white dark:bg-black font-sans">
         <div className="flex gap-5 mb-10 items-start">
           
           {/* Thumbnails */}
@@ -252,7 +252,7 @@ const ProductGallery = ({ product }) => {
       </div>
 
       {/* ===== MOBILE VIEW ===== */}
-      <div className="block md:hidden w-full bg-black rounded-none overflow-hidden">
+      <div className="block md:hidden w-full bg-black rounded-none overflow-hidden font-sans">
         <div className="relative w-full bg-black flex items-center justify-center min-h-[350px]">
           {mediaType === 'video' && videoItem && (
             <div className="relative w-full">
