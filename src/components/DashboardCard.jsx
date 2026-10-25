@@ -31,7 +31,8 @@ export default function DashboardCard({
   const isPriceMoq = displayMode === 'price-moq';
   const isImagePrice = displayMode === 'image-price';
 
-  const displayTitle = title?.length > 30 ? title.substring(0, 25) + '...' : title;
+// 🔥 Kama ni Store, usikate maneno kwa herufi, acha CSS (truncate) ifanye kazi
+const displayTitle = (!isStore && title?.length > 30) ? title.substring(0, 25) + '...' : title;
 
   // Rank Background Colors
   const getRankColor = (r) => {
@@ -89,9 +90,9 @@ export default function DashboardCard({
       <div className="relative z-20 flex flex-col gap-1 p-3 pb-3.5 bg-transparent max-md:!gap-0 max-md:!p-[4px_8px_6px_8px]">
         
         {/* Title */}
-        <h4 className="m-0 line-clamp-2 text-[14px] font-semibold leading-tight tracking-wide text-gray-900 dark:text-white max-md:text-[12px] max-md:font-semibold max-md:leading-[1.2]">
-          {displayTitle || title}
-        </h4>
+      <h4 className={`m-0 text-[14px] font-semibold leading-tight tracking-wide text-gray-900 dark:text-white max-md:text-[12px] max-md:font-semibold max-md:leading-[1.2] ${isStore ? 'truncate whitespace-nowrap block w-full' : 'line-clamp-2'}`}>
+      {displayTitle || title}
+      </h4>
 
          {children}
 

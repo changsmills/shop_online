@@ -106,7 +106,7 @@ export default function SearchBar({ search = "", setSearch }) {
       
       {/* Search Bar Container */}
       <div 
-        className={`flex items-center bg-white dark:bg-[#2d2d44] border-2 rounded-full h-[36px] sm:h-[40px] md:h-[44px] pl-3 sm:pl-4 pr-1 transition-all duration-300 ${
+        className={`flex items-center bg-white dark:bg-black border-2 rounded-full h-[36px] sm:h-[40px] md:h-[44px] pl-3 sm:pl-4 pr-1 transition-all duration-300 ${
           isFocused 
             ? 'border-brand-orange shadow-[0_0_0_4px_rgba(255,102,0,0.1)]' 
             : 'border-gray-300 dark:border-gray-600 hover:border-brand-orange'

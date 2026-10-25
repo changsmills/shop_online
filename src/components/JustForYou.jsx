@@ -34,8 +34,9 @@ export default function JustForYou({ search = "", selectedCategory }) {
         limit: 100 // 🔥 Vuta pool kubwa (100) ili upate nafasi ya kuchagua bila upendeleo
       };
 
-      if (selectedCategory?.id) {
-        params.parent_category = selectedCategory.id;
+      // Kama kategoria ipo, NA sio "All", ndio tuma parent_category
+      if (selectedCategory?.id && selectedCategory.id !== 'all' && !selectedCategory.isAll) {
+      params.parent_category = selectedCategory.id;
       }
 
       const response = await api.get('/products/', { params });
@@ -173,11 +174,12 @@ export default function JustForYou({ search = "", selectedCategory }) {
   // ============================================================
   if (loading) {
     return (
-   <section className="relative w-full bg-white dark:bg-[#1e293b] border-y border-[#e5e7eb] dark:border-[#334155] box-border overflow-x-hidden pt-4 mt-0 p-3 pb-[55px] rounded-lg my-0.5 md:p-4 md:px-0 md:rounded-2xl md:my-2.5">        
+   <section className="relative w-full bg-white dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] box-border overflow-x-hidden pt-4 mt-0 p-3 pb-[55px] rounded-lg my-0.5 md:p-4 md:px-0 md:rounded-2xl md:my-2.5">        
         {renderHeader()}
 
         {/* 🔥 SKELETON GRID - Inaonyesha skeleton 8 kwanza */}
-       <div className="grid w-full box-border grid-cols-2 gap-2.5 px-1 md:grid-cols-4 md:gap-3.5 md:px-2 lg:grid-cols-6 lg:gap-4 lg:px-4 xl:gap-5">          {Array.from({ length: 8 }).map((_, index) => (
+       <div className="grid w-full box-border grid-cols-2 gap-2.5 px-1 md:grid-cols-4 md:gap-3.5 md:px-2 lg:grid-cols-6 lg:gap-4 lg:px-4 xl:gap-5">  
+                {Array.from({ length: 8 }).map((_, index) => (
             <SkeletonCardz key={`skeleton-${index}`} /> 
           ))}
         </div>
@@ -210,11 +212,12 @@ export default function JustForYou({ search = "", selectedCategory }) {
   // SUCCESS STATE - Onyesha bidhaa
   // ============================================================
   return (
-    <section className="relative w-full bg-white dark:bg-[#1e293b] mb-8 border-y border-[#e5e7eb] dark:border-[#334155] box-border overflow-x-hidden pt-4 mt-0 p-3 pb-[55px] rounded-lg my-0.5 md:p-4 md:px-0 md:rounded-2xl md:my-2.5">
+    <section className="relative w-full bg-white dark:bg-black mb-8 border-y border-[#e5e7eb] dark:border-[#334155] box-border overflow-x-hidden pt-4 mt-0 p-3 pb-[55px] rounded-lg my-0.5 md:p-4 md:px-0 md:rounded-2xl md:my-2.5">
       
            {renderHeader()}
 
-     <div className="grid w-full box-border grid-cols-2 gap-2.5 px-1 md:grid-cols-4 md:gap-3.5 md:px-2 lg:grid-cols-6 lg:gap-4 lg:px-4 xl:gap-5">
+     <div className="grid w-full box-border grid-cols-2 gap-2.5 px-1
+      md:grid-cols-4 md:gap-3.5 md:px-2 lg:grid-cols-6 lg:gap-4 lg:px-4 xl:gap-5">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((item) => (
           <DashboardCard 

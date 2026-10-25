@@ -61,6 +61,16 @@ import StorePending from './pages/StorePending';
 import AdminStores from './pages/AdminStores';
 
 
+// 🔥 WEKA HII HAPA
+const ProtectedAdminRoute = ({ children }) => {
+  const token = localStorage.getItem("access_token");
+  if (!token) {
+    return <Navigate to="/dashboard/login" replace />;
+  }
+  return children;
+};
+
+
 
 // ========== COMPONENT MPYA YA KUDHIBITI BOTTOM NAV ==========
 function AppContent({ session }) {
@@ -239,8 +249,14 @@ function AppContent({ session }) {
         <Route path="/payments" element={<PricingPage />} />
         <Route path="/category/:leafId" element={<CategoryProducts session={session} />} />
         <Route path="/store-pending/:storeId" element={<StorePending />} />
-        <Route path="/admin/stores" element={<AdminStores />} />
-
+<Route 
+  path="/admin/stores" 
+  element={
+    <ProtectedAdminRoute>
+      <AdminStores />
+    </ProtectedAdminRoute>
+  } 
+/>
           {/* Default Redirects */}
         <Route path="/" element={<Navigate replace to="/dashboard" />} />
         <Route path="*" element={<Navigate to="/dashboard" />} />

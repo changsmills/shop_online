@@ -35,7 +35,7 @@ export default function MobileCategorySlider({
 
   if (!categories || categories.length === 0) return null;
 
-  const allCategory = { id: null, name: 'All', name_sw: 'Zote' };
+  // 🔥 IMEONDOLEWA: allCategory hapa kwa sababu Dashboard inatuma ALL_CATEGORY tayari
 
   // 🔥 TUMIA RANGI ZA KAWAIDA ZENYE DARK MODE
   const basePillClass = "whitespace-nowrap shrink-0 px-4 py-1.5 rounded-full text-sm cursor-pointer transition-all duration-200 select-none border";
@@ -64,20 +64,11 @@ export default function MobileCategorySlider({
         className="flex overflow-x-auto flex-1 gap-2 py-2 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{ WebkitOverflowScrolling: 'touch' }}
       >
-        {/* ALL CATEGORY */}
-        <div
-          key="all-category"
-          onClick={() => onSelectCategory(allCategory)}
-          className={`${basePillClass} ${
-            (selectedCategory === null || selectedCategory?.id === null) 
-              ? activePillClass 
-              : inactivePillClass
-          }`}
-        >
-          {getDisplayName ? getDisplayName(allCategory) : 'All'}
-        </div>
+        
+        {/* 🔥 IMEONDOLEWA: Ile div ya "ALL CATEGORY" iliyokuwa hapa imefutwa. 
+            Sasa inasoma moja kwa moja kutoka kwenye 'categories' prop ambayo ina "All" ndani yake. */}
 
-        {/* CATEGORIES KUTOKA BACKEND */}
+        {/* CATEGORIES KUTOKA BACKEND (Pamoja na ALL iliyotumwa) */}
         {categories.map((cat) => {
           const displayName = getDisplayName ? getDisplayName(cat) : (cat.name || cat.name_sw);
           const isActive = selectedCategory?.id === cat.id;

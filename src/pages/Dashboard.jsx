@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-//import "../Dashboard.css";
 import api from "../axiosConfig"; 
 import DashboardCard from "../components/DashboardCard";
 import { useUserLocation } from '../hooks/useUserLocation,js';
@@ -33,6 +32,9 @@ import {
 
 const placeholderImg = "https://via.placeholder.com/100?text=Skyfall";
 
+const ALL_CATEGORY = { id: 'all', name: 'All', name_sw: 'Zote', isAll: true };
+
+
 export default function Dashboard() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -54,13 +56,11 @@ export default function Dashboard() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const [activeMenu, setActiveMenu] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(null);
   const [viewMode, setViewMode] = useState('products');
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
   const [selectedSubCategory, setSelectedSubCategory] = useState(null);
   const [leafsForSub, setLeafsForSub] = useState([]);
-  const [selectedCategoryForComponents, setSelectedCategoryForComponents] = useState(null);
   
   const timeoutRef = useRef(null);
   const abortRef = useRef(null); // ✅ ONGEZA HII - kwa ajili ya kufuta requests
@@ -71,6 +71,8 @@ export default function Dashboard() {
   const { location, error: locationError, isLoading: locationLoading } = useUserLocation();
   const [nearbyProducts, setNearbyProducts] = useState([]);
   const [showLocationPrompt, setShowLocationPrompt] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(ALL_CATEGORY);
+  const [selectedCategoryForComponents, setSelectedCategoryForComponents] = useState(ALL_CATEGORY);
 
     useEffect(() => {
     const fetchAdsWithCache = async () => {
@@ -132,8 +134,11 @@ export default function Dashboard() {
 const fetchFeaturedLeafs = async (categoryId) => {
   if (!categoryId) return;
 
-  if (categoryCacheRef.current[categoryId]?.leafs) {
-    setFeaturedProducts(categoryCacheRef.current[categoryId].leafs);
+  const isAll = categoryId === 'all';
+  const cacheKey = isAll ? 'all_products' : categoryId;
+
+  if (categoryCacheRef.current[cacheKey]?.leafs) {
+    setFeaturedProducts(categoryCacheRef.current[cacheKey].leafs);
     setLoadingLeafs(false); 
     return;
   }
@@ -141,15 +146,19 @@ const fetchFeaturedLeafs = async (categoryId) => {
   setLoadingLeafs(true); 
 
   try {
-    console.log(`⏳ [FETCH] Inapakia products za category ${categoryId}...`);
+    console.log(`⏳ [FETCH] Inapakia products za ${isAll ? 'ALL' : categoryId}...`);
     
-    const response = await api.get('/products/', {
-      params: {
-        parent_category: categoryId,
-        limit: 17,
-        ordering: '-views'
-      }
-    });
+    // 🔥 BADILISHA PARAMS: Kama ni 'all', usiweke parent_category
+    const params = {
+      limit: 17,
+      ordering: '-views'
+    };
+    
+    if (!isAll) {
+      params.parent_category = categoryId;
+    }
+
+    const response = await api.get('/products/', { params });
 
     const data = response.data.results || response.data || [];
     
@@ -161,64 +170,9 @@ const fetchFeaturedLeafs = async (categoryId) => {
       name_sw: product.leaf_category_name || product.name
     }));
 
-    // 🔥 FIX MPYA: Kama hakuna bidhaa direct, inakwenda kuchukua kutoka kwenye SUB-CATEGORIES!
-    if (result.length === 0) {
-      console.log("⚠️ Hakuna direct, inaangalia subcategories zote...");
-      
-      // 1. Vuta subcategories za hiyo category
-      const subResponse = await api.get('/subcategories/', {
-        params: { category_id: categoryId }
-      });
-      const subs = subResponse.data || [];
-
-      if (subs.length > 0) {
-        // Weka subcategories kwenye state (ili zionekane kwenye desktop/mobile menu)
-        setSubCategories(subs);
-        setSelectedSubCategory(subs[0]); // Chagua ya kwanza tu kama reference
-
-        let allMappedProducts = [];
-
-        // 2. Piga API kwa KILA subcategory (au kwanza 8 za kwanza ili isiwe slow sana)
-        const subsToFetch = subs.slice(0, 8); // Badilisha hii 8 uweke 100 kama unataka zote
-        for (const sub of subsToFetch) {
-           try {
-             const prodRes = await api.get('/products/', {
-               params: { sub_category: sub.id, limit: 17, ordering: '-views' }
-             });
-             const prodData = prodRes.data.results || prodRes.data || [];
-             
-             const mapped = prodData.map((product) => ({
-               id: product.id,
-               leaf_category_id: product.leaf_category_id || product.id,
-               cover_image_url: product.cover_image_url,
-               name: product.leaf_category_name || product.name,
-               name_sw: product.leaf_category_name || product.name
-             }));
-
-             // Changanya bidhaa za subcategory hii na zilizopo
-             allMappedProducts = allMappedProducts.concat(mapped);
-           } catch (e) {
-             console.error(`❌ Error fetching products for sub ${sub.id}`, e);
-           }
-        }
-
-        // Weka bidhaa zote zilizokusanywa (All Products View!)
-        setFeaturedProducts(allMappedProducts);
-        
-        // Hifadhi kwenye cache
-        categoryCacheRef.current[categoryId] = {
-          ...categoryCacheRef.current[categoryId],
-          leafs: allMappedProducts
-        };
-        
-        setLoadingLeafs(false);
-        return; // Acha hapa kwa sababu tumepata bidhaa!
-      }
-    }
-
-    // Kama kuna bidhaa direct (au hakuna subs), endelea na zile za kawaida
-    categoryCacheRef.current[categoryId] = {
-      ...categoryCacheRef.current[categoryId],
+    // Hifadhi kwenye cache kwa kutumia cacheKey
+    categoryCacheRef.current[cacheKey] = {
+      ...categoryCacheRef.current[cacheKey],
       leafs: result
     };
     
@@ -317,9 +271,7 @@ const fetchLeafsForSub = async (subCategoryId) => {
   }
 };
 
-// ✅ BADILISHA HII: Hakuna kategoria inayojichagua tena!
 useEffect(() => {
-  // Angalia kama URL ina 'category' ID (kwa mfano /?category=5)
   const urlParams = new URLSearchParams(window.location.search);
   const categoryIdFromUrl = urlParams.get('category');
 
@@ -328,25 +280,31 @@ useEffect(() => {
     if (foundCategory) {
       setSelectedCategory(foundCategory);
       setSelectedCategoryForComponents(foundCategory);
-      return; // Acha, tumechagua kutoka URL
+      return;
     }
   }
 
-  // Kama hakuna kategoria kwenye URL, hakikisha inabaki NULL!
-  // Hapa ndipo tunazuiya isijichague.
+  // 🔥 Kama hakuna URL, weka ALL kama default BADALA ya null
   if (!selectedCategory) {
-    setSelectedCategory(null);
-    setSelectedCategoryForComponents(null);
+    setSelectedCategory(ALL_CATEGORY);
+    setSelectedCategoryForComponents(ALL_CATEGORY);
   }
-}, [categories]); // ← Hii inafanya kazi tu kama categories zimebadilika
+}, [categories]);
 
 useEffect(() => {
+  // 🔥 Badilisha condition iwe hivi:
   if (selectedCategory && selectedCategory.id) {
     console.log("🔍 Fetching data for category:", selectedCategory.id);
-    fetchFeaturedLeafs(selectedCategory.id);
-    fetchSubCategories(selectedCategory.id);
+    
+    if (selectedCategory.isAll) {
+      fetchFeaturedLeafs('all');
+      setSubCategories([]); // Hakuna subcategories kwa All
+    } else {
+      fetchFeaturedLeafs(selectedCategory.id);
+      fetchSubCategories(selectedCategory.id);
+    }
   }
-}, [selectedCategory?.id]); // ✅ Tumia optional chaining
+}, [selectedCategory?.id]);
 
   useEffect(() => {
     if (cachedAds.length === 0) return;
@@ -596,7 +554,7 @@ return (
       {/* ✅ Content ina scroll yake yenyewe */}
   <div className="flex-1 w-full">
 
-<div className="w-full max-w-[1400px] mx-auto px-1 pt-[70px] md:pt-0 lg:px-1 lg:pt-6 pb-6">
+<div className="w-full max-w-[1400px] mx-auto px-1 pt-[65px] md:pt-0 lg:px-1 lg:pt-4 pb-6">
 
             {search && (
             <div className="py-4">
@@ -623,39 +581,39 @@ return (
 
     {!search && (
 
-    <div className="block w-full mt-1 lg:mt-4.5 lg:grid
+    <div className="block w-full lg:grid
        lg:grid-cols-[250px_1fr_280px] lg:gap-4 lg:h-[350px] px-1">
 
 {/* 1. SIDEBAR YA KATEGORIA (Kushoto) */}
 <aside className="hidden lg:flex lg:flex-col h-full 
 max-h-full overflow-hidden bg-white dark:bg-[#111111]
- rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
+ rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm w-full">
   
   {/* HEADER YA SIDEBAR */}
-  <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100 dark:border-gray-800 shrink-0">
-    {/* Star icon kama ilivyo kwenye picha (ina outline) */}
-    <Star size={18} className="text-gray-600 dark:text-gray-300" /> 
-    <span className="text-base font-bold text-gray-900 dark:text-white tracking-wide">
-      Categories for you
+  <div className="flex items-center gap-3 px-4 py-4 border-b border-gray-100 dark:border-gray-800 shrink-0">
+    <Star size={18} className="text-gray-600 dark:text-gray-300 shrink-0" /> 
+    <span className="text-[15px] font-bold text-gray-900 dark:text-white tracking-wide whitespace-nowrap">
+      Categories
     </span>
   </div>
 
-  {/* LIST YA KATEGORIA */}
-  <ul className="list-none m-0 overflow-y-auto flex-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-thumb]:rounded-full">
+  {/* LIST YA KATEGORIA - 🔥 TUMEBADILISHA HAPA */}
+  <ul className="list-none m-0 overflow-auto flex-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-thumb]:rounded-full">
     {categories.map(cat => (
       <li 
         key={cat.id} 
         onClick={() => handleCategoryClick(cat)}
-        className="flex justify-between items-center px-5 py-3.5 cursor-pointer transition-colors duration-200 border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+        className="flex justify-between items-center px-4 py-3 cursor-pointer transition-colors duration-200 border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/50"
       >
         {/* Upande wa kushoto: Icon na Jina */}
-        <div className="flex items-center gap-3.5 text-gray-800 dark:text-gray-200">
-          {getIcon(cat.icon_name)}
-          <span className="text-[15px] font-medium">{getCategoryDisplayName(cat)}</span>
+        {/* 🔥 Tumeongeza whitespace-nowrap na text-[13px] */}
+        <div className="flex items-center gap-2.5 text-gray-800 dark:text-gray-200 whitespace-nowrap">
+          <span className="shrink-0">{getIcon(cat.icon_name)}</span>
+          <span className="text-[13px] font-medium">{getCategoryDisplayName(cat)}</span>
         </div>
         
-        {/* Upande wa kulia: Chevron (Mshale) unaoonekana kila wakati */}
-        <ChevronRight size={18} className="text-gray-400 dark:text-gray-500 shrink-0" />
+        {/* Upande wa kulia: Chevron (Mshale) */}
+        <ChevronRight size={16} className="text-gray-400 dark:text-gray-500 shrink-0 ml-2" />
       </li>
     ))}
   </ul>
@@ -666,22 +624,24 @@ max-h-full overflow-hidden bg-white dark:bg-[#111111]
     <div className="block bg-white dark:bg-black w-full lg:hidden">
       {!search && categories.length > 0 && (
         <MobileCategorySlider 
-          categories={categories}
-          selectedCategory={selectedCategoryForComponents}
-          onSelectCategory={(cat) => {
-            if (cat.id === null) {
-              setSelectedCategoryForComponents(null);
-              setSelectedCategory(null);
-              setFeaturedProducts([]);
-              setSubCategories([]);
-            } else {
-              setSelectedCategoryForComponents(cat);
-              setSelectedCategory(cat);
-            }
-          }}          
-          getDisplayName={getCategoryDisplayName}
-          getIcon={getIcon}
-        />
+  // 🔥 BADILISHA HAPA: Ongeza ALL mwanzoni
+  categories={[ALL_CATEGORY, ...categories]} 
+  selectedCategory={selectedCategoryForComponents}
+  onSelectCategory={(cat) => {
+    if (cat.isAll) {
+      setSelectedCategoryForComponents(ALL_CATEGORY);
+      setSelectedCategory(ALL_CATEGORY);
+      fetchFeaturedLeafs('all'); // Vuta zote
+      setSubCategories([]); // Ondoa subcategories za awali
+    } else {
+      setSelectedCategoryForComponents(cat);
+      setSelectedCategory(cat);
+      // fetchFeaturedLeafs itaitwa na useEffect
+    }
+  }}          
+  getDisplayName={getCategoryDisplayName}
+  getIcon={getIcon}
+/>
       )}
     </div>
 
@@ -714,20 +674,24 @@ max-h-full overflow-hidden bg-white dark:bg-[#111111]
 
 {activeAd && (
   // HAPA: Nimebadilisha pl-6 kuwa pl-4 (nafasi ndogo kushoto) na kuongeza gradient nyeusi zaidi kwa ajili ya kusomeka
-  <div className="absolute inset-0 flex flex-col justify-center items-start px-4 pr-3 py-4 sm:pl-10 sm:pr-8 lg:pl-12 lg:pr-10 text-white bg-gradient-to-r from-black/90 via-black/60 to-transparent pointer-events-none">
+  <div className="absolute inset-0 flex flex-col justify-center items-start px-4 pr-3 py-4
+   sm:pl-10 sm:pr-8 lg:pl-12 lg:pr-10 text-white bg-gradient-to-r from-black/90 via-black/60 to-transparent pointer-events-none">
     
     {/* 1. SPONSORED BADGE - Imeongezwa ukubwa kidogo */}
-    <span className="bg-brand-orange px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold w-fit mb-2 tracking-wide uppercase shadow-sm">
+    <span className="bg-brand-orange px-2.5 py-1 rounded-full text-[10px] sm:text-xs 
+    font-bold w-fit mb-2 tracking-wide uppercase shadow-sm">
       {t('sponsored')}
     </span>
 
     {/* 2. TITLE - Imeongezwa ukubwa kuwa text-lg (18px) kwa simu */}
-    <h2 className="text-lg sm:text-2xl lg:text-3xl font-extrabold leading-tight mb-1.5 sm:mb-2 max-w-[95%] sm:max-w-[80%] drop-shadow-md">
+    <h2 className="text-lg sm:text-2xl lg:text-3xl font-extrabold leading-tight mb-1.5
+     sm:mb-2 max-w-[95%] sm:max-w-[80%] drop-shadow-md">
       {activeAd.business_name}
     </h2>
 
     {/* 3. DESCRIPTION - Imeongezwa ukubwa kuwa text-xs (12px) kwa simu */}
-    <p className="text-xs sm:text-sm text-gray-100 max-w-[95%] sm:max-w-[75%] leading-snug sm:leading-relaxed mb-4 line-clamp-2 sm:line-clamp-3 drop-shadow-sm font-medium">
+    <p className="text-xs sm:text-sm text-gray-100 max-w-[95%] sm:max-w-[75%] leading-snug sm:leading-relaxed mb-4 
+    line-clamp-2 sm:line-clamp-3 drop-shadow-sm font-medium">
       {activeAd.description}
     </p>
 
@@ -767,7 +731,8 @@ max-h-full overflow-hidden bg-white dark:bg-[#111111]
   </div>
 
  {/* 3. RECENTLY VIEWED MINI (Kulia) - Imepewa muonekano wa Card */}
-<div className="hidden lg:flex lg:flex-col h-full bg-white dark:bg-[#1a1a2e] rounded-xl border border-gray-200 dark:border-gray-800 p-3 overflow-hidden shadow-sm">
+<div className="hidden lg:flex lg:flex-col h-full bg-white dark:bg-black
+ rounded-xl border border-gray-200 dark:border-gray-800 p-3 overflow-hidden shadow-sm">
   <Suspense fallback={<ComponentFallback />}>
     <RecentlyViewed 
       key={`mini-${i18n.language}`} 
@@ -858,7 +823,7 @@ max-h-full overflow-hidden bg-white dark:bg-[#111111]
   onMouseLeave={handleMouseLeave}
 >
   
-<div className="w-full h-full max-h-[calc(100vh-180px)] bg-white dark:bg-black border-b 
+    <div className="w-full h-full max-h-[calc(100vh-180px)] bg-white dark:bg-black border-b 
 border-gray-200 dark:border-[#1f1f1f] overflow-hidden flex shadow-2xl">
 
         {/* ========== SIDEBAR (KUSHOTO) ========== */}
@@ -1001,9 +966,11 @@ border-gray-200 dark:border-[#1f1f1f] overflow-hidden flex shadow-2xl">
                     onClick={() => {
                       // ... code yako ya onClick ...
                     }}
-                    className="flex flex-col items-center text-center cursor-pointer p-1 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-[#0a0a0a]"
+                    className="flex flex-col items-center text-center cursor-pointer p-1
+                     rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-[#0a0a0a]"
                   >
-                    <div className="w-16 h-16 sm:w-[68px] sm:h-[68px] rounded-full overflow-hidden bg-gray-100 dark:bg-[#1a1a1a] mb-1.5 flex items-center justify-center shrink-0">
+                    <div className="w-16 h-16 sm:w-[68px] sm:h-[68px] rounded-full overflow-hidden 
+                    bg-gray-100 dark:bg-[#1a1a1a] mb-1.5 flex items-center justify-center shrink-0">
                       <img src={leaf.cover_image_url || leaf.cover_image || placeholderImg} alt={leaf.name} className="w-full h-full object-cover" />
                     </div>
                     <p className="text-[11px] sm:text-xs text-black dark:text-white m-0 leading-tight line-clamp-2 w-full">
@@ -1056,7 +1023,7 @@ border-gray-200 dark:border-[#1f1f1f] overflow-hidden flex shadow-2xl">
         </button>
       </div>
 
-            {/* ========== BODY ========== */}
+      {/* ========== BODY ========== */}
       <div className="flex flex-row flex-1 w-full overflow-hidden relative">
         
         {/* SIDEBAR (KUSHOTO) */}
@@ -1101,7 +1068,8 @@ border-gray-200 dark:border-[#1f1f1f] overflow-hidden flex shadow-2xl">
               )}
             </>
           ) : (
-            categories.map((cat) => (
+            // 🔥 IMEBADILISHWA: Tumeongeza [ALL_CATEGORY, ...categories] na logic ya 'isAll'
+            [ALL_CATEGORY, ...categories].map(cat => (
               <div 
                 key={cat.id} 
                 onClick={() => {
@@ -1109,7 +1077,14 @@ border-gray-200 dark:border-[#1f1f1f] overflow-hidden flex shadow-2xl">
                   setSelectedCategoryForComponents(cat);
                   setMobileActiveMenu('categories');
                   setViewMode('products');
-                  fetchFeaturedLeafs(cat.id);
+                  
+                  // 🔥 Kama ni "All", tumia 'all' kuvuta zote, vinginevyo tumia ID ya kategoria
+                  if (cat.isAll) {
+                    fetchFeaturedLeafs('all');
+                    setSubCategories([]); // Hakuna subcategories kwa "All"
+                  } else {
+                    fetchFeaturedLeafs(cat.id);
+                  }
                 }}
                 className={`px-2 py-2.5 text-[11px] cursor-pointer text-left leading-tight transition-colors ${
                   selectedCategory?.id === cat.id 
@@ -1124,7 +1099,6 @@ border-gray-200 dark:border-[#1f1f1f] overflow-hidden flex shadow-2xl">
         </aside>
 
         {/* CONTENT (KULIA) */}
-        {/* 🔥 Tumeongeza px-4 (padding kushoto na kulia) na kuondoa kabisa left-4 */}
         <main className="flex-1 min-w-0 overflow-y-auto px-1 py-1 bg-white dark:bg-black box-border relative z-0 ml-1">
           
           {/* TITLE */}
@@ -1133,7 +1107,6 @@ border-gray-200 dark:border-[#1f1f1f] overflow-hidden flex shadow-2xl">
           </h3>
           
           {/* GRID YA BIDHAA */}
-          {/* 🔥 Tumebadilisha gap-3 kuwa gap-x-2 (usawa) na gap-y-4 (wima) */}
           <div className="grid grid-cols-4 gap-x-1 gap-y-1 w-full">
             
             {loadingLeafs ? (
@@ -1196,7 +1169,8 @@ border-gray-200 dark:border-[#1f1f1f] overflow-hidden flex shadow-2xl">
             )}
 
             {/* SEE ALL BUTTON */}
-            {mobileActiveMenu === 'categories' && !loadingLeafs && featuredProducts && featuredProducts.length > 0 && (
+            {/* 🔥 IMEBADILISHWA: Tumeongeza !selectedCategory?.isAll ili isionekane kwa "All" */}
+            {mobileActiveMenu === 'categories' && !loadingLeafs && featuredProducts && featuredProducts.length > 0 && !selectedCategory?.isAll && (
               <div 
                 onClick={() => {
                   setMobileActiveMenu('subcategories');

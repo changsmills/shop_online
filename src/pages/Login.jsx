@@ -16,6 +16,35 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // 🔥 TENGENEZA FUNCTION MOJA YA KUHANDLE ROUTING ILI KUSIWE NA CODE MARA MBILI
+  const handleUserRouting = (userProfile) => {
+    const role = userProfile.role;
+
+    // 1. KAMA NI SUPER ADMIN AU ADMIN
+    if (role === 'super_admin' || role === 'admin' || userProfile.is_staff === true) {
+      toast.success("Karibu Admin! Inaelekeza kwenye Admin Dashboard...", { duration: 2000 });
+      setTimeout(() => navigate('/admin/stores', { replace: true }), 2000);
+      return;
+    }
+
+    // 2. KAMA NI SUPPLIER
+    if (role === 'supplier') {
+      if (userProfile.is_otp_verified === false || userProfile.is_otp_verified === undefined) {
+        toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", { icon: '🔐', duration: 3000 });
+        setTimeout(() => navigate('/verify-seller-otp', { replace: true }), 3000);
+        return;
+      }
+      
+      // Tunahitaji kuvuta store yake hapa (Hii itafanyika kwenye function inayomwita)
+      return 'need_store_info'; 
+    }
+
+    // 3. KAMA NI MTEJA WA KAWAIDA
+    toast.success("Karibu Mteja!", { duration: 3000 });
+    const from = location.state?.from || '/dashboard';
+    setTimeout(() => { toast.dismiss(); navigate(from, { replace: true }); }, 3000);
+  };
+
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("access_token");
@@ -23,39 +52,32 @@ const Login = () => {
         setIsCheckingAuth(false);
         return;
       }
-      // ... (Logic yako yote ya checkAuth ipo hapa kama ilivyokuwa)
-      // Kwa ufupi, nimeiacha kama ilivyo ili isivunjike
       try {
         const profileRes = await api.get('/profile/', { headers: { Authorization: `Bearer ${token}` } });
         const userProfile = profileRes.data;
-        const role = userProfile.role;
+        
+        const routingResult = handleUserRouting(userProfile);
 
-        if (role === 'supplier') {
-          if (userProfile.is_otp_verified === false || userProfile.is_otp_verified === undefined) {
-            toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", { icon: '🔐', duration: 3000 });
-            setTimeout(() => navigate('/verify-seller-otp', { replace: true }), 3000);
-            return;
-          }
-          const storeRes = await api.get('/stores/', { params: { owner: userProfile.id }, headers: { Authorization: `Bearer ${token}` } });
-          if (storeRes.data && storeRes.data.length > 0) {
-            const store = storeRes.data[0];
-            const storeId = store.id;
-            const verificationStatus = store.verification_status || store.status;
-            if (verificationStatus === 'pending' || verificationStatus === 'unverified') {
-              toast("Store yako inasubiri kupitishwa na Admin.", { icon: '⏳', duration: 3000 });
-              setTimeout(() => navigate(`/store-pending/${storeId}`, { replace: true }), 3000);
+        // Kama ni supplier, tunahitaji kuvuta store info kwanza
+        if (routingResult === 'need_store_info') {
+           const storeRes = await api.get('/stores/', { params: { owner: userProfile.id }, headers: { Authorization: `Bearer ${token}` } });
+            if (storeRes.data && storeRes.data.length > 0) {
+              const store = storeRes.data[0];
+              const storeId = store.id;
+              const verificationStatus = store.verification_status || store.status;
+              if (verificationStatus === 'pending' || verificationStatus === 'unverified') {
+                toast("Store yako inasubiri kupitishwa na Admin.", { icon: '⏳', duration: 3000 });
+                setTimeout(() => navigate(`/store-pending/${storeId}`, { replace: true }), 3000);
+              } else {
+                toast.success("Karibu Muuzaji! Inaelekeza kwenye Dashboard yako...", { duration: 3000 });
+                setTimeout(() => navigate(`/dashboard/sellerboard/${storeId}`, { replace: true }), 3000);
+              }
             } else {
-              toast.success("Karibu Muuzaji! Inaelekeza kwenye Dashboard yako...", { duration: 3000 });
-              setTimeout(() => navigate(`/dashboard/sellerboard/${storeId}`, { replace: true }), 3000);
+              toast.success("Karibu Muuzaji! Tafadhali unda duka lako kwanza.", { duration: 3000 });
+              setTimeout(() => navigate('/create-store', { replace: true }), 3000);
             }
-          } else {
-            toast.success("Karibu Muuzaji! Tafadhali unda duka lako kwanza.", { duration: 3000 });
-            setTimeout(() => navigate('/create-store', { replace: true }), 3000);
-          }
-        } else {
-          toast.success("Karibu Mteja!", { duration: 3000 });
-          setTimeout(() => navigate('/dashboard', { replace: true }), 3000);
         }
+
       } catch (err) {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
@@ -68,8 +90,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // ... (Logic yako yote ya handleLogin ipo hapa kama ilivyokuwa)
-    // Nimeiacha kama ilivyo ili isivunjike
+    
     try {
       const tokenRes = await api.post('/token/', { email: email.trim(), password });
       const { access, refresh } = tokenRes.data;
@@ -78,14 +99,11 @@ const Login = () => {
 
       const profileRes = await api.get('/profile/', { headers: { Authorization: `Bearer ${access}` } });
       const userProfile = profileRes.data;
-      const role = userProfile.role;
+      
+      const routingResult = handleUserRouting(userProfile);
 
-      if (role === 'supplier') {
-        if (!userProfile.is_otp_verified) {
-          toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", { icon: '🔐', duration: 4000 });
-          setTimeout(() => navigate('/verify-seller-otp', { replace: true }), 4000);
-          return;
-        }
+      // Kama ni supplier, tunahitaji kuvuta store info kwanza
+      if (routingResult === 'need_store_info') {
         const storeRes = await api.get('/stores/', { params: { owner: userProfile.id }, headers: { Authorization: `Bearer ${access}` } });
         if (storeRes.data && storeRes.data.length > 0) {
           const store = storeRes.data[0];
@@ -102,11 +120,8 @@ const Login = () => {
           toast.success("Karibu Muuzaji! Tafadhali unda duka lako kwanza.", { duration: 3000 });
           setTimeout(() => navigate('/create-store', { replace: true }), 3000);
         }
-      } else {
-        toast.success("Karibu Mteja!", { duration: 3000 });
-        const from = location.state?.from || '/dashboard';
-        setTimeout(() => { toast.dismiss(); navigate(from, { replace: true }); }, 3000);
       }
+
     } catch (err) {
       if (err.response?.status === 401) {
         toast.error("Barua pepe au nenosiri si sahihi. Tafadhali jaribu tena.", { duration: 4000 });
@@ -120,8 +135,6 @@ const Login = () => {
 
   const handleForgotPassword = () => navigate('/forgot-password');
 
-  // ... (Google Login logic na useGoogleLogin ipo hapa kama ilivyokuwa)
-
   const loginWithGoogle = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
@@ -132,16 +145,13 @@ const Login = () => {
 
         const profileRes = await api.get('/profile/', { headers: { Authorization: `Bearer ${access}` } });
         const userProfile = profileRes.data;
-        const role = userProfile.role;
 
         toast.success(`Karibu ${userProfile.email || 'Mteja'}!`, { duration: 3000 });
+        
+        const routingResult = handleUserRouting(userProfile);
 
-        if (role === 'supplier') {
-          if (userProfile.is_otp_verified === false || userProfile.is_otp_verified === undefined) {
-            toast("Tafadhali thibitisha akaunti yako kwa OTP kwanza.", { icon: '🔐', duration: 4000 });
-            setTimeout(() => navigate('/verify-seller-otp', { replace: true }), 4000);
-            return;
-          }
+        // Kama ni supplier, tunahitaji kuvuta store info kwanza
+        if (routingResult === 'need_store_info') {
           const storeRes = await api.get('/stores/', { params: { owner: userProfile.id }, headers: { Authorization: `Bearer ${access}` } });
           if (storeRes.data && storeRes.data.length > 0) {
             const myStore = storeRes.data.find(s => s.owner === userProfile.id || s.owner_id === userProfile.id) || storeRes.data[0];
@@ -158,10 +168,8 @@ const Login = () => {
             toast.success("Karibu Muuzaji! Tafadhali unda duka lako kwanza.", { duration: 3000 });
             setTimeout(() => navigate('/create-store', { replace: true }), 3000);
           }
-        } else {
-          toast.success("Karibu Mteja!", { duration: 3000 });
-          setTimeout(() => navigate('/dashboard', { replace: true }), 3000);
         }
+
       } catch (error) {
         toast.error("Google login imeshindwa. Jaribu tena.", { duration: 4000 });
       }
@@ -173,12 +181,10 @@ const Login = () => {
   if (isCheckingAuth) {
     return (
       <div className="min-h-screen flex bg-white dark:bg-black">
-        {/* Skeleton Left */}
         <div className="hidden md:flex flex-1 flex-col justify-center p-10 gap-4 bg-gray-50 dark:bg-gray-900">
           <div className="h-[150px] w-[80%] bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
           <div className="h-[30px] w-[50%] bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
         </div>
-        {/* Skeleton Right */}
         <div className="flex-1 max-w-[500px] mx-auto p-10 flex flex-col justify-center gap-4">
           <div className="h-8 w-32 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
           <div className="h-10 w-3/5 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
@@ -212,7 +218,6 @@ const Login = () => {
       {/* RIGHT PANEL (Form) */}
       <div className="flex-1 flex flex-col justify-center p-8 md:p-12 lg:p-20 max-w-[600px] mx-auto w-full">
         
-        {/* Header */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Sign in to your account</h2>
           <p className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
@@ -221,7 +226,6 @@ const Login = () => {
           </p>
         </div>
 
-        {/* Google Button */}
         <div className="mb-6">
           <button
             type="button"
@@ -233,14 +237,12 @@ const Login = () => {
           </button>
         </div>
 
-        {/* Divider */}
         <div className="flex items-center gap-4 mb-6">
           <hr className="flex-1 border-gray-200 dark:border-gray-700" />
           <span className="text-sm text-gray-400">Or</span>
           <hr className="flex-1 border-gray-200 dark:border-gray-700" />
         </div>
 
-        {/* Form */}
         <form onSubmit={handleLogin} className="flex flex-col gap-5">
           <div className="flex flex-col">
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email</label>

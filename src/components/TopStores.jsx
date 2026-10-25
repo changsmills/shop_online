@@ -6,7 +6,6 @@ import DashboardCard from "./DashboardCard";
 import SkeletonCardz from "./SkeletonCardz";
 import { useTranslation } from 'react-i18next';
 import { useUserLocation } from '../hooks/useUserLocation,js';  // 🔥 ONGEZA HII
-//import '../TopStores.css';
 
 export default function TopStores({ navigate }) {
   const { t, i18n } = useTranslation();
@@ -122,7 +121,7 @@ export default function TopStores({ navigate }) {
   // ============================================================
   if (loading) {
     return (
-      <div className="relative w-full bg-white dark:bg-[#1e293b] border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border">
+      <div className="relative w-full bg-white dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border">
         {renderHeader()}
         <div className="relative flex items-center px-2">
           <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-4 md:pb-5 w-full gap-2 md:gap-3 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
@@ -150,7 +149,7 @@ export default function TopStores({ navigate }) {
   // ============================================================
   return (
 
-    <div className="relative w-full bg-white dark:bg-[#1e293b] border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border">
+    <div className="relative w-full bg-white dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border">
       
             {renderHeader()}
 

@@ -261,8 +261,8 @@ export default function NavLinks({ isMobile }) {
 
           {activeMenu === 'categories' && createPortal(
             <div
-              className="fixed top-[105px] left-0 right-0 h-[520px] z-[999] bg-white dark:bg-black shadow-[0_4px_20px_rgba(0,0,0,0.15)] 
-              border-t border-gray-100 dark:border-gray-800 animate-[fadeInDown_0.2s_ease]"
+              className="fixed top-[105px] left-0 right-0 h-[450px] z-[50] bg-white dark:bg-black shadow-[0_4px_20px_rgba(0,0,0,0.15)] 
+              border-t border-gray-100 dark:border-gray-800 animate-[fadeInDown_0.2s_ease] font-sans"
               onMouseEnter={() => handleMouseEnter('categories')}
               onMouseLeave={handleMouseLeave}
             >
@@ -324,7 +324,7 @@ export default function NavLinks({ isMobile }) {
                   </div>
 
                   {/* GRID */}
-                  <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-5 mt-2">
+                  <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-1 mt-2">
                     {viewMode === 'products' ? (
                       loadingLeafs ? (
                         [...Array(8)].map((_, idx) => (
@@ -406,7 +406,8 @@ export default function NavLinks({ isMobile }) {
 
                 {/* ORDER PROTECTIONS (Full Width Dropdown) */}
         <div className="relative group py-2 cursor-pointer flex items-center">
-          <span className="text-[15px] font-bold text-black dark:text-white group-hover:text-orange-500 transition-colors">
+          <span className="text-[15px] font-bold text-black dark:text-white 
+          group-hover:text-orange-500 transition-colors">
             {t('order_protections')}
           </span>
           
@@ -418,7 +419,7 @@ export default function NavLinks({ isMobile }) {
           left-0 w-full bg-white dark:bg-black
            shadow-[0_15px_35px_rgba(0,0,0,0.4)] border-b border-gray-200 
            dark:border-gray-800 opacity-0 invisible group-hover:opacity-100 
-           group-hover:visible group-hover:animate-smooth-dropdown z-[99]">
+           group-hover:visible group-hover:animate-smooth-dropdown z-[50]">
             
             {/* HAPA: Nimeongeza pb-12 (padding chini) na min-h ili isiwe fupi */}
             <div className="max-w-[1250px] mx-auto p-8  grid grid-cols-3 gap-10">

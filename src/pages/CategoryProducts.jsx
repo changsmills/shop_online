@@ -181,9 +181,9 @@ export default function CategoryProducts() {
     return (
       <div className="flex flex-col min-h-screen bg-[#f8f9fa] dark:bg-black">
         <div className="sticky top-0 z-[100] w-full">
-          <Header search="" setSearch={() => {}} />
+          <Header showBack={true} search="" setSearch={() => {}} />
         </div>
-        <div className="flex-1 flex justify-center p-5 pt-[80px] md:pt-[100px]">
+        <div className="flex-1 flex justify-center p-5 pt-[5px] md:pt-[10px]">
           <div className="w-full max-w-[1400px]">
             <main className="flex flex-col lg:flex-row gap-6 md:gap-[30px] mb-10">
               {/* Skeleton Sidebar */}
@@ -245,14 +245,14 @@ export default function CategoryProducts() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#f8f9fa] dark:bg-black">
+    <div className="flex flex-col min-h-screen bg-[#f8f9fa] dark:bg-black font-sans">
       {/* HEADER */}
       <div className="sticky top-0 z-[100] w-full">
-        <Header search="" setSearch={() => {}} />
+          <Header showBack={true} search="" setSearch={() => {}} />
       </div>
       
       {/* MAIN CONTENT */}
-      <div className="flex-1 flex justify-center p-2.5 md:p-5 pt-[70px] md:pt-[90px]">
+      <div className="flex-1 flex justify-center p-2.5 md:p-5  ">
         <div className="w-full max-w-[1400px]">
           <main className="flex flex-col lg:flex-row gap-4 md:gap-[30px] mb-10">
             

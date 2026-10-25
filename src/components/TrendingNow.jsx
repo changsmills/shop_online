@@ -22,8 +22,10 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
       limit: 10,
       ordering: '-order_count,-views',
     };
-    if (selectedCategory?.id) params.parent_category = selectedCategory.id;
-
+// Kama kategoria ipo, NA sio "All", ndio tuma parent_category
+     if (selectedCategory?.id && selectedCategory.id !== 'all' && !selectedCategory.isAll) {
+  params.parent_category = selectedCategory.id;
+}
     const response = await api.get('/products/', { params });
     const productsData = response.data.results || response.data || [];
 
@@ -117,7 +119,7 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
   // ============================================================
   if (loading) {
     return (
-      <div className="relative w-full bg-white dark:bg-[#1e293b] border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border">
+      <div className="relative w-full bg-white dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border">
         {renderHeader()}
 
         <div className="relative flex items-center px-2">
@@ -146,7 +148,7 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
   // ============================================================
   return (
   
-    <div className="relative w-full bg-white dark:bg-[#1e293b] border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border">
+    <div className="relative w-full bg-white dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border">
       
      {renderHeader()}
 
@@ -154,7 +156,7 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
       <div className="relative flex items-center px-2">
          {showLeftArrow && (
           <button 
-            className="absolute z-10 w-6 h-6 md:w-9 md:h-9 bg-white dark:bg-[#1e293b] border border-[#e2e8f0] dark:border-[#334155] rounded-full flex items-center justify-center cursor-pointer shadow-md transition-all top-1/2 -translate-y-1/2 text-black dark:text-white hover:bg-[#8b5cf6] hover:text-white hover:border-[#8b5cf6] hover:scale-105 active:scale-95 left-0 md:-left-1" 
+            className="absolute z-10 w-6 h-6 md:w-9 md:h-9 bg-white dark:bg-black border border-[#e2e8f0] dark:border-[#334155] rounded-full flex items-center justify-center cursor-pointer shadow-md transition-all top-1/2 -translate-y-1/2 text-black dark:text-white hover:bg-[#8b5cf6] hover:text-white hover:border-[#8b5cf6] hover:scale-105 active:scale-95 left-0 md:-left-1" 
             onClick={() => scroll('left')}
           >
           <ChevronLeft size={16} className="md:w-6 md:h-6" />

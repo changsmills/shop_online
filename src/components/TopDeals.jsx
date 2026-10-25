@@ -25,8 +25,11 @@ export default function TopDeals({ navigate, selectedCategory }) {
       setLoading(true);
       try {
         const params = {};
-        if (selectedCategory?.id) params.parent_category = selectedCategory.id;
-
+        
+// Kama kategoria ipo, NA sio "All", ndio tuma parent_category
+if (selectedCategory?.id && selectedCategory.id !== 'all' && !selectedCategory.isAll) {
+  params.parent_category = selectedCategory.id;
+}
         const response = await api.get('/products/', { params });
         const data = response.data.results || response.data || [];
 
@@ -131,7 +134,7 @@ export default function TopDeals({ navigate, selectedCategory }) {
   // ============================================================
   if (loading) {
     return (
-      <div className="relative w-full bg-white dark:bg-[#1e293b] border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border">
+      <div className="relative w-full bg-white dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border">
         {renderHeader()}  
         <div className="relative flex items-center px-2">
           <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-4 w-full gap-2 md:gap-3 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
@@ -158,7 +161,7 @@ export default function TopDeals({ navigate, selectedCategory }) {
   // SUCCESS STATE
   // ============================================================
   return (
-    <div className="relative w-full bg-white dark:bg-[#1e293b] border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border">
+    <div className="relative w-full bg-white dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border">
       
       {renderHeader()}
 

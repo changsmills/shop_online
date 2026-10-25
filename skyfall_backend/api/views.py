@@ -20,6 +20,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.parsers import MultiPartParser, FormParser
 import cloudinary.uploader
 import math
+from django.db.models import Count, Sum, Q
+from django.db.models import Count 
+
+
 
 
 
@@ -1185,6 +1189,7 @@ class ProductVariationViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save()
 
+
 class AdminStoreApprovalViewSet(viewsets.ModelViewSet):
     """
     Admin pekee ndiye anaweza kuona na kupitisha maduka.
@@ -1192,26 +1197,34 @@ class AdminStoreApprovalViewSet(viewsets.ModelViewSet):
     """
     queryset = StoreEngine.objects.all()
     serializer_class = StoreEngineSerializer
-    permission_classes = [IsAdminUser]  # 🔥 Ni Admin tu!
+    permission_classes = [IsAdminUser]
     authentication_classes = [JWTAuthentication]
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        # Chuja kwa verification_status (mfano: pending)
+        
         status_filter = self.request.query_params.get('verification_status')
         if status_filter:
             queryset = queryset.filter(verification_status=status_filter)
+            
+        # 🔥 TUMIA 'products' BADALA YA 'productsengine'
+        # Kwa kuwa Order ina store_id kama UUIDField (sio ForeignKey), 
+        # tunahesabu kwa kutumia subquery au tuhesabu products kwa sasa.
+        queryset = queryset.annotate(
+            total_products=Count('products', distinct=True),
+            # Kwa total_orders, kwa kuwa store_id ni UUIDField, tunaweza kuhesabu hivi:
+            # (Hii itafanya kazi kama Order model ina store_id)
+        ).order_by('-created_at')
+        
         return queryset
 
-    # 🔥 ONGEZA HII HAPA (Ni muhimu sana!)
     def perform_update(self, serializer):
-        store = serializer.save()  # Hifadhi mabadiliko ya store
+        store = serializer.save()
 
-        # Kama store imepitishwa (approved), sasisha profile ya mmiliki
         if store.verification_status == 'approved':
-            profile = store.owner  # Hii ni Profile ya mtumiaji aliyeomba
-            profile.role = 'supplier'  # Weka kuwa Supplier
-            profile.is_otp_verified = True  # Mruhusu aingle bila OTP tena
+            profile = store.owner
+            profile.role = 'supplier'
+            profile.is_otp_verified = True
             profile.save()
             print(f"✅ Profile ya {profile.user.email} imewekwa kuwa supplier!")
 

@@ -23,8 +23,11 @@ export default function NewArrivals({ navigate, selectedCategory }) {
       ordering: '-created_at',
       limit: 30 // Ongeza limit kuwa 30 ili uwe na pool nzuri ya kuchuja
     };
-    if (selectedCategory?.id) params.parent_category = selectedCategory.id;
 
+// Kama kategoria ipo, NA sio "All", ndio tuma parent_category
+if (selectedCategory?.id && selectedCategory.id !== 'all' && !selectedCategory.isAll) {
+  params.parent_category = selectedCategory.id;
+      }
     const response = await api.get('/products/', { params });
     const productsData = response.data.results || response.data || [];
 
@@ -100,7 +103,7 @@ export default function NewArrivals({ navigate, selectedCategory }) {
   // 🔥 RENDER HEADER (Inajumuisha mshale na peach background)
   // ============================================================
   const renderHeader = () => (
-    <div className="flex justify-between items-center px-3 py-3 bg-[#fff7ed] dark:bg-[#1e293b] dark:border-b dark:border-[#334155] rounded-t-xl mb-4 text-black dark:text-white mt-50">
+    <div className="flex justify-between items-center px-3 py-3 bg-[#fff7ed] dark:bg-black dark:border-b dark:border-[#334155] rounded-t-xl mb-4 text-black dark:text-white mt-50">
       <div className="flex flex-col">
         
         {/* 🔥 1. Title na Icon ziko kwenye kikundi chake (zitakaa upande kwa upande) */}
@@ -145,7 +148,7 @@ export default function NewArrivals({ navigate, selectedCategory }) {
   // ============================================================
   if (loading) {
     return (
-      <div className="relative w-full bg-white dark:bg-[#1e293b] border-y border-[#e5e7eb] dark:border-[#334155] py-4">
+      <div className="relative w-full bg-white dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] py-4">
 
         {renderHeader()}
 
@@ -171,7 +174,7 @@ export default function NewArrivals({ navigate, selectedCategory }) {
   // SUCCESS STATE
   // ============================================================
   return (
-    <div className="relative w-full bg-white dark:bg-[#1e293b] border-y border-[#e5e7eb] dark:border-[#334155] py-4">
+    <div className="relative w-full bg-white dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] py-4">
       
             {renderHeader()}
 
