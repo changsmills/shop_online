@@ -41,10 +41,15 @@ export default function AdminStores() {
     setTimeout(() => navigate('/dashboard/login'), 1000);
   };
 
-  const handleApprove = async (storeId) => {
+const handleApprove = async (storeId) => {
     if (!window.confirm("Je, unathibitisha kupitisha duka hili?")) return;
     try {
-      await api.patch(`/admin/stores/${storeId}/`, { verification_status: 'approved', status: 'active' });
+      // 🔥 ONGEZA is_verified: true hapa
+      await api.patch(`/admin/stores/${storeId}/`, { 
+        verification_status: 'approved', 
+        status: 'active',
+        is_verified: true // <--- Hii ndio inakosekana
+      });
       toast.success("Duka limepitishwa!");
       fetchStores(activeTab); // Refresh data
     } catch (err) {

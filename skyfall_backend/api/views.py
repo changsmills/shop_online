@@ -1222,6 +1222,10 @@ class AdminStoreApprovalViewSet(viewsets.ModelViewSet):
         store = serializer.save()
 
         if store.verification_status == 'approved':
+            
+            store.is_verified = True
+            store.save()
+
             profile = store.owner
             profile.role = 'supplier'
             profile.is_otp_verified = True
