@@ -133,7 +133,7 @@ export default function SearchResults({ session }) {
 
  if (loading && products.length === 0) {
     return (
-      <div className="min-h-screen bg-[#f7f8fa] dark:bg-black pt-[60px] md:pt-[80px]">
+      <div className="min-h-screen bg-[#f7f8fa] dark:bg-black">
         <Header showBack={true} />
         
         <div className="max-w-[1400px] mx-auto p-4 md:p-5 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-6">
@@ -158,7 +158,7 @@ export default function SearchResults({ session }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f8fa] dark:bg-black pt-[60px] md:pt-[80px]">
+    <div className="min-h-screen bg-[#f7f8fa] dark:bg-black">
       
       <Header showBack={true} />
 
