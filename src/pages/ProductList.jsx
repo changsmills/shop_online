@@ -95,9 +95,11 @@ export default function ProductList({
       if (storeId) {
         params.store_id = storeId;
       }
-      if (currentCategoryId) {
-        params.parent_category = currentCategoryId;
-      }
+
+      // 🔥 Zuia kutuma 'all' kwa backend
+      if (currentCategoryId && currentCategoryId !== 'all' && currentCategoryId !== 'All') {
+       params.parent_category = currentCategoryId;
+       }
 
       // 2. Search
       if (currentSearch && currentSearch.trim()) {
