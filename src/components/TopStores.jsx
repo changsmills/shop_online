@@ -28,6 +28,7 @@ export default function TopStores({ navigate }) {
             params: {
               lat: location.lat,
               lng: location.lng,
+              limit: 10,
             }
           });
         } else {

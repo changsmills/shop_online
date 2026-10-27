@@ -79,7 +79,6 @@
     font-family: var(--font-sans);
     background-color: var(--color-bg-body);
     color: var(--color-text-primary);
-    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   /* Dark Mode */
