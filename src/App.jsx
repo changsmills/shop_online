@@ -76,7 +76,6 @@ const ProtectedAdminRoute = ({ children }) => {
 function AppContent({ session }) {
   const location = useLocation();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  const [isOnline, setIsOnline] = useState(navigator.onLine); 
 
   
   useEffect(() => {
@@ -85,14 +84,27 @@ function AppContent({ session }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-    // 🔥 ONGEZA HII: KAGUA MTANDAO NA KUPATA DATA MPYA IKIRUDI
+ // 🔥 HAPA NDIO MABADILIKO MAKUU: TUNAONDOA window.location.reload()
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
-      // ✅ Hii itapakia ukurasa upya mara tu mtandao unapounganishwa!
-      window.location.reload(); 
+      
+      // Badala ya ku-reload ukurasa, tunatoa ujumbe tu (Toast)
+      // Components zako (Dashboard, NewArrivals, n.k.) zina useEffect zao za 'online' 
+      // ambazo zitafetch data mpya kimyakimya.
+      toast.success("Back online", {
+        id: 'online-toast', // ID hii inazuia toast kujirudia mara nyingi
+        duration: 3000,
+      });
     };
-    const handleOffline = () => setIsOnline(false);
+
+    const handleOffline = () => {
+      setIsOnline(false);
+      toast.error("you are offline.", {
+        id: 'offline-toast',
+        duration: 5000,
+      });
+    };
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
@@ -118,23 +130,6 @@ function AppContent({ session }) {
     "/messages",
     "/profile"
   ];
-
-  // --- ANZA MABADILIKO HAPA ---
-  useEffect(() => {
-    // 1. Angalia kama kuna session ya mtumiaji
-    // 2. Angalia kama tayari tumeshaonyesha ujumbe huu kwenye session hii ya browser
-    const hasShownWelcome = sessionStorage.getItem('welcomeShown');
-
-    if (session && !hasShownWelcome) {
-      toast.success("Welcome!", {
-        duration: 4000,       
-        id: 'welcome-toast',   
-      });
-      
-      sessionStorage.setItem('welcomeShown', 'true');
-    }
-  }, [session]); 
-
 
 
 
@@ -166,15 +161,6 @@ function AppContent({ session }) {
 
   return (
     <div className="app-main-layout">
-
-
- {/* 🔥 ONGEZA HII HAPA: BANNER YA ONYO LA MTANDAO */}
-        {!isOnline && (
-         <div className="offline-banner">
-           {/* <span className="offline-icon">📶</span> */}
-          {/* <span className="offline-text">⚠️ Connection lost. Please check your internet connection...</span>*/}
-         </div>
-       )}
 
 
       <Routes>
