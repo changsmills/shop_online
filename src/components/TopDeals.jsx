@@ -26,10 +26,10 @@ export default function TopDeals({ navigate, selectedCategory }) {
       try {
         const params = {};
         
-// Kama kategoria ipo, NA sio "All", ndio tuma parent_category
-if (selectedCategory?.id && selectedCategory.id !== 'all' && !selectedCategory.isAll) {
-  params.parent_category = selectedCategory.id;
-}
+        if (selectedCategory?.id && selectedCategory.id !== 'all' && !selectedCategory.isAll) {
+          params.parent_category = selectedCategory.id;
+        }
+        
         const response = await api.get('/products/', { params });
         const data = response.data.results || response.data || [];
 
@@ -93,9 +93,6 @@ if (selectedCategory?.id && selectedCategory.id !== 'all' && !selectedCategory.i
     }
   }, [products]);
 
-  // ============================================================
-  // 🔥 RENDER HEADER
-  // ============================================================
   const renderHeader = () => (
     <div className="flex justify-between items-center px-3 md:px-5 py-2 md:py-3 bg-[#fff7ed] dark:bg-[#1e293b] dark:border-b dark:border-[#334155] rounded-t-xl mb-2.5 md:mb-4 text-black dark:text-white">
       <div className="flex flex-col">
@@ -129,19 +126,19 @@ if (selectedCategory?.id && selectedCategory.id !== 'all' && !selectedCategory.i
     </div>
   );
 
-  // ============================================================
-  // SKELETON LOADING
-  // ============================================================
   if (loading) {
     return (
       <div className="relative w-full bg-white dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border">
         {renderHeader()}  
         <div className="relative flex items-center px-2">
           <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-4 w-full gap-2 md:gap-3 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            {Array.from({ length: 5 }).map((_, index) => (
+            {Array.from({ length: 6 }).map((_, index) => (
               <div 
                 key={`skeleton-${index}`} 
-                className="flex-[0_0_calc((100%-17.6px)/2.2)] min-w-[calc((100%-17.6px)/2.2)] sm:flex-[0_0_calc((100%-35px)/3.5)] sm:min-w-[calc((100%-35px)/3.5)] md:flex-[0_0_calc((100%-54px)/4.5)] md:min-w-[calc((100%-54px)/4.5)] lg:flex-[0_0_calc((100%-78px)/6.5)] lg:min-w-[calc((100%-78px)/6.5)] snap-start"
+                className="flex-[0_0_calc((100%-17.6px)/2.2)] min-w-[calc((100%-17.6px)/2.2)] 
+                sm:flex-[0_0_calc((100%-35px)/3.5)] sm:min-w-[calc((100%-35px)/3.5)] 
+                md:flex-[0_0_calc((100%-54px)/4.5)] md:min-w-[calc((100%-54px)/4.5)] 
+                lg:flex-[0_0_calc((100%-66px)/5.5)] lg:min-w-[calc((100%-66px)/5.5)] snap-start"
               >
                 <SkeletonCardz />
               </div>
@@ -152,14 +149,8 @@ if (selectedCategory?.id && selectedCategory.id !== 'all' && !selectedCategory.i
     );
   }
 
-  // ============================================================
-  // EMPTY STATE
-  // ============================================================
   if (products.length === 0) return null;
 
-  // ============================================================
-  // SUCCESS STATE
-  // ============================================================
   return (
     <div className="relative w-full bg-white dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border">
       
@@ -184,7 +175,10 @@ if (selectedCategory?.id && selectedCategory.id !== 'all' && !selectedCategory.i
             return (
               <div 
                 key={product.id} 
-                className="flex-[0_0_calc((100%-17.6px)/2.2)] min-w-[calc((100%-17.6px)/2.2)] sm:flex-[0_0_calc((100%-35px)/3.5)] sm:min-w-[calc((100%-35px)/3.5)] md:flex-[0_0_calc((100%-54px)/4.5)] md:min-w-[calc((100%-54px)/4.5)] lg:flex-[0_0_calc((100%-78px)/6.5)] lg:min-w-[calc((100%-78px)/6.5)] snap-start"
+                className="flex-[0_0_calc((100%-17.6px)/2.2)] min-w-[calc((100%-17.6px)/2.2)] 
+                sm:flex-[0_0_calc((100%-35px)/3.5)] sm:min-w-[calc((100%-35px)/3.5)] 
+                md:flex-[0_0_calc((100%-54px)/4.5)] md:min-w-[calc((100%-54px)/4.5)] 
+                lg:flex-[0_0_calc((100%-66px)/5.5)] lg:min-w-[calc((100%-66px)/5.5)] snap-start"
               >
                 <DashboardCard
                   image={product.cover_image_url || product.cover_image}

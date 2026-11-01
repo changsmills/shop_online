@@ -160,7 +160,7 @@ export default function UserTools({ session: propSession, isMobile }) {
             )}
             <Link
               to="/cart"
-              className="mt-2 block text-center bg-[#ff6a00] hover:bg-[#e55a00] text-white rounded-full py-2 no-underline font-bold text-[13px] transition-colors"
+              className="mt-2 block text-center bg-[#ff6a00] hover:bg-[#e55a00] text-white rounded-full py-2 no-underline font-[400px] text-[13px] transition-colors"
             >
               Go to Cart
             </Link>
@@ -185,11 +185,13 @@ export default function UserTools({ session: propSession, isMobile }) {
           {/* CREATE ACCOUNT - Background Nyeusi & Text Nyeupe (Light), Background Nyeupe & Text Nyeusi (Dark) */}
           <Link
             to="/dashboard/register"
-            className={`flex items-center justify-center bg-black dark:bg-white !text-white dark:!text-black hover:bg-gray-800 dark:hover:bg-gray-200 rounded-full no-underline font-bold shadow-sm transition-all duration-200 ${
+            className={`flex items-center justify-center bg-black dark:bg-white 
+              !text-white dark:!text-black hover:bg-gray-800 
+              dark:hover:bg-gray-200 rounded-full no-underline font-bold shadow-sm transition-all duration-200 ${
               isMobile ? 'px-3 py-1 text-xs' : 'px-5 py-2 text-sm'
             }`}
           >
-            <span className="relative z-10">Create account</span>
+            <span className="relative z-10 font-[400px]">Create account</span>
           </Link>
           
         </div>

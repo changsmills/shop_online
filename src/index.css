@@ -143,3 +143,36 @@
 .animate-smooth-dropdown {
   animation: slideDownSmooth 0.25s ease-out forwards;
 }
+
+/* ========================================= */
+/* MESH GRADIENT BACKGROUND (LIGHT & DARK)   */
+/* ========================================= */
+
+.mesh-gradient-bg {
+  /* Light Mode (Chungwa/Pink) */
+  background-color: #ffffff; 
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(255, 106, 0, 0.5) 0px, transparent 50%),   
+    radial-gradient(at 100% 100%, rgba(238, 9, 121, 0.4) 0px, transparent 50%), 
+    radial-gradient(at 50% 50%, rgba(255, 237, 213, 0.5) 0px, transparent 50%); 
+  
+  animation: mesh-movement 15s ease-in-out infinite alternate;
+  background-size: 200% 200%;
+  transition: background-image 0.5s ease-in-out, background-color 0.5s ease-in-out;
+}
+
+/* Dark Mode (Bluu na Zambarau) */
+/* Tunatumia .dark kwa sababu kwenye Tailwind class ya dark inawekwa kwenye HTML */
+.dark .mesh-gradient-bg {
+  background-color: #0f172a; /* Bluu nyeusi */
+  background-image: 
+    radial-gradient(at 10% 20%, rgba(21, 21, 22, 0.8) 0px, transparent 50%),  
+    radial-gradient(at 90% 80%, rgba(30, 29, 31, 0.7) 0px, transparent 50%),  
+    radial-gradient(at 50% 50%, rgba(21, 22, 22, 0.5) 0px, transparent 50%);  
+}
+
+@keyframes mesh-movement {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 50% 100%; }
+  100% { background-position: 100% 0%; }
+}

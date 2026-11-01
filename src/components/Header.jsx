@@ -184,11 +184,21 @@ const Header = ({ showBack = false, showSearch = true }) => {
   }, []);
 
   return (
-    <header className="w-full bg-white dark:bg-black 
-    text-black dark:text-white border-t-2 border-t-gray-200 dark:border-t-gray-800 
-    border-b border-b-gray-200 dark:border-b-gray-800 shadow-sm transition-colors duration-300 z-[50]">
+    <header className="relative w-full bg-[#fafcff] dark:bg-black 
+      text-black dark:text-white border-t-2 border-t-gray-200 dark:border-t-gray-800 
+      border-b border-b-gray-200 dark:border-b-gray-800 shadow-sm transition-colors duration-300 z-[50] overflow-hidden">
       
-      <div className="max-w-[1440px] mx-auto px-4 py-1 lg:px-8 overflow-visible">
+      {/* ========================================= */}
+      {/* 1. LAYER YA RANGI (MESH GRADIENT)         */}
+      {/* ========================================= */}
+      
+         {/* LAYER YA RANGI */}
+<div className="absolute inset-0 z-0 mesh-gradient-bg opacity-60 dark:hidden"></div>
+
+      {/* ========================================= */}
+      {/* 2. LAYER YA MAUDHUI (VITUFE NA MAANDISHI) */}
+      {/* ========================================= */}
+      <div className="relative z-10 max-w-[1440px] mx-auto px-4 py-1 lg:px-8 overflow-visible">
 
         <div className="flex items-center justify-between gap-4 h-[52px] lg:gap-5">
           
@@ -228,7 +238,7 @@ const Header = ({ showBack = false, showSearch = true }) => {
                  font-medium text-[13px] text-black dark:text-white hover:text-brand-orange
                   transition-colors"
               >
-                <MapPin size={20} />
+                <MapPin size={14} />
                 <span className="hidden lg:inline font-bold">
                   {deliveryCountry === 'TZ' ? 'TZ' : deliveryCountry}
                 </span>
@@ -259,22 +269,15 @@ const Header = ({ showBack = false, showSearch = true }) => {
         </div>
 
         {/* NAVIGATION ROW (Desktop only) */}
-        <div 
-          className={`hidden lg:block relative border-t border-gray-200 
-            dark:border-gray-800 bg-white dark:bg-black items-center
-             mt-0 transition-all duration-300 ease-in-out lg:px-0 overflow-visible  ${
-            isScrolled 
-              ? 'lg:hidden'
-              : 'lg:block'     
-          }`} 
-          key={language}
-        >
-          <NavLinks />
-        </div>
+<div 
+  className="hidden lg:block relative bg-transparent dark:bg-transparent items-center mt-0 transition-all duration-300 ease-in-out lg:px-0 overflow-visible" 
+  key={language}
+>
+  <NavLinks />
+</div>
 
       </div>
     </header>
   );
-};
-
+}
 export default Header;

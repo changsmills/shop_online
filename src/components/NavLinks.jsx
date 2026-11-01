@@ -241,7 +241,7 @@ export default function NavLinks({ isMobile }) {
 
     <nav className="flex justify-between items-center 
     max-w-[1250px] mx-auto px-6 md:px-12 h-[48px]
-     w-full border-b border-gray-200 dark:border-gray-800 font-sans">
+     w-full font-sans">
       
            {/* LEFT GROUP */}
       <div className="flex items-center gap-4 ">
@@ -252,17 +252,18 @@ export default function NavLinks({ isMobile }) {
           onMouseEnter={(e) => handleMouseEnter('categories', e)}
           onMouseLeave={handleMouseLeave}
         >
-          <span className="flex items-center gap-2 text-[15px] font-bold 
-          text-black dark:text-white group-hover:text-orange-500 transition-colors">
-            <LucideIcons.Menu size={20} strokeWidth={2.5} />
+          <span className="flex items-center gap-2 text-[14px] font-[400] 
+          text-black dark:text-white group-hover:text-black group-hover:dark:text-white transition-colors">
+            <LucideIcons.Menu size={14} strokeWidth={2.5} />
             {t('all_categories')}
           </span>
-          {activeNav === 'categories' && <div className="absolute -bottom-2 left-0 right-0 h-[3px] bg-orange-500 rounded-sm" />}
+
+            {activeNav === 'categories' && <div className="absolute -bottom-3 left-0 right-0 h-[2px] bg-[#222222] dark:bg-white rounded-sm z-[55]" />}
 
           {activeMenu === 'categories' && createPortal(
             <div
               className="fixed top-[105px] left-0 right-0 h-[450px] z-[50] bg-white dark:bg-black shadow-[0_4px_20px_rgba(0,0,0,0.15)] 
-              border-t border-gray-100 dark:border-gray-800 animate-[fadeInDown_0.2s_ease] font-sans"
+              border-t border-[#222222] dark:border-gray-800 animate-[fadeInDown_0.2s_ease] font-sans"
               onMouseEnter={() => handleMouseEnter('categories')}
               onMouseLeave={handleMouseLeave}
             >
@@ -396,237 +397,259 @@ export default function NavLinks({ isMobile }) {
         <div className="relative group py-2 cursor-pointer flex items-center">
           <Link 
             to="/advertise" 
-            className="text-[15px] font-bold text-black dark:text-white group-hover:text-orange-500 transition-colors"
+            className="text-[14px] font-sans text-black dark:text-white group-hover:text-black transition-colors"
           >
-           <span className="text-[15px] font-bold text-black dark:text-white group-hover:text-orange-500 transition-colors"> {t('skyfall_ads')}</span>
+           <span className="text-[14px] font-[400] text-black dark:text-white group-hover:text-black group-hover:dark:text-white transition-colors"> {t('skyfall_ads')}</span>
           </Link>
           {/* Mstari wa chini unapogusa */}
-          <div className="absolute -bottom-2 left-0 right-0 h-[3px] bg-orange-500 rounded-sm scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+          <div className="absolute -bottom-3 left-0 right-0 h-[2px] bg-black  dark:bg-white rounded-sm scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
         </div>
 
-                {/* ORDER PROTECTIONS (Full Width Dropdown) */}
-        <div className="relative group py-2 cursor-pointer flex items-center">
-          <span className="text-[15px] font-bold text-black dark:text-white 
-          group-hover:text-orange-500 transition-colors">
+
+
+           {/* ORDER PROTECTIONS (Full Width Dropdown) */}
+        <div 
+          className="relative group py-2 cursor-pointer flex items-center"
+          onMouseEnter={(e) => handleMouseEnter('protections', e)}
+          onMouseLeave={handleMouseLeave}
+        >
+          <span className="text-[14px] font-[400] text-black dark:text-white group-hover:text-black group-hover:dark:text-white transition-colors">
             {t('order_protections')}
           </span>
           
           {/* Mstari wa chini unapogusa */}
-          <div className="absolute -bottom-[1px] left-0 right-0 h-[3px] bg-orange-500 rounded-sm scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+          <div className="absolute -bottom-3 left-0 right-0 h-[2px] bg-black dark:bg-white rounded-sm scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
 
-          {/* FULL WIDTH DROPDOWN - Imeongezwa urefu na padding */}
-          <div className="fixed top-[112px] 
-          left-0 w-full bg-white dark:bg-black
-           shadow-[0_15px_35px_rgba(0,0,0,0.4)] border-b border-gray-200 
-           dark:border-gray-800 opacity-0 invisible group-hover:opacity-100 
-           group-hover:visible group-hover:animate-smooth-dropdown z-[50]">
-            
-            {/* HAPA: Nimeongeza pb-12 (padding chini) na min-h ili isiwe fupi */}
-            <div className="max-w-[1250px] mx-auto p-8  grid grid-cols-3 gap-10">
-              
-              {/* COLUMN 1: PAYMENT PROTECTION */}
-              <div>
-                <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">
-                  {t('payment_protection')}
-                </h4>
-                <ul className="list-none p-0 m-0 space-y-3">
-                  <li className="flex items-center gap-2.5 text-sm">
-                    <LucideIcons.Lock size={16} className="text-gray-500" />
-                    <Link to="/payment-protection" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
-                      {t('your_payment_protected')}
-                    </Link>
-                  </li>
-                  <li className="flex items-center gap-2.5 text-sm">
-                    <LucideIcons.CreditCard size={16} className="text-gray-500" />
-                    <Link to="/refund-policy" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
-                      {t('refund_policy')}
-                    </Link>
-                  </li>
-                  <li className="flex items-center gap-2.5 text-sm">
-                    <LucideIcons.ShieldCheck size={16} className="text-gray-500" />
-                    <Link to="/buyer-protection" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
-                      {t('buyer_protection')}
-                    </Link>
-                  </li>
-                </ul>
-              </div>
+          {/* FULL WIDTH DROPDOWN - Sasa inatumia createPortal */}
+          {activeMenu === 'protections' && createPortal(
+            <div 
+              className="fixed top-[105px] left-0 w-full bg-white dark:bg-black shadow-[0_15px_35px_rgba(0,0,0,0.4)] border-b border-gray-200 dark:border-gray-800 animate-[fadeInDown_0.2s_ease] z-[50]"
+              onMouseEnter={() => handleMouseEnter('protections')}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div className="max-w-[1250px] mx-auto p-8 grid grid-cols-3 gap-10">
+                
+                {/* COLUMN 1: PAYMENT PROTECTION */}
+                <div>
+                  <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">
+                    {t('payment_protection')}
+                  </h4>
+                  <ul className="list-none p-0 m-0 space-y-3">
+                    <li className="flex items-center gap-2.5 text-sm">
+                      <LucideIcons.Lock size={16} className="text-gray-500" />
+                      <Link to="/payment-protection" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+                        {t('your_payment_protected')}
+                      </Link>
+                    </li>
+                    <li className="flex items-center gap-2.5 text-sm">
+                      <LucideIcons.CreditCard size={16} className="text-gray-500" />
+                      <Link to="/refund-policy" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+                        {t('refund_policy')}
+                      </Link>
+                    </li>
+                    <li className="flex items-center gap-2.5 text-sm">
+                      <LucideIcons.ShieldCheck size={16} className="text-gray-500" />
+                      <Link to="/buyer-protection" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+                        {t('buyer_protection')}
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
 
-              {/* COLUMN 2: PRODUCT ISSUES */}
-              <div>
-                <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">
-                  {t('product_issues')}
-                </h4>
-                <ul className="list-none p-0 m-0 space-y-3">
-                  <li className="flex items-center gap-2.5 text-sm">
-                    <LucideIcons.FileWarning size={16} className="text-gray-500" />
-                    <Link to="/dispute" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
-                      {t('file_dispute')}
-                    </Link>
-                  </li>
-                  <li className="flex items-center gap-2.5 text-sm">
-                    <LucideIcons.Flag size={16} className="text-gray-500" />
-                    <Link to="/report-product" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
-                      {t('report_bad_product')}
-                    </Link>
-                  </li>
-                  <li className="flex items-center gap-2.5 text-sm">
-                    <LucideIcons.MessageCircle size={16} className="text-gray-500" />
-                    <Link to="/contact-support" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
-                      {t('contact_support')}
-                    </Link>
-                  </li>
-                </ul>
-              </div>
+                {/* COLUMN 2: PRODUCT ISSUES */}
+                <div>
+                  <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">
+                    {t('product_issues')}
+                  </h4>
+                  <ul className="list-none p-0 m-0 space-y-3">
+                    <li className="flex items-center gap-2.5 text-sm">
+                      <LucideIcons.FileWarning size={16} className="text-gray-500" />
+                      <Link to="/dispute" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+                        {t('file_dispute')}
+                      </Link>
+                    </li>
+                    <li className="flex items-center gap-2.5 text-sm">
+                      <LucideIcons.Flag size={16} className="text-gray-500" />
+                      <Link to="/report-product" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+                        {t('report_bad_product')}
+                      </Link>
+                    </li>
+                    <li className="flex items-center gap-2.5 text-sm">
+                      <LucideIcons.MessageCircle size={16} className="text-gray-500" />
+                      <Link to="/contact-support" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+                        {t('contact_support')}
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
 
-              {/* COLUMN 3: VERIFIED PRODUCTS */}
-              <div>
-                <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">
-                  {t('verified_products')}
-                </h4>
-                <ul className="list-none p-0 m-0 space-y-3">
-                  <li className="flex items-center gap-2.5 text-sm">
-                    <LucideIcons.CheckCircle size={16} className="text-gray-500" />
-                    <Link to="/verification" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
-                      {t('product_verification')}
-                    </Link>
-                  </li>
-                  <li className="flex items-center gap-2.5 text-sm">
-                    <LucideIcons.Star size={16} className="text-gray-500" />
-                    <Link to="/reviews" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
-                      {t('buyer_reviews')}
-                    </Link>
-                  </li>
-                  <li className="flex items-center gap-2.5 text-sm">
-                    <LucideIcons.Truck size={16} className="text-gray-500" />
-                    <Link to="/shipping-protection" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
-                      {t('shipping_protection')}
-                    </Link>
-                  </li>
-                </ul>
-              </div>
+                {/* COLUMN 3: VERIFIED PRODUCTS */}
+                <div>
+                  <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">
+                    {t('verified_products')}
+                  </h4>
+                  <ul className="list-none p-0 m-0 space-y-3">
+                    <li className="flex items-center gap-2.5 text-sm">
+                      <LucideIcons.CheckCircle size={16} className="text-gray-500" />
+                      <Link to="/verification" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+                        {t('product_verification')}
+                      </Link>
+                    </li>
+                    <li className="flex items-center gap-2.5 text-sm">
+                      <LucideIcons.Star size={16} className="text-gray-500" />
+                      <Link to="/reviews" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+                        {t('buyer_reviews')}
+                      </Link>
+                    </li>
+                    <li className="flex items-center gap-2.5 text-sm">
+                      <LucideIcons.Truck size={16} className="text-gray-500" />
+                      <Link to="/shipping-protection" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+                        {t('shipping_protection')}
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
 
-            </div>
-          </div>
+              </div> 
+            </div>,
+            document.body
+          )}
+      
         </div>
+          
 
       </div>
 
            {/* RIGHT GROUP */}
       <div className="flex items-center gap-4 flex-shrink-0">
         
-        {/* BUYER CENTRAL (Dropdown ya CSS - FIXED) */}
-        <div className="relative group py-2 cursor-pointer flex items-center">
-          <span className="text-[15px] font-bold text-black dark:text-white group-hover:text-orange-500 transition-colors">
+              {/* BUYER CENTRAL */}
+        <div 
+          className="relative group py-2 cursor-pointer flex items-center"
+          onMouseEnter={(e) => handleMouseEnter('buyerCentral', e)}
+          onMouseLeave={handleMouseLeave}
+        >
+          <span className="text-[14px] font-[400] text-black dark:text-white group-hover:text-black group-hover:dark:text-white transition-colors">
             {t('buyer_central')}
           </span>
           
           {/* Mstari wa chini unapogusa */}
-          <div className="absolute -bottom-[1px] left-0 right-0 h-[3px] bg-orange-500 rounded-sm scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+          <div className="absolute -bottom-3 left-0 right-0 h-[2px] bg-black dark:bg-white rounded-sm scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
 
-          {/* DROPDOWN YA BUYER CENTRAL - FIXED, top-[97px], right-0 */}
-          <div className="fixed top-[112px] right-0 w-[900px] 
-          bg-white dark:bg-black shadow-[0_15px_35px_rgba(0,0,0,0.4)] 
-          border-b border-x border-gray-200 dark:border-gray-800 rounded-b-xl opacity-0 
-          invisible group-hover:opacity-100 group-hover:visible group-hover:animate-smooth-dropdown z-[999]">
-            <div className="p-8 pb-12 grid grid-cols-4 gap-10">
-              <div>
-                <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">{t('why_skyfall')}</h4>
-                <ul className="list-none p-0 m-0 space-y-3">
-                  <li><Link to="/about-skyfall" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('what_is_skyfall')}</Link></li>
-                  <li><Link to="/how-to-buy" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('how_to_buy')}</Link></li>
-                  <li><Link to="/wholesale-benefits" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('wholesale_benefits')}</Link></li>
-                  <li><Link to="/blogs" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('business_articles')}</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">{t('business_services')}</h4>
-                <ul className="list-none p-0 m-0 space-y-3">
-                  <li><Link to="/protections" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('payment_protection')}</Link></li>
-                  <li><Link to="/logistics" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('track_logistics')}</Link></li>
-                  <li><Link to="/quotes" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('invoice_requests')}</Link></li>
-                  <li><Link to="/verification" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('product_verification')}</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">{t('support_help')}</h4>
-                <ul className="list-none p-0 m-0 space-y-3">
-                  <li><Link to="/help-center" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('for_buyers')}</Link></li>
-                  <li><Link to="/dispute" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('open_dispute')}</Link></li>
-                  <li><Link to="/report" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('report_issue')}</Link></li>
-                  <li><a href="https://wa.me/255754394845" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('chat_whatsapp')}</a></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">{t('our_partners')}</h4>
-                <div className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <div className="text-2xl font-bold text-orange-500">SF</div>
-                  <div>
-                    <div className="font-semibold text-sm text-black dark:text-white">{t('connect_your_store')}</div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-2">{t('register_store_description')}</p>
-                    <Link to="/create-store" className="text-xs font-bold text-orange-500 hover:underline">{t('start_now')}</Link>
+          {/* DROPDOWN YA BUYER CENTRAL - Inatumia createPortal */}
+          {activeMenu === 'buyerCentral' && createPortal(
+            <div 
+              className="fixed top-[105px] right-0 w-[900px] bg-white dark:bg-black shadow-[0_15px_35px_rgba(0,0,0,0.4)] border-b border-x border-gray-200 dark:border-gray-800 rounded-b-xl animate-[fadeInDown_0.2s_ease] z-[50]"
+              onMouseEnter={() => handleMouseEnter('buyerCentral')}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div className="p-8 pb-12 grid grid-cols-4 gap-10">
+                <div>
+                  <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">{t('why_skyfall')}</h4>
+                  <ul className="list-none p-0 m-0 space-y-3">
+                    <li><Link to="/about-skyfall" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('what_is_skyfall')}</Link></li>
+                    <li><Link to="/how-to-buy" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('how_to_buy')}</Link></li>
+                    <li><Link to="/wholesale-benefits" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('wholesale_benefits')}</Link></li>
+                    <li><Link to="/blogs" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('business_articles')}</Link></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">{t('business_services')}</h4>
+                  <ul className="list-none p-0 m-0 space-y-3">
+                    <li><Link to="/protections" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('payment_protection')}</Link></li>
+                    <li><Link to="/logistics" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('track_logistics')}</Link></li>
+                    <li><Link to="/quotes" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('invoice_requests')}</Link></li>
+                    <li><Link to="/verification" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('product_verification')}</Link></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">{t('support_help')}</h4>
+                  <ul className="list-none p-0 m-0 space-y-3">
+                    <li><Link to="/help-center" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('for_buyers')}</Link></li>
+                    <li><Link to="/dispute" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('open_dispute')}</Link></li>
+                    <li><Link to="/report" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('report_issue')}</Link></li>
+                    <li><a href="https://wa.me/255754394845" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('chat_whatsapp')}</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">{t('our_partners')}</h4>
+                  <div className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div className="text-2xl font-bold text-orange-500">SF</div>
+                    <div>
+                      <div className="font-semibold text-sm text-black dark:text-white">{t('connect_your_store')}</div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-2">{t('register_store_description')}</p>
+                      <Link to="/create-store" className="text-xs font-bold text-orange-500 hover:underline">{t('start_now')}</Link>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </div>,
+            document.body
+          )}
         </div>
 
-        {/* HELP CENTER (Dropdown ya CSS - FIXED) */}
-        <div className="relative group py-2 cursor-pointer flex items-center">
-          <span className="text-[15px] font-bold text-black dark:text-white group-hover:text-orange-500 transition-colors">
+                {/* HELP CENTER */}
+        <div 
+          className="relative group py-2 cursor-pointer flex items-center"
+          onMouseEnter={(e) => handleMouseEnter('helpCenter', e)}
+          onMouseLeave={handleMouseLeave}
+        >
+          <span className="text-[14px] font-[400] text-black dark:text-white group-hover:text-black group-hover:dark:text-white transition-colors">
             {t('help_center')}
           </span>
           
           {/* Mstari wa chini unapogusa */}
-          <div className="absolute -bottom-[1px] left-0 right-0 h-[3px]
-           bg-orange-500 rounded-sm scale-x-0 group-hover:scale-x-100 
-           transition-transform duration-300 origin-left" />
+          <div className="absolute -bottom-3 left-0 right-0 h-[2px] bg-black dark:bg-white rounded-sm scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
 
-          {/* DROPDOWN YA HELP CENTER - FIXED, top-[97px], right-0 */}
-          <div className="fixed top-[112px] right-0 w-[900px] bg-white 
-          dark:bg-black shadow-[0_15px_35px_rgba(0,0,0,0.4)] border-b border-x border-gray-200
-           dark:border-gray-800 rounded-b-xl opacity-0 invisible group-hover:opacity-100
-            group-hover:visible group-hover:animate-smooth-dropdown z-[999]">
-            <div className="p-8 pb-12 grid grid-cols-4 gap-10">
-              <div>
-                <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">{t('buyer_help')}</h4>
-                <ul className="list-none p-0 m-0 space-y-3">
-                  <li><Link to="/help-center" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('help_center_desc')}</Link></li>
-                  <li><Link to="/how-to-buy" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('how_to_buy')}</Link></li>
-                  <li><Link to="/shipping-info" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('shipping_info')}</Link></li>
-                  <li><Link to="/refund-policy" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('refund_policy')}</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">{t('security_policies')}</h4>
-                <ul className="list-none p-0 m-0 space-y-3">
-                  <li><Link to="/dispute" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('open_dispute')}</Link></li>
-                  <li><Link to="/report-abuse" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('report_scam')}</Link></li>
-                  <li><Link to="/terms" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('terms_conditions')}</Link></li>
-                  <li><Link to="/privacy" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('privacy_policy')}</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">{t('contact_us')}</h4>
-                <ul className="list-none p-0 m-0 space-y-3">
-                  <li><a href="https://wa.me/255..." className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('chat_whatsapp')}</a></li>
-                  <li><Link to="/contact-us" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('email_us')}</Link></li>
-                  <li><Link to="/office-location" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('our_offices')}</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">{t('learn_more')}</h4>
-                <div className="p-4 bg-[#f8faff] dark:bg-gray-800 rounded-lg border border-blue-50 dark:border-gray-700">
-                  <div className="flex items-center gap-2 mb-2">
-                    <LucideIcons.PlayCircle size={24} className="text-blue-500" />
-                    <span className="font-semibold text-sm text-black dark:text-white">{t('video_tutorials')}</span>
+          {/* DROPDOWN YA HELP CENTER - Inatumia createPortal */}
+          {activeMenu === 'helpCenter' && createPortal(
+            <div 
+              className="fixed top-[105px] right-0 w-[900px] bg-white dark:bg-black shadow-[0_15px_35px_rgba(0,0,0,0.4)] border-b border-x border-gray-200 dark:border-gray-800 rounded-b-xl animate-[fadeInDown_0.2s_ease] z-[50]"
+              onMouseEnter={() => handleMouseEnter('helpCenter')}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div className="p-8 pb-12 grid grid-cols-4 gap-10">
+                <div>
+                  <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">{t('buyer_help')}</h4>
+                  <ul className="list-none p-0 m-0 space-y-3">
+                    <li><Link to="/help-center" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('help_center_desc')}</Link></li>
+                    <li><Link to="/how-to-buy" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('how_to_buy')}</Link></li>
+                    <li><Link to="/shipping-info" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('shipping_info')}</Link></li>
+                    <li><Link to="/refund-policy" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('refund_policy')}</Link></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">{t('security_policies')}</h4>
+                  <ul className="list-none p-0 m-0 space-y-3">
+                    <li><Link to="/dispute" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('open_dispute')}</Link></li>
+                    <li><Link to="/report-abuse" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('report_scam')}</Link></li>
+                    <li><Link to="/terms" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('terms_conditions')}</Link></li>
+                    <li><Link to="/privacy" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('privacy_policy')}</Link></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">{t('contact_us')}</h4>
+                  <ul className="list-none p-0 m-0 space-y-3">
+                    <li><a href="https://wa.me/255..." className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('chat_whatsapp')}</a></li>
+                    <li><Link to="/contact-us" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('email_us')}</Link></li>
+                    <li><Link to="/office-location" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500">{t('our_offices')}</Link></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">{t('learn_more')}</h4>
+                  <div className="p-4 bg-[#f8faff] dark:bg-gray-800 rounded-lg border border-blue-50 dark:border-gray-700">
+                    <div className="flex items-center gap-2 mb-2">
+                      <LucideIcons.PlayCircle size={24} className="text-blue-500" />
+                      <span className="font-semibold text-sm text-black dark:text-white">{t('video_tutorials')}</span>
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{t('video_description')}</p>
+                    <Link to="/tutorials" className="block mt-3 text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline">{t('watch_videos')}</Link>
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{t('video_description')}</p>
-                  <Link to="/tutorials" className="block mt-3 text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline">{t('watch_videos')}</Link>
                 </div>
               </div>
-            </div>
-          </div>
+            </div>,
+            document.body
+          )}
         </div>
 
               {/* SELL ON SKYFALL */}

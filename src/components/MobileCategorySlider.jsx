@@ -35,12 +35,11 @@ export default function MobileCategorySlider({
 
   if (!categories || categories.length === 0) return null;
 
-  // 🔥 IMEONDOLEWA: allCategory hapa kwa sababu Dashboard inatuma ALL_CATEGORY tayari
-
-  // 🔥 TUMIA RANGI ZA KAWAIDA ZENYE DARK MODE
-  const basePillClass = "whitespace-nowrap shrink-0 px-4 py-1.5 rounded-full text-sm cursor-pointer transition-all duration-200 select-none border";
+  // 🔥 HAPA NDIO MABADILIKO MAKUU YALIYOFANYIKA
+  // Nimepunguza: px-4 -> px-3, py-1.5 -> py-1, text-sm -> text-xs
+  const basePillClass = "whitespace-nowrap shrink-0 px-3 py-1 rounded-full text-xs cursor-pointer transition-all duration-200 select-none border";
   
-  const activePillClass = "bg-[#ff6a00] text-white border-[#ff6a00] font-semibold shadow-md";
+  const activePillClass = "bg-[#ff6a00] text-white border-[#ff6a00] font-semibold shadow-sm";
   
   const inactivePillClass = "bg-gray-100 dark:bg-[#1a1a2e] text-gray-700 dark:text-gray-300 border-transparent hover:bg-gray-200 dark:hover:bg-[#2a2a3e]";
 
@@ -61,14 +60,11 @@ export default function MobileCategorySlider({
       <div
         ref={scrollRef}
         onScroll={checkScroll}
-        className="flex overflow-x-auto flex-1 gap-2 py-2 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex overflow-x-auto flex-1 gap-1.5 py-1.5 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{ WebkitOverflowScrolling: 'touch' }}
       >
         
-        {/* 🔥 IMEONDOLEWA: Ile div ya "ALL CATEGORY" iliyokuwa hapa imefutwa. 
-            Sasa inasoma moja kwa moja kutoka kwenye 'categories' prop ambayo ina "All" ndani yake. */}
-
-        {/* CATEGORIES KUTOKA BACKEND (Pamoja na ALL iliyotumwa) */}
+        {/* CATEGORIES KUTOKA BACKEND */}
         {categories.map((cat) => {
           const displayName = getDisplayName ? getDisplayName(cat) : (cat.name || cat.name_sw);
           const isActive = selectedCategory?.id === cat.id;
@@ -79,7 +75,10 @@ export default function MobileCategorySlider({
               onClick={() => onSelectCategory(cat)}
               className={`${basePillClass} ${isActive ? activePillClass : inactivePillClass}`}
             >
-              {displayName}
+              {/* 🔥 Nimeongeza max-w-[110px] na truncate ili maneno marefu yakatwe na kitufe kisikue kirefu */}
+              <span className="max-w-[110px] truncate block">
+                {displayName}
+              </span>
             </div>
           );
         })}

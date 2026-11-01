@@ -581,42 +581,55 @@ return (
 
     {!search && (
 
-    <div className="block w-full lg:grid
-       lg:grid-cols-[250px_1fr_280px] lg:gap-4 lg:h-[350px] px-1">
+<div className="block w-full lg:grid lg:grid-cols-[320px_1fr_280px] lg:gap-4 lg:h-[350px] px-1">
 
 {/* 1. SIDEBAR YA KATEGORIA (Kushoto) */}
 <aside className="hidden lg:flex lg:flex-col h-full 
-max-h-full overflow-hidden bg-white dark:bg-[#111111]
- rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm w-full">
+  max-h-full overflow-hidden 
+  bg-[#f8f8f8] dark:bg-[#111111] /* Rangi halisi ya Alibaba */
+  border-r border-gray-100 dark:border-gray-800 /* Mstari mwembamba pembeni */
+  rounded-xl shadow-sm w-full">
   
-  {/* HEADER YA SIDEBAR */}
-  <div className="flex items-center gap-3 px-4 py-4 border-b border-gray-100 dark:border-gray-800 shrink-0">
+   {/* HEADER YA SIDEBAR */}
+  <div className="flex items-center gap-3 px-4 py-4 shrink-0 border-b border-gray-200 dark:border-gray-800">
     <Star size={18} className="text-gray-600 dark:text-gray-300 shrink-0" /> 
-    <span className="text-[15px] font-bold text-gray-900 dark:text-white tracking-wide whitespace-nowrap">
+    <span className="text-[16px] font-bold text-gray-900 dark:text-white tracking-wide whitespace-nowrap">
       Categories
     </span>
   </div>
 
-  {/* LIST YA KATEGORIA - 🔥 TUMEBADILISHA HAPA */}
-  <ul className="list-none m-0 overflow-auto flex-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-thumb]:rounded-full">
+  {/* LIST YA KATEGORIA */}
+  <ul className="list-none m-0 overflow-auto flex-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:h-1.5 
+  [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-thumb]:rounded-full py-1">
     {categories.map(cat => (
       <li 
         key={cat.id} 
         onClick={() => handleCategoryClick(cat)}
-        className="flex justify-between items-center px-4 py-3 cursor-pointer transition-colors duration-200 border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+        className="flex justify-between items-center px-4 py-3 
+        cursor-pointer transition-colors duration-200 
+        hover:bg-gray-200/60 dark:hover:bg-gray-800/60 group"
       >
         {/* Upande wa kushoto: Icon na Jina */}
-        {/* 🔥 Tumeongeza whitespace-nowrap na text-[13px] */}
-        <div className="flex items-center gap-2.5 text-gray-800 dark:text-gray-200 whitespace-nowrap">
-          <span className="shrink-0">{getIcon(cat.icon_name)}</span>
-          <span className="text-[13px] font-medium">{getCategoryDisplayName(cat)}</span>
+        <div className="flex items-center gap-3 text-gray-800 dark:text-gray-200 min-w-0">
+          <span className="shrink-0 text-gray-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+            {getIcon(cat.icon_name)}
+          </span>
+          {/* 
+            - text-[14px]: Ukubwa wa herufi
+            - font-semibold: Inafanya maneno yawe yanene (bold) kidogo kama Alibaba
+            - text-gray-900: Rangi nyeusi zaidi kwa usomekaji mzuri
+          */}
+          <span className="text-[14px] font-semibold truncate text-gray-900 dark:text-white">
+            {getCategoryDisplayName(cat)}
+          </span>
         </div>
         
         {/* Upande wa kulia: Chevron (Mshale) */}
-        <ChevronRight size={16} className="text-gray-400 dark:text-gray-500 shrink-0 ml-2" />
+        <ChevronRight size={16} className="text-gray-400 dark:text-gray-500 shrink-0 ml-2 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
       </li>
     ))}
   </ul>
+
 </aside>
 
   {/* 2. BANNER NA SLIDER (Kati) */}
@@ -647,7 +660,7 @@ max-h-full overflow-hidden bg-white dark:bg-[#111111]
 
     <div className="w-full overflow-hidden m-0 p-0 leading-none">
 
-    <div className="relative w-full aspect-[16/9] md:aspect-[16/7] lg:aspect-auto lg:h-[350px] 
+    <div className="relative w-full aspect-[18/9] md:aspect-[16/7] lg:aspect-auto lg:h-[350px] 
     bg-gradient-to-br from-[#1a1a2e] to-[#16213e] overflow-hidden rounded-xl max-h-[350px]">   
       {activeAd && isVideoAd(activeAd) ? (
   <video
