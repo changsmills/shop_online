@@ -132,14 +132,29 @@ export default function JustForYou({ search = "", selectedCategory }) {
       : selectedCategory.name;
   };
 
-  const handleCardClick = (item) => {
-    const priorityId = item.id;
-    const sectionName = encodeURIComponent(`${t('just_for_you')} ${selectedCategory && selectedCategory.id !== null ? `${t('in')} ${getCategoryName()}` : ''}`);
-    const categoryId = selectedCategory?.id || '';
-    const categoryName = encodeURIComponent(getCategoryName() || 'All');
-    const url = `/products?priorityId=${priorityId}&sectionName=${sectionName}&categoryId=${categoryId}&categoryName=${categoryName}`;
-    window.open(url, '_blank');
-  };
+ const handleCardClick = (item) => {
+  const priorityId = item.id;
+  
+  // 🔥 1. Chukua IDs zote tatu kutoka kwenye item
+  const leafId = item.leaf_category_id || '';
+  const subId = item.sub_category_id || ''; 
+  const parentId = item.parent_category_id || '';
+  
+  // 🔥 2. Chukua Jina la Leaf Category
+  const categoryName = encodeURIComponent(
+    i18n.language === 'sw' 
+      ? (item.leaf_category_name_sw || item.leaf_category_name || item.category_name || 'All')
+      : (item.leaf_category_name || item.category_name || 'All')
+  );
+
+  // 🔥 3. Tengeneza Section Name
+  const sectionName = encodeURIComponent(`${t('just_for_you')} in ${categoryName}`);
+
+  // 🔥 4. Tengeneza URL na IDs zote
+  const url = `/products?priorityId=${priorityId}&sectionName=${sectionName}&leafId=${leafId}&subId=${subId}&parentId=${parentId}&categoryName=${categoryName}`;
+  
+  window.open(url, '_blank');
+};
 
   const renderHeader = () => (
     <div className="flex justify-between items-center px-3 py-2 mb-3 sm:px-2.5 sm:py-1.5 sm:mb-2 md:px-5 md:py-3 md:mb-5 bg-[#fff7ed] dark:bg-[#1e293b] dark:border-b dark:border-[#334155] rounded-t-xl text-black dark:text-white">

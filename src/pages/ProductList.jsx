@@ -7,6 +7,9 @@ export default function ProductList({
   search,
   category = "All", 
   categoryId = null,
+  leafId = null,
+  subId = null,
+  parentId = null,
   section = "",      
   priorityId = null, 
   sortBy = "created_at", 
@@ -31,11 +34,17 @@ export default function ProductList({
   const initialFetchDoneRef = useRef(false);
   const hasMoreRef = useRef(true);
   
-  // 🔥 ONGEZA CACHE
+  // 🔥 Safisha section mara moja
+  const cleanSection = useMemo(() => {
+    if (!section) return "";
+    return section.split(' in ')[0].trim();
+  }, [section]);
+
+  // 🔥 CACHE
   const cacheRef = useRef({});
   
   const currentParamsRef = useRef({
-    search, categoryId, section, sortBy, order, minPrice, maxPrice, filterType
+    search, categoryId, leafId, subId, parentId, section: cleanSection, sortBy, order, minPrice, maxPrice, filterType
   });
 
   useEffect(() => {
@@ -57,8 +66,8 @@ export default function ProductList({
     if (!mountedRef.current) return;
     if (!hasMoreRef.current && !isNewSearch && pageNum > 0) return;
 
-    // 🔥 ONGEZA CACHE CHECK
-    const cacheKey = `${categoryId || 'all'}-${search || ''}-${section || ''}-${sortBy}-${order}-${pageNum}`;
+    // 🔥 CACHE KEY (bila section ili isibadilike kila mara)
+    const cacheKey = `${categoryId || 'all'}-${search || ''}-${sortBy}-${order}-${pageNum}`;
     if (isNewSearch && cacheRef.current[cacheKey]) {
       console.log('📦 Using cache for:', cacheKey);
       setProducts(cacheRef.current[cacheKey]);
@@ -84,7 +93,6 @@ export default function ProductList({
       const currentCategoryId = currentParamsRef.current.categoryId;
       const currentSearch = currentParamsRef.current.search;
       const currentSection = currentParamsRef.current.section?.trim() || "";
-      console.log("🔥 SECTION INACHAKULIWA:", currentSection);
       const currentSortBy = currentParamsRef.current.sortBy;
       const currentOrder = currentParamsRef.current.order;
       const currentMinPrice = currentParamsRef.current.minPrice;
@@ -96,10 +104,16 @@ export default function ProductList({
         params.store_id = storeId;
       }
 
-      // 🔥 Zuia kutuma 'all' kwa backend
-      if (currentCategoryId && currentCategoryId !== 'all' && currentCategoryId !== 'All') {
-       params.parent_category = currentCategoryId;
-       }
+      // 🔥 FALLBACK LOGIC: Leaf -> Sub -> Parent -> All
+      if (leafId) {
+        params.leaf_category = leafId;
+      } else if (subId) {
+        params.sub_category = subId;
+      } else if (parentId) {
+        params.parent_category = parentId;
+      } else if (currentCategoryId && currentCategoryId !== 'all' && currentCategoryId !== 'All') {
+        params.parent_category = currentCategoryId;
+      }
 
       // 2. Search
       if (currentSearch && currentSearch.trim()) {
@@ -179,37 +193,29 @@ export default function ProductList({
         };
       });
 
-      // 🔥 FILTER YA TOP DEALS (LAZIMA IWE HAPA!)
-if (currentSection === "Top Deals" || currentSection === "top-deals" || currentSection === "Top deals") {
-    console.log("🔥 TOP DEALS FILTER INAFANYA KAZI! Kabla:", sanitizedData.length);
-    
-    sanitizedData = sanitizedData.filter(p => {
-        const price = parseFloat(p.price) || 0;
-        const originalPrice = parseFloat(p.original_price) || 0;
-        // Inachuja bidhaa zenye original_price > 0 NA original_price < price
-        return originalPrice > 0 && originalPrice < price;
-    });
-    
-    console.log("🔥 TOP DEALS FILTER BAADA:", sanitizedData.length);
-}
+      // 🔥 FILTER YA TOP DEALS
+      if (currentSection === "Top Deals" || currentSection === "top-deals" || currentSection === "Top deals") {
+        sanitizedData = sanitizedData.filter(p => {
+          const price = parseFloat(p.price) || 0;
+          const originalPrice = parseFloat(p.original_price) || 0;
+          return originalPrice > 0 && originalPrice < price;
+        });
+      }
 
+      // 🔥 FILTER YA KUTENGANISHA SECTIONS
+      const isTopDealsSection = currentSection === "Top Deals" || currentSection === "top-deals" || currentSection === "Top deals";
+      const isRecentlyViewedSection = currentSection === "Recently Viewed" || currentSection === "recently-viewed" || currentSection === "recently_viewed";
+            
+      if (!isTopDealsSection && !isRecentlyViewedSection) {
+        sanitizedData = sanitizedData.filter(p => {
+          const price = parseFloat(p.price) || 0;
+          const originalPrice = parseFloat(p.original_price) || 0;
+          const isDiscounted = originalPrice > 0 && originalPrice < price;
+          return !isDiscounted;
+        });
+      }
 
-    // 🔥 FILTER YA KUTENGANISHA SECTIONS (Kuepuka kuchanganyika na Top Deals!)
-const isTopDealsSection = currentSection === "Top Deals" || currentSection === "top-deals" || currentSection === "Top deals";
-const isRecentlyViewedSection = currentSection === "Recently Viewed" || currentSection === "recently-viewed" || currentSection === "recently_viewed";
-      
-if (!isTopDealsSection && !isRecentlyViewedSection) {
-    // Hii inaondoa bidhaa ZOTE zenye punguzo (Top Deals) kwenye Hot Picks, Trending, All, n.k.
-    // LAKINI HAIONDOI kwenye Recently Viewed, kwa sababu hapa tunavuta bidhaa ulizoview.
-    sanitizedData = sanitizedData.filter(p => {
-        const price = parseFloat(p.price) || 0;
-        const originalPrice = parseFloat(p.original_price) || 0;
-        const isDiscounted = originalPrice > 0 && originalPrice < price;
-        return !isDiscounted;
-    });
-}
-
-      // 🔥 Priority Item (kama ipo)
+      // 🔥 Priority Item
       if (priorityId && pageNum === 0) {
         const priorityItem = sanitizedData.find(p => p.id === priorityId);
         if (priorityItem) {
@@ -220,9 +226,7 @@ if (!isTopDealsSection && !isRecentlyViewedSection) {
 
       if (isNewSearch || pageNum === 0) {
         setProducts(sanitizedData);
-        // 🔥 HIFADHI KWENYE CACHE
         cacheRef.current[cacheKey] = sanitizedData;
-        // Ondoa cache za zamani (limit cache size)
         const keys = Object.keys(cacheRef.current);
         if (keys.length > 20) {
           delete cacheRef.current[keys[0]];
@@ -256,22 +260,21 @@ if (!isTopDealsSection && !isRecentlyViewedSection) {
     }
   }, [onLoad, priorityId, storeId]);
 
+  // 🔥 UPDATE currentParamsRef
   useEffect(() => {
     currentParamsRef.current = {
-      search, categoryId, section, sortBy, order, minPrice, maxPrice, filterType
+      search, categoryId, leafId, subId, parentId, section: cleanSection, sortBy, order, minPrice, maxPrice, filterType
     };
-  }, [search, categoryId, section, sortBy, order, minPrice, maxPrice, filterType]);
+  }, [search, categoryId, leafId, subId, parentId, cleanSection, sortBy, order, minPrice, maxPrice, filterType]);
 
+  // 🔥 FETCH YA MWANZO (BILA setProducts([]))
   useEffect(() => {
     initialFetchDoneRef.current = false;
     setPage(0);
     setHasMore(true);
     setError(null);
     
-    // 🔥 TUNAFUTA BIDHAA TU KAMA MTANDAO UKO KWENYE HALI NZURI (Hii itazuia ukurasa kuwa mweupe mtandao ukirudi)
-    if (navigator.onLine) {
-      setProducts([]);
-    }
+    // 🔥 TUMEONDOA setProducts([]) ili kuzuia flickering
     
     const timer = setTimeout(() => {
       if (mountedRef.current) {
@@ -285,14 +288,16 @@ if (!isTopDealsSection && !isRecentlyViewedSection) {
         abortControllerRef.current.abort();
       }
     };
-  }, [search, categoryId, section, sortBy, order, minPrice, maxPrice, filterType, fetchProducts]);
+  }, [search, categoryId, leafId, subId, parentId, sortBy, order, minPrice, maxPrice, filterType, fetchProducts]);
 
+  // 🔥 PAGINATION
   useEffect(() => {
     if (page > 0 && mountedRef.current && !loading && hasMore && initialFetchDoneRef.current) {
       fetchProducts(page, false);
     }
   }, [page, loading, hasMore, fetchProducts]);
 
+  // 🔥 INFINITE SCROLL
   useEffect(() => {
     let timeoutId;
     let ticking = false;
@@ -325,31 +330,23 @@ if (!isTopDealsSection && !isRecentlyViewedSection) {
     };
   }, [loading, hasMore]);
 
-
-
-    // 🔥 HII NDIO ITAFANYA MTANDAO UKIRUDI IENDELEE PALE ILIPOISHIA
+  // 🔥 MTANDAO UKIRUDI
   useEffect(() => {
-    
-        const handleOnline = () => {
-      console.log("🌐 Mtandao umerudi! Tunavuta data mpya...");
-      
+    const handleOnline = () => {
       if (mountedRef.current) {
-        // 🔥 1. Kama data ipo kwenye cache, ionyeshe papo hapo ili isikae mweupe
-        const cacheKey = `${categoryId || 'all'}-${search || ''}-${section || ''}-${sortBy}-${order}-${page}`;
+        const cacheKey = `${categoryId || 'all'}-${search || ''}-${sortBy}-${order}-${page}`;
         if (cacheRef.current[cacheKey]) {
           setProducts(cacheRef.current[cacheKey]);
         }
-
-        // 🔥 2. Kisha fanya fetch ya data mpya
         fetchProducts(page, false); 
       }
     };
 
     window.addEventListener('online', handleOnline);
     return () => window.removeEventListener('online', handleOnline);
-  }, [fetchProducts, page]); // Tunamwambia ifanye kazi kila page inapobadilika
+  }, [fetchProducts, page, categoryId, search, sortBy, order]);
 
-
+  // 🔥 FILTERED PRODUCTS
   const filteredProducts = useMemo(() => {
     let result = products;
     if (search && !loading && products.length > 0) {
@@ -360,6 +357,7 @@ if (!isTopDealsSection && !isRecentlyViewedSection) {
     return limit ? result.slice(0, limit) : result;
   }, [products, search, limit, loading]);
 
+  // 🔥 ERROR
   if (error && products.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
@@ -376,82 +374,44 @@ if (!isTopDealsSection && !isRecentlyViewedSection) {
     );
   }
 
-if (loading && products.length === 0) {
-  return (
-    <div className="w-full" style={{ margin: 0, padding: 0 }}>
-      <div style={{
-        display: 'grid',
-        gap: '1rem',
-        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(6, minmax(0, 1fr))',
-        width: '100%',
-        margin: 0,
-        padding: isMobile ? '0' : '0 16px',
-      }}>
-        {Array.from({ length: isMobile ? 4 : 12 }).map((_, index) => (
-          <div key={index} className="skeleton-card" style={{
-            borderRadius: '12px',
-            overflow: 'hidden',
-            backgroundColor: '#f3f4f6',
-            minHeight: '220px',
-            display: 'flex',
-            flexDirection: 'column'
-          }}>
-            {/* Skeleton Image */}
-            <div style={{
-              height: '150px',
-              backgroundColor: '#e5e7eb',
-              animation: 'pulse 1.5s infinite'
-            }}></div>
-            {/* Skeleton Content */}
-            <div style={{ padding: '12px' }}>
-              <div style={{
-                height: '14px',
-                backgroundColor: '#e5e7eb',
-                borderRadius: '4px',
-                marginBottom: '8px',
-                width: '80%',
-                animation: 'pulse 1.5s infinite'
-              }}></div>
-              <div style={{
-                height: '12px',
-                backgroundColor: '#e5e7eb',
-                borderRadius: '4px',
-                marginBottom: '8px',
-                width: '60%',
-                animation: 'pulse 1.5s infinite'
-              }}></div>
-              <div style={{
-                height: '12px',
-                backgroundColor: '#e5e7eb',
-                borderRadius: '4px',
-                width: '40%',
-                animation: 'pulse 1.5s infinite'
-              }}></div>
+  // 🔥 SKELETON (Inaonekana tu kama hakuna bidhaa kabisa)
+  if (loading && products.length === 0) {
+    return (
+      <div className="w-full">
+        <div className={`grid gap-4 w-full ${isMobile ? 'grid-cols-2 px-0' : 'grid-cols-6 px-4'}`}>
+          {Array.from({ length: isMobile ? 4 : 12 }).map((_, index) => (
+            <div key={index} className="rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 min-h-[220px] flex flex-col animate-pulse">
+              <div className="h-[150px] bg-gray-200 dark:bg-gray-700"></div>
+              <div className="p-3">
+                <div className="h-[14px] bg-gray-200 dark:bg-gray-700 rounded mb-2 w-[80%]"></div>
+                <div className="h-[12px] bg-gray-200 dark:bg-gray-700 rounded mb-2 w-[60%]"></div>
+                <div className="h-[12px] bg-gray-200 dark:bg-gray-700 rounded w-[40%]"></div>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
+  // 🔥 EMPTY STATE (Inaonekana tu kama hakuna bidhaa na hakuna loading)
   if (!loading && products.length === 0 && !error) {
     return (
       <div className="w-full flex flex-col items-center justify-center py-20 px-4">
-        <div className="bg-gray-100 p-6 rounded-full mb-6">
+        <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-full mb-6">
           <span className="text-5xl">📦</span>
         </div>
-        <h3 className="text-2xl font-bold text-gray-800 mb-2">
+        <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
           Bidhaa Hazijapatikana
         </h3>
-        <p className="text-gray-500 max-w-sm text-center mb-8">
+        <p className="text-gray-500 dark:text-gray-400 max-w-sm text-center mb-8">
           Samahani, kwa sasa hatuna bidhaa kwenye kategoria ya 
           <span className="font-semibold text-orange-600"> "{category}"</span>. 
           Tunaongeza bidhaa mpya kila siku, tafadhali rudi baadaye!
         </p>
         <button 
           onClick={() => window.location.href = '/'}
-          className="flex items-center gap-2 px-8 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-black transition-all active:scale-95 shadow-lg"
+          className="flex items-center gap-2 px-8 py-3 bg-gray-900 dark:bg-white text-white dark:text-black font-medium rounded-lg hover:bg-black dark:hover:bg-gray-200 transition-all active:scale-95 shadow-lg"
         >
           <span>←</span> Rudi Kwenye Duka
         </button>
@@ -459,16 +419,10 @@ if (loading && products.length === 0) {
     );
   }
 
+  // 🔥 MAIN RENDER
   return (
-    <div className="w-full" style={{ margin: 0, padding: 0 }}>
-      <div style={{
-        display: 'grid',
-        gap: '1rem',
-        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(6, minmax(0, 1fr))',
-        width: '100%',
-        margin: 0,
-        padding: isMobile ? '0' : '0 16px',
-      }}>
+    <div className="w-full">
+      <div className={`grid gap-4 w-full ${isMobile ? 'grid-cols-2 px-0' : 'grid-cols-6 px-4'}`}>
         {filteredProducts.map((product) => (
           <ProductCard 
             key={product.id} 
@@ -482,15 +436,15 @@ if (loading && products.length === 0) {
       {loading && products.length > 0 && (
         <div className="flex justify-center items-center py-8 gap-3">
           <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-gray-500 text-sm">Inavuta bidhaa zaidi...</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Inavuta bidhaa zaidi...</p>
         </div>
       )}
       
       {!hasMore && products.length > 0 && (
         <div className="flex items-center justify-center gap-4 my-10">
-          <hr className="flex-1 border-gray-200" />
-          <span className="text-gray-400 text-sm">✨ Umeifikia mwisho wa bidhaa ✨</span>
-          <hr className="flex-1 border-gray-200" />
+          <hr className="flex-1 border-gray-200 dark:border-gray-700" />
+          <span className="text-gray-400 dark:text-gray-500 text-sm">✨ Umeifikia mwisho wa bidhaa ✨</span>
+          <hr className="flex-1 border-gray-200 dark:border-gray-700" />
         </div>
       )}
     </div>

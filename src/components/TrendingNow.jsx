@@ -212,17 +212,23 @@ useEffect(() => {
                 views={item.views}
                 rank={index + 1}
                 isVerified={item.is_verified || item.store?.is_verified}
-                onClick={() => {
-                  const queryParams = {
-                    ...(selectedCategory?.id && { categoryId: selectedCategory.id }),
-                    categoryName: selectedCategory?.name || 'All',
-                    sectionName: `${t('hot_picks')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`,
-                    sortBy: 'order_count',
-                    order: 'desc',
-                    priorityId: item.id
-                  };
-                  const params = new URLSearchParams(queryParams).toString();
-                  const url = `/products?${params}`;
+                                   onClick={() => {
+                  // 🔥 Chukua IDs zote tatu kutoka kwenye item
+                  const leafId = item.leaf_category_id || '';
+                  const subId = item.sub_category_id || ''; 
+                  const parentId = item.parent_category_id || '';
+                  
+                  // 🔥 Chukua jina la bidhaa/category (kwa ajili ya bannerDesc)
+                  const categoryName = i18n.language === 'sw' 
+                    ? (item.leaf_category_name_sw || item.leaf_category_name || item.category_name || 'All')
+                    : (item.leaf_category_name || item.category_name || 'All');
+
+                  // 🔥 Tumia "Hot Picks" pekee kama sectionName (bila "in Category")
+                  const sectionName = encodeURIComponent('Hot Picks');
+
+                  // 🔥 Tengeneza URL na IDs zote (BILA priorityId!)
+                  const url = `/products?sectionName=${sectionName}&leafId=${leafId}&subId=${subId}&parentId=${parentId}&categoryName=${encodeURIComponent(categoryName)}`;
+                  
                   window.open(url, '_blank');
                 }}
               />

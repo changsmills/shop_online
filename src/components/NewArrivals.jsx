@@ -221,7 +221,7 @@ export default function NewArrivals({ navigate, selectedCategory }) {
   if (products.length === 0) return null;
 
   return (
-    <div className="relative w-full bg-white dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] py-4">
+    <div className="relative w-full bg-[#f1f3f5] dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] py-4">
       {renderHeader()}
       <div className="relative flex items-center px-2">
 
@@ -252,12 +252,23 @@ export default function NewArrivals({ navigate, selectedCategory }) {
                 rating={product.rating || ''}
                 verified={product.is_verified || product.store?.is_verified || false}
                 years={product.years || ''}
-                onClick={() => {
-                  const priorityId = product.id;
-                  const sectionName = encodeURIComponent(`${t('new_arrivals')} ${selectedCategory ? `${t('in')} ${selectedCategory.name}` : ''}`);
-                  const categoryId = selectedCategory?.id || '';
-                  const categoryName = encodeURIComponent(selectedCategory?.name || 'All');
-                  const url = `/products?priorityId=${priorityId}&sectionName=${sectionName}&categoryId=${categoryId}&categoryName=${categoryName}`;
+                                onClick={() => {
+                  // 🔥 Chukua IDs zote tatu kutoka kwenye bidhaa
+                  const leafId = product.leaf_category_id || '';
+                  const subId = product.sub_category_id || ''; 
+                  const parentId = product.parent_category_id || '';
+                  
+                  // 🔥 Chukua jina la bidhaa/category (kwa ajili ya bannerDesc)
+                  const categoryName = i18n.language === 'sw' 
+                    ? (product.leaf_category_name_sw || product.leaf_category_name || product.category_name || 'All')
+                    : (product.leaf_category_name || product.category_name || 'All');
+
+                  // 🔥 Tumia "New Arrivals" pekee kama sectionName (bila "in Category")
+                  const sectionName = encodeURIComponent('New Arrivals');
+
+                  // 🔥 Tengeneza URL na IDs zote (BILA priorityId!)
+                  const url = `/products?sectionName=${sectionName}&leafId=${leafId}&subId=${subId}&parentId=${parentId}&categoryName=${encodeURIComponent(categoryName)}`;
+                  
                   window.open(url, '_blank');
                 }}
               />

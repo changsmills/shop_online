@@ -47,7 +47,7 @@ export default function DashboardCard({
         - Nimeweka bg-white dark:bg-[#1e293b] (ili card ionekane juu ya background)
         - Nimeweka rounded-xl (mviringo mzuri)
       */
-      className={`product-card-item group relative flex flex-col w-full overflow-hidden rounded-xl border border-[#e5e7eb] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] cursor-pointer transition-shadow duration-250 ease-in-out box-border dark:border-[#334155] dark:bg-[#1e293b] p-2 ${isStore ? 'is-store' : ''} ${isLocation ? 'is-location' : ''} display-${displayMode}`}
+      className={`product-card-item group relative flex flex-col w-full overflow-hidden rounded-xl border border-[#e5e7eb] bg-[#f8f8f8] shadow-[0_2px_8px_rgba(0,0,0,0.06)] cursor-pointer transition-shadow duration-250 ease-in-out box-border dark:border-[#334155] dark:bg-[#1e293b] p-2 ${isStore ? 'is-store' : ''} ${isLocation ? 'is-location' : ''} display-${displayMode}`}
       onClick={onClick} 
       onContextMenu={(e) => e.preventDefault()}
     >

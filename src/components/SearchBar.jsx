@@ -110,7 +110,7 @@ export default function SearchBar({ search = "", setSearch }) {
   };
 
   return (
-    <div className="relative w-full max-w-[800px] mx-auto flex-1 px-2 md:px-4 z-[1000]">
+    <div className="relative w-full max-w-[800px] mx-auto flex-1 px-2 md:px-4 z-[1000] font-sans">
       
       {/* Search Bar Container */}
       <div 

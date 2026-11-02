@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useMemo, useCallback, Suspense } fr
 import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
 import { ArrowUp, ChevronLeft, ChevronRight, ArrowLeft, Search } from "lucide-react";
 import api from "../axiosConfig";
-//import "../ProductsAll.css";
 import ProductList from "./ProductList";
 import SearchDialog from "../components/SearchDialog";
 
@@ -28,25 +27,23 @@ export default function ProductsAll() {
   const incomingStoreId = searchParams.get('storeId') || location.state?.storeId || null;
   const incomingStoreName = searchParams.get('name') || location.state?.name || null;
 
-// ✅ FUNCTION YA NORMALIZE (IWE MBELE YA MATUMIZI)
-const normalizeSection = (section) => {
-  if (!section) return "";
-  return section
-    .trim() 
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-};
+  // ✅ FUNCTION YA NORMALIZE
+  const normalizeSection = (section) => {
+    if (!section) return "";
+    return section
+      .trim() 
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
 
-// ✅ SASA TUMIA
-const incomingSection = normalizeSection(
-  searchParams.get('sectionName') ||
-  searchParams.get('section') ||
-  location.state?.sectionName ||
-  location.state?.section ||
-  ""
-);
-
+  const incomingSection = normalizeSection(
+    searchParams.get('sectionName') ||
+    searchParams.get('section') ||
+    location.state?.sectionName ||
+    location.state?.section ||
+    ""
+  );
 
   // ============================================
   // 2. STATES
@@ -66,7 +63,7 @@ const incomingSection = normalizeSection(
   const [error, setError] = useState(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  // ✅ STATE ZA MTANDAO NA REFETCH (Zilikuwa zipo, zimebaki)
+  // ✅ STATE ZA MTANDAO NA REFETCH
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [fetchTrigger, setFetchTrigger] = useState(0);
 
@@ -90,21 +87,25 @@ const incomingSection = normalizeSection(
   }, [incomingStoreId]);
 
   // ============================================
-  // 5. BANNER TITLE (Optimized with useMemo)
+  // 5. BANNER TITLE
   // ============================================
   
   const bannerTitle = useMemo(() => {
     if (incomingStoreName) {
       return `Bidhaa za ${incomingStoreName}`;
     }
+    
     if (activeSection) {
-      return activeCategory.name === "All" ? activeSection : activeCategory.name;
+      const decodedSection = decodeURIComponent(activeSection);
+      const cleanSection = decodedSection.split(' in ')[0];
+      return cleanSection;
     }
+    
     return activeCategory.name === "All" ? "Mkusanyiko wa Bidhaa" : activeCategory.name;
   }, [incomingStoreName, activeSection, activeCategory.name]);
 
   // ============================================
-  // 6. BANNER DESCRIPTION (Optimized with useMemo)
+  // 6. BANNER DESCRIPTION
   // ============================================
   
   const bannerDesc = useMemo(() => {
@@ -122,11 +123,10 @@ const incomingSection = normalizeSection(
   }, [activeCategory.name, activeSection]);
 
   // ============================================
-  // 7. FETCH CATEGORIES (✅ IMEBORESHA: Hooks haziko ndani ya useEffect tena)
+  // 7. FETCH CATEGORIES
   // ============================================
   const fetchCategories = useCallback(async () => {
     try {
-      // 🔥 ONGEZA CACHE
       const cachedCategories = localStorage.getItem('categories_cache');
       const cachedTime = localStorage.getItem('categories_cache_time');
       
@@ -149,7 +149,6 @@ const incomingSection = normalizeSection(
       if (Array.isArray(data) && data.length > 0) {
         const sortedData = [...data].sort((a, b) => a.name.localeCompare(b.name));
         
-        // 🔥 HIFADHI KWENYE CACHE
         localStorage.setItem('categories_cache', JSON.stringify(sortedData));
         localStorage.setItem('categories_cache_time', String(Date.now()));
 
@@ -169,23 +168,18 @@ const incomingSection = normalizeSection(
     }
   }, []);
 
-  // ✅ USE EFFECT YA KUPIGIA FETCH CATEGORIES (Imetenganishwa vizuri)
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
 
   // ============================================
-  // 8. 🔥 KAGUA MTANDAO NA KUAMUA KUPANDA REFETCH (✅ IMEBORESHA: Imemaliza dependancy)
+  // 8. MTANDAO
   // ============================================
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
       console.log("🌐 Mtandao umeunganishwa! Inapakia data za bidhaa upya...");
-      
-      // 1. Pakia kategoria upya
       fetchCategories();
-      
-      // 2. Pakia bidhaa upya kwa kubadilisha trigger
       setFetchTrigger(prev => prev + 1);
     };
     const handleOffline = () => setIsOnline(false);
@@ -197,7 +191,7 @@ const incomingSection = normalizeSection(
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [fetchCategories]); // ✅ MUHIMU: fetchCategories imeongezwa hapa!
+  }, [fetchCategories]);
 
   // ============================================
   // 9. SYNC CATEGORY FROM URL
@@ -239,7 +233,7 @@ const incomingSection = normalizeSection(
   }, []);
 
   // ============================================
-  // 12. BACK TO TOP - FLOATING BOTTOM BUTTON
+  // 12. BACK TO TOP
   // ============================================
   
   useEffect(() => {
@@ -251,10 +245,9 @@ const incomingSection = normalizeSection(
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-
   useEffect(() => {
-  setActiveSection(incomingSection);
-}, [incomingSection]);
+    setActiveSection(incomingSection);
+  }, [incomingSection]);
 
   // ============================================
   // 13. SCROLL TO TOP FUNCTION
@@ -290,6 +283,11 @@ const incomingSection = normalizeSection(
   const handleCategoryClick = useCallback((cat) => {
     setActiveCategory({ name: cat.name, id: cat.id });
     const newParams = new URLSearchParams(window.location.search);
+    
+    newParams.delete('leafId');
+    newParams.delete('subId');
+    newParams.delete('parentId');
+    
     if (cat.id) {
       newParams.set('categoryId', cat.id);
       newParams.set('categoryName', cat.name);
@@ -298,7 +296,7 @@ const incomingSection = normalizeSection(
       newParams.set('categoryName', 'All');
     }
     const newUrl = `${window.location.pathname}?${newParams.toString()}`;
-    window.history.replaceState({ path: newUrl }, '', newUrl);
+    window.location.href = newUrl;
   }, []);
 
   // ============================================
@@ -328,16 +326,12 @@ const incomingSection = normalizeSection(
   return (
     <div className="min-h-screen w-full bg-[#f8f8f8] dark:bg-[#1e293b] text-black dark:text-[#e2e8f0] overflow-x-hidden transition-colors duration-300 font-sans">
       
-            {/* ========== BANNER (MESH GRADIENT) ========== */}
-      
-          <div className="relative overflow-hidden text-gray-900 dark:text-white text-center py-12 md:py-16 px-4 md:px-5">
-                {/* 🔥 MESH GRADIENT LAYER */}
-        <div className="absolute inset-0 z-0 mesh-gradient-bg opacity-90  dark:hidden"></div>
+      {/* ========== BANNER ========== */}
+      <div className="relative overflow-hidden text-gray-900 dark:text-white text-center py-12 md:py-16 px-4 md:px-5">
+        <div className="absolute inset-0 z-0 mesh-gradient-bg opacity-90 dark:hidden"></div>
         
-        {/* CONTENT WRAPPER */}
         <div className="relative z-10 flex flex-col items-center justify-center h-full">
           
-          {/* ✅ BACK ARROW - KUREJEA DASHBOARD */}
           <button 
             className="hidden max-md:flex absolute top-0 left-0 w-9 h-9 rounded-full items-center justify-center bg-white/15 border border-white/20 backdrop-blur-md transition-all hover:bg-white/25 hover:scale-105 active:scale-95" 
             onClick={handleBackToDashboard}
@@ -346,7 +340,6 @@ const incomingSection = normalizeSection(
             <ArrowLeft size={24} />
           </button>
           
-          {/* ✅ SEARCH BUTTON - KULIA */}
           <button 
             className="flex absolute top-0 right-0 w-9 h-9 md:w-10 md:h-10 rounded-full items-center justify-center bg-white/15 border border-white/20 backdrop-blur-md transition-all hover:bg-white/25 hover:scale-105 active:scale-95" 
             onClick={() => setIsSearchOpen(true)}
@@ -360,25 +353,23 @@ const incomingSection = normalizeSection(
         </div>
       </div>
 
-      {/* ========== SEARCH DIALOG ========== */}
       <SearchDialog 
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
         onSearch={handleSearchSubmit}
       />
 
-           {/* ========== CATEGORY TABS ========== */}
-      <div className="sticky top-[60px] md:top-0 z-[100] bg-white dark:bg-[#1e293b] border-b border-gray-200 dark:border-gray-700 flex items-center w-full h-[54px] md:h-[64px] overflow-hidden px-2 md:px-4 shadow-sm mb-2">
-        
-        {/* LEFT ARROW */}
-        <button 
+      {/* ========== CATEGORY TABS ========== */}
+      
+     <div className="sticky top-[60px] md:top-0 z-[100] bg-white dark:bg-[#1e293b] border-b border-gray-200 dark:border-gray-700 flex items-center w-full h-[54px] md:h-[64px] overflow-hidden px-2 md:px-4 shadow-sm mb-2">              
+      
+              <button 
           className="hidden md:flex absolute z-20 w-8 h-8 bg-white dark:bg-[#1e293b] border border-gray-300 dark:border-gray-600 rounded-full items-center justify-center shadow-md top-1/2 -translate-y-1/2 left-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" 
           onClick={() => scroll("left")}
         >
           <ChevronLeft size={20} />
         </button>
         
-        {/* TABS CONTAINER */}
         <div 
           className="flex flex-row overflow-x-auto scroll-smooth whitespace-nowrap w-full px-1 md:px-12 gap-2 md:gap-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" 
           ref={scrollRef}
@@ -389,8 +380,7 @@ const incomingSection = normalizeSection(
             categories.map((cat) => (
               <button
                 key={cat.id || 'all'}
-                // 🔥 HAPA NDIPO TULIPOWEKA MAREKEBISHO YA RANGI NA PADDING
-                className={`px-4 py-2 md:px-5 md:py-2.5 text-sm md:text-[15px] font-medium rounded-full transition-all duration-200 border whitespace-nowrap ${
+                className={`px-3 py-1.5 md:px-5 md:py-2.5 text-xs md:text-[15px] font-medium rounded-full transition-all duration-200 border whitespace-nowrap ${
                   activeCategory.id === cat.id 
                     ? "bg-[#ff6a00] text-white border-[#ff6a00] shadow-md shadow-orange-500/20" 
                     : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-200 dark:hover:bg-gray-700"
@@ -403,7 +393,6 @@ const incomingSection = normalizeSection(
           )}
         </div>
         
-        {/* RIGHT ARROW */}
         <button 
           className="hidden md:flex absolute z-20 w-8 h-8 bg-white dark:bg-[#1e293b] border border-gray-300 dark:border-gray-600 rounded-full items-center justify-center shadow-md top-1/2 -translate-y-1/2 right-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" 
           onClick={() => scroll("right")}
@@ -416,11 +405,13 @@ const incomingSection = normalizeSection(
       <div className="w-full block p-0 md:p-0">
         <main className="w-full block p-0 md:p-0">
           <ProductList 
-            // ✅ IMEBADILISHWA: Ongeza -${fetchTrigger} mwishoni mwa key!
             key={`${incomingStoreId}-${activeCategory.id}-${activeSection}-${search}-${priorityId}-${fetchTrigger}`}
             category={activeCategory.name}
             storeId={incomingStoreId}
             categoryId={activeCategory.id}
+            leafId={searchParams.get('leafId')}
+            subId={searchParams.get('subId')}
+            parentId={searchParams.get('parentId')}
             search={search}
             activeCategory={activeCategory}
             section={activeSection}
@@ -435,7 +426,7 @@ const incomingSection = normalizeSection(
         </main>
       </div>
 
-      {/* ========== BACK TO TOP - FLOATING BUTTON ========== */}
+      {/* ========== BACK TO TOP ========== */}
       <button 
         className={`fixed bottom-[80px] md:bottom-[120px] right-3 md:right-6 w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#ff6a00] hover:bg-[#e55a00] text-white shadow-[0_4px_16px_gba(255,106,0,0.35)] flex items-center justify-center transition-all duration-300 z[1000] border-none cursor-pointer
          ${showBackToTop ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto visible animate-[bounceIn_0.4s_ease_forwards]' : 'opacity-0 translate-y-5 scale-75 pointer-events-nome invisible'}`} 

@@ -258,11 +258,23 @@ export default function TopDeals({ navigate, selectedCategory }) {
                   rating={product.rating}
                   verified={product.verified || product.store?.is_verified}
                   years={product.years}
-                  onClick={() => {
-                    const priorityId = product.id;
-                    const sectionName = encodeURIComponent(`Top Deals${selectedCategory ? ` in ${selectedCategory.name}` : ''}`);
-                    const categoryId = selectedCategory?.id || '';
-                    const url = `/products?priorityId=${priorityId}&sectionName=${sectionName}${categoryId ? `&categoryId=${categoryId}` : ''}`;
+                          onClick={() => {
+                    // 🔥 Chukua IDs zote tatu kutoka kwenye bidhaa
+                    const leafId = product.leaf_category_id || '';
+                    const subId = product.sub_category_id || ''; 
+                    const parentId = product.parent_category_id || '';
+                    
+                    // 🔥 Chukua jina la bidhaa/category (kwa ajili ya bannerDesc)
+                    const categoryName = i18n.language === 'sw' 
+                      ? (product.leaf_category_name_sw || product.leaf_category_name || product.category_name || 'All')
+                      : (product.leaf_category_name || product.category_name || 'All');
+
+                    // 🔥 Tumia "Top Deals" pekee kama sectionName (bila "in Category")
+                    const sectionName = encodeURIComponent('Top Deals');
+
+                    // 🔥 Tengeneza URL na IDs zote
+                    const url = `/products?sectionName=${sectionName}&leafId=${leafId}&subId=${subId}&parentId=${parentId}&categoryName=${encodeURIComponent(categoryName)}`;
+                    
                     window.open(url, '_blank');
                   }}
                 />

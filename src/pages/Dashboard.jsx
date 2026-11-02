@@ -542,7 +542,7 @@ return (
 
 
 <div key={i18n.language} className="flex flex-col min-h-screen
- bg-white dark:bg-black relative font-sans ">
+ bg-[#f1f3f5] dark:bg-black relative font-sans ">
 
 {/* Wrapper hii inafanya Header iwe fixed kwenye simu, sticky kwenye desktop */}
 <div className="fixed md:sticky top-0 left-0 w-full z-[999]">
@@ -741,7 +741,7 @@ return (
   </div>
 
  {/* 3. RECENTLY VIEWED MINI (Kulia) - Imepewa muonekano wa Card */}
-<div className="hidden lg:flex lg:flex-col h-full bg-white dark:bg-black
+<div className="hidden lg:flex lg:flex-col h-full bg-[#f8f8f8] dark:bg-black
  rounded-xl border border-gray-200 dark:border-gray-800 p-3 overflow-hidden shadow-sm">
   <Suspense fallback={<ComponentFallback />}>
     <RecentlyViewed 
