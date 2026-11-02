@@ -74,49 +74,50 @@ export default function Dashboard() {
   const [selectedCategory, setSelectedCategory] = useState(ALL_CATEGORY);
   const [selectedCategoryForComponents, setSelectedCategoryForComponents] = useState(ALL_CATEGORY);
 
-    useEffect(() => {
-    const fetchAdsWithCache = async () => {
-      const storedAds = localStorage.getItem('skyfall_ads');
-      const storedTime = localStorage.getItem('skyfall_ads_time');
 
-      // 1. Ikiwa cache ipo na bado ni mpya (chini ya dakika 5), tumia hiyo tu
-      if (storedAds && storedTime && (Date.now() - Number(storedTime) < 5 * 60 * 1000)) {
+   // 🔥 1. WEKA fetchAdsWithCache NJE YA useEffect (Kama function ya kawaida)
+  const fetchAdsWithCache = async (forceRefresh = false) => {
+    const storedAds = localStorage.getItem('skyfall_ads');
+    const storedTime = localStorage.getItem('skyfall_ads_time');
+
+    // 1. Ikiwa cache ipo na bado ni mpya (chini ya dakika 5), tumia hiyo tu
+    // (Lakini kama forceRefresh ni true, ruka hii hatua)
+    if (!forceRefresh && storedAds && storedTime && (Date.now() - Number(storedTime) < 5 * 60 * 1000)) {
+      setCachedAds(JSON.parse(storedAds));
+      console.log("📦 [ADS] Zimepakuliwa kutoka cache!");
+      return;
+    }
+
+    try {
+      console.log("⏳ [ADS] Inapakia matangazo kutoka Backend...");
+      const response = await api.get('/advertisements/', {
+        params: { status: 'active' }
+      });
+
+      const data = response.data.results || response.data || [];
+      
+      if (data.length > 0) {
+        console.log(`✅ [ADS] Matangazo ${data.length} yamepakuliwa!`);
+        setCachedAds(data);
+        localStorage.setItem('skyfall_ads', JSON.stringify(data));
+        localStorage.setItem('skyfall_ads_time', String(Date.now()));
+      } else {
+        console.warn("⚠️ [ADS] Hakuna matangazo yaliyorudishwa na Backend.");
+        setCachedAds([]);
+      }
+      
+    } catch (error) {
+      console.error("❌ [ADS] Error fetching ads:", error.message);
+      if (storedAds) {
         setCachedAds(JSON.parse(storedAds));
-        console.log("📦 [ADS] Zimepakuliwa kutoka cache!");
-        return;
+      } else {
+        setCachedAds([]);
       }
+    }
+  };
 
-      // 2. ✅ IMEONDOLEWA: Kizuizi cha token! Sasa mgeni yeyote anaweza kupata matangazo.
-      // Tunatuma ombi moja kwa moja kwa API.
-      try {
-        console.log("⏳ [ADS] Inapakia matangazo kutoka Backend...");
-        const response = await api.get('/advertisements/', {
-          params: { status: 'active' }
-        });
-
-        // 3. ✅ IMEBORESHA: Inashughulikia pagination ya Django (results)
-        const data = response.data.results || response.data || [];
-        
-        if (data.length > 0) {
-          console.log(`✅ [ADS] Matangazo ${data.length} yamepakuliwa!`);
-          setCachedAds(data);
-          localStorage.setItem('skyfall_ads', JSON.stringify(data));
-          localStorage.setItem('skyfall_ads_time', String(Date.now()));
-        } else {
-          console.warn("⚠️ [ADS] Hakuna matangazo yaliyorudishwa na Backend.");
-          setCachedAds([]);
-        }
-        
-      } catch (error) {
-        console.error("❌ [ADS] Error fetching ads:", error.message);
-        // Kama API imeshindwa, jaribu kutumia cache iliyopo
-        if (storedAds) {
-          setCachedAds(JSON.parse(storedAds));
-        } else {
-          setCachedAds([]); // Hakuna cache, hakuna matangazo
-        }
-      }
-    };
+  // 🔥 2. IITE MARA MOJA PALE COMPONENT INAPOPAKIA
+  useEffect(() => {
     fetchAdsWithCache();
   }, []);
 
@@ -131,13 +132,14 @@ export default function Dashboard() {
     return ad.media_url.match(/\.(mp4|webm|mov)$/i) !== null;
   };
 
-const fetchFeaturedLeafs = async (categoryId) => {
+const fetchFeaturedLeafs = async (categoryId, forceRefresh = false) => {
   if (!categoryId) return;
 
   const isAll = categoryId === 'all';
   const cacheKey = isAll ? 'all_products' : categoryId;
 
-  if (categoryCacheRef.current[cacheKey]?.leafs) {
+  // 🔥 KINGA YA CACHE: Kama data ipo na hatulazimishwi, tumia iliyopo
+  if (!forceRefresh && categoryCacheRef.current[cacheKey]?.leafs) {
     setFeaturedProducts(categoryCacheRef.current[cacheKey].leafs);
     setLoadingLeafs(false); 
     return;
@@ -148,7 +150,6 @@ const fetchFeaturedLeafs = async (categoryId) => {
   try {
     console.log(`⏳ [FETCH] Inapakia products za ${isAll ? 'ALL' : categoryId}...`);
     
-    // 🔥 BADILISHA PARAMS: Kama ni 'all', usiweke parent_category
     const params = {
       limit: 17,
       ordering: '-views'
@@ -170,7 +171,6 @@ const fetchFeaturedLeafs = async (categoryId) => {
       name_sw: product.leaf_category_name || product.name
     }));
 
-    // Hifadhi kwenye cache kwa kutumia cacheKey
     categoryCacheRef.current[cacheKey] = {
       ...categoryCacheRef.current[cacheKey],
       leafs: result
@@ -186,15 +186,15 @@ const fetchFeaturedLeafs = async (categoryId) => {
   }
 };
 
-const fetchSubCategories = async (categoryId) => {
+const fetchSubCategories = async (categoryId, forceRefresh = false) => {
   if (!categoryId) return;
 
-  if (categoryCacheRef.current[categoryId]?.subCategories) {
+  // 🔥 KINGA YA CACHE
+  if (!forceRefresh && categoryCacheRef.current[categoryId]?.subCategories) {
     const cachedSubs = categoryCacheRef.current[categoryId].subCategories;
     setSubCategories(cachedSubs);
     if (cachedSubs.length > 0) {
       setSelectedSubCategory(cachedSubs[0]);
-      // Usifanye fetchLeafsForSub hapa! Itafanywa na useEffect au hover
     }
     return;
   }
@@ -219,19 +219,19 @@ const fetchSubCategories = async (categoryId) => {
 
     if (sortedData.length > 0) {
       setSelectedSubCategory(sortedData[0]);
-      // Pia usifanye fetchLeafsForSub hapa!
     }
   } catch (error) {
     console.error("❌ [fetchSubCategories] Error:", error);
   }
 };
 
-const fetchLeafsForSub = async (subCategoryId) => {
+const fetchLeafsForSub = async (subCategoryId, forceRefresh = false) => {
   if (!subCategoryId) return;
 
   const cacheKey = `sub_${subCategoryId}`;
 
-  if (categoryCacheRef.current[cacheKey]) {
+  // 🔥 KINGA YA CACHE
+  if (!forceRefresh && categoryCacheRef.current[cacheKey]) {
     setLeafsForSub(categoryCacheRef.current[cacheKey]);
     setLoadingLeafs(false);
     return;
@@ -362,45 +362,42 @@ useEffect(() => {
       }
       return;
     }
+
+    // 🔥 BADILIKO: Weka session papo hapo kama token ipo!
+    // Hii inafanya UI ionekane haraka bila kusubiri Django.
+    if (isMounted) {
+      setSession({ user: { id: "authenticated" } });
+      setSessionLoading(false);
+    }
     
     try {
-      // 🔥 Pata profile kutoka backend
+      // 🔥 Pata profile kutoka backend NYUMA YA PAZIA (Background)
+      // Hii itathibitisha tu kama mtumiaji ni supplier, lakini haitazuia UI.
       const profileRes = await api.get('/profile/');
       const userProfile = profileRes.data;
 
-      // Kama component imeondoka, usifanye setState
       if (!isMounted) return;
 
-      // 🔥 Ikiwa ni supplier na hajaverify OTP, mpeleke kwenye verify page
       if (userProfile.role === 'supplier' && !userProfile.is_otp_verified) {
         navigate('/verify-seller-otp');
         return;
       }
 
-      // Vinginevyo, set session kama kawaida
+      // Update user ID na data nyingine kamili
       setSession({ user: { id: userProfile.id } });
       
     } catch (err) {
       console.error("Auth check error:", err);
-      
       if (!isMounted) return;
       
-      // Cleanup tokens kama API imeshindwa
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       setSession(null);
-      
-    } finally {
-      // Hakikisha sessionLoading inawekwa false kila wakati
-      if (isMounted) {
-        setSessionLoading(false);
-      }
     }
   };
   
   checkAuth();
   
-  // Cleanup: Weka isMounted kuwa false wakati component inaondoka
   return () => {
     isMounted = false;
   };
@@ -418,18 +415,18 @@ useEffect(() => {
     const handleOnline = () => {
       console.log("🌐 Mtandao umeunganishwa! Inapakia data za Dashboard upya...");
 
-      // 1. Pata matangazo mapya (Ads)
-      fetchAdsWithCache();
+      // 1. Pata matangazo mapya (Ads) - forceRefresh = true
+      fetchAdsWithCache(true); // Ongeza parameter kama fetchAdsWithCache ina cache
 
-      // 2. Pata bidhaa za kategoria iliyochaguliwa (ikiwa ipo)
+      // 2. Pata bidhaa za kategoria iliyochaguliwa - forceRefresh = true
       if (selectedCategory?.id) {
-        fetchFeaturedLeafs(selectedCategory.id);
-        fetchSubCategories(selectedCategory.id);
+        fetchFeaturedLeafs(selectedCategory.id, true); // 🔥 true = Force Refresh
+        fetchSubCategories(selectedCategory.id, true); // 🔥 true = Force Refresh
       }
 
-      // 3. Pata bidhaa za subcategory iliyochaguliwa (ikiwa ipo)
+      // 3. Pata bidhaa za subcategory iliyochaguliwa - forceRefresh = true
       if (viewMode === 'subcategories' && selectedSubCategory?.id) {
-        fetchLeafsForSub(selectedSubCategory.id);
+        fetchLeafsForSub(selectedSubCategory.id, true); // 🔥 true = Force Refresh
       }
     };
 
@@ -532,7 +529,7 @@ const handleSubCategoryHover = (subCategory) => {
   </div>
 );
 
- if (dataLoading || sessionLoading) {
+ if (dataLoading) {
   return (
     <div className="flex flex-col bg-bgPrimary min-h-screen relative">
       <Header search={search} setSearch={setSearch} />
@@ -548,7 +545,7 @@ return (
  bg-white dark:bg-black relative font-sans ">
 
 {/* Wrapper hii inafanya Header iwe fixed kwenye simu, sticky kwenye desktop */}
-<div className="fixed md:sticky top-0 left-0 w-full z-[9999]">
+<div className="fixed md:sticky top-0 left-0 w-full z-[999]">
   <Header search={search} setSearch={setSearch} />
 </div> 
       {/* ✅ Content ina scroll yake yenyewe */}
@@ -758,7 +755,7 @@ return (
 </div>
           )}
 
-<div className="flex flex-col pt-4">
+<div className="flex flex-col pt-4 bg-[#f8f8f8] dark:bg-black ">
     {/* 🔥 RECENTLY VIEWED - IONEKANE MOBILE TU (Imezungukwa na div) */}
 <div className="block lg:hidden">
   <Suspense fallback={<ComponentFallback />}>

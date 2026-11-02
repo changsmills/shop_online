@@ -34,6 +34,8 @@ export default function NavLinks({ isMobile }) {
   const [protectionsMenuPos, setProtectionsMenuPos] = useState({ top: 0, left: 0 });
 
   const timeoutRef = useRef(null);
+   const abortRef = useRef(null);
+  const isMounted = useRef(true);
   const placeholderImg = "https://via.placeholder.com/150?text=Skyfall+Product";
 
   const protectionsRef = useRef(null);
@@ -102,70 +104,125 @@ export default function NavLinks({ isMobile }) {
     }
   }, [selectedParent]);
 
-  useEffect(() => {
-    async function fetchLeafsBySub() {
-      if (viewMode === 'subcategories' && selectedSubForLeaf) {
-        const subCategoryId = selectedSubForLeaf.id;
-        const cacheKey = `sub_${subCategoryId}`;
-        if (categoryCacheRef.current[cacheKey]) {
-          setLeafsForSub(categoryCacheRef.current[cacheKey]);
-          return;
-        }
-        setLoadingLeafs(true);
-        try {
-          const response = await api.get('/products/', { params: { sub_category: subCategoryId, limit: 17, ordering: '-views' } });
-          const data = response.data.results || response.data || [];
-          const result = data.map((product) => ({
-            id: product.id, leaf_category_id: product.leaf_category_id || product.id,
-            cover_image_url: product.cover_image_url, name: product.leaf_category_name || product.name,
-            name_sw: product.leaf_category_name || product.name
-          }));
-          categoryCacheRef.current[cacheKey] = result;
-          setLeafsForSub(result);
-        } catch (error) { console.error(error); setLeafsForSub([]); }
-        finally { setLoadingLeafs(false); }
-      }
-    }
-    fetchLeafsBySub();
-  }, [selectedSubForLeaf, viewMode]);
-
-  async function fetchSubCategories(parentId) {
-    if (!parentId) return;
-    if (categoryCacheRef.current[parentId]?.subCategories) {
-      const cachedSubs = categoryCacheRef.current[parentId].subCategories;
-      setSubCategories(cachedSubs);
-      if (cachedSubs.length > 0) setSelectedSubForLeaf(cachedSubs[0]);
+  // 🔥 Badilisha iwe function ya kawaida inayoweza kuitwa popote
+  async function fetchLeafsBySub(subCategoryId, forceRefresh = false) {
+    if (!subCategoryId) return;
+    const cacheKey = `sub_${subCategoryId}`;
+    
+    if (!forceRefresh && categoryCacheRef.current[cacheKey]) {
+      setLeafsForSub(categoryCacheRef.current[cacheKey]);
       return;
     }
-    try {
-      const response = await api.get('/subcategories/', { params: { category_id: parentId } });
-      const sortedData = (response.data || []).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-      categoryCacheRef.current[parentId] = { ...categoryCacheRef.current[parentId], subCategories: sortedData };
-      setSubCategories(sortedData);
-      if (sortedData.length > 0) setSelectedSubForLeaf(sortedData[0]);
-    } catch (error) { console.error(error); }
-  }
-
-  async function fetchFeaturedLeafs(parentId) {
-    if (!parentId) return;
-    if (categoryCacheRef.current[parentId]?.leafs) {
-      setFeaturedProducts(categoryCacheRef.current[parentId].leafs);
-      setLoadingLeafs(false);
-      return;
-    }
+    
+    if (abortRef.current) abortRef.current.abort();
+    abortRef.current = new AbortController();
+    
     setLoadingLeafs(true);
     try {
-      const response = await api.get('/products/', { params: { parent_category: parentId, limit: 17, ordering: '-views' } });
+      const response = await api.get('/products/', { 
+        params: { sub_category: subCategoryId, limit: 17, ordering: '-views' },
+        signal: abortRef.current.signal
+      });
       const data = response.data.results || response.data || [];
       const result = data.map((product) => ({
         id: product.id, leaf_category_id: product.leaf_category_id || product.id,
         cover_image_url: product.cover_image_url, name: product.leaf_category_name || product.name,
         name_sw: product.leaf_category_name || product.name
       }));
-      categoryCacheRef.current[parentId] = { ...categoryCacheRef.current[parentId], leafs: result };
-      setFeaturedProducts(result);
-    } catch (error) { console.error(error); setFeaturedProducts([]); }
-    finally { setLoadingLeafs(false); }
+      
+      if (isMounted.current) {
+        categoryCacheRef.current[cacheKey] = result;
+        setLeafsForSub(result);
+      }
+    } catch (error) { 
+      if (error.name === 'CanceledError' || error.code === 'ERR_CANCELED') return;
+      console.error(error); 
+      if (isMounted.current) setLeafsForSub([]); 
+    }
+    finally { 
+      if (isMounted.current) setLoadingLeafs(false); 
+    }
+  }
+
+  // 🔥 Kisha useEffect inaita function hiyo
+  useEffect(() => {
+    if (viewMode === 'subcategories' && selectedSubForLeaf?.id) {
+      fetchLeafsBySub(selectedSubForLeaf.id);
+    }
+  }, [selectedSubForLeaf?.id, viewMode]);
+
+
+  async function fetchSubCategories(parentId, forceRefresh = false) {
+    if (!parentId) return;
+    
+    // 🔥 KINGA YA CACHE
+    if (!forceRefresh && categoryCacheRef.current[parentId]?.subCategories) {
+      const cachedSubs = categoryCacheRef.current[parentId].subCategories;
+      setSubCategories(cachedSubs);
+      if (cachedSubs.length > 0) setSelectedSubForLeaf(cachedSubs[0]);
+      return;
+    }
+
+    // 🔥 Futa request ya awali kama ipo
+    if (abortRef.current) abortRef.current.abort();
+    abortRef.current = new AbortController();
+
+    try {
+      const response = await api.get('/subcategories/', { 
+        params: { category_id: parentId },
+        signal: abortRef.current.signal // 🔥 Ongeza hii
+      });
+      const sortedData = (response.data || []).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+      
+      if (isMounted.current) {
+        categoryCacheRef.current[parentId] = { ...categoryCacheRef.current[parentId], subCategories: sortedData };
+        setSubCategories(sortedData);
+        if (sortedData.length > 0) setSelectedSubForLeaf(sortedData[0]);
+      }
+    } catch (error) { 
+      if (error.name === 'CanceledError' || error.code === 'ERR_CANCELED') return;
+      console.error(error); 
+    }
+  }
+
+  async function fetchFeaturedLeafs(parentId, forceRefresh = false) {
+    if (!parentId) return;
+    
+    if (!forceRefresh && categoryCacheRef.current[parentId]?.leafs) {
+      setFeaturedProducts(categoryCacheRef.current[parentId].leafs);
+      setLoadingLeafs(false);
+      return;
+    }
+    
+    // 🔥 Futa request ya awali kama ipo
+    if (abortRef.current) abortRef.current.abort();
+    abortRef.current = new AbortController();
+
+    setLoadingLeafs(true);
+    try {
+      const response = await api.get('/products/', { 
+        params: { parent_category: parentId, limit: 17, ordering: '-views' },
+        signal: abortRef.current.signal // 🔥 Ongeza hii
+      });
+      const data = response.data.results || response.data || [];
+      const result = data.map((product) => ({
+        id: product.id, leaf_category_id: product.leaf_category_id || product.id,
+        cover_image_url: product.cover_image_url, name: product.leaf_category_name || product.name,
+        name_sw: product.leaf_category_name || product.name
+      }));
+      
+      if (isMounted.current) {
+        categoryCacheRef.current[parentId] = { ...categoryCacheRef.current[parentId], leafs: result };
+        setFeaturedProducts(result);
+      }
+    } catch (error) { 
+      if (error.name === 'CanceledError' || error.code === 'ERR_CANCELED') return;
+      console.error(error); 
+      if (isMounted.current) setFeaturedProducts([]); 
+    }
+    finally { 
+      if (isMounted.current) setLoadingLeafs(false); 
+    }
   }
 
   const getDisplayName = (item) => {
@@ -224,6 +281,34 @@ export default function NavLinks({ isMobile }) {
     }
   };
 
+  // 🔥 MTANDAO UKIRUDI: Vuta data upya kwa nguvu (Force Refresh)
+  useEffect(() => {
+    isMounted.current = true;
+
+    const handleOnline = () => {
+      console.log("🌐 [NavLinks] Mtandao umerudi! Inavuta categories upya...");
+      
+      // 1. Kama mtumiaji amegusa category, ivute upya
+      if (selectedParent?.id) {
+        fetchFeaturedLeafs(selectedParent.id, true);
+        fetchSubCategories(selectedParent.id, true);
+      }
+      
+      // 2. Kama mtumiaji yupo kwenye subcategory, ivute bidhaa upya
+      if (viewMode === 'subcategories' && selectedSubForLeaf?.id) {
+        fetchLeafsBySub(selectedSubForLeaf.id, true); // 🔥 Imeongezwa hapa!
+      }
+    };
+
+    window.addEventListener('online', handleOnline);
+
+    return () => {
+      isMounted.current = false;
+      window.removeEventListener('online', handleOnline);
+      if (abortRef.current) abortRef.current.abort();
+    };
+  }, [selectedParent?.id, viewMode, selectedSubForLeaf?.id]);
+
   // ========== MOBILE NAV ==========
   if (isMobile) {
     return (
@@ -235,6 +320,7 @@ export default function NavLinks({ isMobile }) {
       </div>
     );
   }
+
 
   // ========== DESKTOP NAV (TAILWIND) ==========
   return (
@@ -258,18 +344,18 @@ export default function NavLinks({ isMobile }) {
             {t('all_categories')}
           </span>
 
-            {activeNav === 'categories' && <div className="absolute -bottom-3 left-0 right-0 h-[2px] bg-[#222222] dark:bg-white rounded-sm z-[55]" />}
+            {activeNav === 'categories' && <div className="absolute -bottom-3 left-0 right-0 h-[2px] bg-black dark:bg-white rounded-sm z-[999]" />}
 
           {activeMenu === 'categories' && createPortal(
             <div
-              className="fixed top-[105px] left-0 right-0 h-[450px] z-[50] bg-white dark:bg-black shadow-[0_4px_20px_rgba(0,0,0,0.15)] 
+              className="fixed top-[105px] left-0 right-0 h-[450px] z-[50] bg-[#f8f8f8] dark:bg-black shadow-[0_4px_20px_rgba(0,0,0,0.15)] 
               border-t border-[#222222] dark:border-gray-800 animate-[fadeInDown_0.2s_ease] font-sans"
               onMouseEnter={() => handleMouseEnter('categories')}
               onMouseLeave={handleMouseLeave}
             >
               <div className="flex h-full w-full">
                 {/* SIDEBAR */}
-               <aside className="w-[280px] flex-shrink-0 bg-white dark:bg-black border-r border-gray-200 dark:border-gray-800 py-4 overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-gray-900 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600">
+               <aside className="w-[280px] flex-shrink-0 bg-transparent dark:bg-black border-r border-gray-200 dark:border-gray-800 py-4 overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-gray-900 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600">
                     {viewMode === 'products' ? (
                     categories.map((cat) => (
                       <div
@@ -311,7 +397,7 @@ export default function NavLinks({ isMobile }) {
                 </aside>
 
                 {/* CONTENT */}
-                <main className="flex-1 p-8 bg-white dark:bg-[#1e293b] overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-orange-500 [&::-webkit-scrollbar-thumb]:rounded-full">
+                <main className="flex-1 p-8 bg-transparent dark:bg-[#1e293b] overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-orange-500 [&::-webkit-scrollbar-thumb]:rounded-full">
                   <div className="flex justify-between items-center mb-6 pb-3 border-b-2 border-gray-100 dark:border-gray-800">
                     <h3 className="text-lg font-bold text-black dark:text-white">
                       {viewMode === 'products' ? `Top Categories: ${getDisplayName(selectedParent)}` : getDisplayName(selectedSubForLeaf)}
@@ -413,17 +499,20 @@ export default function NavLinks({ isMobile }) {
           onMouseEnter={(e) => handleMouseEnter('protections', e)}
           onMouseLeave={handleMouseLeave}
         >
-          <span className="text-[14px] font-[400] text-black dark:text-white group-hover:text-black group-hover:dark:text-white transition-colors">
+          <span className="text-[14px] font-[400] text-black dark:text-white
+           group-hover:text-black group-hover:dark:text-white transition-colors font-sans">
             {t('order_protections')}
           </span>
           
           {/* Mstari wa chini unapogusa */}
-          <div className="absolute -bottom-3 left-0 right-0 h-[2px] bg-black dark:bg-white rounded-sm scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+          <div className="absolute -bottom-3 left-0 right-0 h-[2px] bg-black
+           dark:bg-white rounded-sm scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
 
           {/* FULL WIDTH DROPDOWN - Sasa inatumia createPortal */}
           {activeMenu === 'protections' && createPortal(
             <div 
-              className="fixed top-[105px] left-0 w-full bg-white dark:bg-black shadow-[0_15px_35px_rgba(0,0,0,0.4)] border-b border-gray-200 dark:border-gray-800 animate-[fadeInDown_0.2s_ease] z-[50]"
+              className="fixed top-[105px] left-0 w-full bg-[#f8f8f8] dark:bg-black shadow-[0_15px_35px_rgba(0,0,0,0.4)]
+               border-b border-gray-200 dark:border-gray-800 animate-[fadeInDown_0.2s_ease] z-[50] font-sans"
               onMouseEnter={() => handleMouseEnter('protections')}
               onMouseLeave={handleMouseLeave}
             >
@@ -529,7 +618,7 @@ export default function NavLinks({ isMobile }) {
           onMouseEnter={(e) => handleMouseEnter('buyerCentral', e)}
           onMouseLeave={handleMouseLeave}
         >
-          <span className="text-[14px] font-[400] text-black dark:text-white group-hover:text-black group-hover:dark:text-white transition-colors">
+          <span className="text-[14px] font-[400] text-black dark:text-white group-hover:text-black group-hover:dark:text-white transition-colors font-sans">
             {t('buyer_central')}
           </span>
           
@@ -539,7 +628,9 @@ export default function NavLinks({ isMobile }) {
           {/* DROPDOWN YA BUYER CENTRAL - Inatumia createPortal */}
           {activeMenu === 'buyerCentral' && createPortal(
             <div 
-              className="fixed top-[105px] right-0 w-[900px] bg-white dark:bg-black shadow-[0_15px_35px_rgba(0,0,0,0.4)] border-b border-x border-gray-200 dark:border-gray-800 rounded-b-xl animate-[fadeInDown_0.2s_ease] z-[50]"
+              className="fixed top-[105px] right-0 w-full bg-[#f8f8f8] dark:bg-black 
+              shadow-[0_15px_35px_rgba(0,0,0,0.4)] border-b border-x border-gray-200
+               dark:border-gray-800 rounded-b-xl animate-[fadeInDown_0.2s_ease] z-[50] font-sans"
               onMouseEnter={() => handleMouseEnter('buyerCentral')}
               onMouseLeave={handleMouseLeave}
             >
@@ -604,7 +695,7 @@ export default function NavLinks({ isMobile }) {
           {/* DROPDOWN YA HELP CENTER - Inatumia createPortal */}
           {activeMenu === 'helpCenter' && createPortal(
             <div 
-              className="fixed top-[105px] right-0 w-[900px] bg-white dark:bg-black shadow-[0_15px_35px_rgba(0,0,0,0.4)] border-b border-x border-gray-200 dark:border-gray-800 rounded-b-xl animate-[fadeInDown_0.2s_ease] z-[50]"
+              className="fixed top-[105px] right-0 w-full bg-[#f8f8f8] dark:bg-black shadow-[0_15px_35px_rgba(0,0,0,0.4)] border-b border-x border-gray-200 dark:border-gray-800 rounded-b-xl animate-[fadeInDown_0.2s_ease] z-[50] font-sans"
               onMouseEnter={() => handleMouseEnter('helpCenter')}
               onMouseLeave={handleMouseLeave}
             >

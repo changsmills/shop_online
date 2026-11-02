@@ -1,9 +1,8 @@
 import { useRef, useState, useEffect } from "react";
 import api from "../axiosConfig";
 import { useNavigate } from "react-router-dom";
-import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { Search } from "lucide-react"; // Tumia icon kutoka lucide-react
+import { Search } from "lucide-react";
 
 export default function SearchBar({ search = "", setSearch }) {
   const { t } = useTranslation();
@@ -14,8 +13,9 @@ export default function SearchBar({ search = "", setSearch }) {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  // Pakia placeholders
+  // Pakia placeholders kutoka Backend
   useEffect(() => {
     const fetchLeafCategoryNames = async () => {
       try {
@@ -32,12 +32,20 @@ export default function SearchBar({ search = "", setSearch }) {
     fetchLeafCategoryNames();
   }, []);
 
-  // Badilisha placeholder
+  // Badilisha placeholder kwa animation ya kudondoka
   useEffect(() => {
     if (placeholders.length <= 1) return;
+    
     const timer = setInterval(() => {
-      setPlaceholderIndex((prev) => (prev === placeholders.length - 1 ? 0 : prev + 1));
+      setIsAnimating(true); // Anzisha animation ya kutoka
+      
+      setTimeout(() => {
+        setPlaceholderIndex((prev) => (prev === placeholders.length - 1 ? 0 : prev + 1));
+        setIsAnimating(false); // Maliza animation (inaingia)
+      }, 300); // Saa 300ms (muda wa kudondoka)
+      
     }, 3000);
+    
     return () => clearInterval(timer);
   }, [placeholders]);
 
@@ -106,16 +114,33 @@ export default function SearchBar({ search = "", setSearch }) {
       
       {/* Search Bar Container */}
       <div 
-        className={`flex items-center bg-white dark:bg-black border-2 rounded-full h-[36px] sm:h-[40px] md:h-[44px] pl-3 sm:pl-4 pr-1 transition-all duration-300 ${
+        className={`flex items-center bg-white dark:bg-black border-2 rounded-full h-[36px] sm:h-[40px] md:h-[44px] pl-3 sm:pl-4 pr-1 transition-all duration-300 relative ${
           isFocused 
             ? 'border-brand-orange shadow-[0_0_0_4px_rgba(255,102,0,0.1)]' 
             : 'border-gray-300 dark:border-gray-600 hover:border-brand-orange'
         }`}
       >
+        
+        {/* 🔥 PLACEHOLDER YA ANIMATION (Inaonekana tu kama hakuna maandishi) */}
+        {!search && (
+          <div className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 pointer-events-none flex items-center overflow-hidden h-[24px]">
+            <span 
+              key={placeholderIndex} 
+              className={`text-[13px] sm:text-[14px] md:text-[15px] text-gray-400 transition-all duration-300 ease-in-out block ${
+                isAnimating 
+                  ? 'translate-y-[-100%] opacity-0' 
+                  : 'translate-y-0 opacity-100 animate-[slideDown_0.3s_ease-out]'
+              }`}
+            >
+              {placeholders[placeholderIndex]}
+            </span>
+          </div>
+        )}
+
+        {/* 🔥 INPUT */}
         <input
           type="text"
-          placeholder={placeholders[placeholderIndex]}
-          className="flex-1 bg-transparent border-none outline-none text-[13px] sm:text-[14px] md:text-[15px] text-gray-800 dark:text-white placeholder:text-gray-400 w-full min-w-0"
+          className="flex-1 bg-transparent border-none outline-none text-[13px] sm:text-[14px] md:text-[15px] text-gray-800 dark:text-white w-full min-w-0 relative z-10"
           value={search}
           onChange={handleInputChange}
           onFocus={() => {
@@ -131,6 +156,7 @@ export default function SearchBar({ search = "", setSearch }) {
           }}
         />
 
+        {/* 🔥 BUTTON */}
         <button 
           className="bg-brand-orange hover:bg-brand-hover text-white h-[28px] sm:h-[32px] md:h-[36px] px-3 sm:px-4 md:px-5 rounded-full font-bold text-[12px] sm:text-[13px] md:text-[14px] flex items-center justify-center gap-1.5 shrink-0 transition-transform active:scale-95"
           onClick={handleSearchSubmit}
@@ -140,26 +166,27 @@ export default function SearchBar({ search = "", setSearch }) {
         </button>
       </div>
 
-{showSuggestions && suggestions.length > 0 && (
-  <div className="absolute top-full left-0 right-0 mt-2 w-full bg-white dark:bg-[#1e293b] z-[9999] rounded-b-2xl shadow-xl border border-gray-200 dark:border-gray-700 border-t-0 overflow-hidden animate-smooth-dropdown">
-    <div className="max-h-[380px] overflow-y-auto scrollbar-thin scrollbar-thumb-brand-orange scrollbar-track-gray-100 dark:scrollbar-track-gray-800">
-      {suggestions.map((item) => (
-        <div 
-          key={`${item.type}-${item.id}`} 
-          className="flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-gray-50 dark:border-gray-800 hover:bg-brand-light dark:hover:bg-gray-700 transition-colors"
-          onMouseDown={() => {
-            if (typeof setSearch === "function") setSearch(item.name);
-            navigateToSearchResults(item.name);
-          }}
-        >
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <span className="text-[14px] text-gray-700 dark:text-gray-200 truncate">{item.name}</span>
+      {/* 🔥 SUGGESTIONS DROPDOWN */}
+      {showSuggestions && suggestions.length > 0 && (
+        <div className="absolute top-full left-0 right-0 mt-2 w-full bg-white dark:bg-[#1e293b] z-[9999] rounded-b-2xl shadow-xl border border-gray-200 dark:border-gray-700 border-t-0 overflow-hidden animate-smooth-dropdown">
+          <div className="max-h-[380px] overflow-y-auto scrollbar-thin scrollbar-thumb-brand-orange scrollbar-track-gray-100 dark:scrollbar-track-gray-800">
+            {suggestions.map((item) => (
+              <div 
+                key={`${item.type}-${item.id}`} 
+                className="flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-gray-50 dark:border-gray-800 hover:bg-brand-light dark:hover:bg-gray-700 transition-colors"
+                onMouseDown={() => {
+                  if (typeof setSearch === "function") setSearch(item.name);
+                  navigateToSearchResults(item.name);
+                }}
+              >
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <span className="text-[14px] text-gray-700 dark:text-gray-200 truncate">{item.name}</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      ))}
-    </div>
-  </div>
-)}
+      )}
 
     </div>
   );

@@ -13,48 +13,76 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
   const scrollContainerRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
+  const cacheRef = useRef({});
+  const isMounted = useRef(true);
+  const abortRef = useRef(null);
+  const scrollPosRef = useRef(0);
 
-  useEffect(() => {
-    const fetchTrending = async () => {
-      setLoading(true);
-      try {
-        const params = {
-          limit: 10,
-          ordering: '-order_count,-views',
-        };
+  // 🔥 Function ya kawaida (nje ya useEffect) — ina cache + forceRefresh
+const fetchTrending = async (forceRefresh = false) => {
+  const cacheKey = selectedCategory?.id || 'all';
 
-        if (selectedCategory?.id && selectedCategory.id !== 'all' && !selectedCategory.isAll) {
-          params.parent_category = selectedCategory.id;
-        }
+  if (!forceRefresh && cacheRef.current[cacheKey]) {
+    console.log("📦 [TrendingNow] Data ipo kwenye cache.");
+    setProducts(cacheRef.current[cacheKey]);
+    setLoading(false);
+    return;
+  }
 
-        const response = await api.get('/products/', { params });
-        const productsData = response.data.results || response.data || [];
+  if (abortRef.current) abortRef.current.abort();
+  abortRef.current = new AbortController();
 
-        const trendingProducts = productsData.filter(product => {
-          const price = parseFloat(product.price) || 0;
-          const originalPrice = parseFloat(product.original_price) || 0;
-          
-          const isDiscounted = originalPrice > 0 && originalPrice < price;
-          if (isDiscounted) return false;
-          
-          const orderCount = parseInt(product.order_count) || 0;
-          const views = parseInt(product.views) || 0;
-          
-          return orderCount > 0 || views > 0;  
-        });
+  setLoading(true);
+  try {
+    const params = { limit: 10, ordering: '-order_count,-views' };
 
-        setProducts(trendingProducts);
-      } catch (err) {
-        console.error("Trending Fetch Error:", err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTrending();
-  }, [selectedCategory, i18n.language]);
+    if (selectedCategory?.id && selectedCategory.id !== 'all' && !selectedCategory.isAll) {
+      params.parent_category = selectedCategory.id;
+    }
+
+    const response = await api.get('/products/', {
+      params,
+      signal: abortRef.current.signal,
+    });
+
+    const productsData = response.data.results || response.data || [];
+
+    const trendingProducts = productsData.filter(product => {
+      const price = parseFloat(product.price) || 0;
+      const originalPrice = parseFloat(product.original_price) || 0;
+      const isDiscounted = originalPrice > 0 && originalPrice < price;
+      if (isDiscounted) return false;
+      const orderCount = parseInt(product.order_count) || 0;
+      const views = parseInt(product.views) || 0;
+      return orderCount > 0 || views > 0;
+    });
+
+    if (isMounted.current) {
+      cacheRef.current[cacheKey] = trendingProducts;
+      setProducts(trendingProducts);
+    }
+  } catch (err) {
+    if (err.name === 'CanceledError' || err.code === 'ERR_CANCELED') return;
+    console.error("Trending Fetch Error:", err.message);
+  } finally {
+    if (isMounted.current) setLoading(false);
+  }
+};
+
+useEffect(() => {
+  isMounted.current = true;
+  fetchTrending();
+
+  return () => {
+    isMounted.current = false;
+    if (abortRef.current) abortRef.current.abort();
+  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [selectedCategory?.id, i18n.language]);
 
   const checkScrollPosition = () => {
     if (scrollContainerRef.current) {
+      scrollPosRef.current = scrollContainerRef.current.scrollLeft;
       const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
       setShowLeftArrow(scrollLeft > 10);
       setShowRightArrow(scrollLeft + clientWidth < scrollWidth - 10);
@@ -76,6 +104,25 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
       return () => container.removeEventListener('scroll', checkScrollPosition);
     }
   }, [products]);
+
+  useEffect(() => {
+  if (scrollContainerRef.current && scrollPosRef.current > 0) {
+    scrollContainerRef.current.scrollLeft = scrollPosRef.current;
+  }
+}, [products]);
+
+
+  // 🔥 Mtandao ukirudi — fetch upya kwa forceRefresh
+useEffect(() => {
+  const handleOnline = () => {
+    console.log("🌐 [TrendingNow] Mtandao umerudi! Inafetch data mpya...");
+    fetchTrending(true);
+  };
+
+  window.addEventListener('online', handleOnline);
+  return () => window.removeEventListener('online', handleOnline);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
 
   const renderHeader = () => (
     <div className="flex justify-between items-center px-3 md:px-5 py-2 md:py-3 bg-[#fff7ed] dark:bg-[#1e293b] dark:border-b dark:border-[#334155] rounded-t-xl mb-2.5 md:mb-4 text-black dark:text-white">

@@ -118,20 +118,22 @@ export default function DashboardCard({
           </div>
         )}
         
-        {/* Price Row */}
+         {/* 🔥 PRICE ROW (Imepewa Background na Padding) 🔥 */}
         {(isFull || isPriceMoq || isImagePrice) && (!isStore || isTopDeal) && !isLocation && hasValidPrice && (
-          <div className="flex items-baseline gap-1 flex-wrap mt-0.5 max-md:!mt-0 max-md:!mb-0">
-            <div className="flex items-baseline">
-              <span className="text-[#ff6a00] text-[16px] font-bold max-md:text-[10px] max-md:font-bold">
+          <div className="flex items-center flex-wrap mt-1.5 max-md:!mt-1 max-md:!mb-0">
+            {/* Bei ya Sasa (Badge) */}
+            <div className="flex items-baseline gap-1 bg-[#fff7ed] dark:bg-[#ff6a00]/10 px-2 py-1 rounded-lg border border-[#ffedd5] dark:border-[#ff6a00]/20 shadow-sm">
+              <span className="text-[#ff6a00] text-[13px] font-bold max-md:text-[10px]">
                 {t('currency')}
               </span>
-              <span className="text-[#ff6a00] text-[22px] font-extrabold max-md:text-[13px] max-md:font-extrabold">
+              <span className="text-[#ff6a00] text-[20px] font-black leading-none max-md:text-[15px]">
                 {numPrice.toLocaleString()}
               </span>
             </div>
             
+            {/* Bei ya Awali (Iliyokatwa) */}
             {isFull && numOriginal > 0 && numOriginal > numPrice && (
-              <span className="line-through text-gray-400 dark:text-gray-500 text-[14px] font-normal max-md:text-[10px]">
+              <span className="line-through text-gray-400 dark:text-gray-500 text-[13px] font-normal ml-2 max-md:text-[10px]">
                 {numOriginal.toLocaleString()}
               </span>
             )}
@@ -159,7 +161,8 @@ export default function DashboardCard({
 
         {/* Subtitle */}
         {isFull && subtitle && (
-          <div className="flex items-center gap-1 mt-0.5 text-gray-500 dark:text-gray-400 w-full overflow-hidden whitespace-nowrap text-ellipsis">
+          <div className="flex items-center gap-1 mt-0.5 text-gray-500 dark:text-gray-400 w-full overflow-hidden 
+          whitespace-nowrap text-ellipsis">
             <MapPin size={10} className="w-2.5 h-2.5 max-md:w-2.5 max-md:h-2.5" />
             <span className="text-[11px] font-normal leading-tight max-md:text-[9.5px]">
               {subtitle}

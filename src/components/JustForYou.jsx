@@ -12,6 +12,7 @@ export default function JustForYou({ search = "", selectedCategory }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const isMounted = useRef(true);
+  const cacheRef = useRef({}); 
   const navigate = useNavigate();
 
   const [isMobile, setIsMobile] = useState(false);
@@ -22,7 +23,16 @@ export default function JustForYou({ search = "", selectedCategory }) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const fetchJustForYou = async () => {
+   const fetchJustForYou = async (forceRefresh = false) => {
+    // 🔥 1. KINGA YA CACHE: Kama data ipo na hatulazimishwi kufetch upya, tumia iliyopo
+    const cacheKey = selectedCategory?.id || 'all';
+    if (!forceRefresh && cacheRef.current[cacheKey]) {
+      console.log("📦 [JustForYou] Data ipo kwenye cache, haifetchi tena.");
+      setProducts(cacheRef.current[cacheKey]);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -74,6 +84,8 @@ export default function JustForYou({ search = "", selectedCategory }) {
           [finalProducts[i], finalProducts[j]] = [finalProducts[j], finalProducts[i]];
         }
 
+        // 🔥 2. HIFADHI KWENYE CACHE
+        cacheRef.current[cacheKey] = finalProducts;
         setProducts(finalProducts);
       }
     } catch (error) {
@@ -93,6 +105,17 @@ export default function JustForYou({ search = "", selectedCategory }) {
     fetchJustForYou();
     return () => { isMounted.current = false; };
   }, [selectedCategory, i18n.language]);
+
+  // 🔥 3. KUFETCH UPYA PALE MTANDAO UNARUDI (Force Refresh)
+  useEffect(() => {
+    const handleOnline = () => {
+      console.log("🌐 [JustForYou] Mtandao umerudi! Inafetch data mpya...");
+      fetchJustForYou(true); // `true` inamaanisha "Lazimisha kufetch upya"
+    };
+
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, []); // 🔥 Empty dependency array - Inaisha kuwekwa mara moja tu
 
   const filteredProducts = useMemo(() => {
     if (!search) return products;
@@ -166,10 +189,10 @@ export default function JustForYou({ search = "", selectedCategory }) {
 
   if (error) {
     return (
-      <div className="text-center py-10 px-5 text-red-500 bg-red-50 dark:bg-red-950/20 rounded-xl m-5">
+      <div className="text-center py-10 px-5 text-gray-500 bg-gray-50 dark:bg-[#1e293b] rounded-xl m-5">
         <div className="flex flex-col items-center justify-center">
           <p className="text-sm md:text-base font-medium mb-4">
-            Oops! Hatukuweza kupakia bidhaa. Tafadhali angalia mtandao wako.
+            Bidhaa hizi hazipatikani kwa sasa. Tafadhali angalia mtandao wako.
           </p>
           <button 
             className="flex items-center gap-2 bg-[#ff6a00] hover:bg-[#e55a00] text-white border-none px-5 py-2 rounded-[30px] text-sm font-semibold cursor-pointer transition-all mx-auto hover:-translate-y-0.5 hover:shadow-md" 

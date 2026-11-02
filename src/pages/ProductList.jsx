@@ -266,8 +266,12 @@ if (!isTopDealsSection && !isRecentlyViewedSection) {
     initialFetchDoneRef.current = false;
     setPage(0);
     setHasMore(true);
-    setProducts([]);
     setError(null);
+    
+    // 🔥 TUNAFUTA BIDHAA TU KAMA MTANDAO UKO KWENYE HALI NZURI (Hii itazuia ukurasa kuwa mweupe mtandao ukirudi)
+    if (navigator.onLine) {
+      setProducts([]);
+    }
     
     const timer = setTimeout(() => {
       if (mountedRef.current) {
@@ -320,6 +324,31 @@ if (!isTopDealsSection && !isRecentlyViewedSection) {
       if (timeoutId) clearTimeout(timeoutId);
     };
   }, [loading, hasMore]);
+
+
+
+    // 🔥 HII NDIO ITAFANYA MTANDAO UKIRUDI IENDELEE PALE ILIPOISHIA
+  useEffect(() => {
+    
+        const handleOnline = () => {
+      console.log("🌐 Mtandao umerudi! Tunavuta data mpya...");
+      
+      if (mountedRef.current) {
+        // 🔥 1. Kama data ipo kwenye cache, ionyeshe papo hapo ili isikae mweupe
+        const cacheKey = `${categoryId || 'all'}-${search || ''}-${section || ''}-${sortBy}-${order}-${page}`;
+        if (cacheRef.current[cacheKey]) {
+          setProducts(cacheRef.current[cacheKey]);
+        }
+
+        // 🔥 2. Kisha fanya fetch ya data mpya
+        fetchProducts(page, false); 
+      }
+    };
+
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, [fetchProducts, page]); // Tunamwambia ifanye kazi kila page inapobadilika
+
 
   const filteredProducts = useMemo(() => {
     let result = products;

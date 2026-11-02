@@ -186,12 +186,13 @@ const Header = ({ showBack = false, showSearch = true }) => {
   return (
     <header className="relative w-full bg-[#fafcff] dark:bg-black 
       text-black dark:text-white border-t-2 border-t-gray-200 dark:border-t-gray-800 
-      border-b border-b-gray-200 dark:border-b-gray-800 shadow-sm transition-colors duration-300 z-[50] overflow-hidden">
+      border-b border-b-gray-200 dark:border-b-gray-800 shadow-sm transition-colors
+       duration-300 z-[9999]">
       
       {/* ========================================= */}
       {/* 1. LAYER YA RANGI (MESH GRADIENT)         */}
       {/* ========================================= */}
-      
+
          {/* LAYER YA RANGI */}
 <div className="absolute inset-0 z-0 mesh-gradient-bg opacity-60 dark:hidden"></div>
 
@@ -231,7 +232,7 @@ const Header = ({ showBack = false, showSearch = true }) => {
           <div className="hidden lg:flex gap-[1.2rem] items-center">
 
             {/* LOCATION DROPDOWN */}
-            <div ref={locationDropdownRef} className="relative">
+            <div ref={locationDropdownRef} className="relative ">
               <button 
                 onClick={() => setIsLocationOpen(!isLocationOpen)}
                 className="flex items-center gap-1 bg-transparent border-none cursor-pointer
@@ -250,7 +251,7 @@ const Header = ({ showBack = false, showSearch = true }) => {
             <UserTools />
 
             {/* LANGUAGE DROPDOWN */}
-            <div ref={dropdownRef} className="relative">
+            <div ref={dropdownRef} className="relative ">
               <button 
                 onClick={() => setIsLangOpen(!isLangOpen)}
                 className="flex items-center gap-1 bg-transparent border-none cursor-pointer 
@@ -270,7 +271,9 @@ const Header = ({ showBack = false, showSearch = true }) => {
 
         {/* NAVIGATION ROW (Desktop only) */}
 <div 
-  className="hidden lg:block relative bg-transparent dark:bg-transparent items-center mt-0 transition-all duration-300 ease-in-out lg:px-0 overflow-visible" 
+  className="hidden lg:block relative bg-transparent 
+  dark:bg-transparent items-center mt-0 transition-all
+   duration-300 ease-in-out lg:px-0 overflow-visible" 
   key={language}
 >
   <NavLinks />
