@@ -8,16 +8,26 @@ import {
   Camera, Save, HelpCircle, FileText, Shield, Phone, Mail, Globe, Truck, Store, Home, Megaphone, X, Eye, EyeOff
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useQuery, useQueryClient } from '@tanstack/react-query'; // 1. Ingiza hooks
+
+// 2. Function ya kuchukua Profile
+const fetchSupplierProfile = async () => {
+  const token = localStorage.getItem("access_token");
+  if (!token) throw new Error("No token");
+  const response = await api.get('/profile/');
+  return response.data;
+};
 
 const SupplierAccountSettings = ({ session }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
 
-  // State
+  // State za UI
   const [isExpanded, setIsExpanded] = useState(false);
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  
+  // State za Edit Profile Modal
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
@@ -25,6 +35,8 @@ const SupplierAccountSettings = ({ session }) => {
   const [profileSaving, setProfileSaving] = useState(false);
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
+  
+  // State za Email/Password
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [emailLoading, setEmailLoading] = useState(false);
@@ -36,34 +48,45 @@ const SupplierAccountSettings = ({ session }) => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
 
-  // Effects
+  // =======================================================
+  // 3. TUMIA useQuery
+  // =======================================================
+  const { 
+    data: profile, 
+    isLoading: loading,
+    error 
+  } = useQuery({
+    queryKey: ['supplierProfile'],
+    queryFn: fetchSupplierProfile,
+    staleTime: 1000 * 60 * 5, // Cache kwa dakika 5
+    retry: false, // Usijaribu tena kama token haipo
+  });
+
+  // Weka data kwenye form pale inapokuja
+  useEffect(() => {
+    if (profile) {
+      setFullName(profile?.full_name || '');
+      setUsername(profile?.username || '');
+      setBio(profile?.bio || '');
+    }
+  }, [profile]);
+
+  // Kama hana token, mpeleke login
+  useEffect(() => {
+    if (error?.message === "No token") {
+      navigate('/dashboard/login');
+    } else if (error) {
+      toast.error('Imeshindwa kupakia profile.');
+    }
+  }, [error, navigate]);
+
+  // Effects za Mobile
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const token = localStorage.getItem("access_token");
-        if (!token) { navigate('/dashboard/login'); return; }
-        const headers = { Authorization: `Bearer ${token}` };
-        const response = await api.get('/profile/', { headers });
-        setProfile(response.data);
-        setFullName(response.data?.full_name || '');
-        setUsername(response.data?.username || '');
-        setBio(response.data?.bio || '');
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-        toast.error('Imeshindwa kupakia profile.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfile();
-  }, [navigate]);
 
   // Handlers
   const handleAvatarChange = (e) => {
@@ -87,14 +110,18 @@ const SupplierAccountSettings = ({ session }) => {
       formData.append('username', username || '');
       formData.append('bio', bio || '');
       if (avatarFile) formData.append('avatar_file', avatarFile);
+      
       const headers = { Authorization: `Bearer ${token}` };
-      const response = await api.patch('/profile/', formData, { headers });
-      setProfile({ ...profile, ...response.data });
+      await api.patch('/profile/', formData, { headers });
+      
       toast.success('Profile imesasishwa!');
       setIsEditingProfile(false);
       setAvatarFile(null);
       if (avatarPreview) URL.revokeObjectURL(avatarPreview);
       setAvatarPreview(null);
+      
+      // Sasisha cache ya profile
+      queryClient.invalidateQueries({ queryKey: ['supplierProfile'] });
     } catch (error) {
       console.error('Profile update error:', error);
       toast.error('Imeshindikana: ' + (error.response?.data?.detail || error.message));
@@ -116,6 +143,7 @@ const SupplierAccountSettings = ({ session }) => {
     finally {
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
+      queryClient.clear(); // Futa cache yote
       navigate('/dashboard/login', { replace: true });
       toast.success('Umefanikiwa kutoka!');
     }
@@ -160,6 +188,9 @@ const SupplierAccountSettings = ({ session }) => {
       </div>
     );
   }
+
+  // Kama profile haipo (labda kosa la mtandao)
+  if (!profile) return null;
 
   // ============ MAIN RENDER ============
   return (

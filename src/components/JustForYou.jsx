@@ -1,121 +1,94 @@
-import React, { useEffect, useState, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import api from "../axiosConfig";
 import { Loader2, ChevronRight, RefreshCw, ArrowRight } from "lucide-react"; 
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import DashboardCard from "./DashboardCard";
 import SkeletonCardz from "./SkeletonCardz"; 
+import { useQuery } from '@tanstack/react-query'; // 1. Ingiza useQuery
+
+// 2. Function ya kuchukua na kupanga data
+const fetchJustForYou = async ({ queryKey }) => {
+  const [_, categoryId] = queryKey;
+
+  const params = {
+    ordering: '-created_at',
+    limit: 100 
+  };
+
+  if (categoryId && categoryId !== 'all') {
+    params.parent_category = categoryId;
+  }
+
+  const response = await api.get('/products/', { params });
+  const data = response.data.results || response.data || [];
+
+  // Filter zisizo za deals
+  const nonDeals = data.filter(p => {
+    const price = parseFloat(p.price) || 0;
+    const originalPrice = parseFloat(p.original_price) || 0;
+    const isDiscounted = originalPrice > 0 && originalPrice < price;
+    return !isDiscounted; 
+  });
+
+  // Group kwa category
+  const categoryMap = {};
+  nonDeals.forEach(product => {
+    const catName = product.category_name || 'Other';
+    if (!categoryMap[catName]) {
+      categoryMap[catName] = [];
+    }
+    categoryMap[catName].push(product);
+  });
+
+  // Panga idadi sawa kwa kila category
+  const overallLimit = 100;  
+  const categoryNames = Object.keys(categoryMap);
+  const maxPerCategory = Math.ceil(overallLimit / Math.max(categoryNames.length, 1));
+  
+  let finalProducts = [];
+  categoryNames.forEach(catName => {
+    const items = categoryMap[catName];
+    finalProducts.push(...items.slice(0, maxPerCategory));
+  });
+
+  finalProducts = finalProducts.slice(0, overallLimit);
+
+  // Shuffle
+  for (let i = finalProducts.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [finalProducts[i], finalProducts[j]] = [finalProducts[j], finalProducts[i]];
+  }
+
+  return finalProducts;
+};
 
 export default function JustForYou({ search = "", selectedCategory }) {
   const { t, i18n } = useTranslation();
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const isMounted = useRef(true);
-  const cacheRef = useRef({}); 
   const navigate = useNavigate();
-
   const [isMobile, setIsMobile] = useState(false);
+
+  const categoryId = selectedCategory?.isAll ? 'all' : (selectedCategory?.id || 'all');
+
+  // 3. Tumia useQuery
+  // Tunaweka lugha kwenye queryKey ili ipange upya data pale lugha inabadilika
+  const { 
+    data: products = [], 
+    isLoading, 
+    error,
+    refetch 
+  } = useQuery({
+    queryKey: ['justForYou', categoryId, i18n.language],
+    queryFn: fetchJustForYou,
+    staleTime: 1000 * 60 * 5, // Cache dakika 5
+  });
+
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-
-   const fetchJustForYou = async (forceRefresh = false) => {
-    // 🔥 1. KINGA YA CACHE: Kama data ipo na hatulazimishwi kufetch upya, tumia iliyopo
-    const cacheKey = selectedCategory?.id || 'all';
-    if (!forceRefresh && cacheRef.current[cacheKey]) {
-      console.log("📦 [JustForYou] Data ipo kwenye cache, haifetchi tena.");
-      setProducts(cacheRef.current[cacheKey]);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const params = {
-        ordering: '-created_at',
-        limit: 100 
-      };
-
-      if (selectedCategory?.id && selectedCategory.id !== 'all' && !selectedCategory.isAll) {
-        params.parent_category = selectedCategory.id;
-      }
-
-      const response = await api.get('/products/', { params });
-
-      if (isMounted.current) {
-        const data = response.data.results || response.data || [];
-
-        const nonDeals = data.filter(p => {
-          const price = parseFloat(p.price) || 0;
-          const originalPrice = parseFloat(p.original_price) || 0;
-          const isDiscounted = originalPrice > 0 && originalPrice < price;
-          return !isDiscounted; 
-        });
-
-        const categoryMap = {};
-        nonDeals.forEach(product => {
-          const catName = product.category_name || 'Other';
-          if (!categoryMap[catName]) {
-            categoryMap[catName] = [];
-          }
-          categoryMap[catName].push(product);
-        });
-
-        const overallLimit = 100;  
-        const categoryNames = Object.keys(categoryMap);
-        const maxPerCategory = Math.ceil(overallLimit / Math.max(categoryNames.length, 1));
-        
-        let finalProducts = [];
-        categoryNames.forEach(catName => {
-          const items = categoryMap[catName];
-          finalProducts.push(...items.slice(0, maxPerCategory));
-        });
-
-        finalProducts = finalProducts.slice(0, overallLimit);
-
-        for (let i = finalProducts.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [finalProducts[i], finalProducts[j]] = [finalProducts[j], finalProducts[i]];
-        }
-
-        // 🔥 2. HIFADHI KWENYE CACHE
-        cacheRef.current[cacheKey] = finalProducts;
-        setProducts(finalProducts);
-      }
-    } catch (error) {
-      console.error("Error:", error.message);
-      if (isMounted.current) {
-        setError(error.message);
-      }
-    } finally {
-      if (isMounted.current) {
-        setLoading(false);
-      }
-    }
-  };
-
-  useEffect(() => {
-    isMounted.current = true;
-    fetchJustForYou();
-    return () => { isMounted.current = false; };
-  }, [selectedCategory, i18n.language]);
-
-  // 🔥 3. KUFETCH UPYA PALE MTANDAO UNARUDI (Force Refresh)
-  useEffect(() => {
-    const handleOnline = () => {
-      console.log("🌐 [JustForYou] Mtandao umerudi! Inafetch data mpya...");
-      fetchJustForYou(true); // `true` inamaanisha "Lazimisha kufetch upya"
-    };
-
-    window.addEventListener('online', handleOnline);
-    return () => window.removeEventListener('online', handleOnline);
-  }, []); // 🔥 Empty dependency array - Inaisha kuwekwa mara moja tu
 
   const filteredProducts = useMemo(() => {
     if (!search) return products;
@@ -132,29 +105,23 @@ export default function JustForYou({ search = "", selectedCategory }) {
       : selectedCategory.name;
   };
 
- const handleCardClick = (item) => {
-  const priorityId = item.id;
-  
-  // 🔥 1. Chukua IDs zote tatu kutoka kwenye item
-  const leafId = item.leaf_category_id || '';
-  const subId = item.sub_category_id || ''; 
-  const parentId = item.parent_category_id || '';
-  
-  // 🔥 2. Chukua Jina la Leaf Category
-  const categoryName = encodeURIComponent(
-    i18n.language === 'sw' 
-      ? (item.leaf_category_name_sw || item.leaf_category_name || item.category_name || 'All')
-      : (item.leaf_category_name || item.category_name || 'All')
-  );
+  const handleCardClick = (item) => {
+    const priorityId = item.id;
+    const leafId = item.leaf_category_id || '';
+    const subId = item.sub_category_id || ''; 
+    const parentId = item.parent_category_id || '';
+    
+    const categoryName = encodeURIComponent(
+      i18n.language === 'sw' 
+        ? (item.leaf_category_name_sw || item.leaf_category_name || item.category_name || 'All')
+        : (item.leaf_category_name || item.category_name || 'All')
+    );
 
-  // 🔥 3. Tengeneza Section Name
-  const sectionName = encodeURIComponent(`${t('just_for_you')} in ${categoryName}`);
-
-  // 🔥 4. Tengeneza URL na IDs zote
-  const url = `/products?priorityId=${priorityId}&sectionName=${sectionName}&leafId=${leafId}&subId=${subId}&parentId=${parentId}&categoryName=${categoryName}`;
-  
-  window.open(url, '_blank');
-};
+    const sectionName = encodeURIComponent(`${t('just_for_you')} in ${categoryName}`);
+    const url = `/products?priorityId=${priorityId}&sectionName=${sectionName}&leafId=${leafId}&subId=${subId}&parentId=${parentId}&categoryName=${categoryName}`;
+    
+    window.open(url, '_blank');
+  };
 
   const renderHeader = () => (
     <div className="flex justify-between items-center px-3 py-2 mb-3 sm:px-2.5 sm:py-1.5 sm:mb-2 md:px-5 md:py-3 md:mb-5 bg-[#fff7ed] dark:bg-[#1e293b] dark:border-b dark:border-[#334155] rounded-t-xl text-black dark:text-white">
@@ -187,12 +154,11 @@ export default function JustForYou({ search = "", selectedCategory }) {
     </div>
   );
   
-  if (loading) {
+  if (isLoading) {
     return (
       <section className="relative w-full bg-white dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] box-border overflow-x-hidden pt-4 mt-0 p-3 pb-[55px] rounded-lg my-0.5 md:p-4 md:px-0 md:rounded-2xl md:my-2.5">        
         {renderHeader()}
 
-        {/* 🔥 SKELETON GRID - ImeBADILISHWA KUWA 5 KWA DESKTOP */}
         <div className="grid w-full box-border grid-cols-2 gap-2.5 px-1 md:grid-cols-4 md:gap-3.5 md:px-2 lg:grid-cols-5 lg:gap-4 lg:px-4 xl:gap-5">  
           {Array.from({ length: 10 }).map((_, index) => (
             <SkeletonCardz key={`skeleton-${index}`} /> 
@@ -211,7 +177,7 @@ export default function JustForYou({ search = "", selectedCategory }) {
           </p>
           <button 
             className="flex items-center gap-2 bg-[#ff6a00] hover:bg-[#e55a00] text-white border-none px-5 py-2 rounded-[30px] text-sm font-semibold cursor-pointer transition-all mx-auto hover:-translate-y-0.5 hover:shadow-md" 
-            onClick={() => fetchJustForYou()}
+            onClick={() => refetch()} // 4. Tumia refetch kutoka useQuery
           >
             <RefreshCw size={16} /> Jaribu tena
           </button>
@@ -221,11 +187,13 @@ export default function JustForYou({ search = "", selectedCategory }) {
   }
 
   return (
-    <section className="relative w-full bg-white dark:bg-black mb-8 border-y border-[#e5e7eb] dark:border-[#334155] box-border overflow-x-hidden pt-4 mt-0 p-3 pb-[55px] rounded-lg my-0.5 md:p-4 md:px-0 md:rounded-2xl md:my-2.5">
+    <section className="relative w-full bg-white dark:bg-black mb-8 border-y border-[#e5e7eb] 
+    dark:border-[#334155] box-border overflow-x-hidden pt-4 mt-0 p-0.5
+     pb-[55px] rounded-lg my-0.5 md:p-4 md:px-0 md:rounded-2xl md:my-2.5">
+
       {renderHeader()}
 
-      {/* 🔥 SUCCESS GRID - ImeBADILISHWA KUWA 5 KWA DESKTOP */}
-      <div className="grid w-full box-border grid-cols-2 gap-2.5 px-1 md:grid-cols-4 md:gap-3.5 md:px-2 lg:grid-cols-5 lg:gap-4 lg:px-4 xl:gap-5">
+<div className="grid w-full box-border grid-cols-2 gap-1 px-0 md:grid-cols-4 md:gap-3.5 md:px-2 lg:grid-cols-5 lg:gap-4 lg:px-4 xl:gap-5">        
         {filteredProducts.length > 0 ? (
           filteredProducts.map((item) => (
             <DashboardCard 
@@ -259,7 +227,7 @@ export default function JustForYou({ search = "", selectedCategory }) {
               </p>
               <button 
                 className="flex items-center gap-2 bg-[#ff6a00] hover:bg-[#e55a00] text-white border-none px-4 py-1.5 md:px-5 md:py-2 rounded-[30px] text-xs md:text-sm font-semibold cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-95" 
-                onClick={() => fetchJustForYou()}
+                onClick={() => refetch()} // 4. Tumia refetch kutoka useQuery
               >
                 <RefreshCw size={14} /> Jaribu tena
               </button>

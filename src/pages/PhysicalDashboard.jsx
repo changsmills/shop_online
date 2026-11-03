@@ -15,11 +15,91 @@ import {
 } from 'lucide-react';
 import ReactDOM from 'react-dom';
 
+// 1. Ingiza TanStack Query
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+
 const BACKEND_URL = "https://shop-online-r9z4.onrender.com";
 
+// ==========================================
+// 2. FUNCTIONS ZA KUCHUKUA DATA
+// ==========================================
+const fetchDashboardData = async ({ queryKey }) => {
+  const [_, paramId] = queryKey;
+  const token = localStorage.getItem("access_token");
+  if (!token) throw new Error("No token");
+
+  const headers = { Authorization: `Bearer ${token}` };
+
+  const [brandsRes, catRes] = await Promise.all([
+    api.get('/brands/', { headers }).catch(() => ({ data: [] })),
+    api.get('/subcategories/', { headers }).catch(() => ({ data: [] }))
+  ]);
+
+  let store = null;
+  if (paramId) {
+    try {
+      const storeRes = await api.get(`/stores/${paramId}/`, { headers });
+      store = storeRes.data;
+    } catch (err) {
+      const profileRes = await api.get('/profile/', { headers });
+      const ownerId = profileRes.data.id;
+      const storesRes = await api.get(`/stores/?owner=${ownerId}`, { headers });
+      const results = storesRes.data.results || storesRes.data;
+      if (Array.isArray(results) && results.length > 0) store = results[0];
+    }
+  } else {
+    const profileRes = await api.get('/profile/', { headers });
+    const ownerId = profileRes.data.id;
+    const storesRes = await api.get(`/stores/?owner=${ownerId}`, { headers });
+    const results = storesRes.data.results || storesRes.data;
+    if (Array.isArray(results) && results.length > 0) store = results[0];
+  }
+
+  let myStoreSubCats = [];
+  let myProducts = [];
+
+  if (store) {
+    if (store.sub_category_ids?.length > 0) {
+      const subDataRes = await api.get('/subcategories/', {
+        params: { id__in: store.sub_category_ids.join(',') }, headers
+      });
+      myStoreSubCats = subDataRes.data || [];
+    }
+    
+    const prodsRes = await api.get('/products/', {
+      params: { store_id: store.id, ordering: '-created_at' }, headers
+    });
+    myProducts = prodsRes.data || [];
+  }
+
+  return {
+    brands: brandsRes.data || [],
+    allSubCategories: catRes.data || [],
+    myStore: store,
+    myStoreSubCats,
+    myProducts
+  };
+};
+
+const fetchUnreadMessages = async ({ queryKey }) => {
+  const [_, storeId] = queryKey;
+  const token = localStorage.getItem("access_token");
+  if (!token || !storeId) return 0;
+  
+  const response = await api.get('/messages/', {
+    params: { receiver_id: storeId, is_read: false },
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data?.length || 0;
+};
+
+// ==========================================
+// 3. DASHBOARD COMPONENT
+// ==========================================
 export default function PhysicalDashboard() {
   const navigate = useNavigate();
   const { id: paramId } = useParams();
+  const queryClient = useQueryClient();
 
   const [isManageMode, setIsManageMode] = useState(false);
   const [showCategoryManager, setShowCategoryManager] = useState(false);
@@ -31,15 +111,11 @@ export default function PhysicalDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 768);
 
-  const [allSubCategories, setAllSubCategories] = useState([]);
-  const [myStore, setMyStore] = useState(null);
-  const [myStoreSubCats, setMyStoreSubCats] = useState([]);
-  const [myProducts, setMyProducts] = useState([]);
-  const [brands, setBrands] = useState([]);
+  // --- State za Form (Hizi zinabaki kuwa za local kwa sababu ni za UI) ---
+  const [myProducts, setMyProducts] = useState([]); // Tunaiweka hapa ili QuickInventoryManager iweze ku-update kirahisi
   const [editingProductId, setEditingProductId] = useState(null);
   const [addedProducts, setAddedProducts] = useState([]);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
-  const [unreadMessages, setUnreadMessages] = useState(0);
 
   const [storeMeta, setStoreMeta] = useState({
     store_name: "", phone_number: "", whatsapp_number: "",
@@ -72,36 +148,90 @@ export default function PhysicalDashboard() {
   const videoInputRef = useRef(null);
   const galleryInputRef = useRef(null);
 
-  useEffect(() => { fetchDashboardData(); }, [paramId]);
+  // ==========================================
+  // 4. QUERIES
+  // ==========================================
+  const { data: dashboardData, isLoading: isDataLoading, error } = useQuery({
+    queryKey: ['physicalDashboard', paramId],
+    queryFn: fetchDashboardData,
+    staleTime: 1000 * 60 * 2, // Cache kwa dakika 2
+    retry: 1
+  });
 
+  const myStore = dashboardData?.myStore || null;
+  const myStoreSubCats = dashboardData?.myStoreSubCats || [];
+  const allSubCategories = dashboardData?.allSubCategories || [];
+  const brands = dashboardData?.brands || [];
+
+  // Weka myProducts kwenye state ya local pindi data inapofika (kwa ajili ya QuickInventoryManager)
   useEffect(() => {
-    if (!myStore?.id) return;
-    const fetchUnreadMessages = async () => {
-      try {
-        const token = localStorage.getItem("access_token");
-        if (!token) return;
-        const response = await api.get('/messages/', {
-          params: { receiver_id: myStore.id, is_read: false },
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setUnreadMessages(response.data?.length || 0);
-      } catch (err) { console.error("Error fetching messages:", err); }
-    };
-    fetchUnreadMessages();
-    const interval = setInterval(fetchUnreadMessages, 10000);
-    return () => clearInterval(interval);
-  }, [myStore?.id]);
+    if (dashboardData?.myProducts) {
+      setMyProducts(dashboardData.myProducts);
+    }
+  }, [dashboardData?.myProducts]);
 
+  // Kama hana token au amekataliwa, mpeleke login
+  useEffect(() => {
+    if (error?.message === "No token" || error?.response?.status === 401) {
+      navigate('/dashboard/login');
+    }
+  }, [error, navigate]);
+
+  // Previews za Store zikifika
+  useEffect(() => {
+    if (myStore) {
+      setLogoPreview(myStore.store_logo_url || null);
+      setBannerPreview(myStore.store_banner_url || null);
+      setOfficePreviews([
+        myStore.office_image_1_url || null,
+        myStore.office_image_2_url || null,
+        myStore.office_image_3_url || null,
+      ]);
+      setStoreMeta({
+        store_name: myStore.store_name || "", 
+        phone_number: myStore.phone_number || "", 
+        whatsapp_number: myStore.whatsapp_number || "",
+        instagram_handle: myStore.instagram_handle || "", 
+        tiktok_handle: myStore.tiktok_handle || "", 
+        youtube_link: myStore.youtube_link || "",
+        physical_address: myStore.physical_address || "", 
+        working_hours: myStore.working_hours || "Mon - Sat (8:00 AM - 6:00 PM)",
+        tin_number: myStore.tin_number || "", 
+        description: myStore.description || "", 
+        city: myStore.city || "",
+        category_id: myStore.category_id || null,
+        sub_category_ids: myStore.sub_category_ids || [],
+        latitude: myStore.latitude || "",
+        longitude: myStore.longitude || "",
+      });
+    }
+  }, [myStore]);
+
+  // Unread Messages Query (ina-refetch kila baada ya sekunde 10 kama ulivyokuwa unafanya)
+  const { data: unreadMessages = 0 } = useQuery({
+    queryKey: ['unreadMessages', myStore?.id],
+    queryFn: fetchUnreadMessages,
+    enabled: !!myStore?.id,
+    refetchInterval: 10000, 
+  });
+
+  // Refetch kwenye mtandao
   useEffect(() => {
     const handleOnline = () => {
       console.log("🌐 Mtandao umeunganishwa! Inapakia data za duka upya...");
-      fetchDashboardData();
+      queryClient.invalidateQueries({ queryKey: ['physicalDashboard'] });
     };
     window.addEventListener('online', handleOnline);
-    return () => {
-      window.removeEventListener('online', handleOnline);
-    };
-  }, []);
+    return () => window.removeEventListener('online', handleOnline);
+  }, [queryClient]);
+
+
+  // ==========================================
+  // 5. HANDLERS
+  // ==========================================
+  const refetchAll = () => {
+    queryClient.invalidateQueries({ queryKey: ['physicalDashboard'] });
+  };
 
   const resetProductForm = () => {
     setAttributes({
@@ -115,81 +245,6 @@ export default function PhysicalDashboard() {
     setEditingProductId(null);
   };
 
-  const fetchDashboardData = async () => {
-    try {
-      const token = localStorage.getItem("access_token");
-      if (!token) { navigate('/dashboard/login'); return; }
-      const headers = { Authorization: `Bearer ${token}` };
-
-      try { const bRes = await api.get('/brands/', { headers }); if (bRes.data) setBrands(bRes.data); } catch (brandErr) { setBrands([]); }
-
-      const catRes = await api.get('/subcategories/', { headers });
-      if (catRes.data) setAllSubCategories(catRes.data);
-
-      let store = null;
-      if (paramId) {
-        try { const storeRes = await api.get(`/stores/${paramId}/`, { headers }); store = storeRes.data; } catch (err) {
-          const profileRes = await api.get('/profile/', { headers });
-          const ownerId = profileRes.data.id;
-          const storesRes = await api.get(`/stores/?owner=${ownerId}`, { headers });
-          const results = storesRes.data.results || storesRes.data;
-          if (Array.isArray(results) && results.length > 0) store = results[0];
-        }
-      } else {
-        const profileRes = await api.get('/profile/', { headers });
-        const ownerId = profileRes.data.id;
-        const storesRes = await api.get(`/stores/?owner=${ownerId}`, { headers });
-        const results = storesRes.data.results || storesRes.data;
-        if (Array.isArray(results) && results.length > 0) store = results[0];
-      }
-
-      if (store) {
-        setMyStore(store);
-
-        setLogoPreview(store.store_logo_url || null);
-        setBannerPreview(store.store_banner_url || null);
-        
-        setStoreMeta({
-          store_name: store.store_name || "", 
-          phone_number: store.phone_number || "", 
-          whatsapp_number: store.whatsapp_number || "",
-          instagram_handle: store.instagram_handle || "", 
-          tiktok_handle: store.tiktok_handle || "", 
-          youtube_link: store.youtube_link || "",
-          physical_address: store.physical_address || "", 
-          working_hours: store.working_hours || "Mon - Sat (8:00 AM - 6:00 PM)",
-          tin_number: store.tin_number || "", 
-          description: store.description || "", 
-          city: store.city || "",
-          category_id: store.category_id || null,
-          sub_category_ids: store.sub_category_ids || [],
-          latitude: store.latitude || "",
-          longitude: store.longitude || "",
-        });
-
-        setOfficePreviews([
-          store.office_image_1_url || null,
-          store.office_image_2_url || null,
-          store.office_image_3_url || null,
-        ]);
-
-        if (store.sub_category_ids?.length > 0) {
-          const subDataRes = await api.get('/subcategories/', {
-            params: { id__in: store.sub_category_ids.join(',') }, headers
-          });
-          if (subDataRes.data) setMyStoreSubCats(subDataRes.data);
-        }
-        const prodsRes = await api.get('/products/', {
-          params: { store_id: store.id, ordering: '-created_at' }, headers
-        });
-        if (prodsRes.data) setMyProducts(prodsRes.data);
-      } else { setMyStore(null); }
-    } catch (err) {
-      console.error("❌ Fetch Error Kubwa:", err);
-      if (err.response?.status === 401) navigate('/dashboard/login');
-    }
-  };
-
   const handleRemoveCategoryFromStore = async (catId) => {
     if (!window.confirm("Are you sure you want to remove this category?")) return;
     if (!myStore?.id) return alert("Store not found!");
@@ -198,7 +253,7 @@ export default function PhysicalDashboard() {
       if (!token) return alert("Token haipo!");
       const updatedIds = (myStore.sub_category_ids || []).filter(cid => cid !== catId);
       await api.patch(`/stores/${myStore.id}/`, { sub_category_ids: updatedIds }, { headers: { Authorization: `Bearer ${token}` } });
-      fetchDashboardData();
+      refetchAll();
     } catch (err) { console.error(err); alert("Imeshindikana: " + (err.response?.data?.detail || err.message)); }
   };
 
@@ -210,7 +265,6 @@ export default function PhysicalDashboard() {
       if (!token) return alert("Token haipo!");
 
       const formData = new FormData();
-      
       const textFields = [
         'store_name', 'phone_number', 'whatsapp_number', 
         'instagram_handle', 'tiktok_handle', 'youtube_link', 
@@ -229,9 +283,7 @@ export default function PhysicalDashboard() {
 
       if (officeFiles && Array.isArray(officeFiles)) {
         officeFiles.forEach((file) => {
-          if (file && file instanceof File) {
-            formData.append("office_images", file);
-          }
+          if (file && file instanceof File) formData.append("office_images", file);
         });
       }
 
@@ -239,7 +291,7 @@ export default function PhysicalDashboard() {
         headers: { "Authorization": `Bearer ${token}`, "Content-Type": "multipart/form-data" }
       });
       
-      if (response.status === 200) { alert("Duka limesasishwa kikamilifu!"); fetchDashboardData(); }
+      if (response.status === 200) { alert("Duka limesasishwa kikamilifu!"); refetchAll(); }
     } catch (err) { 
       console.error("❌ [Update Error] Hitilafu kamili:", err); 
       let errorMsg = "Hitilafu isiyojulikana imetokea.";
@@ -255,9 +307,8 @@ export default function PhysicalDashboard() {
             if (fieldErrors) { errorMsg = `Hitilafu za uwanja:\n${fieldErrors}`; } else { errorMsg = JSON.stringify(errors, null, 2); }
           }
         } else { errorMsg = err.response.data?.detail || err.message; }
-      } else if (err.request) {
-        errorMsg = "Hakuna jibu kutoka kwa server (Network Error).";
-      } else { errorMsg = err.message; }
+      } else if (err.request) { errorMsg = "Hakuna jibu kutoka kwa server (Network Error)."; } 
+      else { errorMsg = err.message; }
       alert("❗ Hitilafu wakati wa kusasisha:\n\n" + errorMsg); 
     } finally { setIsUpdatingStore(false); }
   };
@@ -318,7 +369,7 @@ export default function PhysicalDashboard() {
       
       if (successCount > 0) {
         alert(`✅ Bidhaa ${successCount} zimehifadhiwa kikamilifu!`);
-        fetchDashboardData();
+        refetchAll();
         if (remainingProducts.length === 0 && typeof setCurrentStep === 'function') setCurrentStep(1);
       }
       if (remainingProducts.length > 0) {
@@ -344,6 +395,7 @@ export default function PhysicalDashboard() {
     setGalleryFiles(galleryFiles.filter((_, i) => i !== index));
     setGalleryPreviews(galleryPreviews.filter((_, i) => i !== index));
   };
+  
   const selectedCategoryName = myStoreSubCats?.find(cat => cat.id === attributes.category_id)?.name || "Chagua Kategoria";
 
   const handleAddCategoryToStore = async (cat) => {
@@ -355,7 +407,7 @@ export default function PhysicalDashboard() {
       if (currentIds.includes(cat.id)) { alert("Kategoria hii tayari ipo dukan kwako!"); return; }
       const updatedIds = [...currentIds, cat.id];
       await api.patch(`/stores/${myStore.id}/`, { sub_category_ids: updatedIds }, { headers: { Authorization: `Bearer ${token}` } });
-      await fetchDashboardData();
+      refetchAll();
       alert(`✅ ${cat.name} imeongezwa!`);
     } catch (err) { console.error(err); alert("Hitilafu: " + (err.response?.data?.detail || err.message)); }
   };
@@ -371,6 +423,7 @@ export default function PhysicalDashboard() {
       finally {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
+        queryClient.clear(); // Futa cache yote
         navigate('/dashboard/login', { replace: true });
       }
     }
@@ -387,6 +440,17 @@ export default function PhysicalDashboard() {
     { id: 'logout', label: 'Logout', icon: <LogOut size={20} /> },
   ];
 
+  // ==========================================
+  // 6. RENDER (UI)
+  // ==========================================
+  if (isDataLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-black text-gray-500">
+        Inapakia Dashboard...
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-black text-gray-900 dark:text-white flex flex-col font-sans">
       
@@ -394,11 +458,11 @@ export default function PhysicalDashboard() {
       <header className="fixed top-0 left-0 right-0 h-[64px] md:h-[70px] bg-white dark:bg-[#0a0a0a] border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-3 md:px-6 z-[99999]">
         <div className="flex items-center gap-3">
           <button 
-  className="flex md:hidden items-center justify-center w-10 h-10 bg-transparent border-none text-gray-800 dark:text-white cursor-pointer relative z-[100060]" 
-  onClick={() => setIsSidebarOpen(!isSidebarOpen)}
->
-  <Menu size={24} />
-</button>
+            className="flex md:hidden items-center justify-center w-10 h-10 bg-transparent border-none text-gray-800 dark:text-white cursor-pointer relative z-[100060]" 
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          >
+            <Menu size={24} />
+          </button>
           <div className="flex items-center gap-2">
             <span className="text-lg md:text-2xl font-black text-brand-orange tracking-tight">Skyfall</span>
             <span className="bg-brand-orange text-white text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-full uppercase">Supplier</span>
@@ -451,65 +515,60 @@ export default function PhysicalDashboard() {
 
       {/* MAIN WRAPPER */}
       <div className="flex flex-1 mt-[64px] md:mt-[70px] min-h-[calc(100vh-64px)] md:min-h-[calc(100vh-70px)]">
+        {ReactDOM.createPortal(
+          <>
+            <div 
+              className={`fixed inset-0 bg-black/60 z-50 transition-opacity duration-300 md:hidden ${isSidebarOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+              onClick={() => setIsSidebarOpen(false)}
+            />
 
-{ReactDOM.createPortal(
-  <>
-    {/* Overlay - z-50 */}
-    <div 
-      className={`fixed inset-0 bg-black/60 z-50 transition-opacity duration-300 md:hidden ${isSidebarOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
-      onClick={() => setIsSidebarOpen(false)}
-    />
-
-    {/* Sidebar - z-[60], w-[300px], na whitespace-nowrap */}
-    <aside 
-      className={`fixed top-0 left-0 bottom-0 w-[300px] md:w-[260px] bg-white dark:bg-[#0a0a0a] 
-        border-r border-gray-200 dark:border-gray-800 overflow-y-auto transition-transform duration-300 ease-in-out shadow-2xl z-[60] ${
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-      }`}
-    >
-      <div className="px-6 py-4 mb-2 flex items-center justify-between">
-        <h3 className="text-xl font-extrabold text-brand-orange m-0">Supplier</h3>
-        <button 
-          className="md:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
-          onClick={() => setIsSidebarOpen(false)}
-        >
-          <X size={20} />
-        </button>
-      </div>
-      <ul className="list-none p-0 m-0">
-        {menuItems.map((item) => {
-          const isActive = activeTab === item.id;
-          return (
-            <li
-              key={item.id}
-              // Nimeongeza whitespace-nowrap hapa
-              className={`flex items-center gap-3 px-6 py-3 text-[15px] font-medium 
-                cursor-pointer transition-all border-l-[3px]
-                 whitespace-nowrap ${isActive ? 'bg-orange-50/50 dark:bg-orange-950/20 text-brand-orange border-l-brand-orange font-bold' : 'text-gray-700 dark:text-gray-300 border-l-transparent hover:bg-gray-50 dark:hover:bg-gray-900'} ${item.id === 'logout' ? 'text-red-500 mt-4 border-t border-gray-200 dark:border-gray-800 pt-4' : ''}`}
-              onClick={() => {
-                if (item.id === 'logout') { handleLogout(); } 
-                else if (item.id === 'settings') { navigate('/dashboard/supplier-settings'); } 
-                else {
-                  setActiveTab(item.id);
-                  if (window.innerWidth < 768) setIsSidebarOpen(false);
-                }
-              }}
+            <aside 
+              className={`fixed top-0 left-0 bottom-0 w-[300px] md:w-[260px] bg-white dark:bg-[#0a0a0a] 
+                border-r border-gray-200 dark:border-gray-800 overflow-y-auto transition-transform duration-300 ease-in-out shadow-2xl z-[60] ${
+                isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+              }`}
             >
-              {item.icon}
-              <span>{item.label}</span>
-            </li>
-          );
-        })}
-      </ul>
-    </aside>
-  </>,
-  document.body
-)}
-
+              <div className="px-6 py-4 mb-2 flex items-center justify-between">
+                <h3 className="text-xl font-extrabold text-brand-orange m-0">Supplier</h3>
+                <button 
+                  className="md:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  onClick={() => setIsSidebarOpen(false)}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <ul className="list-none p-0 m-0">
+                {menuItems.map((item) => {
+                  const isActive = activeTab === item.id;
+                  return (
+                    <li
+                      key={item.id}
+                      className={`flex items-center gap-3 px-6 py-3 text-[15px] font-medium 
+                        cursor-pointer transition-all border-l-[3px]
+                        whitespace-nowrap ${isActive ? 'bg-orange-50/50 dark:bg-orange-950/20 text-brand-orange border-l-brand-orange font-bold' : 'text-gray-700 dark:text-gray-300 border-l-transparent hover:bg-gray-50 dark:hover:bg-gray-900'} ${item.id === 'logout' ? 'text-red-500 mt-4 border-t border-gray-200 dark:border-gray-800 pt-4' : ''}`}
+                      onClick={() => {
+                        if (item.id === 'logout') { handleLogout(); } 
+                        else if (item.id === 'settings') { navigate('/dashboard/supplier-settings'); } 
+                        else {
+                          setActiveTab(item.id);
+                          if (window.innerWidth < 768) setIsSidebarOpen(false);
+                        }
+                      }}
+                    >
+                      {item.icon}
+                      <span>{item.label}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </aside>
+          </>,
+          document.body
+        )}
 
         {/* MAIN CONTENT */}
- <main className="flex-1 ml-0 md:ml-[260px] p-3 md:p-6 bg-gray-50 dark:bg-black min-h-[calc(100vh-64px)] md:min-h-[calc(100vh-70px)]">
-                <div className="max-w-[1400px] mx-auto w-full pb-[80px]">
+        <main className="flex-1 ml-0 md:ml-[260px] p-3 md:p-6 bg-gray-50 dark:bg-black min-h-[calc(100vh-64px)] md:min-h-[calc(100vh-70px)]">
+          <div className="max-w-[1400px] mx-auto w-full pb-[80px]">
             
             {/* OVERVIEW TAB */}
             {activeTab === 'overview' && (

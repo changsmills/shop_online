@@ -11,29 +11,152 @@ import {
   ShieldCheck, Box, Video, FileText, Store, X, ChevronRight, Eye
 } from 'lucide-react';
 
+// 1. Ingiza TanStack Query
+import { useQuery } from '@tanstack/react-query';
+
 const ProductGallery = React.lazy(() => import("../components/ProductGallery"));
 const ProductInfo = React.lazy(() => import("../components/ProductInfo"));
 const SkeletonProductDetails = React.lazy(() => import("../components/SkeletonProductDetails"));
 
+// 2. Function ya kuchukua data zote za bidhaa
+const fetchProductDetails = async ({ queryKey }) => {
+  const [_, id] = queryKey;
+
+  // Ombi la kwanza kabisa: Pata bidhaa yenyewe
+  const productRes = await api.get(`/products/${id}/`);
+  const productData = productRes.data;
+  if (!productData) throw new Error("Bidhaa haijapatikana");
+
+  // Tunaandaa maombi mengine yote yafanyike kwa mpigo (Parallel)
+  const fetchPromises = [];
+
+  // Ombi la bidhaa za duka hili
+  let storeProductsPromise = Promise.resolve([]);
+  if (productData?.store_id) {
+    storeProductsPromise = api.get(`/products/?store_id=${productData.store_id}`)
+      .then(res => (res.data.results || res.data || []).filter(p => p.id !== id))
+      .catch(() => []);
+    fetchPromises.push(storeProductsPromise);
+  }
+
+  // Ombi la taarifa za duka
+  let storeDataPromise = Promise.resolve(null);
+  if (productData.store_id) {
+    storeDataPromise = api.get(`/stores/${productData.store_id}/`)
+      .then(res => res.data)
+      .catch(() => null);
+    fetchPromises.push(storeDataPromise);
+  }
+
+  // Ombi la media (picha/video)
+  const mediaDataPromise = api.get(`/product-media/?product_id=${id}`)
+    .then(res => res.data.results || res.data || [])
+    .catch(() => []);
+  fetchPromises.push(mediaDataPromise);
+
+  // Ombi la variations (bidhaa zinazofanana kwenye leaf category)
+  let variationsDataPromise = Promise.resolve([]);
+  if (productData?.leaf_category_id) {
+    variationsDataPromise = api.get(`/products/?leaf_category_id=${productData.leaf_category_id}`)
+      .then(res => (res.data.results || res.data || []).filter(p => p.id !== id).slice(0, 5))
+      .catch(() => []);
+    fetchPromises.push(variationsDataPromise);
+  }
+
+  // Subiri maombi yote yamalize kwa mpigo
+  await Promise.all(fetchPromises);
+
+  const sList = await storeProductsPromise;
+  const storeData = await storeDataPromise;
+  const mediaData = await mediaDataPromise;
+  const variationsData = await variationsDataPromise;
+
+  // Hifadhi kwenye localStorage (recentlyViewed) - Hii ni logic yako ya awali
+  try {
+    if (productData?.id) {
+      const recentlyViewed = JSON.parse(localStorage.getItem("recentlyViewed") || "[]");
+      const filtered = recentlyViewed.filter(pId => pId !== productData.id);
+      const updated = [productData.id, ...filtered].slice(0, 10);
+      localStorage.setItem("recentlyViewed", JSON.stringify(updated));
+    }
+  } catch (err) {}
+
+  // Rejesha data yote
+  return {
+    productData,
+    storeProducts: sList.slice(0, 10),
+    storeData,
+    variationsData,
+    mediaList: [
+      { url: productData.cover_image, type: 'image' }, 
+      ...(mediaData || []).map(m => ({ url: m.media_url, type: m.media_type })),
+      productData.promo_video_url ? { url: productData.promo_video_url, type: 'video' } : null
+    ].filter(Boolean)
+  };
+};
+
+// 3. Function ya kuchukua related products
+const fetchRelatedProducts = async ({ queryKey }) => {
+  const [_, leafCategoryId, productId] = queryKey;
+  if (!leafCategoryId) return [];
+  
+  const response = await api.get('/products/', {
+    params: { leaf_category_id: leafCategoryId, ordering: '-views', limit: 8 }
+  });
+  const data = response.data.results || response.data || [];
+  return data.filter(p => p.id !== productId).slice(0, 8);
+};
+
+
 export default function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [product, setProduct] = useState(null);
-  const [storeProducts, setStoreProducts] = useState([]);
-  const [storeCategories, setStoreCategories] = useState([]);
-  const [activeCategory, setActiveCategory] = useState("all");
+
   const [isMobile, setIsMobile] = useState(false);
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedImageTitle, setSelectedImageTitle] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [relatedProducts, setRelatedProducts] = useState([]);
-  const [loadingRelated, setLoadingRelated] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [fetchTrigger, setFetchTrigger] = useState(0);
-  const [hideHeader, setHideHeader] = useState(false);
-  const lastScrollYRef = useRef(0);
+  const [fetchTrigger, setFetchTrigger] = useState(0); // Bado tunaiacha kwa ajili ya "online" refetch
 
+  // ==========================================
+  // 4. TANSTACK QUERIES
+  // ==========================================
+  const { 
+    data: mainData, 
+    isLoading, 
+    error, 
+    refetch 
+  } = useQuery({
+    queryKey: ['productDetails', id, fetchTrigger],
+    queryFn: fetchProductDetails,
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5, // Cache kwa dakika 5
+  });
+
+  const { data: relatedProducts = [], isLoading: loadingRelated } = useQuery({
+    queryKey: ['relatedProducts', mainData?.productData?.leaf_category_id, id],
+    queryFn: fetchRelatedProducts,
+    enabled: !!mainData?.productData?.leaf_category_id,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const product = mainData?.productData ? {
+    ...mainData.productData,
+    stores: mainData.storeData,
+    variations: mainData.variationsData || [],
+    media_list: mainData.mediaList
+  } : null;
+
+  const storeProducts = mainData?.storeProducts || [];
+  const storeCategories = storeProducts.length > 0 
+    ? [...new Set(storeProducts.map(p => p.sub_category_name).filter(Boolean))] 
+    : [];
+  const activeCategory = product?.sub_category_name || "all";
+
+  // ==========================================
+  // EFFECTS ZILIZOSALIA
+  // ==========================================
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
@@ -61,131 +184,6 @@ export default function ProductDetails() {
   }, [id]);
 
   useEffect(() => {
-    async function getFullProductData() {
-      try {
-        setIsLoading(true);
-        
-        let productData = null;
-        try {
-          const productRes = await api.get(`/products/${id}/`);
-          productData = productRes.data;
-        } catch (err) {
-          console.error("❌ [Fetch 1] Imeshindwa:", err.message);
-          setProduct(null);
-          setIsLoading(false);
-          return; 
-        }
-        
-        if (!productData) {
-          setProduct(null);
-          setIsLoading(false);
-          return;
-        }
-
-        const fetchPromises = [];
-
-        let sList = [];
-        if (productData?.store_id) {
-          fetchPromises.push(
-            api.get(`/products/?store_id=${productData.store_id}`)
-              .then(res => {
-                sList = (res.data.results || res.data || []).filter(p => p.id !== id);
-                return sList;
-              })
-              .catch(() => [])
-          );
-        }
-
-        let storeData = null;
-        if (productData.store_id) {
-          fetchPromises.push(
-            api.get(`/stores/${productData.store_id}/`)
-              .then(res => {
-                storeData = res.data;
-                return storeData;
-              })
-              .catch(() => null)
-          );
-        }
-
-        let mediaData = [];
-        fetchPromises.push(
-          api.get(`/product-media/?product_id=${id}`)
-            .then(res => {
-              mediaData = res.data.results || res.data || [];
-              return mediaData;
-            })
-            .catch(() => [])
-        );
-
-        await Promise.all(fetchPromises);
-
-        setStoreProducts(sList.slice(0, 10));
-        if (sList.length > 0) {
-          const uniqueCats = [...new Set(sList.map(p => p.sub_category_name).filter(Boolean))];
-          setStoreCategories(uniqueCats);
-          setActiveCategory(productData.sub_category_name);
-        }
-
-        let variationsData = [];
-        if (productData?.leaf_category_id) {
-          try {
-            const variationsRes = await api.get(`/products/?leaf_category_id=${productData.leaf_category_id}`);
-            let vList = variationsRes.data.results || variationsRes.data || [];
-            variationsData = vList.filter(p => p.id !== id).slice(0, 5);
-          } catch (err) {}
-        }
-
-        setProduct({
-          ...productData,
-          stores: storeData,
-          variations: variationsData || [],
-          media_list: [
-            { url: productData.cover_image, type: 'image' }, 
-            ...(mediaData || []).map(m => ({ url: m.media_url, type: m.media_type })),
-            productData.promo_video_url ? { url: productData.promo_video_url, type: 'video' } : null
-          ].filter(Boolean)
-        });
-
-        try {
-          if (productData?.id) {
-            const recentlyViewed = JSON.parse(localStorage.getItem("recentlyViewed") || "[]");
-            const filtered = recentlyViewed.filter(pId => pId !== productData.id);
-            const updated = [productData.id, ...filtered].slice(0, 10);
-            localStorage.setItem("recentlyViewed", JSON.stringify(updated));
-          }
-        } catch (err) {}
-
-      } catch (err) {
-        console.error("❌ [Main Catcher]:", err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    if (id) getFullProductData();
-  }, [id, fetchTrigger]);
-
-  useEffect(() => {
-    const fetchRelatedProducts = async () => {
-      if (!product?.leaf_category_id) return;
-      setLoadingRelated(true);
-      try {
-        const response = await api.get('/products/', {
-          params: { leaf_category_id: product.leaf_category_id, ordering: '-views', limit: 8 }
-        });
-        const data = response.data.results || response.data || [];
-        const filtered = data.filter(p => p.id !== product.id);
-        setRelatedProducts(filtered.slice(0, 8));
-      } catch (err) {
-        setRelatedProducts([]);
-      } finally {
-        setLoadingRelated(false);
-      }
-    };
-    if (product?.id) fetchRelatedProducts();
-  }, [product?.id, product?.leaf_category_id]);
-
-  useEffect(() => {
     const handleOnline = () => { setIsOnline(true); setFetchTrigger(prev => prev + 1); };
     const handleOffline = () => setIsOnline(false);
     window.addEventListener('online', handleOnline);
@@ -196,17 +194,21 @@ export default function ProductDetails() {
     };
   }, []);
 
+  // ==========================================
+  // HANDLERS
+  // ==========================================
   const handleRateProduct = async (stars) => {
     const loadingToast = toast.loading("Tunahifadhi rating yako...");
     try {
       await api.post(`/products/${id}/rate/`, { rating: stars });
       toast.dismiss(loadingToast);
       toast.success(`Asante kwa rating ya nyota ${stars}!`);
-      setProduct(prev => {
-        const newTotal = (prev.total_reviews || 0) + 1;
-        const newAverage = (((prev.average_rating || 0) * (prev.total_reviews || 0)) + stars) / newTotal;
-        return { ...prev, total_reviews: newTotal, average_rating: newAverage };
-      });
+      
+      // Sasisha UI papo hapo
+      // Kwa kuwa tunatumia useQuery, tunaweza kutumia queryClient.invalidateQueries 
+      // lakini kwa rating, tunabadilisha data ya cache moja kwa moja
+      refetch(); // Inafetch upya data zote ili rating mpya ionekane
+      
     } catch (err) {
       toast.dismiss(loadingToast);
       toast.error("Tatizo la mtandao limetokea.");
@@ -223,42 +225,39 @@ export default function ProductDetails() {
     return <SkeletonProductDetails isMobile={isMobile} />;
   }
 
-  if (!product) {
+  if (error || !product) {
     return <div className="text-center py-10 text-gray-500">Bidhaa haijapatikana.</div>;
   }
 
+  // ==========================================
+  // RENDER (Muonekano wako ule ule)
+  // ==========================================
   return (
-
-  <div className="min-h-[100dvh] bg-white dark:bg-black flex flex-col pt-0 md:pt-[100px] font-sans overflow-x-hidden">      
+    <div className="min-h-[100dvh] bg-white dark:bg-black flex flex-col pt-0 md:pt-[100px] font-sans overflow-x-hidden">      
       <div className="md:fixed md:top-0 md:left-0 md:w-full md:z-[1000]">
-            <Header showBack={true} /> 
+        <Header showBack={true} /> 
       </div>
 
-   <div className="w-full max-w-full mx-auto px-0 md:px-0 pb-24 md:pb-0">
-
+      <div className="w-full max-w-full mx-auto px-0 md:px-0 pb-24 md:pb-0">
         <main className="flex flex-col md:flex-row w-full items-start">
           
-         {/* LEFT CONTENT (Gallery) */}
-<div className="w-full md:w-[65%] md:sticky md:top-[100px] md:max-h-[calc(100vh-100px)] md:overflow-y-auto bg-white dark:bg-black md:border-r border-gray-200 dark:border-gray-800">
-  
-  {/* Section ya Gallery - Tumeongeza padding kwenye simu na rounded corners */}
-  <section className="w-full bg-white dark:bg-black pt-3 md:pt-6 px-1 md:px-6">
-    <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800">
-      <Suspense fallback={<div className="p-10 text-center text-gray-500">Inapakia picha...</div>}>
-        <ProductGallery product={product} isMobile={isMobile} />
-      </Suspense>
-    </div>
-  </section>
+          {/* LEFT CONTENT (Gallery) */}
+          <div className="w-full md:w-[65%] md:sticky md:top-[100px] md:max-h-[calc(100vh-100px)] md:overflow-y-auto bg-white dark:bg-black md:border-r border-gray-200 dark:border-gray-800">
+            <section className="w-full bg-white dark:bg-black pt-3 md:pt-6 px-1 md:px-6">
+              <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800">
+                <Suspense fallback={<div className="p-10 text-center text-gray-500">Inapakia picha...</div>}>
+                  <ProductGallery product={product} isMobile={isMobile} />
+                </Suspense>
+              </div>
+            </section>
 
-  {/* Maelezo ya Bidhaa - Tumeongeza nafasi (margin) kati ya picha na maelezo */}
-  <div className="mx-3 md:mx-6 my-4 p-4 md:p-5 bg-gray-50 dark:bg-[#0a0a0a] rounded-2xl border border-gray-100 dark:border-gray-800">
-    <h3 className="text-lg font-bold mb-2 text-gray-800 dark:text-white">Maelezo ya Bidhaa</h3>
-    <div className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-      <p>{product?.description || "Hakuna maelezo ya ziada kwa bidhaa hii."}</p>
-    </div>
-  </div>
-  
-</div>
+            <div className="mx-3 md:mx-6 my-4 p-4 md:p-5 bg-gray-50 dark:bg-[#0a0a0a] rounded-2xl border border-gray-100 dark:border-gray-800">
+              <h3 className="text-lg font-bold mb-2 text-gray-800 dark:text-white">Maelezo ya Bidhaa</h3>
+              <div className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                <p>{product?.description || "Hakuna maelezo ya ziada kwa bidhaa hii."}</p>
+              </div>
+            </div>
+          </div>
 
           {/* RIGHT SIDEBAR (Product Info) */}
           <div className="w-full md:w-[35%] md:sticky md:top-[100px] md:max-h-[calc(100vh-100px)] md:overflow-y-auto bg-[#fafbfc] dark:bg-[#0a0a0a] border-l border-gray-200 dark:border-gray-800">
@@ -273,13 +272,11 @@ export default function ProductDetails() {
               </Suspense>
             </div>
           </div>
-
         </main>
 
         {/* STORE DETAILS SECTION */}
         {product.stores ? (
           <section className="bg-white dark:bg-black px-4 md:px-6 py-6 border-t border-gray-200 dark:border-gray-800">
-            
             <div className="bg-[#f8faff] dark:bg-[#0a0a0a] p-4 md:p-5 rounded-xl border-l-4 border-blue-500 mb-5">
               <div className="flex items-center gap-2 text-green-500 font-bold text-xs uppercase tracking-wide mb-1">
                 <ShieldCheck size={20} />

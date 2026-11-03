@@ -1,7 +1,7 @@
 // src/pages/StorePage.jsx
 import { createPortal } from 'react-dom';
-import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import api from '../axiosConfig';
 import Header from '../components/StoresHeader';
 import Footer from '../components/Footer';
@@ -10,28 +10,42 @@ import {
   Package, ShieldCheck, Star, Users, 
   ChevronLeft, Grid3x3, List, Search, X, ChevronRight
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query'; // 1. Ingiza useQuery
 
-// ✅ Badilisha URL sahihi kutoka Backend
-const getImageUrl = (url) => {
-  if (!url) return null;
-  if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  const CLOUD_NAME = 'rlgqgsnv';
-  return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${url}`;
+// ==========================================
+// 2. FUNCTION YA KUCHUKUA DATA (Duka + Bidhaa kwa mpigo)
+// ==========================================
+const fetchStoreData = async ({ queryKey }) => {
+  const [_, storeId] = queryKey;
+  if (!storeId) throw new Error("Store ID haipo");
+
+  // Tumia Promise.all kuchukua vitu vyote kwa mpigo
+  const [storeRes, productsRes] = await Promise.all([
+    api.get(`/stores/${storeId}/`),
+    api.get('/products/', { params: { store_id: storeId, ordering: '-created_at' } })
+  ]);
+
+  const storeData = storeRes.data;
+  const productsData = productsRes.data.results || productsRes.data || [];
+
+  // Panga categories
+  let uniqueCats = [];
+  if (productsData.length > 0) {
+    uniqueCats = [...new Set(productsData.map(p => p.sub_category_name || p.category_name).filter(Boolean))];
+  }
+
+  return { store: storeData, products: productsData, categories: uniqueCats };
 };
 
 export default function StorePage() {
   const { storeId } = useParams();
   const navigate = useNavigate();
-  const [store, setStore] = useState(null);
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  
+  // ========== STATE ZA LOCAL (Filters na Lightbox) ==========
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [categories, setCategories] = useState([]);
   const [viewMode, setViewMode] = useState('grid'); 
 
-  // ========== STATE ZA LIGHTBOX ==========
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [lightboxImages, setLightboxImages] = useState([]);
   const [lightboxIndex, setLightboxIndex] = useState(0);
@@ -41,42 +55,27 @@ export default function StorePage() {
   const [lightboxProductId, setLightboxProductId] = useState(null);
 
   // =======================================================
-  // 🔥 FETCH STORE DATA
+  // 3. TUMIA useQuery
   // =======================================================
-  useEffect(() => {
-    const fetchStoreData = async () => {
-      if (!storeId) return;
-      setLoading(true);
-      try {
-        const storeRes = await api.get(`/stores/${storeId}/`);
-        const storeData = storeRes.data;
-        setStore(storeData);
+  const { 
+    data: pageData, 
+    isLoading, 
+    error 
+  } = useQuery({
+    queryKey: ['storePage', storeId],
+    queryFn: fetchStoreData,
+    enabled: !!storeId,
+    staleTime: 1000 * 60 * 5, // Cache kwa dakika 5
+  });
 
-        const productsRes = await api.get('/products/', {
-          params: { store_id: storeId, ordering: '-created_at' }
-        });
-
-        const productsData = productsRes.data.results || productsRes.data || [];
-        setProducts(productsData);
-        setFilteredProducts(productsData);
-
-        if (productsData.length > 0) {
-          const uniqueCats = [...new Set(productsData.map(p => p.sub_category_name || p.category_name).filter(Boolean))];
-          setCategories(uniqueCats);
-        }
-      } catch (error) {
-        console.error('❌ Error fetching store data:', error.response?.data || error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchStoreData();
-  }, [storeId]);
+  const store = pageData?.store || null;
+  const products = pageData?.products || [];
+  const categories = pageData?.categories || [];
 
   // =======================================================
-  // 🔥 FILTER PRODUCTS
+  // 4. FILTER PRODUCTS (Local Logic)
   // =======================================================
-  useEffect(() => {
+  const filteredProducts = useMemo(() => {
     let filtered = [...products];
     if (searchTerm) {
       filtered = filtered.filter(p => p.name?.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -84,13 +83,13 @@ export default function StorePage() {
     if (selectedCategory !== 'all') {
       filtered = filtered.filter(p => (p.sub_category_name || p.category_name) === selectedCategory);
     }
-    setFilteredProducts(filtered);
+    return filtered;
   }, [searchTerm, selectedCategory, products]);
 
   const formatPrice = (price) => Number(price).toLocaleString();
 
   // =======================================================
-  // 🔥 LIGHTBOX FUNCTIONS
+  // 5. LIGHTBOX FUNCTIONS
   // =======================================================
   const openImageLightbox = (product, e, index) => {
     e.stopPropagation();
@@ -130,22 +129,19 @@ export default function StorePage() {
   const closeLightbox = () => setIsLightboxOpen(false);
 
   // =======================================================
-  // 🔥 LOADING STATE (SKELETON)
+  // 6. RENDER (Loading & Error States)
   // =======================================================
-  if (loading) {
+  if (isLoading) {
     return (
-   <div className="min-h-screen bg-gray-50 dark:bg-[#1a1a2e] pt-0 md:pt-0 pb-10">
-          <Header />
+      <div className="min-h-screen bg-gray-50 dark:bg-[#1a1a2e] pt-0 md:pt-0 pb-10">
+        <Header />
         <div className="max-w-[1200px] mx-auto p-4 skeleton-wrapper animate-pulse">
-          {/* Banner Skeleton */}
           <div className="w-full h-[200px] bg-gray-200 dark:bg-gray-700 rounded-2xl mb-6"></div>
-          {/* Info Cards Skeleton */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             {[1, 2, 3].map(i => (
               <div key={i} className="h-[150px] bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
             ))}
           </div>
-          {/* Products Skeleton */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
               <div key={i} className="h-[250px] bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
@@ -153,42 +149,35 @@ export default function StorePage() {
           </div>
         </div>
         <div className='hidden md:block'><Footer /></div>
-        
       </div>
     );
   }
 
-  // =======================================================
-  // 🔥 STORE NOT FOUND
-  // =======================================================
-  if (!store) {
+  if (error || !store) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-[#1a1a2e] ">
         <Header />
         <div className="flex flex-col items-center justify-center h-[60vh] text-center">
           <Store size={64} className="text-gray-400 mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Store not found</h2>
-          <p className="text-gray-500 mb-6">Store not found or check internent connection</p>
+          <p className="text-gray-500 mb-6">Store not found or check internet connection</p>
           <button onClick={() => navigate('/dashboard')} className="bg-brand-orange text-white px-6 py-2 rounded-lg font-bold hover:bg-brand-hover transition">
             Back Dashboard
           </button>
         </div>
         <div className='hidden md:block'><Footer /></div>
-        
       </div>
     );
   }
 
   // =======================================================
-  // 🔥 RENDER STORE PAGE
+  // 7. RENDER (Muonekano wako ule ule)
   // =======================================================
   return (
-<div className="min-h-screen bg-gray-50 dark:bg-[#1a1a2e] pt-0 pb-10 font-sans">
-
-        <Header />
+    <div className="min-h-screen bg-gray-50 dark:bg-[#1a1a2e] pt-0 pb-10 font-sans">
+      <Header />
       
-      
-      <div className="max-w-[1200px] mx-auto px-1  mt-4 md:mt-4">
+      <div className="max-w-[1200px] mx-auto px-1 mt-4 md:mt-4">
         
         {/* Store Header / Banner */}
         <div 
@@ -247,7 +236,6 @@ export default function StorePage() {
         {/* Store Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           
-          {/* About Store */}
           <div className="bg-white dark:bg-[#2d2d44] p-5 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
             <h3 className="flex items-center gap-2 text-base font-bold text-gray-900 dark:text-white mb-4 pb-3 border-b border-gray-100 dark:border-gray-700">
               <Store size={18} className="text-brand-orange" /> About Store
@@ -269,7 +257,6 @@ export default function StorePage() {
             </div>
           </div>
 
-          {/* Contact */}
           <div className="bg-white dark:bg-[#2d2d44] p-5 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
             <h3 className="flex items-center gap-2 text-base font-bold text-gray-900 dark:text-white mb-4 pb-3 border-b border-gray-100 dark:border-gray-700">
               <MapPin size={18} className="text-brand-orange" /> Contact & Location
@@ -290,7 +277,6 @@ export default function StorePage() {
             </div>
           </div>
 
-          {/* Social */}
           {(store.instagram_handle || store.tiktok_handle || store.twitter_handle || store.youtube_link) && (
             <div className="bg-white dark:bg-[#2d2d44] p-5 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
               <h3 className="flex items-center gap-2 text-base font-bold text-gray-900 dark:text-white mb-4 pb-3 border-b border-gray-100 dark:border-gray-700">
@@ -442,9 +428,9 @@ export default function StorePage() {
         </div>
       </div>
 
-  <div className="hidden md:block">
-  <Footer />
-</div>
+      <div className="hidden md:block">
+        <Footer />
+      </div>
 
       {/* LIGHTBOX PORTAL */}
       {isLightboxOpen && lightboxImages.length > 0 && createPortal(
@@ -490,6 +476,5 @@ export default function StorePage() {
         document.body
       )}
     </div>
-  
   );
 }

@@ -1,30 +1,53 @@
 // src/pages/AccountSettings.jsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
-import api from '../axiosConfig'; // 🔥 Badilisha: Tumia api kutoka axiosConfig!
+import { useNavigate, Link } from 'react-router-dom';
+import api from '../axiosConfig';
 import { 
   LayoutDashboard, MessageSquare, ClipboardList, 
   Settings, BarChart3, Bell, Search, User, LogOut, ChevronRight, Menu, X, Eye, EyeOff,
-  Camera, Upload, Save, HelpCircle, FileText, Shield, Phone, Mail, Globe, Truck, Store,
+  Camera, Save, HelpCircle, FileText, Shield, Phone, Mail, Globe, Truck, Store,
   ArrowLeft
 } from 'lucide-react';
 import UserTools from '../components/UserTools';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import toast from 'react-hot-toast';
-//import '../AccountSettings.css';
+import { useQuery, useQueryClient } from '@tanstack/react-query'; // 1. Ingiza hooks
 
-const AccountSettings = () => { // 🔥 Imeondolewa { session }!
+// ==========================================
+// 2. FUNCTION YA KUCHUKUA DATA (Profile + Store)
+// ==========================================
+const fetchAccountData = async () => {
+  const token = localStorage.getItem('access_token');
+  if (!token) throw new Error("No token");
+
+  // Pata profile
+  const profileRes = await api.get('/profile/');
+  const profile = profileRes.data;
+
+  // Pata duka (kama yupo)
+  let userStoreId = null;
+  try {
+    const storesRes = await api.get('/stores/', { params: { owner: profile.id } });
+    const stores = storesRes.data.results || storesRes.data || [];
+    if (stores.length > 0) {
+      userStoreId = stores[0].id;
+    }
+  } catch (err) {
+    console.error("Error checking store:", err);
+  }
+
+  return { profile, userStoreId };
+};
+
+const AccountSettings = () => {
   const { t } = useTranslation();
   const { language, changeLanguage } = useLanguage();
   const navigate = useNavigate();
-  const location = useLocation();
+  const queryClient = useQueryClient();
 
   // --- STATE ZA SIDEBAR NA DATA ---
   const [isExpanded, setIsExpanded] = useState(false);
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [currentUserId, setCurrentUserId] = useState(null);
 
   // --- STATE ZA EDIT PROFILE MODAL ---
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -39,7 +62,6 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [emailLoading, setEmailLoading] = useState(false);
-  const [userStoreId, setUserStoreId] = useState(null);
 
   // --- STATE ZA PASSWORD UPDATE ---
   const [isEditingPassword, setIsEditingPassword] = useState(false);
@@ -47,62 +69,42 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
 
   // =======================================================
-  // 🔥 1. VUTA PROFILE KUTOKA DJANGO API
+  // 3. TUMIA useQuery
   // =======================================================
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-          navigate('/dashboard/login');
-          return;
-        }
-        
-        // Pata profile data
-        const res = await api.get('/profile/');
-        const data = res.data;
-        
-        setProfile(data);
-        setCurrentUserId(data.id);
-        setFullName(data.full_name || '');
-        setUsername(data.username || '');
-        setBio(data.bio || '');
-      } catch (error) {
-        console.error('Error fetching profile:', error.response?.data || error.message);
-        toast.error('Imeshindwa kupata taarifa za profile.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfile();
-  }, [navigate]);
+  const { 
+    data: accountData, 
+    isLoading: loading, 
+    error 
+  } = useQuery({
+    queryKey: ['accountSettings'],
+    queryFn: fetchAccountData,
+    staleTime: 1000 * 60 * 5, // Cache kwa dakika 5
+    retry: false, // Usijaribu tena mara nyingi kama token haipo
+  });
 
-  // =======================================================
-  // 🔥 2. ANGAZIA KAMA MTUMIAJI ANA DUKA
-  // =======================================================
+  const profile = accountData?.profile || null;
+  const userStoreId = accountData?.userStoreId || null;
+
+  // Weka data kwenye states za form pale data inapokuja
   useEffect(() => {
-    const checkUserStore = async () => {
-      if (!currentUserId) return;
-      try {
-        const res = await api.get('/stores/', { params: { owner: currentUserId } });
-        const stores = res.data.results || res.data || [];
-        if (stores.length > 0) {
-          setUserStoreId(stores[0].id);
-        } else {
-          setUserStoreId(null);
-        }
-      } catch (error) {
-        console.error('Error checking store:', error);
-        setUserStoreId(null);
-      }
-    };
-    checkUserStore();
-  }, [currentUserId]);
+    if (profile) {
+      setFullName(profile.full_name || '');
+      setUsername(profile.username || '');
+      setBio(profile.bio || '');
+    }
+  }, [profile]);
+
+  // Kama hana token, mpeleke login
+  useEffect(() => {
+    if (error?.message === "No token") {
+      navigate('/dashboard/login');
+    } else if (error) {
+      toast.error('Imeshindwa kupata taarifa za profile.');
+    }
+  }, [error, navigate]);
 
   // --- 2. HANDLE AVATAR FILE SELECTION ---
   const handleAvatarChange = (e) => {
@@ -122,7 +124,7 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
   };
 
   // =======================================================
-  // 🔥 3. UPDATE PROFILE (Picha na Maelezo)
+  // 4. UPDATE PROFILE (Picha na Maelezo)
   // =======================================================
   const handleUpdateProfile = async () => {
     if (!fullName.trim()) {
@@ -136,17 +138,14 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
       formData.append('username', username || '');
       formData.append('bio', bio || '');
 
-      // Kama kuna picha mpya, iongeze kwenye FormData
       if (avatarFile) {
-        formData.append('avatar_file', avatarFile); // 🔥 SAHIHI!// Au 'avatar_file' kulingana na serializer yako
+        formData.append('avatar_file', avatarFile);
       }
 
-      // Tumia PATCH kusasisha profile (Endpoints: /api/profile/ au /api/profiles/{id}/)
-      const res = await api.patch('/profile/', formData, {
+      await api.patch('/profile/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      setProfile(res.data);
       toast.success('Profile imesasishwa kwa mafanikio!');
       setIsEditingProfile(false);
       setAvatarFile(null);
@@ -154,6 +153,9 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
         URL.revokeObjectURL(avatarPreview);
         setAvatarPreview(null);
       }
+      
+      // Sasisha data ya profile kwenye cache
+      queryClient.invalidateQueries({ queryKey: ['accountSettings'] });
     } catch (error) {
       console.error('Profile update error:', error.response?.data || error.message);
       toast.error('Imeshindikana kusasisha profile: ' + (error.response?.data?.detail || error.message));
@@ -163,8 +165,6 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
   };
 
   // --- 5. UPDATE EMAIL ---
-  // 🔥 Django inahitaji endpoint maalum kwa mabadiliko ya email. 
-  // Hii inatuma ombi kwa endpoint inayofaa (kama /api/change-email/)
   const handleUpdateEmail = async () => {
     if (!newEmail.trim()) {
       toast.error('Tafadhali weka email mpya');
@@ -189,7 +189,6 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
   };
 
   // --- 6. UPDATE PASSWORD ---
-  // 🔥 Django inahitaji endpoint maalum kwa mabadiliko ya password (kama /api/change-password/)
   const handleUpdatePassword = async () => {
     if (!currentPassword.trim()) {
       toast.error('Tafadhali weka password yako ya sasa');
@@ -228,7 +227,6 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
   // --- 7. RESET PASSWORD ---
   const handlePasswordReset = async () => {
     try {
-      // Django inahitaji endpoint ya password reset (kama /api/password-reset/)
       await api.post('/api/password-reset/', { email: profile?.email });
       toast.success(`Link imetumwa kwenye email yako: ${profile?.email}`, { duration: 6000 });
     } catch (error) {
@@ -243,60 +241,25 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
     try {
       await api.delete('/api/delete-account/');
       toast.success('Akaunti imefutwa kwa mafanikio');
-      // Logout baada ya kufuta
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
+      queryClient.clear();
       window.location.href = '/';
     } catch (error) {
       toast.error('Imeshindikana kufuta akaunti: ' + (error.response?.data?.detail || error.message));
     }
   };
 
-  // =======================================================
-  // 🔥 SIDEBAR LINKS
-  // =======================================================
-  const sidebarItems = [
-    { icon: <LayoutDashboard size={20} />, path: '/dashboard', label: 'Dashboard' },
-    { icon: <Store size={20} />, path: '/dashboard/seller', label: 'Sell on Skyfall' },
-    { icon: <MessageSquare size={20} />, path: '/dashboard/messages', label: 'Messages' },
-    { icon: <ClipboardList size={20} />, path: '/dashboard/orders', label: 'Orders' },
-    { icon: <BarChart3 size={20} />, path: '/dashboard/analytics', label: 'Analytics' },
-    { icon: <Settings size={20} />, path: '/dashboard/settings', label: 'Settings' },
-  ];
-
-
-    const handleSellNavigation = async () => {
-    try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        navigate('/dashboard/register-supplier');
-        return;
-      }
-
-      const profileRes = await api.get('/profile/');
-      const profileData = profileRes.data;
-      if (profileData?.role === 'supplier') {
-        const storeRes = await api.get('/stores/', { params: { owner_id: profileData.id } });
-        const storeData = storeRes.data;
-        if (storeData && storeData.length > 0) {
-          const store = storeData[0];
-          const storeId = store.id;
-          const verificationStatus = store.verification_status || store.status;
-
-          // 🔥 MUHIMU: Kagua kama store inasubiri kupitishwa!
-          if (verificationStatus === 'pending' || verificationStatus === 'unverified') {
-            navigate(`/store-pending/${storeId}`);
-          } else {
-            navigate(`/dashboard/sellerboard/${storeId}`);
-          }
-        } else {
-          navigate('/create-store');
-        }
+  const handleSellNavigation = async () => {
+    if (!profile) return;
+    
+    if (profile.role === 'supplier') {
+      if (userStoreId) {
+        navigate(`/dashboard/sellerboard/${userStoreId}`);
       } else {
-        navigate('/dashboard/seller');
+        navigate('/create-store');
       }
-    } catch (err) {
-      console.error("🔥 Error:", err.response?.data || err.message);
+    } else {
       navigate('/dashboard/seller');
     }
   };
@@ -315,17 +278,15 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
     { icon: <Store size={18} />, title: 'Sell on Skyfall', path: '/dashboard/seller' },
   ];
 
-  // =======================================================
-  // 🔥 SIGN OUT (Ondoa token na redirect)
-  // =======================================================
   const handleSignOut = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    queryClient.clear(); // Futa cache yote
     navigate('/');
     toast.success('Umefanikiwa kutoka!');
   };
 
-// ===== LOADING SKELETON =====
+  // ===== LOADING SKELETON =====
   if (loading) {
     return (
       <div className="flex flex-col h-screen w-full overflow-hidden font-sans bg-white dark:bg-black">
@@ -343,14 +304,15 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
     );
   }
 
+  // Kama data haipo kabisa (mfano, kosa la mtandao)
+  if (!profile) return null;
+
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden font-sans bg-white dark:bg-black text-gray-900 dark:text-white">
 
       {/* ===== HEADER ===== */}
       <header className="h-[60px] bg-white dark:bg-[#0a0a0a] border-b border-gray-200 dark:border-[#1f1f1f] flex items-center justify-between px-3 md:px-5 z-[100] flex-shrink-0 relative">
-
         <div className="flex items-center gap-3 md:gap-5">
-          {/* Back Arrow - mobile only */}
           <button
             className="md:hidden flex items-center justify-center bg-transparent border-none cursor-pointer text-[#ff5722] p-1"
             onClick={() => navigate(-1)}
@@ -359,7 +321,6 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
             <ArrowLeft size={22} />
           </button>
 
-          {/* Menu toggle - desktop only */}
           {!isExpanded && (
             <Menu
               size={22}
@@ -372,7 +333,6 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
             Skyfall.com
           </Link>
 
-          {/* Search - hidden mobile */}
           <div className="hidden md:flex bg-gray-100 dark:bg-[#111] items-center px-3.5 py-1.5 rounded-full w-[280px] text-gray-500 dark:text-[#b0b0b0] border dark:border-[#1f1f1f]">
             <Search size={16} className="text-gray-400 dark:text-slate-500" />
             <input
@@ -383,7 +343,6 @@ const AccountSettings = () => { // 🔥 Imeondolewa { session }!
           </div>
         </div>
 
-        {/* Right - hidden on mobile */}
         <div className="hidden md:flex items-center gap-5">
           <Bell size={20} className="text-gray-500 dark:text-slate-400 cursor-pointer hover:text-[#ff6a00] transition-colors" />
           <UserTools profile={profile} />

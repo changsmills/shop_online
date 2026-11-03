@@ -4,15 +4,32 @@ import { ArrowUp, ChevronLeft, ChevronRight, ArrowLeft, Search } from "lucide-re
 import api from "../axiosConfig";
 import ProductList from "./ProductList";
 import SearchDialog from "../components/SearchDialog";
+import { useQuery, useQueryClient } from '@tanstack/react-query'; // 1. Ingiza useQuery
 
 // ✅ LAZY IMPORT YA SKELETON
 const SkeletonProductsAll = React.lazy(() => import("../components/SkeletonProductsAll"));
+
+// 2. Function ya kuchukua Categories (nje ya component)
+const fetchCategoriesData = async () => {
+  const response = await api.get('/categories/');
+  const data = response.data;
+
+  if (Array.isArray(data) && data.length > 0) {
+    const sortedData = [...data].sort((a, b) => a.name.localeCompare(b.name));
+    return [
+      { id: null, name: "All" },
+      ...sortedData.map((cat) => ({ id: cat.id, name: cat.name }))
+    ];
+  }
+  return [{ id: null, name: "All" }];
+};
 
 export default function ProductsAll() {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const scrollRef = useRef(null);
+  const queryClient = useQueryClient();
 
   // ============================================
   // 1. DATA KUTOKA URL PARAMS NA LOCATION STATE
@@ -55,22 +72,24 @@ export default function ProductsAll() {
   });
 
   const [activeSection, setActiveSection] = useState(incomingSection);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [error, setError] = useState(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-
-  // ✅ STATE ZA MTANDAO NA REFETCH
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [fetchTrigger, setFetchTrigger] = useState(0);
 
   // ============================================
-  // 3. MOBILE DETECTION
+  // 3. QUERIES
   // ============================================
-  
+  const { data: categories = [], isLoading: loadingCategories, error: categoriesError } = useQuery({
+    queryKey: ['productsAllCategories'],
+    queryFn: fetchCategoriesData,
+    staleTime: 1000 * 60 * 10, // Cache kwa dakika 10 (kama ulivyokuwa unafanya na localStorage)
+  });
+
+  // ============================================
+  // 4. MOBILE DETECTION
+  // ============================================
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
@@ -79,17 +98,15 @@ export default function ProductsAll() {
   }, []);
 
   // ============================================
-  // 4. SCROLL TO TOP ON STORE CHANGE
+  // 5. SCROLL TO TOP ON STORE CHANGE
   // ============================================
-  
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [incomingStoreId]);
 
   // ============================================
-  // 5. BANNER TITLE
+  // 6. BANNER TITLE
   // ============================================
-  
   const bannerTitle = useMemo(() => {
     if (incomingStoreName) {
       return `Bidhaa za ${incomingStoreName}`;
@@ -105,9 +122,8 @@ export default function ProductsAll() {
   }, [incomingStoreName, activeSection, activeCategory.name]);
 
   // ============================================
-  // 6. BANNER DESCRIPTION
+  // 7. BANNER DESCRIPTION
   // ============================================
-  
   const bannerDesc = useMemo(() => {
     const catName = activeCategory.name || "All";
     if (activeSection === "New Arrivals") {
@@ -123,80 +139,25 @@ export default function ProductsAll() {
   }, [activeCategory.name, activeSection]);
 
   // ============================================
-  // 7. FETCH CATEGORIES
-  // ============================================
-  const fetchCategories = useCallback(async () => {
-    try {
-      const cachedCategories = localStorage.getItem('categories_cache');
-      const cachedTime = localStorage.getItem('categories_cache_time');
-      
-      if (cachedCategories && cachedTime && (Date.now() - Number(cachedTime) < 10 * 60 * 1000)) {
-        const data = JSON.parse(cachedCategories);
-        setCategories([
-          { id: null, name: "All" },
-          ...data.map((cat) => ({ id: cat.id, name: cat.name }))
-        ]);
-        setLoading(false);
-        return;
-      }
-      
-      setLoading(true);
-      setError(null);
-      
-      const response = await api.get('/categories/');
-      const data = response.data;
-
-      if (Array.isArray(data) && data.length > 0) {
-        const sortedData = [...data].sort((a, b) => a.name.localeCompare(b.name));
-        
-        localStorage.setItem('categories_cache', JSON.stringify(sortedData));
-        localStorage.setItem('categories_cache_time', String(Date.now()));
-
-        setCategories([
-          { id: null, name: "All" },
-          ...sortedData.map((cat) => ({ id: cat.id, name: cat.name }))
-        ]);
-      } else {
-        setCategories([{ id: null, name: "All" }]);
-      }
-    } catch (error) {
-      console.error("Error fetching categories:", error.message);
-      setError("Imeshindwa kupakia kategoria. Tafadhali jaribu tena.");
-      setCategories([{ id: null, name: "All" }]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
-
-  // ============================================
-  // 8. MTANDAO
+  // 8. MTANDAO (ONLINE LISTENER)
   // ============================================
   useEffect(() => {
     const handleOnline = () => {
-      setIsOnline(true);
       console.log("🌐 Mtandao umeunganishwa! Inapakia data za bidhaa upya...");
-      fetchCategories();
-      setFetchTrigger(prev => prev + 1);
+      queryClient.invalidateQueries(); // Hii itasasisha categories na vitu vingine
+      setFetchTrigger(prev => prev + 1); // Hii ni kwa ajili ya ProductList
     };
-    const handleOffline = () => setIsOnline(false);
 
     window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
 
     return () => {
       window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
     };
-  }, [fetchCategories]);
+  }, [queryClient]);
 
   // ============================================
   // 9. SYNC CATEGORY FROM URL
   // ============================================
-  
   useEffect(() => {
     if (incomingCategoryId !== undefined && incomingCategoryId !== activeCategory.id) {
       setActiveCategory({
@@ -209,7 +170,6 @@ export default function ProductsAll() {
   // ============================================
   // 10. PAGE TITLE
   // ============================================
-  
   useEffect(() => {
     const pageTitle = incomingStoreName 
       ? `${incomingStoreName} - Store` 
@@ -220,7 +180,6 @@ export default function ProductsAll() {
   // ============================================
   // 11. SCROLL LOGIC
   // ============================================
-  
   const scroll = useCallback((direction) => {
     if (scrollRef.current) {
       const { scrollLeft, clientWidth } = scrollRef.current;
@@ -235,7 +194,6 @@ export default function ProductsAll() {
   // ============================================
   // 12. BACK TO TOP
   // ============================================
-  
   useEffect(() => {
     const handleScroll = () => {
       setShowBackToTop(window.scrollY > 500);
@@ -252,7 +210,6 @@ export default function ProductsAll() {
   // ============================================
   // 13. SCROLL TO TOP FUNCTION
   // ============================================
-
   const scrollToTop = useCallback(() => {
     window.scrollTo({ 
       top: 0, 
@@ -263,7 +220,6 @@ export default function ProductsAll() {
   // ============================================
   // 14. HANDLE BACK TO DASHBOARD
   // ============================================
-
   const handleBackToDashboard = useCallback(() => {
     navigate('/dashboard');
   }, [navigate]);
@@ -271,7 +227,6 @@ export default function ProductsAll() {
   // ============================================
   // 15. HANDLE SEARCH
   // ============================================
-  
   const handleSearchSubmit = useCallback((query) => {
     navigate(`/products?search=${encodeURIComponent(query)}`);
   }, [navigate]);
@@ -279,7 +234,6 @@ export default function ProductsAll() {
   // ============================================
   // 16. HANDLE CATEGORY CLICK
   // ============================================
-  
   const handleCategoryClick = useCallback((cat) => {
     setActiveCategory({ name: cat.name, id: cat.id });
     const newParams = new URLSearchParams(window.location.search);
@@ -303,11 +257,11 @@ export default function ProductsAll() {
   // 17. RENDER
   // ============================================
 
-  if (error) {
+  if (categoriesError) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-5 bg-white dark:bg-[#1e293b] text-black dark:text-white">
         <h2 className="text-2xl font-bold text-red-600 dark:text-red-500 mb-2">Error</h2>
-        <p className="text-gray-600 dark:text-gray-400">{error}</p>
+        <p className="text-gray-600 dark:text-gray-400">Imeshindwa kupakia kategoria. Tafadhali jaribu tena.</p>
         <button className="bg-brand-orange text-white px-8 py-2.5 rounded-lg cursor-pointer mt-5 hover:bg-brand-hover transition-colors" onClick={() => window.location.reload()}>
           Jaribu Tena
         </button>
@@ -315,7 +269,7 @@ export default function ProductsAll() {
     );
   }
 
-  if (loading) {
+  if (loadingCategories) {
     return (
       <Suspense fallback={<div className="p-10 text-center">Inapakia...</div>}>
         <SkeletonProductsAll isMobile={isMobile} />
@@ -360,10 +314,8 @@ export default function ProductsAll() {
       />
 
       {/* ========== CATEGORY TABS ========== */}
-      
      <div className="sticky top-[60px] md:top-0 z-[100] bg-white dark:bg-[#1e293b] border-b border-gray-200 dark:border-gray-700 flex items-center w-full h-[54px] md:h-[64px] overflow-hidden px-2 md:px-4 shadow-sm mb-2">              
-      
-              <button 
+        <button 
           className="hidden md:flex absolute z-20 w-8 h-8 bg-white dark:bg-[#1e293b] border border-gray-300 dark:border-gray-600 rounded-full items-center justify-center shadow-md top-1/2 -translate-y-1/2 left-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" 
           onClick={() => scroll("left")}
         >
@@ -374,23 +326,19 @@ export default function ProductsAll() {
           className="flex flex-row overflow-x-auto scroll-smooth whitespace-nowrap w-full px-1 md:px-12 gap-2 md:gap-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" 
           ref={scrollRef}
         >
-          {loading ? (
-            <div className="text-gray-400 text-sm px-4 py-2 animate-pulse">Inapakia kategoria...</div>
-          ) : (
-            categories.map((cat) => (
-              <button
-                key={cat.id || 'all'}
-                className={`px-3 py-1.5 md:px-5 md:py-2.5 text-xs md:text-[15px] font-medium rounded-full transition-all duration-200 border whitespace-nowrap ${
-                  activeCategory.id === cat.id 
-                    ? "bg-[#ff6a00] text-white border-[#ff6a00] shadow-md shadow-orange-500/20" 
-                    : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-200 dark:hover:bg-gray-700"
-                }`}
-                onClick={() => handleCategoryClick(cat)}
-              >
-                {cat.name}
-              </button>
-            ))
-          )}
+          {categories.map((cat) => (
+            <button
+              key={cat.id || 'all'}
+              className={`px-3 py-1.5 md:px-5 md:py-2.5 text-xs md:text-[15px] font-medium rounded-full transition-all duration-200 border whitespace-nowrap ${
+                activeCategory.id === cat.id 
+                  ? "bg-[#ff6a00] text-white border-[#ff6a00] shadow-md shadow-orange-500/20" 
+                  : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-200 dark:hover:bg-gray-700"
+              }`}
+              onClick={() => handleCategoryClick(cat)}
+            >
+              {cat.name}
+            </button>
+          ))}
         </div>
         
         <button 

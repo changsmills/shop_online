@@ -6,9 +6,28 @@ import api from '../axiosConfig';
 import ProductSelectionDrawer from '../pages/ProductSelectionDrawer';
 import { MessageSquare, Star, ChevronRight, ShoppingCart, Zap } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useQuery } from '@tanstack/react-query'; // 1. Ingiza useQuery
+
+// 2. Function ya kuchukua Media na Variations (nje ya component)
+const fetchProductMediaAndVariations = async ({ queryKey }) => {
+  const [_, productId] = queryKey;
+  if (!productId) return { mediaData: [], varData: [] };
+
+  const [mediaRes, varRes] = await Promise.all([
+    api.get(`/product-media/?product_id=${productId}`),
+    api.get(`/product-variations/`, { params: { product_id: productId } })
+  ]);
+
+  const mediaData = mediaRes.data.results || mediaRes.data || [];
+  let varData = varRes.data.results || varRes.data || [];
+
+  // Chuja tena upande wa Frontend kwa usalama
+  varData = varData.filter(v => String(v.product) === String(productId));
+
+  return { mediaData, varData };
+};
 
 const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) => {
-  const [productMedia, setProductMedia] = useState([]);
   const [productVariations, setProductVariations] = useState([]);
   
   const [selectedVariationObj, setSelectedVariationObj] = useState(null);
@@ -27,11 +46,62 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
   const [activeSize, setActiveSize] = useState(null);
   const [isSelectionOpen, setIsSelectionOpen] = useState(false);
 
-  // 🔥 BADILISHA HAPA NA JINA LAKO HALISI LA CLOUDINARY
   const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/rlgqgsnv/image/upload";
 
   const moq = product?.moq || 1;
   const productImage = product?.cover_image || "https://via.placeholder.com/150";
+
+  // ==========================================
+  // 3. QUERY YA KUPATA MEDIA NA VARIATIONS
+  // ==========================================
+  const { data: mediaAndVariations } = useQuery({
+    queryKey: ['productMediaVariations', product?.id],
+    queryFn: fetchProductMediaAndVariations,
+    enabled: !!product?.id,
+    staleTime: 1000 * 60 * 5, // Cache kwa dakika 5
+  });
+
+  const productMedia = mediaAndVariations?.mediaData || [];
+
+  // Weka variations kwenye state yetu ya local pale data inapokuja
+  useEffect(() => {
+    if (mediaAndVariations?.varData) {
+      const varData = mediaAndVariations.varData;
+      setProductVariations(varData);
+
+      if (varData.length > 0) {
+        const defaultVar = varData.find(v => v.stock_quantity > 0) || varData[0];
+        setSelectedColor(defaultVar.color_name);
+
+        const firstSize = defaultVar.size_value || "";
+        setSelectedSize(firstSize);
+
+        setSelectedVariationObj({
+          ...defaultVar,
+          size_value: firstSize || null,
+          stock_quantity: (defaultVar.size_stock && defaultVar.size_stock[firstSize] !== undefined)
+            ? defaultVar.size_stock[firstSize]
+            : (defaultVar.stock_quantity || 0)
+        });
+      } else {
+        // Kama hakuna variations, safisha states
+        setSelectedColor("");
+        setSelectedSize("");
+        setSelectedVariationObj(null);
+      }
+    }
+  }, [mediaAndVariations]);
+
+  // Safisha kabisa data za zamani pale bidhaa inapobadilika
+  useEffect(() => {
+    setProductVariations([]);
+    setSelectedColor("");
+    setSelectedSize("");
+    setSelectedVariationObj(null);
+    setActiveColor(null);
+    setActiveSize(null);
+  }, [product?.id]);
+
 
   const parseJsonData = (data, fallback) => {
     if (!data) return fallback;
@@ -56,7 +126,6 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
         fullImageUrl = `${CLOUDINARY_BASE_URL}/${v.color_image}`;
       }
 
-      // 🔥 Kama rangi haipo bado, anzisha
       if (!grouped[colorName]) {
         grouped[colorName] = {
           variation: v,
@@ -64,15 +133,12 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
           size_stock: v.size_stock || {},
           price: v.price,
           stock_quantity: v.stock_quantity,
-          // 🔥 ONGEZA: Ramani ya size → {price, stock, variationId}
           sizesMap: {}
         };
       }
 
-      // 🔥 Ongeza size hii kwenye sizesMap ya rangi
       const sizeKey = v.size_value;
       if (sizeKey) {
-        // Chukua stock kutoka size_stock (kama ipo) au stock_quantity ya variation
         const stockForSize = (v.size_stock && v.size_stock[sizeKey] !== undefined)
           ? v.size_stock[sizeKey]
           : (v.stock_quantity || 0);
@@ -97,7 +163,6 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
     if (!selectedColor) return [];
     const colorData = variationsByColor[selectedColor];
     if (!colorData) return [];
-    // 🔥 Chukua sizes kutoka sizesMap
     const sizes = Object.keys(colorData.sizesMap || {});
     return sizes.sort((a, b) => {
       const order = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
@@ -110,14 +175,12 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
     });
   }, [selectedColor, variationsByColor]);
 
-  // 🔥 Bei sahihi kwa size
   const getPriceForSize = (color, size) => {
     const colorData = variationsByColor[color];
     if (!colorData?.sizesMap?.[size]) return Number(product?.price) || 0;
     return colorData.sizesMap[size].price;
   };
 
-  // 🔥 Stock sahihi kwa size (badilisha `getStockForSize`)
   const getStockForSize = (color, size) => {
     const colorData = variationsByColor[color];
     if (!colorData?.sizesMap?.[size]) return 0;
@@ -125,7 +188,6 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
   };
 
   const getCurrentVariation = (color, size) => {
-    // 🔥 Tafuta kwa size_value PEKEE (sio size_stock keys)
     const found = productVariations.find(v => 
       String(v.product) === String(product?.id) &&
       v.color_name === color && 
@@ -153,12 +215,10 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
   }, [selectedVariationObj, product, selectedColor, selectedSize]);
 
   const currentPrice = useMemo(() => {
-    // 🔥 Kama tuna color + size, tumia bei kutoka sizesMap
     if (selectedColor && selectedSize) {
       const priceFromMap = getPriceForSize(selectedColor, selectedSize);
       if (priceFromMap > 0) return priceFromMap;
     }
-    // Fallback
     const variationPrice = parseFloat(selectedVariationObj?.price);
     if (variationPrice > 0) return variationPrice;
     return parseFloat(product?.price) || 0;
@@ -220,7 +280,6 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
   const handleColorSelect = async (color) => {
     const colorData = variationsByColor[color];
     if (colorData) {
-      // 🔥 Chukua sizes kutoka sizesMap
       const sizes = Object.keys(colorData.sizesMap || {});
       const firstSize = sizes.length > 0 ? sizes[0] : "";
       
@@ -359,12 +418,9 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
         selected_color: variant.color_name || 'Standard',
         selected_size: selectedSizeFromKey || 'Free Size',
         quantity: qty,
-        
-        // 🔥 MUHIMU SANA: Hakikisha hizi zipo!
         price: Number(variant.price) || Number(product?.price) || 0, 
         cover_image_url: fullImageUrl || product?.cover_image_url || product?.cover_image,
         image: fullImageUrl || product?.cover_image_url || product?.cover_image,
-        
         store_id: product.store_id
       });
     });
@@ -426,59 +482,9 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
     await handleOpenDrawer('cart');
   };
 
-  useEffect(() => {
-    const fetchProductData = async () => {
-      if (!product?.id) return;
-
-      // 🔥 KINGA YA 1: Safisha kabisa data za zamani kabla ya kupakia mpya!
-      setProductVariations([]);
-      setSelectedColor("");
-      setSelectedSize("");
-      setSelectedVariationObj(null);
-      setActiveColor(null);
-      setActiveSize(null);
-
-      try {
-        const mediaRes = await api.get(`/product-media/?product_id=${product.id}`);
-        const mediaData = mediaRes.data.results || mediaRes.data;
-
-        const varRes = await api.get(`/product-variations/`, {
-            params: { product_id: product.id } 
-        });
-        const varData = varRes.data.results || varRes.data;
-        
-        if (mediaData) setProductMedia(mediaData);
-        
-        if (varData && varData.length > 0) {
-          // 🔥 KINGA YA 2: Chuja tena upande wa Frontend kwa usalama
-          const filteredData = varData.filter(v => String(v.product) === String(product.id));
-          setProductVariations(filteredData);
-
-          
-          const defaultVar = filteredData.find(v => v.stock_quantity > 0) || filteredData[0];
-          setSelectedColor(defaultVar.color_name);
-
-          // 🔥 Chukua size kutoka size_value ya variation PEKEE
-          const firstSize = defaultVar.size_value || "";
-
-          setSelectedSize(firstSize);
-
-          setSelectedVariationObj({
-            ...defaultVar,
-            size_value: firstSize || null,
-            stock_quantity: (defaultVar.size_stock && defaultVar.size_stock[firstSize] !== undefined)
-              ? defaultVar.size_stock[firstSize]
-              : (defaultVar.stock_quantity || 0)
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching product media/variations:", error);
-        toast.error("Imeshindwa kupata data za bidhaa.");
-      }
-    };
-    fetchProductData();
-  }, [product?.id]);
-
+  // ==========================================
+  // RENDER (Muonekano wako ule ule)
+  // ==========================================
   return (
     <>
       <style>{`

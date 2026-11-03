@@ -1,5 +1,5 @@
 // src/components/StoresHeader.jsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react'; // 1. Ingiza memo
 import { useNavigate } from 'react-router-dom';
 import { Globe, ChevronDown, ArrowLeft } from 'lucide-react';
 import Logo from './Logo';
@@ -7,7 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import StoreSearchBar from './StoreSearchBar'; 
 
-const StoresHeader = ({ onSearch, showBack = true }) => {
+// 2. Tumia React.memo
+const StoresHeader = memo(({ onSearch, showBack = true }) => {
   const { t } = useTranslation();
   const { language, changeLanguage } = useLanguage();
   const navigate = useNavigate(); 
@@ -64,7 +65,6 @@ const StoresHeader = ({ onSearch, showBack = true }) => {
   );
 
   return (
-    // 🔥 HAPA NIMEONGEZA fixed top-0 left-0 w-full z-50
     <header className="sticky top-0 left-0 w-full z-50 bg-white dark:bg-[#161b22] border-b border-gray-200 dark:border-[#30363d] shadow-sm">
       <div className="max-w-[1400px] mx-auto px-4 h-[70px] flex items-center justify-between gap-4">
         
@@ -102,6 +102,8 @@ const StoresHeader = ({ onSearch, showBack = true }) => {
       </div>
     </header>
   );
-};
+});
+
+StoresHeader.displayName = 'StoresHeader';
 
 export default StoresHeader;

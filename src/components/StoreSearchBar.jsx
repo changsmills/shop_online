@@ -4,28 +4,49 @@ import api from "../axiosConfig";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-//import "../SearchBar.css";
+import { useQuery } from '@tanstack/react-query'; // 1. Ingiza useQuery
+
+// ==========================================
+// 2. FUNCTION YA KUCHUKUA SUGGESTIONS ZA MADUKA
+// ==========================================
+const fetchStoreSuggestions = async ({ queryKey }) => {
+  const [_, searchQuery] = queryKey;
+  if (!searchQuery || searchQuery.trim().length < 2) return [];
+
+  const res = await api.get('/stores/', { 
+    params: { search: searchQuery, limit: 5, status: 'active' } 
+  });
+
+  const data = res.data.results || res.data || [];
+  return data.map(store => ({ ...store, type: 'store' }));
+};
 
 export default function StoreSearchBar({ search = "", setSearch }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   
-  const [placeholders, setPlaceholders] = useState(["Tafuta maduka..."]);
+  const [placeholders] = useState([
+    "Tafuta duka la nguo...",
+    "Tafuta wauzaji jijini...",
+    "Suppliers za bidhaa...",
+    "Wholesale stores..."
+  ]);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
-  const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  
+  // Debounce state
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
 
-  // 1. PAKIA PLACEHOLDERS (Kwa maduka)
-  useEffect(() => {
-    // Tunaweza kuweka placeholders za kawaida kwa maduka, au kutoka API
-    setPlaceholders([
-      "Tafuta duka la nguo...",
-      "Tafuta wauzaji jijini...",
-      "Suppliers za bidhaa...",
-      "Wholesale stores..."
-    ]);
-  }, []);
+  // ==========================================
+  // 3. TUMIA useQuery
+  // ==========================================
+  const { data: suggestions = [] } = useQuery({
+    queryKey: ['storeSearchSuggestions', debouncedSearch],
+    queryFn: fetchStoreSuggestions,
+    enabled: debouncedSearch.trim().length >= 2, // Washa tu kama kuna herufi 2+
+    staleTime: 1000 * 60 * 5, // Cache kwa dakika 5
+  });
 
   // Badilisha placeholder (Animation)
   useEffect(() => {
@@ -36,43 +57,25 @@ export default function StoreSearchBar({ search = "", setSearch }) {
     return () => clearInterval(timer);
   }, [placeholders]);
 
-  // 2. SEARCH EFFECT (Kwa Maduka)
+  // Debounce Logic (300ms)
   useEffect(() => {
-    const getStoreSuggestions = async () => {
-      if (!search || typeof search !== "string" || search.trim().length < 2) {
-        setSuggestions([]);
-        setShowSuggestions(false);
-        return;
-      }
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
 
-      const query = search.trim();
-
-      try {
-        const res = await api.get('/stores/', { 
-          params: { search: query, limit: 5, status: 'active' } 
-        });
-
-        const data = res.data.results || res.data || [];
-        
-        // Tunaweka store data kwenye suggestions
-        if (data.length > 0) {
-          setSuggestions(data.map(store => ({ ...store, type: 'store' })));
-          setShowSuggestions(true);
-        } else {
-          setSuggestions([]);
-          setShowSuggestions(false);
-        }
-
-      } catch (err) {
-        console.error("Store Search Error:", err);
-        setSuggestions([]);
-        setShowSuggestions(false);
-      }
+    return () => {
+      clearTimeout(handler);
     };
-
-    const timeoutId = setTimeout(getStoreSuggestions, 300);
-    return () => clearTimeout(timeoutId);
   }, [search]);
+
+  // Onyesha suggestions pale data inapokuja
+  useEffect(() => {
+    if (debouncedSearch.trim().length >= 2 && suggestions.length > 0) {
+      setShowSuggestions(true);
+    } else {
+      setShowSuggestions(false);
+    }
+  }, [suggestions, debouncedSearch]);
 
   const handleInputChange = (e) => {
     const val = e.target.value;

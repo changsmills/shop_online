@@ -6,6 +6,60 @@ import * as LucideIcons from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { useQuery } from '@tanstack/react-query'; // 1. Ingiza useQuery
+
+// ==========================================
+// 2. FUNCTIONS ZA KUCHUKUA DATA
+// ==========================================
+const fetchCategories = async () => {
+  const response = await api.get('/categories/', { params: { ordering: 'name' } });
+  const data = response.data;
+  if (data && data.length > 0) {
+    const sortedData = [...data].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    const allCategory = { id: null, name: 'All Categories', name_sw: 'Kategoria Zote' };
+    return [allCategory, ...sortedData];
+  }
+  return [];
+};
+
+const fetchSubCategories = async ({ queryKey }) => {
+  const [_, parentId] = queryKey;
+  if (!parentId) return [];
+  const response = await api.get('/subcategories/', { params: { category_id: parentId } });
+  return (response.data || []).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+};
+
+const fetchFeaturedLeafs = async ({ queryKey }) => {
+  const [_, parentId] = queryKey;
+  if (!parentId) return [];
+  const response = await api.get('/products/', { 
+    params: { parent_category: parentId, limit: 17, ordering: '-views' }
+  });
+  const data = response.data.results || response.data || [];
+  return data.map((product) => ({
+    id: product.id, 
+    leaf_category_id: product.leaf_category_id || product.id,
+    cover_image_url: product.cover_image_url, 
+    name: product.leaf_category_name || product.name,
+    name_sw: product.leaf_category_name || product.name
+  }));
+};
+
+const fetchLeafsBySub = async ({ queryKey }) => {
+  const [_, subCategoryId] = queryKey;
+  if (!subCategoryId) return [];
+  const response = await api.get('/products/', { 
+    params: { sub_category: subCategoryId, limit: 17, ordering: '-views' }
+  });
+  const data = response.data.results || response.data || [];
+  return data.map((product) => ({
+    id: product.id, 
+    leaf_category_id: product.leaf_category_id || product.id,
+    cover_image_url: product.cover_image_url, 
+    name: product.leaf_category_name || product.name,
+    name_sw: product.leaf_category_name || product.name
+  }));
+};
 
 export default function NavLinks({ isMobile }) {
   const { t, i18n } = useTranslation();
@@ -14,35 +68,69 @@ export default function NavLinks({ isMobile }) {
 
   const [user, setUser] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
-  const [categories, setCategories] = useState([]);
   const [selectedParent, setSelectedParent] = useState(null);
-  const [featuredProducts, setFeaturedProducts] = useState([]);
-  const [subCategories, setSubCategories] = useState([]);
-  const [leafsForSub, setLeafsForSub] = useState([]);
   const [selectedSubForLeaf, setSelectedSubForLeaf] = useState(null);
   const [viewMode, setViewMode] = useState('products');
-  const categoryCacheRef = useRef({});
-  const [loadingLeafs, setLoadingLeafs] = useState(false);
   const [activeNav, setActiveNav] = useState(null);
-  const [hasStore, setHasStore] = useState(false);
-  const [checkingStore, setCheckingStore] = useState(true);
-  const [hasSupplierProfile, setHasSupplierProfile] = useState(false);
-  const [checkingSupplier, setCheckingSupplier] = useState(true);
-
+  
   const [buyerMenuPos, setBuyerMenuPos] = useState({ top: 0, left: 0 });
   const [helpMenuPos, setHelpMenuPos] = useState({ top: 0, left: 0 });
   const [protectionsMenuPos, setProtectionsMenuPos] = useState({ top: 0, left: 0 });
 
   const timeoutRef = useRef(null);
-   const abortRef = useRef(null);
-  const isMounted = useRef(true);
   const placeholderImg = "https://via.placeholder.com/150?text=Skyfall+Product";
 
   const protectionsRef = useRef(null);
   const buyerRef = useRef(null);
   const helpRef = useRef(null);
 
-  // ========== LOGIC ZOTE ZILIBAKI SAWA ==========
+  // ==========================================
+  // 3. QUERIES
+  // ==========================================
+  const { data: categories = [] } = useQuery({
+    queryKey: ['navCategories'],
+    queryFn: fetchCategories,
+    staleTime: Infinity,
+  });
+
+  useEffect(() => {
+    if (categories.length > 0 && !selectedParent) {
+      setSelectedParent(categories[0]);
+    }
+  }, [categories, selectedParent]);
+
+  const parentId = selectedParent?.id;
+
+  const { data: subCategories = [] } = useQuery({
+    queryKey: ['navSubCategories', parentId],
+    queryFn: fetchSubCategories,
+    enabled: !!parentId,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  useEffect(() => {
+    if (subCategories.length > 0 && !selectedSubForLeaf) {
+      setSelectedSubForLeaf(subCategories[0]);
+    }
+  }, [subCategories, selectedSubForLeaf]);
+
+  const { data: featuredProducts = [], isLoading: loadingLeafs } = useQuery({
+    queryKey: ['navFeaturedLeafs', parentId],
+    queryFn: fetchFeaturedLeafs,
+    enabled: !!parentId,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const { data: leafsForSub = [] } = useQuery({
+    queryKey: ['navLeafsBySub', selectedSubForLeaf?.id],
+    queryFn: fetchLeafsBySub,
+    enabled: !!selectedSubForLeaf?.id && viewMode === 'subcategories',
+    staleTime: 1000 * 60 * 5,
+  });
+
+  // ==========================================
+  // 4. EFFECTS ZILIZOSALIA
+  // ==========================================
   useEffect(() => {
     const checkUser = async () => {
       const token = localStorage.getItem("access_token");
@@ -53,177 +141,8 @@ export default function NavLinks({ isMobile }) {
   }, []);
 
   useEffect(() => {
-    const checkUserSupplierAndStore = async () => {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        setCheckingSupplier(false); setCheckingStore(false);
-        setHasSupplierProfile(false); setHasStore(false);
-        return;
-      }
-      setCheckingSupplier(true); setCheckingStore(true);
-      try {
-        const profileRes = await api.get('/profile/');
-        const profileData = profileRes.data;
-        setHasSupplierProfile(profileData?.role === 'supplier');
-        const storeRes = await api.get('/stores/', { params: { owner_id: profileData?.id } });
-        setHasStore(storeRes.data && storeRes.data.length > 0);
-      } catch (err) {
-        console.error("❌ Error checking user data:", err.response?.data || err.message);
-      } finally {
-        setCheckingSupplier(false); setCheckingStore(false);
-      }
-    };
-    checkUserSupplierAndStore();
-  }, [user]);
-
-  useEffect(() => {
-    async function fetchCategories() {
-      try {
-        const response = await api.get('/categories/', { params: { ordering: 'name' } });
-        const data = response.data;
-        if (data && data.length > 0) {
-          const sortedData = [...data].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-          const allCategory = { id: null, name: 'All Categories', name_sw: 'Kategoria Zote' };
-          setCategories([allCategory, ...sortedData]);
-          setSelectedParent(allCategory);
-        }
-      } catch (error) { console.error("Error fetching categories:", error); }
-    }
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    if (selectedParent) {
-      setViewMode('products');
-      if (selectedParent.id === null) {
-        setSubCategories([]); setFeaturedProducts([]); setLeafsForSub([]);
-        return;
-      }
-      fetchSubCategories(selectedParent.id);
-      fetchFeaturedLeafs(selectedParent.id);
-    }
+    if (selectedParent) setViewMode('products');
   }, [selectedParent]);
-
-  // 🔥 Badilisha iwe function ya kawaida inayoweza kuitwa popote
-  async function fetchLeafsBySub(subCategoryId, forceRefresh = false) {
-    if (!subCategoryId) return;
-    const cacheKey = `sub_${subCategoryId}`;
-    
-    if (!forceRefresh && categoryCacheRef.current[cacheKey]) {
-      setLeafsForSub(categoryCacheRef.current[cacheKey]);
-      return;
-    }
-    
-    if (abortRef.current) abortRef.current.abort();
-    abortRef.current = new AbortController();
-    
-    setLoadingLeafs(true);
-    try {
-      const response = await api.get('/products/', { 
-        params: { sub_category: subCategoryId, limit: 17, ordering: '-views' },
-        signal: abortRef.current.signal
-      });
-      const data = response.data.results || response.data || [];
-      const result = data.map((product) => ({
-        id: product.id, leaf_category_id: product.leaf_category_id || product.id,
-        cover_image_url: product.cover_image_url, name: product.leaf_category_name || product.name,
-        name_sw: product.leaf_category_name || product.name
-      }));
-      
-      if (isMounted.current) {
-        categoryCacheRef.current[cacheKey] = result;
-        setLeafsForSub(result);
-      }
-    } catch (error) { 
-      if (error.name === 'CanceledError' || error.code === 'ERR_CANCELED') return;
-      console.error(error); 
-      if (isMounted.current) setLeafsForSub([]); 
-    }
-    finally { 
-      if (isMounted.current) setLoadingLeafs(false); 
-    }
-  }
-
-  // 🔥 Kisha useEffect inaita function hiyo
-  useEffect(() => {
-    if (viewMode === 'subcategories' && selectedSubForLeaf?.id) {
-      fetchLeafsBySub(selectedSubForLeaf.id);
-    }
-  }, [selectedSubForLeaf?.id, viewMode]);
-
-
-  async function fetchSubCategories(parentId, forceRefresh = false) {
-    if (!parentId) return;
-    
-    // 🔥 KINGA YA CACHE
-    if (!forceRefresh && categoryCacheRef.current[parentId]?.subCategories) {
-      const cachedSubs = categoryCacheRef.current[parentId].subCategories;
-      setSubCategories(cachedSubs);
-      if (cachedSubs.length > 0) setSelectedSubForLeaf(cachedSubs[0]);
-      return;
-    }
-
-    // 🔥 Futa request ya awali kama ipo
-    if (abortRef.current) abortRef.current.abort();
-    abortRef.current = new AbortController();
-
-    try {
-      const response = await api.get('/subcategories/', { 
-        params: { category_id: parentId },
-        signal: abortRef.current.signal // 🔥 Ongeza hii
-      });
-      const sortedData = (response.data || []).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-      
-      if (isMounted.current) {
-        categoryCacheRef.current[parentId] = { ...categoryCacheRef.current[parentId], subCategories: sortedData };
-        setSubCategories(sortedData);
-        if (sortedData.length > 0) setSelectedSubForLeaf(sortedData[0]);
-      }
-    } catch (error) { 
-      if (error.name === 'CanceledError' || error.code === 'ERR_CANCELED') return;
-      console.error(error); 
-    }
-  }
-
-  async function fetchFeaturedLeafs(parentId, forceRefresh = false) {
-    if (!parentId) return;
-    
-    if (!forceRefresh && categoryCacheRef.current[parentId]?.leafs) {
-      setFeaturedProducts(categoryCacheRef.current[parentId].leafs);
-      setLoadingLeafs(false);
-      return;
-    }
-    
-    // 🔥 Futa request ya awali kama ipo
-    if (abortRef.current) abortRef.current.abort();
-    abortRef.current = new AbortController();
-
-    setLoadingLeafs(true);
-    try {
-      const response = await api.get('/products/', { 
-        params: { parent_category: parentId, limit: 17, ordering: '-views' },
-        signal: abortRef.current.signal // 🔥 Ongeza hii
-      });
-      const data = response.data.results || response.data || [];
-      const result = data.map((product) => ({
-        id: product.id, leaf_category_id: product.leaf_category_id || product.id,
-        cover_image_url: product.cover_image_url, name: product.leaf_category_name || product.name,
-        name_sw: product.leaf_category_name || product.name
-      }));
-      
-      if (isMounted.current) {
-        categoryCacheRef.current[parentId] = { ...categoryCacheRef.current[parentId], leafs: result };
-        setFeaturedProducts(result);
-      }
-    } catch (error) { 
-      if (error.name === 'CanceledError' || error.code === 'ERR_CANCELED') return;
-      console.error(error); 
-      if (isMounted.current) setFeaturedProducts([]); 
-    }
-    finally { 
-      if (isMounted.current) setLoadingLeafs(false); 
-    }
-  }
 
   const getDisplayName = (item) => {
     if (!item) return '';
@@ -281,34 +200,6 @@ export default function NavLinks({ isMobile }) {
     }
   };
 
-  // 🔥 MTANDAO UKIRUDI: Vuta data upya kwa nguvu (Force Refresh)
-  useEffect(() => {
-    isMounted.current = true;
-
-    const handleOnline = () => {
-      console.log("🌐 [NavLinks] Mtandao umerudi! Inavuta categories upya...");
-      
-      // 1. Kama mtumiaji amegusa category, ivute upya
-      if (selectedParent?.id) {
-        fetchFeaturedLeafs(selectedParent.id, true);
-        fetchSubCategories(selectedParent.id, true);
-      }
-      
-      // 2. Kama mtumiaji yupo kwenye subcategory, ivute bidhaa upya
-      if (viewMode === 'subcategories' && selectedSubForLeaf?.id) {
-        fetchLeafsBySub(selectedSubForLeaf.id, true); // 🔥 Imeongezwa hapa!
-      }
-    };
-
-    window.addEventListener('online', handleOnline);
-
-    return () => {
-      isMounted.current = false;
-      window.removeEventListener('online', handleOnline);
-      if (abortRef.current) abortRef.current.abort();
-    };
-  }, [selectedParent?.id, viewMode, selectedSubForLeaf?.id]);
-
   // ========== MOBILE NAV ==========
   if (isMobile) {
     return (
@@ -321,41 +212,34 @@ export default function NavLinks({ isMobile }) {
     );
   }
 
-
   // ========== DESKTOP NAV (TAILWIND) ==========
   return (
-
-    <nav className="flex justify-between items-center 
-    max-w-[1250px] mx-auto px-6 md:px-12 h-[48px]
-     w-full font-sans">
+    <nav className="flex justify-between items-center max-w-[1250px] mx-auto px-6 md:px-12 h-[48px] w-full font-sans">
       
-           {/* LEFT GROUP */}
+      {/* LEFT GROUP */}
       <div className="flex items-center gap-4 ">
         
-        {/* ALL CATEGORIES (Hii tunaiacha kama ilivyo kwa sababu inatumia logic ya kuchagua category) */}
+        {/* ALL CATEGORIES */}
         <div
           className="relative inline-flex items-center py-2 cursor-pointer group px-3 z-[999] font-sans"
           onMouseEnter={(e) => handleMouseEnter('categories', e)}
           onMouseLeave={handleMouseLeave}
         >
-          <span className="flex items-center gap-2 text-[14px] font-[400] 
-          text-black dark:text-white group-hover:text-black group-hover:dark:text-white transition-colors">
+          <span className="flex items-center gap-2 text-[14px] font-[400] text-black dark:text-white group-hover:text-black group-hover:dark:text-white transition-colors">
             <LucideIcons.Menu size={14} strokeWidth={2.5} />
             {t('all_categories')}
           </span>
 
-            {activeNav === 'categories' && <div className="absolute -bottom-3 left-0 right-0 h-[2px] bg-black dark:bg-white rounded-sm z-[999]" />}
+          {activeNav === 'categories' && <div className="absolute -bottom-3 left-0 right-0 h-[2px] bg-black dark:bg-white rounded-sm z-[999]" />}
 
           {activeMenu === 'categories' && createPortal(
             <div
-              className="fixed top-[105px] left-0 right-0 h-[450px] z-[50] bg-[#f8f8f8] dark:bg-black shadow-[0_4px_20px_rgba(0,0,0,0.15)] 
-              border-t border-[#222222] dark:border-gray-800 animate-[fadeInDown_0.2s_ease] font-sans"
+              className="fixed top-[105px] left-0 right-0 h-[450px] z-[50] bg-[#f8f8f8] dark:bg-black shadow-[0_4px_20px_rgba(0,0,0,0.15)] border-t border-[#222222] dark:border-gray-800 animate-[fadeInDown_0.2s_ease] font-sans"
               onMouseEnter={() => handleMouseEnter('categories')}
               onMouseLeave={handleMouseLeave}
             >
               <div className="flex h-full w-full">
-                {/* SIDEBAR */}
-               <aside className="w-[280px] flex-shrink-0 bg-transparent dark:bg-black border-r border-gray-200 dark:border-gray-800 py-4 overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-gray-900 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600">
+                <aside className="w-[280px] flex-shrink-0 bg-transparent dark:bg-black border-r border-gray-200 dark:border-gray-800 py-4 overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-gray-900 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600">
                     {viewMode === 'products' ? (
                     categories.map((cat) => (
                       <div
@@ -396,7 +280,6 @@ export default function NavLinks({ isMobile }) {
                   )}
                 </aside>
 
-                {/* CONTENT */}
                 <main className="flex-1 p-8 bg-transparent dark:bg-[#1e293b] overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-orange-500 [&::-webkit-scrollbar-thumb]:rounded-full">
                   <div className="flex justify-between items-center mb-6 pb-3 border-b-2 border-gray-100 dark:border-gray-800">
                     <h3 className="text-lg font-bold text-black dark:text-white">
@@ -410,7 +293,6 @@ export default function NavLinks({ isMobile }) {
                     </button>
                   </div>
 
-                  {/* GRID */}
                   <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-1 mt-2">
                     {viewMode === 'products' ? (
                       loadingLeafs ? (
@@ -479,46 +361,33 @@ export default function NavLinks({ isMobile }) {
           )}
         </div>
 
-        {/* SKYFALL ADS (Iliyorekebishwa kwa CSS Group Hover) */}
+        {/* SKYFALL ADS */}
         <div className="relative group py-2 cursor-pointer flex items-center">
-          <Link 
-            to="/advertise" 
-            className="text-[14px] font-sans text-black dark:text-white group-hover:text-black transition-colors"
-          >
+          <Link to="/advertise" className="text-[14px] font-sans text-black dark:text-white group-hover:text-black transition-colors">
            <span className="text-[14px] font-[400] text-black dark:text-white group-hover:text-black group-hover:dark:text-white transition-colors"> {t('skyfall_ads')}</span>
           </Link>
-          {/* Mstari wa chini unapogusa */}
           <div className="absolute -bottom-3 left-0 right-0 h-[2px] bg-black  dark:bg-white rounded-sm scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
         </div>
 
-
-
-           {/* ORDER PROTECTIONS (Full Width Dropdown) */}
+        {/* ORDER PROTECTIONS */}
         <div 
           className="relative group py-2 cursor-pointer flex items-center"
           onMouseEnter={(e) => handleMouseEnter('protections', e)}
           onMouseLeave={handleMouseLeave}
         >
-          <span className="text-[14px] font-[400] text-black dark:text-white
-           group-hover:text-black group-hover:dark:text-white transition-colors font-sans">
+          <span className="text-[14px] font-[400] text-black dark:text-white group-hover:text-black group-hover:dark:text-white transition-colors font-sans">
             {t('order_protections')}
           </span>
           
-          {/* Mstari wa chini unapogusa */}
-          <div className="absolute -bottom-3 left-0 right-0 h-[2px] bg-black
-           dark:bg-white rounded-sm scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+          <div className="absolute -bottom-3 left-0 right-0 h-[2px] bg-black dark:bg-white rounded-sm scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
 
-          {/* FULL WIDTH DROPDOWN - Sasa inatumia createPortal */}
           {activeMenu === 'protections' && createPortal(
             <div 
-              className="fixed top-[105px] left-0 w-full bg-[#f8f8f8] dark:bg-black shadow-[0_15px_35px_rgba(0,0,0,0.4)]
-               border-b border-gray-200 dark:border-gray-800 animate-[fadeInDown_0.2s_ease] z-[50] font-sans"
+              className="fixed top-[105px] left-0 w-full bg-[#f8f8f8] dark:bg-black shadow-[0_15px_35px_rgba(0,0,0,0.4)] border-b border-gray-200 dark:border-gray-800 animate-[fadeInDown_0.2s_ease] z-[50] font-sans"
               onMouseEnter={() => handleMouseEnter('protections')}
               onMouseLeave={handleMouseLeave}
             >
               <div className="max-w-[1250px] mx-auto p-8 grid grid-cols-3 gap-10">
-                
-                {/* COLUMN 1: PAYMENT PROTECTION */}
                 <div>
                   <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">
                     {t('payment_protection')}
@@ -545,7 +414,6 @@ export default function NavLinks({ isMobile }) {
                   </ul>
                 </div>
 
-                {/* COLUMN 2: PRODUCT ISSUES */}
                 <div>
                   <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">
                     {t('product_issues')}
@@ -572,7 +440,6 @@ export default function NavLinks({ isMobile }) {
                   </ul>
                 </div>
 
-                {/* COLUMN 3: VERIFIED PRODUCTS */}
                 <div>
                   <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">
                     {t('verified_products')}
@@ -606,13 +473,12 @@ export default function NavLinks({ isMobile }) {
       
         </div>
           
-
       </div>
 
-           {/* RIGHT GROUP */}
+      {/* RIGHT GROUP */}
       <div className="flex items-center gap-4 flex-shrink-0">
         
-              {/* BUYER CENTRAL */}
+        {/* BUYER CENTRAL */}
         <div 
           className="relative group py-2 cursor-pointer flex items-center"
           onMouseEnter={(e) => handleMouseEnter('buyerCentral', e)}
@@ -622,15 +488,11 @@ export default function NavLinks({ isMobile }) {
             {t('buyer_central')}
           </span>
           
-          {/* Mstari wa chini unapogusa */}
           <div className="absolute -bottom-3 left-0 right-0 h-[2px] bg-black dark:bg-white rounded-sm scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
 
-          {/* DROPDOWN YA BUYER CENTRAL - Inatumia createPortal */}
           {activeMenu === 'buyerCentral' && createPortal(
             <div 
-              className="fixed top-[105px] right-0 w-full bg-[#f8f8f8] dark:bg-black 
-              shadow-[0_15px_35px_rgba(0,0,0,0.4)] border-b border-x border-gray-200
-               dark:border-gray-800 rounded-b-xl animate-[fadeInDown_0.2s_ease] z-[50] font-sans"
+              className="fixed top-[105px] right-0 w-full bg-[#f8f8f8] dark:bg-black shadow-[0_15px_35px_rgba(0,0,0,0.4)] border-b border-x border-gray-200 dark:border-gray-800 rounded-b-xl animate-[fadeInDown_0.2s_ease] z-[50] font-sans"
               onMouseEnter={() => handleMouseEnter('buyerCentral')}
               onMouseLeave={handleMouseLeave}
             >
@@ -679,7 +541,7 @@ export default function NavLinks({ isMobile }) {
           )}
         </div>
 
-                {/* HELP CENTER */}
+        {/* HELP CENTER */}
         <div 
           className="relative group py-2 cursor-pointer flex items-center"
           onMouseEnter={(e) => handleMouseEnter('helpCenter', e)}
@@ -689,10 +551,8 @@ export default function NavLinks({ isMobile }) {
             {t('help_center')}
           </span>
           
-          {/* Mstari wa chini unapogusa */}
           <div className="absolute -bottom-3 left-0 right-0 h-[2px] bg-black dark:bg-white rounded-sm scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
 
-          {/* DROPDOWN YA HELP CENTER - Inatumia createPortal */}
           {activeMenu === 'helpCenter' && createPortal(
             <div 
               className="fixed top-[105px] right-0 w-full bg-[#f8f8f8] dark:bg-black shadow-[0_15px_35px_rgba(0,0,0,0.4)] border-b border-x border-gray-200 dark:border-gray-800 rounded-b-xl animate-[fadeInDown_0.2s_ease] z-[50] font-sans"
@@ -743,10 +603,10 @@ export default function NavLinks({ isMobile }) {
           )}
         </div>
 
-              {/* SELL ON SKYFALL */}
+        {/* SELL ON SKYFALL */}
         <div
           onClick={handleSellNavigation}
-          className={`relative flex items-center justify-center px-3 py-2 rounded-md border text-sm font-medium transition-all duration-200 cursor-pointer ${ /* 🔥 ONGEZA 'relative' HAPA */
+          className={`relative flex items-center justify-center px-3 py-2 rounded-md border text-sm font-medium transition-all duration-200 cursor-pointer ${
             user 
               ? 'bg-transparent border-gray-200 dark:border-gray-700 text-black dark:text-white hover:border-orange-500 hover:text-orange-500' 
               : 'bg-orange-50 dark:bg-[#1e293b] border-orange-100 dark:border-gray-700 text-black dark:text-white hover:border-orange-500 hover:bg-orange-100 dark:hover:bg-gray-800 hover:text-orange-500'
@@ -755,7 +615,6 @@ export default function NavLinks({ isMobile }) {
           onMouseLeave={() => setActiveNav(null)}
         >
           <span>{t('sell_on_skyfall')}</span>
-          {/* 🔥 ONDOA top-[47px], acha -bottom-2 pekee */}
           {activeNav === 'sell' && <div className="absolute -bottom-2 left-0 right-0 h-[3px] bg-orange-500 rounded-sm"/>}
         </div>
 

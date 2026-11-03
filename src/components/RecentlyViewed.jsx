@@ -4,52 +4,49 @@ import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
 import SkeletonCardz from "./SkeletonCardz";
 import { useTranslation } from 'react-i18next';
-// import '../RecentlyViewed.css'; // ❌ IMEONDOLEWA
+import { useQuery } from '@tanstack/react-query'; 
+
+// 2. Function ya kuchukua data
+const fetchRecentlyViewed = async () => {
+  const storedIds = localStorage.getItem("recentlyViewed");
+  const ids = storedIds ? JSON.parse(storedIds) : [];
+  
+  if (ids.length > 0) {
+    const response = await api.get('/products/', { params: { id__in: ids.join(',') } });
+    const data = response.data.results || response.data || [];
+    
+    // Panga data kulingana na jinsi ilivyokuwa kwenye localStorage
+    return ids.map(id => data.find(p => p.id === id)).filter(Boolean);
+  }
+  return [];
+};
 
 export default function RecentlyViewed({ navigate, compact = false }) {
   const { t, i18n } = useTranslation();
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  
   const scrollContainerRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0); // Kwa Dots
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  // Fetch data
-  useEffect(() => {
-    const fetchRecentlyViewed = async () => {
-      setLoading(true);
-      const storedIds = localStorage.getItem("recentlyViewed");
-      const ids = storedIds ? JSON.parse(storedIds) : [];
-      
-      if (ids.length > 0) {
-        try {
-          const response = await api.get('/products/', { params: { id__in: ids.join(',') } });
-          const data = response.data.results || response.data || [];
-          if (data) {
-            const sortedData = ids.map(id => data.find(p => p.id === id)).filter(Boolean);
-            setProducts(sortedData);
-          }
-        } catch (err) { console.error("Error fetching recently viewed:", err.message); }
-      }
-      setLoading(false);
-    };
-    fetchRecentlyViewed();
-  }, [i18n.language]);
+  // 3. Tumia useQuery
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ['recentlyViewed', i18n.language],
+    queryFn: fetchRecentlyViewed,
+    staleTime: 1000 * 60 * 5, // Cache kwa dakika 5
+  });
 
-  // Scroll position
+  // ========== SCROLL HANDLERS ==========
   const checkScrollPosition = () => {
     if (scrollContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
       setShowLeftArrow(scrollLeft > 10);
       setShowRightArrow(scrollLeft + clientWidth < scrollWidth - 10);
 
-      // Hesabu kadi iliyoonekana (Desktop tu kwa Standard mode)
       if (window.innerWidth > 1024 && !compact) {
         const cardWidth = scrollContainerRef.current.clientWidth;
         setActiveIndex(Math.round(scrollLeft / cardWidth));
       } else if (compact) {
-        // Kwa compact mode, hesabu index kulingana na upana wa card moja
         const cardWidth = scrollContainerRef.current.clientWidth;
         setActiveIndex(Math.round(scrollLeft / cardWidth));
       }
@@ -70,7 +67,6 @@ export default function RecentlyViewed({ navigate, compact = false }) {
     }
   };
 
-  // Add scroll listener
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (container) {
@@ -80,9 +76,9 @@ export default function RecentlyViewed({ navigate, compact = false }) {
     }
   }, [products, compact]);
 
-  // Header
+  // ========== HEADER ==========
   const renderHeader = () => (
-    <div className={`flex justify-between items-center ${compact ? 'p-0 mb-2.5 bg-transparent border-none' : 'px-3 md:px-5 py-2 md:py-3 bg-[#fff7ed] dark:bg-[#1a1a2e] border-b border-transparent dark:border-[#334155] rounded-t-xl mb-2.5 md:mb-4'} text-black dark:text-white`}>
+    <div className={`flex justify-between items-center ${compact ? 'p-0 mb-2.5 bg-transparent border-none' : 'px-0.5 md:px-2 py-2 md:py-3 bg-[#fff7ed] dark:bg-[#1a1a2e] border-b border-transparent dark:border-[#334155] rounded-t-xl mb-2.5 md:mb-4'} text-black dark:text-white`}>
       <div className="flex flex-col">
         <div className={`flex items-center ${compact ? 'gap-1.5' : 'gap-1.5 md:gap-2.5'}`}>
           <History className={`text-[#10b981] dark:text-[#34d399] ${compact ? 'w-4.5 h-4.5' : 'w-4 h-4 md:w-6 md:h-6'}`} />
@@ -90,7 +86,6 @@ export default function RecentlyViewed({ navigate, compact = false }) {
             {t('recently_viewed')}
           </h2>
         </div>
-        {/* FICHA SUBTITLE IKIWA COMPACT */}
         {!compact && (
           <p className="text-[10px] md:text-xs lg:text-sm text-[#888] dark:text-[#94a3b8] m-0 mt-1 lg:mt-0 lg:pl-[34px]">
             {t('items_you_recently_viewed')}
@@ -116,17 +111,17 @@ export default function RecentlyViewed({ navigate, compact = false }) {
     </div>
   );
 
-  // Loading skeleton
-  if (loading) {
+  // ========== LOADING SKELETON ==========
+  if (isLoading) {
     return (
       <div className={`relative w-full ${compact ? 'h-full flex flex-col bg-transparent border-none p-0 overflow-hidden' : 'bg-white dark:bg-[#1e293b] border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border'}`}>
         {renderHeader()}
-        <div className="relative flex items-center px-2">
-          <div className={`flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 w-full snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${compact ? 'gap-0 p-0 flex-1 min-h-0' : 'gap-2 md:gap-3 pb-4'}`}>
+        <div className="relative flex items-center px-0.5">
+          <div className={`flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-0 py-2 w-full snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${compact ? 'gap-0 p-0 flex-1 min-h-0' : 'gap-1.5 md:gap-3 pb-4'}`}>
             {Array.from({ length: 5 }).map((_, index) => (
               <div 
                 key={`skeleton-${index}`} 
-                className={`${compact ? 'flex-[0_0_100%] min-w-[100%] max-w-[100%] snap-center m-0 h-full flex flex-col' : 'flex-[0_0_calc((100%-17.6px)/2.2)] min-w-[calc((100%-17.6px)/2.2)] sm:flex-[0_0_calc((100%-35px)/3.5)] sm:min-w-[calc((100%-35px)/3.5)] md:flex-[0_0_calc((100%-54px)/4.5)] md:min-w-[calc((100%-54px)/4.5)] lg:flex-[0_0_calc((100%-78px)/6.5)] lg:min-w-[calc((100%-78px)/6.5)] snap-start'}`}
+                className={`${compact ? 'flex-[0_0_100%] min-w-[100%] max-w-[100%] snap-center m-0 h-full flex flex-col' : 'flex-[0_0_calc((100%-16px)/2.1)] min-w-[calc((100%-16px)/2.1)] sm:flex-[0_0_calc((100%-35px)/3.5)] sm:min-w-[calc((100%-35px)/3.5)] md:flex-[0_0_calc((100%-54px)/4.5)] md:min-w-[calc((100%-54px)/4.5)] lg:flex-[0_0_calc((100%-78px)/6.5)] lg:min-w-[calc((100%-78px)/6.5)] snap-start'}`}
               >
                 <SkeletonCardz />
               </div>
@@ -137,20 +132,19 @@ export default function RecentlyViewed({ navigate, compact = false }) {
     );
   }
 
-     if (!compact) {
-      return null;
-    }
-        
+  if (!compact && products.length === 0) {
+    return null;
+  }
+  
+  if (products.length === 0) return null;
 
-  // Main render
+  // ========== MAIN RENDER ==========
   return (
     <div className={`relative w-full ${compact ? 'h-full flex flex-col bg-transparent border-none p-0 overflow-hidden' : 'bg-white dark:bg-[#1e293b] border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border'}`}>
       {renderHeader()}
       
-      {/* Carousel Container */}
-      <div className="relative flex items-center px-2">
+      <div className="relative flex items-center px-0.5">
         
-        {/* Mshale wa Kushoto - Desktop tu au Compact */}
         {showLeftArrow && (window.innerWidth > 1024 || compact) && (
           <button 
             className={`absolute z-10 rounded-full flex items-center justify-center shadow-md transition-all top-1/2 -translate-y-1/2 active:scale-95 ${compact ? 'w-10 h-10 bg-white text-[#333] hover:bg-[#ff6a00] hover:text-white hover:border-[#ff6a00] border border-[#eee] left-1' : 'w-6 h-6 md:w-9 md:h-9 bg-white dark:bg-[#1e293b] border border-[#e2e8f0] dark:border-[#334155] text-black dark:text-white hover:bg-[#10b981] hover:text-white hover:border-[#10b981] hover:scale-105 left-0 md:-left-1'}`}
@@ -162,12 +156,12 @@ export default function RecentlyViewed({ navigate, compact = false }) {
         
         <div 
           ref={scrollContainerRef} 
-          className={`flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 w-full snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${compact ? 'gap-0 p-0 flex-1 min-h-0' : 'gap-2 md:gap-3 pb-4'}`}
+          className={`flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-0 py-2 w-full snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${compact ? 'gap-0 p-0 flex-1 min-h-0' : 'gap-1.5 md:gap-3 pb-4'}`}
         >
           {products.map((product) => (
             <div 
               key={product.id} 
-              className={`${compact ? 'flex-[0_0_100%] min-w-[100%] max-w-[100%] snap-center m-0 h-full flex flex-col' : 'flex-[0_0_calc((100%-17.6px)/2.2)] min-w-[calc((100%-17.6px)/2.2)] sm:flex-[0_0_calc((100%-35px)/3.5)] sm:min-w-[calc((100%-35px)/3.5)] md:flex-[0_0_calc((100%-54px)/4.5)] md:min-w-[calc((100%-54px)/4.5)] lg:flex-[0_0_calc((100%-78px)/6.5)] lg:min-w-[calc((100%-78px)/6.5)] snap-start'}`}
+              className={`${compact ? 'flex-[0_0_100%] min-w-[100%] max-w-[100%] snap-center m-0 h-full flex flex-col' : 'flex-[0_0_calc((100%-16px)/2.1)] min-w-[calc((100%-16px)/2.1)] sm:flex-[0_0_calc((100%-35px)/3.5)] sm:min-w-[calc((100%-35px)/3.5)] md:flex-[0_0_calc((100%-54px)/4.5)] md:min-w-[calc((100%-54px)/4.5)] lg:flex-[0_0_calc((100%-78px)/6.5)] lg:min-w-[calc((100%-78px)/6.5)] snap-start'}`}
             >
               <DashboardCard
                 image={product.cover_image_url || product.cover_image || ''}
@@ -183,7 +177,6 @@ export default function RecentlyViewed({ navigate, compact = false }) {
           ))}
         </div>
         
-        {/* Mshale wa Kulia - Desktop tu au Compact */}
         {showRightArrow && (window.innerWidth > 1024 || compact) && (
           <button 
             className={`absolute z-10 rounded-full flex items-center justify-center shadow-md transition-all top-1/2 -translate-y-1/2 active:scale-95 ${compact ? 'w-10 h-10 bg-white text-[#333] hover:bg-[#ff6a00] hover:text-white hover:border-[#ff6a00] border border-[#eee] right-1' : 'w-6 h-6 md:w-9 md:h-9 bg-white dark:bg-[#1e293b] border border-[#e2e8f0] dark:border-[#334155] text-black dark:text-white hover:bg-[#10b981] hover:text-white hover:border-[#10b981] hover:scale-105 right-0 md:-right-1'}`}
@@ -194,7 +187,6 @@ export default function RecentlyViewed({ navigate, compact = false }) {
         )}
       </div>
 
-      {/* Dots - Desktop tu kwa Standard, au kwa Compact Mode */}
       {products.length > 1 && (window.innerWidth > 1024 || compact) && (
         <div className="flex justify-center gap-2 mt-2.5">
           {products.map((_, idx) => (

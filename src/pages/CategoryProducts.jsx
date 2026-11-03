@@ -1,42 +1,116 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../axiosConfig";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import DashboardCard from "../components/DashboardCard";
-import { Link } from "react-router-dom";
 import { ChevronRight, List } from "lucide-react";
-//import "../CategoryProducts.css";
+import { useQuery } from '@tanstack/react-query'; // 1. Ingiza useQuery
+
+// ==========================================
+// 2. FUNCTION YA KUCHUKUA DATA YOTE KWA MPIGO
+// ==========================================
+const fetchCategoryData = async ({ queryKey }) => {
+  const [_, leafId, activeFilterId] = queryKey;
+  if (!leafId) throw new Error("Leaf ID haipo");
+
+  // 1. Get Leaf Category
+  let leaf = null;
+  try {
+    const leafRes = await api.get(`/leaf-categories/${leafId}/`);
+    leaf = leafRes.data;
+  } catch (leafErr) {
+    if (leafErr.response?.status === 404) {
+      throw new Error(`Category ${leafId} haipo kwenye mfumo.`);
+    }
+    throw new Error("Imeshindwa kupata kategoria ya leaf.");
+  }
+
+  const subId = leaf?.sub_category_id || null;
+
+  // 2. Get Filters na 3. Get Products (Kwa mpigo)
+  const fetchPromises = [];
+  
+  let filtersPromise = Promise.resolve([]);
+  if (subId) {
+    filtersPromise = api.get('/leaf-categories/', { params: { sub_category_id: subId } })
+      .then(res => res.data.results || res.data || [])
+      .catch(() => []);
+    fetchPromises.push(filtersPromise);
+  }
+
+  const currentFilterId = activeFilterId || leafId;
+  const productsPromise = api.get('/products/', {
+    params: { leaf_category: currentFilterId, ordering: '-created_at' }
+  })
+    .then(res => res.data.results || res.data || [])
+    .catch(err => {
+      if (err.response?.status === 404) throw new Error("Hakuna bidhaa zilizopatikana kwa kategoria hii.");
+      throw new Error("Imeshindwa kupata bidhaa za kategoria hii.");
+    });
+  fetchPromises.push(productsPromise);
+
+  await Promise.all(fetchPromises);
+
+  const filters = await filtersPromise;
+  const productsData = await productsPromise;
+
+  // Jaza hierarchy
+  let hierarchy = { category: "Marketplace", sub: "General", leaf: "Products" };
+  if (productsData.length > 0) {
+    const firstProduct = productsData[0];
+    hierarchy = {
+      category: firstProduct.category_name || "Marketplace",
+      sub: firstProduct.sub_category_name || "General",
+      leaf: firstProduct.leaf_category_name || "Products"
+    };
+  } else if (leaf) {
+    hierarchy = {
+      category: "Marketplace",
+      sub: "General",
+      leaf: leaf?.name || "Products"
+    };
+  }
+
+  return { productsData, filters, hierarchy, leaf };
+};
 
 export default function CategoryProducts() {
   const { leafId } = useParams();
   const navigate = useNavigate();
   
-  const [products, setProducts] = useState([]);
-  const [hierarchy, setHierarchy] = useState({ category: "Marketplace", sub: "General", leaf: "Products" });
-  const [filters, setFilters] = useState([]);
   const [activeFilterId, setActiveFilterId] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
-
-// 1. Ongeza hizi state karibu na state zingine
+  // ==========================================
+  // 3. STATE YA FILTER YA BEI (Local)
+  // ==========================================
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [displayedProducts, setDisplayedProducts] = useState([]);
 
-// 2. Ongeza function ya kuchuja bei (Inaweza kuitwa wakati wa filter)
-  const handlePriceFilter = () => {
-  // Piga API upya au chuja products zilizopo
-  // Kwa sasa tutatumia products zilizopo kwa mfano huu:
-  const filtered = products.filter(p => {
-    const price = parseFloat(p.price);
-    const min = minPrice ? parseFloat(minPrice) : 0;
-    const max = maxPrice ? parseFloat(maxPrice) : Infinity;
-    return price >= min && price <= max;
+  // ==========================================
+  // 4. TUMIA useQuery
+  // ==========================================
+  const { 
+    data: pageData, 
+    isLoading, 
+    error 
+  } = useQuery({
+    queryKey: ['categoryProducts', leafId, activeFilterId],
+    queryFn: fetchCategoryData,
+    enabled: !!leafId,
+    staleTime: 1000 * 60 * 5, // Cache kwa dakika 5
   });
-  setProducts(filtered); // Hii inabadilisha matokeo
-};
+
+  const products = pageData?.productsData || [];
+  const filters = pageData?.filters || [];
+  const hierarchy = pageData?.hierarchy || { category: "Marketplace", sub: "General", leaf: "Products" };
+
+  // Synchronize displayedProducts pale data mpya inapokuja
+  useEffect(() => {
+    setDisplayedProducts(products);
+  }, [products]);
 
   // ========== RESPONSIVE ==========
   useEffect(() => {
@@ -53,122 +127,16 @@ export default function CategoryProducts() {
     }
   }, [leafId, navigate]);
 
-  // ========== FETCH DATA ==========
-  useEffect(() => {
-    async function fetchPageData() {
-      if (!leafId) {
-        setError("Leaf ID haipo - URL inahitaji ID ya category");
-        setLoading(false);
-        return;
-      }
-      
-      setLoading(true);
-      setError(null);
-      
-      try {
-        // ==========================================
-        // 1. GET LEAF CATEGORY (INABAKI KWA FILTERS NA FALLBACK)
-        // ==========================================
-        let leaf = null;
-        try {
-          const leafRes = await api.get(`/leaf-categories/${leafId}/`);
-          leaf = leafRes.data;
-          console.log("✅ [Leaf] Leaf data retrieved:", leaf);
-        } catch (leafErr) {
-          console.error("❌ [Leaf] Failed to fetch leaf category:", leafErr.response?.data || leafErr.message);
-          if (leafErr.response?.status === 404) {
-            setError(`Category ${leafId} haipo kwenye mfumo.`);
-          } else {
-            setError("Imeshindwa kupata kategoria ya leaf.");
-          }
-          setLoading(false);
-          return;
-        }
-
-        // 🔥 SubId bado inahitajika kwa FILTERS (Sidebar)
-        let subId = null;
-        if (leaf && leaf.sub_category_id) {
-          subId = leaf.sub_category_id;
-        }
-
-        // ==========================================
-        // 2. GET FILTERS (Leaf categories for this subId)
-        // ==========================================
-        if (subId) {
-          try {
-            const filtersRes = await api.get('/leaf-categories/', {
-              params: { sub_category_id: subId }
-            });
-            const allFilters = filtersRes.data.results || filtersRes.data || [];
-            setFilters(allFilters);
-            console.log(`✅ [Filters] ${allFilters.length} filters retrieved`);
-          } catch (filterErr) {
-            console.error("❌ [Filters] Failed to fetch filters:", filterErr.response?.data || filterErr.message);
-            // Continue without filters
-          }
-        }
-
-        // ==========================================
-        // 3. GET PRODUCTS (Sasa IMEBORESHA - HAPA NDIO MAJINA YANATOKA)
-        // ==========================================
-        const currentFilterId = activeFilterId || leafId;
-        console.log(`🔍 [Products] Fetching products for leaf_category_id: ${currentFilterId}`);
-
-        let productsData = [];
-        try {
-          const productsRes = await api.get('/products/', {
-            params: { 
-              leaf_category: currentFilterId,
-              ordering: '-created_at' 
-            }
-          });
-          productsData = productsRes.data.results || productsRes.data || [];
-          console.log(`✅ [Products] ${productsData.length} products retrieved`);
-          
-          // ✅ Jaza hierarchy kutoka kwenye bidhaa ya kwanza (Ikiwa ipo)
-          if (productsData.length > 0) {
-            const firstProduct = productsData[0];
-            setHierarchy({
-              category: firstProduct.category_name || "Marketplace",
-              sub: firstProduct.sub_category_name || "General",
-              leaf: firstProduct.leaf_category_name || "Products"
-            });
-            console.log("✅ [Hierarchy] Majina yamewekwa kutoka kwenye bidhaa:", {
-              category: firstProduct.category_name,
-              sub: firstProduct.sub_category_name,
-              leaf: firstProduct.leaf_category_name
-            });
-          } else if (leaf) {
-            // ✅ Fallback: Ikiwa hakuna bidhaa, tumia majina kutoka Leaf Category
-            setHierarchy({
-              category: "Marketplace",
-              sub: "General",
-              leaf: leaf?.name || "Products"
-            });
-          }
-          
-        } catch (prodErr) {
-          console.error("❌ [Products] Failed to fetch products:", prodErr.response?.data || prodErr.message);
-          if (prodErr.response?.status === 404) {
-            setError(`Hakuna bidhaa zilizopatikana kwa kategoria hii.`);
-          } else {
-            setError("Imeshindwa kupata bidhaa za kategoria hii.");
-          }
-          setLoading(false);
-          return;
-        }
-
-        setProducts(productsData);
-
-      } catch (err) {
-        console.error("❌ [General] Unexpected error in fetchPageData:", err);
-        setError("Kuna tatizo la jumla la mtandao au msimbo.");
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchPageData();
-  }, [leafId, activeFilterId]);
+  // ========== FILTER YA BEI (Local) ==========
+  const handlePriceFilter = () => {
+    const filtered = products.filter(p => {
+      const price = parseFloat(p.price);
+      const min = minPrice ? parseFloat(minPrice) : 0;
+      const max = maxPrice ? parseFloat(maxPrice) : Infinity;
+      return price >= min && price <= max;
+    });
+    setDisplayedProducts(filtered);
+  };
 
   // ========== GET IMAGE ==========
   const getProductImage = (item) => {
@@ -177,7 +145,10 @@ export default function CategoryProducts() {
     return "https://placehold.co/400x400?text=No+Image";
   };
 
-   if (loading) {
+  // ==========================================
+  // 5. RENDER
+  // ==========================================
+  if (isLoading) {
     return (
       <div className="flex flex-col min-h-screen bg-[#f8f9fa] dark:bg-black">
         <div className="sticky top-0 z-[100] w-full">
@@ -233,7 +204,7 @@ export default function CategoryProducts() {
         <div className="flex-1 flex justify-center p-5 pt-[80px] md:pt-[100px]">
           <div className="w-full max-w-[1400px]">
             <div className="flex flex-col items-center justify-center p-10 md:p-20 bg-white dark:bg-[#111] rounded-xl text-center">
-              <p className="text-lg md:text-xl text-red-500 mb-5">{error}</p>
+              <p className="text-lg md:text-xl text-red-500 mb-5">{error.message}</p>
               <button onClick={() => navigate('/')} className="px-8 py-3 bg-[#3182ce] hover:bg-[#2c5282] text-white border-none rounded-lg text-base cursor-pointer transition-colors">
                 Rudi Nyumbani
               </button>
@@ -330,8 +301,8 @@ export default function CategoryProducts() {
 
               {/* Products Grid */}
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 md:gap-4 lg:gap-[25px]">
-                {products.length > 0 ? (
-                  products.map((item) => (
+                {displayedProducts.length > 0 ? (
+                  displayedProducts.map((item) => (
                     <DashboardCard
                       key={item.id}
                       image={getProductImage(item)}

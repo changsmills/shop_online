@@ -1,24 +1,72 @@
+// src/pages/UpdateProductPage.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../axiosConfig";
 import { Camera, Trash2, Save, ArrowLeft, Loader2, Plus, X, Edit3, Palette } from "lucide-react";
+import { useQuery, useQueryClient } from '@tanstack/react-query'; // 1. Ingiza hooks
+
+// ==========================================
+// 2. FUNCTION YA KUCHUKUA DATA YOTE YA BIDHAA
+// ==========================================
+const fetchProductData = async ({ queryKey }) => {
+  const [_, productId] = queryKey;
+  if (!productId) throw new Error("ID ya bidhaa haijapatikana");
+
+  const token = localStorage.getItem("access_token");
+  const headers = { Authorization: `Bearer ${token}` };
+
+  // 1. Pata Bidhaa
+  const prodRes = await api.get(`/products/${productId}/`, { headers });
+  const productData = prodRes.data;
+
+  // 2. Pata Media, Variations, na Store (Kwa mpigo)
+  const [mediaRes, varRes, storeRes] = await Promise.allSettled([
+    api.get(`/product-media/?product_id=${productId}`, { headers }),
+    api.get(`/product-variations/?product_id=${encodeURIComponent(productId)}`, { headers }),
+    productData.store_id ? api.get(`/stores/${productData.store_id}/`, { headers }) : Promise.resolve({ data: null })
+  ]);
+
+  const mediaData = mediaRes.status === 'fulfilled' ? (mediaRes.value.data.results || mediaRes.value.data || []) : [];
+  const varData = varRes.status === 'fulfilled' ? (varRes.value.data.results || varRes.value.data || []) : [];
+  const storeData = storeRes.status === 'fulfilled' ? storeRes.value.data : null;
+
+  // 3. Pata Leaf Categories (Kama product ina sub_category_id)
+  let leafCategoriesData = [];
+  if (productData.sub_category_id) {
+    try {
+      const leafRes = await api.get(`/leaf-categories/?sub_category=${productData.sub_category_id}`, { headers });
+      leafCategoriesData = leafRes.data.results || leafRes.data || [];
+    } catch (err) {
+      console.error("Error fetching leaf categories:", err);
+    }
+  }
+
+  return {
+    product: productData,
+    gallery: mediaData,
+    variations: varData,
+    storeSubCats: storeData?.sub_categories || [],
+    leafCategories: leafCategoriesData
+  };
+};
+
 
 const UpdateProductPage = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  const [product, setProduct] = useState(null);
-  const [gallery, setGallery] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // State za UI
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const [storeSubCats, setStoreSubCats] = useState([]);
-  const [leafCategories, setLeafCategories] = useState([]);
+  // State za Form
+  const [product, setProduct] = useState(null);
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [selectedLeafCategory, setSelectedLeafCategory] = useState("");
+  const [leafCategories, setLeafCategories] = useState([]);
 
-  const [variations, setVariations] = useState([]);
+  // State za Variations
   const [showVariationForm, setShowVariationForm] = useState(false);
   const [editingVariationId, setEditingVariationId] = useState(null);
   const [variationForm, setVariationForm] = useState({
@@ -35,51 +83,52 @@ const UpdateProductPage = () => {
     marketplace_image_preview: null,
   });
 
-  // ========== FETCH DATA ==========
+  // ==========================================
+  // 3. TUMIA useQuery
+  // ==========================================
+  const { 
+    data: pageData, 
+    isLoading: loading, 
+    error 
+  } = useQuery({
+    queryKey: ['updateProduct', productId],
+    queryFn: fetchProductData,
+    enabled: !!productId,
+    staleTime: 1000 * 60 * 5, // Cache kwa dakika 5
+  });
+
+  const gallery = pageData?.gallery || [];
+  const variations = pageData?.variations || [];
+  const storeSubCats = pageData?.storeSubCats || [];
+
+  // Weka data kwenye states za form pale inapokuja
   useEffect(() => {
-    if (productId) {
-      fetchAllData();
-    } else {
+    if (pageData) {
+      setProduct(pageData.product);
+      setSelectedSubCategory(pageData.product.sub_category_id || "");
+      setSelectedLeafCategory(pageData.product.leaf_category_id || "");
+      setLeafCategories(pageData.leafCategories);
+    }
+  }, [pageData]);
+
+  // Kama productId haipo au kuna kosa
+  useEffect(() => {
+    if (!productId) {
       alert("ID ya bidhaa haijapatikana!");
       navigate(-1);
-    }
-  }, [productId]);
-
-  const fetchAllData = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem("access_token");
-      const headers = { Authorization: `Bearer ${token}` };
-
-      const prodRes = await api.get(`/products/${productId}/`, { headers });
-      const productData = prodRes.data;
-      setProduct(productData);
-
-      const mediaRes = await api.get(`/product-media/?product_id=${productId}`, { headers });
-      setGallery(mediaRes.data.results || mediaRes.data || []);
-
-      const varRes = await api.get(`/product-variations/?product_id=${encodeURIComponent(productId)}`, { headers });
-      setVariations(varRes.data.results || varRes.data || []);
-
-      if (productData.store_id) {
-        const storeRes = await api.get(`/stores/${productData.store_id}/`, { headers });
-        const storeData = storeRes.data;
-        setStoreSubCats(storeData.sub_categories || []);
-        if (productData.sub_category_id) setSelectedSubCategory(productData.sub_category_id);
-        if (productData.leaf_category_id) setSelectedLeafCategory(productData.leaf_category_id);
-      }
-
-      if (productData.sub_category_id) {
-        fetchLeafCategories(productData.sub_category_id);
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
+    } else if (error) {
       alert("Imeshindwa kuvuta data za bidhaa.");
-    } finally {
-      setLoading(false);
+      navigate(-1);
     }
+  }, [productId, error, navigate]);
+
+  const refetchAll = () => {
+    queryClient.invalidateQueries({ queryKey: ['updateProduct', productId] });
   };
 
+  // ==========================================
+  // 4. HANDLERS
+  // ==========================================
   const fetchLeafCategories = async (subCatId) => {
     try {
       const token = localStorage.getItem("access_token");
@@ -119,16 +168,15 @@ const UpdateProductPage = () => {
       if (type === "cover") {
         const coverForm = new FormData();
         coverForm.append("cover_image", file);
-        const res = await api.patch(`/products/${productId}/`, coverForm, { headers });
-        setProduct(prev => ({ ...prev, cover_image: res.data.cover_image }));
+        await api.patch(`/products/${productId}/`, coverForm, { headers });
       } else {
         const mediaForm = new FormData();
         mediaForm.append("product", productId);
         mediaForm.append("media_type", "image");
         mediaForm.append("media_file", file);
-        const res = await api.post(`/product-media/`, mediaForm, { headers });
-        setGallery(prev => [...prev, res.data]);
+        await api.post(`/product-media/`, mediaForm, { headers });
       }
+      refetchAll(); // Sasisha data baada ya kupakia
     } catch (err) {
       alert("Error uploading file: " + (err.response?.data?.detail || err.message));
     } finally {
@@ -141,7 +189,7 @@ const UpdateProductPage = () => {
     try {
       const token = localStorage.getItem("access_token");
       await api.delete(`/product-media/${id}/`, { headers: { Authorization: `Bearer ${token}` } });
-      setGallery(gallery.filter((m) => m.id !== id));
+      refetchAll();
     } catch (err) {
       alert("Imeshindwa kufuta picha.");
     }
@@ -164,7 +212,7 @@ const UpdateProductPage = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert("Taarifa zimehifadhiwa kikamilifu!");
-      fetchAllData();
+      refetchAll();
     } catch (err) {
       alert("Kuna tatizo limejitokeza: " + (err.response?.data?.detail || err.message));
     } finally {
@@ -222,20 +270,18 @@ const UpdateProductPage = () => {
       }
       formData.append("variant_specifications", JSON.stringify(variationForm.attributes || {}));
 
-      let response;
       if (editingVariationId) {
-        response = await api.patch(`/product-variations/${editingVariationId}/`, formData, {
+        await api.patch(`/product-variations/${editingVariationId}/`, formData, {
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" }
         });
-        setVariations(variations.map(v => v.id === editingVariationId ? response.data : v));
       } else {
-        response = await api.post(`/product-variations/`, formData, {
+        await api.post(`/product-variations/`, formData, {
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" }
         });
-        setVariations([...variations, response.data]);
       }
       resetVariationForm();
       alert(editingVariationId ? "Variation imesasishwa!" : "Variation imeongezwa!");
+      refetchAll();
     } catch (err) {
       alert("Kuna tatizo: " + (err.response?.data?.detail || err.message));
     }
@@ -246,7 +292,7 @@ const UpdateProductPage = () => {
     try {
       const token = localStorage.getItem("access_token");
       await api.delete(`/product-variations/${id}/`, { headers: { Authorization: `Bearer ${token}` } });
-      setVariations(variations.filter(v => v.id !== id));
+      refetchAll();
     } catch (err) {
       alert("Imeshindwa kufuta variation.");
     }
@@ -274,7 +320,6 @@ const UpdateProductPage = () => {
   if (loading) {
     return (
       <div className="max-w-[1400px] mx-auto p-4 md:p-6 min-h-screen bg-gray-50 dark:bg-gray-900 font-sans pointer-events-none">
-        {/* HEADER SKELETON */}
         <div className="flex flex-wrap justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-xl mb-6 shadow-sm border border-gray-200 dark:border-gray-700 gap-3">
           <div className="w-20 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
           <div className="text-center flex flex-col items-center">
@@ -285,7 +330,6 @@ const UpdateProductPage = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* PICHA SKELETON */}
           <div className="bg-white dark:bg-gray-800 p-5 rounded-[20px] border border-gray-200 dark:border-gray-700 shadow-md">
             <div className="w-1/3 h-5 bg-gray-200 dark:bg-gray-700 rounded mb-4 animate-pulse" />
             <div className="flex flex-col gap-6">
@@ -298,7 +342,6 @@ const UpdateProductPage = () => {
             </div>
           </div>
 
-          {/* MAELEZO SKELETON */}
           <div className="bg-white dark:bg-gray-800 p-5 rounded-[20px] border border-gray-200 dark:border-gray-700 shadow-md">
             <div className="w-1/3 h-5 bg-gray-200 dark:bg-gray-700 rounded mb-4 animate-pulse" />
             <div className="flex flex-col gap-4">
@@ -316,16 +359,6 @@ const UpdateProductPage = () => {
                 <div className="w-20 h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                 <div className="w-full h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">
-                  <div className="w-16 h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                  <div className="w-full h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <div className="w-16 h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                  <div className="w-full h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
-                </div>
-              </div>
               <div className="flex flex-col gap-2">
                 <div className="w-24 h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                 <div className="w-full h-24 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
@@ -333,34 +366,11 @@ const UpdateProductPage = () => {
             </div>
           </div>
         </div>
-
-        {/* VARIATIONS SKELETON */}
-        <div className="mt-6 bg-white dark:bg-gray-800 p-5 rounded-[20px] border border-gray-200 dark:border-gray-700 shadow-md">
-          <div className="flex justify-between items-center mb-4">
-            <div className="w-48 h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-            <div className="w-32 h-9 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
-          </div>
-          <div className="flex flex-col gap-3">
-            {[...Array(2)].map((_, i) => (
-              <div key={i} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
-                  <div className="flex flex-col gap-2">
-                    <div className="w-28 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                    <div className="w-40 h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
-                  <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     );
   }
+
+  if (!product) return null; // Fallback
 
   return (
     <div className="max-w-[1400px] mx-auto p-4 md:p-6 min-h-screen bg-gray-50 dark:bg-gray-900 font-sans">
@@ -395,7 +405,6 @@ const UpdateProductPage = () => {
           </h3>
           
           <div className="flex flex-col gap-6">
-            {/* Main Cover */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Picha Kuu (Cover)</label>
               <div className="relative overflow-hidden rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 aspect-square group">
@@ -412,7 +421,6 @@ const UpdateProductPage = () => {
               </div>
             </div>
 
-            {/* Gallery */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Picha za Nyongeza (Gallery)</label>
               <div className="grid grid-cols-3 gap-3 mt-1">
@@ -445,7 +453,6 @@ const UpdateProductPage = () => {
           </h3>
           
           <div className="flex flex-col gap-5">
-            {/* Kategoria */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Kategoria Ndogo (Sub-category)</label>

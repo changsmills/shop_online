@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+// src/components/TopDealsSection.jsx
+import React, { useState, memo } from "react"; // 1. Ingiza memo
 import api from "../axiosConfig";
+import { useQueryClient } from '@tanstack/react-query'; // 2. Ingiza useQueryClient
 
-const TopDealsSection = ({ products, onUpdate }) => {
+// 3. Tumia React.memo kwenye component ya nje
+const TopDealsSection = memo(({ products, onUpdate }) => {
   const myProducts = products || [];
 
   return (
@@ -39,11 +42,13 @@ const TopDealsSection = ({ products, onUpdate }) => {
       </div>
     </section>
   );
-};
+});
 
-const FlashSaleCard = ({ product, onUpdate }) => {
+// 4. Tumia React.memo kwenye FlashSaleCard pia
+const FlashSaleCard = memo(({ product, onUpdate }) => {
   const [percentage, setPercentage] = useState(0);
   const [isUpdating, setIsUpdating] = useState(false);
+  const queryClient = useQueryClient(); // Kwa ajili ya kusasisha cache
 
   const beiKuu = Number(product.price) || 0;
   const kiasiChaPunguzo = (percentage / 100) * beiKuu;
@@ -95,6 +100,10 @@ const FlashSaleCard = ({ product, onUpdate }) => {
       );
 
       alert(`✅ Offer of ${percentage}% applied successfully!`);
+      
+      // Sasisha cache ya PhysicalDashboard
+      queryClient.invalidateQueries({ queryKey: ['physicalDashboard'] });
+      
       if (onUpdate) onUpdate();
       setPercentage(0);
 
@@ -181,6 +190,9 @@ const FlashSaleCard = ({ product, onUpdate }) => {
       </div>
     </div>
   );
-};
+});
+
+TopDealsSection.displayName = 'TopDealsSection';
+FlashSaleCard.displayName = 'FlashSaleCard';
 
 export default TopDealsSection;

@@ -5,109 +5,60 @@ import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
 import SkeletonCardz from "./SkeletonCardz";
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query'; // 1. Ingiza useQuery
+
+// 2. Function ya kuchukua data (nje ya component)
+const fetchDeals = async ({ queryKey }) => {
+  const [_, categoryId] = queryKey;
+
+  const params = {};
+  if (categoryId && categoryId !== 'all') {
+    params.parent_category = categoryId;
+  }
+
+  const response = await api.get('/products/', { params });
+  const data = response.data.results || response.data || [];
+
+  // Logic yako ya kupanga punguzo (discount)
+  const calculatedDeals = data.map(product => {
+    const beiYaKawaida = parseFloat(product.price) || 0;
+    const beiYaOfa = parseFloat(product.original_price) || 0;
+
+    let asilimia = 0;
+    if (beiYaKawaida > beiYaOfa && beiYaOfa > 0) {
+      asilimia = ((beiYaKawaida - beiYaOfa) / beiYaKawaida) * 100;
+    }
+    return { ...product, discountPercent: asilimia };
+  });
+
+  return calculatedDeals
+    .filter(p => p.discountPercent > 0 && p.discountPercent < 100)
+    .sort((a, b) => b.discountPercent - a.discountPercent)
+    .slice(0, 10);
+};
 
 export default function TopDeals({ navigate, selectedCategory }) {
   const { t, i18n } = useTranslation();
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  
   const scrollContainerRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
-
-  // 🔥 Refs za cache / mount / abort / scroll
-  const cacheRef = useRef({});
-  const isMounted = useRef(true);
-  const abortRef = useRef(null);
   const scrollPosRef = useRef(0);
   const prevCategoryKeyRef = useRef('');
+
+  const categoryId = selectedCategory?.isAll ? 'all' : (selectedCategory?.id || 'all');
+
+  // 3. Tumia useQuery
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ['topDeals', categoryId, i18n.language],
+    queryFn: fetchDeals,
+    staleTime: 1000 * 60 * 5, // Cache kwa dakika 5
+  });
 
   const getCategoryDisplayName = (category) => {
     if (!category) return '';
     return i18n.language === 'sw' ? (category.name_sw || category.name) : category.name;
   };
-
-  // 🔥 FETCH — cache + forceRefresh
-  const fetchDeals = async (forceRefresh = false) => {
-    const cacheKey = `${selectedCategory?.id || 'all'}_${i18n.language}`;
-
-    // 🔥 KINGA YA CACHE
-    if (!forceRefresh && cacheRef.current[cacheKey]) {
-      console.log("📦 [TopDeals] Data ipo kwenye cache, haifetchi tena.");
-      setProducts(cacheRef.current[cacheKey]);
-      setLoading(false);
-      return;
-    }
-
-    // 🔥 Futa request ya awali kama ipo
-    if (abortRef.current) abortRef.current.abort();
-    abortRef.current = new AbortController();
-
-    setLoading(true);
-    try {
-      const params = {};
-
-      if (selectedCategory?.id && selectedCategory.id !== 'all' && !selectedCategory.isAll) {
-        params.parent_category = selectedCategory.id;
-      }
-
-      const response = await api.get('/products/', {
-        params,
-        signal: abortRef.current.signal,
-      });
-      const data = response.data.results || response.data || [];
-
-      const calculatedDeals = data.map(product => {
-        const beiYaKawaida = parseFloat(product.price) || 0;
-        const beiYaOfa = parseFloat(product.original_price) || 0;
-
-        let asilimia = 0;
-        if (beiYaKawaida > beiYaOfa && beiYaOfa > 0) {
-          asilimia = ((beiYaKawaida - beiYaOfa) / beiYaKawaida) * 100;
-        }
-        return { ...product, discountPercent: asilimia };
-      });
-
-      const sortedDeals = calculatedDeals
-        .filter(p => p.discountPercent > 0 && p.discountPercent < 100)
-        .sort((a, b) => b.discountPercent - a.discountPercent)
-        .slice(0, 10);
-
-      if (isMounted.current) {
-        // 🔥 Hifadhi kwenye cache
-        cacheRef.current[cacheKey] = sortedDeals;
-        setProducts(sortedDeals);
-      }
-    } catch (err) {
-      if (err.name === 'CanceledError' || err.code === 'ERR_CANCELED') return;
-      console.error("Top Deals Fetch Error:", err.message);
-    } finally {
-      if (isMounted.current) setLoading(false);
-    }
-  };
-
-  // 🔥 EFFECT YA KUANZISHA + KUFUATA CATEGORY/LANGUAGE
-  useEffect(() => {
-    isMounted.current = true;
-    fetchDeals();
-
-    return () => {
-      isMounted.current = false;
-      if (abortRef.current) abortRef.current.abort();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCategory?.id, i18n.language]);
-
-  // 🔥 ONLINE LISTENER — mtandao ukirudi, fetch upya
-  useEffect(() => {
-    const handleOnline = () => {
-      console.log("🌐 [TopDeals] Mtandao umerudi! Inafetch data mpya...");
-      fetchDeals(true);
-    };
-
-    window.addEventListener('online', handleOnline);
-    return () => window.removeEventListener('online', handleOnline);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const getDiscountPercentage = (originalPrice, currentPrice) => {
     const beiYaAwali = parseFloat(originalPrice) || 0;
@@ -145,7 +96,7 @@ export default function TopDeals({ navigate, selectedCategory }) {
     }
   }, [products]);
 
-  // 🔥 REjesha scroll — lakini anza mwanzo kama category/language imebadilika
+  // 🔥 Rejesha scroll — anza mwanzo kama category/language imebadilika
   useEffect(() => {
     const currentKey = `${selectedCategory?.id || 'all'}_${i18n.language}`;
 
@@ -196,7 +147,7 @@ export default function TopDeals({ navigate, selectedCategory }) {
     </div>
   );
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="relative w-full bg-white dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border">
         {renderHeader()}
@@ -258,21 +209,16 @@ export default function TopDeals({ navigate, selectedCategory }) {
                   rating={product.rating}
                   verified={product.verified || product.store?.is_verified}
                   years={product.years}
-                          onClick={() => {
-                    // 🔥 Chukua IDs zote tatu kutoka kwenye bidhaa
+                  onClick={() => {
                     const leafId = product.leaf_category_id || '';
                     const subId = product.sub_category_id || ''; 
                     const parentId = product.parent_category_id || '';
                     
-                    // 🔥 Chukua jina la bidhaa/category (kwa ajili ya bannerDesc)
                     const categoryName = i18n.language === 'sw' 
                       ? (product.leaf_category_name_sw || product.leaf_category_name || product.category_name || 'All')
                       : (product.leaf_category_name || product.category_name || 'All');
 
-                    // 🔥 Tumia "Top Deals" pekee kama sectionName (bila "in Category")
                     const sectionName = encodeURIComponent('Top Deals');
-
-                    // 🔥 Tengeneza URL na IDs zote
                     const url = `/products?sectionName=${sectionName}&leafId=${leafId}&subId=${subId}&parentId=${parentId}&categoryName=${encodeURIComponent(categoryName)}`;
                     
                     window.open(url, '_blank');

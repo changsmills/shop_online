@@ -2,6 +2,10 @@
 Django settings for skyfall_backend project.
 """
 
+import mimetypes
+mimetypes.add_type("application/javascript", ".js", True)
+
+
 from pathlib import Path
 import os
 from dotenv import load_dotenv
@@ -79,6 +83,9 @@ INSTALLED_APPS = [
     'products',
     'orders',
   'django.contrib.postgres',  # 🔥 ONGEZA HII!
+  "debug_toolbar",
+
+
 
 ]
 
@@ -105,6 +112,7 @@ AUTH_USER_MODEL = 'users.User'  # Sio 'products.Profile'!
 
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware', 
     'corsheaders.middleware.CorsMiddleware',
     'skyfall_backend.middleware.RemoveServerHeaderMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware', # 🔥 ONGEZA HII! (Inapaswa kuwa chini ya SecurityMiddleware)
@@ -273,7 +281,7 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
 # Zuia Clickjacking
-X_FRAME_OPTIONS = 'DENY'
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 if DEBUG:
     SESSION_COOKIE_SECURE = False   
@@ -350,7 +358,7 @@ else:
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # Prevent clickjacking
-X_FRAME_OPTIONS = 'DENY'
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # Referrer policy
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
@@ -407,3 +415,9 @@ LOGGING = {
     },
 
 }
+
+# ==================== DEBUG TOOLBAR ====================
+INTERNAL_IPS = [
+    "127.0.0.1",
+    "localhost",
+]

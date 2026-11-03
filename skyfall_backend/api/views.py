@@ -140,7 +140,13 @@ class LeafCategoryViewSet(viewsets.ModelViewSet):
             raise e
 
 class ProductsEngineViewSet(viewsets.ModelViewSet):
-    queryset = ProductsEngine.objects.all()
+    # 🔥 TUMIA select_related NA prefetch_related HAPA
+    queryset = ProductsEngine.objects.select_related(
+        'store', 'user', 'leaf_category', 'parent_category', 'sub_category'
+    ).prefetch_related(
+        'variations', 'media' # Badilisha hivi kama majina ni tofauti kwenye models zako
+    ).all()
+    
     serializer_class = ProductsEngineSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [JWTAuthentication]
@@ -150,27 +156,17 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     search_fields = ['name', 'description', 'sku']
 
-
-       # 🆕 ONGEZA HII METHOD (NDANI YA CLASS HII)
     def get_queryset(self):
+        # Hii inachukua queryset iliyo na select_related na prefetch_related kutoka juu
         queryset = super().get_queryset()
         
-        # Chukua thamani ya original_price__gt kutoka URL (mfano: ?original_price__gt=0)
         original_price_gt = self.request.query_params.get('original_price__gt')
         
         if original_price_gt is not None:
             from django.db.models import F
-            
-            # 1. Hakikisha original_price (bei ya punguzo) ni kubwa kuliko 0
             queryset = queryset.filter(original_price__gt=original_price_gt)
-            
-            # 2. Hakikisha original_price (bei ya punguzo) ni NDOGO kuliko price (bei halisi)
-            # Hii inazuiya bidhaa ambazo zina original_price = 0 au original_price > price zisionekane.
             queryset = queryset.filter(original_price__lt=F('price'))
 
-
-
-            # 🔥 BADILISHA HII BLOCK (Search)
         search = self.request.query_params.get('search')
         if search:
             from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
@@ -181,7 +177,7 @@ class ProductsEngineViewSet(viewsets.ModelViewSet):
             ).filter(rank__gte=0.1).order_by('-rank')
         
         return queryset
-
+    
     def perform_create(self, serializer):
         try:
             # 🔥 1. Hakikisha store_id imetumwa
@@ -329,12 +325,14 @@ class AdvertisementViewSet(viewsets.ModelViewSet):
         return Advertisement.objects.filter(user=profile)
 
 class StoreEngineViewSet(viewsets.ModelViewSet):
-    queryset = StoreEngine.objects.all()
+    # 🔥 TUMIA select_related HAPA
+    queryset = StoreEngine.objects.select_related(
+        'owner__user', 'category'
+    ).all()
     serializer_class = StoreEngineSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [JWTAuthentication]
 
-    # 🔥 Filter, ordering, pagination
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['owner', 'status', 'verification_status', 'category_id', 'is_verified']
     ordering_fields = ['created_at', 'store_name']
@@ -344,20 +342,17 @@ class StoreEngineViewSet(viewsets.ModelViewSet):
         serializer.save(owner=self.request.user.profile)
 
     def get_queryset(self):
+        # Hii itarithi select_related kutoka juu
         user = self.request.user
 
-        # 🔥 1. ADMIN — anaona KILA KITU (ruhusa ya kwanza kabisa)
         if user.is_authenticated and (user.is_staff or user.is_superuser):
-            return StoreEngine.objects.all().order_by('-created_at')
+            return StoreEngine.objects.select_related('owner__user', 'category').all().order_by('-created_at')
 
-        # ─── Sehemu zako zilizokuwa zipo (HAZIBADILIKI) ───
-        # Ruhusu wageni waone maduka yote
         if self.action in ['list', 'retrieve']:
-            return StoreEngine.objects.all()
+            return StoreEngine.objects.select_related('owner__user', 'category').all()
 
-        # Kwa kuunda/kuhariri - zuia kwa mmiliki tu
         if user.is_authenticated:
-            return StoreEngine.objects.filter(owner__user=user)
+            return StoreEngine.objects.select_related('owner__user', 'category').filter(owner__user=user)
 
         return StoreEngine.objects.none()
 
@@ -801,42 +796,39 @@ class PasswordResetVerifyView(APIView):
             )
 
 
-
-       # ==========================================
-       # 5. 🔥 VIEWS ZA ORDERS NA ORDER ITEMS
-       # ==========================================
 class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all()
+    # 🔥 TUMIA select_related NA prefetch_related HAPA
+    queryset = Order.objects.select_related(
+        'customer__user', 'store'
+    ).prefetch_related(
+        'order_items__product' # Kama Order inaunganishwa na order_items
+    ).all()
+    
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
     
-    # 🔥 FILTERS & PAGINATION
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['status', 'store_id', 'customer']
     ordering_fields = ['created_at', 'grand_total', 'status', 'id']
-    ordering = ['-id']  # 🔥 Badilisha -created_at kuwa -id ili kuepuka 500 Error
+    ordering = ['-id']
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
         user = self.request.user
         
-        # 🔥 1. Admin — anaona KILA KITU
         if user.is_authenticated and (user.is_staff or user.is_superuser):
-            return Order.objects.all().order_by('-id')
+            return Order.objects.select_related('customer__user', 'store').all().order_by('-id')
         
-        # 🔥 2. Supplier — anaona oda za store yake tu
         if user.is_authenticated:
             try:
                 profile = user.profile
                 if profile.role == 'supplier':
-                    # Pata store za supplier huyu
                     stores = StoreEngine.objects.filter(owner=profile)
                     store_ids = [str(store.id) for store in stores]
-                    return Order.objects.filter(store_id__in=store_ids).order_by('-id')
+                    return Order.objects.select_related('customer__user', 'store').filter(store_id__in=store_ids).order_by('-id')
                 else:
-                    # Buyer — anaona oda zake tu
-                    return Order.objects.filter(customer=profile).order_by('-id')
+                    return Order.objects.select_related('customer__user', 'store').filter(customer=profile).order_by('-id')
             except Profile.DoesNotExist:
                 return Order.objects.none()
         
@@ -1258,14 +1250,13 @@ class NearbyProductsView(APIView):
         except ValueError:
             return Response({"error": "lat/lng sio sahihi"}, status=400)
         
-        # Pata bidhaa zote zilizoidhinishwa
+        # 1. select_related ni muhimu hapa
         products = ProductsEngine.objects.filter(
             is_approved=True,
             status='active',
             store_id__isnull=False
         ).select_related('store')[:200]
         
-        # Hesabu umbali kwa kila bidhaa
         product_list = []
         for product in products:
             store = product.store
@@ -1276,18 +1267,21 @@ class NearbyProductsView(APIView):
                 )
                 product_list.append((distance, product))
         
-        # Panga kwa umbali (karibu kwanza)
         product_list.sort(key=lambda x: x[0])
         
-        # Chukua 20 za karibu
-        nearby_products_data = []
-        for distance, product in product_list[:20]:
-            data = ProductSerializer(product).data
-            data['distance_km'] = round(distance, 2)  # 🔥 ONGEZA HII!
-            nearby_products_data.append(data)
-        
-        return Response(nearby_products_data, status=200)
+        # 2. Chukua bidhaa 20 za karibu
+        top_20 = [item[1] for item in product_list[:20]]
+        distances = [item[0] for item in product_list[:20]]
 
+        # 3. SERIALIZE MARA MOJA TU (Hapa ndio kasi inakuja)
+        serializer = ProductsEngineSerializer(top_20, many=True, context={'request': request})
+        data = serializer.data
+        
+        # 4. Ongeza distance kwenye kila bidhaa
+        for i, item in enumerate(data):
+            item['distance_km'] = round(distances[i], 2)
+        
+        return Response(data, status=200)
 class NearbyStoresView(APIView):
     def get(self, request):
         lat = request.query_params.get('lat')
@@ -1300,22 +1294,29 @@ class NearbyStoresView(APIView):
         except ValueError:
             return Response({"error": "lat/lng sio sahihi"}, status=400)
 
+        # 1. Tumia select_related
         stores = StoreEngine.objects.filter(
             verification_status='approved',
             status='active'
-        )
+        ).select_related('owner__user', 'category')
+
         store_list = []
         for store in stores:
             if store.latitude and store.longitude:
                 distance = haversine_distance(user_lat, user_lng, float(store.latitude), float(store.longitude))
                 store_list.append((distance, store))
+        
         store_list.sort(key=lambda x: x[0])
         
-        # 🔥 ONGEZA HII: Rudisha distance_km kwenye kila store!
-        nearby_stores_data = []
-        for distance, store in store_list[:10]:
-            data = StoreEngineSerializer(store).data
-            data['distance_km'] = round(distance, 2)
-            nearby_stores_data.append(data)
+        # 2. Chukua maduka 10 ya karibu
+        top_10 = [item[1] for item in store_list[:10]]
+        distances = [item[0] for item in store_list[:10]]
 
-        return Response(nearby_stores_data, status=200)
+        # 3. SERIALIZE MARA MOJA
+        serializer = StoreEngineSerializer(top_10, many=True, context={'request': request})
+        data = serializer.data
+        
+        for i, item in enumerate(data):
+            item['distance_km'] = round(distances[i], 2)
+
+        return Response(data, status=200)

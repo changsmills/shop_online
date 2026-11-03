@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+// src/components/QuickInventoryManager.jsx
+import React, { useState, memo } from 'react';
 import { PackageSearch, Settings, TrendingUp, AlertTriangle, Save } from 'lucide-react';
 import api from '../axiosConfig';
+import { useQueryClient } from '@tanstack/react-query'; // 1. Ingiza useQueryClient
 
-const QuickInventoryManager = ({ products, setProducts }) => {
+// 2. Tumia React.memo kuzuia render zisizo za lazima
+const QuickInventoryManager = memo(({ products, setProducts }) => {
   const [updatingId, setUpdatingId] = useState(null);
   const [toast, setToast] = useState({ show: false, text: '', type: '' });
   const [localChanges, setLocalChanges] = useState({});
+  const queryClient = useQueryClient();
 
   const handleInputChange = (productId, field, value) => {
     setLocalChanges(prev => ({
@@ -37,9 +41,13 @@ const QuickInventoryManager = ({ products, setProducts }) => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
+      // Sasisha state ya local
       setProducts(prev => prev.map(p =>
         p.id === productId ? { ...p, ...updates } : p
       ));
+
+      // Sasisha cache ya TanStack Query (kama PhysicalDashboard inatumia)
+      queryClient.invalidateQueries({ queryKey: ['physicalDashboard'] });
 
       const newChanges = { ...localChanges };
       delete newChanges[productId];
@@ -236,6 +244,8 @@ const QuickInventoryManager = ({ products, setProducts }) => {
       </div>
     </div>
   );
-};
+});
+
+QuickInventoryManager.displayName = 'QuickInventoryManager';
 
 export default QuickInventoryManager;

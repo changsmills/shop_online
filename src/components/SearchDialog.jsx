@@ -3,43 +3,56 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from "../axiosConfig";
+import { useQuery } from '@tanstack/react-query'; // 1. Ingiza useQuery
+
+// ==========================================
+// 2. FUNCTION YA KUCHUKUA SUGGESTIONS
+// ==========================================
+const fetchSuggestions = async ({ queryKey }) => {
+  const [_, searchQuery] = queryKey;
+  if (!searchQuery || searchQuery.trim().length < 2) return [];
+
+  const response = await api.get('/products/', {
+    params: { search: searchQuery, limit: 5 }
+  });
+  return response.data.results || response.data || [];
+};
 
 export default function SearchDialog({ isOpen, onClose, onSearch }) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [debouncedSearch, setDebouncedSearch] = useState(''); // Kwa ajili ya debounce
   const inputRef = useRef(null);
   const navigate = useNavigate();
 
+  // ==========================================
+  // 3. TUMIA useQuery
+  // ==========================================
+  const { 
+    data: suggestions = [], 
+    isLoading: loading 
+  } = useQuery({
+    queryKey: ['searchDialogSuggestions', debouncedSearch],
+    queryFn: fetchSuggestions,
+    enabled: debouncedSearch.trim().length >= 2, // Washa tu kama kuna herufi 2+
+    staleTime: 1000 * 60 * 5, // Cache kwa dakika 5
+  });
+
+  // Focus input pale modal inafunguka
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [isOpen]);
 
+  // Debounce Logic (300ms)
   useEffect(() => {
-    const fetchSuggestions = async () => {
-      if (searchQuery.trim().length < 2) {
-        setSuggestions([]);
-        return;
-      }
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
 
-      setLoading(true);
-      try {
-        const response = await api.get('/products/', {
-          params: { search: searchQuery, limit: 5 }
-        });
-        const data = response.data.results || response.data || [];
-        setSuggestions(data);
-      } catch (error) {
-        console.error("Search error:", error);
-      } finally {
-        setLoading(false);
-      }
+    return () => {
+      clearTimeout(handler);
     };
-
-    const timeoutId = setTimeout(fetchSuggestions, 300);
-    return () => clearTimeout(timeoutId);
   }, [searchQuery]);
 
   const handleSearch = (e) => {
@@ -110,8 +123,15 @@ export default function SearchDialog({ isOpen, onClose, onSearch }) {
           </button>
         </form>
 
+        {/* ===== LOADING ===== */}
+        {loading && (
+          <div className="py-10 px-5 text-center text-gray-400">
+            <p className="m-0 text-sm sm:text-[15px]">Inatafuta...</p>
+          </div>
+        )}
+
         {/* ===== SUGGESTIONS ===== */}
-        {suggestions.length > 0 && (
+        {!loading && suggestions.length > 0 && (
           <div className="flex-1 overflow-y-auto py-2">
             <div className="px-4 sm:px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">
               Results

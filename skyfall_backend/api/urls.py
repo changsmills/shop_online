@@ -1,4 +1,5 @@
 from django.urls import path, include
+from debug_toolbar.toolbar import debug_toolbar_urls 
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.views.decorators.csrf import csrf_exempt  # 🔥 ONGEZA HII JUU!
@@ -76,3 +77,7 @@ urlpatterns = [
 from django.conf import settings
 from django.conf.urls.static import static
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# 🔥 ONGEZA HII MWISHONI
+if settings.DEBUG:
+    urlpatterns += debug_toolbar_urls()

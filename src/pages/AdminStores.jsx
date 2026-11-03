@@ -1,57 +1,60 @@
 // src/pages/AdminStores.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../axiosConfig';
 import { toast, Toaster } from 'react-hot-toast';
 import { CheckCircle, XCircle, LogOut, Store, Package, ShoppingCart, ShieldCheck, Clock } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query'; // 1. Ingiza hooks
+
+// ==========================================
+// 2. FUNCTION YA KUCHUKUA MADUKA
+// ==========================================
+const fetchAdminStores = async ({ queryKey }) => {
+  const [_, status] = queryKey;
+  const response = await api.get('/admin/stores/', {
+    params: { verification_status: status }
+  });
+  return response.data.results || response.data || [];
+};
 
 export default function AdminStores() {
-  const [stores, setStores] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   
   // 🔥 TUMEONGEZA STATE YA TAB (Pending vs Approved)
   const [activeTab, setActiveTab] = useState('pending'); 
-  
-  const navigate = useNavigate();
 
-  const fetchStores = async (status) => {
-    setLoading(true);
-    try {
-      const response = await api.get('/admin/stores/', {
-        params: { verification_status: status } // Tuma 'pending' au 'approved'
-      });
-      setStores(response.data.results || response.data || []);
-    } catch (err) {
-      console.error("Error fetching stores:", err.response?.data || err.message);
-      toast.error("Imeshindwa kuvuta data. Hakikisha wewe ni Admin.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 🔥 Kila tab inabadilika, vuta data mpya
-  useEffect(() => {
-    fetchStores(activeTab);
-  }, [activeTab]);
+  // ==========================================
+  // 3. TUMIA useQuery
+  // ==========================================
+  const { 
+    data: stores = [], 
+    isLoading: loading 
+  } = useQuery({
+    queryKey: ['adminStores', activeTab],
+    queryFn: fetchAdminStores,
+    staleTime: 1000 * 60 * 2, // Cache kwa dakika 2 tu (kwa sababu Admin anahitaji data mpya mara kwa mara)
+  });
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    queryClient.clear(); // Futa cache yote
     toast.success("Umetoka kwenye mfumo kikamilifu.");
     setTimeout(() => navigate('/dashboard/login'), 1000);
   };
 
-const handleApprove = async (storeId) => {
+  const handleApprove = async (storeId) => {
     if (!window.confirm("Je, unathibitisha kupitisha duka hili?")) return;
     try {
-      // 🔥 ONGEZA is_verified: true hapa
       await api.patch(`/admin/stores/${storeId}/`, { 
         verification_status: 'approved', 
         status: 'active',
-        is_verified: true // <--- Hii ndio inakosekana
+        is_verified: true
       });
       toast.success("Duka limepitishwa!");
-      fetchStores(activeTab); // Refresh data
+      // Sasisha orodha ya maduka
+      queryClient.invalidateQueries({ queryKey: ['adminStores'] });
     } catch (err) {
       toast.error("Imeshindwa: " + (err.response?.data?.detail || err.message));
     }
@@ -62,7 +65,8 @@ const handleApprove = async (storeId) => {
     try {
       await api.patch(`/admin/stores/${storeId}/`, { verification_status: 'rejected', status: 'inactive' });
       toast.success("Duka limekataliwa.");
-      fetchStores(activeTab);
+      // Sasisha orodha ya maduka
+      queryClient.invalidateQueries({ queryKey: ['adminStores'] });
     } catch (err) {
       toast.error("Imeshindwa: " + (err.response?.data?.detail || err.message));
     }

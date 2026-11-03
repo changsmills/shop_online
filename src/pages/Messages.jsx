@@ -1,3 +1,4 @@
+// src/pages/Messages.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
@@ -7,22 +8,72 @@ import {
   Plus, Megaphone, Loader2, Image as ImageIcon 
 } from 'lucide-react';
 
-import api from "../axiosConfig"; 
-
+import api from "../axiosConfig";
 import UserTools from '../components/UserTools';
-//import '../Messages.css';
-//import '../AccountSettings.css';
 import messageImage from "../images/messageSent.svg"; 
+import { useQuery, useQueryClient } from '@tanstack/react-query'; // 1. Ingiza hooks
+
+// ==========================================
+// 2. FUNCTIONS ZA KUCHUKUA DATA
+// ==========================================
+const fetchProfile = async () => {
+  const res = await api.get('/profile/');
+  return res.data;
+};
+
+const fetchInbox = async ({ queryKey }) => {
+  const [_, userId] = queryKey;
+  if (!userId) return [];
+
+  const res = await api.get('/messages/', {
+    params: { user_id: userId, ordering: '-created_at' }
+  });
+
+  const data = res.data.results || res.data || [];
+  const chatGroups = {};
+
+  data.forEach(msg => {
+    const isISender = msg.sender_id === userId;
+    const partnerId = isISender ? msg.receiver_id : msg.sender_id;
+    const partnerName = isISender ? msg.receiver_name : msg.sender_name;
+    const partnerAvatar = isISender ? (msg.receiver_avatar || null) : (msg.sender_avatar || null);
+    const displayName = partnerName || `User ${partnerId.slice(0,4)}`;
+
+    if (partnerId && !chatGroups[partnerId]) {
+      chatGroups[partnerId] = {
+        id: partnerId,
+        name: displayName,
+        avatar: partnerAvatar || null,
+        lastMsg: msg.content,
+        date: new Date(msg.created_at).toLocaleDateString(),
+        timestamp: new Date(msg.created_at).getTime()
+      };
+    }
+  });
+
+  return Object.values(chatGroups).sort((a,b) => b.timestamp - a.timestamp);
+};
+
+const fetchMessages = async ({ queryKey }) => {
+  const [_, userId, partnerId] = queryKey;
+  if (!userId || !partnerId) return [];
+
+  const res = await api.get('/messages/', {
+    params: { user_id: userId, receiver: partnerId }
+  });
+  return res.data.results || res.data || [];
+};
+
 
 const Messages = () => {
-
   const navigate = useNavigate();
   const location = useLocation();
   const messagesEndRef = useRef(null);
+  const queryClient = useQueryClient();
+
+  // ========== STATE ZA UI ==========
   const [isExpanded, setIsExpanded] = useState(false);
-  const [chats, setChats] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
-  const [messages, setMessages] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [newMessage, setNewMessage] = useState("");
   const [isMobile, setIsMobile] = useState(false);
@@ -34,28 +85,56 @@ const Messages = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
 
-  const [currentUserId, setCurrentUserId] = useState(null);
-  const [userRole, setUserRole] = useState('customer');
+  // ==========================================
+  // 3. QUERIES
+  // ==========================================
+  
+  // Query ya Profile
+  const { data: profileData, isLoading: loadingProfile, error: profileError } = useQuery({
+    queryKey: ['messagesProfile'],
+    queryFn: fetchProfile,
+    staleTime: Infinity,
+  });
 
+  const currentUserId = profileData?.id;
+  const userRole = profileData?.role || 'customer';
+
+  // Kama hana token, mpeleke login
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const token = localStorage.getItem("access_token");
-        if (!token) {
-          navigate('/dashboard/login');
-          return;
-        }
-        const res = await api.get('/profile/');
-        setCurrentUserId(res.data.id);
-        setUserRole(res.data.role || 'customer');
-      } catch (err) {
-        console.error("Failed to get profile ID:", err);
-        navigate('/dashboard/login');
-      }
-    };
-    fetchProfile();
-  }, [navigate]);
+    if (profileError) {
+      navigate('/dashboard/login');
+    }
+  }, [profileError, navigate]);
 
+  // Query ya Inbox (Inafetch kila baada ya sekunde 5 kama ulivyokuwa unafanya)
+  const { data: chats = [], isLoading: loadingChats } = useQuery({
+    queryKey: ['messagesInbox', currentUserId],
+    queryFn: fetchInbox,
+    enabled: !!currentUserId,
+    staleTime: 1000 * 10, // Cache kwa sekunde 10
+    refetchInterval: 10000, // Refetch kila baada ya sekunde 10
+  });
+
+  // Query ya Messages za Chat Iliyochaguliwa
+  const { data: messages = [], isLoading: loadingMessages } = useQuery({
+    queryKey: ['messagesChat', currentUserId, activeChat?.id],
+    queryFn: fetchMessages,
+    enabled: !!currentUserId && !!activeChat?.id,
+    staleTime: 1000 * 5,
+    refetchInterval: 5000, // Refetch kila baada ya sekunde 5 (Polling)
+  });
+
+  // Loading jumla
+  useEffect(() => {
+    if (!loadingProfile && !loadingChats) {
+      setLoading(false);
+    }
+  }, [loadingProfile, loadingChats]);
+
+  // ==========================================
+  // 4. EFFECTS
+  // ==========================================
+  
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
@@ -63,6 +142,19 @@ const Messages = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  useEffect(() => {
+    if (!isMobile) setShowMobileChat(false);
+  }, [isMobile]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  // Start new chat from location state
   useEffect(() => {
     const startNewChat = async () => {
       if (location.state?.sellerId && currentUserId) {
@@ -93,80 +185,28 @@ const Messages = () => {
     }
   }, [location.state, chats, isMobile, currentUserId]);
 
+  // Save last active chat to localStorage
   useEffect(() => {
-    if (!isMobile) {
-      setShowMobileChat(false);
+    if (activeChat?.id) {
+      localStorage.setItem('lastActiveChatId', activeChat.id);
     }
-  }, [isMobile]);
+  }, [activeChat]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
+  // Load last active chat
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const fetchMessages = async (partnerId) => {
-    if (!partnerId || !currentUserId) return;
-    try {
-      const res = await api.get('/messages/', {
-        params: {
-          user_id: currentUserId,
-          receiver: partnerId
-        }
-      });
-      setMessages(res.data.results || res.data || []);
-    } catch (err) {
-      console.error("Error fetching messages:", err.response?.data || err.message);
-      setMessages([]);
-    }
-  };
-
-  const fetchInbox = async () => {
-    if (!currentUserId) return;
-    setLoading(true);
-
-    try {
-      const res = await api.get('/messages/', {
-        params: {
-          user_id: currentUserId,
-          ordering: '-created_at'
-        }
-      });
-
-      const data = res.data.results || res.data || [];
-
-      if (data) {
-        const chatGroups = {};
-        data.forEach(msg => {
-          const isISender = msg.sender_id === currentUserId;
-          const partnerId = isISender ? msg.receiver_id : msg.sender_id;
-          const partnerName = isISender ? msg.receiver_name : msg.sender_name;
-          const partnerAvatar = isISender ? (msg.receiver_avatar || null) : (msg.sender_avatar || null);
-          const displayName = partnerName || `User ${partnerId.slice(0,4)}`;
-
-          if (partnerId && !chatGroups[partnerId]) {
-            chatGroups[partnerId] = {
-              id: partnerId,
-              name: displayName,
-              avatar: partnerAvatar || null,
-              lastMsg: msg.content,
-              date: new Date(msg.created_at).toLocaleDateString(),
-              timestamp: new Date(msg.created_at).getTime()
-            };
-          }
-        });
-
-        setChats(Object.values(chatGroups).sort((a,b) => b.timestamp - a.timestamp));
+    const lastChatId = localStorage.getItem('lastActiveChatId');
+    if (lastChatId && chats.length > 0 && !activeChat) {
+      const lastChat = chats.find(c => c.id === lastChatId);
+      if (lastChat) {
+        handleChatSelect(lastChat);
       }
-    } catch (err) {
-      console.error("Network error while fetching inbox:", err);
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [chats, activeChat]);
 
+  // ==========================================
+  // 5. HANDLERS
+  // ==========================================
+  
   const handleSearchStores = async (query) => {
     setSearchQuery(query);
     if (query.trim().length < 2) {
@@ -200,7 +240,6 @@ const Messages = () => {
         lastMsg: "Anza mazungumzo mapya...",
         date: "New"
       };
-      setMessages([]); 
       setActiveChat(newChatPartner);
       if (isMobile) setShowMobileChat(true);
     }
@@ -223,98 +262,62 @@ const Messages = () => {
       formData.append('image', selectedImage);
     }
 
+    // Optimistic Update (Tunaweka ujumbe kwenye cache ya TanStack Query)
+    const tempId = `temp-${Date.now()}`;
     const tempMsg = {
-      id: Date.now(),
+      id: tempId,
       sender_id: currentUserId,
       receiver_id: activeChat.id,
       content: newMessage.trim(),
-      image_url: imagePreview,
+      image: imagePreview,
       created_at: new Date().toISOString(),
       isPending: true
     };
 
-    setMessages(prev => [...prev, tempMsg]);
+    // Sasisha cache ya messages
+    queryClient.setQueryData(['messagesChat', currentUserId, activeChat.id], (oldData) => {
+      return [...(oldData || []), tempMsg];
+    });
+
     const originalMessage = newMessage;
     setNewMessage("");
-    
     setSelectedImage(null);
     setImagePreview(null);
-    
     scrollToBottom();
 
     try {
       await api.post('/messages/', formData);
-
-      setMessages(prev => [...prev, {
-        ...tempMsg,
-        isPending: false
-      }]);
+      
+      // Baada ya kufanikiwa, sasisha inbox na chat
+      queryClient.invalidateQueries({ queryKey: ['messagesChat', currentUserId, activeChat.id] });
+      queryClient.invalidateQueries({ queryKey: ['messagesInbox', currentUserId] });
     } catch (error) {
       console.error("Error sending:", error);
-      console.error("Error response:", error.response?.data);
-      setMessages(prev => prev.filter(msg => msg.id !== tempMsg.id));
+      // Rudisha ujumbe kama umeshindwa
       setNewMessage(originalMessage);
       setSelectedImage(selectedImage);
       setImagePreview(imagePreview);
+      queryClient.invalidateQueries({ queryKey: ['messagesChat', currentUserId, activeChat.id] });
     }
   };
 
-  const handleChatSelect = async (chat) => {
+  const handleChatSelect = (chat) => {
     setActiveChat(chat);
-    await fetchMessages(chat.id);
-    scrollToBottom();
-    if (isMobile) {
-      setShowMobileChat(true);
-    }
+    if (isMobile) setShowMobileChat(true);
   };
 
   const handleBackNavigation = () => {
     if (isMobile && showMobileChat) {
       setShowMobileChat(false);
       setActiveChat(null);
-      setMessages([]);
     } else {
       navigate('/dashboard');
     }
   };
 
-  useEffect(() => {
-    let intervalId;
-    if (activeChat && currentUserId) {
-      intervalId = setInterval(() => {
-        fetchMessages(activeChat.id);
-      }, 5000);
-    }
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [activeChat?.id, currentUserId]);
-
-  useEffect(() => {
-    if (currentUserId) {
-      fetchInbox();
-    }
-  }, [currentUserId]);
-
-  useEffect(() => {
-    if (activeChat?.id) {
-      localStorage.setItem('lastActiveChatId', activeChat.id);
-    }
-  }, [activeChat]);
-
-  useEffect(() => {
-    const lastChatId = localStorage.getItem('lastActiveChatId');
-    if (lastChatId && chats.length > 0 && !activeChat) {
-      const lastChat = chats.find(c => c.id === lastChatId);
-      if (lastChat) {
-        handleChatSelect(lastChat);
-      }
-    }
-  }, [chats, activeChat]);
-
   const getSenderName = (msg) => {
     if (msg.sender_id === currentUserId) return "Me";
-    return msg.sender?.full_name || "User";
+    return msg.sender_name || msg.sender?.full_name || "User";
   };
 
   const isSupplier = userRole === 'supplier';
@@ -332,9 +335,19 @@ const Messages = () => {
     { icon: <Settings size={20} />, path: '/dashboard/settings', label: 'Settings' },
   ];
 
-  const handleSearchNavigation = () => {
-    setShowSearchModal(true);
-  };
+  // ==========================================
+  // 6. RENDER
+  // ==========================================
+  
+  if (loading) {
+    return (
+      <div className="flex h-screen w-full bg-white dark:bg-[#1e293b]">
+        <div className="w-full flex items-center justify-center">
+          <Loader2 className="animate-spin text-orange-500" size={48} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-screen w-full bg-white dark:bg-[#1e293b] text-black dark:text-white font-sans overflow-hidden">
@@ -425,7 +438,7 @@ const Messages = () => {
             </div>
 
             <div className="flex-1 overflow-y-auto">
-              {loading ? (
+              {loadingChats ? (
                 <div className="p-2.5">
                   {[1, 2, 3, 4, 5].map((item) => (
                     <div key={item} className="flex items-center gap-3 p-4 border-b border-[#f5f5f5] dark:border-[#334155] animate-pulse">
@@ -498,7 +511,9 @@ const Messages = () => {
                 </div>
 
                 <div className={`flex-1 overflow-y-auto p-4 md:p-5 bg-[#f5f5f7] dark:bg-[#0f172a] flex flex-col gap-3 ${isMobile ? 'mb-[60px]' : 'pb-[60px] mb-5'}`}>
-                  {messages.length === 0 ? (
+                  {loadingMessages ? (
+                     <div className="flex justify-center items-center h-full text-gray-400">Inapakia ujumbe...</div>
+                  ) : messages.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-gray-400 text-sm text-center p-5">
                       <p className="m-0">Hakuna ujumbe bado.</p>
                       <p className="mt-1 text-xs text-gray-300 dark:text-gray-600">Andika ujumbe ili kuanza mazungumzo na muuzaji!</p>

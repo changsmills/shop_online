@@ -1,11 +1,24 @@
+// src/components/StoreManagement.jsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { Settings, CheckCircle, X, Plus, Phone, Instagram, Truck, Edit2, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
-import api from "../axiosConfig"; // 🔥 Tumia api
-//import '../StoreManagement.css';
+import api from "../axiosConfig";
+import { useQuery, useQueryClient } from '@tanstack/react-query'; // 1. Ingiza hooks
 
-// 🔥 FUTE HII LINE (haifai tena kwa Cloudinary):
-// const BACKEND_BASE_URL = "https://shop-online-r9z4.onrender.com";
+// ==========================================
+// 2. FUNCTION YA KUCHUKUA SHIPPING METHODS
+// ==========================================
+const fetchShippingMethods = async ({ queryKey }) => {
+  const [_, storeUuid] = queryKey;
+  if (!storeUuid) return [];
+
+  const token = localStorage.getItem("access_token");
+  const response = await api.get('/shipping-methods/', {
+    params: { store_id: storeUuid },
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data || [];
+};
 
 const StoreManagement = ({
   isManageMode,
@@ -28,6 +41,7 @@ const StoreManagement = ({
 }) => {
   const { id: paramId } = useParams();
   const [storeUuid, setStoreUuid] = useState(null);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const resolveStoreId = async () => {
@@ -38,7 +52,6 @@ const StoreManagement = ({
         setStoreUuid(paramId);
       } else {
         try {
-          // 🔥 MABADILIKO: api.get
           const response = await api.get('/stores/', {
             params: { store_index: parseInt(paramId) },
             headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
@@ -50,41 +63,45 @@ const StoreManagement = ({
     resolveStoreId();
   }, [storeId, paramId]);
 
-  const [shippingMethods, setShippingMethods] = useState([]);
+  // ==========================================
+  // 3. TUMIA useQuery KWA SHIPPING METHODS
+  // ==========================================
+  const { 
+    data: shippingMethods = [], 
+    isLoading: loadingShipping 
+  } = useQuery({
+    queryKey: ['shippingMethods', storeUuid],
+    queryFn: fetchShippingMethods,
+    enabled: !!storeUuid,
+    staleTime: 1000 * 60 * 5, // Cache kwa dakika 5
+  });
+
   const [editingShippingId, setEditingShippingId] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newShipping, setNewShipping] = useState({
     label: '', description: '', price_local: '', price_national: '', is_active: true
   });
+  
+  // Kwa kuwa shippingMethods zinabadilika kwenye form (inline editing), tunahitaji state ya local
+  const [localShippingMethods, setLocalShippingMethods] = useState([]);
 
   useEffect(() => {
-    if (!storeUuid) return;
-    const fetchShippingMethods = async () => {
-      try {
-        const token = localStorage.getItem("access_token");
-        // 🔥 MABADILIKO: api.get
-        const response = await api.get('/shipping-methods/', {
-          params: { store_id: storeUuid },
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setShippingMethods(response.data || []);
-      } catch (error) { console.error('Error fetching shipping methods:', error); }
-    };
-    fetchShippingMethods();
-  }, [storeUuid]);
+    if (shippingMethods) {
+      setLocalShippingMethods(shippingMethods);
+    }
+  }, [shippingMethods]);
 
   const handleAddShipping = async () => {
     if (!storeUuid) return alert("Store ID is missing.");
     if (!newShipping.label.trim()) return alert('Please fill in the shipping method name');
     try {
       const token = localStorage.getItem("access_token");
-      // 🔥 MABADILIKO: api.post
-      const response = await api.post('/shipping-methods/', {
+      await api.post('/shipping-methods/', {
           store_id: storeUuid, label: newShipping.label, description: newShipping.description || null,
           price_local: parseFloat(newShipping.price_local) || 0, price_national: parseFloat(newShipping.price_national) || 0, is_active: true
         }, { headers: { Authorization: `Bearer ${token}` } }
       );
-      setShippingMethods([...shippingMethods, response.data]);
+      queryClient.invalidateQueries({ queryKey: ['shippingMethods', storeUuid] });
       setNewShipping({ label: '', description: '', price_local: '', price_national: '', is_active: true });
       setShowAddForm(false);
       } catch (error) { alert('Failed to add: ' + (error.response?.data?.detail || error.message)); }
@@ -93,9 +110,8 @@ const StoreManagement = ({
   const handleUpdateShipping = async (id, updatedFields) => {
     try {
       const token = localStorage.getItem("access_token");
-      // 🔥 MABADILIKO: api.patch
       await api.patch(`/shipping-methods/${id}/`, updatedFields, { headers: { Authorization: `Bearer ${token}` } });
-      setShippingMethods(shippingMethods.map(m => m.id === id ? { ...m, ...updatedFields } : m));
+      queryClient.invalidateQueries({ queryKey: ['shippingMethods', storeUuid] });
       setEditingShippingId(null);
       } catch (error) { alert('Failed to update: ' + (error.response?.data?.detail || error.message)); }
   };
@@ -104,9 +120,8 @@ const StoreManagement = ({
     if (!window.confirm('Are you sure you want to delete this shipping method?')) return;
     try {
       const token = localStorage.getItem("access_token");
-      // 🔥 MABADILIKO: api.delete
       await api.delete(`/shipping-methods/${id}/`, { headers: { Authorization: `Bearer ${token}` } });
-      setShippingMethods(shippingMethods.filter(m => m.id !== id));
+      queryClient.invalidateQueries({ queryKey: ['shippingMethods', storeUuid] });
         } catch (error) { alert('Failed to delete: ' + (error.response?.data?.detail || error.message)); }
   };
 
@@ -132,14 +147,12 @@ const StoreManagement = ({
     return myStoreSubCats.filter(subCat => storeSubIds.includes(subCat.id));
   }, [myStoreSubCats, storeMeta]);
 
-  // 🔥 BADILISHA HAPA: Rudisha URL tu (imekuwa Cloudinary URL tayari)
   const getFullImageUrl = (url) => {
     if (!url) return null;
-    // Kama url tayari ni Cloudinary URL, irudishe tu
     return url;
   };
 
- return (
+  return (
     <section className="mt-6">
       <div className="bg-white dark:bg-slate-800 rounded-[20px] p-4 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_25px_-5px_rgba(0,0,0,0.4)] border border-gray-100 dark:border-slate-700">
 
@@ -228,7 +241,11 @@ const StoreManagement = ({
           </div>
 
           <div className="grid grid-cols-1 gap-4 mb-4">
-            {shippingMethods.length === 0 ? (
+            {loadingShipping ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+              </div>
+            ) : localShippingMethods.length === 0 ? (
               <div className="text-center py-8 bg-gray-50 dark:bg-slate-900 rounded-xl border border-dashed border-gray-200 dark:border-slate-700">
                 <Truck size={32} className="mx-auto mb-2 text-gray-300 dark:text-slate-600" />
                 <p className="text-gray-400 dark:text-slate-400 text-sm m-0 mb-2">
@@ -242,7 +259,7 @@ const StoreManagement = ({
                 </button>
               </div>
             ) : (
-              shippingMethods.map((method) => (
+              localShippingMethods.map((method) => (
                 <div
                   key={method.id}
                   className="bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-700"
@@ -255,7 +272,7 @@ const StoreManagement = ({
                         value={method.label}
                         onChange={(e) => {
                           const updated = { ...method, label: e.target.value };
-                          setShippingMethods(shippingMethods.map(m => m.id === method.id ? updated : m));
+                          setLocalShippingMethods(localShippingMethods.map(m => m.id === method.id ? updated : m));
                         }}
                       />
                       <textarea
@@ -265,7 +282,7 @@ const StoreManagement = ({
                         value={method.description || ''}
                         onChange={(e) => {
                           const updated = { ...method, description: e.target.value };
-                          setShippingMethods(shippingMethods.map(m => m.id === method.id ? updated : m));
+                          setLocalShippingMethods(localShippingMethods.map(m => m.id === method.id ? updated : m));
                         }}
                       />
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -276,7 +293,7 @@ const StoreManagement = ({
                           value={method.price_local}
                           onChange={(e) => {
                             const updated = { ...method, price_local: e.target.value };
-                            setShippingMethods(shippingMethods.map(m => m.id === method.id ? updated : m));
+                            setLocalShippingMethods(localShippingMethods.map(m => m.id === method.id ? updated : m));
                           }}
                         />
                         <input
@@ -286,7 +303,7 @@ const StoreManagement = ({
                           value={method.price_national}
                           onChange={(e) => {
                             const updated = { ...method, price_national: e.target.value };
-                            setShippingMethods(shippingMethods.map(m => m.id === method.id ? updated : m));
+                            setLocalShippingMethods(localShippingMethods.map(m => m.id === method.id ? updated : m));
                           }}
                         />
                       </div>

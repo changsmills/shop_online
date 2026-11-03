@@ -3,92 +3,114 @@ import api from "../axiosConfig";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { Search } from "lucide-react";
+import { useQuery } from '@tanstack/react-query'; // 1. Ingiza useQuery
 
+// ==========================================
+// 2. FUNCTIONS ZA KUCHUKUA DATA
+// ==========================================
+const fetchPlaceholders = async () => {
+  const response = await api.get('/leaf-categories/', { params: { limit: 15 } });
+  const data = response.data.results || response.data || [];
+  if (Array.isArray(data) && data.length > 0) {
+    return data.map(item => item.name);
+  }
+  return ["Search"]; // Fallback
+};
+
+const fetchSuggestions = async ({ queryKey }) => {
+  const [_, query] = queryKey;
+  if (!query || query.trim().length < 2) return [];
+
+  const [catRes, prodRes] = await Promise.allSettled([
+    api.get('/leaf-categories/', { params: { search: query, limit: 4 } }),
+    api.get('/products/', { params: { search: query, limit: 4 } })
+  ]);
+
+  const categories = catRes.status === 'fulfilled' ? (catRes.value.data.results || catRes.value.data || []) : [];
+  const products = prodRes.status === 'fulfilled' ? (prodRes.value.data.results || prodRes.value.data || []) : [];
+
+  return [
+    ...products.map(item => ({ ...item, type: 'product' })),
+    ...categories.map(item => ({ ...item, type: 'category' }))
+  ];
+};
+
+// ==========================================
+// 3. COMPONENT
+// ==========================================
 export default function SearchBar({ search = "", setSearch }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   
-  const [placeholders, setPlaceholders] = useState(["Search"])
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
-  const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  
+  // Debounce state kwa ajili ya utafutaji
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
 
-  // Pakia placeholders kutoka Backend
-  useEffect(() => {
-    const fetchLeafCategoryNames = async () => {
-      try {
-        const response = await api.get('/leaf-categories/', { params: { limit: 15 } });
-        const data = response.data.results || response.data || [];
-        if (Array.isArray(data)) {
-          const names = data.map(item => item.name);
-          if (names.length > 0) setPlaceholders(names);
-        }
-      } catch (err) {
-        console.error("❌ Error fetching placeholders:", err);
-      }
-    };
-    fetchLeafCategoryNames();
-  }, []);
+  // ==========================================
+  // 4. QUERIES
+  // ==========================================
+  
+  // Query ya Placeholders (Inafetch mara moja tu)
+  const { data: placeholders = ["Search"] } = useQuery({
+    queryKey: ['searchPlaceholders'],
+    queryFn: fetchPlaceholders,
+    staleTime: Infinity, // Hazibadiliki, hivyo zinabaki kwenye cache milele
+  });
 
-  // Badilisha placeholder kwa animation ya kudondoka
+  // Query ya Suggestions (Inategemea na debouncedSearch)
+  const { data: suggestions = [] } = useQuery({
+    queryKey: ['searchSuggestions', debouncedSearch],
+    queryFn: fetchSuggestions,
+    enabled: debouncedSearch.trim().length >= 2, // Washa tu kama kuna herufi 2+
+    staleTime: 1000 * 60 * 5, // Cache kwa dakika 5 (kama mtu akirudia neno lile lile)
+  });
+
+  // ==========================================
+  // 5. EFFECTS
+  // ==========================================
+
+  // Animation ya Placeholders
   useEffect(() => {
     if (placeholders.length <= 1) return;
     
     const timer = setInterval(() => {
-      setIsAnimating(true); // Anzisha animation ya kutoka
-      
+      setIsAnimating(true); 
       setTimeout(() => {
         setPlaceholderIndex((prev) => (prev === placeholders.length - 1 ? 0 : prev + 1));
-        setIsAnimating(false); // Maliza animation (inaingia)
-      }, 300); // Saa 300ms (muda wa kudondoka)
-      
+        setIsAnimating(false); 
+      }, 300); 
     }, 3000);
     
     return () => clearInterval(timer);
   }, [placeholders]);
 
-  // Tafuta suggestions
+  // Debounce Logic kwa ajili ya Search (300ms)
   useEffect(() => {
-    const getCombinedSuggestions = async () => {
-      if (!search || typeof search !== "string" || search.trim().length < 2) {
-        setSuggestions([]);
-        setShowSuggestions(false);
-        return;
-      }
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
 
-      const query = search.trim();
-      try {
-        const [catRes, prodRes] = await Promise.allSettled([
-          api.get('/leaf-categories/', { params: { search: query, limit: 4 } }),
-          api.get('/products/', { params: { search: query, limit: 4 } })
-        ]);
-
-        const categories = catRes.status === 'fulfilled' ? (catRes.value.data.results || catRes.value.data || []) : [];
-        const products = prodRes.status === 'fulfilled' ? (prodRes.value.data.results || prodRes.value.data || []) : [];
-
-        const combined = [
-          ...products.map(item => ({ ...item, type: 'product' })),
-          ...categories.map(item => ({ ...item, type: 'category' }))
-        ];
-
-        if (combined.length > 0) {
-          setSuggestions(combined);
-          setShowSuggestions(true);
-        } else {
-          setSuggestions([]);
-          setShowSuggestions(false);
-        }
-      } catch (err) {
-        console.error("❌ Search Error:", err);
-      }
+    return () => {
+      clearTimeout(handler);
     };
-
-    const timeoutId = setTimeout(getCombinedSuggestions, 300);
-    return () => clearTimeout(timeoutId);
   }, [search]);
 
+  // Onyesha suggestions pale data inapokuja
+  useEffect(() => {
+    if (debouncedSearch.trim().length >= 2 && suggestions.length > 0) {
+      setShowSuggestions(true);
+    } else {
+      setShowSuggestions(false);
+    }
+  }, [suggestions, debouncedSearch]);
+
+  // ==========================================
+  // 6. HANDLERS
+  // ==========================================
   const handleInputChange = (e) => {
     const val = e.target.value;
     if (typeof setSearch === "function") setSearch(val);
@@ -109,6 +131,9 @@ export default function SearchBar({ search = "", setSearch }) {
     if (search.trim()) navigateToSearchResults(search);
   };
 
+  // ==========================================
+  // 7. RENDER (UI)
+  // ==========================================
   return (
     <div className="relative w-full max-w-[800px] mx-auto flex-1 px-2 md:px-4 z-[1000] font-sans">
       
@@ -121,7 +146,7 @@ export default function SearchBar({ search = "", setSearch }) {
         }`}
       >
         
-        {/* 🔥 PLACEHOLDER YA ANIMATION (Inaonekana tu kama hakuna maandishi) */}
+        {/* 🔥 PLACEHOLDER YA ANIMATION */}
         {!search && (
           <div className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 pointer-events-none flex items-center overflow-hidden h-[24px]">
             <span 
@@ -132,7 +157,7 @@ export default function SearchBar({ search = "", setSearch }) {
                   : 'translate-y-0 opacity-100 animate-[slideDown_0.3s_ease-out]'
               }`}
             >
-              {placeholders[placeholderIndex]}
+              {placeholders[placeholderIndex] || "Search"}
             </span>
           </div>
         )}

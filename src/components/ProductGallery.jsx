@@ -1,9 +1,10 @@
 // src/components/ProductGallery.jsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Maximize2, X, ChevronLeft, ChevronRight, Play, Pause, Volume2, VolumeX, Maximize } from 'lucide-react';
 
-const ProductGallery = ({ product }) => {
+// 1. Tunatumia React.memo ili isirender upya kama 'product' haijabadilika
+const ProductGallery = React.memo(({ product }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [bgPos, setBgPos] = useState('0% 0%');
   const [isZooming, setIsZooming] = useState(false);
@@ -18,8 +19,8 @@ const ProductGallery = ({ product }) => {
   const [photoIndex, setPhotoIndex] = useState(0);
   const videoRef = useRef(null);
   
- // ========== PREPARE MEDIA LIST ==========
-  const mediaList = React.useMemo(() => {
+  // ========== PREPARE MEDIA LIST (Tumia useMemo) ==========
+  const mediaList = useMemo(() => {
     if (!product?.media_list) return [];
     return [...product.media_list]
       .filter(item => item?.url)
@@ -117,6 +118,7 @@ const ProductGallery = ({ product }) => {
     } else {
       document.body.style.overflow = 'unset';
     }
+    return () => { document.body.style.overflow = 'unset'; }; // Clean up
   }, [isModalOpen]);
 
   // ========== MOUSE ZOOM HANDLERS ==========
@@ -327,6 +329,9 @@ const ProductGallery = ({ product }) => {
       )}
     </>
   );
-};
+});
+
+// Hii ni muhimu ili React.memo ifanye kazi vizuri
+ProductGallery.displayName = 'ProductGallery';
 
 export default ProductGallery;
