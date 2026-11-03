@@ -83,11 +83,14 @@ INSTALLED_APPS = [
     'products',
     'orders',
   'django.contrib.postgres',  # 🔥 ONGEZA HII!
-  "debug_toolbar",
+ # "debug_toolbar",
 
 
 
 ]
+
+if DEBUG:
+    INSTALLED_APPS += ["debug_toolbar"]
 
 
 SITE_ID = 1
@@ -112,7 +115,7 @@ AUTH_USER_MODEL = 'users.User'  # Sio 'products.Profile'!
 
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware', 
+   # 'debug_toolbar.middleware.DebugToolbarMiddleware', 
     'corsheaders.middleware.CorsMiddleware',
     'skyfall_backend.middleware.RemoveServerHeaderMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware', # 🔥 ONGEZA HII! (Inapaswa kuwa chini ya SecurityMiddleware)
