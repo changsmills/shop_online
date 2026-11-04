@@ -269,7 +269,7 @@ export default function ProductList({
   // 🔥 MAIN RENDER
   return (
     <div className="w-full">
-      <div className={`grid gap-4 w-full ${isMobile ? 'grid-cols-2 px-0' : 'grid-cols-6 px-4'}`}>
+      <div className={`grid gap-4 w-full ${isMobile ? 'grid-cols-2 px-4' : 'grid-cols-6 px-4'}`}>
         {filteredProducts.map((product) => (
           <ProductCard 
             key={product.id} 

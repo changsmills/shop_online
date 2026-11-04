@@ -39,11 +39,15 @@ export default function ProductCard({ product, isMobile = false, isPriority = fa
     finalImage = cover_image || image || "/images/placeholder.png";
   }
   
-  // Dynamic name length
+   // Dynamic name length
   const maxNameLength = isMobile ? 30 : 60;
-  const displayName = name?.length > maxNameLength 
-    ? name.substring(0, maxNameLength - 3) + '...' 
-    : name;
+  
+  // 🔥 HAPA: Tumeongeza .charAt(0).toUpperCase() + name.slice(1) ili neno la kwanza liwe Capital
+  const capitalizedName = name ? name.charAt(0).toUpperCase() + name.slice(1) : "Bidhaa";
+  
+  const displayName = capitalizedName?.length > maxNameLength 
+    ? capitalizedName.substring(0, maxNameLength - 3) + '...' 
+    : capitalizedName;
 
   const numericPrice = parseFloat(price) || 0;
   const numericOriginal = parseFloat(original_price) || 0;

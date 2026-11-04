@@ -179,9 +179,9 @@ export default function StorePage() {
       
       <div className="max-w-[1200px] mx-auto px-1 mt-4 md:mt-4">
         
-        {/* Store Header / Banner */}
+       {/* Store Header / Banner */}
         <div 
-          className="relative rounded-2xl p-6 md:p-10 mb-6 overflow-hidden bg-gray-800"
+          className="relative rounded-2xl p-4 md:p-10 mb-4 md:mb-6 overflow-hidden bg-gray-800"
           style={{
             backgroundImage: store.store_banner_url ? `url(${store.store_banner_url})` : 'none',
             backgroundSize: 'cover',
@@ -189,27 +189,38 @@ export default function StorePage() {
           }}
         >
           <div className="absolute inset-0 bg-black/70"></div>
-          <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
-            <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden bg-white shrink-0">
+          <div className="relative z-10 flex flex-col md:flex-row items-center gap-3 md:gap-6">
+            
+            {/* Logo imepunguzwa kwenye mobile: w-14 h-14, ikirudi w-24 kwenye desktop */}
+            <div className="w-14 h-14 md:w-24 md:h-24 rounded-xl overflow-hidden bg-white shrink-0">
               {store.store_logo_url ? (
                 <img src={store.store_logo_url} alt={store.store_name} className="w-full h-full object-cover" onError={(e) => { e.target.src = 'https://placehold.co/150x150?text=No+Logo'; }} />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-100"><Store className="text-brand-orange" size={40} /></div>
+                <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                  {/* Icon imepunguzwa kwenye mobile: 24px, ikirudi 40px kwenye desktop */}
+                  <Store className="text-brand-orange w-6 h-6 md:w-10 md:h-10" />
+                </div>
               )}
             </div>
+
             <div className="text-center md:text-left text-white">
-              <h1 className="text-2xl md:text-3xl font-bold mb-2">{store.store_name || 'Store Name'}</h1>
-              <div className="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm mb-3">
+              {/* Jina limepunguzwa kwenye mobile: text-xl */}
+              <h1 className="text-xl md:text-3xl font-bold mb-1.5 md:mb-2">{store.store_name || 'Store Name'}</h1>
+              
+              {/* Badge imepunguzwa: text-xs */}
+              <div className="inline-flex items-center gap-1 bg-white/20 backdrop-blur-sm px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[10px] md:text-sm mb-2 md:mb-3">
                 {store.is_verified ? (
-                  <><ShieldCheck size={16} className="text-green-400" /><span>Verified Seller</span></>
+                  <><ShieldCheck size={12} className="text-green-400 md:w-4 md:h-4" /><span>Verified Seller</span></>
                 ) : (
                   <span>Seller</span>
                 )}
               </div>
-              <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-gray-200">
-                <div className="flex items-center gap-1.5"><Package size={16} /><span>{products.length} Products</span></div>
-                <div className="flex items-center gap-1.5"><Star size={16} /><span>{store.average_rating || 0} Rating</span></div>
-                <div className="flex items-center gap-1.5"><Users size={16} /><span>{store.total_sales || 0} Sales</span></div>
+
+              {/* Takwimu (Products, Rating, Sales) zimepunguzwa ukubwa na nafasi */}
+              <div className="flex flex-wrap justify-center md:justify-start gap-2 md:gap-4 text-[11px] md:text-sm text-gray-200">
+                <div className="flex items-center gap-1"><Package size={12} className="md:w-4 md:h-4" /><span>{products.length} Products</span></div>
+                <div className="flex items-center gap-1"><Star size={12} className="md:w-4 md:h-4" /><span>{store.average_rating || 0} Rating</span></div>
+                <div className="flex items-center gap-1"><Users size={12} className="md:w-4 md:h-4" /><span>{store.total_sales || 0} Sales</span></div>
               </div>
             </div>
           </div>
@@ -361,15 +372,17 @@ export default function StorePage() {
                 </button>
               )}
             </div>
-          ) : viewMode === 'grid' ? (
+                    ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {filteredProducts.map((product, index) => (
                 <div 
                   key={product.id} 
-                  className="group bg-white dark:bg-[#1a1a2e] rounded-xl overflow-hidden border border-gray-100 dark:border-gray-800 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+                  /* 🔥 MABADILIKO: Tumeongeza 'p-2' (padding) na 'bg-white dark:bg-[#1a1a2e]' ili kadi ionekane vizuri */
+                  className="group bg-white dark:bg-[#1a1a2e] p-2 rounded-2xl border border-gray-100 dark:border-gray-800 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer"
                   onClick={() => navigate(`/product/${product.id}`)}
                 >
-                  <div className="relative aspect-square overflow-hidden bg-gray-50 dark:bg-gray-800">
+                  {/* 🔥 MABADILIKO: Tumeongeza 'rounded-xl' kwenye div ya picha ili pembe zionekane */}
+                  <div className="relative aspect-square overflow-hidden rounded-xl bg-gray-50 dark:bg-gray-800 mb-3">
                     <img 
                       src={product.cover_image_url || product.cover_image || 'https://placehold.co/300'} 
                       alt={product.name} 
@@ -378,21 +391,30 @@ export default function StorePage() {
                       onClick={(e) => openImageLightbox(product, e, index)}
                     />
                     {product.discount > 0 && (
-                      <span className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">-{product.discount}%</span>
+                      <span className="absolute top-2 right-2 bg-red-500 text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded-md shadow-sm">-{product.discount}%</span>
                     )}
                   </div>
-                  <div className="p-3">
-                    <h4 className="text-sm font-semibold text-gray-800 dark:text-white truncate mb-2">{product.name}</h4>
+
+                  {/* 🔥 MABADILIKO: Maandishi yamepangwa vizuri zaidi (px-1) */}
+                  <div className="px-1 pb-1">
+                    <h4 className="text-[13px] md:text-sm font-semibold text-gray-800 dark:text-white truncate mb-1.5">{product.name}</h4>
+                    
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-base font-bold text-brand-orange">TSh {formatPrice(product.price)}</span>
+                      <span className="text-[15px] md:text-base font-black text-brand-orange">TSh {formatPrice(product.price)}</span>
                       {product.original_price && product.original_price > product.price && (
-                        <span className="text-xs text-gray-400 line-through">TSh {formatPrice(product.original_price)}</span>
+                        <span className="text-[11px] text-gray-400 line-through">TSh {formatPrice(product.original_price)}</span>
                       )}
                     </div>
+
+                    {/* 🔥 MABADILIKO: Hali ya Stoo imewekwa kwenye badge ndogo (Pro look) */}
                     {product.stock_quantity > 0 ? (
-                      <span className="text-xs font-medium text-green-500">In Stock ({product.stock_quantity})</span>
+                      <span className="inline-block text-[10px] md:text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-md">
+                        In Stock ({product.stock_quantity})
+                      </span>
                     ) : (
-                      <span className="text-xs font-medium text-red-500">Out of Stock</span>
+                      <span className="inline-block text-[10px] md:text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-md">
+                        Out of Stock
+                      </span>
                     )}
                   </div>
                 </div>

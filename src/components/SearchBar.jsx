@@ -146,21 +146,22 @@ export default function SearchBar({ search = "", setSearch }) {
         }`}
       >
         
-        {/* 🔥 PLACEHOLDER YA ANIMATION */}
-        {!search && (
-          <div className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 pointer-events-none flex items-center overflow-hidden h-[24px]">
-            <span 
-              key={placeholderIndex} 
-              className={`text-[13px] sm:text-[14px] md:text-[15px] text-gray-400 transition-all duration-300 ease-in-out block ${
-                isAnimating 
-                  ? 'translate-y-[-100%] opacity-0' 
-                  : 'translate-y-0 opacity-100 animate-[slideDown_0.3s_ease-out]'
-              }`}
-            >
-              {placeholders[placeholderIndex] || "Search"}
-            </span>
-          </div>
-        )}
+      {/* 🔥 PLACEHOLDER YA ANIMATION */}
+{!search && (
+  <div className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 pointer-events-none flex items-center overflow-hidden h-[24px] w-[calc(100%-80px)] sm:w-[calc(100%-100px)]">
+    <span 
+      key={placeholderIndex} 
+      className={`text-[13px] sm:text-[14px] md:text-[15px] text-gray-400 transition-all duration-300 ease-in-out block truncate w-full ${
+        isAnimating 
+          ? 'translate-y-[-100%] opacity-0' 
+          : 'translate-y-0 opacity-100 animate-[slideDown_0.3s_ease-out]'
+      }`}
+      title={placeholders[placeholderIndex]} // Inaonyesha maneno yote ukibonyeza kwa muda mrefu
+    >
+      {placeholders[placeholderIndex] || "Search"}
+    </span>
+  </div>
+)}
 
         {/* 🔥 INPUT */}
         <input

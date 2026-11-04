@@ -1,13 +1,32 @@
 // src/components/StoresHeader.jsx
-import React, { useState, useEffect, useRef, memo } from 'react'; // 1. Ingiza memo
+import React, { useState, useEffect, useRef, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Globe, ChevronDown, ArrowLeft } from 'lucide-react';
 import Logo from './Logo';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import StoreSearchBar from './StoreSearchBar'; 
+import api from '../axiosConfig'; // 1. Ingiza api
+import { useQuery } from '@tanstack/react-query'; // 2. Ingiza useQuery
 
-// 2. Tumia React.memo
+// 3. Function ya kuchukua majina ya maduka
+const fetchStoreNames = async () => {
+  try {
+    // Tunachukua maduka 10 tu kwa ajili ya placeholder
+    const response = await api.get('/stores/', { params: { limit: 10 } });
+    const data = response.data.results || response.data || [];
+    
+    // Tunachukua majina tu (store_name)
+    const names = data.map(store => store.store_name || store.name).filter(Boolean);
+    
+    // Kama hakuna majina, rudisha maneno ya kawaida
+    return names.length > 0 ? names : ["Search stores...", "Find your favorite shop..."];
+  } catch (error) {
+    console.error("Imeshindwa kuchukua majina ya maduka:", error);
+    return ["Search stores...", "Find your favorite shop..."];
+  }
+};
+
 const StoresHeader = memo(({ onSearch, showBack = true }) => {
   const { t } = useTranslation();
   const { language, changeLanguage } = useLanguage();
@@ -17,6 +36,13 @@ const StoresHeader = memo(({ onSearch, showBack = true }) => {
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [currency, setCurrency] = useState("TZS");
   const dropdownRef = useRef(null);
+
+  // 4. Tumia useQuery kufetch majina
+  const { data: storePlaceholders = ["Search stores..."] } = useQuery({
+    queryKey: ['storePlaceholders'],
+    queryFn: fetchStoreNames,
+    staleTime: 1000 * 60 * 10, // Cache kwa dakika 10
+  });
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -83,7 +109,12 @@ const StoresHeader = memo(({ onSearch, showBack = true }) => {
 
         {/* KATI: Search Bar */}
         <form onSubmit={handleSearchSubmit} className="flex-1 max-w-2xl">
-          <StoreSearchBar search={search} setSearch={setSearch} />
+          {/* 5. Tumeongeza prop 'placeholders' hapa */}
+          <StoreSearchBar 
+            search={search} 
+            setSearch={setSearch} 
+            placeholders={storePlaceholders} 
+          />
         </form>
 
         {/* KULIA: Lugha na Sarafu */}

@@ -219,8 +219,10 @@ const Login = () => {
       <div className="flex-1 flex flex-col justify-center p-8 md:p-12 lg:p-20 max-w-[600px] mx-auto w-full">
         
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Sign in to your account</h2>
-          <p className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2 leading-tight">
+           Sign in to your account
+            </h2>    
+            <p className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <Lock size={14} className="text-green-500" />
             <span className="text-green-600 font-medium">We Secure Your Data</span>
           </p>

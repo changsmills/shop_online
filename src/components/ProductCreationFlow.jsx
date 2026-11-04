@@ -506,8 +506,7 @@ varFormData.append("price", finalPrice);
 };
   
   return (
-       <section className="w-full max-w-full mx-auto p-2 sm:p-4 box-border font-sans text-gray-800 min-h-screen">  
-       
+      <section className="w-full max-w-full mx-auto p-2 sm:p-4 box-border font-sans text-gray-800 min-h-screen">         
         {/* STEP HEADER */}
       <div className="flex items-center justify-between gap-1 sm:gap-2 bg-gray-50 p-3 sm:p-6 rounded-2xl sm:rounded-3xl border border-gray-100 mb-4 sm:mb-10 overflow-x-auto">
         {[

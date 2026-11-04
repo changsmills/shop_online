@@ -293,6 +293,11 @@ const ProductSelectionDrawer = ({
         navigate('/checkout', { state: { orderItems: itemsToProcess } });
     };
 
+    const capitalizeFirstLetter = (text) => {
+    if (!text) return "";
+    return text.charAt(0).toUpperCase() + text.slice(1);
+    };
+
     const handleAddToCart = () => {
         const itemsToCart = [];
         Object.entries(selectedItems).forEach(([itemKey, qty]) => {
@@ -403,14 +408,14 @@ const ProductSelectionDrawer = ({
                 </div>
 
                 {/* Right Side Drawer */}
-                <div className="fixed right-0 top-0 h-screen w-[600px] max-w-[90vw] bg-white dark:bg-gray-800 shadow-[-5px_0_25px_rgba(0,0,0,0.15)] dark:shadow-[-5px_0_25px_rgba(0,0,0,0.6)] z-[10000] flex flex-col overflow-hidden animate-[slideInRight_0.3s_ease-out] text-gray-800 dark:text-gray-200">
+                <div className="fixed right-0 top-0 h-screen w-[600px] max-w-[90vw] bg-white dark:bg-gray-800 shadow-[-5px_0_25px_rgba(0,0,0,0.15)] dark:shadow-[-5px_0_25px_rgba(0,0,0,0.6)] z-[10000] flex flex-col overflow-hidden animate-[slideInRight_0.3s_ease-out] text-gray-800 dark:text-gray-200 font-sans">
                     <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100 dark:border-gray-600 shrink-0 bg-white dark:bg-gray-800">
                         <h3 className="m-0 text-lg font-semibold text-gray-900 dark:text-gray-200">Select variations</h3>
                         <button className="w-9 h-9 rounded-full bg-transparent border-none cursor-pointer text-2xl flex items-center justify-center text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" onClick={onClose}>✕</button>
                     </div>
                     <div className="p-5 px-6 flex-1 overflow-y-auto min-h-0 bg-white dark:bg-gray-800 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-gray-800 [&::-webkit-scrollbar-thumb]:bg-[#ff4e00] [&::-webkit-scrollbar-thumb]:rounded-full">
                         <div className="mb-6 text-gray-900 dark:text-gray-200">
-                            <h2 className="text-xl font-bold mb-2">{product?.name}</h2>
+                            <h2 className="text-xl font-bold mb-2">{capitalizeFirstLetter(product?.name)}</h2>
                             <div className="text-2xl font-bold text-[#ff4e00]">TSH {formatPrice(product?.price)}</div>
                         </div>
 
@@ -502,14 +507,14 @@ const ProductSelectionDrawer = ({
             </div>
 
             {/* ===== MOBILE LAYOUT ===== */}
-            <div className="md:hidden fixed inset-0 z-[9999] flex flex-col justify-end pointer-events-none">
+            <div className="md:hidden fixed inset-0 z-[9999] flex flex-col justify-end pointer-events-none ">
                 {/* 
                   🔥 HAPA NDIO PALIPOBADILIKA: 
                   Tumeweka h-[85dvh] (Dynamic Viewport Height) ili ichukue 85% ya screen 
                   na kuzuia address bar isumbue kwenye simu. 
                 */}
-                <div className="pointer-events-auto fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 rounded-t-[20px] z-[10000] animate-[slideUp_0.3s_ease-out] h-[85dvh] flex flex-col overflow-hidden shadow-[0_-5px_25px_rgba(0,0,0,0.15)] dark:shadow-[0_-5px_25px_rgba(0,0,0,0.6)] text-gray-800 dark:text-gray-200">
-                    <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto my-3 cursor-pointer" onClick={onClose}></div>
+                <div className="pointer-events-auto fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 rounded-t-[20px] z-[10000] animate-[slideUp_0.3s_ease-out] h-[85dvh] flex flex-col overflow-hidden shadow-[0_-5px_25px_rgba(0,0,0,0.15)] dark:shadow-[0_-5px_25px_rgba(0,0,0,0.6)] text-gray-800 dark:text-gray-200 font-sans">
+                    <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto my-3 cursor-pointer font-sans" onClick={onClose}></div>
                     <div className="flex justify-between items-center px-4 sm:px-5 pb-2.5 sm:pb-3 border-b border-gray-100 dark:border-gray-600 shrink-0 bg-white dark:bg-gray-800">
                         <h3 className="m-0 text-lg font-semibold text-gray-900 dark:text-gray-200">Select Options</h3>
                         <button className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 border-none text-lg cursor-pointer flex items-center justify-center text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" onClick={onClose}>✕</button>
@@ -521,7 +526,7 @@ const ProductSelectionDrawer = ({
                                 <img src={previewImage} alt={product?.name} className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1">
-                                <h4 className="text-sm font-semibold mb-1 text-gray-900 dark:text-gray-200">{product?.name}</h4>
+                                <h4 className="text-sm font-semibold mb-1 text-gray-900 dark:text-gray-200">{capitalizeFirstLetter(product?.name)}</h4>
                                 <div className="text-lg font-bold text-[#ff4e00]">TSH {formatPrice(product?.price)}</div>
                             </div>
                         </div>

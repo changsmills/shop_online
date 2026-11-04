@@ -35,13 +35,13 @@ export default function MobileCategorySlider({
 
   if (!categories || categories.length === 0) return null;
 
-  // 🔥 HAPA NDIO MABADILIKO MAKUU YALIYOFANYIKA
-  // Nimepunguza: px-4 -> px-3, py-1.5 -> py-1, text-sm -> text-xs
-  const basePillClass = "whitespace-nowrap shrink-0 px-3 py-1 rounded-full text-xs cursor-pointer transition-all duration-200 select-none border";
+  // 🔥 Tumeongeza font-medium na kubadilisha rangi kuwa nyeusi zaidi (gray-800)
+  const basePillClass = "whitespace-nowrap shrink-0 px-3 py-1.5 rounded-full text-[13px] font-medium cursor-pointer transition-all duration-200 select-none border";
   
   const activePillClass = "bg-[#ff6a00] text-white border-[#ff6a00] font-semibold shadow-sm";
   
-  const inactivePillClass = "bg-gray-100 dark:bg-[#1a1a2e] text-gray-700 dark:text-gray-300 border-transparent hover:bg-gray-200 dark:hover:bg-[#2a2a3e]";
+  // 🔥 Tumebadilisha text-gray-700 kuwa text-gray-800, na dark mode kuwa text-gray-200
+  const inactivePillClass = "bg-gray-100 dark:bg-[#1a1a2e] text-gray-800 dark:text-gray-200 border-transparent hover:bg-gray-200 dark:hover:bg-[#2a2a3e]";
 
   return (
     <div className="relative flex items-center w-full px-1 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">

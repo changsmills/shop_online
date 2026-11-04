@@ -4,7 +4,7 @@ import api from "../axiosConfig";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query'; // 1. Ingiza useQuery
+import { useQuery } from '@tanstack/react-query';
 
 // ==========================================
 // 2. FUNCTION YA KUCHUKUA SUGGESTIONS ZA MADUKA
@@ -21,17 +21,15 @@ const fetchStoreSuggestions = async ({ queryKey }) => {
   return data.map(store => ({ ...store, type: 'store' }));
 };
 
-export default function StoreSearchBar({ search = "", setSearch }) {
+// 🔥 1. POKEA PROP YA 'placeholders' HAPA
+export default function StoreSearchBar({ search = "", setSearch, placeholders = ["Tafuta duka...", "Tafuta wauzaji..."] }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   
-  const [placeholders] = useState([
-    "Tafuta duka la nguo...",
-    "Tafuta wauzaji jijini...",
-    "Suppliers za bidhaa...",
-    "Wholesale stores..."
-  ]);
+  // 🔥 2. ONDOA STATE YA ZAMANI YA placeholders na uweke ya animation
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   
@@ -44,16 +42,22 @@ export default function StoreSearchBar({ search = "", setSearch }) {
   const { data: suggestions = [] } = useQuery({
     queryKey: ['storeSearchSuggestions', debouncedSearch],
     queryFn: fetchStoreSuggestions,
-    enabled: debouncedSearch.trim().length >= 2, // Washa tu kama kuna herufi 2+
-    staleTime: 1000 * 60 * 5, // Cache kwa dakika 5
+    enabled: debouncedSearch.trim().length >= 2,
+    staleTime: 1000 * 60 * 5,
   });
 
-  // Badilisha placeholder (Animation)
+  // 🔥 3. ANIMATION YA PLACEHOLDER
   useEffect(() => {
     if (placeholders.length <= 1) return;
+    
     const timer = setInterval(() => {
-      setPlaceholderIndex((prev) => (prev === placeholders.length - 1 ? 0 : prev + 1));
-    }, 3000);
+      setIsAnimating(true); 
+      setTimeout(() => {
+        setPlaceholderIndex((prev) => (prev === placeholders.length - 1 ? 0 : prev + 1));
+        setIsAnimating(false); 
+      }, 300); 
+    }, 3000); // Inabadilika kila sekunde 3
+    
     return () => clearInterval(timer);
   }, [placeholders]);
 
@@ -118,10 +122,27 @@ export default function StoreSearchBar({ search = "", setSearch }) {
             : 'border-gray-300 dark:border-slate-700 hover:border-[#FF6600]'
         }`}
       >
+        
+        {/* 🔥 4. WEKA ANIMATION YA PLACEHOLDER HAPA (Badala ya placeholder kwenye input) */}
+        {!search && (
+          <div className="absolute left-2.5 sm:left-3 md:left-[18px] top-1/2 -translate-y-1/2 pointer-events-none flex items-center overflow-hidden h-[24px] w-[calc(100%-60px)]">
+            <span 
+              key={placeholderIndex} 
+              className={`text-xs sm:text-[13px] md:text-[15px] text-gray-400 dark:text-slate-400 transition-all duration-300 ease-in-out block truncate w-full ${
+                isAnimating 
+                  ? 'translate-y-[-100%] opacity-0' 
+                  : 'translate-y-0 opacity-100 animate-[slideDown_0.3s_ease-out]'
+              }`}
+            >
+              {placeholders[placeholderIndex]}
+            </span>
+          </div>
+        )}
+
         <input
           type="text"
-          placeholder={placeholders[placeholderIndex]}
-          className="flex-1 border-none outline-none text-xs sm:text-[13px] md:text-[15px] bg-transparent w-full text-gray-800 dark:text-white px-2 sm:px-2 md:px-2.5 placeholder:text-gray-400 dark:placeholder:text-slate-400 transition-opacity duration-300"
+          // 🔥 5. ONDOA placeholder YA KAWAIDA HAPA
+          className="flex-1 border-none outline-none text-xs sm:text-[13px] md:text-[15px] bg-transparent w-full text-gray-800 dark:text-white px-2 sm:px-2 md:px-2.5 transition-opacity duration-300 relative z-10"
           value={search}
           onChange={handleInputChange}
           onFocus={() => {

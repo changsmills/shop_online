@@ -281,29 +281,37 @@ export default function ProductsAll() {
     <div className="min-h-screen w-full bg-[#f8f8f8] dark:bg-[#1e293b] text-black dark:text-[#e2e8f0] overflow-x-hidden transition-colors duration-300 font-sans">
       
       {/* ========== BANNER ========== */}
-      <div className="relative overflow-hidden text-gray-900 dark:text-white text-center py-12 md:py-16 px-4 md:px-5">
+      <div className="relative overflow-hidden text-gray-900 dark:text-white text-center py-8 md:py-12 px-4 md:px-5">
         <div className="absolute inset-0 z-0 mesh-gradient-bg opacity-90 dark:hidden"></div>
         
         <div className="relative z-10 flex flex-col items-center justify-center h-full">
           
+          {/* Nimeongeza top-2 kwa mobile ili isigonge kingo vizuri */}
           <button 
-            className="hidden max-md:flex absolute top-0 left-0 w-9 h-9 rounded-full items-center justify-center bg-white/15 border border-white/20 backdrop-blur-md transition-all hover:bg-white/25 hover:scale-105 active:scale-95" 
+            className="hidden max-md:flex absolute top-2 left-2 w-8 h-8 rounded-full items-center justify-center bg-white/15 border border-white/20 backdrop-blur-md transition-all hover:bg-white/25 hover:scale-105 active:scale-95" 
             onClick={handleBackToDashboard}
             aria-label="Rudi Dashboard"
           >
-            <ArrowLeft size={24} />
+            <ArrowLeft size={20} />
           </button>
           
           <button 
-            className="flex absolute top-0 right-0 w-9 h-9 md:w-10 md:h-10 rounded-full items-center justify-center bg-white/15 border border-white/20 backdrop-blur-md transition-all hover:bg-white/25 hover:scale-105 active:scale-95" 
+            className="flex absolute top-2 right-2 w-8 h-8 md:w-10 md:h-10 rounded-full items-center justify-center bg-white/15 border border-white/20 backdrop-blur-md transition-all hover:bg-white/25 hover:scale-105 active:scale-95" 
             onClick={() => setIsSearchOpen(true)}
             aria-label="Tafuta"
           >
-            <Search size={22} />
+            <Search size={20} />
           </button>
 
-          <h1 className="text-3xl lg:text-[32px] font-extrabold m-0 drop-shadow-md">{bannerTitle}</h1>
-          <p className="text-xs md:text-sm lg:text-base mt-2 opacity-90 font-medium drop-shadow-sm">{bannerDesc}</p>
+          {/* Title imepunguzwa kutoka text-3xl kwenda text-2xl kwa mobile */}
+          <h1 className="text-2xl md:text-3xl lg:text-[32px] font-extrabold m-0 drop-shadow-md">
+            {bannerTitle}
+          </h1>
+          
+          {/* Description imepunguzwa kidogo */}
+          <p className="text-[11px] md:text-sm lg:text-base mt-1.5 opacity-90 font-medium drop-shadow-sm">
+            {bannerDesc}
+          </p>
         </div>
       </div>
 

@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import api from '../axiosConfig';
 import ProductSelectionDrawer from '../pages/ProductSelectionDrawer';
-import { MessageSquare, Star, ChevronRight, ShoppingCart, Zap } from 'lucide-react';
+import { MessageSquare, Star, ChevronRight, ShoppingCart, Zap, ThumbsUp, CheckCircle } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { useQuery } from '@tanstack/react-query'; // 1. Ingiza useQuery
+import { useQuery } from '@tanstack/react-query';
 
-// 2. Function ya kuchukua Media na Variations (nje ya component)
+// Function ya kuchukua Media na Variations
 const fetchProductMediaAndVariations = async ({ queryKey }) => {
   const [_, productId] = queryKey;
   if (!productId) return { mediaData: [], varData: [] };
@@ -21,7 +21,6 @@ const fetchProductMediaAndVariations = async ({ queryKey }) => {
   const mediaData = mediaRes.data.results || mediaRes.data || [];
   let varData = varRes.data.results || varRes.data || [];
 
-  // Chuja tena upande wa Frontend kwa usalama
   varData = varData.filter(v => String(v.product) === String(productId));
 
   return { mediaData, varData };
@@ -46,6 +45,37 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
   const [activeSize, setActiveSize] = useState(null);
   const [isSelectionOpen, setIsSelectionOpen] = useState(false);
 
+  // ==========================================
+  // STATES ZA REVIEWS (Maoni)
+  // ==========================================
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewHover, setReviewHover] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
+  
+  // Mock Reviews (Badilisha hizi baadaye kwa data kutoka API)
+  const mockReviews = [
+    {
+      id: 1,
+      name: "Juma M.",
+      rating: 5,
+      date: "2 siku zilizopita",
+      comment: "Bidhaa ni nzuri sana na inafanya kazi vizuri. Ilifika haraka na packaging ilikuwa nzuri. Nawashauri wengine kununua.",
+      verified: true,
+      helpful: 12
+    },
+    {
+      id: 2,
+      name: "Asha K.",
+      rating: 4,
+      date: "Wiki iliyopita",
+      comment: "Ni nzuri lakini nilidhani ni kubwa kidogo kuliko nilivyodhani. Lakini kwa bei hii ni thamani ya pesa.",
+      verified: false,
+      helpful: 4
+    }
+  ];
+
   const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/rlgqgsnv/image/upload";
 
   const moq = product?.moq || 1;
@@ -58,12 +88,11 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
     queryKey: ['productMediaVariations', product?.id],
     queryFn: fetchProductMediaAndVariations,
     enabled: !!product?.id,
-    staleTime: 1000 * 60 * 5, // Cache kwa dakika 5
+    staleTime: 1000 * 60 * 5,
   });
 
   const productMedia = mediaAndVariations?.mediaData || [];
 
-  // Weka variations kwenye state yetu ya local pale data inapokuja
   useEffect(() => {
     if (mediaAndVariations?.varData) {
       const varData = mediaAndVariations.varData;
@@ -84,7 +113,6 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
             : (defaultVar.stock_quantity || 0)
         });
       } else {
-        // Kama hakuna variations, safisha states
         setSelectedColor("");
         setSelectedSize("");
         setSelectedVariationObj(null);
@@ -92,7 +120,6 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
     }
   }, [mediaAndVariations]);
 
-  // Safisha kabisa data za zamani pale bidhaa inapobadilika
   useEffect(() => {
     setProductVariations([]);
     setSelectedColor("");
@@ -482,9 +509,28 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
     await handleOpenDrawer('cart');
   };
 
-  // ==========================================
-  // RENDER (Muonekano wako ule ule)
-  // ==========================================
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    if (reviewRating === 0) {
+      toast.error("Tafadhali chagua nyota (rating) kwanza!");
+      return;
+    }
+    if (reviewComment.trim().length < 5) {
+      toast.error("Tafadhali andika maoni yako kwa urefu wa kutosha.");
+      return;
+    }
+    
+    setSubmittingReview(true);
+    
+    setTimeout(() => {
+      toast.success("Asante! Maoni yako yamepokelewa na yatasubiri approval.");
+      setReviewRating(0);
+      setReviewComment("");
+      setShowReviewForm(false);
+      setSubmittingReview(false);
+    }, 1000);
+  };
+
   return (
     <>
       <style>{`
@@ -492,9 +538,18 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
         }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #334155; }
       `}</style>
 
-      <div className="bg-white dark:bg-black flex flex-col w-full h-auto max-h-none overflow-y-visible md:sticky md:top-[100px] text-gray-900 dark:text-white">
+      {/* 
+        🔥 HAPA: Container Kuu. Tumeongeza md:h-[calc(100vh-120px)] na md:overflow-hidden 
+        ili kuzuia page nzima iscroll, na badala yake content ndio iscroll.
+      */}
+      <div className="bg-white dark:bg-black flex flex-col w-full md:sticky md:top-[100px] text-gray-900 dark:text-white md:h-[calc(100vh-120px)] md:rounded-xl md:overflow-hidden font-sans">
+        
         <ProductSelectionDrawer
           isOpen={isSelectionOpen}
           initialColor={activeColor}
@@ -520,6 +575,7 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
           isLoading={loading}
         />
 
+        {/* Mobile Bottom Nav (Haibadiliki) */}
         {isMobile && (
           <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-black flex justify-around items-center px-3 pt-2 pb-5 border-t border-gray-200 dark:border-[#1f1f1f] shadow-[0_-2px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_-2px_10px_rgba(0,0,0,0.6)] z-[1000] gap-2">
             <button onClick={handleWhatsAppOrder} disabled={!selectedVariationObj || loading} className="flex-1 flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-xl text-[11px] font-semibold cursor-pointer bg-[#25D366] text-white active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
@@ -541,20 +597,36 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
           </div>
         )}
 
-        <div className="flex flex-col gap-3 p-0 pt-2.5 pb-5 md:p-3 w-full box-border overflow-y-visible flex-1 md:pb-[80px]">
+        {/* 
+          🔥 HAPA: Content Area. Tumeongeza overflow-y-auto na flex-1 
+          ili ichukue nafasi yote iliyobaki juu ya buttons za Desktop na iscroll.
+        */}
+        <div className="flex flex-col gap-3 p-3 w-full box-border overflow-y-auto flex-1 custom-scrollbar">
           
-          <div className="bg-white dark:bg-[#0a0a0a] rounded-[10px] md:rounded-xl p-3 md:p-4 shadow-sm border border-[#f0f0f0] dark:border-[#1f1f1f] flex flex-col h-auto animate-[fadeIn_0.3s_ease_forwards]">
-            <h1 className="text-[15px] md:text-[20px] max-lg:text-[18px] max-md:text-[16px] font-bold mb-1.5 md:mb-2 leading-[1.3] text-[#1a1a1a] dark:text-white">{product?.name}</h1>
-            <div className="flex items-center gap-1.5 mb-2.5 md:mb-[15px] flex-wrap">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star key={star} size={16} fill={(hover || product.average_rating) >= star ? "#ffc107" : "none"} color="#ffc107" 
-                  className="cursor-pointer md:w-[18px] md:h-[18px]" onMouseEnter={() => setHover(star)} onMouseLeave={() => setHover(0)} onClick={() => onRate && onRate(star)} />
-              ))}
-              <span className="text-[13px] text-[#666] dark:text-[#b0b0b0] ml-2">({product.total_reviews || 0} reviews)</span>
+          {/* ===== RATING SUMMARY (Juu - Inakaa Pale Pale Ikiscroll) ===== */}
+           <div className="bg-white dark:bg-[#0a0a0a] rounded-xl p-3 md:p-4 shadow-sm border border-[#f0f0f0] dark:border-[#1f1f1f] flex flex-col h-auto mb-2">
+              <h1 className="text-[15px] md:text-[20px] max-lg:text-[18px] max-md:text-[16px] font-bold mb-1.5 md:mb-2 leading-[1.3] text-[#1a1a1a] dark:text-white capitalize">
+              {product?.name ? product.name.charAt(0).toUpperCase() + product.name.slice(1) : ""}
+            </h1>
+            
+            <div className="flex items-center gap-2 mb-2.5 md:mb-[15px] flex-wrap">
+              <div className="flex items-center gap-0.5">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star key={star} size={18} fill={(hover || product.average_rating) >= star ? "#ffc107" : "none"} color="#ffc107" 
+                    className="cursor-pointer md:w-[20px] md:h-[20px]" onMouseEnter={() => setHover(star)} onMouseLeave={() => setHover(0)} onClick={() => onRate && onRate(star)} />
+                ))}
+              </div>
+              <span className="text-[14px] font-bold text-gray-800 dark:text-white">
+                {product.average_rating ? Number(product.average_rating).toFixed(1) : "0.0"}
+              </span>
+              <span className="text-[13px] text-gray-500 dark:text-gray-400 underline cursor-pointer" onClick={() => document.getElementById('reviews-section')?.scrollIntoView({ behavior: 'smooth' })}>
+                ({product.total_reviews || 0} reviews)
+              </span>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-[#0a0a0a] rounded-[10px] md:rounded-xl p-3 md:p-4 shadow-sm border border-[#f0f0f0] dark:border-[#1f1f1f] flex flex-col h-auto animate-[fadeIn_0.3s_ease_forwards] [animation-delay:0.1s]">
+          {/* ... (Variations, Stoo, Specs, Bei, Audience zipo hapa kama kawaida) ... */}
+          <div className="bg-white dark:bg-[#0a0a0a] rounded-[10px] md:rounded-xl p-3 md:p-4 shadow-sm border border-[#f0f0f0] dark:border-[#1f1f1f] flex flex-col h-auto">
             {Object.keys(variationsByColor).length > 0 && (
               <div className="mb-5">
                 <span className="text-[14px] text-[#333] dark:text-white block mb-3 font-semibold">Rangi zinazopatikana:</span>
@@ -632,7 +704,7 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
           </div>
 
           {audience && audience.length > 0 && (
-            <div className="bg-white dark:bg-[#0a0a0a] rounded-[10px] md:rounded-xl p-3 md:p-4 shadow-sm border border-[#f0f0f0] dark:border-[#1f1f1f] flex flex-col h-auto animate-[fadeIn_0.3s_ease_forwards] [animation-delay:0.15s]">
+            <div className="bg-white dark:bg-[#0a0a0a] rounded-[10px] md:rounded-xl p-3 md:p-4 shadow-sm border border-[#f0f0f0] dark:border-[#1f1f1f] flex flex-col h-auto">
               <span className="text-[14px] text-[#333] dark:text-white block mb-3 font-semibold">👥 Inafaa kwa:</span>
               <div className="flex flex-wrap gap-1.5">
                 {audience.map((a, i) => (
@@ -642,25 +714,146 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
             </div>
           )}
 
-          <div className="hidden md:block mt-2.5 p-[15px] bg-white dark:bg-black rounded-xl shadow-[0_-2px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_-2px_10px_rgba(0,0,0,0.6)]">
-            <button onClick={handleWhatsAppOrder} disabled={!selectedVariationObj || loading} className="bg-[#25D366] text-white flex items-center justify-center gap-2.5 font-semibold p-3.5 rounded-[10px] border-none w-full mb-3 cursor-pointer transition-all hover:bg-[#1da851] disabled:opacity-60 disabled:cursor-not-allowed">
-              <MessageSquare size={18} /> Order via WhatsApp
-            </button>
-            <div className="flex gap-2.5 w-full">
-              <button onClick={() => handleOpenDrawer('order')} disabled={!selectedVariationObj || currentStock === 0 || loading} className="bg-[#ff4e00] dark:bg-[#ff6a00] text-white border-none p-3 rounded-[10px] font-bold flex-[2] flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:bg-[#e04400] dark:hover:bg-[#e55a00] disabled:opacity-60 disabled:cursor-not-allowed max-sm:text-[12px]">
-                <Zap size={16} /> Order Now
-              </button>
-              <button onClick={() => handleOpenDrawer('cart')} disabled={!selectedVariationObj || currentStock === 0 || loading} className="bg-white dark:bg-[#0a0a0a] text-[#ff4e00] dark:text-[#ff6a00] border border-[#ff4e00] dark:border-[#ff6a00] p-3 rounded-[10px] font-bold flex-[2] flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:bg-[#fff4f0] dark:hover:bg-[#1f1000] disabled:opacity-60 disabled:cursor-not-allowed max-sm:text-[12px]">
-                <ShoppingCart size={16} /> Add to Cart
-              </button>
-              <button onClick={handleChatWithSeller} className="w-[50px] flex justify-center items-center border border-[#e5e7eb] dark:border-[#1f1f1f] rounded-[10px] bg-[#f9fafb] dark:bg-[#0a0a0a] cursor-pointer transition-all hover:bg-[#f3f4f6] dark:hover:bg-[#1f1f1f]">
-                <MessageSquare size={18} color="currentColor" className="text-[#374151] dark:text-white" />
+          {/* ===== REVIEWS SECTION ===== */}
+          <div id="reviews-section" className="bg-white dark:bg-[#0a0a0a] rounded-[10px] md:rounded-xl p-4 md:p-6 shadow-sm border border-[#f0f0f0] dark:border-[#1f1f1f] mt-2 mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-[16px] md:text-[18px] font-bold text-gray-900 dark:text-white m-0">
+                Customer Reviews
+              </h2>
+              <button 
+                onClick={() => setShowReviewForm(!showReviewForm)}
+                className="text-[#ff4e00] text-[12px] md:text-[14px] font-semibold hover:underline"
+              >
+                {showReviewForm ? "Cancel" : "Write a Review"}
               </button>
             </div>
-          </div>
 
-          {isMobile && <div className="h-20" />}
+            {showReviewForm && (
+              <form onSubmit={handleSubmitReview} className="bg-gray-50 dark:bg-[#111] p-4 rounded-xl mb-6 border border-gray-100 dark:border-gray-800">
+                <h3 className="text-[14px] font-semibold mb-3">Rate this product</h3>
+                <div className="flex items-center gap-1 mb-4">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star 
+                      key={star} 
+                      size={24} 
+                      fill={(reviewHover || reviewRating) >= star ? "#ffc107" : "none"} 
+                      color="#ffc107"
+                      className="cursor-pointer transition-colors"
+                      onMouseEnter={() => setReviewHover(star)}
+                      onMouseLeave={() => setReviewHover(0)}
+                      onClick={() => setReviewRating(star)}
+                    />
+                  ))}
+                  <span className="ml-2 text-sm text-gray-500">
+                    {reviewRating > 0 ? `${reviewRating} Star${reviewRating > 1 ? 's' : ''}` : "Select rating"}
+                  </span>
+                </div>
+                <textarea
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="Share your experience with this product..."
+                  className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-black text-[13px] outline-none focus:border-[#ff4e00] transition-colors resize-none"
+                  rows="3"
+                ></textarea>
+                <button 
+                  type="submit" 
+                  disabled={submittingReview}
+                  className="mt-3 bg-[#ff4e00] text-white px-6 py-2 rounded-lg font-semibold text-[13px] hover:bg-[#e04400] disabled:opacity-70 transition-colors"
+                >
+                  {submittingReview ? "Submitting..." : "Submit Review"}
+                </button>
+              </form>
+            )}
+
+            <div className="flex flex-col md:flex-row gap-6 mb-6 pb-6 border-b border-gray-100 dark:border-gray-800">
+              <div className="flex flex-col items-center justify-center bg-gray-50 dark:bg-[#111] p-4 rounded-xl min-w-[120px]">
+                <span className="text-[32px] font-black text-gray-900 dark:text-white">
+                  {product.average_rating ? Number(product.average_rating).toFixed(1) : "0.0"}
+                </span>
+                <div className="flex text-[#ffc107] mb-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} size={14} fill={(product.average_rating || 0) >= star ? "#ffc107" : "none"} color="#ffc107" />
+                  ))}
+                </div>
+                <span className="text-[11px] text-gray-500">Based on {product.total_reviews || 0} reviews</span>
+              </div>
+
+              <div className="flex-1 flex flex-col justify-center gap-2">
+                {[5, 4, 3, 2, 1].map((star) => (
+                  <div key={star} className="flex items-center gap-2 text-[12px]">
+                    <span className="w-3 text-gray-500">{star}</span>
+                    <Star size={12} fill="#ffc107" color="#ffc107" />
+                    <div className="flex-1 h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+                      <div className="h-full bg-[#ffc107] rounded-full" style={{ width: star === 5 ? '70%' : star === 4 ? '20%' : '5%' }}></div>
+                    </div>
+                    <span className="w-8 text-right text-gray-500">{star === 5 ? '70%' : star === 4 ? '20%' : '5%'}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-5">
+              {mockReviews.map((review) => (
+                <div key={review.id} className="flex gap-3">
+                  <div className="w-10 h-10 rounded-full bg-[#ff4e00]/10 text-[#ff4e00] flex items-center justify-center font-bold text-lg shrink-0">
+                    {review.name.charAt(0)}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className="font-semibold text-[13px] md:text-[14px] text-gray-900 dark:text-white">{review.name}</span>
+                      {review.verified && (
+                        <span className="flex items-center gap-1 text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">
+                          <CheckCircle size={10} /> Verified Purchase
+                        </span>
+                      )}
+                      <span className="text-[10px] text-gray-400">{review.date}</span>
+                    </div>
+                    <div className="flex text-[#ffc107] mb-1.5">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star key={star} size={12} fill={review.rating >= star ? "#ffc107" : "none"} color="#ffc107" />
+                      ))}
+                    </div>
+                    <p className="text-[12px] md:text-[13px] text-gray-600 dark:text-gray-300 leading-relaxed m-0">
+                      {review.comment}
+                    </p>
+                    <div className="flex gap-3 mt-2 text-[11px] text-gray-400">
+                      <button className="flex items-center gap-1 hover:text-[#ff4e00] transition-colors">
+                        <ThumbsUp size={12} /> Helpful ({review.helpful})
+                      </button>
+                      <button className="hover:text-[#ff4e00] transition-colors">Report</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button className="w-full mt-5 py-2.5 border border-gray-200 dark:border-gray-700 rounded-lg text-[13px] font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+              Load More Reviews
+            </button>
+          </div>
         </div>
+
+        {/* 
+          🔥 HAPA: Desktop Buttons. Tumeyatoa nje ya div ya content (inayoscroll).
+          Sasa yatakaa chini kabisa ya container, bila kuscroll.
+        */}
+        <div className="hidden md:block p-[15px] bg-white dark:bg-[#0a0a0a] border-t border-[#f0f0f0] dark:border-[#1f1f1f] shrink-0 z-50">
+          <button onClick={handleWhatsAppOrder} disabled={!selectedVariationObj || loading} className="bg-[#25D366] text-white flex items-center justify-center gap-2.5 font-semibold p-3.5 rounded-[10px] border-none w-full mb-3 cursor-pointer transition-all hover:bg-[#1da851] disabled:opacity-60 disabled:cursor-not-allowed">
+            <MessageSquare size={18} /> Order via WhatsApp
+          </button>
+          <div className="flex gap-2.5 w-full">
+            <button onClick={() => handleOpenDrawer('order')} disabled={!selectedVariationObj || currentStock === 0 || loading} className="bg-[#ff4e00] dark:bg-[#ff6a00] text-white border-none p-3 rounded-[10px] font-bold flex-[2] flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:bg-[#e04400] dark:hover:bg-[#e55a00] disabled:opacity-60 disabled:cursor-not-allowed max-sm:text-[12px]">
+              <Zap size={16} /> Order Now
+            </button>
+            <button onClick={() => handleOpenDrawer('cart')} disabled={!selectedVariationObj || currentStock === 0 || loading} className="bg-white dark:bg-[#0a0a0a] text-[#ff4e00] dark:text-[#ff6a00] border border-[#ff4e00] dark:border-[#ff6a00] p-3 rounded-[10px] font-bold flex-[2] flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:bg-[#fff4f0] dark:hover:bg-[#1f1000] disabled:opacity-60 disabled:cursor-not-allowed max-sm:text-[12px]">
+              <ShoppingCart size={16} /> Add to Cart
+            </button>
+            <button onClick={handleChatWithSeller} className="w-[50px] flex justify-center items-center border border-[#e5e7eb] dark:border-[#1f1f1f] rounded-[10px] bg-[#f9fafb] dark:bg-[#0a0a0a] cursor-pointer transition-all hover:bg-[#f3f4f6] dark:hover:bg-[#1f1f1f]">
+              <MessageSquare size={18} color="currentColor" className="text-[#374151] dark:text-white" />
+            </button>
+          </div>
+        </div>
+
       </div>
     </>
   );
