@@ -1,7 +1,6 @@
 import traceback
 
 from rest_framework import serializers
-import cloudinary.uploader 
 import os
 import urllib.parse
 from django.conf import settings  # 🔥 ONGEZA HII MBELE!
@@ -9,6 +8,54 @@ from PIL import Image, ImageOps
 from io import BytesIO
 from django.core.files.base import ContentFile
 from pathlib import Path
+
+import os
+import uuid
+import urllib.parse
+from supabase import create_client, Client
+
+# ============================================================
+# 🔥 SUPABASE STORAGE CONFIGURATION
+# ============================================================
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
+BUCKET_NAME = "media"
+
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+def upload_to_supabase(file, folder="general"):
+    """Inapakia faili kwenye Supabase Storage na kurudisha path."""
+    if not file:
+        return None
+    file_extension = file.name.split('.')[-1]
+    file_name = f"{folder}/{uuid.uuid4()}.{file_extension}"
+    file.seek(0)
+    file_content = file.read()
+    try:
+        supabase.storage.from_(BUCKET_NAME).upload(
+            path=file_name,
+            file=file_content,
+            file_options={"content-type": file.content_type}
+        )
+        print(f"✅ [Supabase] Uploaded: {file_name}")
+        return file_name
+    except Exception as e:
+        print(f"❌ [Supabase Upload Error]: {e}")
+        return None
+
+def get_supabase_url(path):
+    """Inarudisha URL kamili ya picha kutoka Supabase."""
+    if not path:
+        return None
+    path_str = str(path)
+    if path_str.startswith("http"):
+        return path_str
+    try:
+        res = supabase.storage.from_(BUCKET_NAME).get_public_url(path_str)
+        return res
+    except Exception as e:
+        print(f"❌ [Supabase URL Error]: {e}")
+        return None
 
 
 
@@ -147,20 +194,16 @@ class ProductMediaSerializer(serializers.ModelSerializer):
         read_only_fields = ['media_url'] 
 
 # ============================================================
-# 🔥 PRODUCTS ENGINE SERIALIZER (FINAL - Full Response Edition)
+# 🔥 PRODUCTS ENGINE SERIALIZER (SUPABASE STORAGE VERSION)
 # ============================================================
 class ProductsEngineSerializer(serializers.ModelSerializer):
     leaf_category_id = serializers.UUIDField(source='leaf_category.id', read_only=True)
     cover_image_url = serializers.SerializerMethodField()
-    leaf_category_name = serializers.SerializerMethodField()  # ✅ ONGEZA HII
+    leaf_category_name = serializers.SerializerMethodField()
     discount = serializers.SerializerMethodField()
+    sub_category_name = serializers.SerializerMethodField()
+    category_name = serializers.SerializerMethodField()
 
-    leaf_category_name = serializers.SerializerMethodField()  # Ulikuwa nayo
-    sub_category_name = serializers.SerializerMethodField()   # ✅ ONGEZA HII
-    category_name = serializers.SerializerMethodField() 
-
-
-    
     # 🔥 Fields za kupokea faili (write_only)
     cover_image = serializers.ImageField(write_only=True, required=False, allow_null=True)
     gallery_images = serializers.ListField(
@@ -177,7 +220,7 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
         allow_null=True
     )
 
-    # 🔥 NYONGEZA HII: Inarudisha picha zilizopakiwa kwenye Response!
+    # Inarudisha picha zilizopakiwa kwenye Response
     media = ProductMediaSerializer(many=True, read_only=True)
 
     class Meta:
@@ -185,9 +228,8 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['user', 'created_at', 'cover_image']
 
-
-        # ------------------------------------------------------------------
-    # 🔥 1. LEAF CATEGORY NAME (Umeshakwisha)
+    # ------------------------------------------------------------------
+    # 🔥 1. LEAF CATEGORY NAME
     # ------------------------------------------------------------------
     def get_leaf_category_name(self, obj):
         if obj.leaf_category:
@@ -195,137 +237,39 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
         return None
     
     # ------------------------------------------------------------------
-    # 🔥 2. SUB CATEGORY NAME (Imeongezwa)
+    # 🔥 2. SUB CATEGORY NAME
     # ------------------------------------------------------------------
     def get_sub_category_name(self, obj):
-        # Leaf inaungana na Subcategory
         if obj.leaf_category and obj.leaf_category.sub_category:
             return obj.leaf_category.sub_category.name
         return None
 
     # ------------------------------------------------------------------
-    # 🔥 3. MAIN CATEGORY NAME (Imeongezwa)
+    # 🔥 3. MAIN CATEGORY NAME
     # ------------------------------------------------------------------
     def get_category_name(self, obj):
-        # Subcategory inaungana na Category kuu (parent)
         if obj.leaf_category and obj.leaf_category.sub_category and obj.leaf_category.sub_category.category:
             return obj.leaf_category.sub_category.category.name
         return None
 
-     # 🔥 ONGEZA HII METHOD
+    # ------------------------------------------------------------------
+    # 🔥 4. DISCOUNT
+    # ------------------------------------------------------------------
     def get_discount(self, obj):
         if obj.original_price and obj.price and obj.original_price > obj.price:
             return round(((obj.original_price - obj.price) / obj.original_price) * 100, 2)
         return 0
 
-        # 🔥 KWA PICHA ZA COVER (Sahihi 100%)
-        # ==========================================================
-    # 🔥 DEBUGGING VERSION - KWA COVER IMAGES
-    # ==========================================================
+    # ------------------------------------------------------------------
+    # 🔥 5. COVER IMAGE URL (Supabase)
+    # ------------------------------------------------------------------
     def get_cover_image_url(self, obj):
-        print(f"📸 [DEBUG] get_cover_image_url called for obj.id: {obj.id}", flush=True)
-        
-        if not obj.cover_image:
-            print("  ⚠️ [DEBUG] obj.cover_image is None or empty", flush=True)
-            return None
-        
-        # 1. Jaribu kupata Cloud Name
-        CLOUD_NAME = settings.CLOUDINARY_STORAGE.get('CLOUD_NAME')
-        if not CLOUD_NAME:
-            CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
-            
-        if not CLOUD_NAME:
-            print("❌ [ERROR] CLOUD_NAME is None! Check .env or settings.", flush=True)
-            return None
-        else:
-            print(f"✅ [DEBUG] CLOUD_NAME found: {CLOUD_NAME}", flush=True)
+        # Tumia helper function yetu ya Supabase
+        return get_supabase_url(obj.cover_image)
 
-        path = str(obj.cover_image)
-        print(f"  📂 [DEBUG] Raw path from DB: {path}", flush=True)
-        
-        # 2. Logic ya path
-        if path.startswith('product_media/') or path.startswith('product_variations/'):
-            safe_path = path
-            print(f"  ✅ Path is new style (product_media/). Using full path.", flush=True)
-        elif path.startswith('product_covers/'):
-            safe_path = path.split('/')[-1]
-            print(f"  🔄 Path is old style (product_covers/). Extracted filename: {safe_path}", flush=True)
-        else:
-            safe_path = path
-            print(f"  ℹ️ Path is unknown format. Using as is: {safe_path}", flush=True)
-
-        safe_path = urllib.parse.quote(safe_path, safe='/')
-        final_url = f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{safe_path}"
-        print(f"✅ [SUCCESS] Final Cloudinary URL: {final_url}", flush=True)
-        return final_url
-
-    # ==========================================================
-    # 🔥 DEBUGGING VERSION - KWA VARIATIONS (RANGI)
-    # ==========================================================
-    def get_color_image_url(self, obj):
-        print(f"🎨 [DEBUG] get_color_image_url called for obj.id: {obj.id}", flush=True)
-        
-        if not obj.color_image:
-            print("  ⚠️ [DEBUG] obj.color_image is None or empty", flush=True)
-            return None
-        
-        # 1. Tafuta Cloud Name
-        CLOUD_NAME = settings.CLOUDINARY_STORAGE.get('CLOUD_NAME')
-        if not CLOUD_NAME:
-            CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
-            
-        if not CLOUD_NAME:
-            print("❌ [ERROR] CLOUD_NAME is None! Check .env or settings.", flush=True)
-            return None
-        else:
-            print(f"✅ [DEBUG] CLOUD_NAME found: {CLOUD_NAME}", flush=True)
-
-        path = str(obj.color_image)
-        print(f"  📂 [DEBUG] Raw path from DB: {path}", flush=True)
-        
-        # 2. Logic ya path
-        if path.startswith('product_variations/') or path.startswith('product_media/'):
-            safe_path = path
-            print(f"  ✅ Path is new style. Using full path.", flush=True)
-        elif path.startswith('product_covers/'):
-            safe_path = path.split('/')[-1]
-            print(f"  🔄 Path is old style. Extracted filename: {safe_path}", flush=True)
-        else:
-            safe_path = path
-            print(f"  ℹ️ Path is unknown format. Using as is: {safe_path}", flush=True)
-
-        safe_path = urllib.parse.quote(safe_path, safe='/')
-        final_url = f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{safe_path}"
-        print(f"✅ [SUCCESS] Final Cloudinary URL: {final_url}", flush=True)
-        return final_url
-
-    def get_color_image_url(self, obj):
-        if not obj.color_image:
-            return None
-        # 🔥 BADILISHA HAPA PIA:
-        CLOUD_NAME = settings.CLOUDINARY_STORAGE.get('CLOUD_NAME')
-        if not CLOUD_NAME:
-            return None
-
-        path = str(obj.color_image)
-        if path.startswith('product_variations/') or path.startswith('product_media/'):
-            safe_path = path
-        elif path.startswith('product_covers/'):
-            safe_path = path.split('/')[-1]
-        else:
-            safe_path = path
-
-        safe_path = urllib.parse.quote(safe_path, safe='/')
-        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{safe_path}"
-
-     # ✅ ONGEZA HAPA (baada ya get_cover_image_url)
-    def get_leaf_category_name(self, obj):
-        if obj.leaf_category:
-            return obj.leaf_category.name
-        return None
-    
-    
-    # 🔥 DEBUG: Angalia kama serializer inaitwa!
+    # ------------------------------------------------------------------
+    # 🔥 6. TO_INTERNAL_VALUE (Kukusanya Files)
+    # ------------------------------------------------------------------
     def to_internal_value(self, data):
         request = self.context.get('request')
         
@@ -346,9 +290,11 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
             
         return super().to_internal_value(data)
 
+    # ------------------------------------------------------------------
+    # 🔥 7. CREATE METHOD (Supabase Version)
+    # ------------------------------------------------------------------
     def create(self, validated_data):
         import traceback
-        import cloudinary.uploader
 
         print("📦 [DEBUG] Starting Product Creation...", flush=True)
 
@@ -358,16 +304,13 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
         video_file = self._video_file
         color_image_files = self._color_image_files
 
-        # ============================================================
-        # 🔥 MUHIMU SANA: Ondoa hizi fields kutoka validated_data!
-        # (Kwa sababu hazipo kwenye model ya ProductsEngine)
-        # ============================================================
+        # Ondoa hizi fields kutoka validated_data
         validated_data.pop('gallery_images', None)
         validated_data.pop('cover_image', None)
         validated_data.pop('video_file', None)
         validated_data.pop('color_image_files', None)
 
-        # 2. Unda bidhaa (Sasa haitatoa TypeError!)
+        # 1. Unda bidhaa
         try:
             print("  🔧 [DEBUG] Creating ProductsEngine instance...", flush=True)
             product = super().create(validated_data)
@@ -377,130 +320,88 @@ class ProductsEngineSerializer(serializers.ModelSerializer):
             print(traceback.format_exc(), flush=True)
             raise e
 
-        # 3. Hifadhi Cover Image 🔥 FIX: ONGEZA FOLDER
+        # 2. Hifadhi Cover Image kwenye Supabase
         if cover_image:
-            print(f"  📸 [DEBUG] Attempting to upload Cover Image...", flush=True)
-            try:
-                result = cloudinary.uploader.upload(cover_image, folder="product_media", format="webp"
-)
+            print(f"  📸 [DEBUG] Uploading Cover Image to Supabase...", flush=True)
+            saved_path = upload_to_supabase(cover_image, folder="product_media")
+            if saved_path:
+                # Hifadhi path kwenye product.cover_image
+                product.cover_image = saved_path
+                product.save(update_fields=['cover_image'])
+                
+                # Hifadhi URL kamili kwenye ProductMedia
+                public_url = get_supabase_url(saved_path)
                 ProductMedia.objects.create(
                     product=product,
                     media_type='cover',
-                    media_url=result['secure_url'],
+                    media_url=public_url,
                     display_order=0
                 )
                 print("  ✅ [DEBUG] Cover Image uploaded and saved to ProductMedia.", flush=True)
-                product.cover_image = result.get('public_id')
-                product.save(update_fields=['cover_image'])
-            except cloudinary.api.Error as e:
-                print(f"❌ [CLOUDINARY ERROR] Cover Image upload failed: {e}", flush=True)
-            except Exception as e:
-                print(f"❌ [UNKNOWN ERROR] Cover Image processing failed: {e}", flush=True)
-                print(traceback.format_exc(), flush=True)
 
-                # 4. Hifadhi Gallery Images
+        # 3. Hifadhi Gallery Images kwenye Supabase
         if gallery_images:
-            print(
-                f"🖼️ [DEBUG] Attempting to upload {len(gallery_images)} Gallery Images...",
-                flush=True
-            )
-
+            print(f"🖼️ [DEBUG] Uploading {len(gallery_images)} Gallery Images...", flush=True)
             for idx, img in enumerate(gallery_images):
                 try:
-                    print(
-                        f"    - Optimizing gallery image {idx+1}...",
-                        flush=True
-                    )
-
-                    optimized_img = optimize_image_for_upload(
-                        img,
-                        quality=80,
-                        max_width=1920,
-                        max_height=1920
-                    )
-
-                    result = cloudinary.uploader.upload(
-                        optimized_img,
-                        folder="product_media",
-                        resource_type="image",
-                        format="webp"
-                    )
-
-                    ProductMedia.objects.create(
-                        product=product,
-                        media_type='gallery',
-                        media_url=result['secure_url'],
-                        display_order=idx + 1
-                    )
-
-                    print(
-                        f"      ✅ Gallery image {idx+1} optimized and saved.",
-                        flush=True
-                    )
-
-                except cloudinary.api.Error as e:
-                    print(
-                        f"❌ [CLOUDINARY ERROR] Gallery image {idx+1} failed: {e}",
-                        flush=True
-                    )
-
+                    # Optimize kwanza (tumia function iliyopo)
+                    optimized_img = optimize_image_for_upload(img)
+                    
+                    saved_path = upload_to_supabase(optimized_img, folder="product_media")
+                    if saved_path:
+                        public_url = get_supabase_url(saved_path)
+                        ProductMedia.objects.create(
+                            product=product,
+                            media_type='gallery',
+                            media_url=public_url,
+                            display_order=idx + 1
+                        )
+                        print(f"      ✅ Gallery image {idx+1} uploaded.", flush=True)
                 except Exception as e:
-                    print(
-                        f"❌ [UNKNOWN ERROR] Gallery image {idx+1} failed: {e}",
-                        flush=True
-                    )
-                    print(traceback.format_exc(), flush=True)
+                    print(f"❌ [ERROR] Gallery image {idx+1} failed: {e}", flush=True)
 
-        # 5. Hifadhi Video 🔥 FIX: ONGEZA FOLDER
+        # 4. Hifadhi Video kwenye Supabase
         if video_file:
-            print(f"  🎬 [DEBUG] Attempting to upload Video...", flush=True)
-            try:
-                result = cloudinary.uploader.upload(video_file, resource_type="video", folder="product_media")
+            print(f"  🎬 [DEBUG] Uploading Video to Supabase...", flush=True)
+            saved_path = upload_to_supabase(video_file, folder="product_media")
+            if saved_path:
+                public_url = get_supabase_url(saved_path)
                 ProductMedia.objects.create(
                     product=product,
                     media_type='video',
-                    media_url=result['secure_url'],
+                    media_url=public_url,
                     is_promo_video=True
                 )
-                print("  ✅ [DEBUG] Video uploaded and saved to ProductMedia.", flush=True)
-            except cloudinary.api.Error as e:
-                print(f"❌ [CLOUDINARY ERROR] Video upload failed: {e}", flush=True)
-            except Exception as e:
-                print(f"❌ [UNKNOWN ERROR] Video processing failed: {e}", flush=True)
-                print(traceback.format_exc(), flush=True)
+                print("  ✅ [DEBUG] Video uploaded.", flush=True)
 
-        # 6. Hifadhi Color Images 🔥 FIX: ONGEZA FOLDER
+        # 5. Hifadhi Color Images kwenye Supabase
         if color_image_files:
             print(f"  🎨 [DEBUG] Uploading {len(color_image_files)} Color Images...", flush=True)
             for file in color_image_files:
-                try:
-                    result = cloudinary.uploader.upload(file, folder="product_media", format="webp"
-)
+                saved_path = upload_to_supabase(file, folder="product_media")
+                if saved_path:
+                    public_url = get_supabase_url(saved_path)
                     ProductMedia.objects.create(
                         product=product,
                         media_type='color_image',
-                        media_url=result['secure_url'],
+                        media_url=public_url,
                         display_order=10
                     )
-                    print(f"    ✅ Color image uploaded and saved.", flush=True)
-                except Exception as e:
-                    print(f"❌ [ERROR] Failed to upload color image: {e}", flush=True)
+                    print(f"    ✅ Color image uploaded.", flush=True)
 
         print("🏁 [DEBUG] Product Creation Finished.", flush=True)
         return product
 
-
-
-        # 🔥 ONGEZA HII METHOD MWISHONI MWA ProductsEngineSerializer:
+    # ------------------------------------------------------------------
+    # 🔥 8. TO_REPRESENTATION (Kuhakikisha store_id ipo)
+    # ------------------------------------------------------------------
     def to_representation(self, instance):
         data = super().to_representation(instance)
         
-        # ✅ HAKIKISHA STORE_ID IPO KWENYE RESPONSE!
         if hasattr(instance, 'store_id') and instance.store_id:
             data['store_id'] = str(instance.store_id)
-        # Kama model inatumia 'store' kama ForeignKey, tumia hii:
         elif hasattr(instance, 'store') and instance.store:
-            data['store_id'] = str(instance.store_id)  # instance.store_id inatoa UUID
+            data['store_id'] = str(instance.store_id)
             data['store'] = str(instance.store_id)
             
         return data
@@ -546,28 +447,7 @@ class StoreEngineSerializer(serializers.ModelSerializer):
         read_only_fields = ['owner']
 
     # ------------------------------------------------------------------
-    # 🔥 HELPER METHOD - KUUNDA CLOUDINARY URL
-    # ------------------------------------------------------------------
-    def _get_cloudinary_url(self, field_value, field_name, store_id):
-        """Helper method to generate Cloudinary URL"""
-        if not field_value:
-            print(f"⚠️ [DEBUG] {field_name} haipo kwa store: {store_id}", flush=True)
-            return None
-
-        CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
-        if not CLOUD_NAME:
-            print("❌ [ERROR] CLOUDINARY_CLOUD_NAME haipo kwenye .env!", flush=True)
-            return None
-
-        public_id = str(field_value)
-        safe_path = urllib.parse.quote(public_id)
-        final_url = f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/v1/{safe_path}"
-
-        print(f"✅ [DEBUG] {field_name} imeundwa: {final_url}", flush=True)
-        return final_url
-
-    # ------------------------------------------------------------------
-    # 🔥 CATEGORY & SUBCATEGORY METHODS
+    # 🔥 1. CATEGORY & SUBCATEGORY METHODS (Hazibadiliki)
     # ------------------------------------------------------------------
     def get_sub_categories(self, obj):
         if not obj.sub_category_ids:
@@ -585,46 +465,40 @@ class StoreEngineSerializer(serializers.ModelSerializer):
             return None
 
     # ------------------------------------------------------------------
-    # 🔥 URL METHODS (Zinatumia Helper)
+    # 🔥 2. URL METHODS (Zinatumia Supabase Sasa!)
     # ------------------------------------------------------------------
     def get_store_logo_url(self, obj):
-        return self._get_cloudinary_url(obj.store_logo, 'store_logo_url', obj.id)
+        return get_supabase_url(obj.store_logo)
 
     def get_store_banner_url(self, obj):
-        return self._get_cloudinary_url(obj.store_banner, 'store_banner_url', obj.id)
+        return get_supabase_url(obj.store_banner)
 
     def get_tin_image_url(self, obj):
-        return self._get_cloudinary_url(obj.tin_image, 'tin_image_url', obj.id)
+        return get_supabase_url(obj.tin_image)
 
     def get_office_image_1_url(self, obj):
+        # Kumbuka: office_image_1 ilikuwa inahifadhi URL kamili tangu zamani
         if not obj.office_image_1:
-            print(f"⚠️ [DEBUG] office_image_1 haipo kwa store: {obj.id}", flush=True)
             return None
-        print(f"✅ [DEBUG] office_image_1 URL: {obj.office_image_1}", flush=True)
-        return obj.office_image_1
+        # Kama ni ya Supabase (path), get_supabase_url itaitoa. Kama ni ya zamani (http), itairudisha.
+        return get_supabase_url(obj.office_image_1)
 
     def get_office_image_2_url(self, obj):
         if not obj.office_image_2:
-            print(f"⚠️ [DEBUG] office_image_2 haipo kwa store: {obj.id}", flush=True)
             return None
-        print(f"✅ [DEBUG] office_image_2 URL: {obj.office_image_2}", flush=True)
-        return obj.office_image_2
+        return get_supabase_url(obj.office_image_2)
 
     def get_office_image_3_url(self, obj):
         if not obj.office_image_3:
-            print(f"⚠️ [DEBUG] office_image_3 haipo kwa store: {obj.id}", flush=True)
             return None
-        print(f"✅ [DEBUG] office_image_3 URL: {obj.office_image_3}", flush=True)
-        return obj.office_image_3
+        return get_supabase_url(obj.office_image_3)
 
     # ============================================================
-    # 🔥 TO_INTERNAL_VALUE - Kukusanya Files
+    # 🔥 3. TO_INTERNAL_VALUE - Kukusanya Files
     # ============================================================
     def to_internal_value(self, data):
         request = self.context.get('request')
-
-        print(f"🔍 [DEBUG] StoreSerializer to_internal_value called! Request FILES keys: {request.FILES.keys() if request else 'No Request'}", flush=True)
-
+        
         self._store_logo = None
         self._store_banner = None
         self._tin_image = None
@@ -636,37 +510,29 @@ class StoreEngineSerializer(serializers.ModelSerializer):
             self._tin_image = request.FILES.get('tin_image')
             self._office_images = request.FILES.getlist('office_images')
 
-            print(f"🔍 [DEBUG] Store Logo received: {self._store_logo is not None}", flush=True)
-            print(f"🔍 [DEBUG] Store Banner received: {self._store_banner is not None}", flush=True)
-            print(f"🔍 [DEBUG] TIN Image received: {self._tin_image is not None}", flush=True)
-            print(f"🔍 [DEBUG] Office Images count: {len(self._office_images)}", flush=True)
-
         return super().to_internal_value(data)
 
     # ============================================================
-    # 🔥 CREATE METHOD
+    # 🔥 4. CREATE METHOD (Supabase Version)
     # ============================================================
     def create(self, validated_data):
-        import cloudinary.uploader
         import traceback
         request = self.context.get('request')
         user = request.user
 
-        print("📦 [DEBUG] Starting Store Creation (Like ProductsEngine)...", flush=True)
+        print("📦 [DEBUG] Starting Store Creation...", flush=True)
 
         try:
             profile = Profile.objects.get(user=user)
         except Profile.DoesNotExist:
-            print("❌ [ERROR] Profile haipo!", flush=True)
             raise serializers.ValidationError({"owner": "Mtumiaji hana Profile. Tafadhali unda profile kwanza."})
 
-        # 🔥 1. PAKUA CATEGORY_ID KUTOKA REQUEST
+        # 1. Pakua Category ID
         category_id = request.data.get('category_id') or request.data.get('category')
         if category_id:
             validated_data['category_id'] = category_id
-            print(f"✅ [DEBUG] Category ID imepakiwa: {category_id}", flush=True)
 
-        # 🔥 2. PAKUA SUB_CATEGORY_IDS
+        # 2. Pakua Sub Category IDs
         sub_category_ids = request.data.get('sub_category_ids')
         if sub_category_ids:
             import json
@@ -676,24 +542,22 @@ class StoreEngineSerializer(serializers.ModelSerializer):
                 except json.JSONDecodeError:
                     sub_category_ids = sub_category_ids.split(',')
             validated_data['sub_category_ids'] = sub_category_ids
-            print(f"✅ [DEBUG] Sub Category IDs: {sub_category_ids}", flush=True)
 
-        # 🔥 3. TOA PICHA KUTOKA self (Zilizokusanywa na to_internal_value)
+        # 3. Toa picha kutoka self
         store_logo_file = self._store_logo
         store_banner_file = self._store_banner
         tin_image_file = self._tin_image
         office_images = self._office_images
 
-        # 🔥 4. ONDOA FIELDS ZA PICHA KUTOKA validated_data
+        # 4. Ondoa fields za picha kutoka validated_data
         validated_data.pop('store_logo', None)
         validated_data.pop('store_banner', None)
         validated_data.pop('tin_image', None)
         validated_data.pop('office_images', None)
 
-        # 🔥 5. UNDA DUKA (BILA PICHA KWANZA)
+        # 5. Unda Duka (Bila Picha Kwanza)
         validated_data['owner'] = profile
         try:
-            print("  🔧 [DEBUG] Creating StoreEngine instance...", flush=True)
             store = super().create(validated_data)
             print(f"  ✅ [DEBUG] Store created with ID: {store.id}", flush=True)
         except Exception as e:
@@ -701,107 +565,71 @@ class StoreEngineSerializer(serializers.ModelSerializer):
             print(traceback.format_exc(), flush=True)
             raise e
 
-        # 🔥 6. PAKIA NA KUHIFADHI PICHA KWENYE CLOUDINARY
+        # 6. Pakia Picha kwenye Supabase
         # Store Logo
         if store_logo_file:
-            print(f"  📸 [DEBUG] Attempting to upload Store Logo...", flush=True)
-            try:
-                result = cloudinary.uploader.upload(store_logo_file, folder="store_logos")
-                store.store_logo = result['public_id']
+            saved_path = upload_to_supabase(store_logo_file, folder="store_logos")
+            if saved_path:
+                store.store_logo = saved_path
                 store.save(update_fields=['store_logo'])
-                print(f"    ✅ Store Logo uploaded! Public ID: {result['public_id']}", flush=True)
-            except Exception as e:
-                print(f"❌ [ERROR] Store Logo upload failed: {e}", flush=True)
-                print(traceback.format_exc(), flush=True)
+                print(f"    ✅ Store Logo uploaded to Supabase: {saved_path}", flush=True)
 
         # Store Banner
         if store_banner_file:
-            print(f"  📸 [DEBUG] Attempting to upload Store Banner...", flush=True)
-            try:
-                result = cloudinary.uploader.upload(store_banner_file, folder="store_banners", format="webp"
-)
-                store.store_banner = result['public_id']
+            saved_path = upload_to_supabase(store_banner_file, folder="store_banners")
+            if saved_path:
+                store.store_banner = saved_path
                 store.save(update_fields=['store_banner'])
-                print(f"    ✅ Store Banner uploaded! Public ID: {result['public_id']}", flush=True)
-            except Exception as e:
-                print(f"❌ [ERROR] Store Banner upload failed: {e}", flush=True)
-                print(traceback.format_exc(), flush=True)
+                print(f"    ✅ Store Banner uploaded to Supabase: {saved_path}", flush=True)
 
         # TIN Image
         if tin_image_file:
-            print(f"  📸 [DEBUG] Attempting to upload TIN Image...", flush=True)
-            try:
-                result = cloudinary.uploader.upload(tin_image_file, folder="tin_verification", format="webp"
-)
-                store.tin_image = result['public_id']
+            saved_path = upload_to_supabase(tin_image_file, folder="tin_verification")
+            if saved_path:
+                store.tin_image = saved_path
                 store.save(update_fields=['tin_image'])
-                print(f"    ✅ TIN Image uploaded! Public ID: {result['public_id']}", flush=True)
-            except Exception as e:
-                print(f"❌ [ERROR] TIN Image upload failed: {e}", flush=True)
-                print(traceback.format_exc(), flush=True)
+                print(f"    ✅ TIN Image uploaded to Supabase: {saved_path}", flush=True)
 
         # Office Images
         if office_images:
-            print(f"  🏢 [DEBUG] Attempting to upload {len(office_images)} Office Images...", flush=True)
-            if len(office_images) == 0:
-                print("❌ [ERROR] Hakuna office images zilizopatikana!", flush=True)
-            else:
-                for i, file in enumerate(office_images[:3]):
-                    try:
-                        print(f"    - Uploading office image {i+1}...", flush=True)
-                        result = cloudinary.uploader.upload(file, folder="store_offices", format="webp"
-)
+            print(f"  🏢 [DEBUG] Uploading {len(office_images)} Office Images...", flush=True)
+            for i, file in enumerate(office_images[:3]):
+                saved_path = upload_to_supabase(file, folder="store_offices")
+                if saved_path:
+                    # Hifadhi URL kamili kwa sababu model inatumia CharField
+                    public_url = get_supabase_url(saved_path)
+                    if i == 0:
+                        store.office_image_1 = public_url
+                    elif i == 1:
+                        store.office_image_2 = public_url
+                    elif i == 2:
+                        store.office_image_3 = public_url
+            store.save(update_fields=['office_image_1', 'office_image_2', 'office_image_3'])
+            print("      ✅ Office images uploaded.", flush=True)
 
-                        if i == 0:
-                            store.office_image_1 = result['secure_url']
-                        elif i == 1:
-                            store.office_image_2 = result['secure_url']
-                        elif i == 2:
-                            store.office_image_3 = result['secure_url']
-
-                        store.save(update_fields=['office_image_1', 'office_image_2', 'office_image_3'])
-                        print(f"      ✅ Office image {i+1} uploaded! URL: {result['secure_url']}", flush=True)
-
-                    except Exception as e:
-                        print(f"❌ [ERROR] Office image {i+1} failed: {e}", flush=True)
-                        print(traceback.format_exc(), flush=True)
-
-        print("🏁 [DEBUG] Store Creation Finished (Like ProductsEngine).", flush=True)
+        print("🏁 [DEBUG] Store Creation Finished.", flush=True)
         return store
 
-
 # ============================================================
-# 🔥 PRODUCT VARIATION SERIALIZER (SAHIHI - Imeondoa read_only!)
+# 🔥 PRODUCT VARIATION SERIALIZER (Supabase Storage Version)
 # ============================================================
 class ProductVariationSerializer(serializers.ModelSerializer):
-    # 🔥 1. Hii ndiyo itatumwa kwa Frontend (URL kamili ya Cloudinary)
+    # Hii ndiyo itatumwa kwa Frontend (URL kamili kutoka Supabase)
     color_image_url = serializers.SerializerMethodField()
     
-    # 🔥 2. Hii inakubali File kutoka Frontend na kuihifadhi kwenye Cloudinary
+    # Hii inakubali File kutoka Frontend
     color_image_file = serializers.ImageField(write_only=True, required=False)
 
     class Meta:
         model = ProductVariation
         fields = '__all__'
-        # ✅ MUHIMU SANA: Ondoa 'color_image' kwenye read_only_fields!
-        read_only_fields = ['id', 'created_at']  
+        read_only_fields = ['id', 'created_at']
 
     def get_color_image_url(self, obj):
-        if not obj.color_image:
-            return None
-        
-        # Tafuta Cloud Name kwa usalama
-        CLOUD_NAME = settings.CLOUDINARY_STORAGE.get('CLOUD_NAME')
-        if not CLOUD_NAME:
-            CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
-        if not CLOUD_NAME:
-            return None
-
-        # ✅ SAHIHI: Tumia public_id moja kwa moja (sio kuongeza 'media/')
-        safe_path = urllib.parse.quote(str(obj.color_image), safe='/')
-        return f"https://res.cloudinary.com/{CLOUD_NAME}/image/upload/{safe_path}"
+        # 🔥 Tumia helper function yetu ya Supabase
+        return get_supabase_url(obj.color_image)
     
-    # 🔥 ONGEZA HII METHOD ili kuona ni data ipi inakosea kwenye 400!
+    # Hii method inasaidia kuona data inayokuja kwenye 400 errors
     def validate(self, data):
         print("🔍 [VALIDATE] Data received:", data)
         print("🔍 [VALIDATE] Fields present:", data.keys())
@@ -809,16 +637,13 @@ class ProductVariationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         import traceback
-        import cloudinary.uploader
-        import cloudinary.api
-        import cloudinary.exceptions
 
         print("🎨 [DEBUG] Creating ProductVariation...")
 
-        # 🔥 1. Toa picha kutoka validated_data
+        # 1. Toa picha kutoka validated_data
         color_image_file = validated_data.pop('color_image_file', None)
         
-        # 🔥 2. Unda variation (bila picha kwanza)
+        # 2. Unda variation (bila picha kwanza)
         try:
             variation = super().create(validated_data)
             print(f"  ✅ [DEBUG] Variation created with ID: {variation.id}")
@@ -827,12 +652,12 @@ class ProductVariationSerializer(serializers.ModelSerializer):
             print(traceback.format_exc())
             raise e
 
-        # 🔥 3. Ikiwa picha ipo, ipakie Cloudinary
+        # 3. Ikiwa picha ipo, ipakie Supabase Storage
         if color_image_file:
-            print(f"  📸 [DEBUG] Uploading color_image for {variation.color_name}...")
+            print(f"  📸 [DEBUG] Uploading color_image for {variation.color_name} to Supabase...")
 
             try:
-                # 1. Optimize picha kwanza
+                # 1. Optimize picha kwanza (tumia function iliyopo)
                 optimized_image = optimize_image_for_upload(
                     color_image_file,
                     quality=80,
@@ -840,28 +665,20 @@ class ProductVariationSerializer(serializers.ModelSerializer):
                     max_height=1920
                 )
 
-                # 2. Upload picha iliyoboreshwa Cloudinary
-                result = cloudinary.uploader.upload(
-                    optimized_image,
-                    folder="product_variations",
-                    resource_type="image",
-                    format="webp",
-                    timeout=60
-                )
+                # 2. Upload picha iliyoboreshwa Supabase
+                saved_path = upload_to_supabase(optimized_image, folder="product_variations")
 
-                # 3. Hifadhi Cloudinary Public ID
-                variation.color_image = result['public_id']
-                variation.save(update_fields=['color_image'])
-
-                print(
-                    f"  ✅ [DEBUG] Color Image uploaded! "
-                    f"Public ID: {result['public_id']}"
-                )
+                if saved_path:
+                    # 3. Hifadhi path kwenye database
+                    variation.color_image = saved_path
+                    variation.save(update_fields=['color_image'])
+                    print(f"  ✅ [DEBUG] Color Image uploaded to Supabase: {saved_path}")
+                else:
+                    print(f"❌ [SUPABASE ERROR] Color Image upload failed for variation {variation.id}")
 
             except Exception as e:
-                print(f"❌ [ERROR] Color Image upload failed: {e}")
+                print(f"❌ [ERROR] Color Image processing failed: {e}")
                 print(traceback.format_exc())
 
         print("🏁 [DEBUG] ProductVariation creation finished.")
-
         return variation
