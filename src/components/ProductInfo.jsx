@@ -412,13 +412,18 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
       return;
     }
 
-    if (drawerAction === 'order') {
+      if (drawerAction === 'order') {
       const token = localStorage.getItem('access_token');
       if (!token) {
-        toast.dismiss();
-        toast.error("Tafadhali ingia kwanza!");
+        // 🔥 BADILIKO HAPA: 
+        // 1. Ongeza duration (mfano sekunde 3)
+        // 2. Ongeza setTimeout kabla ya navigate ili mtumiaji aisome hiyo toast kwanza
+        toast.error("Tafadhali ingia kwanza!", { duration: 1000 });
         setLoading(false);
-        navigate("/dashboard/login");
+        
+        setTimeout(() => {
+          navigate("/dashboard/login");
+        }, 1500); // Inasubiri sekunde 1.5 kabla ya kubadilisha ukurasa
         return;
       }
     }

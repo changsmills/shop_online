@@ -185,30 +185,41 @@ const CheckoutPage = () => {
   ];
 
  return (
-    <div className="flex flex-col h-screen bg-white dark:bg-[#1e293b] text-gray-800 dark:text-slate-200">
+    <div className="flex flex-col h-screen bg-white dark:bg-[#1e293b] text-gray-800 dark:text-slate-200 font-sans">
       <Toaster position="top-center" />
 
-      {/* ===== HEADER ===== */}
-      <header className="flex justify-between items-center px-3 sm:px-4 md:px-6 py-2.5 border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-[#1e293b] z-20">
-        <div className="flex items-center gap-3 md:gap-5">
+            {/* ===== HEADER ===== */}
+      <header className="flex justify-between items-center px-2 sm:px-4 md:px-6 py-2.5 border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-[#1e293b] z-20 shrink-0 gap-2">
+        
+        {/* KUSHOTO: Back Arrow + Logo */}
+        <div className="flex items-center gap-2 sm:gap-4">
+
           <Link
             to="/dashboard"
-            className="text-base sm:text-lg md:text-xl font-extrabold text-[#ff6a00] no-underline"
+            className="text-sm sm:text-base md:text-xl font-extrabold text-[#ff6a00] no-underline whitespace-nowrap"
           >
-            Skyfall.com
+            Skyfall.co.tz
           </Link>
-          <div className="hidden md:flex items-center bg-gray-100 dark:bg-slate-700 px-3 py-1.5 rounded-lg">
+
+          {/* Search Bar (Desktop Only) */}
+          <div className="hidden md:flex items-center bg-gray-100 dark:bg-slate-700 px-3 py-1.5 rounded-lg ml-2">
             <Search size={16} className="text-gray-400 dark:text-slate-400" />
             <input
               type="text"
               placeholder="Search order details..."
-              className="border-none bg-transparent outline-none ml-2 text-sm text-gray-800 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-500"
+              className="border-none bg-transparent outline-none ml-2 text-sm text-gray-800 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-500 w-48"
             />
           </div>
         </div>
-        <div className="flex items-center gap-2.5 md:gap-4">
-          <Bell size={20} className="hidden md:block cursor-pointer text-gray-500 dark:text-slate-400" />
-          <UserTools />
+
+        {/* KULIA: Icons */}
+        <div className="flex items-center gap-1.5 sm:gap-3">
+          <Bell size={18} className="hidden sm:block cursor-pointer text-gray-500 dark:text-slate-400 hover:text-[#ff6a00] transition-colors" />
+          
+          {/* Kama UserTools ni kubwa, unaweza kuifunga kwa div yenye scale */}
+          <div className="scale-90 sm:scale-100 origin-right">
+            <UserTools />
+          </div>
         </div>
       </header>
 
