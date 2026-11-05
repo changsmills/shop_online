@@ -1,3 +1,4 @@
+// src/pages/Dashboard.jsx
 import React, { Suspense, lazy, useState, useEffect, useRef } from "react";
 import ReactDOM from 'react-dom';
 import { useNavigate } from "react-router-dom";
@@ -22,7 +23,6 @@ import { useDashboardData } from "../hooks/useDashboardData";
 import BottomNav from "../components/BottomNav";
 import MobileCategorySlider from "../components/MobileCategorySlider";
 import { useTranslation } from 'react-i18next';
-import SkeletonLayout from '../components/SkeletonLayout';
 
 import {
   Star, Shirt, Headphones, Dribbble, Sparkles, Gem, ChevronRight,
@@ -35,7 +35,7 @@ const placeholderImg = "https://via.placeholder.com/100?text=Skyfall";
 const ALL_CATEGORY = { id: 'all', name: 'All', name_sw: 'Zote', isAll: true };
 
 // ==========================================
-// 0. LAZY SECTION COMPONENT (Mpya)
+// 0. LAZY SECTION COMPONENT
 // ==========================================
 const LazySection = ({ children, height = "300px" }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -49,7 +49,7 @@ const LazySection = ({ children, height = "300px" }) => {
           observer.disconnect();
         }
       },
-      { rootMargin: "200px" } // Inaanza kupakia 200px kabla ya kufika kabisa
+      { rootMargin: "200px" }
     );
 
     if (sectionRef.current) observer.observe(sectionRef.current);
@@ -151,7 +151,7 @@ export default function Dashboard() {
   // ==========================================
   // 3. QUERIES (TanStack Query)
   // ==========================================
-  const { data: cachedAds = [] } = useQuery({
+  const { data: cachedAds = [], isLoading: loadingAds } = useQuery({
     queryKey: ['ads'],
     queryFn: fetchAds,
     staleTime: 1000 * 60 * 5,
@@ -190,11 +190,7 @@ export default function Dashboard() {
   // ==========================================
   // 4. EFFECTS ZILIZOSALIA
   // ==========================================
-  const activeAd = cachedAds[currentAdIndex] || {
-    media_url: "https://picsum.photos/seed/promo/800/400",
-    business_name: "Welcome Skyfall",
-    description: "Pata bidhaa bora kutoka kwa wauzaji waliohakikiwa nchi nzima."
-  };
+  const activeAd = cachedAds[currentAdIndex] || null;
 
   const isVideoAd = (ad) => {
     if (!ad?.media_url) return false;
@@ -345,27 +341,57 @@ export default function Dashboard() {
     return <IconComponent size={18} />;
   };
 
-  const ComponentFallback = () => (
-    <div className="flex items-center justify-center p-5">
-      <div className="flex gap-1">
-        <div className="w-2 h-2 rounded-full bg-brand-orange animate-bounce [animation-delay:0ms]"></div>
-        <div className="w-2 h-2 rounded-full bg-brand-orange animate-bounce [animation-delay:150ms]"></div>
-        <div className="w-2 h-2 rounded-full bg-brand-orange animate-bounce [animation-delay:300ms]"></div>
+  // ==========================================
+  // 6. SKELETON COMPONENTS
+  // ==========================================
+  const SkeletonSection = () => (
+    <div className="w-full py-4 px-2">
+      <div className="flex justify-between items-center mb-4 px-1">
+        <div className="w-32 h-6 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"></div>
+        <div className="w-16 h-4 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"></div>
+      </div>
+      <div className="flex gap-2 sm:gap-3 overflow-hidden">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="w-[130px] sm:w-[160px] md:w-[180px] shrink-0">
+            <div className="w-full aspect-square bg-gray-200 dark:bg-gray-800 rounded-xl mb-2 animate-pulse"></div>
+            <div className="w-3/4 h-4 bg-gray-200 dark:bg-gray-800 rounded mb-1.5 animate-pulse"></div>
+            <div className="w-1/2 h-4 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"></div>
+          </div>
+        ))}
       </div>
     </div>
   );
 
-  if (dataLoading) {
-    return (
-      <div className="flex flex-col bg-bgPrimary min-h-screen relative">
-        <Header search={search} setSearch={setSearch} />
-        <SkeletonLayout />
-      </div>
-    );
-  }
+  // Skeleton ya Sidebar Categories
+  const SkeletonSidebar = () => (
+    <div className="w-full flex flex-col gap-4 p-4">
+      {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+        <div key={i} className="flex items-center gap-3">
+          <div className="w-5 h-5 bg-gray-200 dark:bg-gray-800 rounded-full animate-pulse"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-3/4 animate-pulse"></div>
+        </div>
+      ))}
+    </div>
+  );
+
+  // Skeleton ya Recently Viewed (Sidebar ya Kulia)
+  const SkeletonRecent = () => (
+    <div className="w-full flex flex-col gap-3 p-3">
+      <div className="w-24 h-5 bg-gray-200 dark:bg-gray-800 rounded mb-2 animate-pulse"></div>
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="flex gap-2">
+          <div className="w-12 h-12 bg-gray-200 dark:bg-gray-800 rounded-lg animate-pulse"></div>
+          <div className="flex-1">
+            <div className="w-full h-3 bg-gray-200 dark:bg-gray-800 rounded mb-1 animate-pulse"></div>
+            <div className="w-1/2 h-3 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   // ==========================================
-  // 6. RENDER (UI)
+  // 7. RENDER (UI)
   // ==========================================
   return (
     <div key={i18n.language} className="flex flex-col min-h-screen bg-[#f1f3f5] dark:bg-black relative font-sans ">
@@ -398,22 +424,28 @@ export default function Dashboard() {
           {!search && (
             <div className="block w-full lg:grid lg:grid-cols-[320px_1fr_280px] lg:gap-4 lg:h-[350px] px-1">
               
+              {/* ===== SIDEBAR CATEGORIES ===== */}
               <aside className="hidden lg:flex lg:flex-col h-full max-h-full overflow-hidden bg-[#f8f8f8] dark:bg-[#111111] border-r border-gray-100 dark:border-gray-800 rounded-xl shadow-sm w-full">
                 <div className="flex items-center gap-3 px-4 py-4 shrink-0 border-b border-gray-200 dark:border-gray-800">
                   <Star size={18} className="text-gray-600 dark:text-gray-300 shrink-0" />
                   <span className="text-[16px] font-bold text-gray-900 dark:text-white tracking-wide whitespace-nowrap">Categories</span>
                 </div>
-                <ul className="list-none m-0 overflow-auto flex-1 py-1">
-                  {categories.map(cat => (
-                    <li key={cat.id} onClick={() => handleCategoryClick(cat)} className="flex justify-between items-center px-4 py-3 cursor-pointer transition-colors duration-200 hover:bg-gray-200/60 dark:hover:bg-gray-800/60 group">
-                      <div className="flex items-center gap-3 text-gray-800 dark:text-gray-200 min-w-0">
-                        <span className="shrink-0 text-gray-500 group-hover:text-black dark:group-hover:text-white transition-colors">{getIcon(cat.icon_name)}</span>
-                        <span className="text-[14px] font-semibold truncate text-gray-900 dark:text-white">{getCategoryDisplayName(cat)}</span>
-                      </div>
-                      <ChevronRight size={16} className="text-gray-400 dark:text-gray-500 shrink-0 ml-2 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
-                    </li>
-                  ))}
-                </ul>
+                {/* 🔥 HAPA: Kama categories zinapakia, onyesha SkeletonSidebar */}
+                {dataLoading && categories.length === 0 ? (
+                  <SkeletonSidebar />
+                ) : (
+                  <ul className="list-none m-0 overflow-auto flex-1 py-1">
+                    {categories.map(cat => (
+                      <li key={cat.id} onClick={() => handleCategoryClick(cat)} className="flex justify-between items-center px-4 py-3 cursor-pointer transition-colors duration-200 hover:bg-gray-200/60 dark:hover:bg-gray-800/60 group">
+                        <div className="flex items-center gap-3 text-gray-800 dark:text-gray-200 min-w-0">
+                          <span className="shrink-0 text-gray-500 group-hover:text-black dark:group-hover:text-white transition-colors">{getIcon(cat.icon_name)}</span>
+                          <span className="text-[14px] font-semibold truncate text-gray-900 dark:text-white">{getCategoryDisplayName(cat)}</span>
+                        </div>
+                        <ChevronRight size={16} className="text-gray-400 dark:text-gray-500 shrink-0 ml-2 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </aside>
 
               <div className="h-full">
@@ -432,29 +464,42 @@ export default function Dashboard() {
                   )}
                 </div>
 
+                {/* ========================================= */}
+                {/* BANNER NA SKELETON YAKE (Bila Neno) */}
+                {/* ========================================= */}
                 <div className="w-full overflow-hidden m-0 p-0 leading-none">
                   <div className="relative w-full aspect-[18/9] md:aspect-[16/7] lg:aspect-auto lg:h-[350px] bg-gradient-to-br from-[#1a1a2e] to-[#16213e] overflow-hidden rounded-xl max-h-[350px]">
-                    {activeAd && isVideoAd(activeAd) ? (
-                      <video src={activeAd.media_url} autoPlay muted playsInline onEnded={() => { if (cachedAds.length) setCurrentAdIndex((prev) => (prev + 1) % cachedAds.length); }} className="w-full h-full object-cover object-center block bg-[#1a1a2e]" />
+                    
+                    {/* 🔥 HAPA: Skeleton tupu bila neno */}
+                    {loadingAds || cachedAds.length === 0 ? (
+                      <div className="w-full h-full bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
                     ) : (
-                      activeAd && <img src={activeAd.media_url} className="w-full h-full object-cover object-center block bg-[#1a1a2e]" alt="promo" loading="lazy" />
-                    )}
-                    {activeAd && (
-                      <div className="absolute inset-0 flex flex-col justify-center items-start px-4 pr-3 py-4 sm:pl-10 sm:pr-8 lg:pl-12 lg:pr-10 text-white bg-gradient-to-r from-black/90 via-black/60 to-transparent pointer-events-none">
-                        <span className="bg-brand-orange px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold w-fit mb-2 tracking-wide uppercase shadow-sm">{t('sponsored')}</span>
-                        <h2 className="text-lg sm:text-2xl lg:text-3xl font-extrabold leading-tight mb-1.5 sm:mb-2 max-w-[95%] sm:max-w-[80%] drop-shadow-md">{activeAd.business_name}</h2>
-                        <p className="text-xs sm:text-sm text-gray-100 max-w-[95%] sm:max-w-[75%] leading-snug sm:leading-relaxed mb-4 line-clamp-2 sm:line-clamp-3 drop-shadow-sm font-medium">{activeAd.description}</p>
-                        <button className="bg-[#FF6A00] hover:bg-[#e55a00] text-white font-bold px-5 py-2.5 sm:px-6 sm:py-2.5 rounded-full w-fit pointer-events-auto transition-all duration-300 ease-in-out shadow-[0_4px_10px_rgba(255,106,0,0.4)] hover:shadow-[0_6px_20px_rgba(255,106,0,0.6)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-sm sm:text-base flex items-center gap-1.5" onClick={() => { if (window.innerWidth > 1024) { window.open(`/store/${activeAd.store_id}`, '_blank'); } else { navigate(`/store/${activeAd.store_id}`); } }}>
-                          {t('source_now')} <span>→</span>
-                        </button>
-                      </div>
+                      <>
+                        {activeAd && isVideoAd(activeAd) ? (
+                          <video src={activeAd.media_url} autoPlay muted playsInline onEnded={() => { if (cachedAds.length) setCurrentAdIndex((prev) => (prev + 1) % cachedAds.length); }} className="w-full h-full object-cover object-center block bg-[#1a1a2e]" />
+                        ) : (
+                          activeAd && <img src={activeAd.media_url} className="w-full h-full object-cover object-center block bg-[#1a1a2e]" alt="promo" loading="lazy" />
+                        )}
+                        
+                        {activeAd && (
+                          <div className="absolute inset-0 flex flex-col justify-center items-start px-4 pr-3 py-4 sm:pl-10 sm:pr-8 lg:pl-12 lg:pr-10 text-white bg-gradient-to-r from-black/90 via-black/60 to-transparent pointer-events-none">
+                            <span className="bg-brand-orange px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold w-fit mb-2 tracking-wide uppercase shadow-sm">{t('sponsored')}</span>
+                            <h2 className="text-lg sm:text-2xl lg:text-3xl font-extrabold leading-tight mb-1.5 sm:mb-2 max-w-[95%] sm:max-w-[80%] drop-shadow-md">{activeAd.business_name}</h2>
+                            <p className="text-xs sm:text-sm text-gray-100 max-w-[95%] sm:max-w-[75%] leading-snug sm:leading-relaxed mb-4 line-clamp-2 sm:line-clamp-3 drop-shadow-sm font-medium">{activeAd.description}</p>
+                            <button className="bg-[#FF6A00] hover:bg-[#e55a00] text-white font-bold px-5 py-2.5 sm:px-6 sm:py-2.5 rounded-full w-fit pointer-events-auto transition-all duration-300 ease-in-out shadow-[0_4px_10px_rgba(255,106,0,0.4)] hover:shadow-[0_6px_20px_rgba(255,106,0,0.6)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-sm sm:text-base flex items-center gap-1.5" onClick={() => { if (window.innerWidth > 1024) { window.open(`/store/${activeAd.store_id}`, '_blank'); } else { navigate(`/store/${activeAd.store_id}`); } }}>
+                              {t('source_now')} <span>→</span>
+                            </button>
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
               </div>
 
+              {/* ===== RECENTLY VIEWED SIDEBAR ===== */}
               <div className="hidden lg:flex lg:flex-col h-full bg-[#f8f8f8] dark:bg-black rounded-xl border border-gray-200 dark:border-gray-800 p-3 overflow-hidden shadow-sm">
-                <Suspense fallback={<ComponentFallback />}>
+                <Suspense fallback={<SkeletonRecent />}>
                   <RecentlyViewed key={`mini-${i18n.language}`} navigate={navigate} compact={true} />
                 </Suspense>
               </div>
@@ -463,41 +508,41 @@ export default function Dashboard() {
 
           <div className="flex flex-col pt-4 bg-[#f8f8f8] dark:bg-black ">
             <div className="block lg:hidden">
-              <Suspense fallback={<ComponentFallback />}>
+              <Suspense fallback={<SkeletonSection />}>
                 <RecentlyViewed key={i18n.language} navigate={navigate} />
               </Suspense>
             </div>
 
             {/* ========================================= */}
-            {/* TUMEONGEZA LAZY SECTION HAPA CHINI */}
+            {/* LAZY SECTIONS NA SKELETON ZAO */}
             {/* ========================================= */}
 
             <LazySection height="250px">
-              <Suspense fallback={<ComponentFallback />}>
+              <Suspense fallback={<SkeletonSection />}>
                 <NewArrivals key={i18n.language} navigate={navigate} selectedCategory={selectedCategoryForComponents} />
               </Suspense>
             </LazySection>
 
             <LazySection height="250px">
-              <Suspense fallback={<ComponentFallback />}>
+              <Suspense fallback={<SkeletonSection />}>
                 <TrendingNow key={i18n.language} products={trendingProducts} navigate={navigate} selectedCategory={selectedCategoryForComponents} getCategoryDisplayName={getCategoryDisplayName} />
               </Suspense>
             </LazySection>
 
             <LazySection height="250px">
-              <Suspense fallback={<ComponentFallback />}>
+              <Suspense fallback={<SkeletonSection />}>
                 <TopDeals key={i18n.language} navigate={navigate} selectedCategory={selectedCategoryForComponents} />
               </Suspense>
             </LazySection>
 
             <LazySection height="250px">
-              <Suspense fallback={<ComponentFallback />}>
+              <Suspense fallback={<SkeletonSection />}>
                 <TopStores key={i18n.language} navigate={navigate} selectedCategory={selectedCategoryForComponents} />
               </Suspense>
             </LazySection>
 
             <LazySection height="400px">
-              <Suspense fallback={<ComponentFallback />}>
+              <Suspense fallback={<SkeletonSection />}>
                 <JustForYou key={i18n.language} handleAction={handleProtectedAction} search={search} selectedCategory={selectedCategoryForComponents} />
               </Suspense>
             </LazySection>

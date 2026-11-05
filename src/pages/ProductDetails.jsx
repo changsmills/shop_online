@@ -16,7 +16,6 @@ import { useQuery } from '@tanstack/react-query';
 
 const ProductGallery = React.lazy(() => import("../components/ProductGallery"));
 const ProductInfo = React.lazy(() => import("../components/ProductInfo"));
-const SkeletonProductDetails = React.lazy(() => import("../components/SkeletonProductDetails"));
 
 // 2. Function ya kuchukua data zote za bidhaa
 const fetchProductDetails = async ({ queryKey }) => {
@@ -71,7 +70,7 @@ const fetchProductDetails = async ({ queryKey }) => {
   const mediaData = await mediaDataPromise;
   const variationsData = await variationsDataPromise;
 
-  // Hifadhi kwenye localStorage (recentlyViewed) - Hii ni logic yako ya awali
+  // Hifadhi kwenye localStorage (recentlyViewed)
   try {
     if (productData?.id) {
       const recentlyViewed = JSON.parse(localStorage.getItem("recentlyViewed") || "[]");
@@ -117,7 +116,7 @@ export default function ProductDetails() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedImageTitle, setSelectedImageTitle] = useState("");
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [fetchTrigger, setFetchTrigger] = useState(0); // Bado tunaiacha kwa ajili ya "online" refetch
+  const [fetchTrigger, setFetchTrigger] = useState(0);
 
   // ==========================================
   // 4. TANSTACK QUERIES
@@ -131,7 +130,7 @@ export default function ProductDetails() {
     queryKey: ['productDetails', id, fetchTrigger],
     queryFn: fetchProductDetails,
     enabled: !!id,
-    staleTime: 1000 * 60 * 5, // Cache kwa dakika 5
+    staleTime: 1000 * 60 * 5,
   });
 
   const { data: relatedProducts = [], isLoading: loadingRelated } = useQuery({
@@ -203,12 +202,7 @@ export default function ProductDetails() {
       await api.post(`/products/${id}/rate/`, { rating: stars });
       toast.dismiss(loadingToast);
       toast.success(`Asante kwa rating ya nyota ${stars}!`);
-      
-      // Sasisha UI papo hapo
-      // Kwa kuwa tunatumia useQuery, tunaweza kutumia queryClient.invalidateQueries 
-      // lakini kwa rating, tunabadilisha data ya cache moja kwa moja
-      refetch(); // Inafetch upya data zote ili rating mpya ionekane
-      
+      refetch();
     } catch (err) {
       toast.dismiss(loadingToast);
       toast.error("Tatizo la mtandao limetokea.");
@@ -221,16 +215,15 @@ export default function ProductDetails() {
     setIsImageViewerOpen(true);
   };
 
-  if (isLoading) {
-    return <SkeletonProductDetails isMobile={isMobile} />;
-  }
+  // 🔥 TUMEONDOA KIZUIZI CHA if (error || !product)
+  // Tutatumia conditional kwenye kila sehemu
 
-  if (error || !product) {
-    return <div className="text-center py-10 text-gray-500">Bidhaa haijapatikana.</div>;
+  if (error) {
+    return <div className="text-center py-10 text-gray-500">Hitilafu imetokea: {error.message}</div>;
   }
 
   // ==========================================
-  // RENDER (Muonekano wako ule ule)
+  // RENDER (UI)
   // ==========================================
   return (
     <div className="min-h-[100dvh] bg-white dark:bg-black flex flex-col pt-0 md:pt-[100px] font-sans overflow-x-hidden">      
@@ -241,41 +234,77 @@ export default function ProductDetails() {
       <div className="w-full max-w-full mx-auto px-0 md:px-0 pb-24 md:pb-0">
         <main className="flex flex-col md:flex-row w-full items-start">
           
-          {/* LEFT CONTENT (Gallery) */}
+          {/* LEFT CONTENT (Gallery & Description) */}
           <div className="w-full md:w-[65%] md:sticky md:top-[100px] md:max-h-[calc(100vh-100px)] md:overflow-y-auto bg-white dark:bg-black md:border-r border-gray-200 dark:border-gray-800">
             <section className="w-full bg-white dark:bg-black pt-3 md:pt-6 px-1 md:px-6">
               <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800">
-                <Suspense fallback={<div className="p-10 text-center text-gray-500">Inapakia picha...</div>}>
-                  <ProductGallery product={product} isMobile={isMobile} />
-                </Suspense>
+                
+                {/* 🔥 GALLERY SKELETON */}
+                {isLoading || !product ? (
+                  <div className="w-full aspect-square bg-gray-200 dark:bg-gray-800 animate-pulse flex items-center justify-center">
+                    <span className="text-gray-400">Inapakia Picha...</span>
+                  </div>
+                ) : (
+                  <Suspense fallback={<div className="w-full aspect-square bg-gray-200 animate-pulse"></div>}>
+                    <ProductGallery product={product} isMobile={isMobile} />
+                  </Suspense>
+                )}
               </div>
             </section>
 
             <div className="mx-3 md:mx-6 my-4 p-4 md:p-5 bg-gray-50 dark:bg-[#0a0a0a] rounded-2xl border border-gray-100 dark:border-gray-800">
               <h3 className="text-lg font-bold mb-2 text-gray-800 dark:text-white">Maelezo ya Bidhaa</h3>
-              <div className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-                <p>{product?.description || "Hakuna maelezo ya ziada kwa bidhaa hii."}</p>
-              </div>
+              
+              {/* 🔥 DESCRIPTION SKELETON */}
+              {isLoading || !product ? (
+                <div className="space-y-2">
+                  <div className="w-full h-4 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"></div>
+                  <div className="w-full h-4 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"></div>
+                  <div className="w-2/3 h-4 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"></div>
+                </div>
+              ) : (
+                <div className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                  <p>{product?.description || "Hakuna maelezo ya ziada kwa bidhaa hii."}</p>
+                </div>
+              )}
             </div>
           </div>
 
           {/* RIGHT SIDEBAR (Product Info) */}
           <div className="w-full md:w-[35%] md:sticky md:top-[100px] md:max-h-[calc(100vh-100px)] md:overflow-y-auto bg-[#fafbfc] dark:bg-[#0a0a0a] border-l border-gray-200 dark:border-gray-800">
             <div className="px-4 py-4 md:px-6 md:py-6">
-              <Suspense fallback={<div className="p-10 text-center text-gray-500">Inapakia maelezo...</div>}>
-                <ProductInfo 
-                  product={product} 
-                  storeProducts={storeProducts} 
-                  onRate={handleRateProduct} 
-                  isMobile={isMobile} 
-                />
-              </Suspense>
+              
+              {/* 🔥 PRODUCT INFO SKELETON */}
+              {isLoading || !product ? (
+                <div className="space-y-4">
+                  <div className="w-3/4 h-6 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"></div>
+                  <div className="w-1/2 h-5 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"></div>
+                  <div className="w-full h-24 bg-gray-200 dark:bg-gray-800 rounded-lg animate-pulse"></div>
+                  <div className="w-full h-12 bg-gray-200 dark:bg-gray-800 rounded-lg animate-pulse"></div>
+                </div>
+              ) : (
+                <Suspense fallback={<div className="p-10 text-center text-gray-500">Inapakia maelezo...</div>}>
+                  <ProductInfo 
+                    product={product} 
+                    storeProducts={storeProducts} 
+                    onRate={handleRateProduct} 
+                    isMobile={isMobile} 
+                  />
+                </Suspense>
+              )}
             </div>
           </div>
         </main>
 
-        {/* STORE DETAILS SECTION */}
-        {product.stores ? (
+        {/* ===== STORE DETAILS SECTION ===== */}
+        
+        {/* 🔥 STORE SKELETON (Kama Bado Inapakia) */}
+        {isLoading || !product ? (
+          <section className="bg-white dark:bg-black px-4 md:px-6 py-6 border-t border-gray-200 dark:border-gray-800">
+            <div className="w-full h-32 bg-gray-200 dark:bg-gray-800 rounded-xl animate-pulse mb-4"></div>
+            <div className="w-full h-24 bg-gray-200 dark:bg-gray-800 rounded-xl animate-pulse"></div>
+          </section>
+        ) : product.stores ? (
           <section className="bg-white dark:bg-black px-4 md:px-6 py-6 border-t border-gray-200 dark:border-gray-800">
             <div className="bg-[#f8faff] dark:bg-[#0a0a0a] p-4 md:p-5 rounded-xl border-l-4 border-blue-500 mb-5">
               <div className="flex items-center gap-2 text-green-500 font-bold text-xs uppercase tracking-wide mb-1">
@@ -403,17 +432,31 @@ export default function ProductDetails() {
             </div>
           </section>
         ) : (
-          <div className="text-center py-4 text-sm text-gray-400 border-t border-gray-200 dark:border-gray-800 mt-8">(Taarifa za duka zinapakuliwa...)</div>
+          <div className="text-center py-4 text-sm text-gray-400 border-t border-gray-200 dark:border-gray-800 mt-8">(Taarifa za duka hazipo)</div>
         )}
 
-        {relatedProducts.length > 0 && (
+        {/* ===== RELATED PRODUCTS ===== */}
+        {loadingRelated ? (
+          <div className="p-4 md:px-6">
+            <div className="w-32 h-6 bg-gray-200 dark:bg-gray-800 rounded mb-4 animate-pulse"></div>
+            <div className="flex gap-3 overflow-hidden">
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="w-[130px] sm:w-[160px] shrink-0">
+                  <div className="w-full aspect-square bg-gray-200 dark:bg-gray-800 rounded-xl mb-2 animate-pulse"></div>
+                  <div className="w-3/4 h-4 bg-gray-200 dark:bg-gray-800 rounded mb-1 animate-pulse"></div>
+                  <div className="w-1/2 h-4 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : relatedProducts.length > 0 ? (
           <RelatedProducts 
             relatedProducts={relatedProducts}
-            leafCategoryId={product.leaf_category_id}
+            leafCategoryId={product?.leaf_category_id}
             loadingRelated={loadingRelated}
             navigate={navigate}
           />
-        )}
+        ) : null}
 
       </div>
 

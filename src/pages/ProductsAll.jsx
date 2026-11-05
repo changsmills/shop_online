@@ -1,12 +1,13 @@
+// src/pages/ProductsAll.jsx
 import React, { useState, useEffect, useRef, useMemo, useCallback, Suspense } from "react";
 import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
 import { ArrowUp, ChevronLeft, ChevronRight, ArrowLeft, Search } from "lucide-react";
 import api from "../axiosConfig";
 import ProductList from "./ProductList";
 import SearchDialog from "../components/SearchDialog";
-import { useQuery, useQueryClient } from '@tanstack/react-query'; // 1. Ingiza useQuery
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-// ✅ LAZY IMPORT YA SKELETON
+// ✅ LAZY IMPORT YA SKELETON (Haituhitaji tena kwa ukurasa mzima, lakini tunaiacha kwa usalama)
 const SkeletonProductsAll = React.lazy(() => import("../components/SkeletonProductsAll"));
 
 // 2. Function ya kuchukua Categories (nje ya component)
@@ -84,7 +85,7 @@ export default function ProductsAll() {
   const { data: categories = [], isLoading: loadingCategories, error: categoriesError } = useQuery({
     queryKey: ['productsAllCategories'],
     queryFn: fetchCategoriesData,
-    staleTime: 1000 * 60 * 10, // Cache kwa dakika 10 (kama ulivyokuwa unafanya na localStorage)
+    staleTime: 1000 * 60 * 10,
   });
 
   // ============================================
@@ -144,8 +145,8 @@ export default function ProductsAll() {
   useEffect(() => {
     const handleOnline = () => {
       console.log("🌐 Mtandao umeunganishwa! Inapakia data za bidhaa upya...");
-      queryClient.invalidateQueries(); // Hii itasasisha categories na vitu vingine
-      setFetchTrigger(prev => prev + 1); // Hii ni kwa ajili ya ProductList
+      queryClient.invalidateQueries();
+      setFetchTrigger(prev => prev + 1);
     };
 
     window.addEventListener('online', handleOnline);
@@ -257,6 +258,8 @@ export default function ProductsAll() {
   // 17. RENDER
   // ============================================
 
+  // 🔥 TUMEONDOA KIZUIZI CHA loadingCategories HAPA
+
   if (categoriesError) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-5 bg-white dark:bg-[#1e293b] text-black dark:text-white">
@@ -269,14 +272,6 @@ export default function ProductsAll() {
     );
   }
 
-  if (loadingCategories) {
-    return (
-      <Suspense fallback={<div className="p-10 text-center">Inapakia...</div>}>
-        <SkeletonProductsAll isMobile={isMobile} />
-      </Suspense>
-    );
-  }
-
   return (
     <div className="min-h-screen w-full bg-[#f8f8f8] dark:bg-[#1e293b] text-black dark:text-[#e2e8f0] overflow-x-hidden transition-colors duration-300 font-sans">
       
@@ -286,7 +281,6 @@ export default function ProductsAll() {
         
         <div className="relative z-10 flex flex-col items-center justify-center h-full">
           
-          {/* Nimeongeza top-2 kwa mobile ili isigonge kingo vizuri */}
           <button 
             className="hidden max-md:flex absolute top-2 left-2 w-8 h-8 rounded-full items-center justify-center bg-white/15 border border-white/20 backdrop-blur-md transition-all hover:bg-white/25 hover:scale-105 active:scale-95" 
             onClick={handleBackToDashboard}
@@ -303,12 +297,10 @@ export default function ProductsAll() {
             <Search size={20} />
           </button>
 
-          {/* Title imepunguzwa kutoka text-3xl kwenda text-2xl kwa mobile */}
           <h1 className="text-2xl md:text-3xl lg:text-[32px] font-extrabold m-0 drop-shadow-md">
             {bannerTitle}
           </h1>
           
-          {/* Description imepunguzwa kidogo */}
           <p className="text-[11px] md:text-sm lg:text-base mt-1.5 opacity-90 font-medium drop-shadow-sm">
             {bannerDesc}
           </p>
@@ -322,7 +314,7 @@ export default function ProductsAll() {
       />
 
       {/* ========== CATEGORY TABS ========== */}
-     <div className="sticky top-[60px] md:top-0 z-[100] bg-white dark:bg-[#1e293b] border-b border-gray-200 dark:border-gray-700 flex items-center w-full h-[54px] md:h-[64px] overflow-hidden px-2 md:px-4 shadow-sm mb-2">              
+      <div className="sticky top-[60px] md:top-0 z-[100] bg-white dark:bg-[#1e293b] border-b border-gray-200 dark:border-gray-700 flex items-center w-full h-[54px] md:h-[64px] overflow-hidden px-2 md:px-4 shadow-sm mb-2">              
         <button 
           className="hidden md:flex absolute z-20 w-8 h-8 bg-white dark:bg-[#1e293b] border border-gray-300 dark:border-gray-600 rounded-full items-center justify-center shadow-md top-1/2 -translate-y-1/2 left-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" 
           onClick={() => scroll("left")}
@@ -334,19 +326,29 @@ export default function ProductsAll() {
           className="flex flex-row overflow-x-auto scroll-smooth whitespace-nowrap w-full px-1 md:px-12 gap-2 md:gap-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" 
           ref={scrollRef}
         >
-          {categories.map((cat) => (
-            <button
-              key={cat.id || 'all'}
-              className={`px-3 py-1.5 md:px-5 md:py-2.5 text-xs md:text-[15px] font-medium rounded-full transition-all duration-200 border whitespace-nowrap ${
-                activeCategory.id === cat.id 
-                  ? "bg-[#ff6a00] text-white border-[#ff6a00] shadow-md shadow-orange-500/20" 
-                  : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-200 dark:hover:bg-gray-700"
-              }`}
-              onClick={() => handleCategoryClick(cat)}
-            >
-              {cat.name}
-            </button>
-          ))}
+          
+          {/* 🔥 HAPA: Kama categories zinapakia, onyesha Skeleton ndogo hapa */}
+          {loadingCategories ? (
+            <>
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="h-8 md:h-10 w-20 md:w-28 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse shrink-0"></div>
+              ))}
+            </>
+          ) : (
+            categories.map((cat) => (
+              <button
+                key={cat.id || 'all'}
+                className={`px-3 py-1.5 md:px-5 md:py-2.5 text-xs md:text-[15px] font-medium rounded-full transition-all duration-200 border whitespace-nowrap ${
+                  activeCategory.id === cat.id 
+                    ? "bg-[#ff6a00] text-white border-[#ff6a00] shadow-md shadow-orange-500/20" 
+                    : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-200 dark:hover:bg-gray-700"
+                }`}
+                onClick={() => handleCategoryClick(cat)}
+              >
+                {cat.name}
+              </button>
+            ))
+          )}
         </div>
         
         <button 
@@ -384,8 +386,8 @@ export default function ProductsAll() {
 
       {/* ========== BACK TO TOP ========== */}
       <button 
-        className={`fixed bottom-[80px] md:bottom-[120px] right-3 md:right-6 w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#ff6a00] hover:bg-[#e55a00] text-white shadow-[0_4px_16px_gba(255,106,0,0.35)] flex items-center justify-center transition-all duration-300 z[1000] border-none cursor-pointer
-         ${showBackToTop ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto visible animate-[bounceIn_0.4s_ease_forwards]' : 'opacity-0 translate-y-5 scale-75 pointer-events-nome invisible'}`} 
+        className={`fixed bottom-[80px] md:bottom-[120px] right-3 md:right-6 w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#ff6a00] hover:bg-[#e55a00] text-white shadow-[0_4px_16px_rgba(255,106,0,0.35)] flex items-center justify-center transition-all duration-300 z-[1000] border-none cursor-pointer
+         ${showBackToTop ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto visible animate-[bounceIn_0.4s_ease_forwards]' : 'opacity-0 translate-y-5 scale-75 pointer-events-none invisible'}`} 
         onClick={scrollToTop}
       >
         <ArrowUp className="w-5 h-5 md:w-6 md:h-6 stroke-[2.5]" />
