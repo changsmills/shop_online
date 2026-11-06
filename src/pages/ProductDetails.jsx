@@ -242,7 +242,7 @@ export default function ProductDetails() {
                 {/* 🔥 GALLERY SKELETON */}
                 {isLoading || !product ? (
                   <div className="w-full aspect-square bg-gray-200 dark:bg-gray-800 animate-pulse flex items-center justify-center">
-                    <span className="text-gray-400">Inapakia Picha...</span>
+                    
                   </div>
                 ) : (
                   <Suspense fallback={<div className="w-full aspect-square bg-gray-200 animate-pulse"></div>}>

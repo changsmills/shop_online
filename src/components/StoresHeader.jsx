@@ -1,25 +1,19 @@
 // src/components/StoresHeader.jsx
 import React, { useState, useEffect, useRef, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Globe, ChevronDown, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react'; 
 import Logo from './Logo';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import StoreSearchBar from './StoreSearchBar'; 
-import api from '../axiosConfig'; // 1. Ingiza api
-import { useQuery } from '@tanstack/react-query'; // 2. Ingiza useQuery
+import api from '../axiosConfig';
+import { useQuery } from '@tanstack/react-query';
 
-// 3. Function ya kuchukua majina ya maduka
 const fetchStoreNames = async () => {
   try {
-    // Tunachukua maduka 10 tu kwa ajili ya placeholder
     const response = await api.get('/stores/', { params: { limit: 10 } });
     const data = response.data.results || response.data || [];
-    
-    // Tunachukua majina tu (store_name)
     const names = data.map(store => store.store_name || store.name).filter(Boolean);
-    
-    // Kama hakuna majina, rudisha maneno ya kawaida
     return names.length > 0 ? names : ["Search stores...", "Find your favorite shop..."];
   } catch (error) {
     console.error("Imeshindwa kuchukua majina ya maduka:", error);
@@ -33,15 +27,15 @@ const StoresHeader = memo(({ onSearch, showBack = true }) => {
   const navigate = useNavigate(); 
   const [search, setSearch] = useState("");
   
+  // States za lugha (hazitumiki tena lakini tunaziacha kuzuia error)
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [currency, setCurrency] = useState("TZS");
   const dropdownRef = useRef(null);
 
-  // 4. Tumia useQuery kufetch majina
   const { data: storePlaceholders = ["Search stores..."] } = useQuery({
     queryKey: ['storePlaceholders'],
     queryFn: fetchStoreNames,
-    staleTime: 1000 * 60 * 10, // Cache kwa dakika 10
+    staleTime: 1000 * 60 * 10,
   });
 
   useEffect(() => {
@@ -59,40 +53,11 @@ const StoresHeader = memo(({ onSearch, showBack = true }) => {
     if (onSearch) onSearch(search);
   };
 
-  const handleSave = () => {
-    setIsLangOpen(false);
-  };
-
-  const LanguageCurrencyDropdown = () => (
-    <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-[#161b22] rounded-xl shadow-lg border border-gray-200 dark:border-[#30363d] p-4 z-50">
-      <div className="mb-4">
-        <h3 className="font-bold text-gray-800 dark:text-white">{t('set_language_currency')}</h3>
-        <p className="text-xs text-gray-500">{t('select_preferred_language')}</p>
-      </div>
-      <div className="mb-3">
-        <label className="block text-xs font-semibold text-gray-600 mb-1">{t('language')}</label>
-        <select value={language} onChange={(e) => changeLanguage(e.target.value)} className="w-full p-2 border rounded-lg text-sm bg-gray-50 dark:bg-[#0d1117] dark:text-white dark:border-[#30363d]">
-          <option value="en">English</option>
-          <option value="sw">Kiswahili</option>
-        </select>
-      </div>
-      <div className="mb-4">
-        <label className="block text-xs font-semibold text-gray-600 mb-1">{t('currency')}</label>
-        <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="w-full p-2 border rounded-lg text-sm bg-gray-50 dark:bg-[#0d1117] dark:text-white dark:border-[#30363d]">
-          <option value="TZS">TZS - Tanzanian Shilling</option>
-          <option value="USD">USD - US Dollar</option>
-          <option value="KES">KES - Kenyan Shilling</option>
-        </select>
-      </div>
-      <button onClick={handleSave} className="w-full bg-brand-orange text-white py-2 rounded-lg text-sm font-semibold hover:bg-[#e65c00] transition-colors">
-        {t('save')}
-      </button>
-    </div>
-  );
-
   return (
-    <header className="sticky top-0 left-0 w-full z-50 bg-white dark:bg-[#161b22] border-b border-gray-200 dark:border-[#30363d] shadow-sm">
-      <div className="max-w-[1400px] mx-auto px-4 h-[70px] flex items-center justify-between gap-4">
+    <header className="sticky top-0 left-0 w-full z-50 bg-white dark:bg-[#161b22] border-b border-gray-200 dark:border-[#30363d] shadow-sm font-sans">
+      
+      {/* Header Container */}
+      <div className="max-w-[1400px] mx-auto px-4 h-[70px] flex items-center justify-between gap-2 md:gap-4">
         
         {/* KUSHOTO: Back Arrow + Logo */}
         <div className="flex items-center gap-2 shrink-0">
@@ -108,8 +73,8 @@ const StoresHeader = memo(({ onSearch, showBack = true }) => {
         </div>
 
         {/* KATI: Search Bar */}
-        <form onSubmit={handleSearchSubmit} className="flex-1 max-w-2xl">
-          {/* 5. Tumeongeza prop 'placeholders' hapa */}
+        {/* Nimeondoa max-w-2xl na kuweka w-full max-w-3xl ili itumie nafasi vizuri */}
+        <form onSubmit={handleSearchSubmit} className="flex-1 w-full max-w-3xl mx-auto">
           <StoreSearchBar 
             search={search} 
             setSearch={setSearch} 
@@ -117,18 +82,9 @@ const StoresHeader = memo(({ onSearch, showBack = true }) => {
           />
         </form>
 
-        {/* KULIA: Lugha na Sarafu */}
-        <div className="flex items-center gap-2 shrink-0 relative" ref={dropdownRef}>
-          <button 
-            onClick={() => setIsLangOpen(!isLangOpen)} 
-            className="flex items-center gap-1.5 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#21262d] transition-colors text-gray-700 dark:text-gray-300"
-          >
-            <Globe size={20} />
-            <span className="hidden md:inline text-sm font-medium">{language === 'en' ? 'English' : 'Kiswahili'}-{currency}</span>
-            <ChevronDown size={14} className="hidden md:inline" />
-          </button>
-          {isLangOpen && <LanguageCurrencyDropdown />}
-        </div>
+        {/* 🔥 KULIA: Nafasi Tupu (Spacer) */}
+        {/* Hii inasaidia Search Bar kubaki katikati kwa kuweka nafasi sawa na ile ya Logo upande wa kushoto */}
+        <div className="w-[30px] md:w-[100px] shrink-0"></div>
         
       </div>
     </header>

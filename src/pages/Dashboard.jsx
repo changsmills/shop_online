@@ -449,53 +449,80 @@ export default function Dashboard() {
               </aside>
 
               <div className="h-full">
-                <div className="block bg-white dark:bg-black w-full lg:hidden">
-                  {!search && categories.length > 0 && (
-                    <MobileCategorySlider
-                      categories={[ALL_CATEGORY, ...categories]}
-                      selectedCategory={selectedCategoryForComponents}
-                      onSelectCategory={(cat) => {
-                        setSelectedCategoryForComponents(cat);
-                        setSelectedCategory(cat);
-                      }}
-                      getDisplayName={getCategoryDisplayName}
-                      getIcon={getIcon}
-                    />
-                  )}
-                </div>
+  {/* ========================================= */}
+  {/* MOBILE CATEGORY SLIDER (PILLS STYLE) */}
+  {/* ========================================= */}
+  <div className="block bg-white dark:bg-black w-full lg:hidden pb-1 pt-2">
+    {!search && (
+      dataLoading && categories.length === 0 ? (
+        // 🔥 SKELETON: Sasa ni mistatili (Pills) na sio maduara
+        <div className="flex gap-2 overflow-x-auto px-3 py-1 animate-pulse [&::-webkit-scrollbar]:hidden">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="h-9 w-24 bg-gray-200 dark:bg-gray-800 rounded-full shrink-0"></div>
+          ))}
+        </div>
+      ) : categories.length > 0 ? (
+        // 🔥 HAPA NDIO TUNAITA COMPONENT MPYA
+        <div className="flex gap-2 overflow-x-auto px-3 py-1 [&::-webkit-scrollbar]:hidden">
+          {[ALL_CATEGORY, ...categories].map((cat) => {
+            const isSelected = selectedCategoryForComponents?.id === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => {
+                  setSelectedCategoryForComponents(cat);
+                  setSelectedCategory(cat);
+                }}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-full whitespace-nowrap transition-all duration-200 text-[13px] font-medium border ${
+                  isSelected
+                    ? "bg-[#FF6A00] text-white border-[#FF6A00] shadow-sm"
+                    : "bg-white dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                }`}
+              >
+                {/* Kama unataka icon ionekane, ondoa alama ya comment hapa chini */}
+                {/* <span className={isSelected ? "text-white" : "text-gray-500"}>{getIcon(cat.icon_name)}</span> */}
+                <span>{getCategoryDisplayName(cat)}</span>
+              </button>
+            );
+          })}
+        </div>
+      ) : null
+    )}
+  </div>
 
-                {/* ========================================= */}
-                {/* BANNER NA SKELETON YAKE (Bila Neno) */}
-                {/* ========================================= */}
-                <div className="w-full overflow-hidden m-0 p-0 leading-none">
-                  <div className="relative w-full aspect-[18/9] md:aspect-[16/7] lg:aspect-auto lg:h-[350px] bg-gradient-to-br from-[#1a1a2e] to-[#16213e] overflow-hidden rounded-xl max-h-[350px]">
-                    
-                    {/* 🔥 HAPA: Skeleton tupu bila neno */}
-                    {loadingAds || cachedAds.length === 0 ? (
-                      <div className="w-full h-full bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
-                    ) : (
-                      <>
-                        {activeAd && isVideoAd(activeAd) ? (
-                          <video src={activeAd.media_url} autoPlay muted playsInline onEnded={() => { if (cachedAds.length) setCurrentAdIndex((prev) => (prev + 1) % cachedAds.length); }} className="w-full h-full object-cover object-center block bg-[#1a1a2e]" />
-                        ) : (
-                          activeAd && <img src={activeAd.media_url} className="w-full h-full object-cover object-center block bg-[#1a1a2e]" alt="promo" loading="lazy" />
-                        )}
-                        
-                        {activeAd && (
-                          <div className="absolute inset-0 flex flex-col justify-center items-start px-4 pr-3 py-4 sm:pl-10 sm:pr-8 lg:pl-12 lg:pr-10 text-white bg-gradient-to-r from-black/90 via-black/60 to-transparent pointer-events-none">
-                            <span className="bg-brand-orange px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold w-fit mb-2 tracking-wide uppercase shadow-sm">{t('sponsored')}</span>
-                            <h2 className="text-lg sm:text-2xl lg:text-3xl font-extrabold leading-tight mb-1.5 sm:mb-2 max-w-[95%] sm:max-w-[80%] drop-shadow-md">{activeAd.business_name}</h2>
-                            <p className="text-xs sm:text-sm text-gray-100 max-w-[95%] sm:max-w-[75%] leading-snug sm:leading-relaxed mb-4 line-clamp-2 sm:line-clamp-3 drop-shadow-sm font-medium">{activeAd.description}</p>
-                            <button className="bg-[#FF6A00] hover:bg-[#e55a00] text-white font-bold px-5 py-2.5 sm:px-6 sm:py-2.5 rounded-full w-fit pointer-events-auto transition-all duration-300 ease-in-out shadow-[0_4px_10px_rgba(255,106,0,0.4)] hover:shadow-[0_6px_20px_rgba(255,106,0,0.6)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-sm sm:text-base flex items-center gap-1.5" onClick={() => { if (window.innerWidth > 1024) { window.open(`/store/${activeAd.store_id}`, '_blank'); } else { navigate(`/store/${activeAd.store_id}`); } }}>
-                              {t('source_now')} <span>→</span>
-                            </button>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
+  {/* ========================================= */}
+  {/* BANNER NA SKELETON YAKE */}
+  {/* ========================================= */}
+  <div className="w-full overflow-hidden m-0 p-0 leading-none mt-1">
+    <div className="relative w-full aspect-[18/9] md:aspect-[16/7] lg:aspect-auto lg:h-[350px] bg-gradient-to-br from-[#1a1a2e] to-[#16213e] overflow-hidden rounded-xl max-h-[350px]">
+      
+      {/* 🔥 HAPA: Skeleton tupu bila neno - Nimebadilisha rangi iwe nyepesi */}
+      {loadingAds || cachedAds.length === 0 ? (
+         <div className="w-full h-full bg-gray-100 dark:bg-[#1a1a1a] animate-pulse flex items-center justify-center border border-gray-200 dark:border-gray-800 rounded-xl">
+        </div>
+         ) : (
+           <>
+          {activeAd && isVideoAd(activeAd) ? (
+            <video src={activeAd.media_url} autoPlay muted playsInline onEnded={() => { if (cachedAds.length) setCurrentAdIndex((prev) => (prev + 1) % cachedAds.length); }} className="w-full h-full object-cover object-center block bg-[#1a1a2e]" />
+          ) : (
+            activeAd && <img src={activeAd.media_url} className="w-full h-full object-cover object-center block bg-[#1a1a2e]" alt="promo" loading="lazy" />
+          )}
+          
+          {activeAd && (
+            <div className="absolute inset-0 flex flex-col justify-center items-start px-4 pr-3 py-4 sm:pl-10 sm:pr-8 lg:pl-12 lg:pr-10 text-white bg-gradient-to-r from-black/90 via-black/60 to-transparent pointer-events-none">
+              <span className="bg-brand-orange px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold w-fit mb-2 tracking-wide uppercase shadow-sm">{t('sponsored')}</span>
+              <h2 className="text-lg sm:text-2xl lg:text-3xl font-extrabold leading-tight mb-1.5 sm:mb-2 max-w-[95%] sm:max-w-[80%] drop-shadow-md">{activeAd.business_name}</h2>
+              <p className="text-xs sm:text-sm text-gray-100 max-w-[95%] sm:max-w-[75%] leading-snug sm:leading-relaxed mb-4 line-clamp-2 sm:line-clamp-3 drop-shadow-sm font-medium">{activeAd.description}</p>
+              <button className="bg-[#FF6A00] hover:bg-[#e55a00] text-white font-bold px-5 py-2.5 sm:px-6 sm:py-2.5 rounded-full w-fit pointer-events-auto transition-all duration-300 ease-in-out shadow-[0_4px_10px_rgba(255,106,0,0.4)] hover:shadow-[0_6px_20px_rgba(255,106,0,0.6)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-sm sm:text-base flex items-center gap-1.5" onClick={() => { if (window.innerWidth > 1024) { window.open(`/store/${activeAd.store_id}`, '_blank'); } else { navigate(`/store/${activeAd.store_id}`); } }}>
+                {t('source_now')} <span>→</span>
+              </button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  </div>
+</div>
 
               {/* ===== RECENTLY VIEWED SIDEBAR ===== */}
               <div className="hidden lg:flex lg:flex-col h-full bg-[#f8f8f8] dark:bg-black rounded-xl border border-gray-200 dark:border-gray-800 p-3 overflow-hidden shadow-sm">

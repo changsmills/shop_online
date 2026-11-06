@@ -2,10 +2,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import api from "../axiosConfig";
-import { Filter } from 'lucide-react';
+import { Filter, ArrowUp } from 'lucide-react';
 import Header from "../components/Header";
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query'; // 1. Ingiza hooks
-
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+// 🔥 1. Ingiza Component mpya ya Kadi hapa
+import ProductGridCard from '../components/ProductGridCard'; 
 const PRODUCTS_PER_PAGE = 20;
 
 // ============================================
@@ -49,24 +50,22 @@ export default function SearchResults({ session }) {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   
-  // Hii ni kwa ajili ya kubonyeza "OK" kwenye filter ya bei (ili isifanye fetch kila unapoandika)
   const [appliedMinPrice, setAppliedMinPrice] = useState("");
   const [appliedMaxPrice, setAppliedMaxPrice] = useState("");
 
+  const [showBackToTop, setShowBackToTop] = useState(false);
   const lastProductRef = useRef();
 
   // ============================================
   // 3. TUMIA QUERIES
   // ============================================
   
-  // Query ya Kategoria za Sidebar
   const { data: categories = [] } = useQuery({
     queryKey: ['searchSidebarCategories'],
     queryFn: fetchSidebarCategories,
     staleTime: Infinity,
   });
 
-  // Query ya Bidhaa (Infinite Scroll)
   const {
     data: productsData,
     fetchNextPage,
@@ -84,10 +83,9 @@ export default function SearchResults({ session }) {
     queryFn: fetchSearchProducts,
     initialPageParam: 1,
     getNextPageParam: (lastPage) => lastPage.nextPage,
-    staleTime: 1000 * 60 * 5, // Cache kwa dakika 5
+    staleTime: 1000 * 60 * 5,
   });
 
-  // Gabanya kurasa zote kuwa orodha moja
   const products = productsData?.pages.flatMap(page => page.data) || [];
 
   // ============================================
@@ -98,7 +96,6 @@ export default function SearchResults({ session }) {
     setSearch(initialQuery);
   }, [initialQuery]);
 
-  // Infinite Scroll Logic
   useEffect(() => {
     if (isLoading || isFetchingNextPage || !hasNextPage) return;
     
@@ -117,6 +114,18 @@ export default function SearchResults({ session }) {
       if (lastProductRef.current) observer.unobserve(lastProductRef.current);
     };
   }, [isLoading, isFetchingNextPage, hasNextPage, fetchNextPage]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 500);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   // ============================================
   // 5. HANDLERS
@@ -142,7 +151,6 @@ export default function SearchResults({ session }) {
   // 6. RENDER
   // ============================================
 
-  // Loading Skeleton (Inaonekana tu kama hakuna bidhaa na bado inapakia)
   if (isLoading && products.length === 0) {
     return (
       <div className="min-h-screen bg-[#f7f8fa] dark:bg-black">
@@ -168,7 +176,7 @@ export default function SearchResults({ session }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f8fa] dark:bg-black">
+    <div className="min-h-screen bg-[#f7f8fa] dark:bg-black font-sans">
       
       <Header showBack={true} />
 
@@ -234,16 +242,17 @@ export default function SearchResults({ session }) {
         {/* PRODUCTS CONTENT */}
         <div className="w-full">
       
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4 lg:gap-[16px]">
+          {/* 🔥 2. GRID INAYOTUMIA COMPONENT MPYA */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1.5 sm:gap-2 md:gap-3 lg:gap-4">
             {products.length > 0 ? (
               products.map((product, index) => (
                 <div 
                   key={product.id} 
-                  className="bg-white dark:bg-[#111] border border-[#eee] dark:border-[#1f1f1f] rounded-xl overflow-hidden transition-all duration-300 h-full flex flex-col group hover:-translate-y-1 hover:shadow-[0_8px_25px_rgba(0,0,0,0.1)] hover:border-brand-orange"
                   ref={index === products.length - 1 ? lastProductRef : null}
                 >
-                  <div 
-                    className="cursor-pointer flex flex-col h-full"
+                  <ProductGridCard 
+                    product={product}
+                    getProductImage={getProductImage}
                     onClick={() => {
                       if (window.innerWidth > 1024) {
                         window.open(`/product/${product.id}`, '_blank');
@@ -251,25 +260,7 @@ export default function SearchResults({ session }) {
                         navigate(`/product/${product.id}`);
                       }
                     }}
-                  >
-                    <div className="w-full aspect-square overflow-hidden bg-[#f8fafc] dark:bg-[#0a0a0a]">
-                      <img 
-                        src={getProductImage(product)} 
-                        alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        onError={(e) => { e.target.src = '/placeholder-image.jpg'; }}
-                      />
-                    </div>
-                    <div className="p-2.5 md:p-3 flex-1 flex flex-col">
-                      <h3 className="text-xs md:text-sm font-semibold text-[#333] dark:text-white m-0 mb-1.5 md:mb-2 leading-[1.4] line-clamp-2">
-                        {product.name}
-                      </h3>
-                      <div className="flex items-baseline gap-1 mt-auto">
-                        <span className="text-[11px] md:text-xs text-[#666] dark:text-[#94a3b8] font-medium">TSH</span>
-                        <span className="text-sm md:text-base font-extrabold text-brand-orange">{Number(product.price).toLocaleString()}</span>
-                      </div>
-                    </div>
-                  </div>
+                  />
                 </div>
               ))
             ) : (
@@ -297,6 +288,17 @@ export default function SearchResults({ session }) {
         </div>
 
       </main>
+
+      {/* 🔥 KITUFE CHA BACK TO TOP */}
+      <button 
+        className={`fixed bottom-[80px] md:bottom-[120px] right-3 md:right-6 w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#ff6a00] hover:bg-[#e55a00] text-white shadow-[0_4px_16px_rgba(255,106,0,0.35)] flex items-center justify-center transition-all duration-300 z-[1000] border-none cursor-pointer
+         ${showBackToTop ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto visible' : 'opacity-0 translate-y-5 scale-75 pointer-events-none invisible'}`} 
+        onClick={scrollToTop}
+        aria-label="Rudi Juu"
+      >
+        <ArrowUp className="w-5 h-5 md:w-6 md:h-6 stroke-[2.5]" />
+      </button>
+
     </div>
   );
 }

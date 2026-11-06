@@ -406,16 +406,7 @@ export default function StorePage() {
                       )}
                     </div>
 
-                    {/* 🔥 MABADILIKO: Hali ya Stoo imewekwa kwenye badge ndogo (Pro look) */}
-                    {product.stock_quantity > 0 ? (
-                      <span className="inline-block text-[10px] md:text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-md">
-                        In Stock ({product.stock_quantity})
-                      </span>
-                    ) : (
-                      <span className="inline-block text-[10px] md:text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-md">
-                        Out of Stock
-                      </span>
-                    )}
+    
                   </div>
                 </div>
               ))}
@@ -436,7 +427,7 @@ export default function StorePage() {
                     onClick={(e) => openImageLightbox(product, e, index)}
                   />
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-base font-semibold text-gray-800 dark:text-white truncate">{product.name}</h4>
+                    <h4 className="capitalize text-[13px] md:text-sm font-semibold text-gray-800 dark:text-white truncate mb-1.5">{product.name}</h4>
                     <p className="text-xs text-gray-500 mb-1">{product.sub_category_name || product.category_name || ''}</p>
                     <div className="flex items-center gap-2">
                       <span className="text-base font-bold text-brand-orange">TSh {formatPrice(product.price)}</span>

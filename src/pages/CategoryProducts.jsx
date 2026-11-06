@@ -4,8 +4,9 @@ import api from "../axiosConfig";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import DashboardCard from "../components/DashboardCard";
-import { ChevronRight, List } from "lucide-react";
-import { useQuery } from '@tanstack/react-query'; // 1. Ingiza useQuery
+// 🔥 Nimeongeza ArrowUp hapa
+import { ChevronRight, List, ArrowUp } from "lucide-react";
+import { useQuery } from '@tanstack/react-query'; 
 
 // ==========================================
 // 2. FUNCTION YA KUCHUKUA DATA YOTE KWA MPIGO
@@ -89,6 +90,9 @@ export default function CategoryProducts() {
   const [maxPrice, setMaxPrice] = useState("");
   const [displayedProducts, setDisplayedProducts] = useState([]);
 
+  // 🔥 STATE YA BACK TO TOP
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
   // ==========================================
   // 4. TUMIA useQuery
   // ==========================================
@@ -100,7 +104,7 @@ export default function CategoryProducts() {
     queryKey: ['categoryProducts', leafId, activeFilterId],
     queryFn: fetchCategoryData,
     enabled: !!leafId,
-    staleTime: 1000 * 60 * 5, // Cache kwa dakika 5
+    staleTime: 1000 * 60 * 5, 
   });
 
   const products = pageData?.productsData || [];
@@ -126,6 +130,20 @@ export default function CategoryProducts() {
       navigate('/');
     }
   }, [leafId, navigate]);
+
+  // 🔥 EFFECT YA KUSIKILIZA SCROLL KWA AJILI YA BACK TO TOP
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 500);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // 🔥 FUNCTION YA KURUDI JUU
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   // ========== FILTER YA BEI (Local) ==========
   const handlePriceFilter = () => {
@@ -328,6 +346,17 @@ export default function CategoryProducts() {
           </div>
         </div>
       </div>
+
+      {/* 🔥 KITUFE CHA BACK TO TOP KIMEONGEWA HAPA */}
+      <button 
+        className={`fixed bottom-[80px] md:bottom-[120px] right-3 md:right-6 w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#ff6a00] hover:bg-[#e55a00] text-white shadow-[0_4px_16px_rgba(255,106,0,0.35)] flex items-center justify-center transition-all duration-300 z-[1000] border-none cursor-pointer
+         ${showBackToTop ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto visible' : 'opacity-0 translate-y-5 scale-75 pointer-events-none invisible'}`} 
+        onClick={scrollToTop}
+        aria-label="Rudi Juu"
+      >
+        <ArrowUp className="w-5 h-5 md:w-6 md:h-6 stroke-[2.5]" />
+      </button>
+
     </div>
   );
 }
