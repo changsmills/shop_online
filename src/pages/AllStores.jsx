@@ -164,6 +164,7 @@ export default function AllStores({ session }) {
 
   // ===== 6. MAIN RENDER =====
   return (
+    
     <div className="bg-[#f8f9fa] dark:bg-[#0d1117] min-h-screen flex flex-col">
       <StoresHeader showBack={true} onSearch={setSearchQuery} />
 
