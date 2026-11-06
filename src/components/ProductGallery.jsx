@@ -18,6 +18,7 @@ const ProductGallery = React.memo(({ product }) => {
   const [duration, setDuration] = useState(0);
   const [photoIndex, setPhotoIndex] = useState(0);
   const videoRef = useRef(null);
+  const thumbsContainerRef = useRef(null);
   
   // ========== PREPARE MEDIA LIST (Tumia useMemo) ==========
   const mediaList = useMemo(() => {
@@ -157,88 +158,178 @@ const ProductGallery = React.memo(({ product }) => {
 
   return (
     <>
-            {/* ===== DESKTOP VIEW ===== */}
-      <div className="hidden md:block w-full max-w-[800px] mx-auto p-2 bg-white dark:bg-black font-sans">
-        <div className="flex gap-4 items-start">
+      {/* ===== DESKTOP VIEW ===== */}
+      <div className="hidden md:block max-w-[1000px] mx-auto p-5 bg-white dark:bg-black font-sans">
+        <div className="flex gap-5 mb-10 items-start">
           
-          {/* Thumbnails (Kushoto) */}
-          <div className="w-[60px] shrink-0">
-            <div className="flex flex-col gap-2">
-              {mediaList.map((item, i) => (
-                <div 
-                  key={i} 
-                  className={`w-[56px] h-[56px] rounded-md overflow-hidden cursor-pointer transition-all duration-200 border-2 ${currentIndex === i ? 'border-brand-orange scale-105 shadow-sm' : 'border-gray-200 hover:border-brand-orange'}`}
-                  onMouseEnter={() => setCurrentIndex(i)}
-                >
-                  {item.type === 'video' && <div className="absolute z-10 bg-black/50 text-white p-0.5 rounded text-[10px]">▶️</div>}
-                  <img src={item.type === 'video' ? `${item.url}#t=0.5` : item.url} alt={`Thumb ${i}`} className="w-full h-full object-cover" />
-                </div>
-              ))}
+          {/* Thumbnails Wrapper */}
+<div className="w-[80px] shrink-0 h-[380px] flex flex-col relative group">
+  
+  {/* Up Arrow */}
+  {mediaList.length > 4 && (
+    <button 
+      onClick={() => thumbsContainerRef.current?.scrollBy({ top: -150, behavior: 'smooth' })}
+      className="absolute top-0 left-1/2 -translate-x-1/2 z-20 bg-white/90 dark:bg-black/90 shadow-md border border-gray-200 dark:border-gray-700 rounded-full p-1 hover:bg-brand-orange hover:text-white transition-all opacity-0 group-hover:opacity-100"
+    >
+      <ChevronLeft size={16} className="rotate-90" />
+    </button>
+  )}
+
+  {/* Scrollable Container */}
+  <div 
+    ref={thumbsContainerRef}
+    className="flex flex-col gap-3 overflow-y-auto custom-scrollbar h-full py-8 px-1"
+  >
+    {mediaList.map((item, i) => (
+      <div 
+        key={i} 
+        className={`w-[70px] h-[70px] shrink-0 rounded-lg overflow-hidden cursor-pointer transition-all duration-200 border-2 relative flex items-center justify-center ${currentIndex === i ? 'border-brand-orange scale-105 shadow-md' : 'border-gray-200 hover:border-brand-orange'}`}
+        onMouseEnter={() => setCurrentIndex(i)}
+      >
+        {item.type === 'video' && (
+          <div className="absolute z-20 bg-black/50 text-white p-1 rounded">▶️</div>
+        )}
+        <img 
+          src={item.type === 'video' ? `${item.url}#t=0.5` : item.url} 
+          alt={`Thumb ${i}`} 
+          className="w-full h-full object-cover" 
+        />
+        <div className="absolute inset-0 bg-black opacity-5 pointer-events-none"></div>
+      </div>
+    ))}
+  </div>
+
+  {/* Down Arrow */}
+  {mediaList.length > 4 && (
+    <button 
+      onClick={() => thumbsContainerRef.current?.scrollBy({ top: 150, behavior: 'smooth' })}
+      className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20 bg-white/90 dark:bg-black/90 shadow-md border border-gray-200 dark:border-gray-700 rounded-full p-1 hover:bg-brand-orange hover:text-white transition-all opacity-0 group-hover:opacity-100"
+    >
+      <ChevronLeft size={16} className="-rotate-90" />
+    </button>
+  )}
+</div>
+
+          {/* Main Stage */}
+          <div className="flex-1 flex items-center gap-4">
+
+            <div className="relative w-[380px] h-[380px] bg-white dark:bg-[#0a0a0a] rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden flex items-center justify-center">
+
+              <div className="w-full h-full flex items-center justify-center relative cursor-zoom-in">
+                {currentMedia?.type === 'video' ? (
+                  <video key={currentMedia.url} src={currentMedia.url} controls autoPlay muted className="max-w-full max-h-full object-contain" />
+                ) : (
+                  <div 
+                    className="w-full h-full relative"
+                    onMouseMove={handleMouseMove}
+                    onMouseEnter={() => setIsZooming(true)}
+                    onMouseLeave={() => setIsZooming(false)}
+                    onClick={() => setIsModalOpen(true)}
+                  >
+                    <img src={currentMedia?.url} alt={product.name} className="w-full h-full object-contain" />
+                    {isZooming && (
+                      <div 
+                        className="absolute inset-0 bg-no-repeat bg-[length:250%] pointer-events-none z-10"
+                        style={{ backgroundImage: `url(${currentMedia?.url})`, backgroundPosition: bgPos }}
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+              <button className="absolute top-4 right-4 bg-white dark:bg-black p-2 rounded-full shadow-md hover:bg-brand-orange hover:text-white transition-colors" onClick={() => setIsModalOpen(true)}>
+                <Maximize2 size={20} />
+              </button>
             </div>
           </div>
+        </div>
 
-          {/* Main Stage (Picha Kuu) - Tumeipanga upya iwe ndogo */}
-          <div className="relative w-[300px] h-[300px] bg-white dark:bg-[#0a0a0a] rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden flex items-center justify-center shrink-0">            
-            <div className="w-full h-full flex items-center justify-center relative cursor-zoom-in">
+        {/* Full List View */}
+        <div className="flex flex-wrap justify-start w-full bg-white dark:bg-black mt-5 px-4 md:px-8">
+          {mediaList.map((item, idx) => (
+            <div 
+              key={idx} 
+              className="w-[400px] h-[400px] flex items-center justify-center overflow-hidden rounded-lg border border-gray-100 dark:border-gray-800 -ml-[1px] -mt-[1px]"
+            >
+              {item.type === 'video' ? (
+                <video 
+                  src={item.url} 
+                  controls 
+                  className="w-full h-full object-cover" 
+                  muted 
+                />
+              ) : (
+                <img 
+                  src={item.url} 
+                  alt={`Detail ${idx}`} 
+                  className="w-full h-full object-cover" 
+                />
+              )}
+            </div>
+          ))}
+        </div>
+
+               {/* Lightbox Modal */}
+        {isModalOpen && createPortal(
+          <div className="fixed inset-0 bg-black/95 z-[10000] flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}>
+            
+            {/* Close Button */}
+            <button className="absolute top-5 right-5 bg-white/20 text-white p-2 rounded-full hover:bg-brand-orange transition-colors z-50" onClick={() => setIsModalOpen(false)}>
+              <X size={35} />
+            </button>
+            
+            {/* Prev Button */}
+            <button className="absolute left-5 top-1/2 -translate-y-1/2 bg-white/20 text-white p-3 rounded-full hover:bg-brand-orange transition-colors z-50" onClick={prevImage}>
+              <ChevronLeft size={30} />
+            </button>
+            
+            {/* Next Button */}
+            <button className="absolute right-5 top-1/2 -translate-y-1/2 bg-white/20 text-white p-3 rounded-full hover:bg-brand-orange transition-colors z-50" onClick={nextImage}>
+              <ChevronRight size={30} />
+            </button>
+
+            {/* Main Content Area */}
+            <div 
+              className="w-full max-w-[1200px] h-[85vh] bg-black rounded-xl overflow-hidden relative flex items-center justify-center" 
+              onClick={(e) => e.stopPropagation()}
+            >
               {currentMedia?.type === 'video' ? (
-                <video key={currentMedia.url} src={currentMedia.url} controls autoPlay muted className="w-full h-full object-contain" />
+                <video key={currentMedia.url} src={currentMedia.url} controls autoPlay className="max-w-full max-h-full object-contain" />
               ) : (
                 <div 
-                  className="w-full h-full relative"
-                  onMouseMove={handleMouseMove}
-                  onMouseEnter={() => setIsZooming(true)}
+                  className="w-full h-full flex items-center justify-center relative cursor-crosshair" 
+                  onMouseMove={handleMouseMove} 
+                  onMouseEnter={() => setIsZooming(true)} 
                   onMouseLeave={() => setIsZooming(false)}
-                  onClick={() => setIsModalOpen(true)}
+                  onTouchMove={handleTouchMove} 
+                  onTouchStart={handleTouchMove} 
+                  onTouchEnd={handleTouchEnd}
                 >
-                  <img src={currentMedia?.url} alt={product.name} className="w-full h-full object-contain" />
+                  {/* Picha imewekwa hapa kwa max-w na max-h pekee ili isijibane */}
+                  <img 
+                    key={currentMedia?.url} 
+                    src={currentMedia?.url} 
+                    alt="View" 
+                    className="max-w-full max-h-full object-contain" 
+                  />
+                  
                   {isZooming && (
                     <div 
-                      className="absolute inset-0 bg-no-repeat bg-[length:250%] pointer-events-none z-10"
-                      style={{ backgroundImage: `url(${currentMedia?.url})`, backgroundPosition: bgPos }}
+                      className="absolute inset-0 bg-no-repeat bg-[length:250%] pointer-events-none" 
+                      style={{ backgroundImage: `url(${currentMedia?.url})`, backgroundPosition: bgPos }} 
                     />
                   )}
                 </div>
               )}
             </div>
-            
-            {/* Kitufe cha Kupanua (Fullscreen) */}
-            <button className="absolute top-3 right-3 bg-white/80 dark:bg-black/80 backdrop-blur-sm p-2 rounded-full shadow-md hover:bg-brand-orange hover:text-white transition-colors z-20" onClick={() => setIsModalOpen(true)}>
-              <Maximize2 size={18} />
-            </button>
-          </div>
-          
-        </div>
 
-        {/* Lightbox Modal (Inabaki kama ilivyo) */}
-        {isModalOpen && createPortal(
-          <div className="fixed inset-0 bg-black/95 z-[10000] flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}>
-            <button className="absolute top-5 right-5 bg-white/20 text-white p-2 rounded-full hover:bg-brand-orange transition-colors z-20" onClick={() => setIsModalOpen(false)}>
-              <X size={35} />
-            </button>
-            <button className="absolute left-5 top-1/2 -translate-y-1/2 bg-white/20 text-white p-3 rounded-full hover:bg-brand-orange transition-colors z-20" onClick={prevImage}><ChevronLeft size={30} /></button>
-            <button className="absolute right-5 top-1/2 -translate-y-1/2 bg-white/20 text-white p-3 rounded-full hover:bg-brand-orange transition-colors z-20" onClick={nextImage}><ChevronRight size={30} /></button>
-
-            <div className="w-full max-w-[1200px] h-[85vh] bg-black border border-gray-800 rounded-xl overflow-hidden relative flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
-              {currentMedia?.type === 'video' ? (
-                <video key={currentMedia.url} src={currentMedia.url} controls autoPlay className="max-w-full max-h-full object-contain" />
-              ) : (
-                <div className="w-full h-full p-5 flex items-center justify-center relative cursor-crosshair" 
-                  onMouseMove={handleMouseMove} onMouseEnter={() => setIsZooming(true)} onMouseLeave={() => setIsZooming(false)}
-                  onTouchMove={handleTouchMove} onTouchStart={handleTouchMove} onTouchEnd={handleTouchEnd}
-                >
-                  <img key={currentMedia?.url} src={currentMedia?.url} alt="View" className="max-w-full max-h-full object-contain" />
-                  {isZooming && (
-                    <div className="absolute inset-0 bg-no-repeat bg-[length:250%] pointer-events-none" style={{ backgroundImage: `url(${currentMedia?.url})`, backgroundPosition: bgPos }} />
-                  )}
-                </div>
-              )}
-            </div>
-            <div className="absolute bottom-5 bg-black/50 text-white px-4 py-1.5 rounded-full text-sm">
+            {/* Counter */}
+            <div className="absolute bottom-5 bg-black/50 text-white px-4 py-1.5 rounded-full text-sm z-50 pointer-events-none">
               {currentIndex + 1} / {mediaList.length}
             </div>
           </div>,
           document.body
         )}
+
       </div>
 
       {/* ===== MOBILE VIEW ===== */}
@@ -284,25 +375,21 @@ const ProductGallery = React.memo(({ product }) => {
             <button onClick={() => setMediaType('photos')} className={`px-5 py-2 rounded-full border-none font-bold text-sm cursor-pointer transition-all ${mediaType === 'photos' ? 'bg-brand-orange text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>📷 Photos ({photoItems.length})</button>
           </div>
         )}
+
+        <div className="mt-5 flex flex-col gap-0 w-full p-0">
+          {mediaList.map((item, idx) => (
+            <div key={idx} className="w-full bg-transparent relative overflow-hidden m-0 p-0">
+              {item.type === 'video' ? (
+                <video src={item.url} controls className="w-full h-auto block object-contain" />
+              ) : (
+                <img src={item.url} alt={`Detail ${idx}`} className="w-full h-auto block object-contain" />
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Mobile Lightbox Modal */}
-      {isModalOpen && createPortal(
-        <div className="fixed inset-0 bg-black/98 z-[10000] flex items-center justify-center p-0" onClick={() => setIsModalOpen(false)}>
-          <button className="fixed top-4 right-4 bg-white/15 text-white p-2 rounded-full z-[10001]" onClick={() => setIsModalOpen(false)}><X size={24} /></button>
-          <button className="fixed left-3 top-1/2 -translate-y-1/2 bg-white/15 text-white p-2.5 rounded-full z-[10001]" onClick={prevImage}><ChevronLeft size={24} /></button>
-          <button className="fixed right-3 top-1/2 -translate-y-1/2 bg-white/15 text-white p-2.5 rounded-full z-[10001]" onClick={nextImage}><ChevronRight size={24} /></button>
-          
-          <div className="w-screen h-screen flex items-center justify-center relative" onClick={(e) => e.stopPropagation()}>
-            {currentMedia?.type === 'video' ? (
-              <video key={currentMedia.url} src={currentMedia.url} controls autoPlay className="max-w-full max-h-full object-contain" />
-            ) : (
-              <img key={currentMedia?.url} src={currentMedia?.url} alt="View" className="max-w-full max-h-full object-contain" />
-            )}
-          </div>
-        </div>,
-        document.body
-      )}
+      
     </>
   );
 });

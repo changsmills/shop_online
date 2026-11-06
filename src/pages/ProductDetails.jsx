@@ -235,7 +235,8 @@ export default function ProductDetails() {
         <main className="flex flex-col md:flex-row w-full items-start">
           
           {/* LEFT CONTENT (Gallery & Description) */}
-            <div className="w-full md:w-[50%] md:sticky md:top-[100px] md:max-h-[calc(100vh-100px)] md:overflow-y-auto bg-[#fafbfc] dark:bg-[#0a0a0a] border-l border-gray-200 dark:border-gray-800">            <section className="w-full bg-white dark:bg-black pt-3 md:pt-6 px-1 md:px-6">
+          <div className="w-full md:w-[65%] md:sticky md:top-[100px] md:max-h-[calc(100vh-100px)] md:overflow-y-auto bg-white dark:bg-black md:border-r border-gray-200 dark:border-gray-800">
+            <section className="w-full bg-white dark:bg-black pt-3 md:pt-6 px-1 md:px-6">
               <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800">
                 
                 {/* 🔥 GALLERY SKELETON */}
