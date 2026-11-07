@@ -798,10 +798,11 @@ class PasswordResetVerifyView(APIView):
 
 class OrderViewSet(viewsets.ModelViewSet):
     # 🔥 TUMIA select_related NA prefetch_related HAPA
+    # Kumbuka: Tumeondoa 'store' kwa sababu Order haina FK ya store (ina store_id UUID)
     queryset = Order.objects.select_related(
-        'customer__user', 'store'
+        'customer__user'
     ).prefetch_related(
-        'order_items__product' # Kama Order inaunganishwa na order_items
+        'order_items__product' # Hii ni sahihi kama Order ina related_name 'order_items'
     ).all()
     
     serializer_class = OrderSerializer
@@ -817,18 +818,20 @@ class OrderViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         
+        # 1. Admin — anaona KILA KITU
         if user.is_authenticated and (user.is_staff or user.is_superuser):
-            return Order.objects.select_related('customer__user', 'store').all().order_by('-id')
+            return Order.objects.select_related('customer__user').all().order_by('-id')
         
+        # 2. Supplier na Buyer
         if user.is_authenticated:
             try:
                 profile = user.profile
                 if profile.role == 'supplier':
                     stores = StoreEngine.objects.filter(owner=profile)
                     store_ids = [str(store.id) for store in stores]
-                    return Order.objects.select_related('customer__user', 'store').filter(store_id__in=store_ids).order_by('-id')
+                    return Order.objects.select_related('customer__user').filter(store_id__in=store_ids).order_by('-id')
                 else:
-                    return Order.objects.select_related('customer__user', 'store').filter(customer=profile).order_by('-id')
+                    return Order.objects.select_related('customer__user').filter(customer=profile).order_by('-id')
             except Profile.DoesNotExist:
                 return Order.objects.none()
         

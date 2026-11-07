@@ -4,10 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import api from '../axiosConfig';
 import { toast, Toaster } from 'react-hot-toast';
 import { CheckCircle, XCircle, LogOut, Store, Package, ShoppingCart, ShieldCheck, Clock } from 'lucide-react';
-import { useQuery, useQueryClient } from '@tanstack/react-query'; // 1. Ingiza hooks
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import AdminSidebar from '../components/AdminSidebar'; // 🔥 Import Sidebar
 
 // ==========================================
-// 2. FUNCTION YA KUCHUKUA MADUKA
+// FUNCTION YA KUCHUKUA MADUKA
 // ==========================================
 const fetchAdminStores = async ({ queryKey }) => {
   const [_, status] = queryKey;
@@ -21,25 +22,23 @@ export default function AdminStores() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   
-  // 🔥 TUMEONGEZA STATE YA TAB (Pending vs Approved)
+  // State ya Tab (Pending vs Approved)
   const [activeTab, setActiveTab] = useState('pending'); 
 
-  // ==========================================
-  // 3. TUMIA useQuery
-  // ==========================================
+  // TUMIA useQuery
   const { 
     data: stores = [], 
     isLoading: loading 
   } = useQuery({
     queryKey: ['adminStores', activeTab],
     queryFn: fetchAdminStores,
-    staleTime: 1000 * 60 * 2, // Cache kwa dakika 2 tu (kwa sababu Admin anahitaji data mpya mara kwa mara)
+    staleTime: 1000 * 60 * 2, // Cache kwa dakika 2 tu
   });
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-    queryClient.clear(); // Futa cache yote
+    queryClient.clear();
     toast.success("Umetoka kwenye mfumo kikamilifu.");
     setTimeout(() => navigate('/dashboard/login'), 1000);
   };
@@ -53,7 +52,6 @@ export default function AdminStores() {
         is_verified: true
       });
       toast.success("Duka limepitishwa!");
-      // Sasisha orodha ya maduka
       queryClient.invalidateQueries({ queryKey: ['adminStores'] });
     } catch (err) {
       toast.error("Imeshindwa: " + (err.response?.data?.detail || err.message));
@@ -65,7 +63,6 @@ export default function AdminStores() {
     try {
       await api.patch(`/admin/stores/${storeId}/`, { verification_status: 'rejected', status: 'inactive' });
       toast.success("Duka limekataliwa.");
-      // Sasisha orodha ya maduka
       queryClient.invalidateQueries({ queryKey: ['adminStores'] });
     } catch (err) {
       toast.error("Imeshindwa: " + (err.response?.data?.detail || err.message));
@@ -76,26 +73,8 @@ export default function AdminStores() {
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex font-sans">
       <Toaster position="top-center" />
 
-      {/* SIDEBAR */}
-      <aside className="w-64 bg-slate-900 text-white flex flex-col hidden md:flex fixed h-full z-10">
-        <div className="h-16 flex items-center px-6 border-b border-slate-800">
-          <Store className="mr-3 text-orange-500" size={24} />
-          <span className="text-xl font-bold tracking-wider">Skyfall Admin</span>
-        </div>
-        
-        <nav className="flex-1 py-6 px-4 space-y-2">
-          <button className="w-full flex items-center gap-3 px-4 py-3 bg-orange-600 text-white rounded-lg font-medium transition-colors">
-            <Store size={20} />
-            Store Management
-          </button>
-        </nav>
-
-        <div className="p-4 border-t border-slate-800">
-          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-lg font-medium transition-colors">
-            <LogOut size={20} /> Logout
-          </button>
-        </div>
-      </aside>
+      {/* 🔥 TUMIA SIDEBAR COMPONENT HAPA */}
+      <AdminSidebar activePage="stores" />
 
       {/* MAIN CONTENT */}
       <div className="flex-1 md:ml-64 flex flex-col min-h-screen">
@@ -111,7 +90,7 @@ export default function AdminStores() {
         <main className="flex-1 p-4 md:p-8 overflow-y-auto">
           <div className="max-w-[1200px] mx-auto">
             
-            {/* 🔥 TABS ZA KUCHAGUA (PENDING / APPROVED) */}
+            {/* TABS ZA KUCHAGUA (PENDING / APPROVED) */}
             <div className="flex gap-4 mb-6 border-b border-gray-200 dark:border-slate-700 pb-2">
               <button 
                 onClick={() => setActiveTab('pending')}
@@ -158,7 +137,7 @@ export default function AdminStores() {
                           {store.business_type} <span className="mx-1">•</span> {store.city}
                         </p>
                         
-                        {/* 🔥 STATISTICS ZA DUKA (Zinaonekana hapa) */}
+                        {/* STATISTICS ZA DUKA */}
                         <div className="flex items-center gap-4 mt-3">
                           <div className="flex items-center gap-1.5 text-xs font-medium text-blue-600 bg-blue-50 dark:bg-blue-500/10 py-1 px-2.5 rounded-md">
                             <Package size={14} />
@@ -174,7 +153,6 @@ export default function AdminStores() {
 
                     {/* Actions */}
                     <div className="flex gap-3 w-full md:w-auto mt-2 md:mt-0">
-                      {/* Kama tupo kwenye Pending, Onyesha Approve/Reject */}
                       {activeTab === 'pending' && (
                         <>
                           <button onClick={() => handleApprove(store.id)} className="flex-1 md:flex-initial bg-green-500 hover:bg-green-600 text-white px-5 py-2.5 rounded-lg flex items-center justify-center gap-2 font-semibold transition-colors">
@@ -186,7 +164,6 @@ export default function AdminStores() {
                         </>
                       )}
                       
-                      {/* Kama tupo kwenye Approved, Onyesha Status Badge */}
                       {activeTab === 'approved' && (
                         <span className="px-4 py-2 bg-green-100 text-green-700 font-bold rounded-lg text-sm flex items-center gap-2">
                           <ShieldCheck size={18} /> Approved

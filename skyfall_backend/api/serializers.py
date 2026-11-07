@@ -294,8 +294,8 @@ class OrderSerializer(serializers.ModelSerializer):
     customer_email = serializers.SerializerMethodField()
     customer_phone = serializers.SerializerMethodField()
     
-    # 🔥 2. Items za order
-    items = OrderItemSerializer(source='items', many=True, read_only=True)
+    # 🔥 2. Items za order (Ondoa source='items' kwa sababu jina la field ni 'items')
+    items = OrderItemSerializer(many=True, read_only=True)
     
     # 🔥 3. Payment (latest payment for this order)
     payment = serializers.SerializerMethodField()
@@ -326,10 +326,7 @@ class OrderSerializer(serializers.ModelSerializer):
         return 'N/A'
     
     def get_customer_phone(self, obj):
-        """Pata simu - angalia Profile kwanza, kisha parse kutoka customer_location"""
-        if obj.customer and obj.customer.phone:
-            return obj.customer.phone
-        
+        """Pata simu - parse kutoka customer_location (kwa sababu Profile haina 'phone')"""
         # Fallback: parse kutoka customer_location
         # Format: "chacha magige | Gongo la mboto, House No. 56 | Simu: 0610768845"
         if obj.customer_location:
