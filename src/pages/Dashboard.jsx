@@ -494,18 +494,19 @@ export default function Dashboard() {
   {/* BANNER NA SKELETON YAKE */}
   {/* ========================================= */}
   <div className="w-full overflow-hidden m-0 p-0 leading-none mt-1">
-    <div className="relative w-full aspect-[18/9] md:aspect-[16/7] lg:aspect-auto lg:h-[350px] bg-gradient-to-br from-[#1a1a2e] to-[#16213e] overflow-hidden rounded-xl max-h-[350px]">
+    {/* Nimebadilisha hapa: bg-gradient... imeondolewa, nimeweka bg-white dark:bg-[#111111] */}
+    <div className="relative w-full aspect-[18/9] md:aspect-[16/7] lg:aspect-auto lg:h-[350px] bg-white dark:bg-[#111111] overflow-hidden rounded-xl max-h-[350px]">
       
-      {/* 🔥 HAPA: Skeleton tupu bila neno - Nimebadilisha rangi iwe nyepesi */}
+      {/* 🔥 SKELETON: Nimeondoa border na kuweka rangi laini inayofanana na app */}
       {loadingAds || cachedAds.length === 0 ? (
-         <div className="w-full h-full bg-gray-100 dark:bg-[#1a1a1a] animate-pulse flex items-center justify-center border border-gray-200 dark:border-gray-800 rounded-xl">
+         <div className="w-full h-full bg-gray-200 dark:bg-[#1a1a1a] animate-pulse flex items-center justify-center rounded-xl">
         </div>
          ) : (
            <>
           {activeAd && isVideoAd(activeAd) ? (
-            <video src={activeAd.media_url} autoPlay muted playsInline onEnded={() => { if (cachedAds.length) setCurrentAdIndex((prev) => (prev + 1) % cachedAds.length); }} className="w-full h-full object-cover object-center block bg-[#1a1a2e]" />
+            <video src={activeAd.media_url} autoPlay muted playsInline onEnded={() => { if (cachedAds.length) setCurrentAdIndex((prev) => (prev + 1) % cachedAds.length); }} className="w-full h-full object-cover object-center block bg-white dark:bg-[#111111]" />
           ) : (
-            activeAd && <img src={activeAd.media_url} className="w-full h-full object-cover object-center block bg-[#1a1a2e]" alt="promo" loading="lazy" />
+            activeAd && <img src={activeAd.media_url} className="w-full h-full object-cover object-center block bg-white dark:bg-[#111111]" alt="promo" loading="lazy" />
           )}
           
           {activeAd && (
