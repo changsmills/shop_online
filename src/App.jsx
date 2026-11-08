@@ -60,6 +60,7 @@ import VerifySellerOTP from './pages/VerifySellerOTP';
 import StorePending from './pages/StorePending';
 import AdminStores from './pages/AdminStores';
 import AdminOrders from './pages/AdminOrders';
+import api from './axiosConfig'; 
 
 
 
@@ -78,6 +79,28 @@ const ProtectedAdminRoute = ({ children }) => {
 function AppContent({ session }) {
   const location = useLocation();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  const [isOnline, setIsOnline] = useState(navigator.onLine); 
+
+
+    // 🔥 WEKA HII HAPA: Tracker ya Wageni
+  useEffect(() => {
+    // 1. Usirekodi kama ni kurasa za admin/dashboard (hiari, lakini ni vizuri)
+    if (location.pathname.includes('/dashboard') || location.pathname.includes('/admin')) {
+      return; 
+    }
+
+    // 2. Tuma taarifa kwa Backend (Django)
+    api.post('/track-visit/', { 
+      path: location.pathname,
+      // Kama una search query kwenye URL (mfano: /search?q=skyfall)
+      query: new URLSearchParams(location.search).get('q') || '' 
+    }).catch(err => {
+      console.log("Tracking imeshindwa (Backend haipo?)", err);
+    });
+    
+  }, [location.pathname]); // Inafanya kazi kila ukurasa unapobadilika
+  // 🔥 MWISHO WA TRACKER
 
   
   useEffect(() => {

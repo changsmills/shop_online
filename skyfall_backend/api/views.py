@@ -22,6 +22,12 @@ import cloudinary.uploader
 import math
 from django.db.models import Count, Sum, Q
 from django.db.models import Count 
+ # ==========================================
+# 🔥 6. VIEWS ZA ANALYTICS (SITE VISITS)
+# ==========================================
+from django.db.models.functions import TruncDate
+from django.utils import timezone
+from datetime import timedelta
 
 
 
@@ -41,7 +47,7 @@ import requests
 # 🔥 MODELS IMPORTS:
 from products.models import (
     Category, ProductVariation, SubCategory, ProductsEngine, LeafCategory, Advertisement, 
-    StoreEngine, ProductMedia, Message, ShippingMethod, Brand, Lead, Order, OrderItem,  
+    StoreEngine, ProductMedia, Message, ShippingMethod, Brand, Lead, Order, OrderItem,  SiteVisit 
 )
 
 # 🔥 ONGEZA HII IMPORT MUHIMU KABISA (Inaingiza ViewSet kutoka products.views):
@@ -1323,3 +1329,73 @@ class NearbyStoresView(APIView):
             item['distance_km'] = round(distances[i], 2)
 
         return Response(data, status=200)
+
+
+class TrackVisitView(APIView):
+    """
+    API ya kurekodi mtu anapoingia kwenye tovuti.
+    """
+    permission_classes = [AllowAny] # Mtu yeyote anaweza kurekodiwa
+    
+    def post(self, request):
+        path = request.data.get('path', '/')
+        query = request.data.get('query', '')
+        
+        # Pata IP address
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+
+        # Hifadhi kwenye Database
+        SiteVisit.objects.create(
+            path=path,
+            search_query=query,
+            ip_address=ip,
+            user_agent=request.META.get('HTTP_USER_AGENT', '')
+        )
+        
+        return Response({"status": "success"}, status=status.HTTP_201_CREATED)
+
+
+class AdminAnalyticsView(APIView):
+    """
+    API ya Admin kuona takwimu za wageni.
+    """
+    permission_classes = [AllowAny] # Kwa sasa tumeweka AllowAny kwa majaribio
+    
+    def get(self, request):
+        today = timezone.now().date()
+        
+        # 1. Ziara za Leo
+        visits_today = SiteVisit.objects.filter(timestamp__date=today).count()
+        
+        # 2. Jumla ya Ziara Zote
+        total_visits = SiteVisit.objects.count()
+        
+        # 3. Idadi ya waliotafuta "Skyfall"
+        skyfall_searches = SiteVisit.objects.filter(
+            search_query__icontains='skyfall'
+        ).count()
+
+        # 4. Data ya Siku 7 za mwisho
+        seven_days_ago = today - timedelta(days=7)
+        daily_data = SiteVisit.objects.filter(timestamp__date__gte=seven_days_ago) \
+            .annotate(date=TruncDate('timestamp')) \
+            .values('date') \
+            .annotate(count=Count('id')) \
+            .order_by('date')
+
+        # Badilisha date kuwa string kwa ajili ya React
+        formatted_daily_data = [
+            {"date": item['date'].strftime('%Y-%m-%d'), "count": item['count']} 
+            for item in daily_data
+        ]
+
+        return Response({
+            "visits_today": visits_today,
+            "total_visits": total_visits,
+            "skyfall_searches": skyfall_searches,
+            "daily_visits": formatted_daily_data
+        }, status=status.HTTP_200_OK)

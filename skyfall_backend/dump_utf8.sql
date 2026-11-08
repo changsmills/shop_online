@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict FTIOzifymXLnPjqeteC3KvxaYafrxdO0BCvbSGmx9rGLcb7NOG7kwu2DDxqH8vj
+\restrict 0Y85dglpBi1BlkV5OpO8GDjoT2uhHSamU1fb23GmRlJAACxkU0BpKn7b5p1ARJJ
 
 -- Dumped from database version 18.6 (ac70818)
 -- Dumped by pg_dump version 18.6
@@ -5982,5 +5982,5 @@ CREATE POLICY "Allow public read sub_categories" ON "public"."sub_categories" FO
 -- PostgreSQL database dump complete
 --
 
-\unrestrict FTIOzifymXLnPjqeteC3KvxaYafrxdO0BCvbSGmx9rGLcb7NOG7kwu2DDxqH8vj
+\unrestrict 0Y85dglpBi1BlkV5OpO8GDjoT2uhHSamU1fb23GmRlJAACxkU0BpKn7b5p1ARJJ
 

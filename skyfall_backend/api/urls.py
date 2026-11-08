@@ -22,7 +22,9 @@ from api.views import (
     SupplierLogoutView,
     AdminStoreApprovalViewSet,
     NearbyProductsView,
-    NearbyStoresView  # 🔥 ONGEZA HII
+    NearbyStoresView,  # 🔥 ONGEZA HII
+    TrackVisitView,      # 🔥 ONGEZA HII
+    AdminAnalyticsView 
 
 
 )
@@ -68,7 +70,9 @@ urlpatterns = [
     path('auth/registration/', include('dj_rest_auth.registration.urls')),  # Registration
     path('auth/google/', GoogleAuthView.as_view(), name='google_auth'),
     path('nearby-products/', NearbyProductsView.as_view(), name='nearby-products'),
-        path('nearby-stores/', NearbyStoresView.as_view(), name='nearby-stores'),  # 🔥 ONGEZA HII
+    path('nearby-stores/', NearbyStoresView.as_view(), name='nearby-stores'),  # 🔥 ONGEZA HII
+    path('track-visit/', TrackVisitView.as_view(), name='track-visit'),
+    path('admin/analytics/', AdminAnalyticsView.as_view(), name='admin-analytics'),
 
 
 

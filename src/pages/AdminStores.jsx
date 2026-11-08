@@ -3,12 +3,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../axiosConfig';
 import { toast, Toaster } from 'react-hot-toast';
-import { CheckCircle, XCircle, LogOut, Store, Package, ShoppingCart, ShieldCheck, Clock } from 'lucide-react';
+// 🔥 1. Icons mpya zimeongezwa hapa (Users, Search, Activity)
+import { CheckCircle, XCircle, LogOut, Store, Package, ShoppingCart, ShieldCheck, Clock, Users, Search, Activity } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import AdminSidebar from '../components/AdminSidebar'; // 🔥 Import Sidebar
+import AdminSidebar from '../components/AdminSidebar'; 
 
 // ==========================================
-// FUNCTION YA KUCHUKUA MADUKA
+// FUNCTIONS ZA KUCHUKUA DATA
 // ==========================================
 const fetchAdminStores = async ({ queryKey }) => {
   const [_, status] = queryKey;
@@ -18,6 +19,12 @@ const fetchAdminStores = async ({ queryKey }) => {
   return response.data.results || response.data || [];
 };
 
+// 🔥 2. Function mpya ya kuchukua takwimu za wageni
+const fetchAnalytics = async () => {
+  const response = await api.get('/admin/analytics/');
+  return response.data;
+};
+
 export default function AdminStores() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -25,14 +32,21 @@ export default function AdminStores() {
   // State ya Tab (Pending vs Approved)
   const [activeTab, setActiveTab] = useState('pending'); 
 
-  // TUMIA useQuery
+  // TUMIA useQuery kwa ajili ya Maduka
   const { 
     data: stores = [], 
     isLoading: loading 
   } = useQuery({
     queryKey: ['adminStores', activeTab],
     queryFn: fetchAdminStores,
-    staleTime: 1000 * 60 * 2, // Cache kwa dakika 2 tu
+    staleTime: 1000 * 60 * 2, 
+  });
+
+  // 🔥 3. useQuery ya kuchukua takwimu (Itajisasisha kila dakika 1)
+  const { data: analytics } = useQuery({
+    queryKey: ['adminAnalytics'],
+    queryFn: fetchAnalytics,
+    refetchInterval: 60000, 
   });
 
   const handleLogout = () => {
@@ -73,13 +87,10 @@ export default function AdminStores() {
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex font-sans">
       <Toaster position="top-center" />
 
-      {/* 🔥 TUMIA SIDEBAR COMPONENT HAPA */}
       <AdminSidebar activePage="stores" />
 
-      {/* MAIN CONTENT */}
       <div className="flex-1 md:ml-64 flex flex-col min-h-screen">
         
-        {/* HEADER */}
         <header className="h-16 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between px-4 md:px-8 shadow-sm">
           <h1 className="text-xl font-bold text-gray-800 dark:text-white">Store Management</h1>
           <button onClick={handleLogout} className="md:hidden flex items-center gap-2 text-red-500 font-medium text-sm">
@@ -90,7 +101,39 @@ export default function AdminStores() {
         <main className="flex-1 p-4 md:p-8 overflow-y-auto">
           <div className="max-w-[1200px] mx-auto">
             
-            {/* TABS ZA KUCHAGUA (PENDING / APPROVED) */}
+            {/* 🔥 4. KADI ZA TAKWIMU ZIMEANZA HAPA */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              
+              {/* Kadi ya Ziara Zote */}
+              <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm flex items-center gap-4">
+                <div className="p-4 bg-blue-100 text-blue-600 rounded-full"><Users size={24} /></div>
+                <div>
+                  <p className="text-sm text-gray-500 font-medium">Total Site Visits</p>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{analytics?.total_visits || 0}</h2>
+                </div>
+              </div>
+
+              {/* Kadi ya Waliotafuta Skyfall */}
+              <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm flex items-center gap-4">
+                <div className="p-4 bg-orange-100 text-orange-600 rounded-full"><Search size={24} /></div>
+                <div>
+                  <p className="text-sm text-gray-500 font-medium">"Skyfall" Searches</p>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{analytics?.skyfall_searches || 0}</h2>
+                </div>
+              </div>
+
+              {/* Kadi ya Ziara za Leo */}
+              <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm flex items-center gap-4">
+                <div className="p-4 bg-green-100 text-green-600 rounded-full"><Activity size={24} /></div>
+                <div>
+                  <p className="text-sm text-gray-500 font-medium">Visits Today</p>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{analytics?.visits_today || 0}</h2>
+                </div>
+              </div>
+
+            </div>
+            {/* 🔥 MWISHO WA KADI ZA TAKWIMU */}
+
             <div className="flex gap-4 mb-6 border-b border-gray-200 dark:border-slate-700 pb-2">
               <button 
                 onClick={() => setActiveTab('pending')}
@@ -106,7 +149,6 @@ export default function AdminStores() {
               </button>
             </div>
 
-            {/* LOADING */}
             {loading ? (
               <div className="flex justify-center py-20">
                 <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-orange-500"></div>
@@ -121,7 +163,6 @@ export default function AdminStores() {
                 {stores.map((store) => (
                   <div key={store.id} className="bg-white dark:bg-slate-800 p-5 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm flex flex-col md:flex-row md:justify-between md:items-center gap-5">
                     
-                    {/* Store Info */}
                     <div className="flex items-start gap-4 flex-1 min-w-0">
                       {store.store_logo_url ? (
                         <img src={store.store_logo_url} alt="logo" className="w-16 h-16 rounded-xl object-cover border border-gray-100" />
@@ -137,7 +178,6 @@ export default function AdminStores() {
                           {store.business_type} <span className="mx-1">•</span> {store.city}
                         </p>
                         
-                        {/* STATISTICS ZA DUKA */}
                         <div className="flex items-center gap-4 mt-3">
                           <div className="flex items-center gap-1.5 text-xs font-medium text-blue-600 bg-blue-50 dark:bg-blue-500/10 py-1 px-2.5 rounded-md">
                             <Package size={14} />
@@ -151,7 +191,6 @@ export default function AdminStores() {
                       </div>
                     </div>
 
-                    {/* Actions */}
                     <div className="flex gap-3 w-full md:w-auto mt-2 md:mt-0">
                       {activeTab === 'pending' && (
                         <>

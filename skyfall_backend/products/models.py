@@ -842,3 +842,32 @@ class OTPModel(models.Model):
     
     def __str__(self):
         return f"{self.email} - {self.otp}"
+
+
+    # --- SITE VISIT / ANALYTICS ---
+class SiteVisit(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    
+    # Hifadhi taarifa za mtu aliyetembelea
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True, null=True)
+    
+    # Njia aliyotembelea (Mfano: '/', '/products/123', '/search')
+    path = models.CharField(max_length=255)
+    
+    # Kama alitumia search bar, neno alilotafuta lihifadhiwe hapa
+    search_query = models.CharField(max_length=255, blank=True, null=True)
+    
+    # Tarehe na muda
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'site_visits'
+        indexes = [
+            models.Index(fields=['-timestamp']), # Kwa ajili ya kupanga kwa siku
+            models.Index(fields=['path']),
+            models.Index(fields=['search_query']), # Kwa kutafuta "skyfall"
+        ]
+
+    def __str__(self):
+        return f"{self.path} - {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
