@@ -117,6 +117,11 @@ export default function ProductDetails() {
   const [selectedImageTitle, setSelectedImageTitle] = useState("");
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [fetchTrigger, setFetchTrigger] = useState(0);
+  const [showHeader, setShowHeader] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const galleryRef = useRef(null);
+  const infoRef = useRef(null);
+  const sentinelRef = useRef(null);
 
   // ==========================================
   // 4. TANSTACK QUERIES
@@ -193,6 +198,26 @@ export default function ProductDetails() {
     };
   }, []);
 
+useEffect(() => {
+  const handleScroll = () => {
+    const scrollTop = window.scrollY;
+    
+    if (scrollTop > lastScrollY && scrollTop > 50) {
+      setShowHeader(false); // Ficha unaposcroll chini
+    } else if (scrollTop < lastScrollY) {
+      setShowHeader(true);  // Onyesha unaposcroll juu
+    }
+    
+    setLastScrollY(scrollTop);
+  };
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+
+  return () => {
+    window.removeEventListener('scroll', handleScroll);
+  };
+}, [lastScrollY]);
+
   // ==========================================
   // HANDLERS
   // ==========================================
@@ -226,16 +251,25 @@ export default function ProductDetails() {
   // RENDER (UI)
   // ==========================================
   return (
-    <div className="min-h-[100dvh] bg-white dark:bg-black flex flex-col pt-0 md:pt-[100px] font-sans overflow-x-hidden">      
-      <div className="md:fixed md:top-0 md:left-0 md:w-full md:z-[1000]">
+
+<div className="min-h-[100dvh] bg-[#fafbfc] dark:bg-[#0a0a0a] flex flex-col pt-0 md:pt-[100px] font-sans overflow-x-hidden">
+
+  <div  className={`fixed top-0 left-0 w-full z-[1000] transition-transform duration-300 ${
+           showHeader ? 'translate-y-0' : '-translate-y-full'
+           }`}
+              >
         <Header showBack={true} /> 
-      </div>
+       </div>
+       <div ref={sentinelRef} className="h-1 w-full bg-transparent" />
 
       <div className="w-full max-w-full mx-auto px-0 md:px-0 pb-24 md:pb-0">
         <main className="flex flex-col md:flex-row w-full items-start">
           
           {/* LEFT CONTENT (Gallery & Description) */}
-          <div className="w-full md:w-[65%] md:sticky md:top-[100px] md:max-h-[calc(100vh-100px)] md:overflow-y-auto bg-white dark:bg-black md:border-r border-gray-200 dark:border-gray-800">
+          <div 
+            ref={galleryRef}
+            className="w-full md:w-[65%] md:sticky md:top-[100px] md:max-h-[calc(100vh-100px)] md:overflow-y-auto bg-white dark:bg-black md:border-r border-gray-200 dark:border-gray-800"
+              >
             <section className="w-full bg-white dark:bg-black pt-3 md:pt-6 px-1 md:px-6">
               <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800">
                 
@@ -271,7 +305,10 @@ export default function ProductDetails() {
           </div>
 
           {/* RIGHT SIDEBAR (Product Info) */}
-          <div className="w-full md:w-[35%] md:sticky md:top-[100px] md:max-h-[calc(100vh-100px)] md:overflow-y-auto bg-[#fafbfc] dark:bg-[#0a0a0a] border-l border-gray-200 dark:border-gray-800">
+          <div 
+            ref={infoRef}
+            className="w-full md:w-[35%] md:sticky md:top-[100px] md:max-h-[calc(100vh-100px)] md:overflow-y-auto bg-[#fafbfc] dark:bg-[#0a0a0a] border-l border-gray-200 dark:border-gray-800"
+            >
             <div className="px-4 py-4 md:px-6 md:py-6">
               
               {/* 🔥 PRODUCT INFO SKELETON */}
