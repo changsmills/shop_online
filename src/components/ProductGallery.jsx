@@ -268,126 +268,170 @@ const ProductGallery = React.memo(({ product }) => {
           ))}
         </div>
 
-               {/* Lightbox Modal */}
-        {isModalOpen && createPortal(
-          <div className="fixed inset-0 bg-black/95 z-[10000] flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}>
-            
-            {/* Close Button */}
-            <button className="absolute top-5 right-5 bg-white/20 text-white p-2 rounded-full hover:bg-brand-orange transition-colors z-50" onClick={() => setIsModalOpen(false)}>
-              <X size={35} />
-            </button>
-            
-            {/* Prev Button */}
-            <button className="absolute left-5 top-1/2 -translate-y-1/2 bg-white/20 text-white p-3 rounded-full hover:bg-brand-orange transition-colors z-50" onClick={prevImage}>
-              <ChevronLeft size={30} />
-            </button>
-            
-            {/* Next Button */}
-            <button className="absolute right-5 top-1/2 -translate-y-1/2 bg-white/20 text-white p-3 rounded-full hover:bg-brand-orange transition-colors z-50" onClick={nextImage}>
-              <ChevronRight size={30} />
-            </button>
+{/* Lightbox Modal */}
+{isModalOpen && createPortal(
+  <div className="fixed inset-0 bg-black/95 z-[10000] flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}>
+    
+    {/* Close Button */}
+    <button className="absolute top-5 right-5 bg-white/20 text-white p-2 rounded-full hover:bg-brand-orange transition-colors z-50" onClick={() => setIsModalOpen(false)}>
+      <X size={35} />
+    </button>
+    
+    {/* Prev Button */}
+    <button className="absolute left-5 top-1/2 -translate-y-1/2 bg-white/20 text-white p-3 rounded-full hover:bg-brand-orange transition-colors z-50" onClick={prevImage}>
+      <ChevronLeft size={30} />
+    </button>
+    
+    {/* Next Button */}
+    <button className="absolute right-5 top-1/2 -translate-y-1/2 bg-white/20 text-white p-3 rounded-full hover:bg-brand-orange transition-colors z-50" onClick={nextImage}>
+      <ChevronRight size={30} />
+    </button>
 
-            {/* Main Content Area */}
+    {/* 
+      🔥 KISANDUKU KIKUU (Fixed Size Container) 
+      Kimewekewa urefu maalum (h-[85vh]) na upana maalum. 
+      Hapa picha ikibadilika, hiki kisanduku hakibadiliki ukubwa wake.
+    */}
+    <div 
+      className="w-full max-w-[1200px] h-[85vh] bg-black rounded-xl overflow-hidden relative flex items-center justify-center" 
+      onClick={(e) => e.stopPropagation()}
+    >
+      {currentMedia?.type === 'video' ? (
+        <video 
+          key={currentMedia.url} 
+          src={currentMedia.url} 
+          controls 
+          autoPlay 
+          // Video inatumia h-full w-full na object-contain ili ionekane yote ndani ya kisanduku
+          className="w-full h-full object-contain" 
+        />
+      ) : (
+        <div 
+          className="w-full h-full flex items-center justify-center relative cursor-crosshair overflow-hidden" 
+          onMouseMove={handleMouseMove} 
+          onMouseEnter={() => setIsZooming(true)} 
+          onMouseLeave={() => setIsZooming(false)}
+          onTouchMove={handleTouchMove} 
+          onTouchStart={handleTouchMove} 
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* 
+            🔥 PICHA IMEWEKWA ABSOLUTE
+            Ili kuzuia picha isisukume kisanduku (kubadilisha size yake).
+            Tumia object-contain ili isikatike. 
+          */}
+          <img 
+            key={currentMedia?.url} 
+            src={currentMedia?.url} 
+            alt="View" 
+            className="absolute inset-0 w-full h-full object-contain p-2" 
+          />
+          
+          {isZooming && (
             <div 
-              className="w-full max-w-[1200px] h-[85vh] bg-black rounded-xl overflow-hidden relative flex items-center justify-center" 
-              onClick={(e) => e.stopPropagation()}
-            >
-              {currentMedia?.type === 'video' ? (
-                <video key={currentMedia.url} src={currentMedia.url} controls autoPlay className="max-w-full max-h-full object-contain" />
-              ) : (
-                <div 
-                  className="w-full h-full flex items-center justify-center relative cursor-crosshair" 
-                  onMouseMove={handleMouseMove} 
-                  onMouseEnter={() => setIsZooming(true)} 
-                  onMouseLeave={() => setIsZooming(false)}
-                  onTouchMove={handleTouchMove} 
-                  onTouchStart={handleTouchMove} 
-                  onTouchEnd={handleTouchEnd}
-                >
-                  {/* Picha imewekwa hapa kwa max-w na max-h pekee ili isijibane */}
-                  <img 
-                    key={currentMedia?.url} 
-                    src={currentMedia?.url} 
-                    alt="View" 
-                    className="max-w-full max-h-full object-contain" 
-                  />
-                  
-                  {isZooming && (
-                    <div 
-                      className="absolute inset-0 bg-no-repeat bg-[length:250%] pointer-events-none" 
-                      style={{ backgroundImage: `url(${currentMedia?.url})`, backgroundPosition: bgPos }} 
-                    />
-                  )}
-                </div>
-              )}
-            </div>
+              className="absolute inset-0 bg-no-repeat bg-[length:250%] pointer-events-none" 
+              style={{ backgroundImage: `url(${currentMedia?.url})`, backgroundPosition: bgPos }} 
+            />
+          )}
+        </div>
+      )}
+    </div>
 
-            {/* Counter */}
-            <div className="absolute bottom-5 bg-black/50 text-white px-4 py-1.5 rounded-full text-sm z-50 pointer-events-none">
-              {currentIndex + 1} / {mediaList.length}
-            </div>
-          </div>,
-          document.body
-        )}
+    {/* Counter */}
+    <div className="absolute bottom-5 bg-black/50 text-white px-4 py-1.5 rounded-full text-sm z-50 pointer-events-none">
+      {currentIndex + 1} / {mediaList.length}
+    </div>
+  </div>,
+  document.body
+)}
 
       </div>
 
-      {/* ===== MOBILE VIEW ===== */}
-      <div className="block md:hidden w-full bg-black rounded-none overflow-hidden font-sans">
-        <div className="relative w-full bg-black flex items-center justify-center min-h-[350px]">
-          {mediaType === 'video' && videoItem && (
-            <div className="relative w-full">
-              <video ref={videoRef} src={videoItem.url} className="w-full h-auto max-h-[400px] object-contain" onTimeUpdate={handleTimeUpdate} onLoadedMetadata={handleTimeUpdate} onPlay={() => setIsPlaying(true)} onPause={() => setIsPlaying(false)} playsInline />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-white text-xs">{formatTime(currentTime)}</span>
-                  <input type="range" min="0" max="100" value={progressPercent} onChange={handleSeek} className="flex-1 h-1 rounded bg-gray-500 accent-brand-orange" />
-                  <span className="text-white text-xs">{formatTime(duration)}</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <button onClick={handlePlayPause} className="text-white">{isPlaying ? <Pause size={20} /> : <Play size={20} />}</button>
-                  <button onClick={handleMute} className="text-white">{isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}</button>
-                  <button onClick={handleFullscreen} className="text-white ml-auto"><Maximize size={18} /></button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {mediaType === 'photos' && currentPhoto && (
-            <>
-              <img src={currentPhoto.url} alt={product.name} className="w-full h-auto max-h-[400px] object-contain block" onClick={() => setIsModalOpen(true)} onContextMenu={(e) => e.preventDefault()} />
-              {photoItems.length > 1 && (
-                <>
-                  <button className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full" onClick={prevImage}><ChevronLeft size={20} /></button>
-                  <button className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full" onClick={nextImage}><ChevronRight size={20} /></button>
-                </>
-              )}
-              <div className="absolute bottom-3 right-3 bg-black/60 text-white px-3 py-1 rounded-full text-xs">
-                {photoIndex + 1} / {photoItems.length}
-              </div>
-            </>
-          )}
-        </div>
-
-        {videoItem && (
-          <div className="flex gap-3 mt-3 justify-center">
-            <button onClick={() => setMediaType('video')} className={`px-5 py-2 rounded-full border-none font-bold text-sm cursor-pointer transition-all ${mediaType === 'video' ? 'bg-brand-orange text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>🎬 Video</button>
-            <button onClick={() => setMediaType('photos')} className={`px-5 py-2 rounded-full border-none font-bold text-sm cursor-pointer transition-all ${mediaType === 'photos' ? 'bg-brand-orange text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>📷 Photos ({photoItems.length})</button>
+     {/* ===== MOBILE VIEW ===== */}
+<div className="block md:hidden w-full bg-black rounded-none overflow-hidden font-sans">
+  
+  {/* 🔥 SEHEMU YA JUU (PICHA KUU) - IMEBAKWA VIZURI */}
+  <div className="relative w-full bg-black flex items-center justify-center h-[400px]"> 
+    {mediaType === 'video' && videoItem && (
+      <div className="relative w-full h-full flex items-center justify-center">
+        <video 
+          ref={videoRef} 
+          src={videoItem.url} 
+          className="w-full h-full object-cover" // 🔥 object-cover hapa
+          onTimeUpdate={handleTimeUpdate} 
+          onLoadedMetadata={handleTimeUpdate} 
+          onPlay={() => setIsPlaying(true)} 
+          onPause={() => setIsPlaying(false)} 
+          playsInline 
+        />
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-white text-xs">{formatTime(currentTime)}</span>
+            <input type="range" min="0" max="100" value={progressPercent} onChange={handleSeek} className="flex-1 h-1 rounded bg-gray-500 accent-brand-orange" />
+            <span className="text-white text-xs">{formatTime(duration)}</span>
           </div>
-        )}
-
-        <div className="mt-5 flex flex-col gap-0 w-full p-0">
-          {mediaList.map((item, idx) => (
-            <div key={idx} className="w-full bg-transparent relative overflow-hidden m-0 p-0">
-              {item.type === 'video' ? (
-                <video src={item.url} controls className="w-full h-auto block object-contain" />
-              ) : (
-                <img src={item.url} alt={`Detail ${idx}`} className="w-full h-auto block object-contain" />
-              )}
-            </div>
-          ))}
+          <div className="flex items-center gap-4">
+            <button onClick={handlePlayPause} className="text-white">{isPlaying ? <Pause size={20} /> : <Play size={20} />}</button>
+            <button onClick={handleMute} className="text-white">{isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}</button>
+            <button onClick={handleFullscreen} className="text-white ml-auto"><Maximize size={18} /></button>
+          </div>
         </div>
       </div>
+    )}
+
+    {mediaType === 'photos' && currentPhoto && (
+      <>
+        <img 
+          src={currentPhoto.url} 
+          alt={product.name} 
+          // 🔥 HAPA NIMEONDOA h-auto na object-contain, NIMEWEKA h-full na object-cover
+          className="w-full h-full object-cover block" 
+          onClick={() => setIsModalOpen(true)} 
+          onContextMenu={(e) => e.preventDefault()} 
+        />
+        {photoItems.length > 1 && (
+          <>
+            <button className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full" onClick={prevImage}><ChevronLeft size={20} /></button>
+            <button className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full" onClick={nextImage}><ChevronRight size={20} /></button>
+          </>
+        )}
+        <div className="absolute bottom-3 right-3 bg-black/60 text-white px-3 py-1 rounded-full text-xs">
+          {photoIndex + 1} / {photoItems.length}
+        </div>
+      </>
+    )}
+  </div>
+
+  {/* VITUFE VYA KUBADILISHA VIDEO/PHOTOS */}
+  {videoItem && (
+    <div className="flex gap-3 mt-3 justify-center">
+      <button onClick={() => setMediaType('video')} className={`px-5 py-2 rounded-full border-none font-bold text-sm cursor-pointer transition-all ${mediaType === 'video' ? 'bg-brand-orange text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>🎬 Video</button>
+      <button onClick={() => setMediaType('photos')} className={`px-5 py-2 rounded-full border-none font-bold text-sm cursor-pointer transition-all ${mediaType === 'photos' ? 'bg-brand-orange text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>📷 Photos ({photoItems.length})</button>
+    </div>
+  )}
+
+  {/* 🔥 SEHEMU YA CHINI (PICHA ZOTE) - ILIYOKUWA SAHIHI */}
+  <div className="mt-5 flex flex-col gap-0 w-full p-0">
+    {mediaList.map((item, idx) => (
+      <div key={idx} className="w-full bg-black relative overflow-hidden m-0 p-0 flex items-center justify-center">
+        {item.type === 'video' ? (
+          <video 
+            src={item.url} 
+            controls 
+            className="w-full h-[350px] md:h-[400px] object-cover block" 
+          />
+        ) : (
+          <img 
+            src={item.url} 
+            alt={`Detail ${idx}`} 
+            className="w-full h-[350px] md:h-[400px] object-cover block" 
+          />
+        )}
+      </div>
+    ))}
+  </div>
+
+</div>
 
       
     </>
