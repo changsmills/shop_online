@@ -252,7 +252,7 @@ useEffect(() => {
   // ==========================================
   return (
 
-<div className="min-h-[100dvh] bg-[#fafbfc] dark:bg-[#0a0a0a] flex flex-col pt-0 md:pt-[100px] font-sans overflow-x-hidden">
+<div className="min-h-[100dvh] bg-[#fafbfc] dark:bg-[#0a0a0a] flex flex-col pt-[55px] md:pt-[100px] font-sans overflow-x-hidden">
 
   <div  className={`fixed top-0 left-0 w-full z-[1000] transition-transform duration-300 ${
            showHeader ? 'translate-y-0' : '-translate-y-full'
