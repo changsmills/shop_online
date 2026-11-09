@@ -697,107 +697,123 @@ export default function Dashboard() {
         document.body
       )}
 
-      {mobileMenuOpen && ReactDOM.createPortal(
-        <div className="fixed inset-0 bg-black/60 z-[9999] flex justify-center items-end font-sans" onClick={() => setMobileMenuOpen(false)}>
-          <div className="w-full h-full bg-white dark:bg-[#0a0a0a] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between px-3 h-14 bg-white dark:bg-black border-b border-gray-200 dark:border-[#1f1f1f] shrink-0">
-              <button className="bg-transparent border-none cursor-pointer text-gray-800 dark:text-white p-1.5 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-[#1a1a1a]" onClick={() => setMobileMenuOpen(false)}>
-                <ChevronLeft size={24} />
-              </button>
-              <h2 className="text-base font-bold text-black dark:text-white m-0 flex-1 text-center truncate">{t('categories')}</h2>
-              <button className="bg-transparent border-none cursor-pointer text-gray-800 dark:text-white p-1.5 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-[#1a1a1a] text-xl font-bold" onClick={() => setMobileMenuOpen(false)}>✕</button>
-            </div>
+     {mobileMenuOpen && ReactDOM.createPortal(
+  // 🔥 1. Nimeongeza z-[99999] hapa ili iwe juu ya BottomNav
+  <div className="fixed inset-0 bg-black/60 z-[99999] flex justify-center items-end font-sans" onClick={() => setMobileMenuOpen(false)}>
+    <div className="w-full h-full bg-white dark:bg-[#0a0a0a] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+      
+      {/* HEADER */}
+      <div className="flex items-center justify-between px-3 h-14 bg-white dark:bg-black border-b border-gray-200 dark:border-[#1f1f1f] shrink-0">
+        <button className="bg-transparent border-none cursor-pointer text-gray-800 dark:text-white p-1.5 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-[#1a1a1a]" onClick={() => setMobileMenuOpen(false)}>
+          <ChevronLeft size={24} />
+        </button>
+        <h2 className="text-base font-bold text-black dark:text-white m-0 flex-1 text-center truncate">{t('categories')}</h2>
+        <button className="bg-transparent border-none cursor-pointer text-gray-800 dark:text-white p-1.5 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-[#1a1a1a] text-xl font-bold" onClick={() => setMobileMenuOpen(false)}>✕</button>
+      </div>
 
-            <div className="flex flex-row flex-1 w-full overflow-hidden relative">
-              <aside className="w-[90px] min-w-[90px] max-w-[90px] bg-[#fafafa] dark:bg-[#0a0a0a] overflow-y-auto border-r border-gray-200 dark:border-[#1f1f1f] py-1 shrink-0 relative z-10">
-                {mobileActiveMenu === 'subcategories' ? (
-                  <>
-                    <div onClick={() => { setSelectedSubCategory(null); setMobileActiveMenu('categories'); setViewMode('products'); }} className="px-2 py-3 cursor-pointer text-brand-orange font-bold border-b border-gray-200 dark:border-[#1f1f1f] flex items-center gap-1.5 text-[11px] leading-tight">
-                      <ChevronLeft size={14} className="shrink-0" /> <span>Back</span>
-                    </div>
-                    {subCategories && subCategories.length > 0 ? (
-                      subCategories.map((sub) => (
-                        <div key={sub.id} onClick={() => { setSelectedSubCategory(sub); }} className={`px-2 py-2.5 text-[11px] cursor-pointer text-left leading-tight transition-colors ${selectedSubCategory?.id === sub.id ? 'text-brand-orange font-bold border-l-[3px] border-brand-orange bg-white dark:bg-black' : 'text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-black'}`}>
-                          {i18n.language === 'sw' ? (sub.name_sw || sub.name) : sub.name}
-                        </div>
-                      ))
-                    ) : (
-                      <div className="p-3 text-gray-400 text-center text-[10px]">Hakuna</div>
-                    )}
-                  </>
-                ) : (
-                  [ALL_CATEGORY, ...categories].map(cat => (
-                    <div key={cat.id} onClick={() => { setSelectedCategory(cat); setSelectedCategoryForComponents(cat); setMobileActiveMenu('categories'); setViewMode('products'); }} className={`px-2 py-2.5 text-[11px] cursor-pointer text-left leading-tight transition-colors ${selectedCategory?.id === cat.id ? 'text-brand-orange font-bold border-l-[3px] border-brand-orange bg-white dark:bg-black' : 'text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-black'}`}>
-                      {getCategoryDisplayName(cat)}
-                    </div>
-                  ))
-                )}
-              </aside>
+      <div className="flex flex-row flex-1 w-full overflow-hidden relative">
+        
+        {/* 🔥 2. UPANDE WA KUSHOTO: Nimeongeza upana kuwa w-[120px] (kutoka 90px) */}
+        <aside className="w-[120px] min-w-[120px] max-w-[120px] bg-[#fafafa] dark:bg-[#0a0a0a] overflow-y-auto border-r border-gray-200 dark:border-[#1f1f1f] py-1 shrink-0 relative z-10">
+          {mobileActiveMenu === 'subcategories' ? (
+            <>
+              <div onClick={() => { setSelectedSubCategory(null); setMobileActiveMenu('categories'); setViewMode('products'); }} className="px-3 py-3 cursor-pointer text-brand-orange font-bold border-b border-gray-200 dark:border-[#1f1f1f] flex items-center gap-1.5 text-[13px] leading-tight">
+                <ChevronLeft size={14} className="shrink-0" /> <span>Back</span>
+              </div>
+              {subCategories && subCategories.length > 0 ? (
+                subCategories.map((sub) => (
+                  <div key={sub.id} onClick={() => { setSelectedSubCategory(sub); }} className={`px-3 py-3 text-[13px] cursor-pointer text-left leading-tight transition-colors ${selectedSubCategory?.id === sub.id ? 'text-brand-orange font-bold border-l-[3px] border-brand-orange bg-white dark:bg-black' : 'text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-black'}`}>
+                    {i18n.language === 'sw' ? (sub.name_sw || sub.name) : sub.name}
+                  </div>
+                ))
+              ) : (
+                <div className="p-3 text-gray-400 text-center text-[11px]">Hakuna</div>
+              )}
+            </>
+          ) : (
+            [ALL_CATEGORY, ...categories].map(cat => (
+              <div key={cat.id} onClick={() => { setSelectedCategory(cat); setSelectedCategoryForComponents(cat); setMobileActiveMenu('categories'); setViewMode('products'); }} className={`px-3 py-3 text-[13px] cursor-pointer text-left leading-tight transition-colors ${selectedCategory?.id === cat.id ? 'text-brand-orange font-bold border-l-[3px] border-brand-orange bg-white dark:bg-black' : 'text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-black'}`}>
+                {getCategoryDisplayName(cat)}
+              </div>
+            ))
+          )}
+        </aside>
 
-              <main className="flex-1 min-w-0 overflow-y-auto px-1 py-1 bg-white dark:bg-black box-border relative z-0 ml-1">
-                <h3 className="text-[13px] font-bold text-black dark:text-white m-0 mb-3 text-left">
-                  {mobileActiveMenu === 'categories' ? 'Category Products' : 'Subcategory Products'}
-                </h3>
-                <div className="grid grid-cols-4 gap-x-1 gap-y-1 w-full">
-                  {loadingFeatured || loadingLeafs ? (
-                    [...Array(6)].map((_, idx) => (
-                      <div key={`mobile-skeleton-${idx}`} className="flex flex-col items-center gap-1.5 animate-pulse min-w-0">
-                        <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-[#1a1a1a] shrink-0"></div>
-                        <div className="h-2.5 w-full max-w-[48px] bg-gray-200 dark:bg-[#1a1a1a] rounded"></div>
-                      </div>
-                    ))
-                  ) : mobileActiveMenu === 'categories' ? (
-                    featuredProducts && featuredProducts.length > 0 ? (
-                      featuredProducts.slice(0, 9).map((leaf) => (
-                        <div key={leaf.id} onClick={() => { handleLeafClick(leaf.leaf_category_id || leaf.id); setMobileMenuOpen(false); }} className="flex flex-col items-center text-center cursor-pointer w-full min-w-0">
-                          <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 dark:bg-[#1a1a1a] mb-1.5 flex items-center justify-center shrink-0">
-                            <img src={leaf.cover_image_url || placeholderImg} alt={leaf.name} className="w-full h-full object-cover" />
-                          </div>
-                          <p className="text-[9px] text-gray-700 dark:text-white m-0 leading-tight line-clamp-2 w-full break-words">
-                            {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
-                          </p>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="col-span-full text-center py-10">
-                        <div className="text-4xl mb-3 ml-8">📦</div>
-                        <p className="text-sm font-bold text-black dark:text-white m-0 px-8">Tap a category to browse its products.</p>
-                      </div>
-                    )
-                  ) : (
-                    leafsForSub && leafsForSub.length > 0 ? (
-                      leafsForSub.slice(0, 9).map((leaf) => (
-                        <div key={leaf.id} onClick={() => { handleLeafClick(leaf.leaf_category_id || leaf.id); setMobileMenuOpen(false); }} className="flex flex-col items-center text-center cursor-pointer w-full min-w-0">
-                          <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 dark:bg-[#1a1a1a] mb-1.5 flex items-center justify-center shrink-0">
-                            <img src={leaf.cover_image_url || placeholderImg} alt={leaf.name} className="w-full h-full object-cover" />
-                          </div>
-                          <p className="text-[9px] text-gray-700 dark:text-white m-0 leading-tight line-clamp-2 w-full break-words">
-                            {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
-                          </p>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="col-span-full text-center py-10">
-                        <div className="text-4xl mb-3 ml-8">📦</div>
-                        <p className="text-sm font-bold text-black dark:text-white m-0 px-8">Hakuna bidhaa katika subcategory hii</p>
-                      </div>
-                    )
-                  )}
-                  {mobileActiveMenu === 'categories' && !loadingFeatured && featuredProducts && featuredProducts.length > 0 && !selectedCategory?.isAll && (
-                    <div onClick={() => { setMobileActiveMenu('subcategories'); setViewMode('subcategories'); setSelectedSubCategory(null); }} className="flex flex-col items-center text-center cursor-pointer w-full min-w-0">
-                      <div className="w-12 h-12 rounded-full flex items-center justify-center mb-1.5 border-2 border-dashed border-brand-orange bg-orange-50 dark:bg-[#1a1000] shrink-0">
-                        <Plus size={22} className="text-brand-orange" />
-                      </div>
-                      <p className="text-[9px] text-brand-orange font-bold m-0 line-clamp-2">{t('see_all')}</p>
-                    </div>
-                  )}
+        {/* UPANDE WA KULIA (MAUDHUI) */}
+        <main className="flex-1 min-w-0 overflow-y-auto px-1 py-1 bg-white dark:bg-black box-border relative z-0 ml-1">
+          {/* Nimeongeza ukubwa wa kichwa kidogo (text-[15px]) */}
+          <h3 className="text-[15px] font-bold text-black dark:text-white m-0 mb-3 text-left">
+            {mobileActiveMenu === 'categories' ? 'Category Products' : 'Subcategory Products'}
+          </h3>
+          
+          <div className="grid grid-cols-4 gap-x-1 gap-y-1 w-full">
+            {loadingFeatured || loadingLeafs ? (
+              [...Array(6)].map((_, idx) => (
+                <div key={`mobile-skeleton-${idx}`} className="flex flex-col items-center gap-1.5 animate-pulse min-w-0">
+                  {/* Nimeongeza ukubwa wa skeleton (w-14 h-14) */}
+                  <div className="w-14 h-14 rounded-full bg-gray-200 dark:bg-[#1a1a1a] shrink-0"></div>
+                  <div className="h-2.5 w-full max-w-[48px] bg-gray-200 dark:bg-[#1a1a1a] rounded"></div>
                 </div>
-              </main>
-            </div>
+              ))
+            ) : mobileActiveMenu === 'categories' ? (
+              featuredProducts && featuredProducts.length > 0 ? (
+                featuredProducts.slice(0, 9).map((leaf) => (
+                  <div key={leaf.id} onClick={() => { handleLeafClick(leaf.leaf_category_id || leaf.id); setMobileMenuOpen(false); }} className="flex flex-col items-center text-center cursor-pointer w-full min-w-0">
+                    {/* Nimeongeza ukubwa wa picha (w-14 h-14) */}
+                    <div className="w-14 h-14 rounded-full overflow-hidden bg-gray-100 dark:bg-[#1a1a1a] mb-1.5 flex items-center justify-center shrink-0">
+                      <img src={leaf.cover_image_url || placeholderImg} alt={leaf.name} className="w-full h-full object-cover" />
+                    </div>
+                    {/* Nimeongeza ukubwa wa maandishi (text-[10px]) */}
+                    <p className="text-[10px] text-gray-700 dark:text-white m-0 leading-tight line-clamp-2 w-full break-words">
+                      {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-10">
+                  <div className="text-4xl mb-3 ml-8">📦</div>
+                  <p className="text-sm font-bold text-black dark:text-white m-0 px-8">Tap a category to browse its products.</p>
+                </div>
+              )
+            ) : (
+              leafsForSub && leafsForSub.length > 0 ? (
+                leafsForSub.slice(0, 9).map((leaf) => (
+                  <div key={leaf.id} onClick={() => { handleLeafClick(leaf.leaf_category_id || leaf.id); setMobileMenuOpen(false); }} className="flex flex-col items-center text-center cursor-pointer w-full min-w-0">
+                    {/* Nimeongeza ukubwa wa picha (w-14 h-14) */}
+                    <div className="w-14 h-14 rounded-full overflow-hidden bg-gray-100 dark:bg-[#1a1a1a] mb-1.5 flex items-center justify-center shrink-0">
+                      <img src={leaf.cover_image_url || placeholderImg} alt={leaf.name} className="w-full h-full object-cover" />
+                    </div>
+                    {/* Nimeongeza ukubwa wa maandishi (text-[10px]) */}
+                    <p className="text-[10px] text-gray-700 dark:text-white m-0 leading-tight line-clamp-2 w-full break-words">
+                      {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-10">
+                  <div className="text-4xl mb-3 ml-8">📦</div>
+                  <p className="text-sm font-bold text-black dark:text-white m-0 px-8">Hakuna bidhaa katika subcategory hii</p>
+                </div>
+              )
+            )}
+            
+            {mobileActiveMenu === 'categories' && !loadingFeatured && featuredProducts && featuredProducts.length > 0 && !selectedCategory?.isAll && (
+              <div onClick={() => { setMobileActiveMenu('subcategories'); setViewMode('subcategories'); setSelectedSubCategory(null); }} className="flex flex-col items-center text-center cursor-pointer w-full min-w-0">
+                {/* Nimeongeza ukubwa wa kitufe cha See All (w-14 h-14) */}
+                <div className="w-14 h-14 rounded-full flex items-center justify-center mb-1.5 border-2 border-dashed border-brand-orange bg-orange-50 dark:bg-[#1a1000] shrink-0">
+                  <Plus size={26} className="text-brand-orange" />
+                </div>
+                <p className="text-[10px] text-brand-orange font-bold m-0 line-clamp-2">{t('see_all')}</p>
+              </div>
+            )}
           </div>
-        </div>,
-        document.body
-      )}
+        </main>
+      </div>
+    </div>
+  </div>,
+  document.body
+)}
+
     </div>
   );
 }
