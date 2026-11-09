@@ -34,7 +34,7 @@ DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 ALLOWED_HOSTS = [
     'skyfall.co.tz',                    # Domain yako (bila www)
     'www.skyfall.co.tz',                # Domain yako (na www)
-    'shop-online-r9z4.onrender.com',    # Backend yako ya Live!
+    'shop-online-1-ult1.onrender.com',  # 🔥 Render mpya    # Backend yako ya Live!
     'shop-online-tan.vercel.app',       # Frontend yako ya Live!
     'localhost', 
     '127.0.0.1'
@@ -192,7 +192,7 @@ CORS_ALLOWED_ORIGINS = [
     'https://shop-online-tan.vercel.app',
     'https://skyfall.co.tz',           
     'https://www.skyfall.co.tz',  
-    'https://shop-online-r9z4.onrender.com',
+    'https://shop-online-1-ult1.onrender.com',  # 🔥 Render mpya
     'https://skyfall-admin-ten.vercel.app',
    
 ]
@@ -207,7 +207,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://shop-online-tan.vercel.app',
     'https://skyfall.co.tz',                    # 🔥
     'https://www.skyfall.co.tz',                # 🔥
-    'https://shop-online-r9z4.onrender.com',    # 🔥
+    'https://shop-online-1-ult1.onrender.com',  # 🔥 Render mpya    # 🔥
     'https://skyfall-admin-ten.vercel.app',
 ]
 
