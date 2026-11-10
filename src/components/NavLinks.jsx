@@ -314,7 +314,16 @@ export default function NavLinks({ isMobile }) {
                               </p>
                             </Link>
                           ))}
-                          <div onClick={() => setViewMode('subcategories')} className="flex flex-col items-center cursor-pointer group">
+                          <div 
+                          onClick={() => {
+                            setViewMode('subcategories');
+                            if (subCategories && subCategories.length > 0 ) {
+                              setSelectedSubForLeaf(subCategories[0]);
+                            }else {
+                              setSelectedSubForLeaf(null)
+                            }
+                            }}
+                            className="flex flex-col items-center cursor-pointer group">
                             <div className="w-[90px] h-[90px] rounded-full flex items-center justify-center border-2 border-dashed border-orange-500 bg-orange-50 dark:bg-orange-500/10 transition-all group-hover:scale-105 group-hover:bg-orange-100">
                               <LucideIcons.Plus size={30} className="text-orange-500" />
                             </div>

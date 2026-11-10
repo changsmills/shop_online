@@ -300,7 +300,13 @@ export default function Dashboard() {
     setActiveMenu('categories');
   };
 
-  const handleViewAll = () => setViewMode('subcategories');
+  const handleViewAll = () => { setViewMode('subcategories');
+    if(subCategories && subCategories.length > 0 ){
+      setSelectedSubCategory(subCategories[0]);
+    } else {
+      setSelectedSubCategory(null);
+    }
+  }
   const handleBack = () => setViewMode('products');
 
   const handleSubCategoryHover = (subCategory) => {
@@ -798,7 +804,17 @@ export default function Dashboard() {
             )}
             
             {mobileActiveMenu === 'categories' && !loadingFeatured && featuredProducts && featuredProducts.length > 0 && !selectedCategory?.isAll && (
-              <div onClick={() => { setMobileActiveMenu('subcategories'); setViewMode('subcategories'); setSelectedSubCategory(null); }} className="flex flex-col items-center text-center cursor-pointer w-full min-w-0">
+              <div onClick={() => {
+                 setMobileActiveMenu('subcategories');
+                  setViewMode('subcategories'); 
+                  
+                  if(subCategories && subCategories.length > 0 ){
+                    setSelectedSubCategory(subCategories[0]);
+                   
+                   } else{
+                    setSelectedSubCategory(null);
+                   }
+                }} className="flex flex-col items-center text-center cursor-pointer w-full min-w-0">
                 {/* Nimeongeza ukubwa wa kitufe cha See All (w-14 h-14) */}
                 <div className="w-14 h-14 rounded-full flex items-center justify-center mb-1.5 border-2 border-dashed border-brand-orange bg-orange-50 dark:bg-[#1a1000] shrink-0">
                   <Plus size={26} className="text-brand-orange" />
