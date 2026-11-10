@@ -15,8 +15,9 @@ export default defineConfig({
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://*.googleapis.com https://*.gstatic.com",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com",
         "font-src 'self' https://fonts.gstatic.com data:",
-        "img-src 'self' data: blob: https:",
-        "connect-src 'self' http://localhost:5173 http://127.0.0.1:8000 http://localhost:8000 https://accounts.google.com https://*.googleapis.com https://*.ondigitalocean.app https://*.onrender.com ws://localhost:5173",
+        "img-src 'self' data: blob: https: http:", // Nimeongeza http: kwa ajili ya picha za localhost
+        // 🔥 HAPA: Nimeongeza ws: na wss: kwa ujumla ili kuzuia error za WebSocket, na nimeongeza API zako
+        "connect-src 'self' http://localhost:5173 ws://localhost:5173 wss://localhost:5173 http://127.0.0.1:8000 http://localhost:8000 ws://127.0.0.1:8000 ws://localhost:8000 https://accounts.google.com https://*.googleapis.com https://*.ondigitalocean.app https://*.onrender.com https://*.skyfall.co.tz", 
         "frame-src 'self' https://accounts.google.com",
         "frame-ancestors 'none'",
         "form-action 'self'",

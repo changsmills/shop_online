@@ -103,7 +103,7 @@ export default function TopStores({ navigate }) {
   }, [stores, locationKey, i18n.language]);
 
   const renderHeader = () => (
-<div className="flex justify-between items-center px-0.5 md:px-2 py-2 md:py-3 bg-[#fff7ed] dark:bg-[#1e293b] dark:border-b dark:border-[#334155] rounded-t-xl mb-2.5 md:mb-4 text-black dark:text-white">
+<div className="flex justify-between items-center px-3 py-3 md:px-2  md:py-3 bg-[#fff7ed] dark:bg-[#1e293b] dark:border-b dark:border-[#334155] rounded-t-xl mb-2.5 md:mb-4 text-black dark:text-white">
         <div className="flex flex-col">
         <div className="flex items-center gap-1.5 md:gap-2.5">
           <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-orange-100 dark:bg-orange-500/20 flex items-center justify-center shrink-0">
@@ -139,7 +139,7 @@ export default function TopStores({ navigate }) {
 
   if (isLoading) {
     return (
-      <div className="relative w-full bg-white dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] pt-0 pb-4 md:py-4 box-border">
+      <div className="relative px-3 py-3 w-full bg-white dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] pt-0 pb-4 md:py-4 box-border">
         {renderHeader()}
         <div className="relative flex items-center px-2">
           <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-4 md:pb-5 w-full gap-2 md:gap-3 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
@@ -166,7 +166,7 @@ export default function TopStores({ navigate }) {
     <div className="relative w-full bg-white dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] pt-0 pb-4 md:py-4 box-border">
       {renderHeader()}
 
-      <div className="relative flex items-center px-0.5">
+      <div className="relative flex items-center px-0.5 py-0.5">
         {showLeftArrow && (
           <button
             className="absolute z-10 w-6 h-6 md:w-9 md:h-9 bg-white dark:bg-[#1e293b] border border-[#e2e8f0] dark:border-[#334155] rounded-full flex items-center justify-center cursor-pointer shadow-md transition-all top-1/2 -translate-y-1/2 text-black dark:text-white hover:bg-[#f97316] hover:text-white hover:border-[#f97316] hover:scale-105 active:scale-95 left-0 md:-left-1"

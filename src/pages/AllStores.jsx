@@ -5,7 +5,6 @@ import Footer from '../components/Footer';
 import StoreCard from '../components/StoreCard';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import api from '../axiosConfig';
-// 🔥 1. Nimeongeza ArrowUp hapa kwenye lucide-react
 import { Filter, ArrowUp } from 'lucide-react'; 
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query'; 
 
@@ -58,12 +57,13 @@ export default function AllStores({ session }) {
   const navigate = useNavigate();
   const lastStoreRef = useRef();
 
+  // 🔥 HAPA NDIO PA KUWeka STATE ZOTE ZA COMPONENT
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterCity, setFilterCity] = useState("");
   const [filterVerified, setFilterVerified] = useState("all");
-
-  // 🔥 2. STATE YA BACK TO TOP
+  
+  // 🔥 NIMERUDISHA STATE YA BACK TO TOP HAPA NDANI
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   // Orodha ya miji (Static)
@@ -130,23 +130,18 @@ export default function AllStores({ session }) {
     };
   }, [loading, isFetchingNextPage, hasNextPage, fetchNextPage, storeId]);
 
-  // 🔥 3. EFFECT YA KUSIKILIZA SCROLL
+  // 🔥 NIMERUDISHA EFFECT YA KUSIKILIZA SCROLL HAPA NDANI
   useEffect(() => {
     const handleScroll = () => {
-      // Kitufe kitaonekana pale mtumiaji atakaposcroll zaidi ya 500px
       setShowBackToTop(window.scrollY > 500);
     };
-    
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 🔥 4. FUNCTION YA KURUDI JUU
+  // 🔥 NIMERUDISHA FUNCTION YA KURUDI JUU HAPA NDANI
   const scrollToTop = () => {
-    window.scrollTo({ 
-      top: 0, 
-      behavior: "smooth" 
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
 
@@ -306,21 +301,9 @@ export default function AllStores({ session }) {
                 </div>
               ))
             ) : (
-              <div className="col-span-full text-center py-10 sm:py-16 px-4 sm:px-5 bg-white dark:bg-[#161b22] rounded-xl text-gray-500 dark:text-[#8b949e] border border-transparent dark:border-[#30363d] flex flex-col items-center gap-4">
-                <p>No stores found matching your criteria.</p>
-                <button
-                  onClick={() => {
-                    setSearchQuery("");
-                    setFilterCategory("");
-                    setFilterCity("");
-                    setFilterVerified("all");
-                  }}
-                  className="px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-full font-semibold transition-colors text-sm"
-                >
-                  Reset Filters
-                </button>
-              </div>
+              null
             )}
+
           </div>
 
           {isFetchingNextPage && (
@@ -337,9 +320,9 @@ export default function AllStores({ session }) {
           )}
         </div>
       </div>
-      <div className=" hidden md:block"><Footer /></div>
+      <div className="hidden md:block"><Footer /></div>
 
-      {/* 🔥 5. KITUFE CHA BACK TO TOP KIMEONGEWA HAPA */}
+      {/* 🔥 KITUFE CHA BACK TO TOP HAPA CHINI */}
       <button 
         className={`fixed bottom-[80px] md:bottom-[120px] right-3 md:right-6 w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#ff6a00] hover:bg-[#e55a00] text-white shadow-[0_4px_16px_rgba(255,106,0,0.35)] flex items-center justify-center transition-all duration-300 z-[1000] border-none cursor-pointer
          ${showBackToTop ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto visible' : 'opacity-0 translate-y-5 scale-75 pointer-events-none invisible'}`} 

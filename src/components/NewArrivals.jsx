@@ -119,7 +119,7 @@ export default function NewArrivals({ navigate, selectedCategory }) {
   }, [products, selectedCategory?.id, i18n.language]);
 
   const renderHeader = () => (
-    <div className="flex justify-between items-center px-3 py-3 bg-[#fff7ed] dark:bg-black dark:border-b dark:border-[#334155] rounded-t-xl mb-4 text-black dark:text-white mt-50">
+    <div className="flex justify-between items-center px-3 py-3 bg-[#fff7ed] dark:bg-black dark:border-b dark:border-[#334155] rounded-t-xl mb-1 text-black dark:text-white mt-50">
       <div className="flex flex-col">
         <div className="flex items-center gap-2.5">
           <Sparkles className="text-[#f973161] dark:text-[#fbbf24] w-[18px] h-[18px] md:w-6 md:h-6" />
@@ -155,7 +155,7 @@ export default function NewArrivals({ navigate, selectedCategory }) {
       <div className="relative w-full bg-white dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] py-4">
         {renderHeader()}
         <div className="relative flex items-center px-1">
-          <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-4 w-full gap-2 md:gap-3 snap-mandatory [&::-webkit-scrollbar]:hidden[-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-1 w-full gap-2 md:gap-3 snap-mandatory [&::-webkit-scrollbar]:hidden[-ms-overflow-style:none] [scrollbar-width:none]">
             {Array.from({ length: 6 }).map((_, index) => (
               <div
                 key={`skeleton-${index}`}

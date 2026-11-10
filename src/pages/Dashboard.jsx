@@ -455,46 +455,7 @@ export default function Dashboard() {
               </aside>
 
               <div className="h-full">
-  {/* ========================================= */}
-  {/* MOBILE CATEGORY SLIDER (PILLS STYLE) */}
-  {/* ========================================= */}
-  <div className="block bg-white dark:bg-black w-full lg:hidden pb-1 pt-2">
-    {!search && (
-      dataLoading && categories.length === 0 ? (
-        // 🔥 SKELETON: Sasa ni mistatili (Pills) na sio maduara
-        <div className="flex gap-2 overflow-x-auto px-3 py-1 animate-pulse [&::-webkit-scrollbar]:hidden">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-9 w-24 bg-gray-200 dark:bg-gray-800 rounded-full shrink-0"></div>
-          ))}
-        </div>
-      ) : categories.length > 0 ? (
-        // 🔥 HAPA NDIO TUNAITA COMPONENT MPYA
-        <div className="flex gap-2 overflow-x-auto px-3 py-1 [&::-webkit-scrollbar]:hidden">
-          {[ALL_CATEGORY, ...categories].map((cat) => {
-            const isSelected = selectedCategoryForComponents?.id === cat.id;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => {
-                  setSelectedCategoryForComponents(cat);
-                  setSelectedCategory(cat);
-                }}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-full whitespace-nowrap transition-all duration-200 text-[13px] font-medium border ${
-                  isSelected
-                    ? "bg-[#FF6A00] text-white border-[#FF6A00] shadow-sm"
-                    : "bg-white dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
-                }`}
-              >
-                {/* Kama unataka icon ionekane, ondoa alama ya comment hapa chini */}
-                {/* <span className={isSelected ? "text-white" : "text-gray-500"}>{getIcon(cat.icon_name)}</span> */}
-                <span>{getCategoryDisplayName(cat)}</span>
-              </button>
-            );
-          })}
-        </div>
-      ) : null
-    )}
-  </div>
+  
 
   {/* ========================================= */}
   {/* BANNER NA SKELETON YAKE */}
@@ -541,47 +502,52 @@ export default function Dashboard() {
           )}
 
           <div className="flex flex-col pt-4 bg-[#f8f8f8] dark:bg-black ">
-            <div className="block lg:hidden">
-              <Suspense fallback={<SkeletonSection />}>
-                <RecentlyViewed key={i18n.language} navigate={navigate} />
-              </Suspense>
-            </div>
+  <div className="block lg:hidden">
+    <Suspense fallback={<SkeletonSection />}>
+      <RecentlyViewed key={i18n.language} navigate={navigate} />
+    </Suspense>
+  </div>
 
-            {/* ========================================= */}
-            {/* LAZY SECTIONS NA SKELETON ZAO */}
-            {/* ========================================= */}
+  {/* ========================================= */}
+  {/* LAZY SECTIONS NA SKELETON ZAO */}
+  {/* ========================================= */}
 
-            <LazySection height="250px">
-              <Suspense fallback={<SkeletonSection />}>
-                <NewArrivals key={i18n.language} navigate={navigate} selectedCategory={selectedCategoryForComponents} />
-              </Suspense>
-            </LazySection>
+  <LazySection height="250px">
+    <Suspense fallback={<SkeletonSection />}>
+      {/* Tumeondoa selectedCategory */}
+      <NewArrivals key={i18n.language} navigate={navigate} />
+    </Suspense>
+  </LazySection>
 
-            <LazySection height="250px">
-              <Suspense fallback={<SkeletonSection />}>
-                <TrendingNow key={i18n.language} products={trendingProducts} navigate={navigate} selectedCategory={selectedCategoryForComponents} getCategoryDisplayName={getCategoryDisplayName} />
-              </Suspense>
-            </LazySection>
+  <LazySection height="250px">
+    <Suspense fallback={<SkeletonSection />}>
+      {/* Tumeondoa selectedCategory */}
+      <TrendingNow key={i18n.language} products={trendingProducts} navigate={navigate} getCategoryDisplayName={getCategoryDisplayName} />
+    </Suspense>
+  </LazySection>
 
-            <LazySection height="250px">
-              <Suspense fallback={<SkeletonSection />}>
-                <TopDeals key={i18n.language} navigate={navigate} selectedCategory={selectedCategoryForComponents} />
-              </Suspense>
-            </LazySection>
+  <LazySection height="250px">
+    <Suspense fallback={<SkeletonSection />}>
+      {/* Tumeondoa selectedCategory */}
+      <TopDeals key={i18n.language} navigate={navigate} />
+    </Suspense>
+  </LazySection>
 
-            <LazySection height="250px">
-              <Suspense fallback={<SkeletonSection />}>
-                <TopStores key={i18n.language} navigate={navigate} selectedCategory={selectedCategoryForComponents} />
-              </Suspense>
-            </LazySection>
+  <LazySection height="250px">
+    <Suspense fallback={<SkeletonSection />}>
+      {/* Tumeondoa selectedCategory */}
+      <TopStores key={i18n.language} navigate={navigate} />
+    </Suspense>
+  </LazySection>
 
-            <LazySection height="400px">
-              <Suspense fallback={<SkeletonSection />}>
-                <JustForYou key={i18n.language} handleAction={handleProtectedAction} search={search} selectedCategory={selectedCategoryForComponents} />
-              </Suspense>
-            </LazySection>
+  <LazySection height="400px">
+    <Suspense fallback={<SkeletonSection />}>
+      {/* Tumeondoa selectedCategory */}
+      <JustForYou key={i18n.language} handleAction={handleProtectedAction} search={search} />
+    </Suspense>
+  </LazySection>
 
-          </div>
+</div>
 
           <div className="block mt-0 hidden lg:block">
             <Footer />
@@ -752,7 +718,7 @@ export default function Dashboard() {
             {mobileActiveMenu === 'categories' ? 'Category Products' : 'Subcategory Products'}
           </h3>
           
-          <div className="grid grid-cols-4 gap-x-1 gap-y-1 w-full">
+          <div className="grid grid-cols-3 gap-x-1 gap-y-1 w-full">
             {loadingFeatured || loadingLeafs ? (
               [...Array(6)].map((_, idx) => (
                 <div key={`mobile-skeleton-${idx}`} className="flex flex-col items-center gap-1.5 animate-pulse min-w-0">
@@ -778,7 +744,7 @@ export default function Dashboard() {
               ) : (
                 <div className="col-span-full text-center py-10">
                   <div className="text-4xl mb-3 ml-8">📦</div>
-                  <p className="text-sm font-bold text-black dark:text-white m-0 px-8">Tap a category to browse its products.</p>
+                  <p className="text-sm font-bold text-black dark:text-white m-0 px-8">No products available in this category.</p>
                 </div>
               )
             ) : (
@@ -798,7 +764,7 @@ export default function Dashboard() {
               ) : (
                 <div className="col-span-full text-center py-10">
                   <div className="text-4xl mb-3 ml-8">📦</div>
-                  <p className="text-sm font-bold text-black dark:text-white m-0 px-8">Hakuna bidhaa katika subcategory hii</p>
+                  <p className="text-sm font-bold text-black dark:text-white m-0 px-8">No products available in this Subcategory.</p>
                 </div>
               )
             )}
