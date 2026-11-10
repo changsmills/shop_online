@@ -333,7 +333,7 @@ export default function NavLinks({ isMobile }) {
                       ) : (
                         <div className="col-span-full flex flex-col items-center py-10">
                           <span className="text-5xl mb-3">📦</span>
-                          <p className="text-base font-bold text-gray-700 dark:text-gray-300">Hakuna bidhaa katika kategoria hii</p>
+                          <p className="text-base font-bold text-gray-700 dark:text-gray-300">No products available in this category</p>
                         </div>
                       )
                     ) : (
@@ -358,7 +358,7 @@ export default function NavLinks({ isMobile }) {
                       ) : (
                         <div className="col-span-full flex flex-col items-center py-10">
                           <span className="text-5xl mb-3">📦</span>
-                          <p className="text-base font-bold text-gray-700 dark:text-gray-300">Hakuna bidhaa katika subcategory hii</p>
+                          <p className="text-base font-bold text-gray-700 dark:text-gray-300">No products available in this Subcategory</p>
                         </div>
                       )
                     )}
