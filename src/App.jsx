@@ -8,6 +8,8 @@ import SupplierMessages from './pages/SupplierMessages';
 import SupplierNotifications from './pages/SupplierNotifications'; 
 import SupplierOrders from './pages/SupplierOrders';
 import ForgotPassword from './pages/ForgotPassword';
+import AdApprovals from './pages/AdApprovals'; // 🔥 Ingiza
+
 
 
 // Import Pages
@@ -204,6 +206,9 @@ function AppContent({ session }) {
         <Route path="/how-to-buy" element={<HowToBuy />} />
         <Route path="/about-skyfall" element={<SkyfallBusiness session={session} />} />
         <Route path="/search" element={<SearchResults session={session} />} />
+
+        <Route path="/admin/ads" element={<AdApprovals />} />
+
 
         
         <Route path="/dashboard/orders" element={session ? <MyOrders session={session} /> : <Navigate to="/dashboard/login" />} />
