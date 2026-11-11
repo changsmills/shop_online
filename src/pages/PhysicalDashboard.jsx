@@ -18,7 +18,7 @@ import ReactDOM from 'react-dom';
 // 1. Ingiza TanStack Query
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-const BACKEND_URL = "https://shop-online-r9z4.onrender.com";
+const BACKEND_URL = "https://api.skyfall.co.tz"; 
 
 // ==========================================
 // 2. FUNCTIONS ZA KUCHUKUA DATA
@@ -537,7 +537,7 @@ export default function PhysicalDashboard() {
                   <X size={20} />
                 </button>
               </div>
-              <ul className="list-none p-0 m-0">
+              <ul className="list-none p-0 m-0 font-sans">
                 {menuItems.map((item) => {
                   const isActive = activeTab === item.id;
                   return (

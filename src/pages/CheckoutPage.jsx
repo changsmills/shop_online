@@ -132,7 +132,7 @@ const CheckoutPage = () => {
       clearCart();
       toast.success("Hongera! Oda yako imepokelewa vyema!");
 
-      let whatsappMessage = `*ORDER CONFIRMATION - SKYFALL.COM*%0A%0A`;
+      let whatsappMessage = `*ORDER CONFIRMATION - SKYFALL.CO.TZ*%0A%0A`;
       whatsappMessage += `*ORDER NUMBER:* ${orderNumber}%0A`;
       whatsappMessage += `*DATE:* ${new Date().toLocaleString()}%0A%0A`;
       whatsappMessage += `*CUSTOMER DETAILS*%0A`;

@@ -3,36 +3,86 @@ import api from "../axiosConfig";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { Search } from "lucide-react";
-import { useQuery } from '@tanstack/react-query'; // 1. Ingiza useQuery
+import { useQuery } from '@tanstack/react-query';
 
 // ==========================================
 // 2. FUNCTIONS ZA KUCHUKUA DATA
 // ==========================================
 const fetchPlaceholders = async () => {
-  const response = await api.get('/leaf-categories/', { params: { limit: 15 } });
-  const data = response.data.results || response.data || [];
-  if (Array.isArray(data) && data.length > 0) {
-    return data.map(item => item.name);
+  try {
+    // Tunavuta bidhaa 15 kutoka kwenye API yako ya products
+    const response = await api.get('/products/', { params: { limit: 15 } });
+    const data = response.data.results || response.data || [];
+    
+    if (Array.isArray(data) && data.length > 0) {
+      // 🔥 HAPA NDIO MABADILIKO YALIYO:
+      const productNames = data.map(item => {
+        if (!item.name) return null;
+        // Tunachukua herufi ya kwanza tuibadilishe kuwa kubwa, kisha tuunganishe na salio la jina
+        return item.name.charAt(0).toUpperCase() + item.name.slice(1);
+      }).filter(Boolean); // filter(Boolean) inasaidia kuondoa hizo null kama jina halipo
+
+      if (productNames.length > 0) {
+        return productNames;
+      }
+    }
+    
+    // Kama API haikurudisha kitu, tunaweka hizi za kawaida
+    return ["Tafuta bidhaa...", "Search electronics...", "Search fashion..."]; 
+  } catch (error) {
+    console.error("Error fetching product placeholders:", error);
+    return ["Tafuta bidhaa...", "Search electronics...", "Search fashion..."]; // Fallback
   }
-  return ["Search"]; // Fallback
 };
 
 const fetchSuggestions = async ({ queryKey }) => {
   const [_, query] = queryKey;
   if (!query || query.trim().length < 2) return [];
 
-  const [catRes, prodRes] = await Promise.allSettled([
-    api.get('/leaf-categories/', { params: { search: query, limit: 4 } }),
-    api.get('/products/', { params: { search: query, limit: 4 } })
-  ]);
+  const cleanQuery = query.trim();
 
-  const categories = catRes.status === 'fulfilled' ? (catRes.value.data.results || catRes.value.data || []) : [];
-  const products = prodRes.status === 'fulfilled' ? (prodRes.value.data.results || prodRes.value.data || []) : [];
+  // ==========================================
+  // 🔥 1. KAMA LINAANZA NA @, TAFUTA MADUKA
+  // ==========================================
+  if (cleanQuery.startsWith('@')) {
+    const storeName = cleanQuery.substring(1).trim(); // Ondoa @
+    
+    // Kama hana jina la duka baada ya @, usifanye kitu
+    if (!storeName) return [];
 
-  return [
-    ...products.map(item => ({ ...item, type: 'product' })),
-    ...categories.map(item => ({ ...item, type: 'category' }))
-  ];
+    try {
+      const res = await api.get('/stores/', { params: { search: storeName, limit: 5 } });
+      const stores = res.data.results || res.data || [];
+      
+      // Tunahakikisha tunavuta store_name kwa usahihi
+      return stores.map(item => ({ 
+        ...item, 
+        type: 'store',
+        name: item.store_name || item.name || "Duka" 
+      }));
+    } catch (error) {
+      console.error("Error fetching stores:", error);
+      return [];
+    }
+  } 
+  
+  // ==========================================
+  // 🔥 2. KAMA HAKUNA @, TAFUTA BIDHAA (Kama kawaida)
+  // ==========================================
+  else {
+    const [catRes, prodRes] = await Promise.allSettled([
+      api.get('/leaf-categories/', { params: { search: cleanQuery, limit: 4 } }),
+      api.get('/products/', { params: { search: cleanQuery, limit: 4 } })
+    ]);
+
+    const categories = catRes.status === 'fulfilled' ? (catRes.value.data.results || catRes.value.data || []) : [];
+    const products = prodRes.status === 'fulfilled' ? (prodRes.value.data.results || prodRes.value.data || []) : [];
+
+    return [
+      ...products.map(item => ({ ...item, type: 'product' })),
+      ...categories.map(item => ({ ...item, type: 'category' }))
+    ];
+  }
 };
 
 // ==========================================
@@ -58,15 +108,15 @@ export default function SearchBar({ search = "", setSearch }) {
   const { data: placeholders = ["Search"] } = useQuery({
     queryKey: ['searchPlaceholders'],
     queryFn: fetchPlaceholders,
-    staleTime: Infinity, // Hazibadiliki, hivyo zinabaki kwenye cache milele
+    staleTime: Infinity, 
   });
 
   // Query ya Suggestions (Inategemea na debouncedSearch)
   const { data: suggestions = [] } = useQuery({
     queryKey: ['searchSuggestions', debouncedSearch],
     queryFn: fetchSuggestions,
-    enabled: debouncedSearch.trim().length >= 2, // Washa tu kama kuna herufi 2+
-    staleTime: 1000 * 60 * 5, // Cache kwa dakika 5 (kama mtu akirudia neno lile lile)
+    enabled: debouncedSearch.trim().length >= 2, 
+    staleTime: 1000 * 60 * 5, 
   });
 
   // ==========================================
@@ -118,11 +168,24 @@ export default function SearchBar({ search = "", setSearch }) {
 
   const navigateToSearchResults = (query) => {
     if (!query || query.trim() === "") return;
-    if (window.innerWidth > 1024) {
-      window.open(`/search?q=${encodeURIComponent(query.trim())}`, '_blank');
-    } else {
-      navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+    const cleanQuery = query.trim();
+
+    // 🔥 KAMA LINAANZA NA @, NENDA KWENYE DUKA
+    if (cleanQuery.startsWith('@')) {
+      const storeNameOrId = cleanQuery.substring(1); 
+      if (storeNameOrId) {
+        navigate(`/store/${storeNameOrId}`);
+      }
+    } 
+    // KAMA HAKUNA @, NENDA KWENYE UTAFUTAJI WA BIDHAA
+    else {
+      if (window.innerWidth > 1024) {
+        window.open(`/search?q=${encodeURIComponent(cleanQuery)}`, '_blank');
+      } else {
+        navigate(`/search?q=${encodeURIComponent(cleanQuery)}`);
+      }
     }
+    
     setShowSuggestions(false);
     setIsFocused(false);
   };
@@ -147,21 +210,21 @@ export default function SearchBar({ search = "", setSearch }) {
       >
         
       {/* 🔥 PLACEHOLDER YA ANIMATION */}
-{!search && (
-  <div className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 pointer-events-none flex items-center overflow-hidden h-[24px] w-[calc(100%-80px)] sm:w-[calc(100%-100px)]">
-    <span 
-      key={placeholderIndex} 
-      className={`text-[13px] sm:text-[14px] md:text-[15px] text-gray-400 transition-all duration-300 ease-in-out block truncate w-full ${
-        isAnimating 
-          ? 'translate-y-[-100%] opacity-0' 
-          : 'translate-y-0 opacity-100 animate-[slideDown_0.3s_ease-out]'
-      }`}
-      title={placeholders[placeholderIndex]} // Inaonyesha maneno yote ukibonyeza kwa muda mrefu
-    >
-      {placeholders[placeholderIndex] || "Search"}
-    </span>
-  </div>
-)}
+      {!search && (
+        <div className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 pointer-events-none flex items-center overflow-hidden h-[24px] w-[calc(100%-80px)] sm:w-[calc(100%-100px)]">
+          <span 
+            key={placeholderIndex} 
+            className={`text-[13px] sm:text-[14px] md:text-[15px] text-gray-400 transition-all duration-300 ease-in-out block truncate w-full ${
+              isAnimating 
+                ? 'translate-y-[-100%] opacity-0' 
+                : 'translate-y-0 opacity-100 animate-[slideDown_0.3s_ease-out]'
+            }`}
+            title={placeholders[placeholderIndex]} 
+          >
+            {placeholders[placeholderIndex] || "Tafuta bidhaa au andika @kutafuta duka..."}
+          </span>
+        </div>
+      )}
 
         {/* 🔥 INPUT */}
         <input
@@ -201,12 +264,22 @@ export default function SearchBar({ search = "", setSearch }) {
                 key={`${item.type}-${item.id}`} 
                 className="flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-gray-50 dark:border-gray-800 hover:bg-brand-light dark:hover:bg-gray-700 transition-colors"
                 onMouseDown={() => {
-                  if (typeof setSearch === "function") setSearch(item.name);
-                  navigateToSearchResults(item.name);
+                  // 🔥 KAMA NI DUKA, MPELeke KWENYE UKURASA WA DUKA
+                  if (item.type === 'store') {
+                    navigate(`/store/${item.id || item.name}`); 
+                  } else {
+                    // Kama ni bidhaa, tumia hii ya kawaida
+                    if (typeof setSearch === "function") setSearch(item.name);
+                    navigateToSearchResults(item.name);
+                  }
+                  setShowSuggestions(false);
                 }}
               >
                 <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <span className="text-[14px] text-gray-700 dark:text-gray-200 truncate">{item.name}</span>
+                  {/* 🔥 ONGEZA ALAMA YA DUKA KAMA NI STORE */}
+                  <span className="text-[14px] text-gray-700 dark:text-gray-200 truncate">
+                    {item.type === 'store' ? `🏪 ${item.name}` : item.name}
+                  </span>
                 </div>
               </div>
             ))}

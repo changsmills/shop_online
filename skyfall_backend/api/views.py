@@ -351,16 +351,23 @@ class StoreEngineViewSet(viewsets.ModelViewSet):
         # Hii itarithi select_related kutoka juu
         user = self.request.user
 
+        # 1. Anza kutengeneza queryset ya msingi kulingana na mtumiaji
         if user.is_authenticated and (user.is_staff or user.is_superuser):
-            return StoreEngine.objects.select_related('owner__user', 'category').all().order_by('-created_at')
+            queryset = StoreEngine.objects.select_related('owner__user', 'category').all().order_by('-created_at')
+        elif self.action in ['list', 'retrieve']:
+            queryset = StoreEngine.objects.select_related('owner__user', 'category').all()
+        elif user.is_authenticated:
+            queryset = StoreEngine.objects.select_related('owner__user', 'category').filter(owner__user=user)
+        else:
+            return StoreEngine.objects.none()
 
-        if self.action in ['list', 'retrieve']:
-            return StoreEngine.objects.select_related('owner__user', 'category').all()
+        search_query = self.request.query_params.get('search', None)
+        if search_query:
+            # Tunatafuta kwenye store_name kwa kutumia 'icontains' (haina ubaguzi wa herufi kubwa au ndogo)
+            queryset = queryset.filter(store_name__icontains=search_query)
 
-        if user.is_authenticated:
-            return StoreEngine.objects.select_related('owner__user', 'category').filter(owner__user=user)
-
-        return StoreEngine.objects.none()
+        # Rudisha queryset iliyochujwa mwishoni
+        return queryset
 
 class ProductMediaViewSet(viewsets.ModelViewSet):
     queryset = ProductMedia.objects.all()

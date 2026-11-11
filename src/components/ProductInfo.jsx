@@ -549,7 +549,7 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
         .dark .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #334155; }
       `}</style>
 
-      {/* 
+           {/* 
         🔥 HAPA: Container Kuu. Tumeongeza md:h-[calc(100vh-120px)] na md:overflow-hidden 
         ili kuzuia page nzima iscroll, na badala yake content ndio iscroll.
       */}
@@ -582,7 +582,7 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
 
         {/* Mobile Bottom Nav (Haibadiliki) */}
         {isMobile && (
-          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-black flex justify-around items-center px-3 pt-2 pb-5 border-t border-gray-200 dark:border-[#1f1f1f] shadow-[0_-2px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_-2px_10px_rgba(0,0,0,0.6)] z-[1000] gap-2">
+          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-black flex justify-around items-center px-2 pt-2 pb-5 border-t border-gray-200 dark:border-[#1f1f1f] shadow-[0_-2px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_-2px_10px_rgba(0,0,0,0.6)] z-[1000] gap-2">
             <button onClick={handleWhatsAppOrder} disabled={!selectedVariationObj || loading} className="flex-1 flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-xl text-[11px] font-semibold cursor-pointer bg-[#25D366] text-white active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
               <MessageSquare size={20} />
               <span>WhatsApp</span>
@@ -606,15 +606,15 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
           🔥 HAPA: Content Area. Tumeongeza overflow-y-auto na flex-1 
           ili ichukue nafasi yote iliyobaki juu ya buttons za Desktop na iscroll.
         */}
-        <div className="flex flex-col gap-3 p-3 w-full box-border overflow-y-auto flex-1 custom-scrollbar">
+        <div className="flex flex-col gap-3 p-2 w-full box-border overflow-y-auto flex-1 custom-scrollbar">
           
           {/* ===== RATING SUMMARY (Juu - Inakaa Pale Pale Ikiscroll) ===== */}
-           <div className="bg-white dark:bg-[#0a0a0a] rounded-xl p-3 md:p-4 shadow-sm border border-[#f0f0f0] dark:border-[#1f1f1f] flex flex-col h-auto mb-2">
+           <div className="bg-white dark:bg-[#0a0a0a] rounded-xl p-2 md:p-3 shadow-sm border border-[#f0f0f0] dark:border-[#1f1f1f] flex flex-col h-auto mb-2">
               <h1 className="text-[15px] md:text-[20px] max-lg:text-[18px] max-md:text-[16px] font-bold mb-1.5 md:mb-2 leading-[1.3] text-[#1a1a1a] dark:text-white capitalize">
               {product?.name ? product.name.charAt(0).toUpperCase() + product.name.slice(1) : ""}
             </h1>
             
-            <div className="flex items-center gap-2 mb-2.5 md:mb-[15px] flex-wrap">
+            <div className="flex items-center gap-2 mb-2 md:mb-[10px] flex-wrap">
               <div className="flex items-center gap-0.5">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star key={star} size={18} fill={(hover || product.average_rating) >= star ? "#ffc107" : "none"} color="#ffc107" 
@@ -630,11 +630,11 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
             </div>
           </div>
 
-          {/* ... (Variations, Stoo, Specs, Bei, Audience zipo hapa kama kawaida) ... */}
-          <div className="bg-white dark:bg-[#0a0a0a] rounded-[10px] md:rounded-xl p-3 md:p-4 shadow-sm border border-[#f0f0f0] dark:border-[#1f1f1f] flex flex-col h-auto">
+          {/* ... (Variations, Stock, Specs, Price, Audience zipo hapa kama kawaida) ... */}
+          <div className="bg-white dark:bg-[#0a0a0a] rounded-[10px] md:rounded-xl p-2 md:p-3 shadow-sm border border-[#f0f0f0] dark:border-[#1f1f1f] flex flex-col h-auto">
             {Object.keys(variationsByColor).length > 0 && (
-              <div className="mb-5">
-                <span className="text-[14px] text-[#333] dark:text-white block mb-3 font-semibold">Rangi zinazopatikana:</span>
+              <div className="mb-4">
+                <span className="text-[13px] text-[#333] dark:text-white block mb-2 font-semibold">Available Colors:</span>
                 <div className="flex gap-2 md:gap-3 flex-wrap">
                   {Object.keys(variationsByColor).map((color) => {
                     const colorData = variationsByColor[color];
@@ -657,18 +657,18 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
             )}
 
             {availableSizesForColor.length > 0 && (
-              <div className="mb-5">
-                <span className="text-[14px] text-[#333] dark:text-white block mb-3 font-semibold">Ukubwa (Bonyeza kuchagua):</span>
+              <div className="mb-4">
+                <span className="text-[13px] text-[#333] dark:text-white block mb-2 font-semibold">Size (Click to select):</span>
                 <div className="flex gap-2 md:gap-2.5 flex-wrap">
                   {availableSizesForColor.map((size) => {
                     const sizeStock = getStockForSize(selectedColor, size);
                     const isOutOfStock = sizeStock === 0;
                     return (
                       <button key={size} onClick={() => !isOutOfStock && handleSizeSelect(size)} disabled={isOutOfStock}
-                        className={`px-3 py-1.5 md:px-5 md:py-2.5 rounded-[10px] border text-[11px] md:text-[14px] transition-all duration-200 cursor-pointer 
+                        className={`px-3 py-1.5 md:px-4 md:py-2 rounded-[10px] border text-[11px] md:text-[13px] transition-all duration-200 cursor-pointer 
                           ${selectedSize === size ? 'border-2 border-[#ff4e00] dark:border-[#ff6a00] bg-[#fff4f0] dark:bg-[#1f1000] text-[#ff4e00] dark:text-[#ff6a00] font-bold' : 'border-[#ddd] dark:border-[#1f1f1f] bg-white dark:bg-[#0a0a0a] text-[#333] dark:text-white'} 
                           ${isOutOfStock ? 'opacity-50 dark:opacity-40 cursor-not-allowed text-[#666] dark:text-[#6b6b6b]' : ''}`}>
-                        {size}{isOutOfStock && <span className="text-[10px] ml-1">(Imeisha)</span>}
+                        {size}{isOutOfStock && <span className="text-[10px] ml-1">(Out of stock)</span>}
                       </button>
                     );
                   })}
@@ -676,22 +676,22 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
               </div>
             )}
 
-            <div className="mb-3 md:mb-[15px] py-2 md:py-2.5 border-t border-b border-[#eee] dark:border-[#1f1f1f] flex items-center flex-wrap">
-              <span className="text-[12px] md:text-[13px] text-[#666] dark:text-[#b0b0b0]">Hali ya Stoo:</span>
+            <div className="mb-2 md:mb-[10px] py-2 md:py-2.5 border-t border-b border-[#eee] dark:border-[#1f1f1f] flex items-center flex-wrap">
+              <span className="text-[12px] md:text-[13px] text-[#666] dark:text-[#b0b0b0]">Stock Status:</span>
               <span className={`ml-2 font-bold ${currentStock > 0 ? 'text-[#10b981] dark:text-[#22c55e]' : 'text-[#ef4444]'}`}>
-                {currentStock > 0 ? `✅ ${currentStock} Zimebaki` : '❌ Imeisha'}
+                {currentStock > 0 ? `✅ ${currentStock} left` : '❌ Out of stock'}
               </span>
             </div>
 
             {Object.keys(currentSpecs).length > 0 && (
-              <div className="mt-[15px] border border-[#f0f0f0] dark:border-[#1f1f1f] rounded-lg overflow-hidden">
-                <div className="p-2.5 px-3 bg-[#fafafa] dark:bg-[#0a0a0a] border-b border-[#f0f0f0] dark:border-[#1f1f1f] text-[13px] font-semibold text-[#333] dark:text-white">📋 Specifications</div>
+              <div className="mt-2 border border-[#f0f0f0] dark:border-[#1f1f1f] rounded-lg overflow-hidden">
+                <div className="p-2 px-2.5 bg-[#fafafa] dark:bg-[#0a0a0a] border-b border-[#f0f0f0] dark:border-[#1f1f1f] text-[13px] font-semibold text-[#333] dark:text-white">📋 Specifications</div>
                 <table className="w-full border-collapse text-[11px] md:text-[12px]">
                   <tbody>
                     {Object.entries(currentSpecs).map(([key, value], index) => (
                       <tr key={key} className={index % 2 === 0 ? 'bg-white dark:bg-[#0a0a0a]' : 'bg-[#fafafa] dark:bg-[#0f0f0f]'}>
-                        <td className="p-2 px-2.5 md:p-2.5 md:px-3 border-b border-[#f0f0f0] dark:border-[#1f1f1f] text-[#666] dark:text-[#b0b0b0] w-[45%] font-medium">{key}</td>
-                        <td className="p-2 px-2.5 md:p-2.5 md:px-3 border-b border-[#f0f0f0] dark:border-[#1f1f1f] text-[#333] dark:text-white font-medium">{typeof value === 'object' ? JSON.stringify(value) : value}</td>
+                        <td className="p-1.5 px-2 border-b border-[#f0f0f0] dark:border-[#1f1f1f] text-[#666] dark:text-[#b0b0b0] w-[45%] font-medium">{key}</td>
+                        <td className="p-1.5 px-2 border-b border-[#f0f0f0] dark:border-[#1f1f1f] text-[#333] dark:text-white font-medium">{typeof value === 'object' ? JSON.stringify(value) : value}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -699,9 +699,9 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
               </div>
             )}
 
-            <div className="mt-3 md:mt-[15px] p-2.5 md:p-3 bg-[#f9fafb] dark:bg-[#0a0a0a] dark:border dark:border-[#1f1f1f] rounded-lg">
-              <span className="text-[12px] md:text-[13px] text-[#666] dark:text-[#b0b0b0]">Bei:</span>
-              <span className="text-[18px] md:text-[24px] max-lg:text-[22px] max-md:text-[20px] font-extrabold text-[#ff4e00] dark:text-[#ff6a00] ml-2">TSH {formatPrice(currentUnitPrice)}</span>
+            <div className="mt-2 p-2 bg-[#f9fafb] dark:bg-[#0a0a0a] dark:border dark:border-[#1f1f1f] rounded-lg">
+              <span className="text-[12px] md:text-[13px] text-[#666] dark:text-[#b0b0b0]">Price:</span>
+              <span className="text-[18px] md:text-[22px] max-lg:text-[22px] max-md:text-[20px] font-extrabold text-[#ff4e00] dark:text-[#ff6a00] ml-2">TSH {formatPrice(currentUnitPrice)}</span>
               {product?.is_wholesale && moq > 1 && (
                 <div className="text-[11px] text-[#666] dark:text-[#b0b0b0] mt-1">📦 Minimum Order: {moq} pieces</div>
               )}
@@ -709,18 +709,18 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
           </div>
 
           {audience && audience.length > 0 && (
-            <div className="bg-white dark:bg-[#0a0a0a] rounded-[10px] md:rounded-xl p-3 md:p-4 shadow-sm border border-[#f0f0f0] dark:border-[#1f1f1f] flex flex-col h-auto">
-              <span className="text-[14px] text-[#333] dark:text-white block mb-3 font-semibold">👥 Inafaa kwa:</span>
+            <div className="bg-white dark:bg-[#0a0a0a] rounded-[10px] md:rounded-xl p-2 md:p-3 shadow-sm border border-[#f0f0f0] dark:border-[#1f1f1f] flex flex-col h-auto">
+              <span className="text-[13px] text-[#333] dark:text-white block mb-2 font-semibold">👥 Suitable for:</span>
               <div className="flex flex-wrap gap-1.5">
                 {audience.map((a, i) => (
-                  <span key={i} className="bg-[#f3f4f6] dark:bg-[#0a0a0a] dark:border dark:border-[#1f1f1f] px-2.5 py-[3px] md:px-3 md:py-1 rounded-[20px] text-[11px] md:text-[12px] text-[#4b5563] dark:text-white">{a}</span>
+                  <span key={i} className="bg-[#f3f4f6] dark:bg-[#0a0a0a] dark:border dark:border-[#1f1f1f] px-2 py-[2px] md:px-2.5 md:py-1 rounded-[20px] text-[11px] md:text-[12px] text-[#4b5563] dark:text-white">{a}</span>
                 ))}
               </div>
             </div>
           )}
 
           {/* ===== REVIEWS SECTION ===== */}
-          <div id="reviews-section" className="bg-white dark:bg-[#0a0a0a] rounded-[10px] md:rounded-xl p-4 md:p-6 shadow-sm border border-[#f0f0f0] dark:border-[#1f1f1f] mt-2 mb-6">
+          <div id="reviews-section" className="bg-white dark:bg-[#0a0a0a] rounded-[10px] md:rounded-xl p-3 md:p-5 shadow-sm border border-[#f0f0f0] dark:border-[#1f1f1f] mt-2 mb-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-[16px] md:text-[18px] font-bold text-gray-900 dark:text-white m-0">
                 Customer Reviews
@@ -734,7 +734,7 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
             </div>
 
             {showReviewForm && (
-              <form onSubmit={handleSubmitReview} className="bg-gray-50 dark:bg-[#111] p-4 rounded-xl mb-6 border border-gray-100 dark:border-gray-800">
+              <form onSubmit={handleSubmitReview} className="bg-gray-50 dark:bg-[#111] p-3 rounded-xl mb-5 border border-gray-100 dark:border-gray-800">
                 <h3 className="text-[14px] font-semibold mb-3">Rate this product</h3>
                 <div className="flex items-center gap-1 mb-4">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -757,22 +757,22 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
                   value={reviewComment}
                   onChange={(e) => setReviewComment(e.target.value)}
                   placeholder="Share your experience with this product..."
-                  className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-black text-[13px] outline-none focus:border-[#ff4e00] transition-colors resize-none"
+                  className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-black text-[13px] outline-none focus:border-[#ff4e00] transition-colors resize-none"
                   rows="3"
                 ></textarea>
                 <button 
                   type="submit" 
                   disabled={submittingReview}
-                  className="mt-3 bg-[#ff4e00] text-white px-6 py-2 rounded-lg font-semibold text-[13px] hover:bg-[#e04400] disabled:opacity-70 transition-colors"
+                  className="mt-3 bg-[#ff4e00] text-white px-5 py-2 rounded-lg font-semibold text-[13px] hover:bg-[#e04400] disabled:opacity-70 transition-colors"
                 >
                   {submittingReview ? "Submitting..." : "Submit Review"}
                 </button>
               </form>
             )}
 
-            <div className="flex flex-col md:flex-row gap-6 mb-6 pb-6 border-b border-gray-100 dark:border-gray-800">
-              <div className="flex flex-col items-center justify-center bg-gray-50 dark:bg-[#111] p-4 rounded-xl min-w-[120px]">
-                <span className="text-[32px] font-black text-gray-900 dark:text-white">
+            <div className="flex flex-col md:flex-row gap-5 mb-5 pb-5 border-b border-gray-100 dark:border-gray-800">
+              <div className="flex flex-col items-center justify-center bg-gray-50 dark:bg-[#111] p-3 rounded-xl min-w-[120px]">
+                <span className="text-[28px] font-black text-gray-900 dark:text-white">
                   {product.average_rating ? Number(product.average_rating).toFixed(1) : "0.0"}
                 </span>
                 <div className="flex text-[#ffc107] mb-1">
@@ -797,7 +797,7 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
               </div>
             </div>
 
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-4">
               {mockReviews.map((review) => (
                 <div key={review.id} className="flex gap-3">
                   <div className="w-10 h-10 rounded-full bg-[#ff4e00]/10 text-[#ff4e00] flex items-center justify-center font-bold text-lg shrink-0">
@@ -832,7 +832,7 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
               ))}
             </div>
 
-            <button className="w-full mt-5 py-2.5 border border-gray-200 dark:border-gray-700 rounded-lg text-[13px] font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+            <button className="w-full mt-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-[13px] font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
               Load More Reviews
             </button>
           </div>
@@ -842,18 +842,18 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
           🔥 HAPA: Desktop Buttons. Tumeyatoa nje ya div ya content (inayoscroll).
           Sasa yatakaa chini kabisa ya container, bila kuscroll.
         */}
-        <div className="hidden md:block p-[15px] bg-white dark:bg-[#0a0a0a] border-t border-[#f0f0f0] dark:border-[#1f1f1f] shrink-0 z-50">
-          <button onClick={handleWhatsAppOrder} disabled={!selectedVariationObj || loading} className="bg-[#25D366] text-white flex items-center justify-center gap-2.5 font-semibold p-3.5 rounded-[10px] border-none w-full mb-3 cursor-pointer transition-all hover:bg-[#1da851] disabled:opacity-60 disabled:cursor-not-allowed">
+        <div className="hidden md:block p-3 bg-white dark:bg-[#0a0a0a] border-t border-[#f0f0f0] dark:border-[#1f1f1f] shrink-0 z-50">
+          <button onClick={handleWhatsAppOrder} disabled={!selectedVariationObj || loading} className="bg-[#25D366] text-white flex items-center justify-center gap-2 font-semibold p-3 rounded-[10px] border-none w-full mb-2.5 cursor-pointer transition-all hover:bg-[#1da851] disabled:opacity-60 disabled:cursor-not-allowed">
             <MessageSquare size={18} /> Order via WhatsApp
           </button>
-          <div className="flex gap-2.5 w-full">
-            <button onClick={() => handleOpenDrawer('order')} disabled={!selectedVariationObj || currentStock === 0 || loading} className="bg-[#ff4e00] dark:bg-[#ff6a00] text-white border-none p-3 rounded-[10px] font-bold flex-[2] flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:bg-[#e04400] dark:hover:bg-[#e55a00] disabled:opacity-60 disabled:cursor-not-allowed max-sm:text-[12px]">
+          <div className="flex gap-2 w-full">
+            <button onClick={() => handleOpenDrawer('order')} disabled={!selectedVariationObj || currentStock === 0 || loading} className="bg-[#ff4e00] dark:bg-[#ff6a00] text-white border-none p-2.5 rounded-[10px] font-bold flex-[2] flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:bg-[#e04400] dark:hover:bg-[#e55a00] disabled:opacity-60 disabled:cursor-not-allowed max-sm:text-[12px]">
               <Zap size={16} /> Order Now
             </button>
-            <button onClick={() => handleOpenDrawer('cart')} disabled={!selectedVariationObj || currentStock === 0 || loading} className="bg-white dark:bg-[#0a0a0a] text-[#ff4e00] dark:text-[#ff6a00] border border-[#ff4e00] dark:border-[#ff6a00] p-3 rounded-[10px] font-bold flex-[2] flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:bg-[#fff4f0] dark:hover:bg-[#1f1000] disabled:opacity-60 disabled:cursor-not-allowed max-sm:text-[12px]">
+            <button onClick={() => handleOpenDrawer('cart')} disabled={!selectedVariationObj || currentStock === 0 || loading} className="bg-white dark:bg-[#0a0a0a] text-[#ff4e00] dark:text-[#ff6a00] border border-[#ff4e00] dark:border-[#ff6a00] p-2.5 rounded-[10px] font-bold flex-[2] flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:bg-[#fff4f0] dark:hover:bg-[#1f1000] disabled:opacity-60 disabled:cursor-not-allowed max-sm:text-[12px]">
               <ShoppingCart size={16} /> Add to Cart
             </button>
-            <button onClick={handleChatWithSeller} className="w-[50px] flex justify-center items-center border border-[#e5e7eb] dark:border-[#1f1f1f] rounded-[10px] bg-[#f9fafb] dark:bg-[#0a0a0a] cursor-pointer transition-all hover:bg-[#f3f4f6] dark:hover:bg-[#1f1f1f]">
+            <button onClick={handleChatWithSeller} className="w-[45px] flex justify-center items-center border border-[#e5e7eb] dark:border-[#1f1f1f] rounded-[10px] bg-[#f9fafb] dark:bg-[#0a0a0a] cursor-pointer transition-all hover:bg-[#f3f4f6] dark:hover:bg-[#1f1f1f]">
               <MessageSquare size={18} color="currentColor" className="text-[#374151] dark:text-white" />
             </button>
           </div>

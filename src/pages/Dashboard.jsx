@@ -454,7 +454,7 @@ export default function Dashboard() {
                 )}
               </aside>
 
-              <div className="h-full">
+              <div className="h-full pt-1">
   
 
   {/* ========================================= */}
