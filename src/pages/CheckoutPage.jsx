@@ -39,10 +39,15 @@ const CheckoutPage = () => {
         setCurrentUserId(res.data.id);
       } catch (error) {
         console.error("Error fetching profile for checkout:", error);
+        // 🔥 Kama hajaingia (401) au profile haipo (404), mpeleke kwenye Login
+        if (error.response?.status === 401 || error.response?.status === 404) {
+          toast.error("Please log in first to proceed.", { duration: 2000 });
+          navigate('/dashboard/login', { state: { from: location.pathname } });
+        }
       }
     };
     fetchProfile();
-  }, []);
+  }, [navigate, location.pathname]);
 
   useEffect(() => {
     const fetchShipping = async () => {
@@ -78,7 +83,25 @@ const CheckoutPage = () => {
   const currentShippingPrice = selectedShipping ? Number(getPrice(selectedShipping)) : 0;
   const totalAmount = subtotal + currentShippingPrice;
 
-   const handlePlaceOrder = async () => {
+  const handlePlaceOrder = async () => {
+    // 🔥 1. Kagua kama ameingia kwanza
+    if (!currentUserId) {
+      toast.error("Please log in to your account first to place an order.", { duration: 1000 });
+      navigate('/dashboard/login', { state: { from: location.pathname } });
+      return;
+    }
+
+    if (orderItems.length === 0) {
+      toast.error("You have no items to order.", { duration: 1000 });
+      return;
+    }
+    
+    if (!customerInfo.fullName || !customerInfo.phone || !customerInfo.address) {
+      toast.error("Please fill in all shipping information.", { duration: 1000 });
+      return;
+    }
+
+
     if (orderItems.length === 0) {
       toast.error("Huna bidhaa yoyote ya kuagiza");
       return;
