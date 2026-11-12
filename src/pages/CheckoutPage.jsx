@@ -78,7 +78,7 @@ const CheckoutPage = () => {
   const currentShippingPrice = selectedShipping ? Number(getPrice(selectedShipping)) : 0;
   const totalAmount = subtotal + currentShippingPrice;
 
-  const handlePlaceOrder = async () => {
+   const handlePlaceOrder = async () => {
     if (orderItems.length === 0) {
       toast.error("Huna bidhaa yoyote ya kuagiza");
       return;
@@ -142,13 +142,31 @@ const CheckoutPage = () => {
       whatsappMessage += `🚚 Usafirishaji: ${selectedShipping?.method_name || selectedShipping?.label} - TZS ${currentShippingPrice.toLocaleString()}%0A%0A`;
       whatsappMessage += `*ORDER DETAILS*%0A`;
       whatsappMessage += `────────────────%0A`;
+
+      // 🔥 HAPA NDIPO TUMEWEKA PICHA NA LINK 🔥
       orderItems.forEach((item, idx) => {
-        whatsappMessage += `\n${idx + 1}. *${item.product_name || item.name}*%0A`;
+        // 1. Tafuta link ya bidhaa (Badilisha domain kama inatofautiana)
+        const productLink = `https://skyfall.co.tz/product/${item.productId || item.id}`; 
+        
+        // 2. Tafuta picha ya bidhaa
+        const productImage = item.cover_image_url || item.image || item.product_image;
+
+        whatsappMessage += `\n*${idx + 1}. ${item.product_name || item.name}*%0A`;
+        
+        // Weka Picha kama ipo
+        if (productImage) {
+          whatsappMessage += `🖼️ Picha: ${productImage}%0A`;
+        }
+        
+        // Weka Link ya Bidhaa
+        whatsappMessage += `🔗 Link: ${productLink}%0A`;
+        
         whatsappMessage += `   🟢 Rangi: ${item.selected_color || 'Standard'}%0A`;
         whatsappMessage += `   📏 Ukubwa: ${item.selected_size || 'Free Size'}%0A`;
         whatsappMessage += `   🔢 Kiasi: ${item.quantity}%0A`;
         whatsappMessage += `   💰 Bei: TZS ${(item.price * item.quantity).toLocaleString()}%0A`;
       });
+      
       whatsappMessage += `\n────────────────%0A`;
       whatsappMessage += `💰 *Subtotal:* TZS ${subtotal.toLocaleString()}%0A`;
       whatsappMessage += `🚚 *Shipping:* TZS ${currentShippingPrice.toLocaleString()}%0A`;

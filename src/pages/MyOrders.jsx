@@ -204,7 +204,7 @@ const MyOrders = () => { // 🔥 Imeondolewa { session }
  // ===== SKELETON LOADING =====
   if (loading) {
     return (
-      <div className="flex flex-col h-screen bg-white dark:bg-[#1e293b]">
+      <div className="flex flex-col h-screen bg-white dark:bg-[#1e293b] font-sans">
         {/* Header Skeleton */}
         <div className="flex justify-between items-center px-4 md:px-6 py-2.5 border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-[#1e293b]">
           <div className="flex items-center gap-4">
@@ -255,7 +255,7 @@ const MyOrders = () => { // 🔥 Imeondolewa { session }
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50 dark:bg-[#0f172a]">
+    <div className="flex flex-col h-screen bg-gray-50 dark:bg-[#0f172a] font-sans">
       <Toaster position="top-center" />
 
       {/* ===== HEADER ===== */}
