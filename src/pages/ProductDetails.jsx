@@ -287,7 +287,7 @@ useEffect(() => {
             </section>
 
             <div className="mx-3 md:mx-6 my-4 p-4 md:p-5 bg-gray-50 dark:bg-[#0a0a0a] rounded-2xl border border-gray-100 dark:border-gray-800">
-              <h3 className="text-lg font-bold mb-2 text-gray-800 dark:text-white">Maelezo ya Bidhaa</h3>
+              <h3 className="text-lg font-bold mb-2 text-gray-800 dark:text-white">Products Description</h3>
               
               {/* 🔥 DESCRIPTION SKELETON */}
               {isLoading || !product ? (
@@ -320,7 +320,7 @@ useEffect(() => {
                   <div className="w-full h-12 bg-gray-200 dark:bg-gray-800 rounded-lg animate-pulse"></div>
                 </div>
               ) : (
-                <Suspense fallback={<div className="p-10 text-center text-gray-500">Inapakia maelezo...</div>}>
+                <Suspense fallback={<div className="p-10 text-center text-gray-500">Loading info...</div>}>
                   <ProductInfo 
                     product={product} 
                     storeProducts={storeProducts} 
