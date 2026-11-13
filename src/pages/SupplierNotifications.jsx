@@ -7,7 +7,6 @@ import {
   Settings, Menu, Megaphone
 } from "lucide-react";
 import toast from 'react-hot-toast';
-//import "../NotificationsPage.css"; 
 
 export default function SupplierNotifications({ session }) {
   const navigate = useNavigate();
@@ -18,7 +17,7 @@ export default function SupplierNotifications({ session }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [myStoreId, setMyStoreId] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState(null); // 🔥 ONGEZA HII!
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
@@ -28,14 +27,14 @@ export default function SupplierNotifications({ session }) {
   }, []);
 
   const sidebarItems = [
-    { icon: <LayoutDashboard size={20} />, path: '/dashboard/sellerboard', label: 'Duka Lako' },
-    { icon: <MessageSquare size={20} />, path: '/dashboard/supplier-messages', label: 'Ujumbe' },
-    { icon: <ClipboardList size={20} />, path: '/dashboard/supplier-notifications', label: 'Arifa (Oda)' }, 
-    { icon: <Settings size={20} />, path: '/dashboard/supplier-settings', label: 'Mipangilio' },
+    { icon: <LayoutDashboard size={20} />, path: '/dashboard/sellerboard', label: 'Your Store' },
+    { icon: <MessageSquare size={20} />, path: '/dashboard/supplier-messages', label: 'Messages' },
+    { icon: <ClipboardList size={20} />, path: '/dashboard/supplier-notifications', label: 'Notifications (Orders)' }, 
+    { icon: <Settings size={20} />, path: '/dashboard/supplier-settings', label: 'Settings' },
   ];
 
   // ==========================================
-  // 🔥 FUNCTION YA KUPATA ORDERS (IMEREKEBISHWA)
+  // 🔥 FUNCTION YA KUPATA ORDERS
   // ==========================================
   useEffect(() => {
     const fetchSellerOrders = async () => {
@@ -48,25 +47,21 @@ export default function SupplierNotifications({ session }) {
       const headers = { Authorization: `Bearer ${token}` };
       
       try {
-        // 1. PATA PROFILE UUID KUTOKA /profile/
         const profileRes = await api.get('/profile/', { headers });
-        const profileId = profileRes.data.id; // Hii ndiyo Profile UUID!
+        const profileId = profileRes.data.id;
         setCurrentUserId(profileId);
 
-        // 2. PATA STORE KWA KUTUMIA PROFILE UUID
         const storeRes = await api.get('/stores/', {
-          params: { owner_id: profileId }, // 🔥 BADILISHA HAPA!
+          params: { owner_id: profileId },
           headers
         });
 
-        // ✅ TUMIA .results! (Django inarudisha {results: [...]})
         const storesData = storeRes.data.results || storeRes.data || [];
         const store = storesData[0]; 
 
         if (store) {
           setMyStoreId(store.id);
 
-          // 3. PATA ORDERS (Tumia .results pia!)
           const ordersRes = await api.get('/orders/', {
             params: { store_id: store.id, ordering: '-created_at' },
             headers
@@ -92,10 +87,10 @@ export default function SupplierNotifications({ session }) {
     };
     
     fetchSellerOrders();
-  }, []); // 🔥 Badilisha kwenda [] (haina haja ya session?.user?.id tena)
+  }, []);
 
   // ==========================================
-  // 🔥 POLLING KWA ODA MPYA (IMEREKEBISHWA)
+  // 🔥 POLLING KWA ODA MPYA
   // ==========================================
   useEffect(() => {
     if (!currentUserId || !myStoreId) return;
@@ -119,8 +114,6 @@ export default function SupplierNotifications({ session }) {
           };
 
           const response = await api.get('/orders/', { params, headers });
-
-          // ✅ TUMIA .results HAPA PIA!
           const ordersData = response.data.results || response.data || [];
           const status = response.status;
 
@@ -170,107 +163,67 @@ export default function SupplierNotifications({ session }) {
         clearInterval(pollingInterval);
       }
     };
-  }, [currentUserId, myStoreId]); // 🔥 Badilisha kutoka session?.user?.id kwenda currentUserId!
+  }, [currentUserId, myStoreId]);
 
   const getStatusStyle = (status) => {
     const styles = {
-      pending: { backgroundColor: '#fff7ed', color: '#ff6a00', label: 'Inasubiri' },
-      received: { backgroundColor: '#e8f4fd', color: '#2196f3', label: 'Imepokelewa' },
-      delivered: { backgroundColor: '#e6fff0', color: '#00a65a', label: 'Imewasilishwa' },
-      cancelled: { backgroundColor: '#fee2e2', color: '#ef4444', label: 'Imefutwa' }
+      pending: { bg: 'bg-orange-50', color: 'text-orange-600', label: 'Inasubiri' },
+      received: { bg: 'bg-blue-50', color: 'text-blue-600', label: 'Imepokelewa' },
+      delivered: { bg: 'bg-green-50', color: 'text-green-600', label: 'Imewasilishwa' },
+      cancelled: { bg: 'bg-red-50', color: 'text-red-600', label: 'Imefutwa' }
     };
-    const style = styles[status] || styles.pending;
-    return {
-      fontSize: isMobile ? '10px' : '11px',
-      padding: isMobile ? '3px 10px' : '4px 12px',
-      borderRadius: '20px',
-      fontWeight: '700',
-      textTransform: 'uppercase',
-      ...style
-    };
+    return styles[status] || styles.pending;
   };
 
   return (
-    <div className="dashboard-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#f7f8fa' }}>
+    <div className="flex flex-col h-screen bg-gray-50 font-sans">
       
       {/* Header */}
-      <header className="dashboard-header" style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        padding: isMobile ? '10px 16px' : '10px 24px', 
-        borderBottom: '1px solid #eee', 
-        backgroundColor: '#fff', 
-        zIndex: 100 
-      }}>
-        <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '10px' : '15px' }}>
+      <header className="flex justify-between items-center px-4 md:px-6 py-3 border-b border-gray-200 bg-white z-[100] shrink-0">
+        <div className="flex items-center gap-3 md:gap-4">
           {!isMobile && (
-            <Menu size={22} style={{ cursor: 'pointer', color: '#666' }} onClick={() => setIsExpanded(!isExpanded)} />
+            <Menu size={22} className="cursor-pointer text-gray-500" onClick={() => setIsExpanded(!isExpanded)} />
           )}
           
-          <Link to="/dashboard/sellerboard" style={{ 
-            fontSize: isMobile ? '18px' : '20px',
-            fontWeight: '800', 
-            color: '#ff6a00', 
-            textDecoration: 'none' 
-          }}>
-            Skyfall.com
+          <Link to="/dashboard/sellerboard" className="text-lg md:text-xl font-extrabold text-[#ff6a00] no-underline">
+            Skyfall.co.tz
           </Link>
         </div>
 
-        <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '10px' : '15px' }}>
+        <div className="flex items-center gap-3">
           {!isMobile && (
-            <Bell size={20} style={{ cursor: 'pointer', color: '#ff6a00' }} />
+            <Bell size={20} className="cursor-pointer text-[#ff6a00]" />
           )}
         </div>
       </header>
 
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div className="flex flex-1 overflow-hidden">
         
         {/* Desktop Sidebar */}
         {!isMobile && (
           <aside 
             onMouseEnter={() => setIsExpanded(true)}
             onMouseLeave={() => setIsExpanded(false)}
-            style={{ 
-              width: isExpanded ? '240px' : '70px', 
-              borderRight: '1px solid #eee', 
-              display: 'flex', 
-              flexDirection: 'column', 
-              paddingTop: '20px', 
-              backgroundColor: '#fff',
-              transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              overflow: 'hidden',
-              whiteSpace: 'nowrap'
-            }}
+            className={`border-r border-gray-200 bg-white pt-5 flex flex-col overflow-hidden whitespace-nowrap transition-[width] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+              isExpanded ? 'w-[240px]' : 'w-[70px]'
+            }`}
           >
             {sidebarItems.map((item) => (
               <Link 
                 key={item.path} 
                 to={item.path} 
-                className="sidebar-item"
-                style={{ 
-                  display: 'flex',
-                  alignItems: 'center',
-                  textDecoration: 'none',
-                  color: location.pathname === item.path ? '#ff6a00' : '#666',
-                  padding: '12px 24px',
-                  margin: '4px 8px',
-                  borderRadius: '8px',
-                  backgroundColor: location.pathname === item.path ? '#fff5ed' : 'transparent',
-                  transition: '0.2s'
-                }}
+                className={`flex items-center no-underline px-6 py-3 mx-2 my-1 rounded-lg transition-colors ${
+                  location.pathname === item.path 
+                    ? 'text-[#ff6a00] bg-[#fff5ed]' 
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
               >
-                <div style={{ minWidth: '22px', display: 'flex', justifyContent: 'center' }}>
+                <div className="min-w-[22px] flex justify-center">
                   {item.icon}
                 </div>
-                <span style={{ 
-                  marginLeft: '15px', 
-                  fontSize: '14px', 
-                  fontWeight: '600',
-                  opacity: isExpanded ? 1 : 0,
-                  transition: 'opacity 0.2s'
-                }}>
+                <span className={`ml-4 text-sm font-semibold transition-opacity duration-200 ${
+                  isExpanded ? 'opacity-100' : 'opacity-0'
+                }`}>
                   {item.label}
                 </span>
               </Link>
@@ -279,80 +232,64 @@ export default function SupplierNotifications({ session }) {
         )}
 
         {/* Main Content */}
-        <main style={{ 
-          flex: 1, 
-          padding: isMobile ? '16px' : '24px', 
-          overflowY: 'auto' 
-        }}>
-          <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+        <main className="flex-1 p-4 md:p-6 overflow-y-auto">
+          <div className="max-w-[900px] mx-auto">
             
-            <h2 style={{ fontSize: isMobile ? '20px' : '24px', fontWeight: '800', marginBottom: '24px', color: '#222' }}>
+            <h2 className="text-xl md:text-2xl font-extrabold mb-6 text-gray-900">
               Arifa za Mauzo (Orders)
             </h2>
 
             <div>
               {loading ? (
-                <div style={{ textAlign: 'center', padding: '60px' }}>
-                  <div style={{ width: '40px', height: '40px', border: '3px solid #f3f4f6', borderTop: '3px solid #ff6a00', borderRadius: '50%', margin: '0 auto', animation: 'spin 1s linear infinite' }}></div>
-                  <p style={{ marginTop: '16px', color: '#6b7280' }}>Inapakia orders zako...</p>
+                <div className="text-center py-16">
+                  <div className="w-10 h-10 border-4 border-gray-100 border-t-[#ff6a00] rounded-full mx-auto animate-spin"></div>
+                  <p className="mt-4 text-gray-500">Inapakia orders zako...</p>
                 </div>
               ) : (
                 <>
                   {sellerOrders.length === 0 && (
-                    <div style={{ textAlign: 'center', padding: '60px', backgroundColor: '#fff', borderRadius: '16px' }}>
-                      <ShoppingBag size={64} color="#ddd" />
-                      <p style={{ marginTop: '16px', color: '#9ca3af' }}>Hamna orders za duka lako bado</p>
+                    <div className="text-center py-16 bg-white rounded-2xl">
+                      <ShoppingBag size={64} className="text-gray-300 mx-auto" />
+                      <p className="mt-4 text-gray-400">Hamna orders za duka lako bado</p>
                     </div>
                   )}
                   
-                  {sellerOrders.map((order) => (
-                    <div 
-                      key={order.id} 
-                      onClick={() => navigate(`/dashboard/orders/${order.id}`)}
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        padding: isMobile ? '12px' : '16px',
-                        backgroundColor: '#fff',
-                        borderRadius: '12px',
-                        marginBottom: '12px',
-                        cursor: 'pointer',
-                        borderLeft: '4px solid #00a65a',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                        transition: 'transform 0.2s',
-                        flexWrap: isMobile ? 'wrap' : 'nowrap'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.transform = 'translateX(4px)'}
-                      onMouseLeave={(e) => e.currentTarget.style.transform = 'translateX(0)'}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '12px' : '15px', flex: 1 }}>
-                        <div style={{ backgroundColor: '#e6fff0', padding: isMobile ? '8px' : '10px', borderRadius: '50%' }}>
-                          <ShoppingBag size={isMobile ? 18 : 22} color="#00a65a" />
+                  {sellerOrders.map((order) => {
+                    const statusStyle = getStatusStyle(order.status);
+                    return (
+                      <div 
+                        key={order.id} 
+                        onClick={() => navigate(`/dashboard/orders/${order.id}`)}
+                        className="flex justify-between items-center p-3 md:p-4 bg-white rounded-xl mb-3 cursor-pointer border-l-4 border-green-500 shadow-sm hover:translate-x-1 transition-transform flex-wrap md:flex-nowrap"
+                      >
+                        <div className="flex items-center gap-3 md:gap-4 flex-1">
+                          <div className="bg-green-50 p-2 md:p-2.5 rounded-full">
+                            <ShoppingBag size={isMobile ? 18 : 22} className="text-green-500" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="text-sm md:text-base font-bold text-gray-800 m-0">
+                              Oda #{order.order_number?.slice(0, 12)}
+                            </h4>
+                            <p className="text-xs md:text-sm text-gray-600 mt-1 mb-0.5">
+                              Mteja: <strong>{order.profiles?.full_name?.slice(0, 20) || 'Mteja Mpya'}</strong>
+                            </p>
+                            <p className="text-[10px] md:text-xs text-gray-500 m-0">
+                              🚚 {order.shipping_method || 'Usafirishaji'} | 📅 {new Date(order.created_at).toLocaleDateString('sw-TZ')}
+                            </p>
+                            <p className="text-xs md:text-sm font-bold text-[#ff6a00] mt-1">
+                              TSH {order.grand_total?.toLocaleString() || 0}
+                            </p>
+                          </div>
                         </div>
-                        <div style={{ flex: 1 }}>
-                          <h4 style={{ margin: 0, fontSize: isMobile ? '14px' : '16px', fontWeight: '700', color: '#1f2937' }}>
-                            Oda #{order.order_number?.slice(0, 12)}
-                          </h4>
-                          <p style={{ margin: '4px 0', fontSize: isMobile ? '12px' : '14px', color: '#4b5563' }}>
-                            Mteja: <strong>{order.profiles?.full_name?.slice(0, 20) || 'Mteja Mpya'}</strong>
-                          </p>
-                          <p style={{ margin: '2px 0', fontSize: isMobile ? '10px' : '12px', color: '#6b7280' }}>
-                            🚚 {order.shipping_method || 'Usafirishaji'} | 📅 {new Date(order.created_at).toLocaleDateString('sw-TZ')}
-                          </p>
-                          <p style={{ margin: '4px 0 0', fontSize: isMobile ? '13px' : '15px', fontWeight: '700', color: '#ff6a00' }}>
-                            TSH {order.grand_total?.toLocaleString() || 0}
-                          </p>
+                        <div className="text-right mt-2 md:mt-0">
+                          <span className={`text-[10px] md:text-[11px] px-2.5 md:px-3 py-1 md:py-1.5 rounded-full font-bold uppercase ${statusStyle.bg} ${statusStyle.color}`}>
+                            {statusStyle.label}
+                          </span>
+                          {!isMobile && <ChevronRight size={20} className="text-gray-400 mt-2 ml-auto" />}
                         </div>
                       </div>
-                      <div style={{ textAlign: 'right', marginTop: isMobile ? '8px' : '0' }}>
-                        <span style={getStatusStyle(order.status)}>
-                          {getStatusStyle(order.status).label}
-                        </span>
-                        {!isMobile && <ChevronRight size={20} color="#9ca3af" style={{ marginTop: '8px' }} />}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </>
               )}
             </div>
@@ -362,44 +299,32 @@ export default function SupplierNotifications({ session }) {
       
       {/* Mobile Bottom Nav */}
       {isMobile && (
-        <nav className="mobile-bottom-nav" style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: 'white',
-          display: 'flex',
-          justifyContent: 'space-around',
-          alignItems: 'center',
-          padding: '8px 0 20px',
-          borderTop: '1px solid #eee',
-          zIndex: 1000,
-          boxShadow: '0 -2px 10px rgba(0,0,0,0.05)'
-        }}>
-          <button onClick={() => navigate('/dashboard/sellerboard')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', cursor: 'pointer', background: 'none', border: 'none', flex: 1 }}>
-            <Home size={22} color={location.pathname.startsWith('/dashboard/sellerboard') ? '#ff6a00' : '#666'} />
-            <span style={{ fontSize: '10px', color: location.pathname.startsWith('/dashboard/sellerboard') ? '#ff6a00' : '#666' }}>Duka</span>
+        <nav className="fixed bottom-0 left-0 right-0 bg-white flex justify-around items-center pt-2 pb-5 border-t border-gray-200 z-[1000] shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+          <button onClick={() => navigate('/dashboard/sellerboard')} className="flex flex-col items-center gap-1 cursor-pointer bg-transparent border-none flex-1">
+            <Home size={22} className={location.pathname.startsWith('/dashboard/sellerboard') ? 'text-[#ff6a00]' : 'text-gray-500'} />
+            <span className={`text-[10px] ${location.pathname.startsWith('/dashboard/sellerboard') ? 'text-[#ff6a00]' : 'text-gray-500'}`}>Duka</span>
           </button>
 
-          <button onClick={() => navigate('/dashboard/supplier-orders')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', cursor: 'pointer', background: 'none', border: 'none', flex: 1 }}>
-            <ClipboardList size={22} color={location.pathname === '/dashboard/supplier-orders' ? '#ff6a00' : '#666'} />
-            <span style={{ fontSize: '10px', color: location.pathname === '/dashboard/supplier-orders' ? '#ff6a00' : '#666' }}>Oda</span>
+          <button onClick={() => navigate('/dashboard/supplier-orders')} className="flex flex-col items-center gap-1 cursor-pointer bg-transparent border-none flex-1">
+            <ClipboardList size={22} className={location.pathname === '/dashboard/supplier-orders' ? 'text-[#ff6a00]' : 'text-gray-500'} />
+            <span className={`text-[10px] ${location.pathname === '/dashboard/supplier-orders' ? 'text-[#ff6a00]' : 'text-gray-500'}`}>Oda</span>
           </button>
 
-          <button onClick={() => navigate('/advertise')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', cursor: 'pointer', background: 'none', border: 'none', flex: 1 }}>
-            <Megaphone size={22} color={location.pathname === '/advertise' ? '#ff6a00' : '#666'} />
-            <span style={{ fontSize: '10px', color: location.pathname === '/advertise' ? '#ff6a00' : '#666' }}>Ads</span>
+          <button onClick={() => navigate('/advertise')} className="flex flex-col items-center gap-1 cursor-pointer bg-transparent border-none flex-1">
+            <Megaphone size={22} className={location.pathname === '/advertise' ? 'text-[#ff6a00]' : 'text-gray-500'} />
+            <span className={`text-[10px] ${location.pathname === '/advertise' ? 'text-[#ff6a00]' : 'text-gray-500'}`}>Ads</span>
           </button>
 
-          <button onClick={() => navigate('/dashboard/supplier-notifications')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', cursor: 'pointer', background: 'none', border: 'none', flex: 1 }}>
-            <Bell size={22} color={location.pathname === '/dashboard/supplier-notifications' ? '#ff6a00' : '#666'} />
-            <span style={{ fontSize: '10px', color: location.pathname === '/dashboard/supplier-notifications' ? '#ff6a00' : '#666' }}>Arifa</span>
+          <button onClick={() => navigate('/dashboard/supplier-notifications')} className="flex flex-col items-center gap-1 cursor-pointer bg-transparent border-none flex-1">
+            <Bell size={22} className={location.pathname === '/dashboard/supplier-notifications' ? 'text-[#ff6a00]' : 'text-gray-500'} />
+            <span className={`text-[10px] ${location.pathname === '/dashboard/supplier-notifications' ? 'text-[#ff6a00]' : 'text-gray-500'}`}>Arifa</span>
           </button>
         </nav>
       )}
 
-      {isMobile && <div style={{ height: '70px' }} />}
+      {isMobile && <div className="h-[70px]" />}
       
+      {/* Keyframes za Spin zimebaki hapa (Tailwind ina animate-spin lakini hii ni backup) */}
       <style>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
