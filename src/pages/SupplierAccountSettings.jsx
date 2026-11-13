@@ -149,12 +149,12 @@ const SupplierAccountSettings = ({ session }) => {
     }
   };
 
-  const sidebarItems = [
-    { icon: <LayoutDashboard size={20} />, path: '/dashboard/sellerboard', label: 'Duka Lako' },
-    { icon: <MessageSquare size={20} />, path: '/dashboard/supplier-messages', label: 'Ujumbe' },
-    { icon: <ClipboardList size={20} />, path: '/dashboard/supplier-notifications', label: 'Arifa (Oda)' },
-    { icon: <Settings size={20} />, path: '/dashboard/supplier-settings', label: 'Mipangilio' },
-  ];
+ const sidebarItems = [
+  { icon: <LayoutDashboard size={20} />, path: '/dashboard/sellerboard', label: 'Your Store' },
+  { icon: <MessageSquare size={20} />, path: '/dashboard/supplier-messages', label: 'Messages' },
+  { icon: <ClipboardList size={20} />, path: '/dashboard/supplier-notifications', label: 'Notifications' },
+  { icon: <Settings size={20} />, path: '/dashboard/supplier-settings', label: 'Settings' },
+];
 
   const helpfulLinks = [
     { icon: <HelpCircle size={18} />, title: 'Help Center', path: '/help-center' },

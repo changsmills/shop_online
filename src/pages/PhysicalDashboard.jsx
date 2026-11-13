@@ -523,7 +523,7 @@ export default function PhysicalDashboard() {
             />
 
             <aside 
-              className={`fixed top-0 left-0 bottom-0 w-[300px] md:w-[260px] bg-white dark:bg-[#0a0a0a] 
+              className={`fixed top-0 left-0 bottom-0 w-[200px] md:w-[260px] bg-white dark:bg-[#0a0a0a] 
                 border-r border-gray-200 dark:border-gray-800 overflow-y-auto transition-transform duration-300 ease-in-out shadow-2xl z-[60] ${
                 isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
               }`}
@@ -582,6 +582,7 @@ export default function PhysicalDashboard() {
                     logoPreview={logoPreview}
                     setLogoFile={setLogoFile}
                     setLogoPreview={setLogoPreview}
+                    refetchAll={refetchAll} 
                   />
                 </div>
 
@@ -660,6 +661,7 @@ export default function PhysicalDashboard() {
                     handleFinalPublishAll={handleFinalPublishAll}
                     isLoading={isLoading}
                     editingProductId={editingProductId}
+                    isPremiumUser={myStore?.is_premium || false} // 🔥 ONGEZA HII
                   />
                 </div>
                 <div>
@@ -680,11 +682,15 @@ export default function PhysicalDashboard() {
                           <p className="font-bold text-sm text-brand-orange m-0">TZS {Number(p.price).toLocaleString()}</p>
                         </div>
                         <button
-                          className="absolute top-2 right-2 bg-blue-600/95 text-white px-2 py-1.5 rounded-md text-[10px] font-semibold border border-white/20 cursor-pointer flex items-center gap-1 z-10 backdrop-blur-sm transition-opacity duration-200 md:opacity-0 group-hover:opacity-100 opacity-100 md:top-2.5 md:right-2.5"
-                          onClick={() => navigate(`/update/${p.id}`)}
-                        >
-                          <Edit3 size={14} /> Edit
-                        </button>
+  className="absolute top-2 right-2 bg-blue-600/95 text-white px-2 py-1.5 rounded-md text-[10px] font-semibold border border-white/20 cursor-pointer flex items-center gap-1 z-10 backdrop-blur-sm transition-opacity duration-200 md:opacity-0 group-hover:opacity-100 opacity-100 md:top-2.5 md:right-2.5"
+  onClick={() => {
+    console.log("🔍 ID ya bidhaa ninayotaka ku-edit:", p.id);
+    console.log("🔍 Bidhaa kamili:", p); // Hii itakuonyesha kama kuna field la 'id'
+    navigate(`/update/${p.id}`);
+  }}
+>
+  <Edit3 size={14} /> Edit
+</button>
                       </div>
                     ))}
                   </div>

@@ -139,6 +139,19 @@ const CheckoutPage = () => {
         await api.post('/order-items/', item);
       }
 
+      try {
+        await api.post('/leads/', {
+          store: orderItems[0]?.store_id,     // Inaunganisha lead na duka lako
+          customer_name: customerInfo.fullName,
+          email: "whatsapp_order@skyfall.com", // Lazima tuweke email kwa sababu model inahitaji
+          message: `Oda mpya ya WhatsApp: ${orderNumber}. Jumla: TZS ${totalAmount.toLocaleString()}. Simu: ${customerInfo.phone}`,
+         // status: 'new'
+        });
+        console.log("✅ Lead imehesabiwa kwenye dashboard!");
+      } catch (leadError) {
+        console.error("Imeshindwa kuhesabu lead:", leadError.response?.data || leadError.message);
+      }
+
       toast.dismiss(loadingToast);
       clearCart();
       toast.success("Hongera! Oda yako imepokelewa vyema!");

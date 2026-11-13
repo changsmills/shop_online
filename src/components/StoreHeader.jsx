@@ -1,6 +1,6 @@
-import React from 'react';
-import { CheckCircle, Loader2, Settings, Camera } from 'lucide-react';
-import api from '../axiosConfig';
+import React, { useState, useEffect } from 'react';
+import { CheckCircle, Loader2, Settings } from 'lucide-react';
+// import api from '../axiosConfig'; // Haifai tena kwa sasa kwa kuwa hakuna kupakia picha
 
 const StoreHeader = ({ 
   myStore, 
@@ -9,56 +9,47 @@ const StoreHeader = ({
   setBannerPreview, 
   logoPreview, 
   setLogoFile, 
-  setLogoPreview 
+  setLogoPreview,
+  refetchAll 
 }) => {
   
-  const handleImageChange = async (e, type) => {
-    const file = e.target.files[0];
-    if (!file || !myStore?.id) return;
+  // 🔥 PICHA YA DEFAULT (Ikiwa banner haipo au imefeli kupakia)
+  const DEFAULT_BANNER = "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&auto=format&fit=crop";
+  
+  // 🔥 State ya kuweka picha ya mwisho itakayoonekana
+  const [finalBanner, setFinalBanner] = useState(DEFAULT_BANNER);
 
-    const localPreview = URL.createObjectURL(file);
-    if (type === 'banner') setBannerPreview(localPreview);
-    else setLogoPreview(localPreview);
-
-    try {
-      const token = localStorage.getItem("access_token");
-      if (!token) { alert("Please login again."); return; }
-
-      const formData = new FormData();
-      const fieldName = type === 'banner' ? 'store_banner' : 'store_logo';
-      formData.append(fieldName, file);
-
-      const response = await api.patch(
-        `/stores/${myStore.id}/`,
-        formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-          }
-        }
-      );
-
-      const updatedStore = response.data;
+  useEffect(() => {
+    // Chukua URL ya picha ya duka (kama ipo)
+    const storeBannerUrl = bannerPreview || myStore?.store_banner_url;
+    
+    if (storeBannerUrl) {
+      // Jaribu kupakia picha ya duka
+      const img = new Image();
+      img.src = storeBannerUrl;
       
-      if (type === 'banner' && updatedStore.store_banner_url) {
-        setBannerPreview(updatedStore.store_banner_url);
-      } else if (type === 'logo' && updatedStore.store_logo_url) {
-        setLogoPreview(updatedStore.store_logo_url);
-      }
-
-      alert('Successfully updated!');
-    } catch (error) {
-      console.error('An error occurred:', error.response?.data || error.message);
-      alert('Failed to upload image. Please try again.');
+      img.onload = () => {
+        // Kama picha imepakiwa vizuri, itumie
+        setFinalBanner(storeBannerUrl);
+      };
+      
+      img.onerror = () => {
+        // Kama picha imeshindwa (404), tumia DEFAULT_BANNER
+        console.log("⚠️ Picha ya duka haipatikani, inatumia default banner.");
+        setFinalBanner(DEFAULT_BANNER);
+      };
+    } else {
+      // Kama hakuna URL kabisa, tumia DEFAULT_BANNER
+      setFinalBanner(DEFAULT_BANNER);
     }
-  };
+  }, [bannerPreview, myStore?.store_banner_url]);
 
   return (
     <header 
-      className="relative rounded-2xl md:rounded-3xl min-h-[240px] md:min-h-[320px] flex flex-col justify-between bg-cover bg-center overflow-hidden"
+      className="relative rounded-2xl md:rounded-3xl min-h-[240px] md:min-h-[320px] flex flex-col justify-between overflow-hidden bg-cover bg-center"
       style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${bannerPreview || myStore?.store_banner_url || "https://via.placeholder.com/1200x400"}')`
+        // 🔥 Tumia finalBanner
+        backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${finalBanner}')`,
       }}
     >
       <div className="p-5 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-0 relative z-10 w-full">
@@ -121,12 +112,8 @@ const StoreHeader = ({
           </div>
         </div>
 
-        <label className="flex items-center gap-1.5 md:gap-2 bg-black/60 backdrop-blur-md px-3 py-2 md:px-4 md:py-2.5 rounded-full text-xs md:text-sm font-semibold text-white cursor-pointer transition-all hover:bg-black/80 whitespace-nowrap border-none mt-2 md:mt-0">
-          <Camera size={16} />
-          <span className="hidden md:inline">Change Banner</span>
-          <span className="inline md:hidden">Banner</span>
-          <input type="file" hidden onChange={(e) => handleImageChange(e, 'banner')} />
-        </label>
+        {/* 🔥 KITUFE CHA "CHANGE BANNER" KIMEONDOLWA KABISA HAPA */}
+        
       </div>
     </header>
   );

@@ -7,12 +7,15 @@ import api from "../axiosConfig"; // 🔥 Tumia api
 import ProductAttributes from '../pages/ProductAttribute';
 //import '../ProductCreationFlow.css';
 import speedDashboardImg from "../images/SpeedDashboard.svg";
+import { useNavigate } from 'react-router-dom';
 
 const ProductCreationFlow = ({ 
   storeId,      
   myStoreSubCats,
   storeSubCategoryIds = [], 
-  onComplete 
+  onComplete,
+  isPremiumUser = false // 🔥 ONGEZA HII
+ 
 }) => {
   console.log("🚀 [INIT] ProductCreationFlow Loaded!");
   console.log("  - Store ID (from props):", storeId);
@@ -88,6 +91,7 @@ const ProductCreationFlow = ({
   const coverInputRef = React.useRef(null);
   const videoInputRef = React.useRef(null);
   const galleryInputRef = React.useRef(null);
+  const navigate = useNavigate();
 
     React.useEffect(() => {
     const fetchLeafCategories = async () => {
@@ -160,25 +164,83 @@ const ProductCreationFlow = ({
 
   const handleCoverChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setCoverFile(file);
-      setCoverPreview(URL.createObjectURL(file));
+    if (!file) return;
+
+    if (file.size > 500 * 1024) { // 500KB
+      alert("❌ Picha Kuu ni kubwa mno! Tafadhali tumia picha isiyozidi 500KB.");
+      e.target.value = ""; // 🔥 Badilisha null kuwa ""
+      return;
     }
+    setCoverFile(file);
+    setCoverPreview(URL.createObjectURL(file));
   };
 
-  const handleVideoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setVideoFile(file);
-      setVideoPreview(URL.createObjectURL(file));
-    }
-  };
+ const handleVideoChange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
+  console.log("🎬 Video selected:", file.name, file.size, "bytes");
+  console.log("👑 isPremiumUser:", isPremiumUser);
+  console.log("🧭 navigate:", typeof navigate);
+
+  if (!isPremiumUser) { 
+    console.log("❌ Not premium, redirecting...");
+    if (window.confirm("Ili kupakia video ya promo, unahitaji kuboresha kifurushi chako. Je, ungependa kuona vifurushi?")) {
+      navigate('/pricing');
+    }
+    e.target.value = "";
+    return;
+  }
+
+  if (file.size > 2 * 1024 * 1024) {
+    alert("❌ Video ni kubwa mno! Tafadhali tumia video isiyozidi 2MB.");
+    e.target.value = "";
+    return;
+  }
+
+  const video = document.createElement('video');
+  video.preload = 'metadata';
+  video.onloadedmetadata = function() {
+    window.URL.revokeObjectURL(video.src);
+    if (video.duration > 12) {
+      alert("❌ Video ni ndefu mno! Tafadhali tumia video isiyozidi sekunde 12.");
+      e.target.value = "";
+      return;
+    }
+    setVideoFile(file);
+    setVideoPreview(URL.createObjectURL(file));
+  };
+  video.src = URL.createObjectURL(file);
+};
+
+  // 3. GALLERY (Max 5, Kila moja Max 250KB)
   const handleGalleryChange = (e) => {
     const files = Array.from(e.target.files);
-    if (galleryFiles.length + files.length > 5) return alert("Picha zisizidi 5");
-    setGalleryFiles(prev => [...prev, ...files]);
-    setGalleryPreviews(prev => [...prev, ...files.map(f => URL.createObjectURL(f))]);
+    const MAX_GALLERY = 3; 
+
+    if (galleryFiles.length + files.length > MAX_GALLERY) {
+      if (window.confirm(`Umehitaji picha zaidi ya ${MAX_GALLERY}. Je, ungependa kuboresha kifurushi chako ili kupakia picha zaidi?`)) {
+        navigate('/pricing');
+      }
+      e.target.value = "";
+      return;
+    }
+
+    const validFiles = [];
+    for (let file of files) {
+      if (file.size > 250 * 1024) { // 250KB
+        alert(`❌ Picha "${file.name}" ni kubwa mno! Tafadhali tumia picha isiyozidi 250KB.`);
+      } else {
+        validFiles.push(file);
+      }
+    }
+
+    if (validFiles.length > 0) {
+      setGalleryFiles(prev => [...prev, ...validFiles]);
+      setGalleryPreviews(prev => [...prev, ...validFiles.map(f => URL.createObjectURL(f))]);
+    } else {
+      e.target.value = ""; // Safisha kama hakuna faili lililokubaliwa
+    }
   };
 
   const removeGalleryImage = (index) => {
@@ -631,50 +693,80 @@ varFormData.append("price", finalPrice);
               </div>
             </div>
 
-            {/* Video upload */}
-            <div onClick={() => videoInputRef.current.click()}>
-              <div
-                className={`h-40 sm:h-52 border-2 border-dashed rounded-2xl sm:rounded-3xl flex items-center justify-center cursor-pointer bg-gray-50 overflow-hidden relative transition-colors hover:border-orange-500 ${
-                  videoPreview ? "border-solid border-gray-200" : "border-gray-100"
-                }`}
-              >
-                {videoPreview ? (
-                  <video src={videoPreview} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="text-center text-gray-500">
-                    <PlayCircle size={24} className="mx-auto sm:w-8 sm:h-8" />
-                    <span className="block text-[10px] sm:text-xs font-bold mt-1 sm:mt-2">Promo Video</span>
-                  </div>
-                )}
-                <input ref={videoInputRef} type="file" hidden onChange={handleVideoChange} accept="video/*" />
-              </div>
-            </div>
+{/* Video upload */}
+<div onClick={() => {
+  // 🔥 1. Kama si Premium, fungua ukurasa wa malipo kwenye tab mpya
+  if (!isPremiumUser) {
+    const confirmUpgrade = window.confirm("Ili kupakia video ya promo, unahitaji kuboresha kifurushi chako. Je, ungependa kuona vifurushi?");
+    if (confirmUpgrade) {
+      // Inafungua ukurasa wa pricing kwenye tab mpya (window.open)
+      window.open('/pricing', '_blank'); 
+    }
+    return; // Acha hapa, usifungue dirisha la kuchagua faili
+  }
+
+  // 🔥 2. Kama ni Premium, fungua dirisha la kuchagua faili
+  videoInputRef.current.click();
+}}>
+  <div
+    className={`h-40 sm:h-52 border-2 border-dashed rounded-2xl sm:rounded-3xl flex items-center justify-center cursor-pointer bg-gray-50 overflow-hidden relative transition-colors hover:border-orange-500 ${
+      videoPreview ? "border-solid border-gray-200" : "border-gray-100"
+    }`}
+  >
+    {videoPreview ? (
+      <video src={videoPreview} className="w-full h-full object-cover" />
+    ) : (
+      <div className="text-center text-gray-500">
+        <PlayCircle size={24} className="mx-auto sm:w-8 sm:h-8" />
+        <span className="block text-[10px] sm:text-xs font-bold mt-1 sm:mt-2">
+          Promo Video <span className="text-red-500">(Premium Only)</span>
+        </span>
+      </div>
+    )}
+    <input ref={videoInputRef} type="file" hidden onChange={handleVideoChange} accept="video/*" />
+  </div>
+</div>
           </div>
 
-          {/* Gallery */}
-          <div className="mt-3 sm:mt-6 bg-gray-50 p-3 sm:p-6 rounded-2xl sm:rounded-3xl">
-            <p className="text-xs sm:text-sm font-bold mb-2 sm:mb-3">Gallery (Max 5)</p>
-            <div className="flex flex-wrap gap-2 sm:gap-3">
-              <div
-                onClick={() => galleryInputRef.current.click()}
-                className="w-12 h-12 sm:w-16 sm:h-16 border-2 border-dashed border-gray-400 rounded-lg sm:rounded-2xl flex items-center justify-center text-gray-500 cursor-pointer hover:border-orange-500 transition-colors"
-              >
-                <Plus size={18} className="sm:w-6 sm:h-6" />
-                <input ref={galleryInputRef} type="file" multiple hidden onChange={handleGalleryChange} accept="image/*" />
-              </div>
-              {galleryPreviews.map((url, i) => (
-                <div key={i} className="relative w-12 h-12 sm:w-16 sm:h-16">
-                  <img src={url} className="w-full h-full rounded-lg sm:rounded-2xl object-cover" />
-                  <button
-                    onClick={() => removeGalleryImage(i)}
-                    className="absolute -top-1 -right-1 bg-white text-red-500 rounded-full p-0.5 shadow border-none cursor-pointer min-w-[18px] min-h-[18px] flex items-center justify-center"
-                  >
-                    <X size={10} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
+{/* Gallery */}
+<div className="mt-3 sm:mt-6 bg-gray-50 p-3 sm:p-6 rounded-2xl sm:rounded-3xl">
+  <p className="text-xs sm:text-sm font-bold mb-2 sm:mb-3">Gallery (Max 3)</p>
+  <div className="flex flex-wrap gap-2 sm:gap-3">
+    <div
+      onClick={() => {
+        // 🔥 1. KAGUA KAMA AMEFIKA KIKOMO CHA PICHA (MAX 3)
+        if (galleryFiles.length >= 3) {
+          // Kama amefika kikomo, mpeleke kwenye malipo
+          const confirmUpgrade = window.confirm("Umehitaji picha zaidi ya 3. Je, ungependa kuboresha kifurushi chako?");
+          if (confirmUpgrade) {
+            window.open('/pricing', '_blank');
+          }
+          return; // Acha hapa, usifungue dirisha la kuchagua picha
+        }
+
+        // 🔥 2. KAMA HAJAFIKA KIKOMO, FUNGUA DIRISHA LA KUCHAGUA PICHA
+        // (Hii inafanya kazi kwenye Desktop na Mobile)
+        galleryInputRef.current.click();
+      }}
+      className="w-12 h-12 sm:w-16 sm:h-16 border-2 border-dashed border-gray-400 rounded-lg sm:rounded-2xl flex items-center justify-center text-gray-500 cursor-pointer hover:border-orange-500 transition-colors"
+    >
+      <Plus size={18} className="sm:w-6 sm:h-6" />
+      <input ref={galleryInputRef} type="file" multiple hidden onChange={handleGalleryChange} accept="image/*" />
+    </div>
+    
+    {galleryPreviews.map((url, i) => (
+      <div key={i} className="relative w-12 h-12 sm:w-16 sm:h-16">
+        <img src={url} className="w-full h-full rounded-lg sm:rounded-2xl object-cover" />
+        <button
+          onClick={() => removeGalleryImage(i)}
+          className="absolute -top-1 -right-1 bg-white text-red-500 rounded-full p-0.5 shadow border-none cursor-pointer min-w-[18px] min-h-[18px] flex items-center justify-center"
+        >
+          <X size={10} />
+        </button>
+      </div>
+    ))}
+  </div>
+</div>
 
           <button
             onClick={() => coverPreview ? setCurrentStep(3) : alert("Weka Picha Kuu!")}
@@ -713,6 +805,59 @@ varFormData.append("price", finalPrice);
                 onClick={() => {
                   if (!attributes.name) return alert("Please fill in the product name!");
 
+                  // 🔥 1. UKAGUZI WA AINA MAALUM (LAZIMA) - Weka hii kwanza kabisa
+                if (!attributes.leaf_category_id) {
+                     return alert("❌ Tafadhali chagua Aina Maalum (Leaf Category) kwanza! Ni lazima kwa filter.");
+                       }
+
+
+                        if (!attributes.leaf_category_id) {
+    return alert("❌ Tafadhali chagua Aina Maalum (Leaf Category) kwanza! Ni lazima kwa filter.");
+  }
+
+  // 2. Ukaguzi wa Jina
+  if (!attributes.name) return alert("Please fill in the product name!");
+
+  // 🔥 3. UKAGUZI WA RANGI NA STOCK/PRICE (LAZIMA KWA KILA RANGI NA UKUBWA)
+  if (!attributes.colors || attributes.colors.length === 0) {
+    return alert("❌ Tafadhali ongeza angalau rangi moja kwenye sehemu ya Rangi na Ukubwa!");
+  }
+
+  for (let color of attributes.colors) {
+    const colorStock = attributes.size_stock?.[color] || {};
+    const colorPrices = attributes.size_prices?.[color] || {};
+    const colorImage = attributes.color_image_files?.[color];
+
+    
+    const sizes = Object.keys(colorStock);
+    if (sizes.length === 0) {
+      return alert(`❌ Tafadhali ongeza angalau ukubwa mmoja kwa rangi "${color}"!`);
+    }
+
+    // 🔥 2. Kagua kama rangi ina picha (LAZIMA)
+    if (!colorImage) {
+      return alert(`❌ Tafadhali weka picha kwa rangi "${color}"! Ni lazima kwa marketplace.`);
+    }
+
+    for (let size of sizes) {
+      const stockValue = colorStock[size];
+      const priceValue = colorPrices[size];
+
+      if (stockValue === undefined || stockValue === null || Number(stockValue) === 0) {
+        return alert(`❌ Tafadhali weka stock kwa ukubwa "${size}" wa rangi "${color}"!`);
+      }
+      if (priceValue === undefined || priceValue === null || Number(priceValue) <= 0) {
+        return alert(`❌ Tafadhali weka bei kwa ukubwa "${size}" wa rangi "${color}"!`);
+      }
+    }
+  }
+
+
+                        // 🔥 3. UKAGUZI WA MAELEZO YA BIDHAA (LAZIMA)
+                   if (!attributes.description || attributes.description.trim() === "") {
+                       return alert("❌ Tafadhali jaza Maelezo ya Bidhaa! Ni lazima kwa wateja kuelewa bidhaa yako.");
+                       }
+
                   if (attributes.is_retail) {
                     if (attributes.has_colors) {
                       const colorPrices = attributes.size_prices || {};
@@ -728,6 +873,11 @@ varFormData.append("price", finalPrice);
                       }
                     }
                   }
+
+                    // 🔥 UKAGUZI WA MOQ (LAZIMA)
+  if (!attributes.moq || Number(attributes.moq) <= 0) {
+    return alert("❌ Tafadhali jaza Kiwango cha chini cha Agizo (MOQ)! Ni lazima.");
+  }
 
                   if (attributes.is_wholesale && (!attributes.price_tiers || attributes.price_tiers.length === 0)) {
                     return alert("You selected Wholesale, please add at least one price range!");

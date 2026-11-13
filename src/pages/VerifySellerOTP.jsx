@@ -116,7 +116,7 @@ export default function VerifySellerOTP() {
   }, []);
 
 return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center px-4 py-10">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center px-4 py-10 font-sans">
       <Toaster position="top-center" reverseOrder={false} />
 
       <div className="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl shadow-xl border border-white/60 p-8 sm:p-10">

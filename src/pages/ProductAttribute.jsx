@@ -83,7 +83,7 @@ function ProductAttributes({ attributes, setAttributes, subCategoryId, leafCateg
       enable_warranty: false,
       enable_weight: false,
       enable_dimensions: false,
-      enable_variations: false,
+      enable_variations: true,
       size_stock: {},
       size_prices: {}, 
       size_format: leaf?.size_format || 'standard',
@@ -291,7 +291,7 @@ function ProductAttributes({ attributes, setAttributes, subCategoryId, leafCateg
         className="w-full bg-slate-50 dark:bg-[#1e293b] border-2 border-slate-200 dark:border-slate-600 rounded-xl px-4 py-3 text-sm sm:text-[15px] text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-[#1e293b] focus:border-blue-500 focus:ring-4 focus:ring-blue-500/12 focus:outline-none resize-y min-h-[120px] box-border"
         value={attributes.description || ""}
         onChange={(e) => setAttributes({ ...attributes, description: e.target.value })}
-        placeholder="Andika maelezo ya kina..."
+        placeholder="Mfano: Shuka za kitanda za pamba safi, laini na zenye rangi zisizopauka. Zinapatikana kwa ukubwa tofauti..."
         rows={4}
       />
     </div>
@@ -511,22 +511,6 @@ function ProductAttributes({ attributes, setAttributes, subCategoryId, leafCateg
             {attributes.enable_dimensions && <CheckCircle2 size={16} className="text-emerald-500" />}
           </button>
 
-          {/* Toggle: Variations */}
-          <button
-            type="button"
-            className={`flex items-center gap-2.5 px-4 py-2.5 rounded-lg border-2 cursor-pointer transition-all duration-200 min-h-[44px] ${
-              attributes.enable_variations
-                ? 'border-emerald-500 bg-emerald-50 dark:bg-[#1a3a2a]'
-                : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-[#0f172a]'
-            }`}
-            onClick={() => setAttributes({ ...attributes, enable_variations: !attributes.enable_variations, has_colors: !attributes.has_colors, enable_colors: !attributes.enable_colors, colors: [] })}
-          >
-            <Palette size={18} className="text-slate-700 dark:text-slate-200" />
-            <span className={`flex-1 text-left text-sm text-slate-700 dark:text-slate-200 ${attributes.enable_variations ? 'font-semibold' : 'font-normal'}`}>
-              🎨 Rangi na Ukubwa (Variations)
-            </span>
-            {attributes.enable_variations && <CheckCircle2 size={16} className="text-emerald-500" />}
-          </button>
         </div>
       </>
     )}
@@ -750,7 +734,7 @@ function ProductAttributes({ attributes, setAttributes, subCategoryId, leafCateg
     )}
 
     {/* ========== SECTION 9: COLORS & SIZES ========== */}
-    {selectedLeaf && attributes.enable_variations && (
+    {selectedLeaf && (
       <>
         <div className="flex items-center gap-2.5 mt-2">
           <Palette size={20} />

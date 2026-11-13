@@ -36,7 +36,6 @@ import CategoryProducts from "./pages/CategoryProducts";
 import ProductsAll from "./pages/ProductsAll";
 import HowToBuy from './pages/HowToBuy';
 import SearchResults from "./pages/SearchResults";
-import PricingPage from "./pages/PricingPage";
 import Dispute from './pages/Dispute';
 import ReportAbuse from './pages/ReportAbuse';
 import Terms from './pages/Terms';
@@ -63,6 +62,8 @@ import StorePending from './pages/StorePending';
 import AdminStores from './pages/AdminStores';
 import AdminOrders from './pages/AdminOrders';
 import api from './axiosConfig'; 
+import PricingPage from './pages/PricingPage';
+
 
 
 
@@ -208,12 +209,9 @@ function AppContent({ session }) {
         <Route path="/search" element={<SearchResults session={session} />} />
 
         <Route path="/admin/ads" element={<AdApprovals />} />
-
-
-        
+        <Route path="/pricing" element={<PricingPage />} />
         <Route path="/dashboard/orders" element={session ? <MyOrders session={session} /> : <Navigate to="/dashboard/login" />} />
         <Route path="/update/:productId" element={session ? <UpdateProductPage /> : <Navigate to="/dashboard/login" />} />
-
         <Route path="/dispute" element={<Dispute />} />
         <Route path="/report-abuse" element={<ReportAbuse />} />
         <Route path="/terms" element={<Terms />} />
@@ -263,7 +261,6 @@ function AppContent({ session }) {
 
       
 
-        <Route path="/payments" element={<PricingPage />} />
         <Route path="/category/:leafId" element={<CategoryProducts session={session} />} />
         <Route path="/store-pending/:storeId" element={<StorePending />} />
         <Route path="/admin/orders" element={<AdminOrders />} />
