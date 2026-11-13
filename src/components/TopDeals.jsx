@@ -177,7 +177,7 @@ export default function TopDeals({ navigate, selectedCategory }) {
 
       {renderHeader()}
 
-      <div className="relative flex items-center px-2">
+      <div className="relative flex items-center px-0.5">
         {showLeftArrow && (
           <button
             className="absolute z-10 w-6 h-6 md:w-9 md:h-9 bg-white dark:bg-[#1e293b] border border-[#e2e8f0] dark:border-[#334155] rounded-full flex items-center justify-center cursor-pointer shadow-md transition-all top-1/2 -translate-y-1/2 text-black dark:text-white hover:bg-[#f97316] hover:text-white hover:border-[#f97316] hover:scale-105 active:scale-95 left-0 md:-left-1"
@@ -189,14 +189,14 @@ export default function TopDeals({ navigate, selectedCategory }) {
 
         <div
           ref={scrollContainerRef}
-          className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-4 w-full gap-2 md:gap-3 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-0.5 py-2 pb-4 w-full gap-1 md:gap-3 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           {products.map((product) => {
             const discountPercent = getDiscountPercentage(product.price, product.original_price);
             return (
               <div
                 key={product.id}
-                className="flex-[0_0_calc((100%-17.6px)/2.2)] min-w-[calc((100%-17.6px)/2.2)] 
+                className="flex-[0_0_calc((100%-17.6px)/2.0)] min-w-[calc((100%-17.6px)/2.0)] 
                 sm:flex-[0_0_calc((100%-35px)/3.5)] sm:min-w-[calc((100%-35px)/3.5)] 
                 md:flex-[0_0_calc((100%-54px)/4.5)] md:min-w-[calc((100%-54px)/4.5)] 
                 lg:flex-[0_0_calc((100%-66px)/5.5)] lg:min-w-[calc((100%-66px)/5.5)] snap-start"
