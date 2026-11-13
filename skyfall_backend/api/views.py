@@ -501,16 +501,44 @@ class BrandViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
 class LeadViewSet(viewsets.ModelViewSet):
-    queryset = Lead.objects.all()
+    queryset = Lead.objects.all()  # 🔥 ONGEZA HII MSTARI
     serializer_class = LeadSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
     def get_queryset(self):
+        user = self.request.user
         store_id = self.request.query_params.get('store_id')
-        if store_id:
-            return self.queryset.filter(store_id=store_id)
-        return self.queryset
+
+        # 1. Kama ni Admin au Superuser, anaona kila kitu
+        if user.is_staff or user.is_superuser:
+            if store_id:
+                return Lead.objects.filter(store_id=store_id).order_by('-created_at')
+            return Lead.objects.all().order_by('-created_at')
+
+        # 2. Kama ni Seller (Supplier), anaona leads za maduka yake tu
+        try:
+            profile = user.profile
+            if profile.role == 'supplier':
+                # Pata maduka yote ya seller huyu
+                my_stores = StoreEngine.objects.filter(owner=profile).values_list('id', flat=True)
+                
+                # Kama ameomba store_id maalum, hakikisha ni yake
+                if store_id:
+                    if str(store_id) in [str(s) for s in my_stores]:
+                        return Lead.objects.filter(store_id=store_id).order_by('-created_at')
+                    else:
+                        return Lead.objects.none() # Hana ruhusa kuona store hii
+                
+                # Kama hajatuma store_id, mpe leads za maduka yake yote
+                return Lead.objects.filter(store_id__in=my_stores).order_by('-created_at')
+            else:
+                # Kama ni Buyer, hana ruhusa kuona leads za wauzaji
+                return Lead.objects.none()
+                
+        except Profile.DoesNotExist:
+            return Lead.objects.none()
+        
 # ==========================================
 # 3. VIEWS ZA REGISTRATION NA PROFILE
 # ==========================================

@@ -803,17 +803,21 @@ class Brand(models.Model):
 # --- LEAD ---
 class Lead(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    store = models.ForeignKey(StoreEngine, on_delete=models.CASCADE, related_name='leads')
-    customer_name = models.CharField(max_length=255)
-    email = models.EmailField()
-    message = models.TextField()
+    
+    # 🔥 Weka null=True, blank=True ili kama store haipo, isilete kosa
+    store = models.ForeignKey(StoreEngine, on_delete=models.CASCADE, related_name='leads', null=True, blank=True) 
+    
+    customer_name = models.CharField(max_length=255, blank=True, null=True)
+    phone_number = models.CharField(max_length=50, blank=True, null=True) # 🔥 ONGEZA HII (Kwa simu ya mteja)
+    email = models.EmailField(blank=True, null=True) # 🔥 Weka blank=True, null=True
+    message = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'leads'
 
     def __str__(self):
-        return f"{self.customer_name} - {self.store}"
+        return f"{self.customer_name or self.phone_number} - {self.store}"
 
 # --- OTP MODEL (Kwa Forgot Password) ---
 class OTPModel(models.Model):
