@@ -78,7 +78,7 @@ export default function RecentlyViewed({ navigate, compact = false }) {
 
   // ========== HEADER ==========
   const renderHeader = () => (
-    <div className={`flex justify-between items-center ${compact ? 'p-0 mb-2.5 bg-transparent border-none' : 'px-0.5 md:px-2 py-2 md:py-3 bg-[#fff7ed] dark:bg-[#1a1a2e] border-b border-transparent dark:border-[#334155] rounded-t-xl mb-2.5 md:mb-4'} text-black dark:text-white`}>
+    <div className={`flex justify-between items-center ${compact ? 'p-0 mb-2.5 bg-transparent border-none' : ' px-3 py-3 md:px-2  md:py-3 bg-[#fff7ed] dark:bg-[#1a1a2e] border-b border-transparent dark:border-[#334155] rounded-t-xl mb-2.5 md:mb-4'} text-black dark:text-white`}>
       <div className="flex flex-col">
         <div className={`flex items-center ${compact ? 'gap-1.5' : 'gap-1.5 md:gap-2.5'}`}>
           <History className={`text-[#10b981] dark:text-[#34d399] ${compact ? 'w-4.5 h-4.5' : 'w-4 h-4 md:w-6 md:h-6'}`} />
