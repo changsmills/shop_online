@@ -351,7 +351,7 @@ const ProductGallery = React.memo(({ product }) => {
 <div className="block md:hidden w-full bg-black rounded-none overflow-hidden font-sans">
   
   {/* 🔥 SEHEMU YA JUU (PICHA KUU) - IMEBAKWA VIZURI */}
-  <div className="relative w-full bg-black flex items-center justify-center h-[400px]"> 
+  <div className="relative w-full bg-black flex items-center justify-center h-[350px]"> 
     {mediaType === 'video' && videoItem && (
       <div className="relative w-full h-full flex items-center justify-center">
         <video 
