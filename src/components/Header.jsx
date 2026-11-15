@@ -194,14 +194,14 @@ const Header = ({ showBack = false, showSearch = true }) => {
       {/* ========================================= */}
 
          {/* LAYER YA RANGI */}
-<div className="absolute inset-0 z-0 mesh-gradient-bg opacity-60 dark:hidden"></div>
+     <div className="absolute inset-0 z-0 mesh-gradient-bg opacity-60 dark:hidden"></div>
 
       {/* ========================================= */}
       {/* 2. LAYER YA MAUDHUI (VITUFE NA MAANDISHI) */}
       {/* ========================================= */}
-      <div className="relative z-10 max-w-[1440px] mx-auto px-4 py-1 lg:px-8 overflow-visible">
+      <div className="relative z-10 max-w-[1440px] mx-auto px-1 gap-1 py-1 lg:px-8 overflow-visible">
 
-        <div className="flex items-center justify-between gap-4 h-[52px] lg:gap-5">
+        <div className="flex items-center justify-between  h-[52px] lg:gap-5">
           
           {/* LEFT GROUP */}
           <div className="flex items-center gap-4 lg:gap-5 max-[480px]:gap-[15px]">
