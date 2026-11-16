@@ -177,7 +177,7 @@ export default function StorePage() {
     <div className="min-h-screen bg-gray-50 dark:bg-[#1a1a2e] pt-0 pb-10 font-sans">
       <Header />
       
-      <div className="max-w-[1200px] mx-auto px-1 mt-4 md:mt-4">
+      <div className="lg:px-4 mx-auto px-1 mt-4 md:mt-4">
         
        {/* Store Header / Banner */}
         <div 
@@ -315,7 +315,7 @@ export default function StorePage() {
         </div>
 
         {/* Products Section */}
-        <div className="bg-white dark:bg-[#2d2d44] rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm">
+        <div className="bg-white dark:bg-[#2d2d44] rounded-2xl p-1 border border-gray-100 dark:border-gray-700 shadow-sm">
           
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">All Products ({filteredProducts.length})</h2>
@@ -373,7 +373,7 @@ export default function StorePage() {
               )}
             </div>
                     ) : viewMode === 'grid' ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1 md:gap-4">
               {filteredProducts.map((product, index) => (
                 <div 
                   key={product.id} 

@@ -57,8 +57,7 @@ const StoresHeader = memo(({ onSearch, showBack = true }) => {
     <header className="sticky top-0 left-0 w-full z-50 bg-white dark:bg-[#161b22] border-b border-gray-200 dark:border-[#30363d] shadow-sm font-sans">
       
       {/* Header Container */}
-      <div className="max-w-[1400px] mx-auto px-4 h-[70px] flex items-center justify-between gap-2 md:gap-4">
-        
+     <div className="w-full px-1 md:px-8 h-[70px] flex items-center gap-0 md:gap-4 lg:gap-6">        
         {/* KUSHOTO: Back Arrow + Logo */}
         <div className="flex items-center gap-2 shrink-0">
           {showBack && (
@@ -74,7 +73,7 @@ const StoresHeader = memo(({ onSearch, showBack = true }) => {
 
         {/* KATI: Search Bar */}
         {/* Nimeondoa max-w-2xl na kuweka w-full max-w-3xl ili itumie nafasi vizuri */}
-        <form onSubmit={handleSearchSubmit} className="flex-1 w-full max-w-3xl mx-auto">
+        <form onSubmit={handleSearchSubmit} className="flex-1 w-full">
           <StoreSearchBar 
             search={search} 
             setSearch={setSearch} 
