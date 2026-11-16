@@ -1,7 +1,8 @@
 // src/components/ProductGallery.jsx
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { Link } from 'react-router-dom'; // 🔥 ONGEZA HII
 import { createPortal } from 'react-dom';
-import { Maximize2, X, ChevronLeft, ChevronRight, Play, Pause, Volume2, VolumeX, Maximize } from 'lucide-react';
+import { Maximize2, X, ChevronLeft, ChevronRight, Play, Pause, Volume2, VolumeX, Maximize, Home } from 'lucide-react';
 
 // 1. Tunatumia React.memo ili isirender upya kama 'product' haijabadilika
 const ProductGallery = React.memo(({ product }) => {
@@ -158,13 +159,33 @@ const ProductGallery = React.memo(({ product }) => {
 
   return (
     <>
-      {/* ===== DESKTOP VIEW ===== */}
+            {/* ===== DESKTOP VIEW ===== */}
       <div className="hidden md:block max-w-[1000px] mx-auto p-5 bg-white dark:bg-black font-sans">
+
+        {/* 🔥 BREADCRUMBS LINE */}
+        <div className="flex items-center flex-wrap gap-2 text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-6 px-2">
+          <Link to="/" className="flex items-center gap-1 hover:text-brand-orange transition-colors">
+            <Home size={14} /> Home
+          </Link>
+          <span>/</span>
+          {/* Tunatumia sub_category_name kama Categories, na leaf_category_name kama Leaf */}
+          <Link to={`/category/${product?.sub_category_id}`} className="hover:text-brand-orange transition-colors">
+            {product?.sub_category_name || "Categories"}
+          </Link>
+          <span>/</span>
+          <Link to={`/category/${product?.leaf_category_id}`} className="hover:text-brand-orange transition-colors">
+            {product?.leaf_category_name || "Sub-category"}
+          </Link>
+          <span>/</span>
+          <span className="text-gray-800 dark:text-gray-200 font-medium truncate max-w-[200px]">
+            {product?.name || "Product Name"}
+          </span>
+        </div>
+
         <div className="flex gap-5 mb-10 items-start">
           
           {/* Thumbnails Wrapper */}
-<div className="w-[80px] shrink-0 h-[380px] flex flex-col relative group">
-  
+<div className="w-[100px] shrink-0 h-[380px] flex flex-col relative group">  
   {/* Up Arrow */}
   {mediaList.length > 4 && (
     <button 
@@ -175,11 +196,10 @@ const ProductGallery = React.memo(({ product }) => {
     </button>
   )}
 
-  {/* Scrollable Container */}
   <div 
-    ref={thumbsContainerRef}
-    className="flex flex-col gap-3 overflow-y-auto custom-scrollbar h-full py-8 px-1"
-  >
+  ref={thumbsContainerRef}
+  className="flex flex-col items-center gap-3 overflow-y-auto custom-scrollbar-hide h-full py-8 px-0 w-full"
+>
     {mediaList.map((item, i) => (
       <div 
         key={i} 
@@ -210,10 +230,9 @@ const ProductGallery = React.memo(({ product }) => {
   )}
 </div>
 
-          {/* Main Stage */}
-          <div className="flex-1 flex items-center gap-4">
-
-            <div className="relative w-[380px] h-[380px] bg-white dark:bg-[#0a0a0a] rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden flex items-center justify-center">
+{/* Main Stage */}
+<div className="flex-1 flex items-center gap-8">
+  <div className="relative w-[380px] h-[380px] bg-white dark:bg-[#0a0a0a] rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden flex items-center justify-center">
 
               <div className="w-full h-full flex items-center justify-center relative cursor-zoom-in">
                 {currentMedia?.type === 'video' ? (
@@ -244,7 +263,7 @@ const ProductGallery = React.memo(({ product }) => {
         </div>
 
         {/* Full List View */}
-        <div className="flex flex-wrap justify-start w-full bg-white dark:bg-black mt-5 px-4 md:px-8">
+        <div className="flex flex-wrap justify-center w-full bg-white dark:bg-black mt-5 px-4 md:px-8 custom-scrollbar-hide">
           {mediaList.map((item, idx) => (
             <div 
               key={idx} 
@@ -287,11 +306,7 @@ const ProductGallery = React.memo(({ product }) => {
       <ChevronRight size={30} />
     </button>
 
-    {/* 
-      🔥 KISANDUKU KIKUU (Fixed Size Container) 
-      Kimewekewa urefu maalum (h-[85vh]) na upana maalum. 
-      Hapa picha ikibadilika, hiki kisanduku hakibadiliki ukubwa wake.
-    */}
+    {/* Kisanduku Kikuu */}
     <div 
       className="w-full max-w-[1200px] h-[85vh] bg-black rounded-xl overflow-hidden relative flex items-center justify-center" 
       onClick={(e) => e.stopPropagation()}
@@ -302,7 +317,6 @@ const ProductGallery = React.memo(({ product }) => {
           src={currentMedia.url} 
           controls 
           autoPlay 
-          // Video inatumia h-full w-full na object-contain ili ionekane yote ndani ya kisanduku
           className="w-full h-full object-contain" 
         />
       ) : (
@@ -315,21 +329,18 @@ const ProductGallery = React.memo(({ product }) => {
           onTouchStart={handleTouchMove} 
           onTouchEnd={handleTouchEnd}
         >
-          {/* 
-            🔥 PICHA IMEWEKWA ABSOLUTE
-            Ili kuzuia picha isisukume kisanduku (kubadilisha size yake).
-            Tumia object-contain ili isikatike. 
-          */}
+          {/* Picha ya Msingi - Imepewa max-w na max-h ili isijaze kila kitu */}
           <img 
             key={currentMedia?.url} 
             src={currentMedia?.url} 
             alt="View" 
-            className="absolute inset-0 w-full h-full object-contain p-2" 
+            className="max-w-full max-h-full object-contain p-2" 
           />
           
+          {/* Zoom Effect - Tumia 150% badala ya 250% kwa zoom ya wastani */}
           {isZooming && (
             <div 
-              className="absolute inset-0 bg-no-repeat bg-[length:250%] pointer-events-none" 
+              className="absolute inset-0 bg-no-repeat bg-[length:150%] pointer-events-none" 
               style={{ backgroundImage: `url(${currentMedia?.url})`, backgroundPosition: bgPos }} 
             />
           )}
@@ -347,11 +358,35 @@ const ProductGallery = React.memo(({ product }) => {
 
       </div>
 
-     {/* ===== MOBILE VIEW ===== */}
-<div className="block md:hidden w-full bg-black rounded-none overflow-hidden font-sans">
-  
+{/* ===== MOBILE VIEW ===== */}
+<div className="block md:hidden w-full bg-white dark:bg-black rounded-none overflow-hidden font-sans px-3 pb-4">  
+  {/* 🔥 BREADCRUMBS (MOBILE) */}
+  <div className="flex items-center flex-wrap gap-1.5 text-[11px] text-gray-500 dark:text-gray-400 px-4 py-3 bg-white dark:bg-black border-b border-gray-100 dark:border-gray-800">
+    <Link to="/" className="flex items-center gap-1 hover:text-brand-orange transition-colors">
+      <Home size={12} /> Home
+    </Link>
+    <span>/</span>
+    {product?.category_name && (
+      <>
+        <Link to={`/category/${product?.category_id}`} className="hover:text-brand-orange transition-colors">
+          {product.category_name}
+        </Link>
+        <span>/</span>
+      </>
+    )}
+    <Link to={`/category/${product?.sub_category_id}`} className="hover:text-brand-orange transition-colors">
+      {product?.sub_category_name || "Sub-category"}
+    </Link>
+    <span>/</span>
+    <span className="text-gray-800 dark:text-gray-200 font-medium truncate max-w-[120px]">
+      {product?.name || "Product"}
+    </span>
+  </div>
+
   {/* 🔥 SEHEMU YA JUU (PICHA KUU) - IMEBAKWA VIZURI */}
-  <div className="relative w-full bg-black flex items-center justify-center h-[350px]"> 
+  <div className="relative w-full bg-black flex items-center justify-center h-[350px] rounded-xl overflow-hidden mt-2"> 
+
+    {/* ... code yako ya video na picha ... */}
     {mediaType === 'video' && videoItem && (
       <div className="relative w-full h-full flex items-center justify-center">
         <video 

@@ -70,7 +70,7 @@ export default function RelatedProducts({ relatedProducts, leafCategoryId, loadi
 
       {/* ===== LOADING SKELETON ===== */}
       {loadingRelated && (
-        <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 mt-2.5">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 mt-2.5">
           {[...Array(5)].map((_, i) => (
             <div
               key={i}

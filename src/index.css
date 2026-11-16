@@ -163,3 +163,14 @@
   background-size: 200% 200%;
   transition: background-image 0.5s ease-in-out, background-color 0.5s ease-in-out;
 }
+
+/* Kuficha scrollbar kwenye Chrome, Safari na Opera */
+.custom-scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+/* Kuficha scrollbar kwenye IE, Edge na Firefox */
+.custom-scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
