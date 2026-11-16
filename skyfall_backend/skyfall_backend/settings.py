@@ -195,7 +195,9 @@ CORS_ALLOWED_ORIGINS = [
     'https://www.skyfall.co.tz',  
     'https://shop-online-1-ult1.onrender.com',
     'https://skyfall-admin-ten.vercel.app',
-    'https://api.skyfall.co.tz',  
+    'https://api.skyfall.co.tz', 
+    'http://10.0.2.2:8000',   
+    'http://localhost:8000', 
 
    
 ]
