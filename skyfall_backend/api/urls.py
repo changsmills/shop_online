@@ -24,9 +24,8 @@ from api.views import (
     NearbyProductsView,
     NearbyStoresView,  # 🔥 ONGEZA HII
     TrackVisitView,      # 🔥 ONGEZA HII
-    AdminAnalyticsView 
-
-
+    AdminAnalyticsView,
+    StoreStatusViewSet,
 )
 
 router = DefaultRouter()
@@ -45,6 +44,7 @@ router.register(r'product-variations', ProductVariationViewSet)
 router.register(r'orders', OrderViewSet)
 router.register(r'order-items', OrderItemViewSet)
 router.register(r'admin/stores', AdminStoreApprovalViewSet, basename='admin-store-approval')
+router.register(r'store-statuses', StoreStatusViewSet)
 
 urlpatterns = [
     path('seller/otp/request/', SellerOTPRequestView.as_view(), name='seller_otp_request'),
@@ -73,6 +73,7 @@ urlpatterns = [
     path('nearby-stores/', NearbyStoresView.as_view(), name='nearby-stores'),  # 🔥 ONGEZA HII
     path('track-visit/', TrackVisitView.as_view(), name='track-visit'),
     path('admin/analytics/', AdminAnalyticsView.as_view(), name='admin-analytics'),
+    path('store-statuses/<uuid:pk>/increment-view/', StoreStatusViewSet.as_view({'post': 'increment_view'}), name='status-increment-view'),
 
 
 

@@ -11,7 +11,8 @@ from products.models import (
     StoreEngine, ProductMedia, Message, Profile,
     ShippingMethod, Brand, Lead,
     ProductVariation ,
-        Order
+        Order,
+        StoreStatus, 
 
 )
 
@@ -417,3 +418,34 @@ class MessageSerializer(serializers.ModelSerializer):
         if obj.receiver and hasattr(obj.receiver, 'store'):
             return obj.receiver.store.store_logo
         return obj.receiver.avatar_url if obj.receiver else None
+
+class StoreStatusSerializer(serializers.ModelSerializer):
+    media_file = serializers.FileField(write_only=True, required=False)
+    store_id = serializers.UUIDField(write_only=True) # 🔥 Ongeza hii
+
+    class Meta:
+        model = StoreStatus
+        fields = ['id', 'store', 'store_id', 'media_type', 'media_url', 'media_file', 'caption', 'views_count', 'created_at', 'expires_at', 'is_active']
+        read_only_fields = ['views_count', 'created_at', 'expires_at', 'is_active', 'media_url', 'store']
+
+    def create(self, validated_data):
+        store_id = validated_data.pop('store_id')
+        media_file = validated_data.pop('media_file', None)
+        
+        status_obj = StoreStatus.objects.create(store_id=store_id, **validated_data)
+        
+        if media_file:
+            try:
+                import cloudinary.uploader
+                result = cloudinary.uploader.upload(
+                    media_file, 
+                    folder="store_statuses",
+                    resource_type="auto"
+                )
+                status_obj.media_url = result['secure_url']
+                status_obj.save(update_fields=['media_url'])
+            except Exception as e:
+                print(f"❌ [Cloudinary] Status upload failed: {e}")
+                raise serializers.ValidationError({"media_file": "Imeshindikana kupakia faili."})
+        
+        return status_obj

@@ -9,7 +9,7 @@ import StoreHeader from '../components/StoreHeader';
 import StoreManagement from '../components/StoreManagement';
 import ProductCreationFlow from '../components/ProductCreationFlow';
 import {
-  Edit3, Rocket, X, CheckCircle, Plus,
+  Edit3, Rocket, X, CheckCircle, Plus, Zap, Eye,
   LayoutDashboard, Package, Box, BarChart3, Store, Megaphone, Menu, Bell, 
   User, TrendingUp, LogOut, MessageSquare, Settings, ClipboardList
 } from 'lucide-react';
@@ -110,6 +110,17 @@ export default function PhysicalDashboard() {
 
   const [activeTab, setActiveTab] = useState('overview');
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 768);
+
+    // ========== STATE ZA STATUS ==========
+  const [statusMediaFile, setStatusMediaFile] = useState(null);
+  const [statusMediaPreview, setStatusMediaPreview] = useState(null);
+  const [statusCaption, setStatusCaption] = useState('');
+  const [statusMediaType, setStatusMediaType] = useState('image'); // 'image' au 'video'
+  const [isPostingStatus, setIsPostingStatus] = useState(false);
+
+    // ========== STATE ZA STATUS VIEWS ==========
+  const [storeStatuses, setStoreStatuses] = useState([]);
+  const [isLoadingStatuses, setIsLoadingStatuses] = useState(false);
 
   // --- State za Form (Hizi zinabaki kuwa za local kwa sababu ni za UI) ---
   const [myProducts, setMyProducts] = useState([]); // Tunaiweka hapa ili QuickInventoryManager iweze ku-update kirahisi
@@ -226,11 +237,51 @@ export default function PhysicalDashboard() {
   }, [queryClient]);
 
 
+    // Vuta status za duka
+  useEffect(() => {
+    const fetchStoreStatuses = async () => {
+      if (!myStore?.id) return;
+      setIsLoadingStatuses(true);
+      try {
+        const token = localStorage.getItem("access_token");
+        const res = await api.get(`/store-statuses/?store_id=${myStore.id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setStoreStatuses(res.data.results || res.data || []);
+      } catch (err) {
+        console.error("Error fetching statuses:", err);
+      } finally {
+        setIsLoadingStatuses(false);
+      }
+    };
+    fetchStoreStatuses();
+  }, [myStore?.id]);
+
+
   // ==========================================
   // 5. HANDLERS
   // ==========================================
-  const refetchAll = () => {
+   const refetchAll = () => {
     queryClient.invalidateQueries({ queryKey: ['physicalDashboard'] });
+    
+    // 🔥 Refetch status pia
+    if (myStore?.id) {
+      const fetchStoreStatuses = async () => {
+        setIsLoadingStatuses(true);
+        try {
+          const token = localStorage.getItem("access_token");
+          const res = await api.get(`/store-statuses/?store_id=${myStore.id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setStoreStatuses(res.data.results || res.data || []);
+        } catch (err) {
+          console.error("Error fetching statuses:", err);
+        } finally {
+          setIsLoadingStatuses(false);
+        }
+      };
+      fetchStoreStatuses();
+    }
   };
 
   const resetProductForm = () => {
@@ -429,9 +480,54 @@ export default function PhysicalDashboard() {
     }
   };
 
+   const handlePostStatus = async () => {
+    if (!statusMediaFile) return alert("Tafadhali chagua picha au video!");
+    if (!statusCaption.trim()) return alert("Tafadhali andika caption!");
+    if (!myStore?.id) return alert("Duka halijapatikana!");
+
+    setIsPostingStatus(true);
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) return alert("Token haipo!");
+
+      const formData = new FormData();
+      formData.append("store_id", myStore.id); // 🔥 Badilisha kuwa store_id
+      formData.append("media_type", statusMediaType);
+      formData.append("caption", statusCaption);
+      formData.append("media_file", statusMediaFile);
+
+      const response = await api.post('/store-statuses/', formData, {
+        headers: { 
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "multipart/form-data" 
+        }
+      });
+
+      if (response.status === 201) {
+        alert("✅ Status imewekwa kikamilifu! Itaonekana kwa wateja kwa saa 24.");
+        setStatusMediaFile(null);
+        setStatusMediaPreview(null);
+        setStatusCaption('');
+        setStatusMediaType('image');
+        
+        // 🔥 Refetch status mara moja
+        const statusRes = await api.get(`/store-statuses/?store_id=${myStore.id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setStoreStatuses(statusRes.data.results || statusRes.data || []);
+      }
+    } catch (err) {
+      console.error("❌ Error posting status:", err);
+      alert("Hitilafu: " + (err.response?.data?.detail || err.message));
+    } finally {
+      setIsPostingStatus(false);
+    }
+  };
+
   const menuItems = [
     { id: 'overview', label: 'My Store', icon: <LayoutDashboard size={20} /> },
     { id: 'products', label: 'My Products', icon: <Package size={20} /> },
+    { id: 'status', label: 'Store Status', icon: <Zap size={20} /> }, // 🔥 ONGEZA HII
     { id: 'inventory', label: 'Inventory', icon: <Box size={20} /> },
     { id: 'offers', label: 'Offers', icon: <TrendingUp size={20} /> }, 
     { id: 'analytics', label: 'Analytics', icon: <BarChart3 size={20} /> },
@@ -694,6 +790,143 @@ export default function PhysicalDashboard() {
                       </div>
                     ))}
                   </div>
+                </div>
+              </div>
+            )}
+
+                       {/* STATUS TAB */}
+            {activeTab === 'status' && (
+              <div className="block animate-[fadeIn_0.2s_ease]">
+                
+                {/* 🔥 SEHEMU MPYA: STATUS VIEWS (Kama WhatsApp) */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-bold mb-3 text-gray-900 dark:text-white flex items-center gap-2">
+                    <Eye size={20} className="text-brand-orange" /> Your Active Statuses
+                  </h3>
+                  
+                  {isLoadingStatuses ? (
+                    <div className="flex gap-3 overflow-x-auto pb-2">
+                      {[1, 2, 3].map(i => (
+                        <div key={i} className="w-24 h-40 bg-gray-200 dark:bg-gray-800 rounded-xl animate-pulse shrink-0"></div>
+                      ))}
+                    </div>
+                  ) : storeStatuses.length === 0 ? (
+                    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 text-center text-sm text-gray-500">
+                      You have no active statuses. Create one below!
+                    </div>
+                  ) : (
+                    <div className="flex gap-4 overflow-x-auto pb-3 custom-scrollbar-hide">
+                      {storeStatuses.map((status) => (
+                        <div 
+                          key={status.id} 
+                          className="relative w-28 h-44 rounded-xl overflow-hidden shrink-0 border-2 border-gray-200 dark:border-gray-700 group cursor-pointer"
+                        >
+                          {/* Picha au Video */}
+                          {status.media_type === 'video' ? (
+                            <video src={status.media_url} className="w-full h-full object-cover" muted />
+                          ) : (
+                            <img src={status.media_url} alt="Status" className="w-full h-full object-cover" />
+                          )}
+                          
+                          {/* Overlay ya Views */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-2">
+                            <div className="flex items-center gap-1 text-white text-xs font-bold">
+                              <Eye size={12} /> {status.views_count || 0} Views
+                            </div>
+                            <p className="text-white text-[10px] truncate opacity-80">
+                              {status.caption || 'No caption'}
+                            </p>
+                          </div>
+                          
+                          {/* Badge ya Muda */}
+                          <div className="absolute top-2 left-2 bg-black/50 text-white text-[9px] px-1.5 py-0.5 rounded-full">
+                            {new Date(status.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Form ya Kuunda Status Mpya */}
+                <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-gray-800 p-6 md:p-8">
+                  <h2 className="text-xl md:text-2xl font-bold mb-2 text-gray-900 dark:text-white flex items-center gap-2">
+                    <Zap className="text-brand-orange" size={28} /> Create New Status
+                  </h2>
+                  <p className="text-sm text-gray-500 mb-6">
+                    Your status will be visible to customers for <strong>24 hours</strong> only. Use this to showcase new products, offers, or announcements.
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Left Side: Media Upload */}
+                    <div>
+                      <label className="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">
+                        Upload Image or Video
+                      </label>
+                      <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-4 text-center hover:border-brand-orange transition-colors">
+                        {statusMediaPreview ? (
+                          <div className="relative">
+                            {statusMediaType === 'image' ? (
+                              <img src={statusMediaPreview} alt="Preview" className="w-full h-56 object-cover rounded-lg" />
+                            ) : (
+                              <video src={statusMediaPreview} controls className="w-full h-56 object-cover rounded-lg" />
+                            )}
+                            <button 
+                              onClick={() => { setStatusMediaFile(null); setStatusMediaPreview(null); }}
+                              className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full shadow-md hover:bg-red-600 transition"
+                            >
+                              <X size={16} />
+                            </button>
+                          </div>
+                        ) : (
+                          <div>
+                            <input 
+                              type="file" 
+                              accept="image/*,video/*"
+                              onChange={(e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                  setStatusMediaFile(file);
+                                  setStatusMediaPreview(URL.createObjectURL(file));
+                                  setStatusMediaType(file.type.startsWith('video') ? 'video' : 'image');
+                                }
+                              }}
+                              className="hidden"
+                              id="status-media-upload"
+                            />
+                            <label htmlFor="status-media-upload" className="cursor-pointer flex flex-col items-center gap-3 py-8">
+                              <div className="w-16 h-16 rounded-full bg-orange-50 dark:bg-orange-950/30 flex items-center justify-center text-brand-orange">
+                                <Plus size={32} />
+                              </div>
+                              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Click to upload</span>
+                              <span className="text-xs text-gray-400">PNG, JPG, MP4 (Max 10MB)</span>
+                            </label>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Right Side: Caption */}
+                    <div>
+                      <label className="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">
+                        Caption / Message
+                      </label>
+                      <textarea 
+                        value={statusCaption}
+                        onChange={(e) => setStatusCaption(e.target.value)}
+                        placeholder="Write a message for your customers..."
+                        className="w-full h-56 p-4 rounded-xl border border-gray-300 dark:border-gray-700 bg-transparent text-gray-900 dark:text-white resize-none focus:outline-none focus:ring-2 focus:ring-brand-orange placeholder:text-gray-400"
+                      />
+                    </div>
+                  </div>
+
+                  <button 
+                    onClick={handlePostStatus}
+                    disabled={isPostingStatus || !statusMediaFile}
+                    className="mt-6 w-full py-3.5 bg-brand-orange text-white rounded-xl font-bold hover:bg-brand-hover transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md"
+                  >
+                    {isPostingStatus ? 'Posting...' : 'Post Status Now'} <Zap size={18} />
+                  </button>
                 </div>
               </div>
             )}

@@ -28,6 +28,8 @@ from django.db.models import Count
 from django.db.models.functions import TruncDate
 from django.utils import timezone
 from datetime import timedelta
+from rest_framework.parsers import MultiPartParser, FormParser # 🔥 Ongeza hii juu
+
 
 
 
@@ -47,7 +49,7 @@ import requests
 # 🔥 MODELS IMPORTS:
 from products.models import (
     Category, ProductVariation, SubCategory, ProductsEngine, LeafCategory, Advertisement, 
-    StoreEngine, ProductMedia, Message, ShippingMethod, Brand, Lead, Order, OrderItem,  SiteVisit 
+    StoreEngine, ProductMedia, Message, ShippingMethod, Brand, Lead, Order, OrderItem,  SiteVisit, StoreStatus, 
 )
 
 # 🔥 ONGEZA HII IMPORT MUHIMU KABISA (Inaingiza ViewSet kutoka products.views):
@@ -63,7 +65,7 @@ from .serializers import (
     CategorySerializer, SubCategorySerializer,
     LeafCategorySerializer, AdvertisementSerializer,
     ProductMediaSerializer, MessageSerializer, ProfileSerializer,
-    ShippingMethodSerializer, BrandSerializer, LeadSerializer, OrderSerializer, OrderItemSerializer
+    ShippingMethodSerializer, BrandSerializer, LeadSerializer, OrderSerializer, OrderItemSerializer, StoreStatusSerializer,
 )
 
 User = get_user_model()
@@ -1434,3 +1436,30 @@ class AdminAnalyticsView(APIView):
             "skyfall_searches": skyfall_searches,
             "daily_visits": formatted_daily_data
         }, status=status.HTTP_200_OK)
+    
+class StoreStatusViewSet(viewsets.ModelViewSet):
+    queryset = StoreStatus.objects.all()
+    serializer_class = StoreStatusSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    authentication_classes = [JWTAuthentication]
+    parser_classes = [MultiPartParser, FormParser] # 🔥 Muhimu kwa FormData
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        store_id = self.request.query_params.get('store_id')
+        if store_id:
+            queryset = queryset.filter(store_id=store_id)
+        queryset = queryset.filter(is_active=True)
+        return queryset.order_by('-created_at')
+
+    # 🔥 TUMEONDOA perform_create KWA SABABU SERIALIZER INAJUA KUSHUGHULIKIA store_id
+
+    @action(detail=True, methods=['post'])
+    def increment_view(self, request, pk=None):
+        try:
+            status_obj = self.get_object()
+            status_obj.views_count += 1
+            status_obj.save()
+            return Response({'status': 'view incremented', 'views_count': status_obj.views_count})
+        except StoreStatus.DoesNotExist:
+            return Response({'error': 'Status not found'}, status=status.HTTP_404_NOT_FOUND)

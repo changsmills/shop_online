@@ -875,3 +875,69 @@ class SiteVisit(models.Model):
 
     def __str__(self):
         return f"{self.path} - {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
+
+
+# --- STORE STATUS (Kama WhatsApp/Instagram Status) ---
+class StoreStatus(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    
+    # Duka linalomiliki status hii
+    store = models.ForeignKey(
+        StoreEngine, 
+        on_delete=models.CASCADE, 
+        related_name='statuses'
+    )
+    
+    # Aina ya status (Picha au Video)
+    MEDIA_TYPE_CHOICES = [
+        ('image', 'Image'),
+        ('video', 'Video'),
+    ]
+    media_type = models.CharField(max_length=10, choices=MEDIA_TYPE_CHOICES, default='image')
+    
+    # URL ya picha/video (Tumia URLField kwa sababu unatumia Cloudinary)
+    media_url = models.URLField(max_length=500, blank=True, null=True) # 🔥 Weka blank=True, null=True
+    
+    # 🔥 ONGEZA HII: Field ya kupokea faili kabla ya ku-upload Cloudinary
+    media_file = models.FileField(upload_to='store_statuses/', blank=True, null=True)
+    
+    # Caption/Ujumbe wa mfanyabiashara
+    caption = models.TextField(blank=True, null=True)
+    
+    # Idadi ya waliotazama (Views)
+    views_count = models.IntegerField(default=0)
+    
+    # Muda wa status (auto-add)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    # 🔥 Muda wa mwisho (Saa 24 baadaye) - Hii itatusaidia kufuta/ku-filter status za zamani
+    expires_at = models.DateTimeField()
+    
+    # Hali ya status (Active au Expired)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'store_statuses'
+        ordering = ['-created_at']  # Mpya kwanza
+        indexes = [
+            models.Index(fields=['store', 'is_active']),
+            models.Index(fields=['expires_at']),
+            models.Index(fields=['-created_at']),
+        ]
+
+    def save(self, *args, **kwargs):
+        # Kama expires_at haijawekwa, weka saa 24 kutoka sasa
+        if not self.expires_at:
+            from django.utils import timezone
+            from datetime import timedelta
+            self.expires_at = timezone.now() + timedelta(hours=24)
+        
+        # Kama muda umepita, weka is_active = False
+        from django.utils import timezone
+        if timezone.now() > self.expires_at:
+            self.is_active = False
+            
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Status by {self.store.store_name} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
