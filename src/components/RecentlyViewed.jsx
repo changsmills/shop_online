@@ -117,7 +117,7 @@ export default function RecentlyViewed({ navigate, compact = false }) {
       <div className={`relative w-full ${compact ? 'h-full flex flex-col bg-transparent border-none p-0 overflow-hidden' : 'bg-white dark:bg-[#1e293b] border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border'}`}>
         {renderHeader()}
         <div className="relative flex items-center px-0.5">
-          <div className={`flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-0 py-2 w-full snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${compact ? 'gap-0 p-0 flex-1 min-h-0' : 'gap-1.5 md:gap-3 pb-4'}`}>
+          <div className={`flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-0 py-2 w-full snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${compact ? 'gap-0 p-0 flex-1 min-h-0' : 'gap-1.5 md:gap-3 pb-1'}`}>
             {Array.from({ length: 5 }).map((_, index) => (
               <div 
                 key={`skeleton-${index}`} 
@@ -156,7 +156,7 @@ export default function RecentlyViewed({ navigate, compact = false }) {
         
         <div 
           ref={scrollContainerRef} 
-          className={`flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-0 py-2 w-full snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${compact ? 'gap-0 p-0 flex-1 min-h-0' : 'gap-1.5 md:gap-3 pb-4'}`}
+          className={`flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-0 py-2 w-full snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${compact ? 'gap-0 p-0 flex-1 min-h-0' : 'gap-1.5 md:gap-3 pb-1'}`}
         >
           {products.map((product) => (
             <div 

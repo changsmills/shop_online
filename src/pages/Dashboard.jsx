@@ -523,9 +523,31 @@ export default function Dashboard() {
               <span className="bg-brand-orange px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold w-fit mb-2 tracking-wide uppercase shadow-sm">{t('sponsored')}</span>
               <h2 className="text-lg sm:text-2xl lg:text-3xl font-extrabold leading-tight mb-1.5 sm:mb-2 max-w-[95%] sm:max-w-[80%] drop-shadow-md">{activeAd.business_name}</h2>
               <p className="text-xs sm:text-sm text-gray-100 max-w-[95%] sm:max-w-[75%] leading-snug sm:leading-relaxed mb-4 line-clamp-2 sm:line-clamp-3 drop-shadow-sm font-medium">{activeAd.description}</p>
-              <button className="bg-[#FF6A00] hover:bg-[#e55a00] text-white font-bold px-5 py-2.5 sm:px-6 sm:py-2.5 rounded-full w-fit pointer-events-auto transition-all duration-300 ease-in-out shadow-[0_4px_10px_rgba(255,106,0,0.4)] hover:shadow-[0_6px_20px_rgba(255,106,0,0.6)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-sm sm:text-base flex items-center gap-1.5" onClick={() => { if (window.innerWidth > 1024) { window.open(`/store/${activeAd.store_id}`, '_blank'); } else { navigate(`/store/${activeAd.store_id}`); } }}>
-                {t('source_now')} <span>→</span>
-              </button>
+              <button
+  className="bg-[#FF6A00] hover:bg-[#e55a00] text-white font-bold px-5 py-2.5 sm:px-6 sm:py-2.5 
+    rounded-full w-fit pointer-events-auto transition-all duration-300 ease-in-out shadow-[0_4px_10px_rgba(255,106,0,0.4)] hover:shadow-[0_6px_20px_rgba(255,106,0,0.6)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-sm sm:text-base flex items-center gap-1.5"
+  onClick={() => {
+    // 🔥 Sasa tunatumia store_id moja kwa moja kwa sababu tumeiongeza kwenye serializer
+    const storeId = activeAd?.store_id;
+
+    // 🔥 Zuia undefined kabla ya navigate
+    if (!storeId || storeId === 'undefined') {
+      console.error('❌ Hakuna store_id kwenye tangazo hili:', activeAd);
+      alert('Tangazo hili halina duka. Tafadhali jaribu lingine.');
+      return;
+    }
+
+    const storeUrl = `/store/${storeId}`;
+
+    if (window.innerWidth > 1024) {
+      window.open(storeUrl, '_blank');
+    } else {
+      navigate(storeUrl);
+    }
+  }}
+>
+  {t('source_now')} <span>→</span>
+</button>
             </div>
           )}
         </>

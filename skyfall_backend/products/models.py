@@ -4,6 +4,8 @@ import uuid
 from PIL import Image                    
 from io import BytesIO                   
 from django.core.files.base import ContentFile 
+from django.utils import timezone
+from datetime import timedelta
 
 User = get_user_model()
 

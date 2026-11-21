@@ -330,7 +330,7 @@ const AccountSettings = () => {
           )}
 
           <Link to="/dashboard" className="text-lg md:text-[22px] font-extrabold text-[#ff6a00] no-underline tracking-tight whitespace-nowrap">
-            Skyfall.com
+            Skyfall
           </Link>
 
           <div className="hidden md:flex bg-gray-100 dark:bg-[#111] items-center px-3.5 py-1.5 rounded-full w-[280px] text-gray-500 dark:text-[#b0b0b0] border dark:border-[#1f1f1f]">

@@ -1448,23 +1448,45 @@ class AdminAnalyticsView(APIView):
             "skyfall_searches": skyfall_searches,
             "daily_visits": formatted_daily_data
         }, status=status.HTTP_200_OK)
-    
+
+
 class StoreStatusViewSet(viewsets.ModelViewSet):
     queryset = StoreStatus.objects.all()
     serializer_class = StoreStatusSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [JWTAuthentication]
-    parser_classes = [MultiPartParser, FormParser] # 🔥 Muhimu kwa FormData
+    parser_classes = [MultiPartParser, FormParser]
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        now = timezone.now()
+        
+        # 🔥 1. Futa zilizopitwa na wakati (Clean-up)
+        expired_statuses = queryset.filter(expires_at__lt=now)
+        if expired_statuses.exists():
+            for status_obj in expired_statuses:
+                if status_obj.media_url:
+                    try:
+                        # Chukua public_id kutoka kwenye URL
+                        public_id = status_obj.media_url.split('/')[-2] + '/' + status_obj.media_url.split('/')[-1].split('.')[0]
+                        cloudinary.uploader.destroy(public_id)
+                        print(f"✅ [Cloudinary] Picha imefutwa: {public_id}")
+                    except Exception as e:
+                        print(f"❌ [Cloudinary] Imeshindwa kufuta picha: {e}")
+                
+                # Futa record kwenye database
+                status_obj.delete()
+            print(f"✅ [Cleanup] Status {expired_statuses.count()} zilizopitwa na wakati zimefutwa.")
+
+        # 🔥 2. Filter kwa store_id (kama Frontend imetuma)
         store_id = self.request.query_params.get('store_id')
         if store_id:
             queryset = queryset.filter(store_id=store_id)
-        queryset = queryset.filter(is_active=True)
+            
+        # 🔥 3. Rudisha tu zilizo active na hazijapitwa na wakati
+        queryset = queryset.filter(is_active=True, expires_at__gt=now)
+        
         return queryset.order_by('-created_at')
-
-    # 🔥 TUMEONDOA perform_create KWA SABABU SERIALIZER INAJUA KUSHUGHULIKIA store_id
 
     @action(detail=True, methods=['post'])
     def increment_view(self, request, pk=None):

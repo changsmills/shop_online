@@ -40,7 +40,8 @@ class LeafCategorySerializer(serializers.ModelSerializer):
 class AdvertisementSerializer(serializers.ModelSerializer):
     # 🔥 Field ya kupokea file
     media_file = serializers.FileField(write_only=True, required=False)
-    
+
+    store_id = serializers.UUIDField(source='store.id', read_only=True, allow_null=True)
     # 🔥 MPYA: Inarudisha category_id ya store moja kwa moja
     store_category_id = serializers.SerializerMethodField()
     
