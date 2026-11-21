@@ -1,6 +1,6 @@
 // src/components/MobileCategorySlider.jsx
-import React, { useRef, useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, ChevronDown, Check, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { ChevronDown, Check, X } from 'lucide-react';
 
 export default function MobileCategorySlider({ 
   categories, 
@@ -8,33 +8,7 @@ export default function MobileCategorySlider({
   onSelectCategory,
   getDisplayName 
 }) {
-  const scrollRef = useRef(null);
-  const [showLeftArrow, setShowLeftArrow] = useState(false);
-  const [showRightArrow, setShowRightArrow] = useState(true);
-  
-  // 🔥 State ya kufungua na kufunga dialog
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const checkScroll = () => {
-    if (scrollRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      setShowLeftArrow(scrollLeft > 10);
-      setShowRightArrow(scrollLeft + clientWidth < scrollWidth - 10);
-    }
-  };
-
-  const scroll = (direction) => {
-    if (scrollRef.current) {
-      const scrollAmount = direction === 'left' ? -200 : 200;
-      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-  };
-
-  useEffect(() => {
-    checkScroll();
-    window.addEventListener('resize', checkScroll);
-    return () => window.removeEventListener('resize', checkScroll);
-  }, [categories]);
 
   if (!categories || categories.length === 0) return null;
 
@@ -44,23 +18,12 @@ export default function MobileCategorySlider({
 
   return (
     <>
-      <div className="relative flex items-center w-full px-1 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
+      {/* 🔥 DIV KUU: Full width, py-1.5, bg-white, na border-b */}
+      <div className="relative flex items-center w-full px-3 py-1.5 bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
         
-        {/* Left Arrow */}
-        {showLeftArrow && (
-          <button
-            onClick={() => scroll('left')}
-            className="absolute left-0 z-10 w-8 h-10 flex items-center justify-start pl-1.5 border-none cursor-pointer rounded-r-[20px] bg-gradient-to-r from-white dark:from-[#0a0a0a] via-white/80 dark:via-[#0a0a0a]/80 to-transparent text-gray-500 dark:text-gray-400"
-          >
-            <ChevronLeft size={20} strokeWidth={2.5} />
-          </button>
-        )}
-
-        {/* Scrollable Container (Pills) */}
+        {/* Scrollable Container (Pills) - Bila mishale */}
         <div
-          ref={scrollRef}
-          onScroll={checkScroll}
-          className="flex overflow-x-auto flex-1 gap-1.5 py-1.5 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pr-10"
+          className="flex overflow-x-auto flex-1 gap-1.5 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pr-12"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
           {categories.map((cat) => {
@@ -81,26 +44,16 @@ export default function MobileCategorySlider({
           })}
         </div>
 
-        {/* Right Arrow */}
-        {showRightArrow && (
-          <button
-            onClick={() => scroll('right')}
-            className="absolute right-8 z-10 w-8 h-10 flex items-center justify-end pr-1.5 border-none cursor-pointer bg-gradient-to-l from-white dark:from-[#0a0a0a] via-white/80 dark:via-[#0a0a0a]/80 to-transparent text-gray-500 dark:text-gray-400"
-          >
-            <ChevronRight size={20} strokeWidth={2.5} />
-          </button>
-        )}
-
-        {/* 🔥 KITUFE KIPYA CHA KUFUNGUA DIALOG (Upande wa kulia kabisa) */}
+        {/* 🔥 KITUFE CHA CHINI (ChevronDown) - Kimebaki kimoja */}
         <button 
           onClick={() => setIsDialogOpen(true)}
-          className="absolute right-1 z-20 w-8 h-8 flex items-center justify-center bg-white dark:bg-[#0a0a0a] rounded-full border border-gray-200 dark:border-gray-700 shadow-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          className="absolute right-2 z-20 w-8 h-8 flex items-center justify-center bg-white dark:bg-black rounded-full border border-gray-200 dark:border-gray-700 shadow-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
         >
           <ChevronDown size={18} strokeWidth={2.5} />
         </button>
       </div>
 
-      {/* 🔥 DIALOG YA CHINI (Inatokea ukibonyeza kitufe cha chini) */}
+      {/* Dialog */}
       {isDialogOpen && (
         <div 
           className="fixed inset-0 z-[9999] flex items-end justify-center bg-black/60"
@@ -110,7 +63,6 @@ export default function MobileCategorySlider({
             className="w-full max-h-[75vh] bg-white dark:bg-[#0a0a0a] rounded-t-2xl flex flex-col overflow-hidden animate-slide-up"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Kichwa cha Dialog */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-800 shrink-0">
               <h3 className="text-base font-bold text-black dark:text-white m-0">All Categories</h3>
               <button onClick={() => setIsDialogOpen(false)} className="p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
@@ -118,8 +70,7 @@ export default function MobileCategorySlider({
               </button>
             </div>
 
-            {/* Orodha ya Categories */}
-            <div className="flex-1 overflow-y-auto p-2  pb-20">
+            <div className="flex-1 overflow-y-auto p-2 pb-20">
               {categories.map((cat) => {
                 const displayName = getDisplayName ? getDisplayName(cat) : (cat.name || cat.name_sw);
                 const isActive = selectedCategory?.id === cat.id;
@@ -129,7 +80,7 @@ export default function MobileCategorySlider({
                     key={cat.id}
                     onClick={() => {
                       onSelectCategory(cat);
-                      setIsDialogOpen(false); // Funga dialog baada ya kuchagua
+                      setIsDialogOpen(false);
                     }}
                     className={`flex items-center justify-between px-4 py-3.5 mb-1 rounded-lg cursor-pointer transition-colors ${
                       isActive 
@@ -143,7 +94,6 @@ export default function MobileCategorySlider({
                 );
               })}
             </div>
-
           </div>
         </div>
       )}

@@ -577,7 +577,14 @@ class Dispute(models.Model):
 class Advertisement(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='advertisements')
-    store_id = models.UUIDField()
+    store = models.ForeignKey(
+        'StoreEngine', 
+        on_delete=models.CASCADE, 
+        db_column='store_id', 
+        related_name='advertisements',
+        null=True, 
+        blank=True
+    )
     business_name = models.CharField(max_length=255)
     ad_type = models.CharField(max_length=50)
     description = models.TextField(blank=True, null=True)

@@ -429,23 +429,23 @@ export default function Dashboard() {
   // 7. RENDER (UI)
   // ==========================================
   return (
-    <div key={i18n.language} className="flex flex-col min-h-screen bg-[#f1f3f5] dark:bg-black relative font-sans ">
+    <div key={i18n.language} className="flex flex-col min-h-screen bg-white dark:bg-black relative font-sans ">
 
       <div className="fixed md:sticky top-0 left-0 w-full z-[999]">
         <Header search={search} setSearch={setSearch} />
       </div>
 
-      {/* 🔥 MOBILE CATEGORY SLIDER - Inatumia state yake mwenyewe */}
-      <div className="block lg:hidden px-2 pt-2 pb-1 bg-[#f1f3f5] dark:bg-black sticky top-[60px] z-40">
-        <MobileCategorySlider
-          categories={[ALL_CATEGORY, ...categories]}
-          selectedCategory={mobileCategory} // 🔥 Tumia mobileCategory hapa
-          onSelectCategory={(cat) => {
-            setMobileCategory(cat); // 🔥 Tunabadilisha mobileCategory pekee
-          }}
-          getDisplayName={getCategoryDisplayName}
-        />
-      </div>
+      {/* 🔥 MOBILE CATEGORY SLIDER - Full Width */}
+<div className="block lg:hidden w-full bg-white dark:bg-black sticky top-[60px] z-40">
+  <MobileCategorySlider
+    categories={[ALL_CATEGORY, ...categories]}
+    selectedCategory={mobileCategory}
+    onSelectCategory={(cat) => {
+      setMobileCategory(cat);
+    }}
+    getDisplayName={getCategoryDisplayName}
+  />
+</div>
 
       <div className="flex-1 w-full">
         <div className="w-full max-w-[1400px] mx-auto px-0 pt-[65px] md:pt-0 lg:px-1 lg:pt-4 pb-6">

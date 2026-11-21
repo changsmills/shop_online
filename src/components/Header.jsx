@@ -184,17 +184,13 @@ const Header = ({ showBack = false, showSearch = true }) => {
   }, []);
 
   return (
-    <header className="relative w-full bg-[#fafcff] dark:bg-black 
-      text-black dark:text-white border-t-2 border-t-gray-200 dark:border-t-gray-800 
-      border-b border-b-gray-200 dark:border-b-gray-800 shadow-sm transition-colors
+    // 🔥 MABADILIKO HAPA: Nimebadilisha bg-[#fafcff] kuwa bg-white, na kuondoa border-t-2
+    <header className="relative w-full bg-white dark:bg-black 
+      text-black dark:text-white 
+      border-b border-gray-300 dark:border-gray-700 shadow-sm transition-colors
        duration-300 z-[9999]">
       
-      {/* ========================================= */}
-      {/* 1. LAYER YA RANGI (MESH GRADIENT)         */}
-      {/* ========================================= */}
-
-         {/* LAYER YA RANGI */}
-     <div className="absolute inset-0 z-0 mesh-gradient-bg opacity-60 dark:hidden"></div>
+      {/* 🔥 NIMEONDOA ILE LAYER YA MESH GRADIENT KABISA ILI RANGI YA PINKI ITOKE */}
 
       {/* ========================================= */}
       {/* 2. LAYER YA MAUDHUI (VITUFE NA MAANDISHI) */}
