@@ -316,21 +316,33 @@ class AdvertisementViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         
+        # 1. Anza na queryset ya msingi (kama ilivyokuwa awali)
         if user.is_anonymous:
-            return Advertisement.objects.all()
-        
-        if user.is_staff or user.is_superuser:
-            return Advertisement.objects.all()
-        
-        from products.models import Profile
-        profile, created = Profile.objects.get_or_create(
-            user=user,
-            defaults={
-                'full_name': user.username or user.email,
-                'role': 'buyer'
-            }
-        )
-        return Advertisement.objects.filter(user=profile)
+            queryset = Advertisement.objects.all()
+        elif user.is_staff or user.is_superuser:
+            queryset = Advertisement.objects.all()
+        else:
+            from products.models import Profile
+            profile, created = Profile.objects.get_or_create(
+                user=user,
+                defaults={
+                    'full_name': user.username or user.email,
+                    'role': 'buyer'
+                }
+            )
+            queryset = Advertisement.objects.filter(user=profile)
+
+        # 🔥 2. ONGEZA HAPA: Chuja kwa category_id (kama Frontend imetuma)
+        category_id = self.request.query_params.get('category_id')
+        if category_id and category_id != 'all':
+            queryset = queryset.filter(store__category_id=category_id)
+
+        # 🔥 3. Chuja kwa status (kama Frontend imetuma)
+        status_param = self.request.query_params.get('status')
+        if status_param:
+            queryset = queryset.filter(status=status_param)
+
+        return queryset
 
 class StoreEngineViewSet(viewsets.ModelViewSet):
     # 🔥 TUMIA select_related HAPA

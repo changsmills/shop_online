@@ -68,9 +68,32 @@ const LazySection = ({ children, height = "300px" }) => {
 // ==========================================
 // 1. FUNCTIONS ZA KUCHUKUA DATA
 // ==========================================
-const fetchAds = async () => {
+const fetchAds = async ({ queryKey }) => {
+  const [_, categoryId] = queryKey; 
+
   const response = await api.get('/advertisements/', { params: { status: 'active' } });
-  return response.data.results || response.data || [];
+  const adsData = response.data.results || response.data || [];
+
+  // 1. Kama category ni 'all' au haipo, rudisha matangazo yote
+  if (!categoryId || categoryId === 'all') {
+    return adsData;
+  }
+
+  // 2. Chuja matangazo kulingana na category
+  const filteredAds = adsData.filter(ad => {
+    const adCategoryId = ad.store_category_id || ad.store?.category_id;
+    return String(adCategoryId) === String(categoryId);
+  });
+
+  // 3. 🔥 FALLBACK: Kama hakuna tangazo kwenye category hii, rudisha matangazo yote
+  // Hii inazuia sehemu kuwa tupu (white space)
+  if (filteredAds.length === 0) {
+    console.log(`Hakuna tangazo la category ${categoryId}, tunaonyesha matangazo yote.`);
+    return adsData; // Rudisha yote badala ya tupu
+  }
+
+  // 4. Kama yapo, rudisha yaliyochujwa
+  return filteredAds;
 };
 
 const fetchFeaturedProducts = async ({ queryKey }) => {
@@ -147,12 +170,18 @@ export default function Dashboard() {
   const [mobileActiveMenu, setMobileActiveMenu] = useState('categories');
   const [selectedCategory, setSelectedCategory] = useState(ALL_CATEGORY);
   const [selectedCategoryForComponents, setSelectedCategoryForComponents] = useState(ALL_CATEGORY);
+  const [mobileCategory, setMobileCategory] = useState(ALL_CATEGORY);
+
 
   // ==========================================
   // 3. QUERIES (TanStack Query)
   // ==========================================
+  
+  // 🔥 Chukua category ID kutoka kwenye mobileCategory
+  const adCategoryId = mobileCategory?.isAll ? 'all' : mobileCategory?.id;
+
   const { data: cachedAds = [], isLoading: loadingAds } = useQuery({
-    queryKey: ['ads'],
+    queryKey: ['ads', adCategoryId], // 🔥 Ongeza adCategoryId hapa
     queryFn: fetchAds,
     staleTime: 1000 * 60 * 5,
   });
@@ -401,8 +430,21 @@ export default function Dashboard() {
   // ==========================================
   return (
     <div key={i18n.language} className="flex flex-col min-h-screen bg-[#f1f3f5] dark:bg-black relative font-sans ">
+
       <div className="fixed md:sticky top-0 left-0 w-full z-[999]">
         <Header search={search} setSearch={setSearch} />
+      </div>
+
+      {/* 🔥 MOBILE CATEGORY SLIDER - Inatumia state yake mwenyewe */}
+      <div className="block lg:hidden px-2 pt-2 pb-1 bg-[#f1f3f5] dark:bg-black sticky top-[60px] z-40">
+        <MobileCategorySlider
+          categories={[ALL_CATEGORY, ...categories]}
+          selectedCategory={mobileCategory} // 🔥 Tumia mobileCategory hapa
+          onSelectCategory={(cat) => {
+            setMobileCategory(cat); // 🔥 Tunabadilisha mobileCategory pekee
+          }}
+          getDisplayName={getCategoryDisplayName}
+        />
       </div>
 
       <div className="flex-1 w-full">
@@ -501,7 +543,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          <div className="flex flex-col pt-4 bg-[#f8f8f8] dark:bg-black ">
+  <div className="flex flex-col pt-4 bg-[#f8f8f8] dark:bg-black ">
   <div className="block lg:hidden">
     <Suspense fallback={<SkeletonSection />}>
       <RecentlyViewed key={i18n.language} navigate={navigate} />
@@ -514,36 +556,36 @@ export default function Dashboard() {
 
   <LazySection height="250px">
     <Suspense fallback={<SkeletonSection />}>
-      {/* Tumeondoa selectedCategory */}
-      <NewArrivals key={i18n.language} navigate={navigate} />
+      {/* 🔥 TUMIA mobileCategory HAPA */}
+      <NewArrivals key={i18n.language} navigate={navigate} mobileCategory={mobileCategory} />
     </Suspense>
   </LazySection>
 
   <LazySection height="250px">
     <Suspense fallback={<SkeletonSection />}>
-      {/* Tumeondoa selectedCategory */}
-      <TrendingNow key={i18n.language} products={trendingProducts} navigate={navigate} getCategoryDisplayName={getCategoryDisplayName} />
+      {/* 🔥 TUMIA mobileCategory HAPA */}
+      <TrendingNow key={i18n.language} products={trendingProducts} navigate={navigate} getCategoryDisplayName={getCategoryDisplayName} mobileCategory={mobileCategory} />
     </Suspense>
   </LazySection>
 
   <LazySection height="250px">
     <Suspense fallback={<SkeletonSection />}>
-      {/* Tumeondoa selectedCategory */}
-      <TopDeals key={i18n.language} navigate={navigate} />
+      {/* 🔥 TUMIA mobileCategory HAPA */}
+      <TopDeals key={i18n.language} navigate={navigate} mobileCategory={mobileCategory} />
     </Suspense>
   </LazySection>
 
   <LazySection height="250px">
     <Suspense fallback={<SkeletonSection />}>
-      {/* Tumeondoa selectedCategory */}
-      <TopStores key={i18n.language} navigate={navigate} />
+      {/* 🔥 TUMIA mobileCategory HAPA (Hata TopStores inaipokea) */}
+      <TopStores key={i18n.language} navigate={navigate} mobileCategory={mobileCategory} />
     </Suspense>
   </LazySection>
 
   <LazySection height="400px">
     <Suspense fallback={<SkeletonSection />}>
-      {/* Tumeondoa selectedCategory */}
-      <JustForYou key={i18n.language} handleAction={handleProtectedAction} search={search} />
+      {/* 🔥 TUMIA mobileCategory HAPA */}
+      <JustForYou key={i18n.language} handleAction={handleProtectedAction} search={search} mobileCategory={mobileCategory} />
     </Suspense>
   </LazySection>
 

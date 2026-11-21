@@ -31,7 +31,7 @@ const fetchTrending = async ({ queryKey }) => {
   });
 };
 
-export default function TrendingNow({ navigate, selectedCategory, getCategoryDisplayName }) {
+export default function TrendingNow({ navigate, mobileCategory, getCategoryDisplayName }) {
   const { t, i18n } = useTranslation();
   
   const scrollContainerRef = useRef(null);
@@ -39,7 +39,7 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
   const [showRightArrow, setShowRightArrow] = useState(false);
   const scrollPosRef = useRef(0);
 
-  const categoryId = selectedCategory?.isAll ? 'all' : (selectedCategory?.id || 'all');
+  const categoryId = mobileCategory?.isAll ? 'all' : (mobileCategory?.id || 'all');
 
   // 3. Tumia useQuery badala ya useEffect na useState
   const { data: products = [], isLoading } = useQuery({
@@ -119,7 +119,7 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
         {renderHeader()}
 
         <div className="relative flex items-center px-2">
-          <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-4 w-full gap-2 md:gap-3 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-1 w-full gap-2 md:gap-3 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {Array.from({ length: 6 }).map((_, index) => (
               <div 
                 key={`skeleton-${index}`} 
@@ -155,7 +155,7 @@ export default function TrendingNow({ navigate, selectedCategory, getCategoryDis
         )}
         
         <div ref={scrollContainerRef} className="flex flex-nowrap overflow-x-auto 
-        overflow-y-hidden scroll-smooth px-0.5 py-2 pb-4 w-full gap-1 md:gap-3 
+        overflow-y-hidden scroll-smooth px-0.5 py-2 pb-1 w-full gap-1 md:gap-3 
         snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {products.map((item, index) => (
             <div 

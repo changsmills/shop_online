@@ -5,14 +5,12 @@ import api from "../axiosConfig";
 import DashboardCard from "./DashboardCard";
 import SkeletonCardz from "./SkeletonCardz";
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query'; // 1. Ingiza useQuery
+import { useQuery } from '@tanstack/react-query';
 
 // 2. Function ya kuchukua data (nje ya component)
 const fetchTopStores = async ({ queryKey }) => {
-  const [_, locationKey] = queryKey;
+  const [_, locationKey, categoryId] = queryKey; // 🔥 Ongeza categoryId hapa
   
-  // Kwa kuwa location ni null kwa sasa, tunatumia no-location
-  // Lakini tumeacha logic ya kuweza kutumia location ikiwa itarudi baadaye
   const location = locationKey !== 'no-location' ? JSON.parse(locationKey) : null;
 
   let response;
@@ -25,20 +23,26 @@ const fetchTopStores = async ({ queryKey }) => {
       },
     });
   } else {
-    response = await api.get('/stores/', {
-      params: {
-        limit: 10,
-        verification_status: 'approved',
-        status: 'active',
-        ordering: '-average_rating,-created_at',
-      },
-    });
+    // 🔥 Ongeza category_id kwenye params
+    const params = {
+      limit: 10,
+      verification_status: 'approved',
+      status: 'active',
+      ordering: '-average_rating,-created_at',
+    };
+    
+    if (categoryId && categoryId !== 'all') {
+      params.category_id = categoryId;
+    }
+
+    response = await api.get('/stores/', { params });
   }
 
   return response.data.results || response.data || [];
 };
 
-export default function TopStores({ navigate }) {
+export default function TopStores({ navigate, mobileCategory }) {
+
   const { t, i18n } = useTranslation();
   const location = null; // Tumeondoa location kwa sasa kama ulivyofanya
   
@@ -51,11 +55,13 @@ export default function TopStores({ navigate }) {
   // 3. Tumia useQuery
   // Tunaweka location na lugha kwenye queryKey ili kama zikibadilika, data ichukuliwe upya
   const locationKey = location ? JSON.stringify(location) : 'no-location';
+
+  const categoryId = mobileCategory?.isAll ? 'all' : (mobileCategory?.id || 'all');
   
   const { data: stores = [], isLoading } = useQuery({
-    queryKey: ['topStores', locationKey, i18n.language],
+    queryKey: ['topStores', locationKey, categoryId, i18n.language], // 🔥 Ongeza categoryId hapa
     queryFn: fetchTopStores,
-    staleTime: 1000 * 60 * 5, // Cache kwa dakika 5
+    staleTime: 1000 * 60 * 5,
   });
 
   // ========== SCROLL HANDLERS ==========
@@ -84,9 +90,9 @@ export default function TopStores({ navigate }) {
     }
   }, [stores]);
 
-  // 🔥 Rejesha scroll — anza mwanzo kama location/language imebadilika
+  // 🔥 Rejesha scroll — anza mwanzo kama location/language/category imebadilika
   useEffect(() => {
-    const currentKey = `${locationKey}_${i18n.language}`;
+    const currentKey = `${locationKey}_${categoryId}_${i18n.language}`; // 🔥 Ongeza categoryId hapa
 
     if (prevLocationKeyRef.current !== currentKey) {
       prevLocationKeyRef.current = currentKey;
@@ -100,7 +106,7 @@ export default function TopStores({ navigate }) {
     if (scrollContainerRef.current && scrollPosRef.current > 0) {
       scrollContainerRef.current.scrollLeft = scrollPosRef.current;
     }
-  }, [stores, locationKey, i18n.language]);
+  }, [stores, locationKey, categoryId, i18n.language]); 
 
   const renderHeader = () => (
 <div className="flex justify-between items-center px-3 py-3 md:px-2  md:py-3 bg-[#fff7ed] dark:bg-[#1e293b] dark:border-b dark:border-[#334155] rounded-t-xl mb-2.5 md:mb-4 text-black dark:text-white">
@@ -142,7 +148,7 @@ export default function TopStores({ navigate }) {
       <div className="relative px-3 py-3 w-full bg-white dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] pt-0 pb-4 md:py-4 box-border">
         {renderHeader()}
         <div className="relative flex items-center px-2">
-          <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-4 md:pb-5 w-full gap-2 md:gap-3 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-1 md:pb-5 w-full gap-2 md:gap-3 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {Array.from({ length: 6 }).map((_, index) => (
               <div
                 key={`skeleton-${index}`}
@@ -176,7 +182,7 @@ export default function TopStores({ navigate }) {
           </button>
         )}
 
-        <div ref={scrollContainerRef} className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-4 md:pb-5 w-full gap-1 md:gap-3 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div ref={scrollContainerRef} className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-1 md:pb-5 w-full gap-1 md:gap-3 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {stores.map((store) => {
             let officeImg = 'https://via.placeholder.com/300x150?text=Verified+Store';
             try {

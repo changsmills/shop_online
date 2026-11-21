@@ -37,7 +37,8 @@ const fetchDeals = async ({ queryKey }) => {
     .slice(0, 10);
 };
 
-export default function TopDeals({ navigate, selectedCategory }) {
+export default function TopDeals({ navigate, mobileCategory }) {
+
   const { t, i18n } = useTranslation();
   
   const scrollContainerRef = useRef(null);
@@ -46,7 +47,7 @@ export default function TopDeals({ navigate, selectedCategory }) {
   const scrollPosRef = useRef(0);
   const prevCategoryKeyRef = useRef('');
 
-  const categoryId = selectedCategory?.isAll ? 'all' : (selectedCategory?.id || 'all');
+const categoryId = mobileCategory?.isAll ? 'all' : (mobileCategory?.id || 'all');
 
   // 3. Tumia useQuery
   const { data: products = [], isLoading } = useQuery({
@@ -98,7 +99,7 @@ export default function TopDeals({ navigate, selectedCategory }) {
 
   // 🔥 Rejesha scroll — anza mwanzo kama category/language imebadilika
   useEffect(() => {
-    const currentKey = `${selectedCategory?.id || 'all'}_${i18n.language}`;
+    const currentKey = `${mobileCategory?.id || 'all'}_${i18n.language}`;
 
     if (prevCategoryKeyRef.current !== currentKey) {
       prevCategoryKeyRef.current = currentKey;
@@ -112,7 +113,7 @@ export default function TopDeals({ navigate, selectedCategory }) {
     if (scrollContainerRef.current && scrollPosRef.current > 0) {
       scrollContainerRef.current.scrollLeft = scrollPosRef.current;
     }
-  }, [products, selectedCategory?.id, i18n.language]);
+}, [products, mobileCategory?.id, i18n.language]);
 
   const renderHeader = () => (
     <div className="flex justify-between items-center px-3 md:px-5 py-2 md:py-3 bg-[#fff7ed] dark:bg-[#1e293b] dark:border-b dark:border-[#334155] rounded-t-xl mb-2.5 md:mb-4 text-black dark:text-white">
@@ -152,7 +153,7 @@ export default function TopDeals({ navigate, selectedCategory }) {
       <div className="relative w-full bg-white dark:bg-black border-y border-[#e5e7eb] dark:border-[#334155] py-4 box-border">
         {renderHeader()}
         <div className="relative flex items-center px-2">
-          <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-4 w-full gap-2 md:gap-3 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-1 py-2 pb-1 w-full gap-2 md:gap-3 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {Array.from({ length: 6 }).map((_, index) => (
               <div
                 key={`skeleton-${index}`}
@@ -189,7 +190,7 @@ export default function TopDeals({ navigate, selectedCategory }) {
 
         <div
           ref={scrollContainerRef}
-          className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-0.5 py-2 pb-4 w-full gap-1 md:gap-3 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="flex flex-nowrap overflow-x-auto overflow-y-hidden scroll-smooth px-0.5 py-2 pb-1 w-full gap-1 md:gap-3 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           {products.map((product) => {
             const discountPercent = getDiscountPercentage(product.price, product.original_price);

@@ -49,7 +49,8 @@ const fetchNewArrivals = async ({ queryKey }) => {
   return freshProducts;
 };
 
-export default function NewArrivals({ navigate, selectedCategory }) {
+export default function NewArrivals({ navigate, mobileCategory }) {
+
   const { t, i18n } = useTranslation();
   
   const scrollContainerRef = useRef(null);
@@ -58,7 +59,7 @@ export default function NewArrivals({ navigate, selectedCategory }) {
   const scrollPosRef = useRef(0);
   const prevCategoryKeyRef = useRef('');
 
-  const categoryId = selectedCategory?.isAll ? 'all' : (selectedCategory?.id || 'all');
+const categoryId = mobileCategory?.isAll ? 'all' : (mobileCategory?.id || 'all');
 
   // 3. Tumia useQuery
   // Tunaweka lugha (i18n.language) kwenye queryKey ili data ichukuliwe upya 
@@ -102,7 +103,7 @@ export default function NewArrivals({ navigate, selectedCategory }) {
 
   // 🔥 Rejesha scroll — anza mwanzo kama category/language imebadilika
   useEffect(() => {
-    const currentKey = `${selectedCategory?.id || 'all'}_${i18n.language}`;
+    const currentKey = `${mobileCategory?.id || 'all'}_${i18n.language}`;
 
     if (prevCategoryKeyRef.current !== currentKey) {
       prevCategoryKeyRef.current = currentKey;
@@ -116,7 +117,7 @@ export default function NewArrivals({ navigate, selectedCategory }) {
     if (scrollContainerRef.current && scrollPosRef.current > 0) {
       scrollContainerRef.current.scrollLeft = scrollPosRef.current;
     }
-  }, [products, selectedCategory?.id, i18n.language]);
+  }, [products, mobileCategory?.id, i18n.language]);
 
   const renderHeader = () => (
     <div className="flex justify-between items-center px-3 py-3 bg-[#fff7ed] dark:bg-black dark:border-b dark:border-[#334155] rounded-t-xl mb-1 text-black dark:text-white mt-50">
@@ -191,7 +192,7 @@ export default function NewArrivals({ navigate, selectedCategory }) {
         )}
 
         <div ref={scrollContainerRef} className="flex flex-nowrap overflow-x-auto overflow-y-hidden 
-        scroll-smooth px-0.5 py-2 pb-4 w-full gap-1 md:gap-3 snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        scroll-smooth px-0.5 py-2 pb-1 w-full gap-1 md:gap-3 snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {products.map((product) => (
             <div
               key={product.id}

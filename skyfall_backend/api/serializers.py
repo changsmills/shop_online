@@ -36,14 +36,24 @@ class LeafCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = LeafCategory
         fields = '__all__'
+
 class AdvertisementSerializer(serializers.ModelSerializer):
-    # 🔥 Ongeza hii field ya kupokea file
+    # 🔥 Field ya kupokea file
     media_file = serializers.FileField(write_only=True, required=False)
+    
+    # 🔥 MPYA: Inarudisha category_id ya store moja kwa moja
+    store_category_id = serializers.SerializerMethodField()
     
     class Meta:
         model = Advertisement
         fields = '__all__'
-        read_only_fields = ['user', 'created_at', 'updated_at', 'status']  # ✅ ONDOA 'media_url'!
+        read_only_fields = ['user', 'created_at', 'updated_at', 'status']
+
+    # 🔥 MPYA: Method ya kupata category_id kutoka kwenye store
+    def get_store_category_id(self, obj):
+        if obj.store and obj.store.category_id:
+            return str(obj.store.category_id)
+        return None
 
     def create(self, validated_data):
         # 🔥 Toa media_file
@@ -68,7 +78,7 @@ class AdvertisementSerializer(serializers.ModelSerializer):
                 print(f"❌ [Cloudinary] Upload failed: {e}")
         
         return advertisement
-
+    
 class StoreEngineSerializer(serializers.ModelSerializer):
     sub_categories = serializers.SerializerMethodField()
     category_name = serializers.SerializerMethodField()

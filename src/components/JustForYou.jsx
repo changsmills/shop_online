@@ -16,14 +16,14 @@ const fetchJustForYou = async ({ queryKey }) => {
     limit: 100 
   };
 
-  if (categoryId && categoryId !== 'all') {
-    params.parent_category = categoryId;
-  }
+if (categoryId && categoryId !== 'all') {
+  params.parent_category = categoryId; 
+}
 
   const response = await api.get('/products/', { params });
   const data = response.data.results || response.data || [];
 
-  // Filter zisizo za deals
+  // Filter zisizo za deals (Top Deals)
   const nonDeals = data.filter(p => {
     const price = parseFloat(p.price) || 0;
     const originalPrice = parseFloat(p.original_price) || 0;
@@ -31,44 +31,25 @@ const fetchJustForYou = async ({ queryKey }) => {
     return !isDiscounted; 
   });
 
-  // Group kwa category
-  const categoryMap = {};
-  nonDeals.forEach(product => {
-    const catName = product.category_name || 'Other';
-    if (!categoryMap[catName]) {
-      categoryMap[catName] = [];
-    }
-    categoryMap[catName].push(product);
-  });
+  // 🔥 TUNAONDOA GROUPING NA KUBAKI NA SHUFFLE PEKEE
+  let finalProducts = [...nonDeals];
 
-  // Panga idadi sawa kwa kila category
-  const overallLimit = 100;  
-  const categoryNames = Object.keys(categoryMap);
-  const maxPerCategory = Math.ceil(overallLimit / Math.max(categoryNames.length, 1));
-  
-  let finalProducts = [];
-  categoryNames.forEach(catName => {
-    const items = categoryMap[catName];
-    finalProducts.push(...items.slice(0, maxPerCategory));
-  });
-
-  finalProducts = finalProducts.slice(0, overallLimit);
-
-  // Shuffle
+  // Shuffle (Changanya bidhaa)
   for (let i = finalProducts.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [finalProducts[i], finalProducts[j]] = [finalProducts[j], finalProducts[i]];
   }
 
-  return finalProducts;
+  return finalProducts.slice(0, 100); // Chukua hadi 100
 };
 
-export default function JustForYou({ search = "", selectedCategory }) {
+export default function JustForYou({ search = "", mobileCategory }) {
+
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
 
-  const categoryId = selectedCategory?.isAll ? 'all' : (selectedCategory?.id || 'all');
+const categoryId = mobileCategory?.isAll ? 'all' : (mobileCategory?.id || 'all');
 
   // 3. Tumia useQuery
   // Tunaweka lugha kwenye queryKey ili ipange upya data pale lugha inabadilika
@@ -98,12 +79,12 @@ export default function JustForYou({ search = "", selectedCategory }) {
     );
   }, [products, search]);
 
-  const getCategoryName = () => {
-    if (!selectedCategory) return '';
-    return i18n.language === 'sw' 
-      ? (selectedCategory.name_sw || selectedCategory.name) 
-      : selectedCategory.name;
-  };
+const getCategoryName = () => {
+  if (!mobileCategory) return '';
+  return i18n.language === 'sw' 
+    ? (mobileCategory.name_sw || mobileCategory.name) 
+    : mobileCategory.name;
+};
 
   const handleCardClick = (item) => {
     const priorityId = item.id;
@@ -223,7 +204,7 @@ export default function JustForYou({ search = "", selectedCategory }) {
             <div className="w-full h-[120px] md:h-[160px] bg-gray-100 dark:bg-[#0f172a] rounded-lg mb-4 animate-pulse"></div>
             <div className="flex flex-col items-center gap-3 text-center">
               <p className="text-xs md:text-sm font-semibold text-black dark:text-white m-0">
-                Hakuna bidhaa katika {selectedCategory?.name || 'kategoria hii'}.
+                Hakuna bidhaa katika {mobileCategory?.name || 'kategoria hii'}.
               </p>
               <button 
                 className="flex items-center gap-2 bg-[#ff6a00] hover:bg-[#e55a00] text-white border-none px-4 py-1.5 md:px-5 md:py-2 rounded-[30px] text-xs md:text-sm font-semibold cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-95" 
