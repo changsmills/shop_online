@@ -35,7 +35,13 @@ const fetchTopStores = async ({ queryKey }) => {
       params.category_id = categoryId;
     }
 
-    response = await api.get('/stores/', { params });
+    response = await api.get('/stores/', { 
+  params: { 
+    ...params, 
+    public_view: 'true' 
+  } 
+});
+
   }
 
   return response.data.results || response.data || [];

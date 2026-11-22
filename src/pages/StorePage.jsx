@@ -22,7 +22,7 @@ const fetchStoreData = async ({ queryKey }) => {
 
   // Tumia Promise.all kuchukua vitu vyote kwa mpigo
   const [storeRes, productsRes, statusesRes] = await Promise.all([
-    api.get(`/stores/${storeId}/`),
+    api.get(`/stores/${storeId}/?public_view=true`),
     api.get('/products/', { params: { store_id: storeId, ordering: '-created_at' } }),
     api.get(`/store-statuses/?store_id=${storeId}`).catch(() => ({ data: [] })) // 🔥 Status fetch
   ]);

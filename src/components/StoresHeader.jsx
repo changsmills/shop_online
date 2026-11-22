@@ -11,7 +11,12 @@ import { useQuery } from '@tanstack/react-query';
 
 const fetchStoreNames = async () => {
   try {
-    const response = await api.get('/stores/', { params: { limit: 10 } });
+    const response = await api.get('/stores/', { 
+      params: { 
+        limit: 10,
+        public_view: 'true' // 🔥 Ongeza hii
+      } 
+    });
     const data = response.data.results || response.data || [];
     const names = data.map(store => store.store_name || store.name).filter(Boolean);
     return names.length > 0 ? names : ["Search stores...", "Find your favorite shop..."];

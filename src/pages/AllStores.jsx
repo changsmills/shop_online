@@ -5,7 +5,7 @@ import Footer from '../components/Footer';
 import StoreCard from '../components/StoreCard';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import api from '../axiosConfig';
-import { Filter, ArrowUp } from 'lucide-react'; 
+import { Filter, ArrowUp, ChevronDown, Check, X } from 'lucide-react'; 
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query'; 
 
 const STORES_PER_PAGE = 20;
@@ -25,7 +25,8 @@ const fetchStoresData = async ({ pageParam = 1, queryKey }) => {
     limit: STORES_PER_PAGE,
     offset: (pageParam - 1) * STORES_PER_PAGE,
     status: 'active',
-    ordering: '-created_at'
+    ordering: '-created_at',
+    public_view: 'true'
   };
   
   if (searchQuery && searchQuery.trim()) params.search = searchQuery.trim();
@@ -46,7 +47,7 @@ const fetchStoresData = async ({ pageParam = 1, queryKey }) => {
 const fetchSingleStore = async ({ queryKey }) => {
   const [_, storeId] = queryKey;
   if (!storeId) return null;
-  const response = await api.get(`/stores/${storeId}/`);
+  const response = await api.get(`/stores/${storeId}/?public_view=true`);
   return response.data && response.data.id ? response.data : null;
 };
 
@@ -57,16 +58,18 @@ export default function AllStores({ session }) {
   const navigate = useNavigate();
   const lastStoreRef = useRef();
 
-  // 🔥 HAPA NDIO PA KUWeka STATE ZOTE ZA COMPONENT
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterCity, setFilterCity] = useState("");
   const [filterVerified, setFilterVerified] = useState("all");
   
-  // 🔥 NIMERUDISHA STATE YA BACK TO TOP HAPA NDANI
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
 
-  // Orodha ya miji (Static)
+  // 🔥 Refs kwa ajili ya mobile category slider
+  const categoryScrollRef = useRef(null);
+  const categoryRefs = useRef({});
+
   const cities = [
     "Dar es Salaam", "Arusha", "Mwanza", "Zanzibar", "Dodoma",
     "Tanga", "Mbeya", "Morogoro", "Tabora", "Kigoma"
@@ -130,7 +133,6 @@ export default function AllStores({ session }) {
     };
   }, [loading, isFetchingNextPage, hasNextPage, fetchNextPage, storeId]);
 
-  // 🔥 NIMERUDISHA EFFECT YA KUSIKILIZA SCROLL HAPA NDANI
   useEffect(() => {
     const handleScroll = () => {
       setShowBackToTop(window.scrollY > 500);
@@ -139,10 +141,22 @@ export default function AllStores({ session }) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 🔥 NIMERUDISHA FUNCTION YA KURUDI JUU HAPA NDANI
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  // 🔥 Auto-scroll kwenye mobile category slider
+  useEffect(() => {
+    if (filterCategory && categoryRefs.current[filterCategory]) {
+      setTimeout(() => {
+        categoryRefs.current[filterCategory]?.scrollIntoView({
+          behavior: 'smooth',
+          inline: 'center',
+          block: 'nearest'
+        });
+      }, 100);
+    }
+  }, [filterCategory]);
 
 
   // ===== Reusable classes =====
@@ -156,19 +170,19 @@ export default function AllStores({ session }) {
   // ===== 5. LOADING SKELETON =====
   if (loading && !singleStore && stores.length === 0) {
     return (
-      <div className="bg-[#f8f9fa] dark:bg-[#0d1117] min-h-screen flex flex-col font-sans">
+      <div className="bg-white dark:bg-[#0d1117] min-h-screen flex flex-col font-sans">
         <StoresHeader showBack={true} onSearch={setSearchQuery} />
         
-        <div className="max-w-[1400px] mx-auto w-full px-2 md:px-4 pt-1 md:pt-[80px] pb-5">
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-0.5 sm:gap-2 lg:gap-3">
-            {Array.from({ length: 8 }).map((_, i) => (
+        <div className="max-w-[1400px] mx-auto w-full px-2 md:px-4 pt-1 md:pt-[8px] pb-5">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3 lg:gap-4">
+            {Array.from({ length: 10 }).map((_, i) => (
               <div
                 key={i}
-                className="bg-white dark:bg-[#161b22] rounded-xl p-1.5 sm:p-2 flex flex-col gap-2 shadow-sm dark:shadow-[0_1px_3px_rgba(0,0,0,0.5)]"
+                className="bg-white dark:bg-[#161b22] rounded-xl p-2 flex flex-col gap-2 shadow-sm border border-gray-200 dark:border-[#30363d] animate-pulse"
               >
-                <div className="w-full aspect-square bg-gray-200 dark:bg-[#30363d] rounded-lg animate-pulse" />
-                <div className="h-3 bg-gray-200 dark:bg-[#30363d] rounded animate-pulse" />
-                <div className="h-3 w-3/5 bg-gray-200 dark:bg-[#30363d] rounded animate-pulse" />
+                <div className="w-full aspect-square bg-gray-200 dark:bg-[#30363d] rounded-lg" />
+                <div className="h-4 bg-gray-200 dark:bg-[#30363d] rounded w-3/4" />
+                <div className="h-3 bg-gray-200 dark:bg-[#30363d] rounded w-1/2" />
               </div>
             ))}
           </div>
@@ -181,7 +195,7 @@ export default function AllStores({ session }) {
   // ===== 6. MAIN RENDER =====
   return (
     
-    <div className="bg-[#f8f9fa] dark:bg-[#0d1117] min-h-screen flex flex-col relative">
+    <div className="bg-white dark:bg-[#0d1117] min-h-screen flex flex-col relative">
       <StoresHeader showBack={true} onSearch={setSearchQuery} />
 
       <div className="flex flex-col lg:flex-row max-w-[1400px] mx-auto w-full px-1 md:px-4 py-2 md:py-4 pb-20 md:pb-6 lg:pb-10 gap-2 sm:gap-4 lg:gap-6 flex-1 ">
@@ -195,7 +209,6 @@ export default function AllStores({ session }) {
             <span>Filters</span>
           </div>
 
-          {/* 🔥 HAPA: Sehemu ya chini inayoscroll */}
           <div className="overflow-y-auto flex-1 pr-1 custom-scrollbar">
             
             {/* Category */}
@@ -275,8 +288,49 @@ export default function AllStores({ session }) {
                {/* ===== MAIN CONTENT ===== */}
         <div className="flex-1 min-w-0">
           
+          {/* 🔥 MOBILE CATEGORY SLIDER (PILLS) */}
+          <div className="block md:hidden mb-4">
+            <div className="relative flex items-center w-full px-3 py-2 bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
+              <div
+                ref={categoryScrollRef}
+                className="flex overflow-x-auto flex-1 gap-2 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pr-12"
+                style={{ WebkitOverflowScrolling: 'touch' }}
+              >
+                <div
+                  onClick={() => setFilterCategory("")}
+                  className={`whitespace-nowrap shrink-0 px-4 py-2 rounded-full text-[13px] font-medium cursor-pointer transition-all duration-200 select-none border ${
+                    !filterCategory ? 'bg-[#ff6a00] text-white border-[#ff6a00] font-semibold shadow-md' : 'bg-gray-100 dark:bg-[#1a1a2e] text-gray-800 dark:text-gray-200 border-transparent hover:bg-gray-200 dark:hover:bg-[#2a2a3e]'
+                  }`}
+                >
+                  All
+                </div>
+                {categories.map((cat) => {
+                  const isActive = filterCategory === cat.id;
+                  return (
+                    <div
+                      key={cat.id}
+                      ref={(el) => { categoryRefs.current[cat.id] = el; }}
+                      onClick={() => setFilterCategory(cat.id)}
+                      className={`whitespace-nowrap shrink-0 px-4 py-2 rounded-full text-[13px] font-medium cursor-pointer transition-all duration-200 select-none border ${
+                        isActive ? 'bg-[#ff6a00] text-white border-[#ff6a00] font-semibold shadow-md' : 'bg-gray-100 dark:bg-[#1a1a2e] text-gray-800 dark:text-gray-200 border-transparent hover:bg-gray-200 dark:hover:bg-[#2a2a3e]'
+                      }`}
+                    >
+                      <span className="max-w-[120px] truncate block">{cat.name}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <button 
+                onClick={() => setIsCategoryDialogOpen(true)}
+                className="absolute right-2 z-20 w-8 h-8 flex items-center justify-center bg-white dark:bg-black rounded-full border border-gray-200 dark:border-gray-700 shadow-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              >
+                <ChevronDown size={18} strokeWidth={2.5} />
+              </button>
+            </div>
+          </div>
+
           {/* 🔥 MAIN GRID: Gap ni 0.5 kwenye mobile, na 4 kwenye desktop kubwa */}
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-0.5 sm:gap-2 lg:gap-3 xl:gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3 lg:gap-4">
 
             {singleStore && (
               <div className="flex">
@@ -324,13 +378,70 @@ export default function AllStores({ session }) {
 
       {/* 🔥 KITUFE CHA BACK TO TOP HAPA CHINI */}
       <button 
-        className={`fixed bottom-[80px] md:bottom-[120px] right-3 md:right-6 w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#ff6a00] hover:bg-[#e55a00] text-white shadow-[0_4px_16px_rgba(255,106,0,0.35)] flex items-center justify-center transition-all duration-300 z-[1000] border-none cursor-pointer
+        className={`fixed bottom-[80px] md:bottom-[120px] right-3 md:right-6 w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#ff6a00] hover:bg-[#e55a00] text-white shadow-[0_4px_16px_rgba(255,106,0,0.35)] flex items-center justify-center transition-all duration-300 z-[1000] border-none cursor-pointer md:hidden
          ${showBackToTop ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto visible' : 'opacity-0 translate-y-5 scale-75 pointer-events-none invisible'}`} 
         onClick={scrollToTop}
         aria-label="Rudi Juu"
       >
         <ArrowUp className="w-5 h-5 md:w-6 md:h-6 stroke-[2.5]" />
       </button>
+
+      {/* 🔥 DIALOG YA CATEGORIES KWA MOBILE */}
+      {isCategoryDialogOpen && (
+        <div 
+          className="fixed inset-0 z-[9999] flex items-end justify-center bg-black/60"
+          onClick={() => setIsCategoryDialogOpen(false)}
+        >
+          <div 
+            className="w-full max-h-[75vh] bg-white dark:bg-[#0a0a0a] rounded-t-2xl flex flex-col overflow-hidden animate-slide-up shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200 dark:border-gray-800 shrink-0">
+              <h3 className="text-base font-bold text-black dark:text-white m-0">All Categories</h3>
+              <button onClick={() => setIsCategoryDialogOpen(false)} className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-3 pb-24">
+              <div
+                onClick={() => {
+                  setFilterCategory("");
+                  setIsCategoryDialogOpen(false);
+                }}
+                className={`flex items-center justify-between px-4 py-3.5 mb-1.5 rounded-xl cursor-pointer transition-colors ${
+                  !filterCategory 
+                    ? 'bg-orange-50 dark:bg-orange-500/10 text-[#ff6a00] font-bold' 
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1a1a2e]'
+                }`}
+              >
+                <span className="truncate pr-4">All</span>
+                {!filterCategory && <Check size={18} className="text-[#ff6a00] shrink-0" />}
+              </div>
+              {categories.map((cat) => {
+                const isActive = filterCategory === cat.id;
+                return (
+                  <div
+                    key={cat.id}
+                    onClick={() => {
+                      setFilterCategory(cat.id);
+                      setIsCategoryDialogOpen(false);
+                    }}
+                    className={`flex items-center justify-between px-4 py-3.5 mb-1.5 rounded-xl cursor-pointer transition-colors ${
+                      isActive 
+                        ? 'bg-orange-50 dark:bg-orange-500/10 text-[#ff6a00] font-bold' 
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1a1a2e]'
+                    }`}
+                  >
+                    <span className="truncate pr-4">{cat.name}</span>
+                    {isActive && <Check size={18} className="text-[#ff6a00] shrink-0" />}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

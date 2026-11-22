@@ -14,7 +14,7 @@ const fetchStoreSuggestions = async ({ queryKey }) => {
   if (!searchQuery || searchQuery.trim().length < 2) return [];
 
   const res = await api.get('/stores/', { 
-    params: { search: searchQuery, limit: 5, status: 'active' } 
+    params: { search: searchQuery, limit: 5, status: 'active', public_view: 'true' } 
   });
 
   const data = res.data.results || res.data || [];

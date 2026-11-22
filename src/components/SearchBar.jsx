@@ -44,27 +44,31 @@ const fetchSuggestions = async ({ queryKey }) => {
   // ==========================================
   // 🔥 1. KAMA LINAANZA NA @, TAFUTA MADUKA
   // ==========================================
-  if (cleanQuery.startsWith('@')) {
-    const storeName = cleanQuery.substring(1).trim(); // Ondoa @
-    
-    // Kama hana jina la duka baada ya @, usifanye kitu
-    if (!storeName) return [];
+if (cleanQuery.startsWith('@')) {
+  const storeName = cleanQuery.substring(1).trim();
+  
+  if (!storeName) return [];
 
-    try {
-      const res = await api.get('/stores/', { params: { search: storeName, limit: 5 } });
-      const stores = res.data.results || res.data || [];
-      
-      // Tunahakikisha tunavuta store_name kwa usahihi
-      return stores.map(item => ({ 
-        ...item, 
-        type: 'store',
-        name: item.store_name || item.name || "Duka" 
-      }));
-    } catch (error) {
-      console.error("Error fetching stores:", error);
-      return [];
-    }
-  } 
+  try {
+    const res = await api.get('/stores/', { 
+      params: { 
+        search: storeName, 
+        limit: 5,
+        public_view: 'true' // 🔥 Ongeza hii
+      } 
+    });
+    const stores = res.data.results || res.data || [];
+    
+    return stores.map(item => ({ 
+      ...item, 
+      type: 'store',
+      name: item.store_name || item.name || "Duka" 
+    }));
+  } catch (error) {
+    console.error("Error fetching stores:", error);
+    return [];
+  }
+}
   
   // ==========================================
   // 🔥 2. KAMA HAKUNA @, TAFUTA BIDHAA (Kama kawaida)
