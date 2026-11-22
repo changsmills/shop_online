@@ -38,12 +38,20 @@ const fetchProductDetails = async ({ queryKey }) => {
     fetchPromises.push(storeProductsPromise);
   }
 
-  // Ombi la taarifa za duka
+  // 🔥 OMBI LA TAARIFA ZA DUKA (LIST BADALA YA RETRIEVE)
   let storeDataPromise = Promise.resolve(null);
   if (productData.store_id) {
-    storeDataPromise = api.get(`/stores/${productData.store_id}/`)
-      .then(res => res.data)
-      .catch(() => null);
+    // Tunatuma public_view=true ili kuruhusu Buyer/Mgeni kuona duka
+    storeDataPromise = api.get('/stores/', { params: { public_view: 'true' } })
+      .then(res => {
+        const stores = res.data.results || res.data || [];
+        const matchedStore = stores.find(s => String(s.id) === String(productData.store_id));
+        return matchedStore || null;
+      })
+      .catch((err) => {
+        console.error("❌ [storeData] Imeshindwa kupata maduka:", err?.response?.status);
+        return null;
+      });
     fetchPromises.push(storeDataPromise);
   }
 

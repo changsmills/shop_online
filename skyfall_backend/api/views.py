@@ -345,7 +345,6 @@ class AdvertisementViewSet(viewsets.ModelViewSet):
         return queryset
 
 class StoreEngineViewSet(viewsets.ModelViewSet):
-    # 🔥 TUMIA select_related HAPA
     queryset = StoreEngine.objects.select_related(
         'owner__user', 'category'
     ).all()
@@ -358,35 +357,52 @@ class StoreEngineViewSet(viewsets.ModelViewSet):
     ordering_fields = ['created_at', 'store_name']
     pagination_class = LimitOffsetPagination
 
+    lookup_field = 'id'
+
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user.profile)
+        profile = getattr(self.request.user, 'profile', None)
+        if profile is None:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({
+                'detail': 'Mtumiaji hana profile. Tafadhali tengeneza profile kwanza.'
+            })
+        serializer.save(owner=profile)
 
     def get_queryset(self):
-        # Hii itarithi select_related kutoka juu
         user = self.request.user
+        
+        # 🔥 KAGUA KAMA OMB LILITOKA KWENYE UKURASA WA UMMA (ProductDetails)
+        is_public_view = self.request.query_params.get('public_view') == 'true'
 
         # 1. Admin — anaona maduka yote
         if user.is_authenticated and (user.is_staff or user.is_superuser):
             queryset = StoreEngine.objects.select_related('owner__user', 'category').all().order_by('-created_at')
         
-        # 2. Mtumiaji aliyeingia — anaona maduka yake tu
-        elif user.is_authenticated:
-            queryset = StoreEngine.objects.select_related('owner__user', 'category').filter(owner__user=user)
-        
-        # 3. Mgeni — hana ruhusa kuona maduka
+        # 2. Mtumiaji aliyeingia au Mgeni
         else:
-            return StoreEngine.objects.none()
+            # 🔥 Kama ni ombi la umma (Buyer au Mgeni anatafuta duka la bidhaa), ruhusu kuona maduka yote
+            if is_public_view:
+                queryset = StoreEngine.objects.select_related('owner__user', 'category').all()
+            
+            # 🔥 Kama ni Supplier (Dashboard) lakini hajaleta public_view, mpe maduka yake TU
+            elif user.is_authenticated and getattr(user, 'profile', None) and user.profile.role == 'supplier':
+                queryset = StoreEngine.objects.select_related('owner__user', 'category').filter(owner__user=user)
+            
+            # Kama ni Buyer lakini hajaleta public_view, mpe maduka yote (kama fallback ya usalama)
+            elif user.is_authenticated:
+                queryset = StoreEngine.objects.select_related('owner__user', 'category').all()
+                
+            # Mgeni asiyetumia public_view haoni kitu
+            else:
+                return StoreEngine.objects.none()
 
         # Filter ya search (kama ipo)
         search_query = self.request.query_params.get('search', None)
         if search_query:
-            # Tunatafuta kwenye store_name kwa kutumia 'icontains' (haina ubaguzi wa herufi kubwa au ndogo)
             queryset = queryset.filter(store_name__icontains=search_query)
 
-        # Rudisha queryset iliyochujwa mwishoni
         return queryset
-
-
+    
 class ProductMediaViewSet(viewsets.ModelViewSet):
     queryset = ProductMedia.objects.all()
     serializer_class = ProductMediaSerializer
