@@ -950,3 +950,33 @@ class StoreStatus(models.Model):
 
     def __str__(self):
         return f"Status by {self.store.store_name} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
+
+# --- PRODUCT REVIEW (Kwa ajili ya Maoni ya Wateja) ---
+class ProductReview(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    product = models.ForeignKey(ProductsEngine, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='reviews')
+    
+    rating = models.IntegerField(default=5) # Nyota 1 hadi 5
+    comment = models.TextField()
+    
+    # Logic: Kama mtumiaji alinunua bidhaa hii, tunaweka True
+    is_verified_purchase = models.BooleanField(default=False) 
+    
+    helpful_count = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'product_reviews'
+        ordering = ['-created_at']
+        # 🔥 Kuzuia mtumiaji kuandika review zaidi ya moja kwa bidhaa moja
+        unique_together = ('product', 'user') 
+        
+        indexes = [
+            models.Index(fields=['product', '-created_at']),
+            models.Index(fields=['user']),
+            models.Index(fields=['rating']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.full_name or self.user.username} - {self.product.name} ({self.rating} Stars)"

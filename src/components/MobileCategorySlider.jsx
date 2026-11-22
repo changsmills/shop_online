@@ -1,5 +1,5 @@
 // src/components/MobileCategorySlider.jsx
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react'; // 🔥 Ongeza useRef na useEffect
 import { ChevronDown, Check, X } from 'lucide-react';
 
 export default function MobileCategorySlider({ 
@@ -9,6 +9,24 @@ export default function MobileCategorySlider({
   getDisplayName 
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  
+  // 🔥 1. Tengeneza ref kwa ajili ya container na kategoria
+  const scrollContainerRef = useRef(null);
+  const categoryRefs = useRef({});
+
+  // 🔥 2. Effect ya kusogeza kategoria iliyochaguliwa katikati
+  useEffect(() => {
+    if (selectedCategory && categoryRefs.current[selectedCategory.id]) {
+      // Tunatumia setTimeout ndogo ili kuhakikisha UI imerender vizuri kwanza
+      setTimeout(() => {
+        categoryRefs.current[selectedCategory.id]?.scrollIntoView({
+          behavior: 'smooth',
+          inline: 'center', // 🔥 Hii inaiweka katikati
+          block: 'nearest'
+        });
+      }, 100);
+    }
+  }, [selectedCategory]);
 
   if (!categories || categories.length === 0) return null;
 
@@ -18,11 +36,11 @@ export default function MobileCategorySlider({
 
   return (
     <>
-      {/* 🔥 DIV KUU: Full width, py-1.5, bg-white, na border-b */}
       <div className="relative flex items-center w-full px-3 py-1.5 bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
         
-        {/* Scrollable Container (Pills) - Bila mishale */}
+        {/* Scrollable Container (Pills) */}
         <div
+          ref={scrollContainerRef} // 🔥 Weka ref hapa
           className="flex overflow-x-auto flex-1 gap-1.5 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pr-12"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
@@ -33,6 +51,7 @@ export default function MobileCategorySlider({
             return (
               <div
                 key={cat.id}
+                ref={(el) => { categoryRefs.current[cat.id] = el; }} // 🔥 Weka ref kwa kila kategoria
                 onClick={() => onSelectCategory(cat)}
                 className={`${basePillClass} ${isActive ? activePillClass : inactivePillClass}`}
               >
@@ -44,7 +63,7 @@ export default function MobileCategorySlider({
           })}
         </div>
 
-        {/* 🔥 KITUFE CHA CHINI (ChevronDown) - Kimebaki kimoja */}
+        {/* KITUFE CHA CHINI (ChevronDown) */}
         <button 
           onClick={() => setIsDialogOpen(true)}
           className="absolute right-2 z-20 w-8 h-8 flex items-center justify-center bg-white dark:bg-black rounded-full border border-gray-200 dark:border-gray-700 shadow-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"

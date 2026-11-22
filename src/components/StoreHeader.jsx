@@ -46,7 +46,7 @@ const StoreHeader = ({
 
   return (
     <header 
-      className="relative rounded-2xl md:rounded-3xl min-h-[240px] md:min-h-[320px] flex flex-col justify-between overflow-hidden bg-cover bg-center"
+      className="relative rounded-2xl md:rounded-3xl min-h-[240px] md:min-h-[250px] flex flex-col justify-between overflow-hidden bg-cover bg-center"
       style={{
         // 🔥 Tumia finalBanner
         backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${finalBanner}')`,

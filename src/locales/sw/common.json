@@ -109,7 +109,7 @@
   "track_logistics": "Fuatilia Stendi",
   "invoice_requests": "Maombi ya Invoice",
   "product_verification": "Uhakiki wa Bidhaa",
-  "skyfall_ads": "Matangazo ya Skyfall",
+  "skyfall_ads": "Matangazo",
   "legal_policies": "Sera na Masharti",
   "privacy_policy": "Sera ya Faragha",
   "terms_conditions": "Vigezo na Masharti",
@@ -149,5 +149,15 @@
   "shipping_options_desc": "Chaguo na gharama za usafirishaji hutofautiana kulingana na eneo lako.",
   "add_address": "Ongeza anwani",
   "or": "Au",
-    "categories": "Kategoria"
+    "categories": "Kategoria",
+  "reach_thousands": "Fikia maelfu ya wanunuzi kila siku",
+  "target_audience": "Lenga hadhira sahihi",
+  "track_performance": "Fuatilia utendaji wa tangazo lako",
+  "how_it_works": "Inavyofanya Kazi",
+  "register_store_first": "Sajili duka lako kwanza",
+  "create_ad_campaign": "Tengeneza kampeni yako ya matangazo",
+  "get_approved": "Pata idhini na uanze",
+  "get_started": "Anza Sasa",
+  "advertise_description": "Jiunge na Matangazo ya Skyfall na ufikie wateja zaidi leo. Sajili duka lako ili uanze kutangaza.",
+  "register_store_now": "Sajili Duka Sasa"
 }

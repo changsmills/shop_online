@@ -361,8 +361,8 @@ const ProductGallery = React.memo(({ product }) => {
 {/* ===== MOBILE VIEW ===== */}
 <div className="block md:hidden w-full bg-white dark:bg-black rounded-none overflow-hidden font-sans px-3 pb-4">  
   {/* 🔥 BREADCRUMBS (MOBILE) */}
-  <div className="flex items-center flex-wrap gap-1.5 text-[11px] text-gray-500 dark:text-gray-400 px-4 py-3 bg-white dark:bg-black border-b border-gray-100 dark:border-gray-800">
-    <Link to="/" className="flex items-center gap-1 hover:text-brand-orange transition-colors">
+<div className="flex flex-nowrap items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400 px-4 py-3 bg-white dark:bg-black border-b border-gray-100 dark:border-gray-800 overflow-x-auto whitespace-nowrap custom-scrollbar-hide">
+      <Link to="/" className="flex items-center gap-1 hover:text-brand-orange transition-colors">
       <Home size={12} /> Home
     </Link>
     <span>/</span>
@@ -383,7 +383,7 @@ const ProductGallery = React.memo(({ product }) => {
     </span>
   </div>
 
-  {/* 🔥 SEHEMU YA JUU (PICHA KUU) - IMEBAKWA VIZURI */}
+{/* 🔥 SEHEMU YA JUU (PICHA KUU) - IMEBAKWA VIZURI */}
   <div className="relative w-full bg-black flex items-center justify-center h-[350px] rounded-xl overflow-hidden mt-2"> 
 
     {/* ... code yako ya video na picha ... */}
@@ -424,6 +424,15 @@ const ProductGallery = React.memo(({ product }) => {
           onClick={() => setIsModalOpen(true)} 
           onContextMenu={(e) => e.preventDefault()} 
         />
+        
+        {/* 🔥 HAPA NDIPO ICON YA [ ] ILIPOONGezwa */}
+        <button 
+          onClick={(e) => { e.stopPropagation(); setIsModalOpen(true); }}
+          className="absolute top-3 right-3 bg-black/50 text-white p-2 rounded-full backdrop-blur-sm z-10"
+        >
+          <Maximize2 size={18} />
+        </button>
+
         {photoItems.length > 1 && (
           <>
             <button className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full" onClick={prevImage}><ChevronLeft size={20} /></button>

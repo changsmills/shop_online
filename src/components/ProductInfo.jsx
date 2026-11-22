@@ -26,6 +26,14 @@ const fetchProductMediaAndVariations = async ({ queryKey }) => {
   return { mediaData, varData };
 };
 
+const fetchProductReviews = async ({ queryKey }) => {
+  const [_, productId] = queryKey;
+  if (!productId) return [];
+  
+  const res = await api.get(`/product-reviews/?product_id=${productId}`);
+  return res.data.results || res.data || [];
+};
+
 const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) => {
   const [productVariations, setProductVariations] = useState([]);
   
@@ -514,27 +522,83 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
     await handleOpenDrawer('cart');
   };
 
-  const handleSubmitReview = async (e) => {
+   const handleSubmitReview = async (e) => {
     e.preventDefault();
+    
+    // 1. Check if user is logged in
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      toast.error("Please login first to write a review.");
+      return;
+    }
+
     if (reviewRating === 0) {
-      toast.error("Tafadhali chagua nyota (rating) kwanza!");
+      toast.error("Please select a star rating first!");
       return;
     }
     if (reviewComment.trim().length < 5) {
-      toast.error("Tafadhali andika maoni yako kwa urefu wa kutosha.");
+      toast.error("Please write a longer comment (at least 5 characters).");
       return;
     }
     
     setSubmittingReview(true);
     
-    setTimeout(() => {
-      toast.success("Asante! Maoni yako yamepokelewa na yatasubiri approval.");
+    try {
+      // 2. Send to API
+      await api.post('/product-reviews/', {
+        product: product.id,
+        rating: reviewRating,
+        comment: reviewComment,
+      });
+
+      toast.success("Thank you! Your review has been submitted.");
       setReviewRating(0);
       setReviewComment("");
       setShowReviewForm(false);
+      
+      // 3. Re-fetch reviews to show the new one immediately
+      refetchReviews(); 
+      
+    } catch (error) {
+      console.error(error);
+      const errorMsg = error.response?.data?.detail || error.response?.data?.non_field_errors?.[0] || "Failed to submit review. Please try again.";
+      toast.error(errorMsg);
+    } finally {
       setSubmittingReview(false);
-    }, 1000);
+    }
   };
+
+    // ==========================================
+  // QUERY YA KUPATA REVIEWS HALISI
+  // ==========================================
+  const { data: reviewsData = [], refetch: refetchReviews } = useQuery({
+    queryKey: ['productReviews', product?.id],
+    queryFn: fetchProductReviews,
+    enabled: !!product?.id,
+  });
+
+    // ==========================================
+  // HESABU ZA REVIEWS (Kwa ajili ya graph)
+  // ==========================================
+  const reviewStats = useMemo(() => {
+    const total = reviewsData.length;
+    if (total === 0) return { avg: 0, counts: {5:0, 4:0, 3:0, 2:0, 1:0}, percentages: {5:0, 4:0, 3:0, 2:0, 1:0}, total: 0 };
+    
+    const counts = {5:0, 4:0, 3:0, 2:0, 1:0};
+    let sum = 0;
+    
+    reviewsData.forEach(r => {
+      counts[r.rating] = (counts[r.rating] || 0) + 1;
+      sum += r.rating;
+    });
+
+    const percentages = {};
+    for (let i = 1; i <= 5; i++) {
+      percentages[i] = Math.round((counts[i] / total) * 100);
+    }
+
+    return { avg: (sum / total).toFixed(1), counts, percentages, total };
+  }, [reviewsData]);
 
   return (
     <>
@@ -602,32 +666,17 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
           </div>
         )}
 
-        {/* 
+                 {/* 
           🔥 HAPA: Content Area. Tumeongeza overflow-y-auto na flex-1 
           ili ichukue nafasi yote iliyobaki juu ya buttons za Desktop na iscroll.
         */}
         <div className="flex flex-col gap-3 p-2 w-full box-border overflow-y-auto flex-1 custom-scrollbar">
           
-          {/* ===== RATING SUMMARY (Juu - Inakaa Pale Pale Ikiscroll) ===== */}
+          {/* ===== RATING SUMMARY (Juu - Jina la Bidhaa Pekee) ===== */}
            <div className="bg-white dark:bg-[#0a0a0a] rounded-xl p-2 md:p-3 shadow-sm border border-[#f0f0f0] dark:border-[#1f1f1f] flex flex-col h-auto mb-2">
               <h1 className="text-[15px] md:text-[20px] max-lg:text-[18px] max-md:text-[16px] font-bold mb-1.5 md:mb-2 leading-[1.3] text-[#1a1a1a] dark:text-white capitalize">
               {product?.name ? product.name.charAt(0).toUpperCase() + product.name.slice(1) : ""}
             </h1>
-            
-            <div className="flex items-center gap-2 mb-2 md:mb-[10px] flex-wrap">
-              <div className="flex items-center gap-0.5">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} size={18} fill={(hover || product.average_rating) >= star ? "#ffc107" : "none"} color="#ffc107" 
-                    className="cursor-pointer md:w-[20px] md:h-[20px]" onMouseEnter={() => setHover(star)} onMouseLeave={() => setHover(0)} onClick={() => onRate && onRate(star)} />
-                ))}
-              </div>
-              <span className="text-[14px] font-bold text-gray-800 dark:text-white">
-                {product.average_rating ? Number(product.average_rating).toFixed(1) : "0.0"}
-              </span>
-              <span className="text-[13px] text-gray-500 dark:text-gray-400 underline cursor-pointer" onClick={() => document.getElementById('reviews-section')?.scrollIntoView({ behavior: 'smooth' })}>
-                ({product.total_reviews || 0} reviews)
-              </span>
-            </div>
           </div>
 
           {/* ... (Variations, Stock, Specs, Price, Audience zipo hapa kama kawaida) ... */}
@@ -773,14 +822,41 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
             <div className="flex flex-col md:flex-row gap-5 mb-5 pb-5 border-b border-gray-100 dark:border-gray-800">
               <div className="flex flex-col items-center justify-center bg-gray-50 dark:bg-[#111] p-3 rounded-xl min-w-[120px]">
                 <span className="text-[28px] font-black text-gray-900 dark:text-white">
-                  {product.average_rating ? Number(product.average_rating).toFixed(1) : "0.0"}
+                  {reviewStats.avg || "0.0"}
                 </span>
-                <div className="flex text-[#ffc107] mb-1">
+                {/* 🔥 Nyota Kubwa Zinazobonyezwa Kutuma Review Moja kwa Moja */}
+                <div className="flex text-[#ffc107] mb-1 gap-1">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} size={14} fill={(product.average_rating || 0) >= star ? "#ffc107" : "none"} color="#ffc107" />
+                    <Star 
+                      key={star} 
+                      size={32} 
+                      fill={(Number(reviewStats.avg) || 0) >= star ? "#ffc107" : "none"} 
+                      color="#ffc107" 
+                      className="cursor-pointer transition-transform hover:scale-110"
+                      onClick={async () => {
+                        const token = localStorage.getItem('access_token');
+                        if (!token) {
+                          toast.error("Please login first to write a review.");
+                          return;
+                        }
+                        try {
+                          await api.post('/product-reviews/', {
+                            product: product.id,
+                            rating: star,
+                            comment: "Rated via stars",
+                          });
+                          toast.success(`Thank you! You rated this product ${star} star${star > 1 ? 's' : ''}.`);
+                          refetchReviews();
+                        } catch (error) {
+                          console.error(error);
+                          const errorMsg = error.response?.data?.detail || error.response?.data?.non_field_errors?.[0] || "Failed to submit rating. Please try again.";
+                          toast.error(errorMsg);
+                        }
+                      }}
+                    />
                   ))}
                 </div>
-                <span className="text-[11px] text-gray-500">Based on {product.total_reviews || 0} reviews</span>
+                <span className="text-[11px] text-gray-500">Based on {reviewStats.total} reviews</span>
               </div>
 
               <div className="flex-1 flex flex-col justify-center gap-2">
@@ -789,47 +865,51 @@ const ProductInfo = ({ product, storeProducts = [], onRate, isMobile = false }) 
                     <span className="w-3 text-gray-500">{star}</span>
                     <Star size={12} fill="#ffc107" color="#ffc107" />
                     <div className="flex-1 h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
-                      <div className="h-full bg-[#ffc107] rounded-full" style={{ width: star === 5 ? '70%' : star === 4 ? '20%' : '5%' }}></div>
+                      <div className="h-full bg-[#ffc107] rounded-full" style={{ width: `${reviewStats.percentages[star]}%` }}></div>
                     </div>
-                    <span className="w-8 text-right text-gray-500">{star === 5 ? '70%' : star === 4 ? '20%' : '5%'}</span>
+                    <span className="w-8 text-right text-gray-500">{reviewStats.percentages[star]}%</span>
                   </div>
                 ))}
               </div>
             </div>
 
             <div className="flex flex-col gap-4">
-              {mockReviews.map((review) => (
-                <div key={review.id} className="flex gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#ff4e00]/10 text-[#ff4e00] flex items-center justify-center font-bold text-lg shrink-0">
-                    {review.name.charAt(0)}
+              {reviewsData.length > 0 ? (
+                reviewsData.map((review) => (
+                  <div key={review.id} className="flex gap-3">
+                    <div className="w-10 h-10 rounded-full bg-[#ff4e00]/10 text-[#ff4e00] flex items-center justify-center font-bold text-lg shrink-0">
+                      {review.name ? review.name.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="font-semibold text-[13px] md:text-[14px] text-gray-900 dark:text-white">{review.name || 'Mtumiaji'}</span>
+                        {review.is_verified_purchase && (
+                          <span className="flex items-center gap-1 text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">
+                            <CheckCircle size={10} /> Verified Purchase
+                          </span>
+                        )}
+                        <span className="text-[10px] text-gray-400">{review.date}</span>
+                      </div>
+                      <div className="flex text-[#ffc107] mb-1.5">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star key={star} size={12} fill={review.rating >= star ? "#ffc107" : "none"} color="#ffc107" />
+                        ))}
+                      </div>
+                      <p className="text-[12px] md:text-[13px] text-gray-600 dark:text-gray-300 leading-relaxed m-0">
+                        {review.comment}
+                      </p>
+                      <div className="flex gap-3 mt-2 text-[11px] text-gray-400">
+                        <button className="flex items-center gap-1 hover:text-[#ff4e00] transition-colors">
+                          <ThumbsUp size={12} /> Helpful ({review.helpful_count || 0})
+                        </button>
+                        <button className="hover:text-[#ff4e00] transition-colors">Report</button>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className="font-semibold text-[13px] md:text-[14px] text-gray-900 dark:text-white">{review.name}</span>
-                      {review.verified && (
-                        <span className="flex items-center gap-1 text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">
-                          <CheckCircle size={10} /> Verified Purchase
-                        </span>
-                      )}
-                      <span className="text-[10px] text-gray-400">{review.date}</span>
-                    </div>
-                    <div className="flex text-[#ffc107] mb-1.5">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star key={star} size={12} fill={review.rating >= star ? "#ffc107" : "none"} color="#ffc107" />
-                      ))}
-                    </div>
-                    <p className="text-[12px] md:text-[13px] text-gray-600 dark:text-gray-300 leading-relaxed m-0">
-                      {review.comment}
-                    </p>
-                    <div className="flex gap-3 mt-2 text-[11px] text-gray-400">
-                      <button className="flex items-center gap-1 hover:text-[#ff4e00] transition-colors">
-                        <ThumbsUp size={12} /> Helpful ({review.helpful})
-                      </button>
-                      <button className="hover:text-[#ff4e00] transition-colors">Report</button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-center text-sm text-gray-500 py-4">Hakuna reviews bado. Kuwa wa kwanza kuandika!</p>
+              )}
             </div>
 
             <button className="w-full mt-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-[13px] font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">

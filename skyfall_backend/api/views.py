@@ -49,7 +49,7 @@ import requests
 # 🔥 MODELS IMPORTS:
 from products.models import (
     Category, ProductVariation, SubCategory, ProductsEngine, LeafCategory, Advertisement, 
-    StoreEngine, ProductMedia, Message, ShippingMethod, Brand, Lead, Order, OrderItem,  SiteVisit, StoreStatus, 
+    StoreEngine, ProductMedia, Message, ShippingMethod, Brand, Lead, Order, OrderItem,  SiteVisit, StoreStatus, ProductReview, 
 )
 
 # 🔥 ONGEZA HII IMPORT MUHIMU KABISA (Inaingiza ViewSet kutoka products.views):
@@ -65,7 +65,7 @@ from .serializers import (
     CategorySerializer, SubCategorySerializer,
     LeafCategorySerializer, AdvertisementSerializer,
     ProductMediaSerializer, MessageSerializer, ProfileSerializer,
-    ShippingMethodSerializer, BrandSerializer, LeadSerializer, OrderSerializer, OrderItemSerializer, StoreStatusSerializer,
+    ShippingMethodSerializer, BrandSerializer, LeadSerializer, OrderSerializer, OrderItemSerializer, StoreStatusSerializer,  ProductReviewSerializer, 
 )
 
 User = get_user_model()
@@ -365,16 +365,19 @@ class StoreEngineViewSet(viewsets.ModelViewSet):
         # Hii itarithi select_related kutoka juu
         user = self.request.user
 
-        # 1. Anza kutengeneza queryset ya msingi kulingana na mtumiaji
+        # 1. Admin — anaona maduka yote
         if user.is_authenticated and (user.is_staff or user.is_superuser):
             queryset = StoreEngine.objects.select_related('owner__user', 'category').all().order_by('-created_at')
-        elif self.action in ['list', 'retrieve']:
-            queryset = StoreEngine.objects.select_related('owner__user', 'category').all()
+        
+        # 2. Mtumiaji aliyeingia — anaona maduka yake tu
         elif user.is_authenticated:
             queryset = StoreEngine.objects.select_related('owner__user', 'category').filter(owner__user=user)
+        
+        # 3. Mgeni — hana ruhusa kuona maduka
         else:
             return StoreEngine.objects.none()
 
+        # Filter ya search (kama ipo)
         search_query = self.request.query_params.get('search', None)
         if search_query:
             # Tunatafuta kwenye store_name kwa kutumia 'icontains' (haina ubaguzi wa herufi kubwa au ndogo)
@@ -383,12 +386,12 @@ class StoreEngineViewSet(viewsets.ModelViewSet):
         # Rudisha queryset iliyochujwa mwishoni
         return queryset
 
+
 class ProductMediaViewSet(viewsets.ModelViewSet):
     queryset = ProductMedia.objects.all()
     serializer_class = ProductMediaSerializer
-    permission_classes = [AllowAny] # Unaweza kubadilisha kuwa IsAuthenticatedOrReadOnly kama unataka
+    permission_classes = [AllowAny] 
 
-    # 🔥 MUHIMU SANA: ONGEZA HII METHOD HAPA (Sio kwenye products/views.py, bali HAPA!)
     def get_queryset(self):
         queryset = super().get_queryset()
         product_id = self.request.query_params.get('product_id')
@@ -400,7 +403,6 @@ class ProductMediaViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save()
-
 
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
@@ -1497,3 +1499,72 @@ class StoreStatusViewSet(viewsets.ModelViewSet):
             return Response({'status': 'view incremented', 'views_count': status_obj.views_count})
         except StoreStatus.DoesNotExist:
             return Response({'error': 'Status not found'}, status=status.HTTP_404_NOT_FOUND)
+
+# ==========================================
+# 🔥 PRODUCT REVIEW VIEWSET (Kwa ajili ya Maoni)
+# ==========================================
+class ProductReviewViewSet(viewsets.ModelViewSet):
+    queryset = ProductReview.objects.all()
+    serializer_class = ProductReviewSerializer 
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    authentication_classes = [JWTAuthentication]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        product_id = self.request.query_params.get('product_id')
+        
+        if product_id:
+            # Safisha UUID ikiwa na hyphens
+            clean_id = str(product_id).replace('-', '')
+            queryset = queryset.filter(product_id=clean_id)
+            
+        return queryset.order_by('-created_at')
+
+    def perform_create(self, serializer):
+        product_id = self.request.data.get('product')
+        
+        # 1. Hakikisha mtumiaji ameingia na ana profile
+        if not self.request.user.is_authenticated:
+            raise serializers.ValidationError({"detail": "Unahitaji kuingia kwanza."})
+            
+        try:
+            profile = self.request.user.profile
+        except Profile.DoesNotExist:
+            profile = Profile.objects.create(
+                user=self.request.user,
+                full_name=self.request.user.username or self.request.user.email,
+                role='buyer'
+            )
+
+        # 2. Cheki kama ameshanunua bidhaa hii (Verified Purchase)
+        # 🔥 ONDOA 'from .models import OrderItem' HAPA
+        # Tumia OrderItem iliyo-import juu ya file
+        try:
+            has_bought = OrderItem.objects.filter(
+                order__customer=profile, # 🔥 Hakikisha 'customer' ni sahihi kwenye Order model yako
+                product_id=product_id,
+                order__status__in=['completed', 'delivered']
+            ).exists()
+        except Exception as e:
+            print(f"⚠️ [Verified Purchase Error]: {e}")
+            has_bought = False # Kama kuna kosa, usisitishe review
+
+        # 3. Hifadhi review
+        review = serializer.save(
+            user=profile,
+            is_verified_purchase=has_bought
+        )
+
+        # 4. Sasisha Rating ya Bidhaa (Product Rating)
+        try:
+            product = ProductsEngine.objects.get(id=product_id)
+            reviews = ProductReview.objects.filter(product=product)
+            
+            total_reviews = reviews.count()
+            avg_rating = sum([r.rating for r in reviews]) / total_reviews if total_reviews > 0 else 0
+            
+            product.total_reviews = total_reviews
+            product.average_rating = round(avg_rating, 2)
+            product.save(update_fields=['total_reviews', 'average_rating'])
+        except ProductsEngine.DoesNotExist:
+            pass

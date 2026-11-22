@@ -6,7 +6,7 @@ import * as LucideIcons from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../context/LanguageContext.jsx';
-import { useQuery } from '@tanstack/react-query'; // 1. Ingiza useQuery
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 
 // ==========================================
 // 2. FUNCTIONS ZA KUCHUKUA DATA
@@ -29,20 +29,28 @@ const fetchSubCategories = async ({ queryKey }) => {
   return (response.data || []).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 };
 
-const fetchFeaturedLeafs = async ({ queryKey }) => {
+const fetchFeaturedLeafs = async ({ queryKey, pageParam = 0 }) => {
   const [_, parentId] = queryKey;
-  if (!parentId) return [];
-  const response = await api.get('/products/', { 
-    params: { parent_category: parentId, limit: 17, ordering: '-views' }
-  });
+  
+  const params = { limit: 17, offset: pageParam, ordering: '-views' };
+  if (parentId) {
+    params.parent_category = parentId;
+  }
+
+  const response = await api.get('/products/', { params });
   const data = response.data.results || response.data || [];
-  return data.map((product) => ({
-    id: product.id, 
-    leaf_category_id: product.leaf_category_id || product.id,
-    cover_image_url: product.cover_image_url, 
-    name: product.leaf_category_name || product.name,
-    name_sw: product.leaf_category_name || product.name
-  }));
+  const next = response.data.next; // 🔥 Hii inatusaidia kujua kama kuna zaidi
+  
+  return {
+    data: data.map((product) => ({
+      id: product.id, 
+      leaf_category_id: product.leaf_category_id || product.id,
+      cover_image_url: product.cover_image_url, 
+      name: product.leaf_category_name || product.name,
+      name_sw: product.leaf_category_name || product.name
+    })),
+    nextPage: next ? pageParam + 17 : undefined
+  };
 };
 
 const fetchLeafsBySub = async ({ queryKey }) => {
@@ -93,11 +101,12 @@ export default function NavLinks({ isMobile }) {
     staleTime: Infinity,
   });
 
-  useEffect(() => {
-    if (categories.length > 0 && !selectedParent) {
-      setSelectedParent(categories[0]);
-    }
-  }, [categories, selectedParent]);
+useEffect(() => {
+  if (categories.length > 0 && !selectedParent) {
+    // categories[0] ni "All Categories" (kutoka fetchCategories)
+    setSelectedParent(categories[0]); 
+  }
+}, [categories, selectedParent]);
 
   const parentId = selectedParent?.id;
 
@@ -114,12 +123,21 @@ export default function NavLinks({ isMobile }) {
     }
   }, [subCategories, selectedSubForLeaf]);
 
-  const { data: featuredProducts = [], isLoading: loadingLeafs } = useQuery({
-    queryKey: ['navFeaturedLeafs', parentId],
-    queryFn: fetchFeaturedLeafs,
-    enabled: !!parentId,
-    staleTime: 1000 * 60 * 5,
-  });
+const { 
+  data: featuredProductsData, 
+  isLoading: loadingLeafs,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage
+} = useInfiniteQuery({
+  queryKey: ['navFeaturedLeafs', parentId],
+  queryFn: fetchFeaturedLeafs,
+  getNextPageParam: (lastPage) => lastPage.nextPage,
+  staleTime: 1000 * 60 * 5,
+});
+
+// 🔥 Tengeneza array moja ya bidhaa zote
+const featuredProducts = featuredProductsData?.pages.flatMap((page) => page.data) || [];
 
   const { data: leafsForSub = [] } = useQuery({
     queryKey: ['navLeafsBySub', selectedSubForLeaf?.id],
@@ -143,6 +161,26 @@ export default function NavLinks({ isMobile }) {
   useEffect(() => {
     if (selectedParent) setViewMode('products');
   }, [selectedParent]);
+
+  const loadMoreRef = useRef(null); // 🔥 Ongeza hii
+
+// 🔥 Ongeza useEffect hii
+useEffect(() => {
+  if (!loadMoreRef.current) return;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    },
+    { threshold: 0.1 }
+  );
+
+  observer.observe(loadMoreRef.current);
+
+  return () => observer.disconnect();
+}, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const getDisplayName = (item) => {
     if (!item) return '';
@@ -314,6 +352,19 @@ export default function NavLinks({ isMobile }) {
                               </p>
                             </Link>
                           ))}
+
+                          {/* 🔥 WEKA HAPA: Infinite Scroll Loading Indicator */}
+                          {hasNextPage && (
+                            <div ref={loadMoreRef} className="col-span-full flex justify-center py-4">
+                              {isFetchingNextPage ? (
+                                <span className="text-sm text-orange-500">Loading more...</span>
+                              ) : (
+                                <span className="text-sm text-gray-400">Scroll to load more</span>
+                              )}
+                            </div>
+                          )}
+
+                           {parentId && (
                           <div 
                           onClick={() => {
                             setViewMode('subcategories');
@@ -329,6 +380,7 @@ export default function NavLinks({ isMobile }) {
                             </div>
                             <p className="text-xs mt-2 text-orange-500 font-bold">{t('see_all')}</p>
                           </div>
+                          )}
                         </>
                       ) : (
                         <div className="col-span-full flex flex-col items-center py-10">
@@ -371,11 +423,118 @@ export default function NavLinks({ isMobile }) {
         </div>
 
         {/* SKYFALL ADS */}
-        <div className="relative group py-2 cursor-pointer flex items-center">
-          <Link to="/advertise" className="text-[14px] font-sans text-black dark:text-white group-hover:text-black transition-colors">
-           <span className="text-[14px] font-[400] text-black dark:text-white group-hover:text-black group-hover:dark:text-white transition-colors"> {t('skyfall_ads')}</span>
-          </Link>
-          <div className="absolute -bottom-3 left-0 right-0 h-[2px] bg-black  dark:bg-white rounded-sm scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+        <div 
+          className="relative group py-2 cursor-pointer flex items-center"
+          onMouseEnter={(e) => handleMouseEnter('skyfallAds', e)}
+          onMouseLeave={handleMouseLeave}
+        >
+          <span className="text-[14px] font-[400] text-black dark:text-white group-hover:text-black group-hover:dark:text-white transition-colors font-sans">
+            {t('skyfall_ads')}
+          </span>
+          
+          <div className="absolute -bottom-3 left-0 right-0 h-[2px] bg-black dark:bg-white rounded-sm scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+
+          {activeMenu === 'skyfallAds' && createPortal(
+            <div 
+              className="fixed top-[105px] left-0 w-full bg-[#f8f8f8] dark:bg-black shadow-[0_15px_35px_rgba(0,0,0,0.4)] border-b border-gray-200 dark:border-gray-800 animate-[fadeInDown_0.2s_ease] z-[50] font-sans"
+              onMouseEnter={() => handleMouseEnter('skyfallAds')}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div className="max-w-[1250px] mx-auto p-8 grid grid-cols-3 gap-10">
+                <div>
+                  <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">
+                    {t('why_advertise')}
+                  </h4>
+                  <ul className="list-none p-0 m-0 space-y-3">
+                    <li className="flex items-center gap-2.5 text-sm">
+                      <LucideIcons.TrendingUp size={16} className="text-gray-500" />
+                      <span className="text-gray-600 dark:text-gray-400">
+                        {t('reach_thousands')}
+                      </span>
+                    </li>
+                    <li className="flex items-center gap-2.5 text-sm">
+                      <LucideIcons.Target size={16} className="text-gray-500" />
+                      <span className="text-gray-600 dark:text-gray-400">
+                        {t('target_audience')}
+                      </span>
+                    </li>
+                    <li className="flex items-center gap-2.5 text-sm">
+                      <LucideIcons.BarChart size={16} className="text-gray-500" />
+                      <span className="text-gray-600 dark:text-gray-400">
+                        {t('track_performance')}
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">
+                    {t('how_it_works')}
+                  </h4>
+                  <ul className="list-none p-0 m-0 space-y-3">
+                    <li className="flex items-center gap-2.5 text-sm">
+                      <LucideIcons.Store size={16} className="text-gray-500" />
+                      <span className="text-gray-600 dark:text-gray-400">
+                        {t('register_store_first')}
+                      </span>
+                    </li>
+                    <li className="flex items-center gap-2.5 text-sm">
+                      <LucideIcons.Camera size={16} className="text-gray-500" />
+                      <span className="text-gray-600 dark:text-gray-400">
+                        {t('create_ad_campaign')}
+                      </span>
+                    </li>
+                    <li className="flex items-center gap-2.5 text-sm">
+                      <LucideIcons.CheckCircle size={16} className="text-gray-500" />
+                      <span className="text-gray-600 dark:text-gray-400">
+                        {t('get_approved')}
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="text-base font-semibold text-black dark:text-white border-l-[3px] border-orange-500 pl-3 mb-4">
+                    {t('get_started')}
+                  </h4>
+                  <div className="p-4 bg-orange-50 dark:bg-orange-500/10 rounded-lg border border-orange-200 dark:border-orange-500/30">
+                    <div className="flex items-center gap-2 mb-2">
+                      <LucideIcons.Zap size={24} className="text-orange-500" />
+                      <span className="font-semibold text-sm text-black dark:text-white">{t('boost_sales')}</span>
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mb-3">
+                      {t('advertise_description')}
+                    </p>
+                    
+                    {/* 🔥 BADILISHA HAPA: Tumia onClick badala ya Link */}
+                    <button 
+                      onClick={() => {
+                        const token = localStorage.getItem('access_token');
+                        if (!token) {
+                          navigate('/dashboard/login'); // Kama hajaingia, mpeleke login
+                        } else {
+                          navigate('/create-store'); // Kama ameingia, mpeleke create store
+                        }
+                        setActiveMenu(null); // Funga dropdown
+                      }}
+                      className="block w-full text-center bg-orange-500 text-white py-2 rounded-md text-xs font-bold hover:bg-orange-600 transition-colors"
+                    >
+                      {t('register_store_now')}
+                    </button>
+
+                    <Link 
+                      to="/advertise" 
+                      onClick={() => setActiveMenu(null)}
+                      className="block w-full text-center mt-2 text-orange-500 text-xs font-bold hover:underline"
+                    >
+                      {t('learn_more')}
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>,
+            document.body
+          )}
         </div>
 
         {/* ORDER PROTECTIONS */}

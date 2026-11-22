@@ -12,7 +12,7 @@ from products.models import (
     ShippingMethod, Brand, Lead,
     ProductVariation ,
         Order,
-        StoreStatus, 
+        StoreStatus, ProductReview,
 
 )
 
@@ -460,3 +460,22 @@ class StoreStatusSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({"media_file": "Imeshindikana kupakia faili."})
         
         return status_obj
+
+# ============================================================
+# 🔥 PRODUCT REVIEW SERIALIZER
+# ============================================================
+class ProductReviewSerializer(serializers.ModelSerializer):
+    # Tunachukua jina la mtumiaji kutoka Profile
+    name = serializers.CharField(source='user.full_name', read_only=True)
+    
+    # Tunatengeneza tarehe nzuri
+    date = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProductReview
+        fields = ['id', 'name', 'rating', 'comment', 'date', 'is_verified_purchase', 'helpful_count']
+        read_only_fields = ['is_verified_purchase', 'helpful_count']
+
+    def get_date(self, obj):
+        # Format: "12 Jan, 2025"
+        return obj.created_at.strftime("%d %b, %Y")

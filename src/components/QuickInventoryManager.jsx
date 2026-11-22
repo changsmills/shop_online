@@ -2,14 +2,16 @@
 import React, { useState, memo } from 'react';
 import { PackageSearch, Settings, TrendingUp, AlertTriangle, Save } from 'lucide-react';
 import api from '../axiosConfig';
-import { useQueryClient } from '@tanstack/react-query'; // 1. Ingiza useQueryClient
+import { useQueryClient } from '@tanstack/react-query';
 
-// 2. Tumia React.memo kuzuia render zisizo za lazima
 const QuickInventoryManager = memo(({ products, setProducts }) => {
   const [updatingId, setUpdatingId] = useState(null);
   const [toast, setToast] = useState({ show: false, text: '', type: '' });
   const [localChanges, setLocalChanges] = useState({});
   const queryClient = useQueryClient();
+
+  // 🔥 Hakikisha products ni array
+  const safeProducts = Array.isArray(products) ? products : [];
 
   const handleInputChange = (productId, field, value) => {
     setLocalChanges(prev => ({
@@ -46,7 +48,7 @@ const QuickInventoryManager = memo(({ products, setProducts }) => {
         p.id === productId ? { ...p, ...updates } : p
       ));
 
-      // Sasisha cache ya TanStack Query (kama PhysicalDashboard inatumia)
+      // Sasisha cache ya TanStack Query
       queryClient.invalidateQueries({ queryKey: ['physicalDashboard'] });
 
       const newChanges = { ...localChanges };
@@ -64,18 +66,22 @@ const QuickInventoryManager = memo(({ products, setProducts }) => {
     }
   };
 
-  if (!products) {
+  // 🔥 Kama products haipo au ni tupu, onyesha ujumbe
+  if (!products || safeProducts.length === 0) {
     return (
       <div className="p-10 px-5 text-center bg-gray-50 dark:bg-slate-800 rounded-[20px] border-2 border-dashed border-gray-200 dark:border-slate-600 flex flex-col items-center gap-3">
-        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
+        <PackageSearch size={40} className="text-gray-400 dark:text-slate-500" />
         <p className="text-[11px] font-bold text-gray-400 dark:text-slate-400 uppercase tracking-wider">
-          Searching Products...
+          No products found
+        </p>
+        <p className="text-[10px] text-gray-400 dark:text-slate-500 mt-1">
+          Please add products to your store first.
         </p>
       </div>
     );
   }
 
-  const lowStockCount = products.filter(p => p.stock_quantity <= 5).length;
+  const lowStockCount = safeProducts.filter(p => p.stock_quantity <= 5).length;
 
   return (
     <div className="relative w-full dark:bg-slate-900">
@@ -98,7 +104,7 @@ const QuickInventoryManager = memo(({ products, setProducts }) => {
         <div className="p-3.5 sm:p-5 rounded-[20px] text-white shadow-[0_4px_15px_rgba(0,0,0,0.05)] transition-transform duration-200 hover:scale-[1.02] bg-orange-500 dark:bg-[#9a3412] dark:text-[#f97316]">
           <PackageSearch size={20} className="mb-2 opacity-80" />
           <h4 className="text-[22px] sm:text-[28px] font-black m-0 mb-1 text-white dark:text-slate-200">
-            {products.length}
+            {safeProducts.length}
           </h4>
           <p className="text-[11px] font-semibold opacity-90 uppercase tracking-wide dark:text-[#94a3b8]">
             All Products
@@ -138,7 +144,7 @@ const QuickInventoryManager = memo(({ products, setProducts }) => {
         <div className="max-h-[500px] overflow-y-auto p-4 [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-slate-50 [&::-webkit-scrollbar-track]:dark:bg-slate-800 [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:dark:bg-slate-600 [&::-webkit-scrollbar-thumb]:rounded-full">
           <div className="grid grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-2.5 sm:gap-4">
 
-            {products.map((p, index) => {
+            {safeProducts.map((p, index) => {
               const hasChanged = localChanges[p.id] !== undefined;
               const delay = (index % 10) * 0.05;
 

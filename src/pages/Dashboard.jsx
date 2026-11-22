@@ -8,7 +8,7 @@ import api from "../axiosConfig";
 import DashboardCard from "../components/DashboardCard";
 
 // Tumeongeza useQuery na useQueryClient
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 
 const TopStores = lazy(() => import("../components/TopStores"));
 const JustForYou = lazy(() => import("../components/JustForYou"));
@@ -122,22 +122,26 @@ const fetchSubCategories = async ({ queryKey }) => {
   return (response.data || []).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 };
 
-const fetchLeafsForSub = async ({ queryKey }) => {
+const fetchLeafsForSub = async ({ queryKey, pageParam = 0 }) => {
   const [_, subCategoryId] = queryKey;
-  if (!subCategoryId) return [];
+  if (!subCategoryId) return { data: [], nextPage: undefined };
 
   const response = await api.get('/products/', {
-    params: { sub_category: subCategoryId, limit: 17, ordering: '-views' }
+    params: { sub_category: subCategoryId, limit: 17, offset: pageParam, ordering: '-views' }
   });
   const data = response.data.results || response.data || [];
+  const next = response.data.next;
 
-  return data.map((product) => ({
-    id: product.id,
-    leaf_category_id: product.leaf_category_id || product.id,
-    cover_image_url: product.cover_image_url,
-    name: product.leaf_category_name || product.name,
-    name_sw: product.leaf_category_name || product.name
-  }));
+  return {
+    data: data.map((product) => ({
+      id: product.id,
+      leaf_category_id: product.leaf_category_id || product.id,
+      cover_image_url: product.cover_image_url,
+      name: product.leaf_category_name || product.name,
+      name_sw: product.leaf_category_name || product.name
+    })),
+    nextPage: next ? pageParam + 17 : undefined
+  };
 };
 
 // ==========================================
@@ -202,12 +206,22 @@ export default function Dashboard() {
     staleTime: 1000 * 60 * 5,
   });
 
-  const { data: leafsForSub = [], isLoading: loadingLeafs } = useQuery({
-    queryKey: ['leafsForSub', selectedSubCategory?.id],
-    queryFn: fetchLeafsForSub,
-    enabled: !!selectedSubCategory?.id && viewMode === 'subcategories',
-    staleTime: 1000 * 60 * 5,
-  });
+const { 
+  data: leafsForSubData, 
+  isLoading: loadingLeafs,
+  fetchNextPage: fetchNextLeafs,
+  hasNextPage: hasNextLeafs,
+  isFetchingNextPage: isFetchingNextLeafs
+} = useInfiniteQuery({
+  queryKey: ['leafsForSub', selectedSubCategory?.id],
+  queryFn: fetchLeafsForSub,
+  getNextPageParam: (lastPage) => lastPage.nextPage,
+  enabled: !!selectedSubCategory?.id && viewMode === 'subcategories',
+  staleTime: 1000 * 60 * 5,
+});
+
+// 🔥 Tengeneza array moja
+const leafsForSub = leafsForSubData?.pages.flatMap((page) => page.data) || [];
 
   useEffect(() => {
     if (subCategories.length > 0 && !selectedSubCategory) {
@@ -268,34 +282,75 @@ export default function Dashboard() {
     };
   }, []);
 
-  useEffect(() => {
-    let isMounted = true;
-    const checkAuth = async () => {
-      const token = getToken();
-      if (!token) {
-        if (isMounted) { setSession(null); setSessionLoading(false); }
-        return;
+useEffect(() => {
+  let isMounted = true;
+  const checkAuth = async () => {
+    const token = getToken();
+    
+    // 1. Kama hana token, mpeleke kwenye login (au acha abaki kama mgeni)
+    if (!token) {
+      if (isMounted) { 
+        setSession(null); 
+        setSessionLoading(false); 
       }
-      if (isMounted) { setSession({ user: { id: "authenticated" } }); setSessionLoading(false); }
-      try {
-        const profileRes = await api.get('/profile/');
-        const userProfile = profileRes.data;
-        if (!isMounted) return;
-        if (userProfile.role === 'supplier' && !userProfile.is_otp_verified) {
+      return;
+    }
+
+    // 2. Kama ana token, weka session ya awali ili UI ionyeshe ameingia
+    if (isMounted) { 
+      setSession({ user: { id: "authenticated" } }); 
+      setSessionLoading(false); 
+    }
+
+    try {
+      // 3. Chukua profile yake
+      const profileRes = await api.get('/profile/');
+      const userProfile = profileRes.data;
+      if (!isMounted) return;
+
+      // 4. Kama ni Supplier
+      if (userProfile.role === 'supplier') {
+        
+        // 4a. Kama haja-verify OTP, mpeleke kwenye ukurasa wa OTP
+        if (!userProfile.is_otp_verified) {
           navigate('/verify-seller-otp');
           return;
         }
-        setSession({ user: { id: userProfile.id } });
-      } catch (err) {
-        if (!isMounted) return;
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        setSession(null);
+
+        // 4b. Kama ame-verify, tafuta store yake
+        const storeRes = await api.get('/stores/', { params: { owner_id: userProfile.id } });
+        const storeData = storeRes.data;
+
+        if (storeData && storeData.length > 0) {
+          // 🔥 HAPA NDIPO PAMEBAILISHWA: Chagua duka linalomilikiwa na mtumiaji huyu
+          const myStore = storeData.find(store => 
+            String(store.owner_id) === String(userProfile.id) || 
+            String(store.owner) === String(userProfile.id)
+          ) || storeData[0]; // Kama haipatikani, chukua ya kwanza
+
+          navigate(`/dashboard/sellerboard/${myStore.id}`);
+        } else {
+          // Kama hana store, mpeleke kutengeneza store
+          navigate('/create-store');
+        }
+        return; // Acha kufanya kazi nyingine
       }
-    };
-    checkAuth();
-    return () => { isMounted = false; };
-  }, [navigate]);
+
+      // 5. Kama ni Buyer, acha abaki kwenye dashboard ya mteja
+      setSession({ user: { id: userProfile.id } });
+
+    } catch (err) {
+      if (!isMounted) return;
+      // Kama kuna kosa (mfano token imeisha muda), mtoe
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      setSession(null);
+    }
+  };
+  
+  checkAuth();
+  return () => { isMounted = false; };
+}, [navigate]);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -305,6 +360,40 @@ export default function Dashboard() {
     window.addEventListener('online', handleOnline);
     return () => window.removeEventListener('online', handleOnline);
   }, [queryClient]);
+
+
+  const desktopLeafLoadMoreRef = useRef(null);
+const mobileLeafLoadMoreRef = useRef(null);
+
+// 🔥 Observer ya Desktop
+useEffect(() => {
+  if (!desktopLeafLoadMoreRef.current || viewMode !== 'subcategories') return;
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting && hasNextLeafs && !isFetchingNextLeafs) {
+        fetchNextLeafs();
+      }
+    },
+    { threshold: 0.1 }
+  );
+  observer.observe(desktopLeafLoadMoreRef.current);
+  return () => observer.disconnect();
+}, [hasNextLeafs, isFetchingNextLeafs, fetchNextLeafs, viewMode]);
+
+// 🔥 Observer ya Mobile
+useEffect(() => {
+  if (!mobileLeafLoadMoreRef.current || mobileActiveMenu !== 'subcategories') return;
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting && hasNextLeafs && !isFetchingNextLeafs) {
+        fetchNextLeafs();
+      }
+    },
+    { threshold: 0.1 }
+  );
+  observer.observe(mobileLeafLoadMoreRef.current);
+  return () => observer.disconnect();
+}, [hasNextLeafs, isFetchingNextLeafs, fetchNextLeafs, mobileActiveMenu]);
 
 
   // ==========================================
@@ -623,115 +712,140 @@ export default function Dashboard() {
         <BottomNav session={session} activeMenu={activeMenu} onOpenCategories={() => setMobileMenuOpen(true)} />
       </div>
 
-      {activeMenu === 'categories' && selectedCategory && ReactDOM.createPortal(
-        <div className="fixed inset-0 top-[104.9px] z-[999] bg-black/60 flex justify-center items-start font-sans" onMouseEnter={() => handleMouseEnter('categories')} onMouseLeave={handleMouseLeave}>
-          <div className="w-full h-full max-h-[calc(100vh-180px)] bg-white dark:bg-black border-b border-gray-200 dark:border-[#1f1f1f] overflow-hidden flex shadow-2xl">
-            <aside className="w-[250px] shrink-0 bg-gray-50 dark:bg-[#0a0a0a] border-r border-gray-200 dark:border-[#1f1f1f] overflow-y-auto py-2">
-              {viewMode === 'products' ? (
-                categories.map((cat) => (
-                  <div key={cat.id} onMouseEnter={() => setSelectedCategory(cat)} className={`flex items-center justify-between px-3.5 py-2.5 cursor-pointer text-[13px] leading-tight border-b border-gray-100 dark:border-[#1a1a1a] transition-all duration-150 ${selectedCategory?.id === cat.id ? 'bg-white dark:bg-[#0a0a0a] text-brand-orange font-bold border-l-[3px] border-brand-orange' : 'text-black dark:text-white hover:bg-white dark:hover:bg-[#0a0a0a]'}`}>
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <span className="shrink-0">{getIcon(cat.icon_name)}</span>
-                      <span className="truncate">{getCategoryDisplayName(cat)}</span>
-                    </div>
-                    <ChevronRight size={14} className="shrink-0 text-gray-400" />
+{activeMenu === 'categories' && selectedCategory && ReactDOM.createPortal(
+  <div className="fixed inset-0 top-[104.9px] z-[999] bg-black/60 flex justify-center items-start font-sans" onMouseEnter={() => handleMouseEnter('categories')} onMouseLeave={handleMouseLeave}>
+    <div className="w-full h-full max-h-[calc(100vh-180px)] bg-white dark:bg-black border-b border-gray-200 dark:border-[#1f1f1f] overflow-hidden flex shadow-2xl">
+      
+      {/* ===== ASIDE (SIDEBAR) ===== */}
+      <aside className="w-[250px] shrink-0 bg-gray-50 dark:bg-[#0a0a0a] border-r border-gray-200 dark:border-[#1f1f1f] overflow-y-auto py-2">
+        {viewMode === 'products' ? (
+          categories.map((cat) => (
+            <div 
+              key={cat.id} 
+              onMouseEnter={() => setSelectedCategory(cat)} 
+              className={`flex items-center justify-between px-3.5 py-2.5 cursor-pointer text-[13px] leading-tight border-b border-gray-100 dark:border-[#1a1a1a] transition-all duration-150 ${selectedCategory?.id === cat.id ? 'bg-white dark:bg-[#0a0a0a] text-brand-orange font-bold border-l-[3px] border-brand-orange' : 'text-black dark:text-white hover:bg-white dark:hover:bg-[#0a0a0a]'}`}
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className="shrink-0">{getIcon(cat.icon_name)}</span>
+                <span className="truncate">{getCategoryDisplayName(cat)}</span>
+              </div>
+              <ChevronRight size={14} className="shrink-0 text-gray-400" />
+            </div>
+          ))
+        ) : (
+          <>
+            <div onClick={handleBack} className="flex items-center gap-2 px-3.5 py-3 cursor-pointer text-[13px] font-bold text-brand-orange border-b border-gray-100 dark:border-[#1a1a1a] bg-white dark:bg-black">
+              <ChevronLeft size={16} /> {t('back_to')} {getCategoryDisplayName(selectedCategory)}
+            </div>
+            {subCategories.map((sub) => (
+              <div 
+                key={sub.id} 
+                onMouseEnter={() => handleSubCategoryHover(sub)} 
+                className={`px-3.5 py-2.5 cursor-pointer text-[13px] leading-tight border-b border-gray-100 dark:border-[#1a1a1a] transition-all duration-150 ${selectedSubCategory?.id === sub.id ? 'bg-white dark:bg-[#0a0a0a] text-brand-orange font-bold border-l-[3px] border-brand-orange' : 'text-black dark:text-white hover:bg-white dark:hover:bg-[#0a0a0a]'}`}
+              >
+                {i18n.language === 'sw' ? (sub.name_sw || sub.name) : sub.name}
+              </div>
+            ))}
+            {/* 🔥 HAPA: Hakuna loadMoreRef hapa (imeondolewa) */}
+          </>
+        )}
+      </aside>
+
+      {/* ===== MAIN (GRID YA BIDHAA) ===== */}
+      <main className="flex-1 min-w-0 overflow-y-auto p-5 lg:p-6 bg-white dark:bg-black">
+        <div className="flex items-center justify-between mb-5 pb-3 border-b border-gray-100 dark:border-[#1a1a1a]">
+          <h3 className="text-base lg:text-lg font-extrabold text-black dark:text-white m-0 truncate pr-3">
+            {viewMode === 'products' ? `${t('top_categories')}: ${getCategoryDisplayName(selectedCategory)}` : (i18n.language === 'sw' ? (selectedSubCategory?.name_sw || selectedSubCategory?.name) : selectedSubCategory?.name)}
+          </h3>
+          <button onClick={() => { setActiveMenu(null); setSelectedCategory(null); }} className="w-9 h-9 shrink-0 rounded-full border border-gray-200 dark:border-[#1f1f1f] flex items-center justify-center cursor-pointer text-gray-700 dark:text-white transition-all duration-200 hover:bg-brand-orange hover:border-brand-orange hover:text-white hover:scale-105 active:scale-95">
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2 sm:gap-3">
+          {viewMode === 'products' ? (
+            <>
+              {loadingFeatured ? (
+                [...Array(8)].map((_, idx) => (
+                  <div key={`skeleton-${idx}`} className="flex flex-col items-center gap-1.5 animate-pulse">
+                    <div className="w-16 h-16 sm:w-[68px] sm:h-[68px] rounded-full bg-gray-200 dark:bg-[#1a1a1a]"></div>
+                    <div className="h-3 w-14 bg-gray-200 dark:bg-[#1a1a1a] rounded"></div>
                   </div>
                 ))
-              ) : (
+              ) : featuredProducts.length > 0 ? (
                 <>
-                  <div onClick={handleBack} className="flex items-center gap-2 px-3.5 py-3 cursor-pointer text-[13px] font-bold text-brand-orange border-b border-gray-100 dark:border-[#1a1a1a] bg-white dark:bg-black">
-                    <ChevronLeft size={16} /> {t('back_to')} {getCategoryDisplayName(selectedCategory)}
-                  </div>
-                  {subCategories.map((sub) => (
-                    <div key={sub.id} onMouseEnter={() => handleSubCategoryHover(sub)} className={`px-3.5 py-2.5 cursor-pointer text-[13px] leading-tight border-b border-gray-100 dark:border-[#1a1a1a] transition-all duration-150 ${selectedSubCategory?.id === sub.id ? 'bg-white dark:bg-[#0a0a0a] text-brand-orange font-bold border-l-[3px] border-brand-orange' : 'text-black dark:text-white hover:bg-white dark:hover:bg-[#0a0a0a]'}`}>
-                      {i18n.language === 'sw' ? (sub.name_sw || sub.name) : sub.name}
+                  {featuredProducts.map((leaf) => (
+                    <div key={leaf.id} onClick={() => {}} className="flex flex-col items-center text-center cursor-pointer p-1 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-[#0a0a0a]">
+                      <div className="w-16 h-16 sm:w-[68px] sm:h-[68px] rounded-full overflow-hidden bg-gray-100 dark:bg-[#1a1a1a] mb-1.5 flex items-center justify-center shrink-0">
+                        <img src={leaf.cover_image_url || placeholderImg} alt={leaf.name} className="w-full h-full object-cover" />
+                      </div>
+                      <p className="text-[11px] sm:text-xs text-black dark:text-white m-0 leading-tight line-clamp-2 w-full">
+                        {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
+                      </p>
                     </div>
                   ))}
+                  <div onClick={handleViewAll} className="flex flex-col items-center text-center cursor-pointer p-1 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-[#0a0a0a]">
+                    <div className="w-16 h-16 sm:w-[68px] sm:h-[68px] rounded-full border-2 border-dashed border-brand-orange bg-orange-50 dark:bg-[#1a1000] mb-1.5 flex items-center justify-center shrink-0">
+                      <Plus size={26} className="text-brand-orange" />
+                    </div>
+                    <p className="text-[11px] sm:text-xs text-brand-orange font-bold m-0">{t('see_all')}</p>
+                  </div>
                 </>
+              ) : (
+                <div className="col-span-full text-center py-10">
+                  <div className="text-5xl mb-3">📦</div>
+                  <p className="text-base font-bold text-black dark:text-white m-0">Tap a category to browse its products.</p>
+                  <p className="text-sm text-gray-500 mt-1">Tafadhali chagua kategoria nyingine</p>
+                </div>
               )}
-            </aside>
-
-            <main className="flex-1 min-w-0 overflow-y-auto p-5 lg:p-6 bg-white dark:bg-black">
-              <div className="flex items-center justify-between mb-5 pb-3 border-b border-gray-100 dark:border-[#1a1a1a]">
-                <h3 className="text-base lg:text-lg font-extrabold text-black dark:text-white m-0 truncate pr-3">
-                  {viewMode === 'products' ? `${t('top_categories')}: ${getCategoryDisplayName(selectedCategory)}` : (i18n.language === 'sw' ? (selectedSubCategory?.name_sw || selectedSubCategory?.name) : selectedSubCategory?.name)}
-                </h3>
-                <button onClick={() => { setActiveMenu(null); setSelectedCategory(null); }} className="w-9 h-9 shrink-0 rounded-full border border-gray-200 dark:border-[#1f1f1f] flex items-center justify-center cursor-pointer text-gray-700 dark:text-white transition-all duration-200 hover:bg-brand-orange hover:border-brand-orange hover:text-white hover:scale-105 active:scale-95">
-                  <X size={18} />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2 sm:gap-3">
-                {viewMode === 'products' ? (
-                  <>
-                    {loadingFeatured ? (
-                      [...Array(8)].map((_, idx) => (
-                        <div key={`skeleton-${idx}`} className="flex flex-col items-center gap-1.5 animate-pulse">
-                          <div className="w-16 h-16 sm:w-[68px] sm:h-[68px] rounded-full bg-gray-200 dark:bg-[#1a1a1a]"></div>
-                          <div className="h-3 w-14 bg-gray-200 dark:bg-[#1a1a1a] rounded"></div>
-                        </div>
-                      ))
-                    ) : featuredProducts.length > 0 ? (
-                      <>
-                        {featuredProducts.map((leaf) => (
-                          <div key={leaf.id} onClick={() => {}} className="flex flex-col items-center text-center cursor-pointer p-1 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-[#0a0a0a]">
-                            <div className="w-16 h-16 sm:w-[68px] sm:h-[68px] rounded-full overflow-hidden bg-gray-100 dark:bg-[#1a1a1a] mb-1.5 flex items-center justify-center shrink-0">
-                              <img src={leaf.cover_image_url || placeholderImg} alt={leaf.name} className="w-full h-full object-cover" />
-                            </div>
-                            <p className="text-[11px] sm:text-xs text-black dark:text-white m-0 leading-tight line-clamp-2 w-full">
-                              {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
-                            </p>
-                          </div>
-                        ))}
-                        <div onClick={handleViewAll} className="flex flex-col items-center text-center cursor-pointer p-1 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-[#0a0a0a]">
-                          <div className="w-16 h-16 sm:w-[68px] sm:h-[68px] rounded-full border-2 border-dashed border-brand-orange bg-orange-50 dark:bg-[#1a1000] mb-1.5 flex items-center justify-center shrink-0">
-                            <Plus size={26} className="text-brand-orange" />
-                          </div>
-                          <p className="text-[11px] sm:text-xs text-brand-orange font-bold m-0">{t('see_all')}</p>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="col-span-full text-center py-10">
-                        <div className="text-5xl mb-3">📦</div>
-                        <p className="text-base font-bold text-black dark:text-white m-0">Tap a category to browse its products.</p>
-                        <p className="text-sm text-gray-500 mt-1">Tafadhali chagua kategoria nyingine</p>
+            </>
+          ) : (
+            <>
+              {loadingLeafs ? (
+                [...Array(8)].map((_, idx) => (
+                  <div key={`skeleton-sub-${idx}`} className="flex flex-col items-center gap-1.5 animate-pulse">
+                    <div className="w-16 h-16 sm:w-[68px] sm:h-[68px] rounded-full bg-gray-200 dark:bg-[#1a1a1a]"></div>
+                    <div className="h-3 w-14 bg-gray-200 dark:bg-[#1a1a1a] rounded"></div>
+                  </div>
+                ))
+              ) : leafsForSub.length > 0 ? (
+                <>
+                  {leafsForSub.map((leaf) => (
+                    <div key={leaf.id} onClick={() => {}} className="flex flex-col items-center text-center cursor-pointer p-1 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-[#0a0a0a]">
+                      <div className="w-16 h-16 sm:w-[68px] sm:h-[68px] rounded-full overflow-hidden bg-gray-100 dark:bg-[#1a1a1a] mb-1.5 flex items-center justify-center shrink-0">
+                        <img src={leaf.cover_image_url || leaf.cover_image || placeholderImg} alt={leaf.name} className="w-full h-full object-cover" />
                       </div>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    {loadingLeafs ? (
-                      [...Array(8)].map((_, idx) => (
-                        <div key={`skeleton-sub-${idx}`} className="flex flex-col items-center gap-1.5 animate-pulse">
-                          <div className="w-16 h-16 sm:w-[68px] sm:h-[68px] rounded-full bg-gray-200 dark:bg-[#1a1a1a]"></div>
-                          <div className="h-3 w-14 bg-gray-200 dark:bg-[#1a1a1a] rounded"></div>
-                        </div>
-                      ))
-                    ) : leafsForSub.length > 0 ? (
-                      leafsForSub.map((leaf) => (
-                        <div key={leaf.id} onClick={() => {}} className="flex flex-col items-center text-center cursor-pointer p-1 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-[#0a0a0a]">
-                          <div className="w-16 h-16 sm:w-[68px] sm:h-[68px] rounded-full overflow-hidden bg-gray-100 dark:bg-[#1a1a1a] mb-1.5 flex items-center justify-center shrink-0">
-                            <img src={leaf.cover_image_url || leaf.cover_image || placeholderImg} alt={leaf.name} className="w-full h-full object-cover" />
-                          </div>
-                          <p className="text-[11px] sm:text-xs text-black dark:text-white m-0 leading-tight line-clamp-2 w-full">
-                            {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
-                          </p>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="col-span-full text-center py-10">
-                        <div className="text-5xl mb-3">📦</div>
-                        <p className="text-base font-bold text-black dark:text-white m-0">Tap a subcategory to browse its products.</p>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            </main>
-          </div>
-        </div>,
-        document.body
-      )}
+                      <p className="text-[11px] sm:text-xs text-black dark:text-white m-0 leading-tight line-clamp-2 w-full">
+                        {i18n.language === 'sw' ? (leaf.name_sw || leaf.name) : leaf.name}
+                      </p>
+                    </div>
+                  ))}
+
+                  {/* 🔥 HAPA: loadMoreRef ya Desktop (Inafanya kazi) */}
+                  {hasNextLeafs && (
+                    <div ref={desktopLeafLoadMoreRef} className="col-span-full flex justify-center py-4">
+                      {isFetchingNextLeafs ? (
+                        <span className="text-sm text-orange-500">Loading more...</span>
+                      ) : (
+                        <span className="text-sm text-gray-400">Scroll to load more</span>
+                      )}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="col-span-full text-center py-10">
+                  <div className="text-5xl mb-3">📦</div>
+                  <p className="text-base font-bold text-black dark:text-white m-0">Tap a subcategory to browse its products.</p>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </main>
+    </div>
+  </div>,
+  document.body
+)}
 
 {mobileMenuOpen && ReactDOM.createPortal(
   <div className="fixed inset-0 bg-black/60 z-[99999] flex justify-center items-end font-sans" onClick={() => setMobileMenuOpen(false)}>
@@ -784,16 +898,15 @@ export default function Dashboard() {
             {loadingFeatured || loadingLeafs ? (
               [...Array(6)].map((_, idx) => (
                 <div key={`mobile-skeleton-${idx}`} className="flex flex-col items-center gap-1.5 animate-pulse min-w-0">
-                  {/* 🔥 Skeleton imebadilishwa kuwa w-[72px] h-[72px] (18x18) */}
                   <div className="w-[72px] h-[72px] rounded-full bg-gray-200 dark:bg-[#1a1a1a] shrink-0"></div>
                   <div className="h-2.5 w-full max-w-[48px] bg-gray-200 dark:bg-[#1a1a1a] rounded"></div>
                 </div>
               ))
             ) : mobileActiveMenu === 'categories' ? (
               featuredProducts && featuredProducts.length > 0 ? (
+                // 🔥 Kwenye categories, tunatumia slice(0, 9) kwa sababu ni featured tu
                 featuredProducts.slice(0, 9).map((leaf) => (
                   <div key={leaf.id} onClick={() => { handleLeafClick(leaf.leaf_category_id || leaf.id); setMobileMenuOpen(false); }} className="flex flex-col items-center text-center cursor-pointer w-full min-w-0">
-                    {/* 🔥 Picha imebadilishwa kuwa w-[72px] h-[72px] (18x18) */}
                     <div className="w-[72px] h-[72px] rounded-full overflow-hidden bg-gray-100 dark:bg-[#1a1a1a] mb-2 flex items-center justify-center shrink-0">
                       <img src={leaf.cover_image_url || placeholderImg} alt={leaf.name} className="w-full h-full object-cover" />
                     </div>
@@ -809,10 +922,10 @@ export default function Dashboard() {
                 </div>
               )
             ) : (
+              // 🔥 Kwenye subcategories, tunatumia leafsForSub.map (bila slice) kwa infinite scroll
               leafsForSub && leafsForSub.length > 0 ? (
-                leafsForSub.slice(0, 9).map((leaf) => (
+                leafsForSub.map((leaf) => (
                   <div key={leaf.id} onClick={() => { handleLeafClick(leaf.leaf_category_id || leaf.id); setMobileMenuOpen(false); }} className="flex flex-col items-center text-center cursor-pointer w-full min-w-0">
-                    {/* 🔥 Picha imebadilishwa kuwa w-[72px] h-[72px] (18x18) */}
                     <div className="w-[72px] h-[72px] rounded-full overflow-hidden bg-gray-100 dark:bg-[#1a1a1a] mb-2 flex items-center justify-center shrink-0">
                       <img src={leaf.cover_image_url || placeholderImg} alt={leaf.name} className="w-full h-full object-cover" />
                     </div>
@@ -828,6 +941,17 @@ export default function Dashboard() {
                 </div>
               )
             )}
+
+            {/* 🔥 HAPA: Mobile Infinite Scroll Trigger */}
+            {hasNextLeafs && (
+              <div ref={mobileLeafLoadMoreRef} className="col-span-full flex justify-center py-4">
+                {isFetchingNextLeafs ? (
+                  <span className="text-sm text-orange-500">Loading...</span>
+                ) : (
+                  <span className="text-sm text-gray-400">Scroll</span>
+                )}
+              </div>
+            )}
             
             {mobileActiveMenu === 'categories' && !loadingFeatured && featuredProducts && featuredProducts.length > 0 && !selectedCategory?.isAll && (
               <div onClick={() => {
@@ -840,7 +964,6 @@ export default function Dashboard() {
                     setSelectedSubCategory(null);
                    }
                 }} className="flex flex-col items-center text-center cursor-pointer w-full min-w-0">
-                {/* 🔥 Kitufe cha See All kimesanisiwa kiwe w-[72px] h-[72px] (18x18) */}
                 <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center mb-2 border-2 border-dashed border-brand-orange bg-orange-50 dark:bg-[#1a1000] shrink-0">
                   <Plus size={30} className="text-brand-orange" />
                 </div>
