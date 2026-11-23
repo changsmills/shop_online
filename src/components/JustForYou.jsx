@@ -118,18 +118,24 @@ const getCategoryName = () => {
         
         <div className="flex items-center">
           <button 
-            className="bg-none border-none cursor-pointer flex items-center justify-center text-black dark:text-white p-1 transition-transform hover:translate-x-1 hover:text-[#f97316] active:scale-95"
-            onClick={() => {
-              const url = '/products?section=just-for-you'; 
-              if (window.innerWidth > 768) {
-                window.open(url, '_blank'); 
-              } else {
-                window.location.href = url; 
-              }
-            }}
-          >
-            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
-          </button>
+  className="bg-none border-none cursor-pointer flex items-center justify-center text-black dark:text-white p-1 transition-transform hover:translate-x-1 hover:text-[#f97316] active:scale-95"
+  onClick={() => {
+    // 🔥 Chukua taarifa za category kutoka kwenye slider
+    const catId = mobileCategory?.isAll ? '' : mobileCategory?.id;
+    const catName = mobileCategory?.isAll ? 'All' : (i18n.language === 'sw' ? (mobileCategory?.name_sw || mobileCategory?.name) : mobileCategory?.name);
+    
+    // 🔥 Weka categoryId kwenye URL
+    const url = `/products?section=just-for-you&categoryId=${catId}&categoryName=${encodeURIComponent(catName)}`;
+    
+    if (window.innerWidth > 768) {
+      window.open(url, '_blank'); 
+    } else {
+      window.location.href = url; 
+    }
+  }}
+>
+  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+</button>
         </div>
       </div>
     </div>

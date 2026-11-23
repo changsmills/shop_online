@@ -1,7 +1,7 @@
 // src/pages/ProductsAll.jsx
 import React, { useState, useEffect, useRef, useMemo, useCallback, Suspense } from "react";
 import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
-import { ArrowUp, ChevronLeft, ChevronRight, ArrowLeft, Search } from "lucide-react";
+import { ArrowUp, ChevronLeft, ChevronRight, ArrowLeft, Search, ChevronDown, Check, X  } from "lucide-react";
 import api from "../axiosConfig";
 import ProductList from "./ProductList";
 import SearchDialog from "../components/SearchDialog";
@@ -78,6 +78,10 @@ export default function ProductsAll() {
   const [isMobile, setIsMobile] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [fetchTrigger, setFetchTrigger] = useState(0);
+    // 🔥 1. Ongeza States za Dialog na Scroll
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const categoryTabsRef = useRef(null); // Kwa ajili ya kusogeza tabs
+  const activeCategoryRef = useRef(null); // Kwa ajili ya kujua tab iko wapi
 
   // ============================================
   // 3. QUERIES
@@ -208,6 +212,20 @@ export default function ProductsAll() {
     setActiveSection(incomingSection);
   }, [incomingSection]);
 
+
+    // 🔥 2. Effect ya kusogeza category iliyochaguliwa katikati ya tabs
+  useEffect(() => {
+    if (activeCategory.id && activeCategoryRef.current) {
+      setTimeout(() => {
+        activeCategoryRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          inline: 'center', // Inaiweka katikati
+          block: 'nearest'
+        });
+      }, 100);
+    }
+  }, [activeCategory.id]);
+
   // ============================================
   // 13. SCROLL TO TOP FUNCTION
   // ============================================
@@ -282,20 +300,20 @@ export default function ProductsAll() {
         <div className="relative z-10 flex flex-col items-center justify-center h-full">
           
           <button 
-            className="hidden max-md:flex absolute top-2 left-2 w-8 h-8 rounded-full items-center justify-center bg-white/15 border border-white/20 backdrop-blur-md transition-all hover:bg-white/25 hover:scale-105 active:scale-95" 
-            onClick={handleBackToDashboard}
-            aria-label="Rudi Dashboard"
-          >
-            <ArrowLeft size={20} />
-          </button>
+  className="hidden max-md:flex absolute top-1 left-1 w-8 h-8 rounded-full items-center justify-center bg-white/15 border border-white/20 backdrop-blur-md transition-all hover:bg-white/25 hover:scale-105 active:scale-95" 
+  onClick={handleBackToDashboard}
+  aria-label="Rudi Dashboard"
+>
+  <ArrowLeft size={20} />
+</button>
           
           <button 
-            className="flex absolute top-2 right-2 w-8 h-8 md:w-10 md:h-10 rounded-full items-center justify-center bg-white/15 border border-white/20 backdrop-blur-md transition-all hover:bg-white/25 hover:scale-105 active:scale-95" 
-            onClick={() => setIsSearchOpen(true)}
-            aria-label="Tafuta"
-          >
-            <Search size={20} />
-          </button>
+  className="flex absolute top-1 right-1 w-8 h-8 md:w-10 md:h-10 rounded-full items-center justify-center bg-white/15 border border-white/20 backdrop-blur-md transition-all hover:bg-white/25 hover:scale-105 active:scale-95" 
+  onClick={() => setIsSearchOpen(true)}
+  aria-label="Tafuta"
+>
+  <Search size={20} />
+</button>
 
           <h1 className="text-2xl md:text-3xl lg:text-[32px] font-extrabold m-0 drop-shadow-md">
             {bannerTitle}
@@ -313,7 +331,7 @@ export default function ProductsAll() {
         onSearch={handleSearchSubmit}
       />
 
-      {/* ========== CATEGORY TABS ========== */}
+            {/* ========== CATEGORY TABS ========== */}
       <div className="sticky top-[60px] md:top-0 z-[100] bg-white dark:bg-[#1e293b] border-b border-gray-200 dark:border-gray-700 flex items-center w-full h-[54px] md:h-[64px] overflow-hidden px-2 md:px-4 shadow-sm mb-2">              
         <button 
           className="hidden md:flex absolute z-20 w-8 h-8 bg-white dark:bg-[#1e293b] border border-gray-300 dark:border-gray-600 rounded-full items-center justify-center shadow-md top-1/2 -translate-y-1/2 left-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" 
@@ -322,12 +340,11 @@ export default function ProductsAll() {
           <ChevronLeft size={20} />
         </button>
         
+        {/* 🔥 Tumeongeza ref={categoryTabsRef} hapa */}
         <div 
-          className="flex flex-row overflow-x-auto scroll-smooth whitespace-nowrap w-full px-1 md:px-12 gap-2 md:gap-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" 
-          ref={scrollRef}
+          className="flex flex-row overflow-x-auto scroll-smooth whitespace-nowrap w-full px-1 md:px-12 pr-12 gap-2 md:gap-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" 
+          ref={categoryTabsRef}
         >
-          
-          {/* 🔥 HAPA: Kama categories zinapakia, onyesha Skeleton ndogo hapa */}
           {loadingCategories ? (
             <>
               {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -338,6 +355,8 @@ export default function ProductsAll() {
             categories.map((cat) => (
               <button
                 key={cat.id || 'all'}
+                // 🔥 Tumeongeza ref={activeCategory.id === cat.id ? activeCategoryRef : null}
+                ref={activeCategory.id === cat.id ? activeCategoryRef : null}
                 className={`px-3 py-1.5 md:px-5 md:py-2.5 text-xs md:text-[15px] font-medium rounded-full transition-all duration-200 border whitespace-nowrap ${
                   activeCategory.id === cat.id 
                     ? "bg-[#ff6a00] text-white border-[#ff6a00] shadow-md shadow-orange-500/20" 
@@ -350,14 +369,66 @@ export default function ProductsAll() {
             ))
           )}
         </div>
+
+        {/* 🔥 KITUFE KIPYA CHA DIALOG (Kulia) */}
+        <button 
+          onClick={() => setIsDialogOpen(true)}
+          className="absolute right-2 md:right-4 z-20 w-8 h-8 flex items-center justify-center bg-white dark:bg-[#1e293b] rounded-full border border-gray-300 dark:border-gray-600 shadow-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+        >
+          <ChevronDown size={18} strokeWidth={2.5} />
+        </button>
         
         <button 
-          className="hidden md:flex absolute z-20 w-8 h-8 bg-white dark:bg-[#1e293b] border border-gray-300 dark:border-gray-600 rounded-full items-center justify-center shadow-md top-1/2 -translate-y-1/2 right-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" 
+          className="hidden md:flex absolute z-20 w-8 h-8 bg-white dark:bg-[#1e293b] border border-gray-300 dark:border-gray-600 rounded-full items-center justify-center shadow-md top-1/2 -translate-y-1/2 right-12 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" 
           onClick={() => scroll("right")}
         >
           <ChevronRight size={20} />
         </button>
       </div>
+
+      {/* 🔥 DIALOG YA ALL CATEGORIES (Iliyohamishwa kutoka MobileSlider) */}
+      {isDialogOpen && (
+        <div 
+          className="fixed inset-0 z-[9999] flex items-end justify-center bg-black/60"
+          onClick={() => setIsDialogOpen(false)}
+        >
+          <div 
+            className="w-full max-h-[75vh] bg-white dark:bg-[#0a0a0a] rounded-t-2xl flex flex-col overflow-hidden animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-800 shrink-0">
+              <h3 className="text-base font-bold text-black dark:text-white m-0">All Categories</h3>
+              <button onClick={() => setIsDialogOpen(false)} className="p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-2 pb-20">
+              {categories.map((cat) => {
+                const isActive = activeCategory.id === cat.id;
+
+                return (
+                  <div
+                    key={cat.id || 'all'}
+                    onClick={() => {
+                      handleCategoryClick(cat);
+                      setIsDialogOpen(false);
+                    }}
+                    className={`flex items-center justify-between px-4 py-3.5 mb-1 rounded-lg cursor-pointer transition-colors ${
+                      isActive 
+                        ? 'bg-orange-50 dark:bg-orange-500/10 text-[#ff6a00] font-bold' 
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1a1a2e]'
+                    }`}
+                  >
+                    <span className="truncate pr-4">{cat.name}</span>
+                    {isActive && <Check size={18} className="text-[#ff6a00] shrink-0" />}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ========== PRODUCT LIST ========== */}
       <div className="w-full block p-0 md:p-0">

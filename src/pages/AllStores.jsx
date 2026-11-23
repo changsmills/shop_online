@@ -58,8 +58,12 @@ export default function AllStores({ session }) {
   const navigate = useNavigate();
   const lastStoreRef = useRef();
 
+  // 🔥 1. Soma URL kutoka kwenye browser
+  const queryParams = new URLSearchParams(location.search);
+  const initialCategory = queryParams.get('categoryId') || "";
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterCategory, setFilterCategory] = useState("");
+  const [filterCategory, setFilterCategory] = useState(initialCategory); // ✅ Sasa kosa limeisha
   const [filterCity, setFilterCity] = useState("");
   const [filterVerified, setFilterVerified] = useState("all");
   
@@ -195,7 +199,7 @@ export default function AllStores({ session }) {
   // ===== 6. MAIN RENDER =====
   return (
     
-    <div className="bg-white dark:bg-[#0d1117] min-h-screen flex flex-col relative">
+    <div className="bg-white dark:bg-[#0d1117] min-h-screen flex flex-col relative font-sans">
       <StoresHeader showBack={true} onSearch={setSearchQuery} />
 
       <div className="flex flex-col lg:flex-row max-w-[1400px] mx-auto w-full px-1 md:px-4 py-2 md:py-4 pb-20 md:pb-6 lg:pb-10 gap-2 sm:gap-4 lg:gap-6 flex-1 ">
